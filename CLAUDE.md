@@ -1,6 +1,8 @@
 # Project instructions
 
-This repo holds one browser game: a single self-contained HTML file, served by GitHub Pages, played mostly on phones.
+This repo holds one browser game: **Tailflick**, a single self-contained HTML file, served by GitHub Pages, played mostly on phones.
+
+**The game is called Tailflick.** This settles the first open question in `BRIEF.md` section 14, which was written before the name was chosen. Treat the name as decided, not open. Use it for the page title, the `localStorage` key prefix, and every internal name.
 
 **Read `BRIEF.md` in full before writing any code.** It is the design brief and it is the source of truth. Section 11 is the build order and it is not optional. Section 12 lists things not to do.
 
@@ -14,6 +16,7 @@ This repo holds one browser game: a single self-contained HTML file, served by G
 - **Every `localStorage` call wrapped in try/catch.** The game must play perfectly with no memory rather than throw.
 - **No audio.** No menus, no settings screen, no pause, no tutorial.
 - Bind both cases of letter keys, so caps lock does not produce dead keys.
+- **Never name anything after a competitor's game.** See BRIEF.md section 10.
 
 ## Working style
 
@@ -24,4 +27,6 @@ This repo holds one browser game: a single self-contained HTML file, served by G
 
 ## Deploy
 
-`index.html` at the repo root is served directly by GitHub Pages. There is nothing to build. Committing to the deployed branch is the deploy.
+`index.html` at the repo root is served directly by GitHub Pages at https://snaphit.github.io/Tailflick/. There is nothing to build. Committing to `main` is the deploy.
+
+The author plays every change on a phone at that URL, so a change is not finished until it is on `main`.
