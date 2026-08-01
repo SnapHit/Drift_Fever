@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en-au">
+<head>
+<meta charset="utf-8">
+<title>Tailflick</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Tailflick, a browser drift game. One file, no downloads, nothing to install.">
+<meta name="theme-color" content="#68c8f0">
+<!-- An empty data URI, so the browser does not go and ask for a favicon.
+     That request would be same origin and harmless, but the rule is zero. -->
+<link rel="icon" href="data:,">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #68c8f0;
+  }
+  body {
+    touch-action: none;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  #game {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* Chrome sits above the canvas so a tap on a button is never read as
+     steering. The canvas listens for pointers, the buttons do not bubble. */
+  #chrome {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) calc(env(safe-area-inset-right, 0px) + 8px) 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  #buttons {
+    display: flex;
+    gap: 6px;
+  }
+  #chrome button {
+    font: 600 12px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #12303f;
+    background: rgba(255, 255, 255, 0.7);
+    border: 0;
+    border-radius: 7px;
+    padding: 9px 11px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  #chrome button[hidden] {
+    display: none;
+  }
+  #chrome button.on {
+    background: #ffd23d;
+    color: #2a1f00;
+  }
+  #note {
+    max-width: 62vw;
+    font: 500 12px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #12303f;
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 7px;
+    padding: 8px 10px;
+    text-align: right;
+  }
+  #note[hidden] {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="chrome">
+  <div id="buttons">
+    <button id="fpsBtn" type="button">FPS</button>
+    <button id="tiltBtn" type="button" hidden>Tilt</button>
+  </div>
+  <div id="note" hidden></div>
+</div>
+<script>
+'use strict';
+
+/* ==================================================================
+   TAILFLICK
+
+   One self-contained file. No requests, no dependencies, no build.
+   Session one: the road, one steering axis, the scrape band, death.
+   ================================================================== */
+
+
+/* ------------------------------------------------------------------
+   FEEL CONSTANTS. NOT TO BE CASUALLY CHANGED.
+
+   Every number that decides how the game feels lives in this block,
+   including every multiplier used inside the update loop. If a value
+   affects feel and it is not here, that is a bug.
+
+   Change one at a time, play it on a phone, and keep the ones that
+   survive. Do not retune this block while changing anything else.
+   ------------------------------------------------------------------ */
+const FEEL = {
+
+  /* Camera and projection.
+     DRAW_DISTANCE_SEGMENTS times SEGMENT_LENGTH is both the planning
+     horizon and the frame budget, so it is the first thing to lower if
+     a weak machine drops frames. At the constants below the player sees
+     about four seconds of road, which is the horizon section 4.3 asks
+     for. FIELD_OF_VIEW_DEG is a sense of speed lever, not a rendering
+     detail: wider reads as faster and distorts more. */
+  FIELD_OF_VIEW_DEG:        100,
+  CAMERA_HEIGHT:           1200,
+  DRAW_DISTANCE_SEGMENTS:   200,
+  SEGMENT_LENGTH:           200,
+  ROAD_HALF_WIDTH:         2000,
+  RUMBLE_SEGMENTS:            4,     // stripe length, in segments
+  RUMBLE_WIDTH_FRACTION:   0.18,     // of the road half width
+  LANE_DASH_FRACTION:      0.02,     // of the road half width
+  HORIZON_FADE_FRACTION:   0.14,     // of screen height, the haze band
+  MAX_PIXEL_RATIO:            2,     // capped for weak integrated graphics
+
+  /* Motion. Speed is constant in this build: speed escalation is step 3
+     of the build order and is deliberately not here yet. */
+  SPEED:                   9000,     // world units per second
+  STEER_RATE:               1.6,     // road half widths per second at full lock
+  STEER_RAMP_TIME:         0.10,     // seconds for keyboard or touch to reach full lock
+  /* CENTRIFUGAL is the fraction of full steering authority a curve of 1.0
+     eats. It is not free to raise: CURVE_HARD times CENTRIFUGAL is how
+     much of full lock the hardest curve costs just to hold a line, and at
+     1.0 the hardest curve becomes unsurvivable no matter how well it is
+     driven. At these values the hardest curve costs a bit over half. */
+  CENTRIFUGAL:             0.11,
+
+  /* The three bands from section 4.2, measured in road half widths, so
+     1.0 is the painted edge of the road. OFF_ROAD minus SCRAPE_START,
+     divided by STEER_RATE, is the correction window: about a quarter of
+     a second at full outward lock on a straight, less in a hard curve,
+     more at any realistic angle. Widen the gap to be kinder. */
+  SCRAPE_START:            0.84,
+  OFF_ROAD:                1.22,
+  SCRAPE_SPEED_FACTOR:     0.62,     // forward speed multiplier while scraping
+
+  /* Feedback. Section 7 warns that shake is the fastest route to motion
+     sickness on a phone held close to the face. Keep these low. */
+  SCRAPE_SHAKE_PX:            4,
+  CRASH_SHAKE_PX:            16,
+  SHAKE_DECAY_TIME:        0.22,     // seconds to fall to about a third
+  SCRAPE_FLASH_ALPHA:      0.32,
+  DEATH_INPUT_LOCK:        0.30,     // seconds before a restart is accepted
+
+  /* Tilt. Untuned, because it has not been tested on a real handset yet.
+     TILT_SMOOTHING_TIME matters most on cheap Android handsets that
+     derive orientation from the accelerometer. */
+  TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
+  TILT_DEADZONE_DEG:          3,     // the neutral state from section 4.1
+  TILT_FULL_LOCK_DEG:        22,     // degrees from the calibrated zero to full lock
+  TILT_SENSOR_TIMEOUT:      1.5,     // seconds to wait for a first real reading
+
+  /* The car. CAR_WIDTH is in road half widths and sets the perceived
+     margin, which is why it is a feel constant and not a drawing detail:
+     SCRAPE_START is set so the outside wheels reach the rumble strip at
+     roughly the moment the scrape band begins. Move one, check the other. */
+  CAR_WIDTH:               0.30,
+  CAR_SCREEN_BOTTOM:       0.98,     // fraction of screen height
+  CAR_LEAN:                0.16,     // how far the body leans into a turn
+
+  /* Road generation. */
+  OPENING_STRAIGHT:         140,     // segments of calm before anything happens
+  SECTION_MIN:               45,
+  SECTION_MAX:              140,
+  STRAIGHT_CHANCE:         0.34,
+  CURVE_GENTLE:             1.6,
+  CURVE_MEDIUM:             3.2,
+  CURVE_HARD:               5.0,
+
+  /* Frame. Clamped so a stutter cannot teleport the player off the road. */
+  MAX_FRAME_DELTA:      1 / 20
+};
+
+
+/* ------------------------------------------------------------------
+   PALETTE. Placeholder, not art direction, which is step 7.
+   Bright and saturated per section 7, dark road, bright verges, and
+   deliberately not synthwave.
+   ------------------------------------------------------------------ */
+const COLOUR = {
+  SKY:          '#68c8f0',
+  HAZE:         '#cdeeff',
+  GRASS_LIGHT:  '#4fbc52',
+  GRASS_DARK:   '#43a747',
+  ROAD_LIGHT:   '#4b5058',
+  ROAD_DARK:    '#43484f',
+  RUMBLE_LIGHT: '#fff4d6',
+  RUMBLE_DARK:  '#ff8a3d',
+  LANE:         '#f2f6ff',
+  SCRAPE:       '#fff0a8',
+  CAR_BODY:     '#ffd23d',
+  CAR_LINE:     '#191d23',
+  CAR_GLASS:    '#2b3138',
+  CAR_LIGHT:    '#ff4d3d',
+  TEXT:         '#ffffff',
+  TEXT_SHADOW:  'rgba(10,30,45,0.55)'
+};
+
+const STORAGE_PREFIX = 'tailflick.';
+
+
+/* ------------------------------------------------------------------
+   Derived values. Not tunable, computed from the block above.
+   ------------------------------------------------------------------ */
+const CAMERA_DEPTH = 1 / Math.tan((FEEL.FIELD_OF_VIEW_DEG / 2) * Math.PI / 180);
+const PLAYER_Z = FEEL.CAMERA_HEIGHT * CAMERA_DEPTH;
+
+
+/* ------------------------------------------------------------------
+   Small helpers.
+   ------------------------------------------------------------------ */
+function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+function randInt(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+function easeIn(a, b, p) { return a + (b - a) * p * p; }
+function easeInOut(a, b, p) { return a + (b - a) * (1 - Math.cos(p * Math.PI)) / 2; }
+
+function storeGet(key) {
+  try { return window.localStorage.getItem(STORAGE_PREFIX + key); }
+  catch (e) { return null; }
+}
+function storeSet(key, value) {
+  try { window.localStorage.setItem(STORAGE_PREFIX + key, value); }
+  catch (e) { /* no memory is fine, the game still plays */ }
+}
+
+
+/* ------------------------------------------------------------------
+   Canvas and view.
+   ------------------------------------------------------------------ */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d', { alpha: false });
+const view = { w: 0, h: 0, dpr: 1 };
+let hazeGradient = null;
+let scrapeGradientLeft = null;
+let scrapeGradientRight = null;
+let scrapeBandWidth = 0;
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, FEEL.MAX_PIXEL_RATIO);
+  const w = Math.max(1, canvas.clientWidth);
+  const h = Math.max(1, canvas.clientHeight);
+  view.w = w;
+  view.h = h;
+  view.dpr = dpr;
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+
+  const fade = h * FEEL.HORIZON_FADE_FRACTION;
+  hazeGradient = ctx.createLinearGradient(0, h / 2, 0, h / 2 + fade);
+  hazeGradient.addColorStop(0, COLOUR.HAZE);
+  hazeGradient.addColorStop(1, 'rgba(205,238,255,0)');
+
+  // Cached, because the scrape flash is drawn on the frames where the
+  // player is under the most pressure and can least afford a hitch.
+  scrapeBandWidth = w * 0.22;
+  scrapeGradientLeft = ctx.createLinearGradient(0, 0, scrapeBandWidth, 0);
+  scrapeGradientLeft.addColorStop(0, COLOUR.SCRAPE);
+  scrapeGradientLeft.addColorStop(1, 'rgba(255,240,168,0)');
+  scrapeGradientRight = ctx.createLinearGradient(w, 0, w - scrapeBandWidth, 0);
+  scrapeGradientRight.addColorStop(0, COLOUR.SCRAPE);
+  scrapeGradientRight.addColorStop(1, 'rgba(255,240,168,0)');
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', resize);
+
+
+/* ==================================================================
+   INPUT LAYER
+
+   Everything below writes into steering.value, a single continuous
+   number from -1 to +1. Section 8.1: the update loop reads that value
+   and nothing else, and does not know or care where it came from.
+   Keyboard and touch are the digital special case and ramp toward the
+   extreme. Tilt is analogue and writes its smoothed value straight in.
+   ================================================================== */
+const steering = { value: 0 };
+
+const held = { keyLeft: false, keyRight: false, touchLeft: false, touchRight: false };
+const touchSides = new Map();   // pointerId -> -1 or +1
+
+function digitalTarget() {
+  const left = held.keyLeft || held.touchLeft;
+  const right = held.keyRight || held.touchRight;
+  return (left ? -1 : 0) + (right ? 1 : 0);
+}
+
+function updateSteering(dt) {
+  const target = digitalTarget();
+  if (tilt.active && target === 0) {
+    steering.value = tilt.value;
+  } else {
+    const step = dt / FEEL.STEER_RAMP_TIME;
+    if (steering.value < target) steering.value = Math.min(steering.value + step, target);
+    else if (steering.value > target) steering.value = Math.max(steering.value - step, target);
+  }
+  steering.value = clamp(steering.value, -1, 1);
+}
+
+function clearHeldInput() {
+  held.keyLeft = held.keyRight = held.touchLeft = held.touchRight = false;
+  touchSides.clear();
+}
+
+
+/* --- Keyboard. Both cases of every letter, so caps lock is not a dead key. --- */
+window.addEventListener('keydown', function (e) {
+  if (e.repeat) { return; }
+  const k = e.key;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
+  else if (k === 'f' || k === 'F') { setFps(!showFps); return; }
+  firstGesture();
+  startOrRestart();
+});
+
+window.addEventListener('keyup', function (e) {
+  const k = e.key;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') held.keyLeft = false;
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') held.keyRight = false;
+});
+
+window.addEventListener('blur', clearHeldInput);
+document.addEventListener('visibilitychange', function () {
+  if (document.hidden) clearHeldInput();
+});
+
+
+/* --- Touch and mouse, through pointer events, one code path for both.
+       Left half of the screen is left, right half is right, nothing held
+       is the neutral from section 4.1. --- */
+function pointerSide(e) {
+  return (e.clientX < view.w / 2) ? -1 : 1;
+}
+
+function applyTouchSides() {
+  let left = false, right = false;
+  touchSides.forEach(function (side) {
+    if (side < 0) left = true; else right = true;
+  });
+  held.touchLeft = left;
+  held.touchRight = right;
+}
+
+canvas.addEventListener('pointerdown', function (e) {
+  touchSides.set(e.pointerId, pointerSide(e));
+  applyTouchSides();
+  if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
+  e.preventDefault();
+  firstGesture();
+  startOrRestart();
+});
+
+canvas.addEventListener('pointermove', function (e) {
+  if (!touchSides.has(e.pointerId)) return;
+  touchSides.set(e.pointerId, pointerSide(e));
+  applyTouchSides();
+});
+
+function releasePointer(e) {
+  touchSides.delete(e.pointerId);
+  applyTouchSides();
+}
+canvas.addEventListener('pointerup', releasePointer);
+canvas.addEventListener('pointercancel', releasePointer);
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+
+/* ==================================================================
+   TILT
+
+   Opt in behind a button. The game is completely playable by someone
+   who never touches it. One permission code path, per section 8.2:
+   call requestPermission if it exists, otherwise treat it as granted,
+   and handle a denial as a first class outcome.
+   ================================================================== */
+const tilt = {
+  supported: false,
+  active: false,
+  listening: false,
+  value: 0,         // smoothed, -1 to +1, written into steering.value
+  rawDeg: null,     // latest reading, already remapped for screen orientation
+  zeroDeg: null,    // the posture captured at enable and at every run start
+  seenSensor: false,
+  waitedFor: 0
+};
+
+const tiltBtn = document.getElementById('tiltBtn');
+const noteEl = document.getElementById('note');
+let noteTimer = 0;
+
+function showNote(text, seconds) {
+  noteEl.textContent = text;
+  noteEl.hidden = false;
+  noteTimer = seconds;
+}
+
+function inCrossOriginFrame() {
+  if (window.top === window.self) return false;
+  try { return window.top.location.origin !== window.location.origin; }
+  catch (e) { return true; }
+}
+
+function detectTiltSupport() {
+  // Desktop has the interface but no sensor, so the button would sit there
+  // doing nothing. A cross origin frame gets no events at all and cannot be
+  // made to. Hide the button in both cases, per the section 8.3 table.
+  if (!('DeviceOrientationEvent' in window)) return false;
+  if (inCrossOriginFrame()) return false;
+  if (window.matchMedia && !window.matchMedia('(any-pointer: coarse)').matches) return false;
+  return true;
+}
+
+function orientationAngle() {
+  if (window.screen && window.screen.orientation && typeof window.screen.orientation.angle === 'number') {
+    return window.screen.orientation.angle;
+  }
+  return (typeof window.orientation === 'number') ? ((window.orientation + 360) % 360) : 0;
+}
+
+function onDeviceOrientation(e) {
+  if (e.gamma === null || e.gamma === undefined) return;   // no real sensor behind the event
+  tilt.seenSensor = true;
+
+  // gamma is left to right tilt in portrait. In landscape gamma and beta
+  // swap roles, so remap off the screen angle.
+  const angle = orientationAngle();
+  let deg;
+  if (angle === 90) deg = -e.beta;
+  else if (angle === 180) deg = -e.gamma;
+  else if (angle === 270) deg = e.beta;
+  else deg = e.gamma;
+
+  tilt.rawDeg = deg;
+  if (tilt.zeroDeg === null) tilt.zeroDeg = deg;
+}
+
+function calibrateTilt() {
+  // Nobody holds a phone flat. Everything is relative to the posture the
+  // player is actually in, recaptured at the start of every run.
+  tilt.zeroDeg = tilt.rawDeg;
+  tilt.value = 0;
+}
+
+function updateTilt(dt) {
+  if (!tilt.active) return;
+
+  if (!tilt.seenSensor) {
+    tilt.waitedFor += dt;
+    if (tilt.waitedFor > FEEL.TILT_SENSOR_TIMEOUT) {
+      disableTilt();
+      tilt.supported = false;
+      tiltBtn.hidden = true;
+      showNote('No motion sensor on this device.', 4);
+    }
+    return;
+  }
+  if (tilt.rawDeg === null || tilt.zeroDeg === null) return;
+
+  const rel = tilt.rawDeg - tilt.zeroDeg;
+  const magnitude = Math.abs(rel);
+  let target = 0;
+  if (magnitude > FEEL.TILT_DEADZONE_DEG) {
+    const span = Math.max(1, FEEL.TILT_FULL_LOCK_DEG - FEEL.TILT_DEADZONE_DEG);
+    target = clamp((magnitude - FEEL.TILT_DEADZONE_DEG) / span, 0, 1) * Math.sign(rel);
+  }
+  const k = 1 - Math.exp(-dt / FEEL.TILT_SMOOTHING_TIME);
+  tilt.value += (target - tilt.value) * k;
+}
+
+function onTiltPermission(result) {
+  if (result !== 'granted') {
+    // Denial is sticky on iOS. Never let the button appear to do nothing.
+    tilt.active = false;
+    tiltBtn.classList.remove('on');
+    storeSet('tilt', '0');
+    showNote('Tilt was blocked. This browser will not ask again for this page.', 5);
+    return;
+  }
+  if (!tilt.listening) {
+    window.addEventListener('deviceorientation', onDeviceOrientation);
+    tilt.listening = true;
+  }
+  tilt.active = true;
+  tilt.waitedFor = 0;
+  tilt.value = 0;
+  tilt.zeroDeg = null;
+  tiltBtn.classList.add('on');
+  storeSet('tilt', '1');
+  showNote('Tilt on. Hold the phone how you like, it zeroes to your posture at the start of every run.', 4);
+}
+
+function requestTilt() {
+  // Must be called synchronously inside a gesture handler, with no async
+  // work before it, or it silently fails. One path, both platforms.
+  const DOE = window.DeviceOrientationEvent;
+  const request = (DOE && typeof DOE.requestPermission === 'function')
+    ? DOE.requestPermission()
+    : Promise.resolve('granted');
+  request.then(onTiltPermission, function () { onTiltPermission('denied'); });
+}
+
+function disableTilt() {
+  tilt.active = false;
+  tilt.value = 0;
+  tiltBtn.classList.remove('on');
+}
+
+tiltBtn.addEventListener('pointerdown', function (e) {
+  e.stopPropagation();
+});
+tiltBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  // Drop focus, or the next space or enter meant for the game activates
+  // the button again instead of starting the run.
+  tiltBtn.blur();
+  if (tilt.active) {
+    disableTilt();
+    storeSet('tilt', '0');
+    showNote('Tilt off.', 2);
+  } else {
+    requestTilt();
+  }
+});
+
+/* The preference persists, the grant does not: most iOS versions want a
+   fresh gesture every page load, so re-request on the first one. */
+let wantsTilt = storeGet('tilt') === '1';
+let gestureUsed = false;
+function firstGesture() {
+  if (gestureUsed) return;
+  gestureUsed = true;
+  if (wantsTilt && tilt.supported) requestTilt();
+}
+
+tilt.supported = detectTiltSupport();
+tiltBtn.hidden = !tilt.supported;
+
+
+/* ------------------------------------------------------------------
+   Frame rate counter, toggled with the button or the F key, so it can
+   be measured on a real device rather than assumed on this one.
+   ------------------------------------------------------------------ */
+const fpsBtn = document.getElementById('fpsBtn');
+let showFps = false;
+let fpsFrames = 0, fpsElapsed = 0, fpsWorst = 0, fpsShown = 0, fpsWorstShown = 0;
+
+function setFps(on) {
+  showFps = on;
+  fpsBtn.classList.toggle('on', on);
+  fpsFrames = 0; fpsElapsed = 0; fpsWorst = 0;
+}
+fpsBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+fpsBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  fpsBtn.blur();
+  setFps(!showFps);
+});
+
+function sampleFps(rawDt) {
+  fpsFrames++;
+  fpsElapsed += rawDt;
+  if (rawDt > fpsWorst) fpsWorst = rawDt;
+  if (fpsElapsed >= 0.5) {
+    fpsShown = fpsFrames / fpsElapsed;
+    fpsWorstShown = fpsWorst * 1000;
+    fpsFrames = 0; fpsElapsed = 0; fpsWorst = 0;
+  }
+}
+
+
+/* ==================================================================
+   THE ROAD
+
+   Lou's segmented pseudo 3D road. Segments hold a curve value only:
+   hills are step 3 territory and are not here. The road is generated
+   ahead of the camera and trimmed behind it, so it is genuinely
+   endless rather than a loop.
+   ================================================================== */
+let segments = [];
+let segBase = 0;         // world index of segments[0]
+
+function segAt(index) {
+  return segments[index - segBase];
+}
+
+function addSegment(curve) {
+  segments.push({ index: segBase + segments.length, curve: curve });
+}
+
+function addRoad(enter, hold, leave, curve) {
+  let i;
+  for (i = 0; i < enter; i++) addSegment(easeIn(0, curve, i / enter));
+  for (i = 0; i < hold; i++) addSegment(curve);
+  for (i = 0; i < leave; i++) addSegment(easeInOut(curve, 0, i / leave));
+}
+
+function addRandomSection() {
+  const len = randInt(FEEL.SECTION_MIN, FEEL.SECTION_MAX);
+  if (Math.random() < FEEL.STRAIGHT_CHANCE) {
+    addRoad(0, len, 0, 0);
+    return;
+  }
+  const pick = Math.random();
+  const size = pick < 0.4 ? FEEL.CURVE_GENTLE : (pick < 0.8 ? FEEL.CURVE_MEDIUM : FEEL.CURVE_HARD);
+  const curve = size * (Math.random() < 0.5 ? -1 : 1);
+  const ramp = Math.max(8, Math.round(len * 0.4));
+  addRoad(ramp, len, ramp, curve);
+}
+
+function resetRoad() {
+  segments = [];
+  segBase = 0;
+  // No tutorial. The opening is the tutorial: a calm straight, then one
+  // gentle curve that teaches hold to turn without a word.
+  addRoad(0, FEEL.OPENING_STRAIGHT, 0, 0);
+  addRoad(30, 90, 30, FEEL.CURVE_GENTLE);
+  addRoad(0, 60, 0, 0);
+}
+
+function topUpRoad(baseIndex) {
+  const needed = baseIndex + FEEL.DRAW_DISTANCE_SEGMENTS + 4;
+  while (segBase + segments.length < needed) addRandomSection();
+  // Trim what is behind the camera, in one splice rather than one shift
+  // per frame, so the array does not grow for the length of a run.
+  const behind = baseIndex - segBase;
+  if (behind > 128) {
+    const drop = behind - 8;
+    segments.splice(0, drop);
+    segBase += drop;
+  }
+}
+
+
+/* ==================================================================
+   GAME STATE AND UPDATE
+
+   The update loop reads steering.value. It does not read a key, a
+   touch or a sensor. That is the section 8.1 rule and it is the one
+   thing here that is expensive to reverse.
+   ================================================================== */
+const TITLE = 0, DRIVING = 1, DEAD = 2;
+let state = TITLE;
+
+let position = 0;        // camera z, world units
+let playerX = 0;         // road half widths, 0 is the centre line, 1 is the painted edge
+let scraping = false;
+let scrapeSide = 0;
+let shake = 0;
+let shakeX = 0, shakeY = 0;
+let deadFor = 0;
+
+function startRun() {
+  resetRoad();
+  position = 0;
+  playerX = 0;
+  scraping = false;
+  scrapeSide = 0;
+  shake = 0;
+  deadFor = 0;
+  steering.value = 0;
+  calibrateTilt();
+  state = DRIVING;
+}
+
+function startOrRestart() {
+  if (state === TITLE) { startRun(); return; }
+  if (state === DEAD && deadFor >= FEEL.DEATH_INPUT_LOCK) { startRun(); }
+}
+
+function update(dt) {
+  // Shake decays in every state, so a crash still reads as a crash.
+  const decay = Math.exp(-dt / FEEL.SHAKE_DECAY_TIME);
+  shake *= decay;
+  shakeX = (Math.random() * 2 - 1) * shake;
+  shakeY = (Math.random() * 2 - 1) * shake;
+
+  if (state === DEAD) { deadFor += dt; return; }
+  if (state !== DRIVING) return;
+
+  const carIndex = Math.floor((position + PLAYER_Z) / FEEL.SEGMENT_LENGTH);
+  topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
+  const carSegment = segAt(carIndex);
+  const curve = carSegment ? carSegment.curve : 0;
+
+  const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1);
+  position += speed * dt;
+
+  // The only place steering is consumed.
+  const lateral = dt * FEEL.STEER_RATE;
+  playerX += lateral * steering.value;
+  playerX -= lateral * curve * FEEL.CENTRIFUGAL;
+
+  const offset = Math.abs(playerX);
+  if (offset > FEEL.OFF_ROAD) {
+    state = DEAD;
+    deadFor = 0;
+    scraping = false;
+    shake = FEEL.CRASH_SHAKE_PX;
+    return;
+  }
+  scraping = offset > FEEL.SCRAPE_START;
+  scrapeSide = scraping ? Math.sign(playerX) : 0;
+  if (scraping && shake < FEEL.SCRAPE_SHAKE_PX) shake = FEEL.SCRAPE_SHAKE_PX;
+}
+
+
+/* ==================================================================
+   RENDER
+   ================================================================== */
+function project(out, worldX, camX, dz, w, h) {
+  const scale = CAMERA_DEPTH / dz;
+  out.z = dz;
+  out.x = w / 2 + scale * (worldX - camX) * w / 2;
+  out.y = h / 2 + scale * FEEL.CAMERA_HEIGHT * h / 2;
+  out.w = scale * FEEL.ROAD_HALF_WIDTH * w / 2;
+  return out;
+}
+
+function polygon(x1, y1, x2, y2, x3, y3, x4, y4) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.lineTo(x3, y3);
+  ctx.lineTo(x4, y4);
+  ctx.closePath();
+  ctx.fill();
+}
+
+let p1 = { x: 0, y: 0, w: 0, z: 0 };
+let p2 = { x: 0, y: 0, w: 0, z: 0 };
+
+function drawRoad(w, h) {
+  const seg = FEEL.SEGMENT_LENGTH;
+  const baseIndex = Math.floor(position / seg);
+  const base = segAt(baseIndex);
+  if (!base) return;
+  const percent = (position - baseIndex * seg) / seg;
+  const camX = playerX * FEEL.ROAD_HALF_WIDTH;
+
+  let x = 0;
+  let dx = -(base.curve * percent);
+  let maxy = h;
+
+  project(p1, x, camX, baseIndex * seg - position, w, h);
+
+  for (let n = 0; n < FEEL.DRAW_DISTANCE_SEGMENTS; n++) {
+    const s = segAt(baseIndex + n);
+    if (!s) break;
+    const z1 = (baseIndex + n) * seg - position;
+    const x2 = x + dx;
+    project(p2, x2, camX, z1 + seg, w, h);
+
+    if (p1.z > CAMERA_DEPTH && p2.y < p1.y && p2.y < maxy) {
+      drawSegment(s.index, w);
+      maxy = p2.y;
+    }
+
+    x = x2;
+    dx += s.curve;
+    const swap = p1; p1 = p2; p2 = swap;   // the next p1 is exactly this p2
+  }
+}
+
+function drawSegment(index, w) {
+  const light = (Math.floor(index / FEEL.RUMBLE_SEGMENTS) & 1) === 0;
+  const grass = light ? COLOUR.GRASS_LIGHT : COLOUR.GRASS_DARK;
+  const road = light ? COLOUR.ROAD_LIGHT : COLOUR.ROAD_DARK;
+  let rumble = light ? COLOUR.RUMBLE_LIGHT : COLOUR.RUMBLE_DARK;
+
+  const y1 = p1.y, y2 = p2.y;
+  const r1 = p1.w * FEEL.RUMBLE_WIDTH_FRACTION;
+  const r2 = p2.w * FEEL.RUMBLE_WIDTH_FRACTION;
+
+  // The overlap pixel goes upwards, into the segment that has not been
+  // drawn yet. Downwards would paint grass over the nearer segment's road
+  // and stripe the whole surface green.
+  ctx.fillStyle = grass;
+  ctx.fillRect(-40, y2 - 1, w + 80, y1 - y2 + 1);
+
+  ctx.fillStyle = rumble;
+  polygon(p1.x - p1.w - r1, y1, p1.x - p1.w, y1, p2.x - p2.w, y2, p2.x - p2.w - r2, y2);
+  polygon(p1.x + p1.w + r1, y1, p1.x + p1.w, y1, p2.x + p2.w, y2, p2.x + p2.w + r2, y2);
+
+  ctx.fillStyle = road;
+  polygon(p1.x - p1.w, y1, p1.x + p1.w, y1, p2.x + p2.w, y2, p2.x - p2.w, y2);
+
+  if (light) {
+    const l1 = p1.w * FEEL.LANE_DASH_FRACTION;
+    const l2 = p2.w * FEEL.LANE_DASH_FRACTION;
+    ctx.fillStyle = COLOUR.LANE;
+    polygon(p1.x - l1, y1, p1.x + l1, y1, p2.x + l2, y2, p2.x - l2, y2);
+  }
+}
+
+function drawCar(w, h) {
+  // Sized against the projected road at the car's own distance, so the
+  // margin the player sees is the margin the physics uses.
+  const scale = CAMERA_DEPTH / PLAYER_Z;
+  const roadHalfPx = scale * FEEL.ROAD_HALF_WIDTH * w / 2;
+  const carW = Math.max(24, FEEL.CAR_WIDTH * roadHalfPx);
+  const carH = carW * 1.1;
+  const cx = w / 2 + steering.value * FEEL.CAR_LEAN * carW;
+  const by = h * FEEL.CAR_SCREEN_BOTTOM;
+  const ty = by - carH;
+
+  ctx.save();
+  ctx.translate(cx, 0);
+
+  // Shadow.
+  ctx.fillStyle = 'rgba(0,0,0,0.28)';
+  ctx.beginPath();
+  ctx.ellipse(0, by - carH * 0.06, carW * 0.56, carH * 0.10, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Flat high contrast silhouette, seen from behind. Rear tyres first so
+  // the body sits over them.
+  ctx.fillStyle = COLOUR.CAR_LINE;
+  ctx.fillRect(-carW * 0.58, ty + carH * 0.52, carW * 0.18, carH * 0.44);
+  ctx.fillRect(carW * 0.40, ty + carH * 0.52, carW * 0.18, carH * 0.44);
+
+  ctx.fillStyle = COLOUR.CAR_BODY;
+  ctx.fillRect(-carW * 0.46, ty + carH * 0.30, carW * 0.92, carH * 0.62);
+  ctx.fillRect(-carW * 0.34, ty + carH * 0.06, carW * 0.68, carH * 0.30);   // cabin
+  ctx.fillStyle = COLOUR.CAR_GLASS;
+  ctx.fillRect(-carW * 0.28, ty + carH * 0.12, carW * 0.56, carH * 0.20);   // rear screen
+
+  ctx.fillStyle = COLOUR.CAR_LIGHT;
+  ctx.fillRect(-carW * 0.42, ty + carH * 0.66, carW * 0.20, carH * 0.14);
+  ctx.fillRect(carW * 0.22, ty + carH * 0.66, carW * 0.20, carH * 0.14);
+
+  ctx.restore();
+}
+
+function drawScrapeFlash(w, h) {
+  if (!scraping) return;
+  ctx.save();
+  ctx.globalAlpha = FEEL.SCRAPE_FLASH_ALPHA;
+  if (scrapeSide < 0) {
+    ctx.fillStyle = scrapeGradientLeft;
+    ctx.fillRect(0, 0, scrapeBandWidth, h);
+  } else {
+    ctx.fillStyle = scrapeGradientRight;
+    ctx.fillRect(w - scrapeBandWidth, 0, scrapeBandWidth, h);
+  }
+  ctx.restore();
+}
+
+function text(str, x, y, size, weight, align) {
+  ctx.font = weight + ' ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = align || 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = COLOUR.TEXT_SHADOW;
+  ctx.fillText(str, x, y + Math.max(1, size * 0.06));
+  ctx.fillStyle = COLOUR.TEXT;
+  ctx.fillText(str, x, y);
+}
+
+function drawOverlay(w, h) {
+  if (state === TITLE) {
+    const s = Math.min(w, h);
+    text('TAILFLICK', w / 2, h * 0.34, Math.round(s * 0.13), '800');
+    text('hold left or right to steer', w / 2, h * 0.45, Math.round(s * 0.045), '600');
+    text('tap or press any key to start', w / 2, h * 0.52, Math.round(s * 0.045), '600');
+  } else if (state === DEAD) {
+    const s = Math.min(w, h);
+    text('OFF THE ROAD', w / 2, h * 0.40, Math.round(s * 0.10), '800');
+    if (deadFor >= FEEL.DEATH_INPUT_LOCK) {
+      text('tap or press any key', w / 2, h * 0.50, Math.round(s * 0.05), '600');
+    }
+  }
+}
+
+function drawHud(w, h) {
+  if (!showFps) return;
+  const pad = 10;
+  ctx.font = '600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  const line = fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms';
+  const tw = ctx.measureText(line).width;
+  ctx.fillStyle = 'rgba(10,30,45,0.55)';
+  ctx.fillRect(pad - 5, pad - 4, tw + 10, 21);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(line, pad, pad);
+}
+
+function render() {
+  const w = view.w, h = view.h;
+  ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+
+  // Background is drawn oversized so screen shake never exposes an edge.
+  ctx.fillStyle = COLOUR.SKY;
+  ctx.fillRect(-40, -40, w + 80, h / 2 + 40);
+  ctx.fillStyle = COLOUR.GRASS_DARK;
+  ctx.fillRect(-40, h / 2, w + 80, h / 2 + 40);
+
+  ctx.save();
+  ctx.translate(shakeX, shakeY);
+  drawRoad(w, h);
+  ctx.fillStyle = hazeGradient;
+  ctx.fillRect(-40, h / 2 - 1, w + 80, h * FEEL.HORIZON_FADE_FRACTION + 2);
+  drawCar(w, h);
+  ctx.restore();
+
+  drawScrapeFlash(w, h);
+  drawOverlay(w, h);
+  drawHud(w, h);
+}
+
+
+/* ==================================================================
+   MAIN LOOP
+   ================================================================== */
+let lastTime = 0;
+
+function frame(now) {
+  window.requestAnimationFrame(frame);
+
+  const rawDt = lastTime ? (now - lastTime) / 1000 : 0;
+  lastTime = now;
+  const dt = Math.min(rawDt, FEEL.MAX_FRAME_DELTA);
+
+  if (noteTimer > 0) {
+    noteTimer -= dt;
+    if (noteTimer <= 0) noteEl.hidden = true;
+  }
+
+  updateTilt(dt);
+  updateSteering(dt);
+  update(dt);
+  render();
+  sampleFps(rawDt);
+}
+
+resetRoad();
+resize();
+window.requestAnimationFrame(frame);
+</script>
+</body>
+</html>
