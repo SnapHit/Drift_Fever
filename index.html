@@ -31,13 +31,17 @@
     height: 100%;
   }
   /* Chrome sits above the canvas so a tap on a button is never read as
-     steering. The canvas listens for pointers, the buttons do not bubble. */
+     steering. It spans the full width, so it must not swallow pointers
+     itself: only the buttons take them, everything else falls through to
+     the canvas and still steers. */
   #chrome {
     position: fixed;
     top: 0;
+    left: 0;
     right: 0;
     z-index: 2;
-    padding: calc(env(safe-area-inset-top, 0px) + 8px) calc(env(safe-area-inset-right, 0px) + 8px) 0 0;
+    pointer-events: none;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) calc(env(safe-area-inset-right, 0px) + 8px) 0 calc(env(safe-area-inset-left, 0px) + 8px);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -45,7 +49,21 @@
   }
   #buttons {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 6px;
+    width: 100%;
+  }
+  #tuner {
+    display: flex;
+    gap: 6px;
+    margin-right: auto;
+  }
+  #tuner[hidden] {
+    display: none;
+  }
+  #chrome button, #note {
+    pointer-events: auto;
   }
   #chrome button {
     font: 600 12px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -82,6 +100,13 @@
 <canvas id="game"></canvas>
 <div id="chrome">
   <div id="buttons">
+    <div id="tuner" hidden>
+      <button data-act="prev" type="button">&#9664;</button>
+      <button data-act="dec" type="button">&minus;</button>
+      <button data-act="inc" type="button">+</button>
+      <button data-act="next" type="button">&#9654;</button>
+      <button data-act="reset" type="button">reset</button>
+    </div>
     <button id="fpsBtn" type="button">FPS</button>
     <button id="tiltBtn" type="button" hidden>Tilt</button>
   </div>
@@ -111,19 +136,29 @@
 const FEEL = {
 
   /* Camera and projection.
+     The four marked LIVE are adjustable while driving behind the FPS
+     toggle, because they can only be judged by playing. Whatever is on
+     screen in the debug readout is what the game is actually using.
+
+     CAMERA_HEIGHT only means anything relative to ROAD_HALF_WIDTH: those
+     two are one ratio, and raising the camera makes the road and the car
+     smaller on screen. HORIZON_FRACTION buys that space back by moving
+     the horizon up and giving the road more of the screen.
      DRAW_DISTANCE_SEGMENTS times SEGMENT_LENGTH is both the planning
      horizon and the frame budget, so it is the first thing to lower if
-     a weak machine drops frames. At the constants below the player sees
-     about four seconds of road, which is the horizon section 4.3 asks
-     for. FIELD_OF_VIEW_DEG is a sense of speed lever, not a rendering
-     detail: wider reads as faster and distorts more. */
-  FIELD_OF_VIEW_DEG:        100,
-  CAMERA_HEIGHT:           1200,
+     a weak machine drops frames. FIELD_OF_VIEW_DEG is a sense of speed
+     lever, not a rendering detail: wider reads as faster and distorts
+     more, and narrower zooms everything in. */
+  FIELD_OF_VIEW_DEG:         82,     // LIVE
+  CAMERA_HEIGHT:           2200,     // LIVE
+  CAMERA_DISTANCE:         2900,     // LIVE, how far the camera sits behind the car
+  HORIZON_FRACTION:        0.34,     // LIVE, where the horizon sits down the screen
   DRAW_DISTANCE_SEGMENTS:   200,
   SEGMENT_LENGTH:           200,
   ROAD_HALF_WIDTH:         2000,
   RUMBLE_SEGMENTS:            4,     // stripe length, in segments
-  RUMBLE_WIDTH_FRACTION:   0.18,     // of the road half width
+  RUMBLE_WIDTH_FRACTION:   0.65,     // of the road half width. This is the shoulder,
+                                     // and it is drawn to match the scrape band below.
   LANE_DASH_FRACTION:      0.02,     // of the road half width
   HORIZON_FADE_FRACTION:   0.14,     // of screen height, the haze band
   MAX_PIXEL_RATIO:            2,     // capped for weak integrated graphics
@@ -131,8 +166,21 @@ const FEEL = {
   /* Motion. Speed is constant in this build: speed escalation is step 3
      of the build order and is deliberately not here yet. */
   SPEED:                   9000,     // world units per second
-  STEER_RATE:               1.6,     // road half widths per second at full lock
+  STEER_RATE:               1.6,     // road half widths per second at full lock, once the
+                                     // tyres have caught up. It is a target now, not a jump.
   STEER_RAMP_TIME:         0.10,     // seconds for keyboard or touch to reach full lock
+
+  /* The drift. GRIP_TIME is the whole mechanic: the car's actual sideways
+     velocity chases what the steering is asking for, and lags it by this
+     long. HEADING_SNAP_TIME is how fast the nose comes round, and it must
+     stay well under GRIP_TIME or there is no gap between where the car
+     points and where it is going, which is to say no drift. The angle
+     between those two is the slip angle, and it is the number 4.4 will
+     score. Raise GRIP_TIME for a looser, slidier car. */
+  GRIP_TIME:               0.30,
+  HEADING_SNAP_TIME:       0.06,
+  SLIP_MAX_DEG:              30,     // slip angle that counts as fully sideways
+  CAR_YAW_GAIN:             1.2,     // drawn yaw against real heading, for readability
   /* CENTRIFUGAL is the fraction of full steering authority a curve of 1.0
      eats. It is not free to raise: CURVE_HARD times CENTRIFUGAL is how
      much of full lock the hardest curve costs just to hold a line, and at
@@ -141,13 +189,23 @@ const FEEL = {
   CENTRIFUGAL:             0.11,
 
   /* The three bands from section 4.2, measured in road half widths, so
-     1.0 is the painted edge of the road. OFF_ROAD minus SCRAPE_START,
-     divided by STEER_RATE, is the correction window: about a quarter of
-     a second at full outward lock on a straight, less in a hard curve,
-     more at any realistic angle. Widen the gap to be kinder. */
-  SCRAPE_START:            0.84,
-  OFF_ROAD:                1.22,
+     1.0 is the painted edge of the road and the car is CAR_WIDTH across.
+     The band is wide on purpose: 4.4 wants the player to live in it, so
+     it is a destination and not a mercy window. SCRAPE_START puts the
+     outside wheels on the shoulder, OFF_ROAD takes them off the far side
+     of it, and RUMBLE_WIDTH_FRACTION is set so the shoulder you can see
+     is exactly the band you are allowed to be in.
+
+     What stops the band being a free ride is the timer, not its width.
+     SCRAPE_TIME_LIMIT is how long you may hold the edge before it kills
+     you, and it refills at SCRAPE_RECOVER_RATE of that while you are back
+     on the road, so risk is spent and earned rather than held. Tune these
+     two for how long a player should be able to sustain risk. */
+  SCRAPE_START:            0.85,
+  OFF_ROAD:                1.50,
   SCRAPE_SPEED_FACTOR:     0.62,     // forward speed multiplier while scraping
+  SCRAPE_TIME_LIMIT:        1.6,     // seconds of edge before it kills you
+  SCRAPE_RECOVER_RATE:      0.8,     // refill rate on the road, against the drain rate
 
   /* Feedback. Section 7 warns that shake is the fastest route to motion
      sickness on a phone held close to the face. Keep these low. */
@@ -167,11 +225,32 @@ const FEEL = {
 
   /* The car. CAR_WIDTH is in road half widths and sets the perceived
      margin, which is why it is a feel constant and not a drawing detail:
-     SCRAPE_START is set so the outside wheels reach the rumble strip at
-     roughly the moment the scrape band begins. Move one, check the other. */
+     SCRAPE_START is set so the outside wheels reach the shoulder at
+     exactly the moment the scrape band begins. Move one, check the other.
+     Where the car sits on screen is no longer a constant, it falls out of
+     CAMERA_DISTANCE and HORIZON_FRACTION. */
   CAR_WIDTH:               0.30,
-  CAR_SCREEN_BOTTOM:       0.98,     // fraction of screen height
-  CAR_LEAN:                0.16,     // how far the body leans into a turn
+
+  /* Tyre marks. They live on the road segments, so they are bounded by
+     the segment window and cannot grow through a long run. They are only
+     visible between the camera and the car, which means CAMERA_DISTANCE
+     decides how much of your own line you get to see. */
+  TYRE_TRACK_HALF:        0.145,     // half the track width, road half widths
+  TYRE_MARK_WIDTH:        0.028,     // road half widths
+  TYRE_MARK_MIN_SLIP:       0.2,     // slip, normalised, below which no mark is laid
+  TYRE_MARK_MAX_ALPHA:     0.45,
+
+  /* Tyre smoke. Screen space, because the car is at a fixed screen
+     position, and capped so a long slide cannot grow the buffer. */
+  SMOKE_MIN_SLIP:          0.30,
+  SMOKE_RATE:                60,     // puffs per second at full slip
+  SMOKE_LIFE:              0.45,     // seconds
+  SMOKE_BACK_SPEED:         340,     // pixels per second down the screen
+  SMOKE_GROWTH:              50,     // pixels per second of radius. Overdo this and
+                                     // the puffs merge into one grey boulder.
+  SMOKE_START_RADIUS:      0.09,     // of the car width
+  SMOKE_ALPHA:             0.16,
+  SMOKE_MAX:                 70,     // hard cap on live puffs
 
   /* Road generation. */
   OPENING_STRAIGHT:         140,     // segments of calm before anything happens
@@ -203,6 +282,9 @@ const COLOUR = {
   RUMBLE_DARK:  '#ff8a3d',
   LANE:         '#f2f6ff',
   SCRAPE:       '#fff0a8',
+  SCRAPE_OUT:   '#ff5a3d',     // the flash shifts to this as the scrape timer runs out
+  TYRE_MARK:    '24,26,30',    // rgb only, the alpha is the slip angle
+  SMOKE:        '242,246,250',
   CAR_BODY:     '#ffd23d',
   CAR_LINE:     '#191d23',
   CAR_GLASS:    '#2b3138',
@@ -215,10 +297,28 @@ const STORAGE_PREFIX = 'tailflick.';
 
 
 /* ------------------------------------------------------------------
-   Derived values. Not tunable, computed from the block above.
+   Derived values. Not tunable in themselves, recomputed whenever one of
+   the LIVE camera constants above is moved.
    ------------------------------------------------------------------ */
-const CAMERA_DEPTH = 1 / Math.tan((FEEL.FIELD_OF_VIEW_DEG / 2) * Math.PI / 180);
-const PLAYER_Z = FEEL.CAMERA_HEIGHT * CAMERA_DEPTH;
+let CAMERA_DEPTH = 0;
+let horizonY = 0;
+
+/* The authored defaults for the four LIVE values, kept so the reset
+   button has something to go back to and so the game can say out loud
+   when it is running on tuned numbers rather than these. */
+const TUNABLES = [
+  { key: 'CAMERA_HEIGHT',     label: 'height',  step: 100,  min: 400, max: 9000,  dp: 0 },
+  { key: 'CAMERA_DISTANCE',   label: 'dist',    step: 100,  min: 600, max: 14000, dp: 0 },
+  { key: 'FIELD_OF_VIEW_DEG', label: 'fov',     step: 2,    min: 40,  max: 130,   dp: 0 },
+  { key: 'HORIZON_FRACTION',  label: 'horizon', step: 0.02, min: 0.12, max: 0.70, dp: 2 }
+];
+const TUNABLE_DEFAULTS = {};
+TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
+
+function recomputeCamera() {
+  CAMERA_DEPTH = 1 / Math.tan((FEEL.FIELD_OF_VIEW_DEG / 2) * Math.PI / 180);
+  if (view.h) resize();   // the horizon and both cached gradients move with it
+}
 
 
 /* ------------------------------------------------------------------
@@ -248,6 +348,8 @@ const view = { w: 0, h: 0, dpr: 1 };
 let hazeGradient = null;
 let scrapeGradientLeft = null;
 let scrapeGradientRight = null;
+let scrapeOutGradientLeft = null;
+let scrapeOutGradientRight = null;
 let scrapeBandWidth = 0;
 
 function resize() {
@@ -257,11 +359,17 @@ function resize() {
   view.w = w;
   view.h = h;
   view.dpr = dpr;
-  canvas.width = Math.round(w * dpr);
-  canvas.height = Math.round(h * dpr);
+  // Live tuning calls this many times a second while a button is held, and
+  // assigning width or height reallocates the backing store even when the
+  // value has not changed. Only touch it when it actually moved.
+  const cw = Math.round(w * dpr), ch = Math.round(h * dpr);
+  if (canvas.width !== cw) canvas.width = cw;
+  if (canvas.height !== ch) canvas.height = ch;
+
+  horizonY = Math.round(h * FEEL.HORIZON_FRACTION);
 
   const fade = h * FEEL.HORIZON_FADE_FRACTION;
-  hazeGradient = ctx.createLinearGradient(0, h / 2, 0, h / 2 + fade);
+  hazeGradient = ctx.createLinearGradient(0, horizonY, 0, horizonY + fade);
   hazeGradient.addColorStop(0, COLOUR.HAZE);
   hazeGradient.addColorStop(1, 'rgba(205,238,255,0)');
 
@@ -274,6 +382,12 @@ function resize() {
   scrapeGradientRight = ctx.createLinearGradient(w, 0, w - scrapeBandWidth, 0);
   scrapeGradientRight.addColorStop(0, COLOUR.SCRAPE);
   scrapeGradientRight.addColorStop(1, 'rgba(255,240,168,0)');
+  scrapeOutGradientLeft = ctx.createLinearGradient(0, 0, scrapeBandWidth, 0);
+  scrapeOutGradientLeft.addColorStop(0, COLOUR.SCRAPE_OUT);
+  scrapeOutGradientLeft.addColorStop(1, 'rgba(255,90,61,0)');
+  scrapeOutGradientRight = ctx.createLinearGradient(w, 0, w - scrapeBandWidth, 0);
+  scrapeOutGradientRight.addColorStop(0, COLOUR.SCRAPE_OUT);
+  scrapeOutGradientRight.addColorStop(1, 'rgba(255,90,61,0)');
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
@@ -323,7 +437,14 @@ window.addEventListener('keydown', function (e) {
   const k = e.key;
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
-  else if (k === 'f' || k === 'F') { setFps(!showFps); return; }
+  else if (k === 'f' || k === 'F') { setDebug(!showDebug); return; }
+  // The tuning keys are the keyboard twin of the on screen buttons, and
+  // like F they must not also start a run.
+  else if (k === '[') { selectTuning(-1); return; }
+  else if (k === ']') { selectTuning(1); return; }
+  else if (k === '-' || k === '_') { nudgeTuning(-1); return; }
+  else if (k === '=' || k === '+') { nudgeTuning(1); return; }
+  else if (k === '0') { resetTuning(); return; }
   firstGesture();
   startOrRestart();
 });
@@ -556,19 +677,21 @@ tiltBtn.hidden = !tilt.supported;
    be measured on a real device rather than assumed on this one.
    ------------------------------------------------------------------ */
 const fpsBtn = document.getElementById('fpsBtn');
-let showFps = false;
+const tunerEl = document.getElementById('tuner');
+let showDebug = false;
 let fpsFrames = 0, fpsElapsed = 0, fpsWorst = 0, fpsShown = 0, fpsWorstShown = 0;
 
-function setFps(on) {
-  showFps = on;
+function setDebug(on) {
+  showDebug = on;
   fpsBtn.classList.toggle('on', on);
+  tunerEl.hidden = !on;
   fpsFrames = 0; fpsElapsed = 0; fpsWorst = 0;
 }
 fpsBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
 fpsBtn.addEventListener('click', function (e) {
   e.stopPropagation();
   fpsBtn.blur();
-  setFps(!showFps);
+  setDebug(!showDebug);
 });
 
 function sampleFps(rawDt) {
@@ -581,6 +704,110 @@ function sampleFps(rawDt) {
     fpsFrames = 0; fpsElapsed = 0; fpsWorst = 0;
   }
 }
+
+
+/* ------------------------------------------------------------------
+   Live camera tuning. The camera can only be judged by driving, so the
+   four LIVE constants are adjustable from the road, on a phone, behind
+   the same toggle as the frame rate counter. The readout on the canvas
+   is the whole answer: screenshot it and the numbers are reportable.
+
+   The values persist, so a reload in the middle of a tuning session does
+   not throw the work away. That could hide stale numbers behind a hidden
+   panel, so the button reads FPS* whenever anything is off default.
+   ------------------------------------------------------------------ */
+let tuneIndex = 0;
+
+function tunerLine() {
+  let out = '';
+  for (let i = 0; i < TUNABLES.length; i++) {
+    const t = TUNABLES[i];
+    out += (i === tuneIndex ? '▸' : ' ') + t.label + ' ' + FEEL[t.key].toFixed(t.dp) + '  ';
+  }
+  return out;
+}
+
+function tunerDirty() {
+  for (let i = 0; i < TUNABLES.length; i++) {
+    if (FEEL[TUNABLES[i].key] !== TUNABLE_DEFAULTS[TUNABLES[i].key]) return true;
+  }
+  return false;
+}
+
+function markTuning() {
+  fpsBtn.textContent = tunerDirty() ? 'FPS*' : 'FPS';
+  recomputeCamera();
+}
+
+function saveTuning() {
+  const out = {};
+  TUNABLES.forEach(function (t) { out[t.key] = FEEL[t.key]; });
+  storeSet('camera', JSON.stringify(out));
+}
+
+function loadTuning() {
+  const raw = storeGet('camera');
+  if (!raw) return;
+  let parsed = null;
+  try { parsed = JSON.parse(raw); } catch (e) { return; }
+  if (!parsed || typeof parsed !== 'object') return;
+  TUNABLES.forEach(function (t) {
+    const v = parsed[t.key];
+    if (typeof v === 'number' && isFinite(v)) FEEL[t.key] = clamp(v, t.min, t.max);
+  });
+}
+
+function nudgeTuning(dir) {
+  const t = TUNABLES[tuneIndex];
+  const next = clamp(FEEL[t.key] + dir * t.step, t.min, t.max);
+  FEEL[t.key] = parseFloat(next.toFixed(t.dp + 2));
+  markTuning();
+  saveTuning();
+}
+
+function selectTuning(dir) {
+  tuneIndex = (tuneIndex + dir + TUNABLES.length) % TUNABLES.length;
+}
+
+function resetTuning() {
+  TUNABLES.forEach(function (t) { FEEL[t.key] = TUNABLE_DEFAULTS[t.key]; });
+  markTuning();
+  saveTuning();
+}
+
+/* Held buttons repeat, because stepping the camera height a hundred at a
+   time with single taps is not a thing anyone will do twice. */
+const repeat = { dir: 0, held: 0, fired: 0 };
+const REPEAT_DELAY = 0.35, REPEAT_INTERVAL = 0.07;
+
+function updateRepeat(dt) {
+  if (!repeat.dir) return;
+  repeat.held += dt;
+  if (repeat.held < REPEAT_DELAY) return;
+  const due = Math.floor((repeat.held - REPEAT_DELAY) / REPEAT_INTERVAL) + 1;
+  while (repeat.fired < due) { repeat.fired++; nudgeTuning(repeat.dir); }
+}
+
+function stopRepeat() { repeat.dir = 0; repeat.held = 0; repeat.fired = 0; }
+
+tunerEl.addEventListener('pointerdown', function (e) {
+  const act = e.target.getAttribute && e.target.getAttribute('data-act');
+  if (!act) return;
+  e.stopPropagation();
+  e.preventDefault();
+  if (act === 'prev') selectTuning(-1);
+  else if (act === 'next') selectTuning(1);
+  else if (act === 'reset') resetTuning();
+  else if (act === 'dec') { nudgeTuning(-1); repeat.dir = -1; repeat.held = 0; repeat.fired = 0; }
+  else if (act === 'inc') { nudgeTuning(1); repeat.dir = 1; repeat.held = 0; repeat.fired = 0; }
+});
+tunerEl.addEventListener('pointerup', stopRepeat);
+tunerEl.addEventListener('pointercancel', stopRepeat);
+tunerEl.addEventListener('pointerleave', stopRepeat);
+window.addEventListener('blur', stopRepeat);
+
+loadTuning();
+markTuning();
 
 
 /* ==================================================================
@@ -599,7 +826,11 @@ function segAt(index) {
 }
 
 function addSegment(curve) {
-  segments.push({ index: segBase + segments.length, curve: curve });
+  // ma, m0 and m1 are the tyre mark this segment carries: its darkness,
+  // and the car's road position entering and leaving it. Marks ride the
+  // segments, so trimming the road behind the camera frees them too and
+  // nothing accumulates over a run.
+  segments.push({ index: segBase + segments.length, curve: curve, ma: 0, m0: 0, m1: 0 });
 }
 
 function addRoad(enter, hold, leave, curve) {
@@ -660,9 +891,30 @@ let position = 0;        // camera z, world units
 let playerX = 0;         // road half widths, 0 is the centre line, 1 is the painted edge
 let scraping = false;
 let scrapeSide = 0;
+let scrapeMeter = 0;     // seconds of edge spent, against SCRAPE_TIME_LIMIT
+let scrapeRisk = 0;      // that meter as 0 to 1, for feedback
 let shake = 0;
 let shakeX = 0, shakeY = 0;
 let deadFor = 0;
+let lastMarkSeg = -1;
+
+/* The drift state, in one place, because the slip angle is what 4.4
+   scores and it should be read from here rather than recomputed. Nothing
+   outside update() writes to it.
+
+   headingV is where the driver is pointing the car, lateralV is where
+   the car is actually going, both in road half widths per second. The
+   gap between them, expressed as an angle against forward speed, is the
+   slip. */
+const drift = {
+  headingV: 0,
+  lateralV: 0,
+  headingAngle: 0,   // radians off straight ahead
+  travelAngle: 0,    // radians off straight ahead
+  slip: 0,           // signed radians, heading minus travel
+  slipDeg: 0,        // signed degrees
+  slipNorm: 0        // magnitude, 0 to 1 against SLIP_MAX_DEG
+};
 
 function startRun() {
   resetRoad();
@@ -670,9 +922,22 @@ function startRun() {
   playerX = 0;
   scraping = false;
   scrapeSide = 0;
+  scrapeMeter = 0;
+  scrapeRisk = 0;
   shake = 0;
   deadFor = 0;
+  lastMarkSeg = -1;
   steering.value = 0;
+  drift.headingV = 0;
+  drift.lateralV = 0;
+  drift.headingAngle = 0;
+  drift.travelAngle = 0;
+  drift.slip = 0;
+  drift.slipDeg = 0;
+  drift.slipNorm = 0;
+  for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
+  smokeCount = 0;
+  smokeAcc = 0;
   calibrateTilt();
   state = DRIVING;
 }
@@ -692,30 +957,154 @@ function update(dt) {
   if (state === DEAD) { deadFor += dt; return; }
   if (state !== DRIVING) return;
 
-  const carIndex = Math.floor((position + PLAYER_Z) / FEEL.SEGMENT_LENGTH);
   topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
+  const carIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
   const carSegment = segAt(carIndex);
   const curve = carSegment ? carSegment.curve : 0;
 
   const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1);
   position += speed * dt;
 
-  // The only place steering is consumed.
-  const lateral = dt * FEEL.STEER_RATE;
-  playerX += lateral * steering.value;
-  playerX -= lateral * curve * FEEL.CENTRIFUGAL;
+  /* The only place steering is consumed, and the whole drift model.
+
+     The driver asks for a sideways speed. The nose comes round to face it
+     almost at once; the tyres take GRIP_TIME to actually deliver it. A
+     curve pushes the car outwards but not the nose, so it drags the two
+     apart for as long as the corner lasts. Flicking the wheel drags them
+     apart hard and briefly. Both of those gaps are the drift. */
+  const intent = steering.value * FEEL.STEER_RATE;
+  const gripTarget = intent - curve * FEEL.CENTRIFUGAL * FEEL.STEER_RATE;
+  drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME));
+  drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
+
+  const prevX = playerX;
+  playerX += drift.lateralV * dt;
+
+  // Sideways speed against forward speed is an angle. The difference of
+  // the two angles is the slip.
+  const rhw = FEEL.ROAD_HALF_WIDTH;
+  drift.headingAngle = Math.atan(drift.headingV * rhw / speed);
+  drift.travelAngle = Math.atan(drift.lateralV * rhw / speed);
+  drift.slip = drift.headingAngle - drift.travelAngle;
+  drift.slipDeg = drift.slip * 180 / Math.PI;
+  drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
+
+  layTyreMarks(carIndex, prevX);
+  updateSmoke(dt);
 
   const offset = Math.abs(playerX);
-  if (offset > FEEL.OFF_ROAD) {
-    state = DEAD;
-    deadFor = 0;
-    scraping = false;
-    shake = FEEL.CRASH_SHAKE_PX;
-    return;
-  }
+  if (offset > FEEL.OFF_ROAD) { crash(); return; }
+
   scraping = offset > FEEL.SCRAPE_START;
   scrapeSide = scraping ? Math.sign(playerX) : 0;
-  if (scraping && shake < FEEL.SCRAPE_SHAKE_PX) shake = FEEL.SCRAPE_SHAKE_PX;
+  if (scraping) {
+    scrapeMeter += dt;
+    if (shake < FEEL.SCRAPE_SHAKE_PX) shake = FEEL.SCRAPE_SHAKE_PX;
+    if (scrapeMeter > FEEL.SCRAPE_TIME_LIMIT) { crash(); return; }
+  } else {
+    scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
+  }
+  scrapeRisk = clamp(scrapeMeter / FEEL.SCRAPE_TIME_LIMIT, 0, 1);
+}
+
+function crash() {
+  state = DEAD;
+  deadFor = 0;
+  scraping = false;
+  shake = FEEL.CRASH_SHAKE_PX;
+}
+
+
+/* ==================================================================
+   DRIFT FEEDBACK
+
+   Section 7 calls tyre marks the highest value single effect in a drift
+   game. They are stored on the road segments rather than in a list of
+   their own, so they curve with the road for free and get thrown away
+   with it.
+   ================================================================== */
+function layTyreMarks(carIndex, prevX) {
+  const alpha = (drift.slipNorm - FEEL.TYRE_MARK_MIN_SLIP) / (1 - FEEL.TYRE_MARK_MIN_SLIP);
+  if (alpha <= 0) { lastMarkSeg = carIndex; return; }
+  const a = clamp(alpha, 0, 1) * FEEL.TYRE_MARK_MAX_ALPHA;
+
+  // Fill in any segment the car stepped over this frame, so a long frame
+  // does not punch a hole in the line.
+  let from = carIndex;
+  if (lastMarkSeg >= 0 && carIndex - lastMarkSeg > 0 && carIndex - lastMarkSeg <= 4) {
+    from = lastMarkSeg + 1;
+  }
+  for (let i = from; i <= carIndex; i++) {
+    const s = segAt(i);
+    if (!s) continue;
+    // m0 picks up where the previous segment's m1 was left, so the line
+    // is continuous across the join.
+    if (s.ma === 0) s.m0 = prevX;
+    s.m1 = playerX;
+    if (a > s.ma) s.ma = a;
+  }
+  lastMarkSeg = carIndex;
+}
+
+/* Smoke is screen space. The car is pinned to one spot on screen, so
+   there is nothing to gain from putting the puffs in the world, and a
+   ring buffer of fixed objects means no allocation while sliding. */
+const SMOKE_FILL = 'rgb(' + COLOUR.SMOKE + ')';
+const smoke = [];
+let smokeCount = 0;
+let smokeHead = 0;
+let smokeAcc = 0;
+for (let i = 0; i < FEEL.SMOKE_MAX; i++) {
+  smoke.push({ x: 0, y: 0, vx: 0, vy: 0, r: 0, life: 0 });
+}
+
+function spawnSmoke(side) {
+  const p = smoke[smokeHead];
+  smokeHead = (smokeHead + 1) % FEEL.SMOKE_MAX;
+  if (smokeCount < FEEL.SMOKE_MAX) smokeCount++;
+  const geom = carGeometry(view.w, view.h);
+  p.x = geom.x + side * geom.w * 0.42 + (Math.random() * 2 - 1) * geom.w * 0.12;
+  p.y = geom.groundY - geom.h * 0.12;
+  p.vx = -drift.lateralV * 40 + (Math.random() * 2 - 1) * 45;
+  p.vy = FEEL.SMOKE_BACK_SPEED * (0.75 + Math.random() * 0.5);
+  p.r = geom.w * FEEL.SMOKE_START_RADIUS;
+  p.life = FEEL.SMOKE_LIFE;
+}
+
+function updateSmoke(dt) {
+  for (let i = 0; i < FEEL.SMOKE_MAX; i++) {
+    const p = smoke[i];
+    if (p.life <= 0) continue;
+    p.life -= dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.r += FEEL.SMOKE_GROWTH * dt;
+  }
+  if (drift.slipNorm <= FEEL.SMOKE_MIN_SLIP) { smokeAcc = 0; return; }
+  const strength = (drift.slipNorm - FEEL.SMOKE_MIN_SLIP) / (1 - FEEL.SMOKE_MIN_SLIP);
+  smokeAcc += dt * FEEL.SMOKE_RATE * strength;
+  let guard = 0;
+  while (smokeAcc >= 1 && guard < 8) {
+    smokeAcc -= 1;
+    guard++;
+    spawnSmoke(guard & 1 ? -1 : 1);
+  }
+  if (smokeAcc > 1) smokeAcc = 1;
+}
+
+function drawSmoke() {
+  if (smokeCount === 0) return;
+  ctx.fillStyle = SMOKE_FILL;
+  for (let i = 0; i < FEEL.SMOKE_MAX; i++) {
+    const p = smoke[i];
+    if (p.life <= 0) continue;
+    const t = p.life / FEEL.SMOKE_LIFE;
+    ctx.globalAlpha = t * FEEL.SMOKE_ALPHA;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
 }
 
 
@@ -723,12 +1112,29 @@ function update(dt) {
    RENDER
    ================================================================== */
 function project(out, worldX, camX, dz, w, h) {
+  // Everything hangs off the horizon line rather than the middle of the
+  // screen, so HORIZON_FRACTION decides how the screen is split between
+  // sky and road without touching the perspective.
   const scale = CAMERA_DEPTH / dz;
   out.z = dz;
   out.x = w / 2 + scale * (worldX - camX) * w / 2;
-  out.y = h / 2 + scale * FEEL.CAMERA_HEIGHT * h / 2;
+  out.y = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2;
   out.w = scale * FEEL.ROAD_HALF_WIDTH * w / 2;
   return out;
+}
+
+/* Where the car sits and how big it is, both falling out of the camera
+   rather than being placed by hand. Used by the sprite and by the smoke,
+   so they cannot drift apart when the camera is tuned. */
+const carGeom = { x: 0, groundY: 0, w: 0, h: 0, roadHalf: 0 };
+function carGeometry(w, h) {
+  const scale = CAMERA_DEPTH / FEEL.CAMERA_DISTANCE;
+  carGeom.roadHalf = scale * FEEL.ROAD_HALF_WIDTH * w / 2;
+  carGeom.w = Math.max(16, FEEL.CAR_WIDTH * carGeom.roadHalf);
+  carGeom.h = carGeom.w * 1.1;
+  carGeom.x = w / 2;
+  carGeom.groundY = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2;
+  return carGeom;
 }
 
 function polygon(x1, y1, x2, y2, x3, y3, x4, y4) {
@@ -766,7 +1172,7 @@ function drawRoad(w, h) {
     project(p2, x2, camX, z1 + seg, w, h);
 
     if (p1.z > CAMERA_DEPTH && p2.y < p1.y && p2.y < maxy) {
-      drawSegment(s.index, w);
+      drawSegment(s, w);
       maxy = p2.y;
     }
 
@@ -776,7 +1182,8 @@ function drawRoad(w, h) {
   }
 }
 
-function drawSegment(index, w) {
+function drawSegment(s, w) {
+  const index = s.index;
   const light = (Math.floor(index / FEEL.RUMBLE_SEGMENTS) & 1) === 0;
   const grass = light ? COLOUR.GRASS_LIGHT : COLOUR.GRASS_DARK;
   const road = light ? COLOUR.ROAD_LIGHT : COLOUR.ROAD_DARK;
@@ -805,27 +1212,51 @@ function drawSegment(index, w) {
     ctx.fillStyle = COLOUR.LANE;
     polygon(p1.x - l1, y1, p1.x + l1, y1, p2.x + l2, y2, p2.x - l2, y2);
   }
+
+  // Tyre marks, on top of the surface. A point at road offset m sits at
+  // p.x + m * p.w, because p.w is the road half width in pixels.
+  if (s.ma > 0) {
+    const t = FEEL.TYRE_TRACK_HALF, mw = FEEL.TYRE_MARK_WIDTH;
+    ctx.fillStyle = markFill(s.ma);
+    const a1 = s.m0 - t, a2 = s.m1 - t;
+    polygon(p1.x + (a1 - mw) * p1.w, y1, p1.x + (a1 + mw) * p1.w, y1,
+            p2.x + (a2 + mw) * p2.w, y2, p2.x + (a2 - mw) * p2.w, y2);
+    const b1 = s.m0 + t, b2 = s.m1 + t;
+    polygon(p1.x + (b1 - mw) * p1.w, y1, p1.x + (b1 + mw) * p1.w, y1,
+            p2.x + (b2 + mw) * p2.w, y2, p2.x + (b2 - mw) * p2.w, y2);
+  }
+}
+
+/* Mark colours are quantised into a small table, so drawing a road full
+   of marks does not build a colour string per segment per frame. */
+const MARK_FILLS = [];
+for (let i = 0; i < 16; i++) {
+  MARK_FILLS.push('rgba(' + COLOUR.TYRE_MARK + ',' + ((i + 1) / 16).toFixed(3) + ')');
+}
+function markFill(a) {
+  let i = Math.round(a * 16) - 1;
+  if (i < 0) i = 0; else if (i > 15) i = 15;
+  return MARK_FILLS[i];
 }
 
 function drawCar(w, h) {
-  // Sized against the projected road at the car's own distance, so the
-  // margin the player sees is the margin the physics uses.
-  const scale = CAMERA_DEPTH / PLAYER_Z;
-  const roadHalfPx = scale * FEEL.ROAD_HALF_WIDTH * w / 2;
-  const carW = Math.max(24, FEEL.CAR_WIDTH * roadHalfPx);
-  const carH = carW * 1.1;
-  const cx = w / 2 + steering.value * FEEL.CAR_LEAN * carW;
-  const by = h * FEEL.CAR_SCREEN_BOTTOM;
-  const ty = by - carH;
+  const g = carGeometry(w, h);
+  const carW = g.w, carH = g.h;
+
+  // The shadow stays square to the road, so the body visibly turns against
+  // something that does not.
+  ctx.fillStyle = 'rgba(0,0,0,0.26)';
+  ctx.beginPath();
+  ctx.ellipse(g.x, g.groundY - carH * 0.05, carW * 0.56, carH * 0.11, 0, 0, Math.PI * 2);
+  ctx.fill();
 
   ctx.save();
-  ctx.translate(cx, 0);
+  ctx.translate(g.x, g.groundY - carH * 0.5);
+  // The camera holds the car in the middle of the screen, so the yaw is
+  // the only thing on the car itself that shows the drift.
+  ctx.rotate(drift.headingAngle * FEEL.CAR_YAW_GAIN);
 
-  // Shadow.
-  ctx.fillStyle = 'rgba(0,0,0,0.28)';
-  ctx.beginPath();
-  ctx.ellipse(0, by - carH * 0.06, carW * 0.56, carH * 0.10, 0, 0, Math.PI * 2);
-  ctx.fill();
+  const ty = -carH * 0.5;
 
   // Flat high contrast silhouette, seen from behind. Rear tyres first so
   // the body sits over them.
@@ -849,13 +1280,21 @@ function drawCar(w, h) {
 function drawScrapeFlash(w, h) {
   if (!scraping) return;
   ctx.save();
-  ctx.globalAlpha = FEEL.SCRAPE_FLASH_ALPHA;
+  // The band brightens and turns as the scrape timer runs down, so the
+  // player can feel the clock without a meter on the screen.
+  ctx.globalAlpha = FEEL.SCRAPE_FLASH_ALPHA * (0.55 + 0.45 * scrapeRisk);
   if (scrapeSide < 0) {
     ctx.fillStyle = scrapeGradientLeft;
     ctx.fillRect(0, 0, scrapeBandWidth, h);
   } else {
     ctx.fillStyle = scrapeGradientRight;
     ctx.fillRect(w - scrapeBandWidth, 0, scrapeBandWidth, h);
+  }
+  if (scrapeRisk > 0.4) {
+    ctx.globalAlpha = (scrapeRisk - 0.4) / 0.6 * FEEL.SCRAPE_FLASH_ALPHA;
+    ctx.fillStyle = scrapeSide < 0 ? scrapeOutGradientLeft : scrapeOutGradientRight;
+    if (scrapeSide < 0) ctx.fillRect(0, 0, scrapeBandWidth, h);
+    else ctx.fillRect(w - scrapeBandWidth, 0, scrapeBandWidth, h);
   }
   ctx.restore();
 }
@@ -885,18 +1324,31 @@ function drawOverlay(w, h) {
   }
 }
 
+/* The debug readout. Everything needed to report a camera back sits on
+   one line, so a screenshot is a complete answer. */
 function drawHud(w, h) {
-  if (!showFps) return;
+  if (!showDebug) return;
   const pad = 10;
+  const lines = [
+    fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms',
+    tunerLine(),
+    'slip ' + drift.slipDeg.toFixed(0) + '°   edge ' + (scrapeRisk * 100).toFixed(0) + '%'
+  ];
   ctx.font = '600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  const line = fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms';
-  const tw = ctx.measureText(line).width;
-  ctx.fillStyle = 'rgba(10,30,45,0.55)';
-  ctx.fillRect(pad - 5, pad - 4, tw + 10, 21);
+  let widest = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const tw = ctx.measureText(lines[i]).width;
+    if (tw > widest) widest = tw;
+  }
+  const top = pad + 44;   // clear of the button row
+  ctx.fillStyle = 'rgba(10,30,45,0.6)';
+  ctx.fillRect(pad - 5, top - 4, widest + 10, lines.length * 18 + 8);
   ctx.fillStyle = '#ffffff';
-  ctx.fillText(line, pad, pad);
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], pad, top + i * 18);
+  }
 }
 
 function render() {
@@ -905,15 +1357,16 @@ function render() {
 
   // Background is drawn oversized so screen shake never exposes an edge.
   ctx.fillStyle = COLOUR.SKY;
-  ctx.fillRect(-40, -40, w + 80, h / 2 + 40);
+  ctx.fillRect(-40, -40, w + 80, horizonY + 40);
   ctx.fillStyle = COLOUR.GRASS_DARK;
-  ctx.fillRect(-40, h / 2, w + 80, h / 2 + 40);
+  ctx.fillRect(-40, horizonY, w + 80, h - horizonY + 40);
 
   ctx.save();
   ctx.translate(shakeX, shakeY);
   drawRoad(w, h);
   ctx.fillStyle = hazeGradient;
-  ctx.fillRect(-40, h / 2 - 1, w + 80, h * FEEL.HORIZON_FADE_FRACTION + 2);
+  ctx.fillRect(-40, horizonY - 1, w + 80, h * FEEL.HORIZON_FADE_FRACTION + 2);
+  drawSmoke();
   drawCar(w, h);
   ctx.restore();
 
@@ -940,6 +1393,7 @@ function frame(now) {
     if (noteTimer <= 0) noteEl.hidden = true;
   }
 
+  updateRepeat(dt);
   updateTilt(dt);
   updateSteering(dt);
   update(dt);
@@ -947,6 +1401,7 @@ function frame(now) {
   sampleFps(rawDt);
 }
 
+recomputeCamera();
 resetRoad();
 resize();
 window.requestAnimationFrame(frame);
