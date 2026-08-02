@@ -670,11 +670,29 @@ const FEEL = {
 
      Fatigue is the thing to design against here, because this sound is
      present for most of a good run. Three defences: the top end is rolled
-     off by a fixed lowpass after the bandpass, the gain never approaches
-     full, and the band moves over a deliberately modest range so it reads
-     as a tyre loading up rather than as a siren. SKID_WOBBLE keeps it
-     alive at a held slip angle without any of that movement being large. */
-  SKID_GAIN_MAX:           0.30,
+     off by a fixed lowpass after the bandpass, the band moves over a
+     deliberately modest range so it reads as a tyre loading up rather
+     than as a siren, and SKID_WOBBLE keeps it alive at a held slip angle
+     without any of that movement being large.
+
+     SKID_GAIN_MAX is NOT a level and must not be read as one. It is a
+     gain applied before two filters that throw most of the energy away,
+     so it compensates for them and the number that matters is what comes
+     out. Measured at the master output at full slip: at 0.30 the skid was
+     0.016 RMS against the music's 0.046, so the sound carrying the core
+     mechanic was three times quieter than the backing track despite the
+     two constants looking comparable. 1.10 only brought it to parity, so
+     this is 1.60, which measures 0.075 RMS against the music's 0.049, a
+     lead of about four decibels. The worst case the graph can produce,
+     full slip plus a scrape plus a crash on top, peaks at 0.40 of full
+     scale, so there are eight decibels of headroom left. There is
+     no clipping and no distortion: the path is linear, so a louder skid
+     is a louder skid and not a harsher one.
+
+     Note that bite scales this by slip, and a typical fast lap sits near
+     0.65 slip rather than 1.0, so the sustained level in play is roughly
+     two thirds of the figure above. */
+  SKID_GAIN_MAX:           1.60,
   SKID_MIN_SLIP:           0.08,     // slipNorm below this is silent
   SKID_FREQ_LOW:            520,     // Hz at the first hint of slip
   SKID_FREQ_HIGH:          1250,     // Hz fully sideways. Modest on purpose.
@@ -743,19 +761,33 @@ const FEEL = {
      button beside Tilt reverses it permanently, rather than a sign error
      ever being a blocker again.
 
-     This has been reversed three times across sessions ten, eleven and
-     thirteen. A rotation model of the W3C frame says +1 is the physically
-     correct sign; three separate reports from a real handset say it reads
-     backwards. The handset wins, because the model cannot account for
-     what a wrist actually does at the angle a phone is held, and because
-     gamma's decomposition is at a singularity near upright anyway.
+     THE CONVENTION, written down because this has now been reversed four
+     times and each time it was reasoned about from scratch.
 
-     There is no toggle any more, deliberately: a control that is wrong
-     until the player finds a second button to fix it is worse than one
-     that is simply right. That makes this constant the only place the
-     direction lives, so it is on the debug cycler behind ?debug=1 and can
-     be settled on the phone in one tap rather than in another session. */
-  TILT_DIRECTION:            -1,
+     A positive steering value turns the car RIGHT. That is fixed by the
+     keyboard, where the right key sets the digital target to +1, and it
+     runs through unchanged: intent is steering times the rate, lateralV
+     chases intent, carX adds lateralV, and a positive carX is the right
+     hand side of the road. Nothing between the sensor and the car
+     reverses it.
+
+     In portrait the reading is e.gamma, and gamma is positive when the
+     device's right edge is tipped DOWN. The chain from there is
+     sign preserving throughout: rel is the reading minus the calibrated
+     zero times this constant, the deadzone takes a magnitude and puts
+     Math.sign(rel) straight back on, the smoothing is a lerp toward that
+     target, and updateSteering assigns tilt.value to steering.value
+     unmodified.
+
+     So at +1: drop the right edge, gamma rises, steering goes positive,
+     the car goes right. Drop the left edge and it goes left. That is the
+     direction a driver expects and it is what this must be.
+
+     At -1 it was exactly inverted, which is the bug reported in sessions
+     ten, twelve and thirteen. Session eleven had it right and session
+     thirteen broke it again. It is on the debug cycler behind ?debug=1
+     so it can be settled on a handset rather than in another session. */
+  TILT_DIRECTION:             1,
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
   TILT_DEADZONE_DEG:       1.50,     // LIVE, the neutral state from section 4.1
   TILT_FULL_LOCK_DEG:        15,     // LIVE, degrees from the calibrated zero to full lock
