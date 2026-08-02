@@ -31,9 +31,19 @@
     height: 100%;
   }
   /* Chrome sits above the canvas so a tap on a button is never read as
-     steering. It spans the full width, so it must not swallow pointers
-     itself: only the buttons take them, everything else falls through to
-     the canvas and still steers. */
+     steering. It spans the full width, so it MUST NOT swallow pointers
+     itself: pointer-events is none on the container and auto on the
+     buttons, so everything between and around them falls through to the
+     canvas and still steers.
+
+     This is not a precaution, it is a repeat. Beakdown shipped with an
+     in-play button row in a full width container without this, and the
+     invisible strip between the buttons ate every tap across that band of
+     the screen. The game was unplayable and the cause took a long time to
+     find, because nothing is visible and nothing throws. Tailflick steers
+     on the left and right halves of the screen, so any container laid over
+     it is exposed to exactly the same failure. Every new overlay goes in
+     here, under these rules, or it gets its own pointer-events none. */
   #chrome {
     position: fixed;
     top: 0;
@@ -94,6 +104,20 @@
   #note[hidden] {
     display: none;
   }
+  /* A probe for the safe area insets, so the canvas can keep the resource
+     bar and the pause overlay clear of the home indicator and the gesture
+     bar. Canvas cannot read env() itself. Zero sized and never hit
+     testable. */
+  #safe {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
 </style>
 </head>
 <body>
@@ -108,11 +132,13 @@
       <button data-act="reset" type="button">reset</button>
       <button data-act="seed" type="button">seed</button>
     </div>
+    <button id="pauseBtn" type="button">Pause</button>
     <button id="fpsBtn" type="button">FPS</button>
     <button id="tiltBtn" type="button" hidden>Tilt</button>
   </div>
   <div id="note" hidden></div>
 </div>
+<div id="safe"></div>
 <script>
 'use strict';
 
@@ -155,6 +181,12 @@ const FEEL = {
   FIELD_OF_VIEW_DEG:         78,     // LIVE
   CAMERA_HEIGHT:           1800,     // LIVE
   CAMERA_DISTANCE:         3600,     // LIVE, how far the camera sits behind the car
+  /* The camera follows the car up so a jump does not leave the frame, but
+     only part of the way and lazily, because a camera that tracks height
+     exactly cancels the height it is tracking and the jump stops reading
+     as one at all. */
+  CAMERA_AIR_FOLLOW:       0.55,
+  CAMERA_AIR_TIME:         0.28,     // seconds of lag on that follow
   HORIZON_FRACTION:        0.50,     // LIVE, where the horizon sits down the screen
   DRAW_DISTANCE_SEGMENTS:   200,
   SEGMENT_LENGTH:           200,
@@ -277,13 +309,30 @@ const FEEL = {
   GRIP_TIME:               0.30,     // LIVE
   HEADING_SNAP_TIME:       0.06,
   SLIP_MAX_DEG:              30,     // slip angle that counts as fully sideways
-  CAR_YAW_GAIN:             1.2,     // drawn yaw against real heading, for readability
+  /* How far the car is drawn turned. LIVE, both of them.
+
+     CAR_YAW_GAIN is the honest half: the nose points where the steering is
+     asking. CAR_CURVE_YAW is the lie, and it is the one that makes a
+     corner feel like a corner. The camera tracks the road, so a car
+     holding a perfect line through a bend is not rotating relative to the
+     frame at all, and it sits dead square while the world bends around it.
+     Pointing it into the turn, and a little past it, reads as oversteer
+     and reads as true. Every arcade racer tells this lie. */
+  CAR_YAW_GAIN:             1.6,     // LIVE
+  CAR_CURVE_YAW:          0.038,     // LIVE, radians per unit of road curvature
+
   /* CENTRIFUGAL is the fraction of full steering authority a curve of 1.0
-     eats. It is not free to raise: CURVE_HARD times CENTRIFUGAL is how
-     much of full lock the hardest curve costs just to hold a line, and at
-     1.0 the hardest curve becomes unsurvivable no matter how well it is
-     driven. At these values the hardest curve costs a bit over half. */
-  CENTRIFUGAL:             0.11,
+     eats. LIVE, and the number that decides whether a corner is something
+     you drive or something that happens around you.
+
+     It is not free to raise. The generator's real ceiling is CURVE_HARD
+     exactly: every phrase interpolates between two endpoints and none can
+     overshoot them, so nothing on the road is ever stronger than 5. That
+     times this is the share of full lock the hardest corner costs just to
+     hold a line, and at 1.0 the corner is unsurvivable however well it is
+     driven. The debug readout prints that product live, beside the largest
+     curvature actually generated, so it can be walked up in full view. */
+  CENTRIFUGAL:             0.14,     // LIVE
 
   /* The three bands from section 4.2, measured in road half widths, so
      1.0 is the painted edge of the road and the car is CAR_BODY_WIDTH
@@ -313,6 +362,57 @@ const FEEL = {
      the sideways speed that put it there, slides off the lip, and only
      then starts dropping, so it goes over the edge instead of sinking
      through the surface. The camera coasts rather than stopping dead. */
+  /* Ramps and air. A ramp sits on one edge only, never both, so taking it
+     commits the car to that side of the road, and that commitment is the
+     risk. Whatever sideways speed the car has at the lip carries it, so
+     launching while sliding outwards throws it off the cliff.
+
+     AIR_STEER is deliberately tiny. Not being able to steer is what makes
+     the launch a decision rather than a detour. Zero would be defensible;
+     a little is kinder and still commits.
+
+     RAMP_LENGTH, RAMP_HEIGHT, SPEED and AIR_GRAVITY together decide where
+     the arc peaks, and the ring is placed from those same numbers at
+     generation time. If speed escalation ever lands, ring placement has to
+     be recomputed against the speed at the ramp rather than at load. */
+  RAMP_LENGTH:               10,     // segments of climb
+  RAMP_HEIGHT:              520,     // world units at the lip
+  RAMP_INNER:              0.40,     // inner edge, in road half widths
+  /* Long enough to cover the whole arc and gather the car up afterwards,
+     and no longer. The arc at these numbers is about forty segments, so
+     this leaves roughly twenty to get straight before whatever comes
+     next. Not varied: too short and the car lands in the following
+     phrase's first corner. */
+  RAMP_LANDING:              62,     // segments of run out after the lip
+  AIR_GRAVITY:             6300,     // world units per second squared
+  AIR_STEER:               0.55,     // share of full steering authority while airborne
+  LAND_SHAKE_PX:              7,
+
+  /* The ring sits at the apex of a fully committed jump, so it is a target
+     rather than a lottery: leave the ramp early and the arc is lower and
+     the ring is missed. Passing through it refills the scrape budget
+     outright, which closes the loop that budget already opened rather
+     than opening a second one. */
+  RING_RADIUS:              620,     // world units
+  RING_CATCH:              1.35,     // how much larger than the ring the catch is
+  RING_FLASH_TIME:         0.85,     // seconds the collection reads for
+  RING_GLOW_ALPHA:         0.30,
+
+  /* The budget bar. Section 7 wants the risk state legible without UI and
+     it already is: the edge flash shifts colour as the timer runs down,
+     and that stays the primary channel because in a reflex game the eyes
+     never leave the road. This is the secondary channel, for learning the
+     system and for reading between corners, so it sits low and central
+     where the eyes already are rather than in a corner nobody will glance
+     at, it disappears when the budget is full, and it never gets bright
+     enough to argue with the road edges. */
+  BAR_WIDTH:               0.42,     // of screen width
+  BAR_HEIGHT:                 6,     // pixels
+  BAR_BOTTOM:                26,     // pixels above the safe area
+  BAR_FADE_TIME:           0.45,     // seconds to fade away once full again
+  BAR_ALPHA:               0.70,
+  BAR_PULSE_SCALE:          2.2,     // how much a ring collection swells it
+
   CRASH_GRAVITY:          26000,     // world units per second squared
   CRASH_TUMBLE:             2.4,     // radians per second, nose over
   CRASH_COAST_TIME:        0.55,     // seconds for the camera to run down
@@ -376,7 +476,10 @@ const FEEL = {
      overdoing motion on a phone held close to the face, so this is small
      on purpose. CAR_ROLL_REFERENCE is the sideways acceleration, in road
      half widths per second squared, at which the lean saturates. */
-  CAR_ROLL_DEG:             7.0,
+  /* Off. It read as the car tilting rather than as the car drifting, which
+     is a different and worse thing to say. The constant and the code stay
+     so it can be put back by moving one number. */
+  CAR_ROLL_DEG:             0.0,
   CAR_ROLL_REFERENCE:       8.0,
   CAR_ROLL_PIVOT:            60,     // height of the axis it leans about
   CAR_POOL_ALPHA:          0.30,     // the light the car spills onto the road
@@ -503,11 +606,26 @@ const COLOUR = {
   EDGE_GLOW:    '109,236,255',  // the faint wide pass under the lip
   SLAB_BOTTOM:  '#2f86ad',      // the underside line, dimmer than the top lip
   SLAB_BOTTOM_GLOW: '47,134,173',
+  RAMP_TOP:     '#264f78',      // the wedge surface, read as track rather than road
+  RAMP_SIDE:    '#132b45',
+  RAMP_LIP:     '#7fe8ff',      // its leading edge, lit like an edge because it is one
+  RING:         '#ff5ec8',      // the risk colour the trail already speaks
+  RING_GLOW:    '255,94,200',
+  RING_TAKEN:   '#8affd0',
   PYLON:        '#4fb4d6',
   PYLON_MAJOR:  '#9cf0ff',
   PYLON_GLOW:   '96,206,240',
   SKYLINE:      '#091321',
   SKYLINE_TOP:  '#164059',
+
+  /* Deliberately duller than the edge lip. This is the secondary channel
+     and it must never pull the eye down off the road. */
+  BAR_TRACK:    'rgba(12,24,44,0.85)',
+  BAR_FILL:     '#3f9ec2',
+  BAR_LOW:      '#e0703c',
+  BAR_RING:     '#9dffd8',
+
+  PAUSE_COVER:  '#040610',      // opaque, so the corner ahead cannot be studied
 
   SCRAPE:       '#fff0a8',
   SCRAPE_OUT:   '#ff5a3d',     // the flash shifts to this as the scrape timer runs out
@@ -539,6 +657,11 @@ const STORAGE_PREFIX = 'tailflick.';
    ------------------------------------------------------------------ */
 let CAMERA_DEPTH = 0;
 let horizonY = 0;
+/* Camera state rather than camera constants, and up here with them because
+   recomputeCamera below touches it and that runs while the stored tuning
+   loads, long before the game state further down exists. */
+let cameraLift = 0;      // the camera following the car up, damped
+let camHeight = 0;       // FEEL.CAMERA_HEIGHT plus that lift, what everything projects against
 
 /* The authored defaults for the four LIVE values, kept so the reset
    button has something to go back to and so the game can say out loud
@@ -559,13 +682,17 @@ const TUNABLES = [
   { key: 'PYLON_SPACING',      label: 'pylons',  step: 1,    min: 2,    max: 40,    dp: 0, group: 4 },
   { key: 'PYLON_HEIGHT',       label: 'post',    step: 30,   min: 60,   max: 2400,  dp: 0, group: 4 },
   { key: 'EDGE_GLOW_ALPHA',    label: 'glow',    step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 4 },
-  { key: 'GRID_DEPTH',         label: 'depth',   step: 500,  min: 500,  max: 40000, dp: 0, group: 4 }
+  { key: 'GRID_DEPTH',         label: 'depth',   step: 500,  min: 500,  max: 40000, dp: 0, group: 4 },
+  { key: 'CENTRIFUGAL',        label: 'cent',    step: 0.005, min: 0,   max: 0.30,  dp: 3, group: 5 },
+  { key: 'CAR_YAW_GAIN',       label: 'yaw',     step: 0.1,  min: 0,    max: 5.0,   dp: 1, group: 5 },
+  { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
 
 function recomputeCamera() {
   CAMERA_DEPTH = 1 / Math.tan((FEEL.FIELD_OF_VIEW_DEG / 2) * Math.PI / 180);
+  camHeight = FEEL.CAMERA_HEIGHT + cameraLift;
   if (view.h) resize();   // the horizon and both cached gradients move with it
 }
 
@@ -593,6 +720,7 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const view = { w: 0, h: 0, dpr: 1 };
 let hazeGradient = null;
 let horizonGradient = null;
+let safeBottom = 0;      // home indicator and gesture bar, measured from CSS
 let scrapeGradientLeft = null;
 let scrapeGradientRight = null;
 let scrapeOutGradientLeft = null;
@@ -614,6 +742,9 @@ function resize() {
   if (canvas.height !== ch) canvas.height = ch;
 
   horizonY = Math.round(h * FEEL.HORIZON_FRACTION);
+
+  const probe = window.getComputedStyle(document.getElementById('safe'));
+  safeBottom = parseFloat(probe.paddingBottom) || 0;
 
   // The distant road fades into the horizon glow rather than staying sharp
   // all the way to the vanishing point.
@@ -699,6 +830,7 @@ window.addEventListener('keydown', function (e) {
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
   else if (k === 'f' || k === 'F') { setDebug(!showDebug); return; }
+  else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
   // The tuning keys are the keyboard twin of the on screen buttons, and
   // like F they must not also start a run.
   else if (k === '[') { selectTuning(-1); return; }
@@ -739,10 +871,12 @@ function applyTouchSides() {
 }
 
 canvas.addEventListener('pointerdown', function (e) {
+  e.preventDefault();
+  // A tap anywhere on the covered view resumes, and does not also steer.
+  if (paused) { setPaused(false); return; }
   touchSides.set(e.pointerId, pointerSide(e));
   applyTouchSides();
   if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
-  e.preventDefault();
   firstGesture();
   startOrRestart();
 });
@@ -938,7 +1072,18 @@ tiltBtn.hidden = !tilt.supported;
    be measured on a real device rather than assumed on this one.
    ------------------------------------------------------------------ */
 const fpsBtn = document.getElementById('fpsBtn');
+const pauseBtn = document.getElementById('pauseBtn');
 const tunerEl = document.getElementById('tuner');
+
+/* The pause button lives inside #chrome, which already has the
+   pointer-events discipline described in the stylesheet. That is the whole
+   reason it is there and not in a container of its own. */
+pauseBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+pauseBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  pauseBtn.blur();
+  togglePause();
+});
 let showDebug = false;
 let fpsFrames = 0, fpsElapsed = 0, fpsWorst = 0, fpsShown = 0, fpsWorstShown = 0;
 
@@ -1008,6 +1153,14 @@ function tunerLine(group) {
     // Below this the flare loses to the width one segment gains by being
     // nearer, and the cliff stops being visible at all.
     out += 'min ' + Math.round(660000 / FEEL.CAMERA_DISTANCE);
+  }
+  if (group === 5) {
+    /* The ceiling, live. The share of full steering lock the hardest
+       corner on the road consumes just to hold a line, against the largest
+       curvature the generator has actually produced rather than against
+       the constant. At 1.00 that corner cannot be driven at all. */
+    const peak = Math.max(maxCurveSeen, 0);
+    out += 'ceil ' + (peak * FEEL.CENTRIFUGAL).toFixed(2) + ' @' + peak.toFixed(1);
   }
   return out;
 }
@@ -1159,9 +1312,13 @@ function addSegment(curve, halfWidth) {
   // of this segment's own width so they draw correctly wherever it is.
   // Marks ride the segments, so trimming the road behind the camera frees
   // them too and nothing accumulates over a run.
+  const mag = curve < 0 ? -curve : curve;
+  if (mag > maxCurveSeen) maxCurveSeen = mag;
   segments.push({
     index: segBase + segments.length, curve: curve, hw: halfWidth,
-    ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0
+    ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0,
+    // Ramp and ring, both null on almost every segment.
+    ramp: 0, rampH: 0, ringH: 0, ringOff: 0, ringTaken: 0
   });
 }
 
@@ -1315,6 +1472,28 @@ const PHRASES = [
     }
   },
   {
+    /* A ramp on one edge, with a run up to line it up on and a landing
+       strip to come down on. Deliberately built on a straight.
+
+       That is not only for readability. The car's position is held
+       relative to the road centre, so in the air, with the centrifugal
+       term switched off, it keeps its road relative offset and therefore
+       follows the curve of the road while it is supposed to be flying
+       straight. On a straight there is no curve to follow and the
+       contradiction never arises. */
+    name: 'launch', intensity: 2,
+    build: function () {
+      const side = pickDir();
+      addRun(vary(FEEL.RECOVERY_MIN), 0, 0, roadWidth, 1, true);
+      const from = segBase + segments.length;
+      addRun(FEEL.RAMP_LENGTH, 0, 0, 1, 1, false);
+      const lip = segBase + segments.length - 1;
+      // Enough landing strip for the whole arc plus room to gather it up.
+      addRun(FEEL.RAMP_LANDING, 0, 0, 1, 1, false);
+      shapeRamp(from, lip, side);
+    }
+  },
+  {
     // A dogleg. Out and straight back, over in a moment, and the shape
     // that most rewards a flick rather than a steer.
     name: 'jink', intensity: 1,
@@ -1402,6 +1581,37 @@ const PHRASES = [
   }
 ];
 
+/* Write the ramp onto the segments it climbs, and put the ring where a
+   fully committed jump actually peaks.
+
+   The arc is worked out here rather than at collection time, from the same
+   constants the flight uses, so the ring and the physics cannot drift
+   apart. Leave the ramp early and the launch is from lower down, the arc
+   is flatter, and the ring is missed. That is the whole point of it. */
+function shapeRamp(from, lip, side) {
+  const climbSegments = lip - from + 1;
+  for (let i = from; i <= lip; i++) {
+    const s = segAt(i);
+    if (!s) continue;
+    s.ramp = side;
+    s.rampH = FEEL.RAMP_HEIGHT * (i - from + 1) / climbSegments;
+  }
+
+  const climbTime = climbSegments * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
+  const vy = FEEL.RAMP_HEIGHT / climbTime;
+  const apexTime = vy / FEEL.AIR_GRAVITY;
+  const apexHeight = FEEL.RAMP_HEIGHT + vy * vy / (2 * FEEL.AIR_GRAVITY);
+  const apexAhead = FEEL.SPEED * apexTime;
+
+  const ringIndex = lip + Math.round(apexAhead / FEEL.SEGMENT_LENGTH);
+  const ring = segAt(ringIndex);
+  if (!ring) return;
+  ring.ringH = apexHeight;
+  // Straight off the middle of the ramp, because a well driven launch has
+  // no sideways speed left at the lip.
+  ring.ringOff = side * (FEEL.RAMP_INNER + EDGE_OUT) / 2;
+}
+
 /* Rhythm. A hard phrase buys the player calm on either side of it, so
    pressure arrives in waves rather than as a flat wall. */
 let restOwed = 0;
@@ -1476,6 +1686,29 @@ function topUpRoad(baseIndex) {
 const TITLE = 0, DRIVING = 1, DEAD = 2;
 let state = TITLE;
 
+/* Pause. Section 12 says no pause and the author has overruled it: this
+   audience is on managed devices and sometimes needs the screen gone in
+   one tap, and calls arrive mid run on a phone. Section 5 is untouched,
+   because restart after death is still instant and on the same input.
+   This is for during a run only.
+
+   It blanks the view rather than freezing it. A pause that leaves the
+   road on screen is a cheat button in a reflex game: it hands the player
+   as long as they like to study the corner they are about to enter and
+   plan the line through it. */
+let paused = false;
+
+function setPaused(on) {
+  if (on && state !== DRIVING) return;
+  paused = on;
+  pauseBtn.textContent = on ? 'Resume' : 'Pause';
+}
+
+function togglePause() {
+  if (paused) setPaused(false);
+  else if (state === DRIVING) setPaused(true);
+}
+
 let position = 0;        // camera z, world units
 /* The car's offset from the road centre is held in world units, not in
    road half widths. That is what makes a narrower road genuinely harder:
@@ -1493,10 +1726,16 @@ let shakeX = 0, shakeY = 0;
 let deadFor = 0;
 let lastMarkSeg = -1;
 let carSegIndex = 0;     // the segment the car is on, read by the trail fade
-let carY = 0;            // height above the road, only ever negative, while falling
+let carCurve = 0;        // road curvature under the car, read by the drawn yaw
+let maxCurveSeen = 0;    // largest curvature the generator has actually produced
+let carY = 0;            // height above the road: a ramp, a jump, or a fall
 let carFallV = 0;
 let carPitch = 0;
 let coastSpeed = 0;
+let airborne = false;
+let airVy = 0;
+let prevCarSeg = 0;      // so a fast frame cannot skip past a ring
+let ringFlash = 0;       // seconds left on the collection response
 
 /* The drift state, in one place, because the slip angle is what 4.4
    scores and it should be read from here rather than recomputed. Nothing
@@ -1543,6 +1782,12 @@ function startRun() {
   carFallV = 0;
   carPitch = 0;
   coastSpeed = 0;
+  airborne = false;
+  airVy = 0;
+  prevCarSeg = 0;
+  ringFlash = 0;
+  cameraLift = 0;
+  barShow = 0;
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
   smokeCount = 0;
   smokeAcc = 0;
@@ -1562,6 +1807,13 @@ function update(dt) {
   shakeX = (Math.random() * 2 - 1) * shake;
   shakeY = (Math.random() * 2 - 1) * shake;
 
+  // The camera chases the car's height, and everything projects against
+  // the result rather than against the constant.
+  const target = carY > 0 ? carY * FEEL.CAMERA_AIR_FOLLOW : 0;
+  cameraLift += (target - cameraLift) * (1 - Math.exp(-dt / FEEL.CAMERA_AIR_TIME));
+  camHeight = FEEL.CAMERA_HEIGHT + cameraLift;
+  if (ringFlash > 0) ringFlash -= dt;
+
   if (state === DEAD) { updateFall(dt); return; }
   if (state !== DRIVING) return;
 
@@ -1570,10 +1822,18 @@ function update(dt) {
   carSegIndex = carIndex;
   const carSegment = segAt(carIndex);
   const curve = carSegment ? carSegment.curve : 0;
+  carCurve = curve;
   const localHalf = carSegment ? carSegment.hw : FEEL.ROAD_HALF_WIDTH_BASE;
 
   const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1);
   position += speed * dt;
+
+  /* Whether the car is on the road, climbing a ramp or in the air is
+     settled here, from where it was at the end of the last frame, because
+     the lateral model below branches on it. A frame of lag on that
+     decision is not visible; a circular dependency would be. */
+  const rampNow = !airborne && carSegment && carSegment.ramp !== 0
+                  && onRampBand(carSegment);
 
   /* The only place steering is consumed, and the whole drift model.
 
@@ -1588,18 +1848,32 @@ function update(dt) {
   // the local width.
   const rate = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE;
   const intent = steering.value * rate;
-  const gripTarget = intent - curve * FEEL.CENTRIFUGAL * rate;
+  // The nose still comes round to where the driver is pointing, in the air
+  // as much as on the road. Only the tyres stop mattering.
   drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME));
-  drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
 
-  // The acceleration the model is actually applying sideways, straight out
-  // of the lerp rather than differenced between frames, so it is smooth
-  // enough to lean a body on without any filtering.
-  drift.lateralAccel = (gripTarget - drift.lateralV) / FEEL.GRIP_TIME;
+  if (airborne) {
+    /* Nothing under the wheels. Whatever sideways speed the car left the
+       lip with carries it, which is what makes launching mid slide throw
+       it off the cliff, and the steering barely touches it. */
+    drift.lateralV += steering.value * rate * FEEL.AIR_STEER * dt;
+    drift.lateralAccel = 0;
+  } else {
+    const gripTarget = intent - curve * FEEL.CENTRIFUGAL * rate;
+    drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
+    // The acceleration the model is actually applying sideways, straight
+    // out of the lerp rather than differenced between frames, so it is
+    // smooth enough to lean a body on without any filtering.
+    drift.lateralAccel = (gripTarget - drift.lateralV) / FEEL.GRIP_TIME;
+  }
 
   const prevX = carX;
   carX += drift.lateralV * dt;
   carFrac = carX / localHalf;
+
+  updateVertical(dt, rampNow, carSegment);
+  collectRings(carIndex, localHalf);
+  prevCarSeg = carIndex;
 
   // Sideways speed against forward speed is an angle. The difference of
   // the two angles is the slip.
@@ -1609,8 +1883,19 @@ function update(dt) {
   drift.slipDeg = drift.slip * 180 / Math.PI;
   drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
 
-  layTyreMarks(carIndex, prevX);
+  // No marks and no smoke with the wheels off the ground.
+  if (carY <= 0) layTyreMarks(carIndex, prevX);
   updateSmoke(dt);
+
+  /* Off the ground, none of the road's bands apply. A ramp climb is not a
+     scrape even though it runs out over the shoulder, and a jump is not a
+     crash until it comes back down. Landing is checked the moment it does,
+     which is the frame updateVertical reports. */
+  if (carY > 0) {
+    scraping = false;
+    scrapeSide = 0;
+    return;
+  }
 
   const offset = Math.abs(carFrac);
   if (offset > FEEL.OFF_ROAD) { crash(); return; }
@@ -1625,6 +1910,75 @@ function update(dt) {
     scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
   }
   scrapeRisk = clamp(scrapeMeter / FEEL.SCRAPE_TIME_LIMIT, 0, 1);
+}
+
+/* Is the car laterally on the ramp's wedge? The ramp occupies the outer
+   part of one side, so this is a side test and a band test at once. */
+function onRampBand(seg) {
+  const f = carFrac * seg.ramp;
+  return f >= FEEL.RAMP_INNER && f <= EDGE_OUT;
+}
+
+/* How fast the wedge is lifting the car, which is what it launches with.
+   Leaving the ramp early launches at the same rate from a lower height, so
+   the arc is flatter and the ring is out of reach. */
+function rampLaunchSpeed() {
+  const climbTime = FEEL.RAMP_LENGTH * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
+  return FEEL.RAMP_HEIGHT / climbTime;
+}
+
+/* Height, ramps and flight. On the frame the car touches back down it
+   sets the height to zero, which is what lets the caller run the road's
+   checks again on that same frame rather than one late. */
+function updateVertical(dt, rampNow, carSegment) {
+  if (airborne) {
+    carY += airVy * dt;
+    airVy -= FEEL.AIR_GRAVITY * dt;
+    if (carY <= 0) {
+      carY = 0;
+      airborne = false;
+      airVy = 0;
+      if (shake < FEEL.LAND_SHAKE_PX) shake = FEEL.LAND_SHAKE_PX;
+    }
+    return;
+  }
+
+  if (rampNow) {
+    carY = carSegment.rampH;
+    return;
+  }
+
+  // Off the end of the wedge, or steered off the side of it, with height
+  // still under the wheels. That is the launch.
+  if (carY > 0) {
+    airborne = true;
+    airVy = rampLaunchSpeed();
+    return;
+  }
+
+  carY = 0;
+}
+
+/* Rings, checked across every segment the car crossed this frame rather
+   than only the one it ended on, because a long frame covers more than two
+   segments and would otherwise pass straight through one. */
+function collectRings(carIndex, localHalf) {
+  let from = carIndex - 3;
+  if (prevCarSeg > from) from = prevCarSeg;
+  for (let i = from; i <= carIndex; i++) {
+    const s = segAt(i);
+    if (!s || s.ringH <= 0 || s.ringTaken) continue;
+    const dx = carX - s.ringOff * localHalf;
+    const dy = carY - s.ringH;
+    const r = FEEL.RING_RADIUS * FEEL.RING_CATCH;
+    if (dx * dx + dy * dy > r * r) continue;
+    s.ringTaken = 1;
+    // The whole point of it: the scrape budget comes back outright.
+    scrapeMeter = 0;
+    scrapeRisk = 0;
+    ringFlash = FEEL.RING_FLASH_TIME;
+    barShow = 1;
+  }
 }
 
 function crash() {
@@ -1669,13 +2023,28 @@ function updateFall(dt) {
    their own, so they curve with the road for free and get thrown away
    with it.
    ================================================================== */
+/* How far the car is turned, in radians, and the single source of it. The
+   drawn body and the rear wheel contact points both read this, so the
+   marks can never come off a car pointing somewhere else.
+
+   Two terms. The steering the driver is asking for, and the curvature of
+   the road under the car. The second one is not physical, because the
+   camera turns with the road, but without it a car coasting through a
+   bend sits square while the world rotates around it and nothing about
+   the corner reads. */
+function dead() { return state === DEAD; }
+
+function carYaw() {
+  return drift.headingAngle * FEEL.CAR_YAW_GAIN + carCurve * FEEL.CAR_CURVE_YAW;
+}
+
 /* Where the two rear wheels touch the road, in world units, given a centre
    position. They yaw with the body, so as the car comes sideways the pair
    swings apart and the two marks sweep away from each other. That
    divergence is the rotation, drawn. */
 const rearContact = { left: 0, right: 0 };
 function rearWheelOffsets(centreX) {
-  const yaw = drift.headingAngle * FEEL.CAR_YAW_GAIN;
+  const yaw = carYaw();
   const c = Math.cos(yaw), s = Math.sin(yaw);
   const trackHalf = FEEL.CAR_TRACK / 2;
   const shared = -FEEL.CAR_WHEELBASE / 2 * s;
@@ -1770,7 +2139,7 @@ function updateSmoke(dt) {
    the camera, the columns slide with the car, and the whole thing is two
    stroked paths. Kept dim: nothing down here may compete with the edges. */
 function drawGrid(w, h) {
-  const rise = FEEL.CAMERA_HEIGHT + FEEL.GRID_DEPTH;
+  const rise = camHeight + FEEL.GRID_DEPTH;
   const spacing = FEEL.GRID_SPACING;
   const offset = position - Math.floor(position / spacing) * spacing;
 
@@ -1887,7 +2256,7 @@ function drawSmoke() {
 function projectPoint(out, wx, wy, wz, camX, w, h) {
   const scale = CAMERA_DEPTH / wz;
   out.sx = w / 2 + scale * (wx - camX) * w / 2;
-  out.sy = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2 - scale * wy * w / 2;
+  out.sy = horizonY + scale * camHeight * h / 2 - scale * wy * w / 2;
   return out;
 }
 
@@ -1919,6 +2288,8 @@ const bw = new Float64Array(MAX_BOUNDS);
 const bz = new Float64Array(MAX_BOUNDS);
 const bt = new Float64Array(MAX_BOUNDS);
 const bf = new Float64Array(MAX_BOUNDS);
+const bh = new Float64Array(MAX_BOUNDS);   // world height to pixels at this boundary
+let anyRamp = false, anyRing = false;
 const bvis = new Uint8Array(MAX_BOUNDS);
 const blight = new Uint8Array(MAX_BOUNDS);
 
@@ -1931,6 +2302,7 @@ const WALL_CULL_PX = 1.6;
 const EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
 const SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
 const PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
+const RING_GLOW_FILL = 'rgb(' + COLOUR.RING_GLOW + ')';
 // The outer lip of the slab, half width plus the shoulder, as a multiple
 // of the half width. The shoulder is the scrape band, so the drawn edge of
 // the road really is the last place the car may be.
@@ -1963,13 +2335,14 @@ function drawRoad(w, h) {
     const dz = (baseIndex + k) * seg - position;
     const scale = CAMERA_DEPTH / dz;
     bx[k] = w / 2 + scale * (x - camX) * w / 2;
-    by[k] = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2;
+    by[k] = horizonY + scale * camHeight * h / 2;
     bw[k] = scale * lastHw * w / 2;
     bz[k] = dz;
     // Thickness is a height, so it uses the horizontal scale, the same way
     // the car's height does and for the same reason.
     bt[k] = scale * FEEL.ROAD_THICKNESS * w / 2;
     bf[k] = scale * FEEL.ROAD_FLARE * w / 2;
+    bh[k] = scale * w / 2;
     count = k;
     if (baseIndex + k === carIdx) carCurveX = x + dx * carSegFrac;
     if (!s) break;
@@ -1983,6 +2356,8 @@ function drawRoad(w, h) {
      entire road, which is what pays for the pylons and the glow. */
   let maxy = h;
   let first = -1, last = -1;
+  anyRamp = false;
+  anyRing = false;
   for (let n = 0; n < count; n++) {
     const s = segAt(baseIndex + n);
     bvis[n] = 0;
@@ -1990,6 +2365,11 @@ function drawRoad(w, h) {
     if (bz[n] <= CAMERA_DEPTH || by[n + 1] >= by[n] || by[n + 1] >= maxy) continue;
     bvis[n] = 1;
     blight[n] = (Math.floor(s.index / FEEL.RUMBLE_SEGMENTS) & 1) === 0 ? 1 : 0;
+    // Ramps and rings are rare, so note here whether there are any in shot
+    // at all. Without this their passes still sweep the whole draw distance
+    // on every frame of a road that has neither.
+    if (s.ramp) anyRamp = true;
+    if (s.ringH > 0) anyRing = true;
     if (first < 0) first = n;
     last = n;
     maxy = by[n + 1];
@@ -2010,7 +2390,101 @@ function drawRoad(w, h) {
   lanePass(first, last);
   edgeGlowPass(first, last);
   drawTrail(first, last, baseIndex);
+  if (anyRamp) drawRamps(first, last, baseIndex);
   drawPylons(first, last, baseIndex, w);
+  if (anyRing) drawRings(first, last, baseIndex);
+}
+
+/* The wedge. Its top surface, the inner face under it, and a lit line
+   along the leading edge so the launch point is unmistakable from a long
+   way back. Three batched fills for every ramp in view. */
+function drawRamps(first, last, baseIndex) {
+  let any = false;
+  ctx.beginPath();
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const s = segAt(baseIndex + n), t = segAt(baseIndex + n + 1);
+    if (!s || !s.ramp) continue;
+    any = true;
+    const side = s.ramp;
+    const hN = t && t.ramp ? t.rampH : (s.rampH);
+    const y1 = by[n] - bh[n] * s.rampH, y2 = by[n + 1] - bh[n + 1] * hN;
+    const i1 = bx[n] + side * bw[n] * FEEL.RAMP_INNER;
+    const i2 = bx[n + 1] + side * bw[n + 1] * FEEL.RAMP_INNER;
+    const o1 = bx[n] + side * bw[n] * EDGE_OUT;
+    const o2 = bx[n + 1] + side * bw[n + 1] * EDGE_OUT;
+    ctx.moveTo(i1, y1); ctx.lineTo(o1, y1); ctx.lineTo(o2, y2); ctx.lineTo(i2, y2);
+    ctx.closePath();
+  }
+  if (!any) return;
+  ctx.fillStyle = COLOUR.RAMP_TOP;
+  ctx.fill();
+
+  // The inner face, from the road up to the wedge.
+  ctx.beginPath();
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const s = segAt(baseIndex + n), t = segAt(baseIndex + n + 1);
+    if (!s || !s.ramp) continue;
+    const side = s.ramp;
+    const hN = t && t.ramp ? t.rampH : s.rampH;
+    const i1 = bx[n] + side * bw[n] * FEEL.RAMP_INNER;
+    const i2 = bx[n + 1] + side * bw[n + 1] * FEEL.RAMP_INNER;
+    ctx.moveTo(i1, by[n] - bh[n] * s.rampH); ctx.lineTo(i1, by[n]);
+    ctx.lineTo(i2, by[n + 1]); ctx.lineTo(i2, by[n + 1] - bh[n + 1] * hN);
+    ctx.closePath();
+  }
+  ctx.fillStyle = COLOUR.RAMP_SIDE;
+  ctx.fill();
+
+  // The lip, lit.
+  ctx.beginPath();
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const s = segAt(baseIndex + n), t = segAt(baseIndex + n + 1);
+    if (!s || !s.ramp || (t && t.ramp)) continue;   // only the last one
+    const side = s.ramp;
+    const y = by[n] - bh[n] * s.rampH;
+    const i1 = bx[n] + side * bw[n] * FEEL.RAMP_INNER;
+    const o1 = bx[n] + side * bw[n] * EDGE_OUT;
+    const thick = Math.max(1.5, bh[n] * 70);
+    ctx.moveTo(i1, y - thick); ctx.lineTo(o1, y - thick);
+    ctx.lineTo(o1, y + thick); ctx.lineTo(i1, y + thick);
+    ctx.closePath();
+  }
+  ctx.fillStyle = COLOUR.RAMP_LIP;
+  ctx.fill();
+}
+
+/* The rings. A hoop standing in the air at the top of the arc, drawn wide
+   and faint then normal like every other lit thing here, and turned to a
+   different colour once taken so missing one is unmistakable. */
+function drawRings(first, last, baseIndex) {
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const s = segAt(baseIndex + n);
+    if (!s || s.ringH <= 0) continue;
+    const cx = bx[n] + s.ringOff * bw[n];
+    const cy = by[n] - bh[n] * s.ringH;
+    const r = bh[n] * FEEL.RING_RADIUS;
+    if (r < 2) continue;
+    if (s.ringTaken) {
+      ctx.strokeStyle = COLOUR.RING_TAKEN;
+      ctx.lineWidth = Math.max(1, r * 0.06);
+      ctx.globalAlpha = 0.35;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = 1;
+      continue;
+    }
+    ctx.strokeStyle = RING_GLOW_FILL;
+    ctx.globalAlpha = FEEL.RING_GLOW_ALPHA;
+    ctx.lineWidth = Math.max(2, r * 0.34);
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = COLOUR.RING;
+    ctx.lineWidth = Math.max(1.5, r * 0.11);
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  }
 }
 
 /* One colour, both sides of the road, every segment on the given stripe.
@@ -2370,7 +2844,7 @@ function drawBox(ox, oy, oz, hw, hh, hl, extraYaw, rolled, faceColours, stroked,
     const c = boxPts[face.idx[2]], d = boxPts[face.idx[3]];
     // Centre of the face, against the camera at (camX, CAMERA_HEIGHT, 0).
     const vx = (a.wx + b.wx + c.wx + d.wx) * 0.25 - camX;
-    const vy = (a.wy + b.wy + c.wy + d.wy) * 0.25 - FEEL.CAMERA_HEIGHT;
+    const vy = (a.wy + b.wy + c.wy + d.wy) * 0.25 - camHeight;
     const vz = (a.wz + b.wz + c.wz + d.wz) * 0.25;
     if (n.wx * vx + n.wy * vy + n.wz * vz >= 0) continue;   // facing away
     if (f === 0) drawBox.drewRear = true;
@@ -2483,7 +2957,7 @@ const CAR_POOL_GRADS = [];
 
 function drawCar(w, h) {
   const camX = carX;
-  const yaw = drift.headingAngle * FEEL.CAR_YAW_GAIN;
+  const yaw = carYaw();
   const roll = clamp(drift.lateralAccel / FEEL.CAR_ROLL_REFERENCE, -1, 1)
              * FEEL.CAR_ROLL_DEG * Math.PI / 180;
 
@@ -2513,6 +2987,22 @@ function drawCar(w, h) {
   // A pool of the car's own light on the road, so it sits in the world
   // rather than on it, with the contact shadow still under it. Gone once
   // it has left the road, because there is nothing there to light.
+  /* The shadow stays on the road while the car is in the air, shrinking
+     and fading with height. Without it a jump reads as the car sitting
+     still while the camera drifts, because the camera is following it up
+     and there is nothing else left to measure the height against. */
+  if (carY > 0 && !dead()) {
+    const lift = clamp(carY / FEEL.RAMP_HEIGHT, 0, 2.4);
+    const shrink = 1 / (1 + lift * 0.55);
+    const keepY = carT.worldY;
+    carT.worldY = 0;
+    ctx.globalAlpha = clamp(0.85 - lift * 0.3, 0.15, 1);
+    drawBox(0, 1, 0, halfW * 0.96 * shrink, 1, halfL * 0.96 * shrink, 0, false,
+            SHADOW_COLOURS, false, camX, w, h);
+    ctx.globalAlpha = 1;
+    carT.worldY = keepY;
+  }
+
   if (carY === 0) {
     carToWorld(poolPt, 0, 0, 0, false);
     projectPoint(poolPt, poolPt.wx, poolPt.wy, poolPt.wz, camX, w, h);
@@ -2623,6 +3113,38 @@ function drawOverlay(w, h) {
   }
 }
 
+/* The scrape budget, drawn low and central. It shows what is left rather
+   than what is spent, so a full bar means safe, and it fades out entirely
+   when there is nothing to say. A ring collection swells and whitens it,
+   because collecting something and seeing no response is worse than not
+   showing it at all. */
+let barShow = 0;
+function updateBar(dt) {
+  const wanted = (state === DRIVING && scrapeRisk > 0.01) || ringFlash > 0 ? 1 : 0;
+  if (wanted) barShow = 1;
+  else barShow = Math.max(0, barShow - dt / FEEL.BAR_FADE_TIME);
+}
+
+function drawBar(w, h) {
+  if (barShow <= 0) return;
+  const flash = ringFlash > 0 ? ringFlash / FEEL.RING_FLASH_TIME : 0;
+  const left = 1 - scrapeRisk;
+  const bw2 = w * FEEL.BAR_WIDTH;
+  const bh2 = FEEL.BAR_HEIGHT * (1 + flash * (FEEL.BAR_PULSE_SCALE - 1));
+  const x = (w - bw2) / 2;
+  const y = h - safeBottom - FEEL.BAR_BOTTOM - bh2;
+
+  ctx.globalAlpha = barShow * FEEL.BAR_ALPHA;
+  ctx.fillStyle = COLOUR.BAR_TRACK;
+  ctx.fillRect(x, y, bw2, bh2);
+  // Cool while there is room, warm as it runs out, which is the same thing
+  // the edge flash is saying at the same moment.
+  ctx.fillStyle = flash > 0 ? COLOUR.BAR_RING
+                : (left < 0.35 ? COLOUR.BAR_LOW : COLOUR.BAR_FILL);
+  ctx.fillRect(x, y, bw2 * left, bh2);
+  ctx.globalAlpha = 1;
+}
+
 /* The debug readout. Everything needed to report a camera back sits on
    one line, so a screenshot is a complete answer. */
 function drawHud(w, h) {
@@ -2635,6 +3157,7 @@ function drawHud(w, h) {
     tunerLine(2),
     tunerLine(3),
     tunerLine(4),
+    tunerLine(5),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free')
   ];
@@ -2681,8 +3204,22 @@ function render() {
   ctx.restore();
 
   drawScrapeFlash(w, h);
+  drawBar(w, h);
   drawOverlay(w, h);
+  drawPauseCover(w, h);
   drawHud(w, h);
+}
+
+/* The cover. Opaque, over everything except the debug readout, because
+   leaving the road visible turns the pause into a free look at the corner
+   ahead. */
+function drawPauseCover(w, h) {
+  if (!paused) return;
+  ctx.fillStyle = COLOUR.PAUSE_COVER;
+  ctx.fillRect(0, 0, w, h);
+  const s = Math.min(w, h);
+  text('PAUSED', w / 2, h * 0.44, Math.round(s * 0.11), '800');
+  text('tap to resume', w / 2, h * 0.53, Math.round(s * 0.045), '600');
 }
 
 
@@ -2704,9 +3241,18 @@ function frame(now) {
   }
 
   updateRepeat(dt);
+  if (paused) {
+    // Nothing moves and nothing is read, but the frame still runs so the
+    // cover is drawn and the buttons stay live.
+    clearHeldInput();
+    render();
+    sampleFps(rawDt);
+    return;
+  }
   updateTilt(dt);
   updateSteering(dt);
   update(dt);
+  updateBar(dt);
   render();
   sampleFps(rawDt);
 }
