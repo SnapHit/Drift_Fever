@@ -943,6 +943,118 @@ const FEEL = {
   CURVE_SCALE:              2.5,     // LIVE, the reference the ramp is built around
 
   /* ----------------------------------------------------------------
+     Road hazards, which is section 4.5: escalate by KIND, not by degree.
+     Three of them, each a different skill, introduced one at a time.
+
+     BLOCKER  occupies part of the width. A line change. Placed off centre
+              so the clean line often runs near an edge, which spends the
+              scrape economy that already exists rather than inventing a
+              second one.
+     SPLITTER a long bar down the middle. Pick a side and commit. A
+              decision rather than a reflex, and a fork in feel without
+              any fork geometry.
+     MOVER    a blocker sliding across the road. Timing.
+
+     All three are the same box with different parameters, so there is one
+     piece of geometry, one collision test and one draw pass.
+
+     THEY MUST NEVER BE UNAVOIDABLE, and that is enforced rather than
+     hoped for. See hazardFits: every candidate is checked against the
+     lateral distance the car can actually cover in the warning distance,
+     at the worst curvature in the span, from the worst starting side, and
+     rejected if the margin is under HAZARD_SAFETY. Nothing is placed that
+     has not passed.
+
+     THEY GET THE SAME THREE BANDS AS THE ROAD EDGE. Clipping the shoulder
+     of one drives the existing scrape state, so it costs speed and budget
+     and brings the flash and the shake with it. Hitting the core kills.
+     Section 4.2's argument against a binary cliff applies to a hazard
+     exactly as it applies to the road edge. */
+  HAZARD_HEIGHT:            620,     // world units, tall enough to read at distance
+  HAZARD_CLIP:              140,     // world units of shoulder each side, the middle band
+  HAZARD_WARN_SEGMENTS:      45,     // a full second of warning, painted on the road
+  HAZARD_WARN_STRIPES:        5,
+  /* The curvature a hazard may sit in at its entry, after the scale.
+
+     This is a READABILITY bound and nothing else. The road slides off the
+     side of the screen at about 2L/(CAMERA_DEPTH x curvature) segments,
+     so for a warning run of 45 segments to be on screen at all the
+     curvature has to stay under about 9.2. Set below that with margin.
+
+     It deliberately does NOT try to be the safety bound as well. The
+     crossing check in hazardFits already uses the actual curvature of the
+     actual span, so it rejects anything unreachable by arithmetic rather
+     than by a blanket rule, and it self limits long before this: at 7.0,
+     centrifugal has eaten 87% of the steering and almost nothing passes.
+     Setting this to 3.0 as a catch-all made hazards so rare that a player
+     met one every ten minutes. */
+  HAZARD_MAX_CURVE:         7.0,
+  HAZARD_SAFETY:           1.35,     // required margin on the crossing check
+  /* A gap exactly one car wide is not a gap. The car carries GRIP_TIME of
+     lag, so it cannot be placed into a slot and held there, and a check
+     that only asks whether the centre fits will happily build one. Every
+     usable gap has to admit the car and this much slack as well. Movers
+     were the ones that exposed it: at the ends of their swing they left
+     a sliver against the far edge that passed a centre-fits test and was
+     undriveable in practice. */
+  HAZARD_MIN_GAP:           260,     // world units of slack beyond the car
+
+  /* The crossing has to be made at the ENTRY. Once alongside a hazard the
+     car only has to hold a lane, which is a much weaker requirement, so
+     the strict curvature gate covers the warning run and the first few
+     segments and the body is allowed to bend further.
+
+     Without this a splitter never places at all: 44 segments of hazard
+     plus 45 of warning is 89 segments, and 89 segments under a post scale
+     curvature of 3.0 essentially never occurs in this grammar. The body
+     limit is set below the point where centrifugal eats the whole of the
+     steering, which is 1/CENTRIFUGAL, about 8.0, so the car can always
+     still hold its lane. */
+  HAZARD_ENTRY_SEGMENTS:      8,
+  HAZARD_BODY_CURVE:        6.0,
+
+  BLOCKER_HALF:             420,     // world units
+  BLOCKER_SEGMENTS:           5,
+  BLOCKER_OFFSET_MIN:      0.28,     // road half widths from the centre line
+  BLOCKER_OFFSET_MAX:      0.62,
+  SPLITTER_HALF:            300,
+  SPLITTER_SEGMENTS:         44,     // about a second of committing to one side
+  MOVER_HALF:               320,
+  MOVER_SEGMENTS:             5,
+  MOVER_SWING:             0.36,     // road half widths either side of centre
+  /* Slow enough to read, and that is a hard number rather than a feel.
+     A mover the car cannot outrun sideways is not a timing problem, it is
+     a coin toss: commit to a side, watch it follow you, die. So the sweep
+     speed is gated against the car's own lateral speed in hazardFits and
+     the placement is rejected if the ratio is under MOVER_OUTRUN. At a
+     swing of 0.52 and this period the mover crosses at about 0.54 half
+     widths per second against roughly 2.0 the car can manage in the worst
+     curvature a hazard is allowed to sit in. */
+  MOVER_PERIOD:             6.0,     // seconds for a full sweep
+  MOVER_OUTRUN:             2.5,     // times faster the car must be, sideways
+
+  /* When each kind first appears, in seconds of the run, and how often
+     one is tried after that. The on ramp has none at all: a new player
+     never meets a mover and a good player meets everything, which is the
+     same split the difficulty ramp already uses and it does the
+     forgiveness work for free. EVERY is a mean gap in segments, so
+     smaller is more often. All six are LIVE. */
+  BLOCKER_TIME:              62,     // seconds, just past the on ramp
+  SPLITTER_TIME:            105,
+  MOVER_TIME:               155,
+  /* Mean segments between ATTEMPTS, not between hazards. Most attempts
+     are refused: every hazard sterilises its own length plus a warning
+     run either side, so nothing under about 2 x HAZARD_WARN_SEGMENTS can
+     ever place twice in a row, and the readability gate throws out any
+     candidate whose warning run passes through a real corner. Measured
+     over half an hour of deep game road that lands at roughly 1.5 hazards
+     a minute all told, and the corner gate rather than these numbers is
+     what caps it. All three are LIVE. */
+  BLOCKER_EVERY:             90,     // LIVE, segments between attempts
+  SPLITTER_EVERY:           650,     // LIVE
+  MOVER_EVERY:              450,     // LIVE
+
+  /* ----------------------------------------------------------------
      Progressive difficulty, in two halves that are deliberately not the
      same thing.
 
@@ -1086,6 +1198,14 @@ const COLOUR = {
 
   PAUSE_COVER:  '#0a0402',      // opaque, so the corner ahead cannot be studied
 
+  /* The hazards. A third colour family, because the road is warm and the
+     car is cool and a hazard must not be mistaken for either. */
+  HAZARD_TOP:   '#ff3d7a',
+  HAZARD_SIDE:  '#8e1338',
+  HAZARD_LIP:   '#ffd6e4',
+  HAZARD_GLOW:  '255,61,122',
+  HAZARD_WARN:  '#ff3d7a',
+
   SCRAPE:       '#fff4d2',
   SCRAPE_OUT:   '#ff2b4d',     // the flash shifts to this as the scrape timer runs out
   SCRAPE_FADE:  '255,244,210',
@@ -1155,6 +1275,15 @@ const TUNABLES = [
   { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 },
   { key: 'CURVE_SCALE',        label: 'curve',   step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
   { key: 'CURVE_SCALE_DEEP',   label: 'deep',    step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
+  // The minimums are above 2 x HAZARD_WARN_SEGMENTS, under which
+  // consecutive attempts always collide with each other's warning runs.
+  { key: 'BLOCKER_EVERY',      label: 'block',   step: 10,   min: 100,  max: 1200,  dp: 0, group: 8 },
+  { key: 'SPLITTER_EVERY',     label: 'split',   step: 25,   min: 100,  max: 2000,  dp: 0, group: 8 },
+  { key: 'MOVER_EVERY',        label: 'mover',   step: 25,   min: 100,  max: 2000,  dp: 0, group: 8 },
+  { key: 'BLOCKER_TIME',       label: 'bAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
+  { key: 'SPLITTER_TIME',      label: 'sAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
+  { key: 'MOVER_TIME',         label: 'mAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
+  { key: 'MOVER_PERIOD',       label: 'sweep',   step: 0.5,  min: 1.5,  max: 20,    dp: 1, group: 9 },
   { key: 'CAMERA_LOOK',        label: 'look',    step: 10,   min: 0,    max: 500,   dp: 0, group: 7 },
   { key: 'CAMERA_LOOK_AHEAD',  label: 'ahead',   step: 500,  min: 0,    max: 30000, dp: 0, group: 7 },
   /* Two positions only, and it is here because the flip button is gone
@@ -1680,6 +1809,16 @@ function tunerLine(group) {
     const peak = maxCurveSeen * curveScale;
     out += 'ceil ' + (peak * FEEL.CENTRIFUGAL).toFixed(2) + ' @' + peak.toFixed(1);
   }
+  if (group === 8) {
+    // What is actually on the road in front of you, live, because spawn
+    // rates cannot be tuned against a number that is not visible.
+    let b = 0, sp = 0, m = 0;
+    for (let i = 0; i < hazards.length; i++) {
+      if (hazards[i].kind === HAZ_BLOCKER) b++;
+      else if (hazards[i].kind === HAZ_SPLITTER) sp++; else m++;
+    }
+    out += 'live ' + b + '/' + sp + '/' + m;
+  }
   if (group === 6) {
     // Seconds of road still in frame, ahead of the car. Below the 3.5 of
     // section 4.3 the corner cannot be planned for, whatever the
@@ -2199,6 +2338,10 @@ function addPhrase() {
 
 function resetRoad(seed) {
   segments = [];
+  hazards = [];
+  hazardDue[HAZ_BLOCKER] = 0;
+  hazardDue[HAZ_SPLITTER] = 0;
+  hazardDue[HAZ_MOVER] = 0;
   segBase = 0;
   rngState = seed >>> 0;
   roadWidth = 1;
@@ -2213,9 +2356,219 @@ function resetRoad(seed) {
   addRun(60, 0, 0, 1, 1, false);
 }
 
+/* ==================================================================
+   HAZARDS
+
+   Held in a list beside the road rather than in fields on every segment.
+   There are only ever a handful inside the draw distance, so a list of
+   objects costs nothing, while seven more fields on every segment would
+   be paid for by the whole road whether or not anything is on it.
+
+   Each entry spans segments [from, to] and occupies a lateral band around
+   x, measured in WORLD units so that a hazard does not shrink when the
+   road narrows. A mover swings its x with time; the other two do not.
+   ================================================================== */
+const HAZ_BLOCKER = 1, HAZ_SPLITTER = 2, HAZ_MOVER = 3;
+let hazards = [];
+let nextHazardSeg = 0;    // the segment index each kind is next tried at
+const hazardDue = { 1: 0, 2: 0, 3: 0 };
+
+/* How far across the road the car can actually get, in world units, from
+   a standstill sideways, in the time it has, with the worst corner in the
+   span pushing the other way the whole time.
+
+   This is the same shape as worstOvershoot: the sideways speed chases its
+   target through GRIP_TIME, so the ground covered in T is not v times T
+   but v times (T minus the lag it spends getting there). */
+function lateralReach(seconds, curve) {
+  const v = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE
+          * (1 - Math.abs(curve) * FEEL.CENTRIFUGAL);
+  if (v <= 0) return 0;
+  return v * (seconds - FEEL.GRIP_TIME * (1 - Math.exp(-seconds / FEEL.GRIP_TIME)));
+}
+
+/* The guarantee. Given a band the car must not be inside, in fractions of
+   the local half width, return the worst crossing any starting position
+   on the painted road can be forced into, or -1 if there is no gap wide
+   enough for the car at all.
+
+   Both edges of the road are considered as starting points, because the
+   player may be anywhere, and for each one the nearer usable gap is taken,
+   because the player will take it. */
+function worstCrossing(lo, hi, carHalf, slack) {
+  /* A gap counts only if it admits the car, the slack beyond it, AND
+     leaves the car clear of the scrape band.
+
+     That last one is not fussiness. A blocker set far enough out leaves a
+     sliver between it and the road edge that a centre-fits test happily
+     calls a gap; the car threads it, and then dies to the scrape timer a
+     second and a half later having avoided the hazard perfectly. Getting
+     past must not cost the run, so the bound here is SCRAPE_START rather
+     than the painted edge, and the hazard system takes its definition of
+     survivable from the same constant the road edge does. */
+  const limit = FEEL.SCRAPE_START;
+  const leftOk = lo - carHalf - slack >= -limit;
+  const rightOk = hi + carHalf + slack <= limit;
+  if (!leftOk && !rightOk) return -1;
+  let worst = 0;
+  for (let k = 0; k < 2; k++) {
+    // The player may be anywhere on the painted road when the warning
+    // appears, so both edges are tried as starting points.
+    const start = k === 0 ? -1 : 1;
+    let best = Infinity;
+    if (leftOk) { const t = lo - carHalf; best = Math.min(best, Math.max(0, start - t)); }
+    if (rightOk) { const t = hi + carHalf; best = Math.min(best, Math.max(0, t - start)); }
+    if (best > worst) worst = best;
+  }
+  return worst;
+}
+
+/* Whether a candidate may be placed. Every condition here is a hard gate
+   and any one of them rejects the placement outright.
+
+   1  the road is straight enough over the whole warning run and the
+      hazard itself, so it is on screen a second out and so the corner
+      does not eat the steering needed to get round it;
+   2  the narrowest segment under it still leaves the car a gap;
+   3  the worst crossing it can force is inside what the car can cover in
+      the warning distance, with HAZARD_SAFETY to spare.
+
+   A mover is checked at both ends of its swing, which is sufficient
+   because the crossing it demands is monotonic in x on each side. */
+function hazardFits(from, to, xFrac, halfWorld, swingFrac) {
+  const warn = FEEL.HAZARD_WARN_SEGMENTS;
+  /* No two hazards may share a stretch of road, including each other's
+     warning runs. Each kind is placed on its own schedule, so without
+     this a blocker and a splitter can land on the same segments: both
+     pass the crossing check alone and together they seal the road. Every
+     check below reasons about ONE band, so one band is what there has to
+     be.
+
+     This is also what "combinations" has to mean here. A run that has
+     everything unlocked meets all three kinds interleaved; it does not
+     meet two at once, because two at once cannot be guaranteed avoidable
+     without solving the pair, and then the triple, and so on. */
+  for (let i = 0; i < hazards.length; i++) {
+    const o = hazards[i];
+    if (from - warn <= o.to && to >= o.from - warn) return false;
+  }
+  const entryEnd = Math.min(to, from + FEEL.HAZARD_ENTRY_SEGMENTS);
+  let entryCurve = 0, bodyCurve = 0, minHw = Infinity;
+  for (let i = from - warn; i <= to; i++) {
+    const seg = segAt(i);
+    if (!seg) return false;                       // not generated, cannot vouch for it
+    const c = Math.abs(seg.curve * curveScale);
+    if (i <= entryEnd) { if (c > entryCurve) entryCurve = c; }
+    if (c > bodyCurve) bodyCurve = c;
+    if (i >= from && seg.hw < minHw) minHw = seg.hw;
+  }
+  // The line change happens here, so this is the strict one.
+  if (entryCurve > FEEL.HAZARD_MAX_CURVE) return false;
+  // Alongside, the car only has to hold a lane, so this is the loose one.
+  if (bodyCurve > FEEL.HAZARD_BODY_CURVE) return false;
+
+  const carHalf = (FEEL.CAR_BODY_WIDTH / 2) / minHw;
+  const slack = FEEL.HAZARD_MIN_GAP / minHw;
+  const half = (halfWorld + FEEL.HAZARD_CLIP) / minHw;   // the clip band counts as blocked
+  const seconds = warn * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
+  const budget = lateralReach(seconds, entryCurve);
+  /* A mover must be outrunnable. Its own sideways speed against the
+     car's, both in half widths per second, in the worst curvature this
+     placement allows. */
+  if (swingFrac > 0) {
+    const moverSpeed = swingFrac * Math.PI * 2 / FEEL.MOVER_PERIOD;
+    const carSpeed = FEEL.STEER_RATE * (1 - entryCurve * FEEL.CENTRIFUGAL);
+    if (carSpeed < moverSpeed * FEEL.MOVER_OUTRUN) return false;
+    /* One side has to stay open for the WHOLE sweep. Checking each end of
+       the swing separately is not enough: it accepts a mover that is
+       passable on the left at one end and only on the right at the other,
+       which forces the player to change sides while the thing is moving
+       and cannot be guaranteed. With a side that is always open, the
+       mover is get out of the middle and hold, which is still timing and
+       is still readable, and it is provable. */
+    const lim = FEEL.SCRAPE_START;
+    let leftAlways = true, rightAlways = true;
+    for (let k = -1; k <= 1; k += 2) {
+      const x = xFrac + k * swingFrac;
+      if (x - half - carHalf - slack < -lim) leftAlways = false;
+      if (x + half + carHalf + slack > lim) rightAlways = false;
+    }
+    if (!leftAlways && !rightAlways) return false;
+  }
+  for (let k = -1; k <= 1; k++) {
+    const x = xFrac + k * swingFrac;
+    if (swingFrac === 0 && k !== 0) continue;
+    const need = worstCrossing(x - half, x + half, carHalf, slack);
+    if (need < 0) return false;                   // no gap wide enough anywhere
+    if (need * minHw * FEEL.HAZARD_SAFETY > budget) return false;
+  }
+  return true;
+}
+
+function addHazard(kind, from, to, xFrac, halfWorld, swingFrac) {
+  if (!hazardFits(from, to, xFrac, halfWorld, swingFrac)) return false;
+  hazards.push({ kind: kind, from: from, to: to, x: xFrac,
+                 half: halfWorld, swing: swingFrac,
+                 phase: rng() * Math.PI * 2 });
+  return true;
+}
+
+/* Where a hazard sits across the road right now, in fractions of the
+   local half width. Only a mover moves, and it moves on run time so it is
+   the same for the drawing and for the collision test. */
+function hazardX(h) {
+  if (h.kind !== HAZ_MOVER) return h.x;
+  return h.x + h.swing * Math.sin(h.phase + runTime * (Math.PI * 2 / FEEL.MOVER_PERIOD));
+}
+
+/* Tried as the road is built, one kind at a time and only once the run
+   has earned it. Each kind keeps its own next-attempt marker, so the
+   frequencies are independent and tunable apart. */
+function placeHazards(from, to) {
+  /* Longest and rarest first. Every hazard claims its own stretch of
+     road including both warning runs, so whoever is tried first wins the
+     ground, and blockers are short and frequent enough to leave a
+     splitter nowhere to go if they go first. */
+  const kinds = [
+    { k: HAZ_SPLITTER, time: FEEL.SPLITTER_TIME, every: FEEL.SPLITTER_EVERY },
+    { k: HAZ_MOVER,    time: FEEL.MOVER_TIME,    every: FEEL.MOVER_EVERY },
+    { k: HAZ_BLOCKER,  time: FEEL.BLOCKER_TIME,  every: FEEL.BLOCKER_EVERY }
+  ];
+  for (let n = 0; n < kinds.length; n++) {
+    const spec = kinds[n];
+    if (runTime < spec.time) { hazardDue[spec.k] = to + spec.every; continue; }
+    if (hazardDue[spec.k] < from) hazardDue[spec.k] = from;
+    while (hazardDue[spec.k] <= to) {
+      const at = hazardDue[spec.k];
+      // Jittered, so the spacing never reads as a metronome.
+      hazardDue[spec.k] = at + Math.round(spec.every * (0.65 + rng() * 0.7));
+      if (spec.k === HAZ_BLOCKER) {
+        const side = rng() < 0.5 ? -1 : 1;
+        const off = FEEL.BLOCKER_OFFSET_MIN
+                  + rng() * (FEEL.BLOCKER_OFFSET_MAX - FEEL.BLOCKER_OFFSET_MIN);
+        addHazard(HAZ_BLOCKER, at, at + FEEL.BLOCKER_SEGMENTS - 1,
+                  side * off, FEEL.BLOCKER_HALF, 0);
+      } else if (spec.k === HAZ_SPLITTER) {
+        addHazard(HAZ_SPLITTER, at, at + FEEL.SPLITTER_SEGMENTS - 1,
+                  0, FEEL.SPLITTER_HALF, 0);
+      } else {
+        addHazard(HAZ_MOVER, at, at + FEEL.MOVER_SEGMENTS - 1,
+                  0, FEEL.MOVER_HALF, FEEL.MOVER_SWING);
+      }
+    }
+  }
+}
+
 function topUpRoad(baseIndex) {
   const needed = baseIndex + FEEL.DRAW_DISTANCE_SEGMENTS + 4;
-  while (segBase + segments.length < needed) addPhrase();
+  while (segBase + segments.length < needed) {
+    const before = segBase + segments.length;
+    addPhrase();
+    /* Placed after the phrase exists, because the checks read the curve
+       and the width of the segments they are going onto, and they need
+       the warning run behind the candidate to exist too. */
+    placeHazards(before, segBase + segments.length - 1);
+  }
   // Trim what is behind the camera, in one splice rather than one shift
   // per frame, so the array does not grow for the length of a run.
   const behind = baseIndex - segBase;
@@ -2223,6 +2576,7 @@ function topUpRoad(baseIndex) {
     const drop = behind - 8;
     segments.splice(0, drop);
     segBase += drop;
+    while (hazards.length && hazards[0].to < segBase) hazards.shift();
   }
 }
 
@@ -2278,6 +2632,7 @@ let shakeX = 0, shakeY = 0;
 let deadFor = 0;
 let lastMarkSeg = -1;
 let carSegIndex = 0;     // the segment the car is on, read by the trail fade
+let prevCarIndex = 0;    // so a long frame cannot tunnel through a hazard
 let carCurve = 0;        // road curvature under the car, read by the drawn yaw
 let maxCurveSeen = 0;    // largest curvature the generator has actually produced
 let carY = 0;            // height above the road, which is the death fall
@@ -2332,6 +2687,9 @@ function startRun() {
   carFallV = 0;
   carPitch = 0;
   coastSpeed = 0;
+  carSegIndex = 0;
+  prevCarIndex = 0;
+  hazardSide = 0;
   barShow = 0;
   score = 0;
   multiplier = 1;
@@ -2369,6 +2727,7 @@ function update(dt) {
   updateDifficulty();
   topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
   const carIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+  prevCarIndex = carSegIndex;
   carSegIndex = carIndex;
   const carSegment = segAt(carIndex);
   // Curvature is stored as shape and scaled on read, so the live gain
@@ -2421,8 +2780,21 @@ function update(dt) {
   const offset = Math.abs(carFrac);
   if (offset > FEEL.OFF_ROAD) { crash(); return; }
 
-  scraping = offset > FEEL.SCRAPE_START;
-  scrapeSide = scraping ? Math.sign(carFrac) : 0;
+  /* Three bands on a hazard, the same three the road edge has. Section
+     4.2's argument is that a binary cliff reads as unfair and a gradient
+     reads as hard, and an insta kill hazard would put the cliff straight
+     back in the middle of the road.
+
+     It cost almost nothing to honour: clipping one sets the same scraping
+     flag the shoulder sets, so the speed penalty, the budget drain, the
+     edge flash, the shake and the bar all come along without a line of
+     new feedback code. Only the death test is the hazard's own. */
+  const clipped = hazardBand(carIndex, localHalf);
+  if (clipped === 2) { crash(); return; }
+
+  scraping = offset > FEEL.SCRAPE_START || clipped === 1;
+  scrapeSide = clipped === 1 ? hazardSide
+             : (scraping ? Math.sign(carFrac) : 0);
   if (scraping) {
     scrapeMeter += dt;
     if (shake < FEEL.SCRAPE_SHAKE_PX) shake = FEEL.SCRAPE_SHAKE_PX;
@@ -2456,6 +2828,35 @@ function lookAheadCurve() {
     weight += w;
   }
   return weight > 0 ? sum * curveScale / weight : 0;
+}
+
+/* Which band of a hazard the car is in on this frame: 0 clear, 1 the
+   clip shoulder, 2 the deadly core. Only hazards the car is actually
+   alongside are considered, and the car is a box, so this is an overlap
+   of two intervals rather than a point test.
+
+   Every segment the car crossed this frame is checked rather than only
+   the one it ended on, because at this speed a long frame covers more
+   than one segment and would otherwise pass straight through a blocker. */
+let hazardSide = 0;
+function hazardBand(carIndex, localHalf) {
+  const carHalf = (FEEL.CAR_BODY_WIDTH / 2) / localHalf;
+  const lo = carFrac - carHalf, hi = carFrac + carHalf;
+  let worst = 0;
+  for (let i = 0; i < hazards.length; i++) {
+    const h = hazards[i];
+    if (h.to < prevCarIndex || h.from > carIndex) continue;
+    const x = hazardX(h);
+    const core = h.half / localHalf;
+    const clip = (h.half + FEEL.HAZARD_CLIP) / localHalf;
+    if (hi <= x - clip || lo >= x + clip) continue;
+    if (hi > x - core && lo < x + core) return 2;
+    worst = 1;
+    // The flash belongs on the side the hazard is, not the side of the
+    // road the car happens to be on.
+    hazardSide = carFrac < x ? -1 : 1;
+  }
+  return worst;
 }
 
 function crash() {
@@ -2881,7 +3282,138 @@ function drawRoad(w, h) {
   lanePass(first, last);
   edgeGlowPass(first, last);
   drawTrail(first, last, baseIndex);
+  drawHazardWarnings(first, last, baseIndex);
   drawPylons(first, last, baseIndex, w);
+  drawHazards(first, last, baseIndex);
+}
+
+/* The warning, painted on the road surface a full second before the
+   hazard, across exactly the width the hazard occupies. This is what real
+   roads do and it costs one batched fill for every warning in shot.
+
+   It matters more here than on a real road, because sight is about two
+   seconds and a hazard that resolves at the same moment it has to be
+   avoided is the unfairness section 4.3 is about. The stripes are on the
+   ground, so they are visible while the object itself is still a speck. */
+function drawHazardWarnings(first, last, baseIndex) {
+  const stripes = FEEL.HAZARD_WARN_STRIPES;
+  const warn = FEEL.HAZARD_WARN_SEGMENTS;
+  const gap = Math.max(2, Math.floor(warn / stripes));
+  let any = false;
+  ctx.beginPath();
+  for (let k = 0; k < hazards.length; k++) {
+    const h = hazards[k];
+    if (h.from - warn > baseIndex + last || h.from < baseIndex + first) continue;
+    const x = hazardX(h);
+    for (let m = 1; m <= stripes; m++) {
+      const at = h.from - m * gap;
+      const n = at - baseIndex;
+      if (n < first || n > last || !bvis[n]) continue;
+      any = true;
+      const half = (h.half + FEEL.HAZARD_CLIP) / segAt(at).hw;
+      const y1 = by[n], y2 = by[n + 1] - 1;
+      const l1 = bx[n] + bw[n] * (x - half), r1 = bx[n] + bw[n] * (x + half);
+      const l2 = bx[n + 1] + bw[n + 1] * (x - half), r2 = bx[n + 1] + bw[n + 1] * (x + half);
+      ctx.moveTo(l1, y1); ctx.lineTo(r1, y1); ctx.lineTo(r2, y2); ctx.lineTo(l2, y2);
+      ctx.closePath();
+    }
+  }
+  if (!any) return;
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = COLOUR.HAZARD_WARN;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+/* The hazards themselves. One box per hazard, standing on the road, drawn
+   in four batched passes over every hazard in shot: a wide faint glow, the
+   near face, the top face and a lit leading edge. Four fills for the whole
+   screen however many are in view, which is the same discipline the road
+   itself is drawn under.
+
+   Heights use the horizontal scale, the same way the car and the road
+   thickness do, so a hazard keeps its proportions rather than being
+   stretched by the vertical anisotropy. */
+function hazardQuads(first, last, baseIndex, spread, top) {
+  let any = false;
+  ctx.beginPath();
+  for (let k = 0; k < hazards.length; k++) {
+    const h = hazards[k];
+    const x = hazardX(h);
+    for (let i = h.from; i <= h.to; i++) {
+      const n = i - baseIndex;
+      if (n < first || n > last || !bvis[n]) continue;
+      const seg = segAt(i);
+      if (!seg) continue;
+      any = true;
+      const half = (h.half + spread) / seg.hw;
+      const rise = top ? bh[n] * FEEL.HAZARD_HEIGHT : 0;
+      const riseN = top ? bh[n + 1] * FEEL.HAZARD_HEIGHT : 0;
+      const y1 = by[n] - rise, y2 = by[n + 1] - 1 - riseN;
+      const l1 = bx[n] + bw[n] * (x - half), r1 = bx[n] + bw[n] * (x + half);
+      const l2 = bx[n + 1] + bw[n + 1] * (x - half), r2 = bx[n + 1] + bw[n + 1] * (x + half);
+      if (top) {
+        // The near face, from the road up to the top of the box.
+        ctx.moveTo(l1, by[n]); ctx.lineTo(r1, by[n]);
+        ctx.lineTo(r1, y1); ctx.lineTo(l1, y1);
+      } else {
+        ctx.moveTo(l1, y1); ctx.lineTo(r1, y1); ctx.lineTo(r2, y2); ctx.lineTo(l2, y2);
+      }
+      ctx.closePath();
+    }
+  }
+  return any;
+}
+
+const HAZARD_GLOW_FILL = 'rgb(' + COLOUR.HAZARD_GLOW + ')';
+function drawHazards(first, last, baseIndex) {
+  if (!hazards.length) return;
+  // Wide and faint first, the same two pass glow the road edges use, and
+  // still no shadowBlur anywhere.
+  if (hazardQuads(first, last, baseIndex, FEEL.HAZARD_CLIP * 2.2, false)) {
+    ctx.globalAlpha = 0.28;
+    ctx.fillStyle = HAZARD_GLOW_FILL;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  // The clip shoulder, which is a real band and is drawn as one.
+  if (hazardQuads(first, last, baseIndex, FEEL.HAZARD_CLIP, false)) {
+    ctx.fillStyle = COLOUR.HAZARD_SIDE;
+    ctx.fill();
+  }
+  // The near face of the core, then its top.
+  if (hazardQuads(first, last, baseIndex, 0, true)) {
+    ctx.fillStyle = COLOUR.HAZARD_SIDE;
+    ctx.fill();
+  }
+  if (hazardQuads(first, last, baseIndex, 0, false)) {
+    ctx.fillStyle = COLOUR.HAZARD_TOP;
+    ctx.fill();
+  }
+  // The lit top edge, so the object resolves as a solid at draw distance
+  // rather than as a smear, exactly as the road lip does.
+  let any = false;
+  ctx.beginPath();
+  for (let k = 0; k < hazards.length; k++) {
+    const h = hazards[k];
+    const x = hazardX(h);
+    for (let i = h.from; i <= h.to; i++) {
+      const n = i - baseIndex;
+      if (n < first || n > last || !bvis[n]) continue;
+      const seg = segAt(i);
+      if (!seg) continue;
+      any = true;
+      const half = h.half / seg.hw;
+      const rise = bh[n] * FEEL.HAZARD_HEIGHT;
+      const y = by[n] - rise;
+      const t = Math.max(1.2, bh[n] * 90);
+      const l1 = bx[n] + bw[n] * (x - half), r1 = bx[n] + bw[n] * (x + half);
+      ctx.moveTo(l1, y - t); ctx.lineTo(r1, y - t);
+      ctx.lineTo(r1, y + t); ctx.lineTo(l1, y + t);
+      ctx.closePath();
+    }
+  }
+  if (any) { ctx.fillStyle = COLOUR.HAZARD_LIP; ctx.fill(); }
 }
 
 /* One colour, both sides of the road, every segment on the given stripe.
@@ -3646,6 +4178,8 @@ function drawHud(w, h) {
     tunerLine(5),
     tunerLine(6),
     tunerLine(7),
+    tunerLine(8),
+    tunerLine(9),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
