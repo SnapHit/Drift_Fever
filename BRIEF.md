@@ -324,7 +324,7 @@ A list of failures rather than a list of good examples, deliberately. Examples i
 
 These are to be answered by playing rather than in advance. Putting answers here would constrain the build for no reason.
 
-- The game's name.
+- ~~The game's name.~~ Settled in session ten: the game is **Drift Fever**. It was called Tailflick between sessions one and nine.
 - Whether the multiplier banks at checkpoints or only on death.
 - What the escalating road features are, and in what order they appear.
 - Whether there are lives, recoveries, or neither.

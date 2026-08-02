@@ -2,9 +2,9 @@
 <html lang="en-au">
 <head>
 <meta charset="utf-8">
-<title>Tailflick</title>
+<title>Drift Fever</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="description" content="Tailflick, a browser drift game. One file, no downloads, nothing to install.">
+<meta name="description" content="Drift Fever, a browser drift game. One file, no downloads, nothing to install.">
 <meta name="theme-color" content="#68c8f0">
 <!-- An empty data URI, so the browser does not go and ask for a favicon.
      That request would be same origin and harmless, but the rule is zero. -->
@@ -40,7 +40,7 @@
      in-play button row in a full width container without this, and the
      invisible strip between the buttons ate every tap across that band of
      the screen. The game was unplayable and the cause took a long time to
-     find, because nothing is visible and nothing throws. Tailflick steers
+     find, because nothing is visible and nothing throws. Drift Fever steers
      on the left and right halves of the screen, so any container laid over
      it is exposed to exactly the same failure. Every new overlay goes in
      here, under these rules, or it gets its own pointer-events none. */
@@ -184,6 +184,7 @@
     <button id="pauseBtn" type="button">Pause</button>
     <button id="fpsBtn" type="button">FPS</button>
     <button id="tiltBtn" type="button" hidden>Tilt</button>
+    <button id="tiltFlipBtn" type="button" hidden>Flip</button>
   </div>
   <div id="note" hidden></div>
 </div>
@@ -193,7 +194,7 @@
 'use strict';
 
 /* ==================================================================
-   TAILFLICK
+   DRIFT FEVER
 
    One self-contained file. No requests, no dependencies, no build.
    Session one: the road, one steering axis, the scrape band, death.
@@ -231,27 +232,30 @@ const FEEL = {
   FIELD_OF_VIEW_DEG:         80,     // LIVE
   CAMERA_HEIGHT:           1800,     // LIVE
   CAMERA_DISTANCE:         4100,     // LIVE, how far the camera sits behind the car
-  /* The camera looks into the corner: its x slides toward the way the road
-     is bending, so the far road stays in frame for longer. LIVE.
+  /* CAMERA_LOOK slides the camera sideways toward the way the road is
+     bending, so the far road stays in frame for longer. It is zero, and
+     zero means the camera is locked to the car: the car sits centred and
+     stays centred, and nothing slides the world sideways underneath the
+     player.
 
-     This is what buys the extra curvature. Curves here are faked by
-     sliding segments sideways, so a tight one walks the far road off the
-     side of the screen and the player cannot see where it goes, which is
-     section 4.3 broken. Offsetting the camera the same way pulls it back
-     into shot.
+     It was 125 and it was wrong. The offset itself was the complaint, not
+     how fast it arrived, and no amount of smoothing or anticipation fixes
+     an offset. Two sessions were spent making the lean gentler when the
+     answer was not to lean. Corner preview is given up with it, and the
+     pylons and the camera height already do that job.
 
-     CAMERA_LOOK_AHEAD is how far up the road it reads that curvature
-     from, and it is the difference between anticipation and a shove.
-     Reading it under the car means the lean only starts once the car is
-     already committed, and a chicane whips the camera both ways as the
-     car passes through it. Averaged over a stretch ahead, weighted toward
-     the near end, the camera leans before the corner arrives and a
-     chicane mostly cancels itself out. LIVE, and clamped at read time to
-     road that is actually still on screen: leaning on road the player
-     cannot see reads as the camera moving by itself.
+     The machinery below stays so it can be dialled back up from zero on
+     the cycler, and it is worth understanding before doing so: curves are
+     faked by sliding segments sideways, so lateral offset grows as the
+     square of distance while this is a constant. Measured, it buys about
+     2% more visible road per 500 world units of camera offset. It is not
+     a lever, which is the other reason it is zero.
 
-     The lag can be long now that the signal leads rather than follows. */
-  CAMERA_LOOK:              125,     // LIVE, world units per unit of curvature
+     CAMERA_LOOK_AHEAD is where the curvature is read from when it is not
+     zero: an average over a stretch ahead, weighted toward the near end
+     and clipped to road still on screen, so the lean leads the corner
+     rather than being shoved by it. */
+  CAMERA_LOOK:                0,     // LIVE, world units per unit of curvature
   CAMERA_LOOK_AHEAD:      11000,     // LIVE, world units up the road it reads from
   CAMERA_LOOK_TIME:        0.70,     // seconds of lag on it
   HORIZON_FRACTION:        0.32,     // LIVE, where the horizon sits down the screen
@@ -378,15 +382,24 @@ const FEEL = {
   SLIP_MAX_DEG:              30,     // slip angle that counts as fully sideways
   /* How far the car is drawn turned. LIVE, both of them.
 
-     CAR_YAW_GAIN is the honest half: the nose points where the steering is
-     asking. CAR_CURVE_YAW is the lie, and it is the one that makes a
-     corner feel like a corner. The camera tracks the road, so a car
-     holding a perfect line through a bend is not rotating relative to the
-     frame at all, and it sits dead square while the world bends around it.
-     Pointing it into the turn, and a little past it, reads as oversteer
-     and reads as true. Every arcade racer tells this lie. */
+     CAR_YAW_GAIN is the honest half: the nose points where the steering
+     is asking, and only there.
+
+     CAR_CURVE_YAW was the lie, added to stop the car looking detached as
+     the road bent around it, and it is zero now. It read as the game
+     steering for you, which is far worse than reading as detached: a
+     driving game that appears to have aim assistance has lost the only
+     thing it was selling. Nothing may now rotate the car that the driver
+     did not ask for.
+
+     It stays on the cycler so it can be dialled back up from zero, but
+     note before doing so that it is not needed to avoid detachment.
+     Holding a line through any real corner already costs most of full
+     lock, because centrifugal is 0.124 and a medium corner after the
+     curve scale is 8.0, so CAR_YAW_GAIN alone yaws the car hard into
+     every bend. That is honest yaw, out of the driver's own input. */
   CAR_YAW_GAIN:             1.0,     // LIVE
-  CAR_CURVE_YAW:          0.042,     // LIVE, radians per unit of road curvature
+  CAR_CURVE_YAW:              0,     // LIVE, radians per unit of road curvature
 
   /* CENTRIFUGAL is the fraction of full steering authority a curve of 1.0
      eats. LIVE, and the number that decides whether a corner is something
@@ -553,6 +566,14 @@ const FEEL = {
      of the wrist to the dead part. The readout prints the deadzone as a
      percentage of full lock for exactly that reason: hold that percentage
      roughly steady while hunting for the lock angle. */
+  /* Which way a tilt steers. The sign that comes off the sensor is not
+     reliable across handsets and browsers, and the reading also degrades
+     as the phone approaches upright, where the spec's own decomposition
+     is at a singularity. So this is the shipped default and the Flip
+     button beside Tilt reverses it permanently, rather than a sign error
+     ever being a blocker again. Flipped in session ten, because the
+     shipped direction read backwards on a real handset. */
+  TILT_DIRECTION:            -1,
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
   TILT_DEADZONE_DEG:       1.50,     // LIVE, the neutral state from section 4.1
   TILT_FULL_LOCK_DEG:        15,     // LIVE, degrees from the calibrated zero to full lock
@@ -779,7 +800,7 @@ const COLOUR = {
   TEXT_SHADOW:  'rgba(0,8,20,0.75)'
 };
 
-const STORAGE_PREFIX = 'tailflick.';
+const STORAGE_PREFIX = 'driftfever.';
 
 
 /* ------------------------------------------------------------------
@@ -1123,13 +1144,17 @@ function updateTilt(dt) {
       disableTilt();
       tilt.supported = false;
       tiltBtn.hidden = true;
+      tiltFlipBtn.hidden = true;
       showNote('No motion sensor on this device.', 4);
     }
     return;
   }
   if (tilt.rawDeg === null || tilt.zeroDeg === null) return;
 
-  const rel = tilt.rawDeg - tilt.zeroDeg;
+  /* The direction is applied here rather than where the reading is taken,
+     so that flipping mid run does not also flip the captured posture and
+     force a recalibration. */
+  const rel = (tilt.rawDeg - tilt.zeroDeg) * tiltSign();
   const magnitude = Math.abs(rel);
   let target = 0;
   if (magnitude > FEEL.TILT_DEADZONE_DEG) {
@@ -1195,6 +1220,34 @@ tiltBtn.addEventListener('click', function (e) {
   }
 });
 
+/* Which way round the tilt steers. Stored as the player's departure from
+   FEEL.TILT_DIRECTION rather than as an absolute sign, so the Flip button
+   is unlit on a fresh install and lit only once it has been touched, and
+   so changing the shipped default later does not silently reverse the
+   controls for everyone who already set one. */
+let tiltFlipped = storeGet('tiltflip') === '1';
+function tiltSign() { return FEEL.TILT_DIRECTION * (tiltFlipped ? -1 : 1); }
+
+const tiltFlipBtn = document.getElementById('tiltFlipBtn');
+function setTiltFlipped(on) {
+  tiltFlipped = on;
+  tiltFlipBtn.classList.toggle('on', on);
+  storeSet('tiltflip', on ? '1' : '0');
+}
+tiltFlipBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+tiltFlipBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  tiltFlipBtn.blur();
+  resumeAudio();
+  setTiltFlipped(!tiltFlipped);
+  // The reading itself is untouched, so the flip takes effect on the very
+  // next frame with no recalibration and no dead moment.
+  tilt.value = 0;
+  showNote(tiltFlipped
+    ? 'Tilt reversed. Tap Flip again to put it back.'
+    : 'Tilt back the way it ships.', 3);
+});
+
 /* The preference persists, the grant does not: most iOS versions want a
    fresh gesture every page load, so re-request on the first one. */
 let wantsTilt = storeGet('tilt') === '1';
@@ -1208,6 +1261,10 @@ function firstGesture() {
 
 tilt.supported = detectTiltSupport();
 tiltBtn.hidden = !tilt.supported;
+// Beside Tilt, and gone wherever Tilt is gone, because on a device with
+// no sensor it is a button that reverses nothing.
+tiltFlipBtn.hidden = !tilt.supported;
+setTiltFlipped(tiltFlipped);
 
 
 /* ------------------------------------------------------------------
@@ -2048,11 +2105,12 @@ function updateFall(dt) {
    drawn body and the rear wheel contact points both read this, so the
    marks can never come off a car pointing somewhere else.
 
-   Two terms. The steering the driver is asking for, and the curvature of
-   the road under the car. The second one is not physical, because the
-   camera turns with the road, but without it a car coasting through a
-   bend sits square while the world rotates around it and nothing about
-   the corner reads. */
+   Two terms, but only one of them is live. The first is the steering the
+   driver is asking for. The second was the curvature of the road under
+   the car, which is not physical and which is now zero, because a car
+   that turns without being asked reads as the game steering for you. See
+   CAR_CURVE_YAW. Nothing here may rotate the car off the driver's own
+   input while that constant is zero. */
 function dead() { return state === DEAD; }
 
 function carYaw() {
@@ -3019,10 +3077,20 @@ function text(str, x, y, size, weight, align) {
   ctx.fillText(str, x, y);
 }
 
+/* The size that makes a string fill a share of the width and no more,
+   so the game's own name cannot clip off the side of a narrow handset. */
+function fittedSize(str, weight, want, maxWidth) {
+  ctx.font = weight + ' ' + want + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const width = ctx.measureText(str).width;
+  return width <= maxWidth ? want : Math.floor(want * maxWidth / width);
+}
+
 function drawOverlay(w, h) {
   if (state === TITLE) {
     const s = Math.min(w, h);
-    text('TAILFLICK', w / 2, h * 0.34, Math.round(s * 0.13), '800');
+    const title = 'DRIFT FEVER';
+    text(title, w / 2, h * 0.34,
+         fittedSize(title, '800', Math.round(s * 0.13), w * 0.88), '800');
     text('hold left or right to steer', w / 2, h * 0.45, Math.round(s * 0.045), '600');
     text('tap or press any key to start', w / 2, h * 0.52, Math.round(s * 0.045), '600');
   } else if (state === DEAD) {

@@ -1,6 +1,6 @@
-# Drift game
+# Drift Fever
 
-A single-file browser arcade game. Work in progress.
+A single-file browser drift game. One HTML file, no build step, no dependencies. Work in progress.
 
 - `index.html` is the game. It is the whole thing.
 - `BRIEF.md` is the design brief and the source of truth.
