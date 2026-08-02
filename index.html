@@ -5,7 +5,7 @@
 <title>Drift Fever</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="Drift Fever, a browser drift game. One file, no downloads, nothing to install.">
-<meta name="theme-color" content="#68c8f0">
+<meta name="theme-color" content="#e2521c">
 <!-- An empty data URI, so the browser does not go and ask for a favicon.
      That request would be same origin and harmless, but the rule is zero. -->
 <link rel="icon" href="data:,">
@@ -15,7 +15,7 @@
     padding: 0;
     height: 100%;
     overflow: hidden;
-    background: #68c8f0;
+    background: #e2521c;
   }
   body {
     touch-action: none;
@@ -77,8 +77,8 @@
   }
   #chrome button {
     font: 600 12px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: #12303f;
-    background: rgba(255, 255, 255, 0.7);
+    color: #3a1405;
+    background: rgba(255, 236, 214, 0.78);
     border: 0;
     border-radius: 7px;
     padding: 9px 11px;
@@ -89,14 +89,14 @@
     display: none;
   }
   #chrome button.on {
-    background: #ffd23d;
-    color: #2a1f00;
+    background: #ffb03a;
+    color: #2a0d02;
   }
   #note {
     max-width: 62vw;
     font: 500 12px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: #12303f;
-    background: rgba(255, 255, 255, 0.82);
+    color: #3a1405;
+    background: rgba(255, 238, 218, 0.86);
     border-radius: 7px;
     padding: 8px 10px;
     text-align: right;
@@ -116,7 +116,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 54px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 100px);
     z-index: 2;
     pointer-events: none;
     display: flex;
@@ -133,25 +133,89 @@
     text-align: center;
     font: 700 10px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     letter-spacing: 0.22em;
-    color: rgba(140, 214, 240, 0.75);
+    color: rgba(255, 168, 110, 0.8);
     margin-bottom: 2px;
   }
   #radio button {
     pointer-events: auto;
     font: 700 12px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     letter-spacing: 0.08em;
-    color: #bfeaff;
-    background: rgba(10, 24, 44, 0.72);
-    border: 1px solid rgba(109, 236, 255, 0.45);
+    color: #ffd7ae;
+    background: rgba(28, 10, 5, 0.72);
+    border: 1px solid rgba(255, 146, 44, 0.45);
     border-radius: 999px;
     padding: 9px 13px;
     cursor: pointer;
     touch-action: manipulation;
   }
   #radio button.on {
-    color: #0a1a26;
-    background: #8af2ff;
-    border-color: #dcfeff;
+    color: #2a0d02;
+    background: #ffb03a;
+    border-color: #fff6dc;
+  }
+  /* The corner pads: mute, pause and the two tilt controls. Round, barely
+     there until touched, and low enough in the frame that they are out of
+     the way of the road.
+
+     POINTER EVENTS. This container spans the full width of the screen and
+     sits over a game that steers on the left and right halves, which is
+     precisely the Beakdown failure described at the top of this
+     stylesheet: an invisible full width strip over the play area ate every
+     tap along its band and the game was unplayable. So pointer-events is
+     none on #pads and on .padGroup, and auto only on the buttons
+     themselves. Everything between and around the four circles falls
+     through to the canvas and still steers. Do not put a background, a
+     hit target or a pointer-events:auto on either container.
+
+     SAFE AREA. The bottom inset is where iOS puts the home indicator and
+     Android puts its gesture bar, so the whole row is pushed above it and
+     the side insets are respected too. */
+  #pads {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 calc(env(safe-area-inset-right, 0px) + 12px)
+             calc(env(safe-area-inset-bottom, 0px) + 12px)
+             calc(env(safe-area-inset-left, 0px) + 12px);
+  }
+  .padGroup {
+    pointer-events: none;
+    display: flex;
+    gap: 8px;
+  }
+  #pads button {
+    pointer-events: auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    font: 700 9px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: 0.06em;
+    color: rgba(255, 226, 196, 0.72);
+    background: rgba(28, 10, 5, 0.34);
+    border: 1px solid rgba(255, 150, 80, 0.38);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+  #pads button[hidden] {
+    display: none;
+  }
+  #pads button:active {
+    background: rgba(255, 146, 44, 0.5);
+    color: #2a0d02;
+  }
+  #pads button.on {
+    color: #2a0d02;
+    background: rgba(255, 176, 58, 0.88);
+    border-color: #fff6dc;
   }
   /* A probe for the safe area insets, so the canvas can keep the resource
      bar and the pause overlay clear of the home indicator and the gesture
@@ -181,12 +245,18 @@
       <button data-act="reset" type="button">reset</button>
       <button data-act="seed" type="button">seed</button>
     </div>
-    <button id="pauseBtn" type="button">Pause</button>
-    <button id="fpsBtn" type="button">FPS</button>
-    <button id="tiltBtn" type="button" hidden>Tilt</button>
-    <button id="tiltFlipBtn" type="button" hidden>Flip</button>
   </div>
   <div id="note" hidden></div>
+</div>
+<div id="pads">
+  <div class="padGroup">
+    <button id="muteBtn" type="button">MUTE</button>
+    <button id="pauseBtn" type="button">PAUSE</button>
+  </div>
+  <div class="padGroup">
+    <button id="tiltBtn" type="button" hidden>TILT</button>
+    <button id="tiltFlipBtn" type="button" hidden>FLIP</button>
+  </div>
 </div>
 <div id="radio" hidden></div>
 <div id="safe"></div>
@@ -448,7 +518,11 @@ const FEEL = {
      enough to argue with the road edges. */
   BAR_WIDTH:               0.42,     // of screen width
   BAR_HEIGHT:                 6,     // pixels
-  BAR_BOTTOM:                26,     // pixels above the safe area
+  /* Above the safe area AND above the corner pads, which are 48 across
+     with a 12 margin. The bar is centred and the pads are in the corners
+     so they never actually touch, but sitting them on the same line read
+     as clutter. */
+  BAR_BOTTOM:                72,     // pixels above the safe area
   BAR_FADE_TIME:           0.45,     // seconds to fade away once full again
   BAR_ALPHA:               0.70,
 
@@ -476,7 +550,11 @@ const FEEL = {
      ---------------------------------------------------------------- */
   AUDIO_MASTER:            0.55,     // the whole graph, never near 1
   AUDIO_FADE_TIME:         0.08,     // seconds, the follow on every live level
-  AUDIO_START_TIME:        0.35,     // seconds to fade the graph in from silence
+  AUDIO_START_TIME:        0.35,     // seconds to fade the graph in on a station change
+  /* The very first start is slower than a station change, because it is
+     the one nobody asked for. A game that comes up at full level in a
+     quiet room gets closed before the player finds the mute. */
+  AUDIO_FIRST_FADE:         1.2,     // seconds, silence to full on the first gesture
   /* The pause does not mute. It closes a lowpass over the whole graph, so
      the music is still there and muffled, which reads as the game being
      set aside rather than as the audio having crashed. */
@@ -571,9 +649,16 @@ const FEEL = {
      as the phone approaches upright, where the spec's own decomposition
      is at a singularity. So this is the shipped default and the Flip
      button beside Tilt reverses it permanently, rather than a sign error
-     ever being a blocker again. Flipped in session ten, because the
-     shipped direction read backwards on a real handset. */
-  TILT_DIRECTION:            -1,
+     ever being a blocker again.
+
+     Session ten flipped this to -1 on a report that it read backwards,
+     against a rotation model that said +1 was right. Session eleven put
+     it back: the model was right, and what read as inverted was the
+     camera sliding sideways and the car yawing without being asked, both
+     of which are now zero. The stored preference key was renamed with it,
+     so a flip saved against the old default cannot silently reverse the
+     controls of anyone who set one. */
+  TILT_DIRECTION:             1,
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
   TILT_DEADZONE_DEG:       1.50,     // LIVE, the neutral state from section 4.1
   TILT_FULL_LOCK_DEG:        15,     // LIVE, degrees from the calibrated zero to full lock
@@ -743,61 +828,100 @@ const FEEL = {
    a dark background, so item 4 above is the one to check first if any of
    this is changed.
    ------------------------------------------------------------------ */
-const COLOUR = {
-  VOID:         '#04060e',
-  GRID:         'rgba(64,148,196,0.20)',
-  GRID_NEAR:    'rgba(88,196,240,0.30)',
-  HORIZON_GLOW: '#2e7fa8',
+/* The palette is one decision, made twice.
 
-  ROAD_LIGHT:   '#1b2440',     // the surface, plainly above the void
-  ROAD_DARK:    '#161d35',
+   The world is warm: reds and oranges, saturated, dark where it needs to
+   be dark and hot where it needs to be seen. The car is cool, and that is
+   not a taste, it is the whole reason it reads. A yellow car worked
+   because it was the one warm object in a cool world; turning the world
+   warm without turning the car would have hidden it. So the relationship
+   is inverted rather than kept, and the car is now the one cool object in
+   a warm world. It stays the highest contrast thing on screen, which is
+   the only rule about it that matters.
+
+   The three rules from the neon session are unchanged and still bind:
+   the road edges are the brightest thing on screen, the road surface
+   stays plainly above the void in value, and the centre line stays dim
+   enough that it can never be mistaken for an edge. The tyre marks are a
+   fourth: they ran cool to hot through magenta before, and magenta on
+   warm asphalt is a much weaker read than magenta on blue, so the ramp is
+   now blue to cyan to white and carries its intensity in value rather
+   than in hue. */
+const COLOUR = {
+  VOID:         '#0b0503',
+  GRID:         'rgba(150,58,22,0.22)',
+  GRID_NEAR:    'rgba(214,88,30,0.32)',
+  HORIZON_GLOW: '#b8431a',
+  /* The haze the far road fades into, and the fade the horizon glow runs
+     out to. Held here as rgb triples rather than written into the
+     gradients, so the palette really is one block. */
+  HAZE:         '58,20,10',
+  HORIZON_FADE: '184,67,26',
+
+  ROAD_LIGHT:   '#33191a',     // the surface, plainly above the void
+  ROAD_DARK:    '#2b1416',
   /* The side of the slab. It has to sit below the road surface in value,
      which is what was asked for, and still be separable from the void,
      which is nearly black. There is not much room between those, so most
      of the silhouette comes from this occluding the grid behind it. */
-  WALL:         '#111a35',
-  SHOULDER_LIGHT:'#2a6a8c',    // the scrape band, a zone rather than an edge
-  SHOULDER_DARK:'#215671',
-  EDGE_LIGHT:   '#dcfeff',     // the brightest thing on screen, and it must stay that way
-  EDGE_DARK:    '#8af2ff',
-  LANE:         '#31507e',     // dim on purpose, it must never read as an edge
+  WALL:         '#1f0f0e',
+  /* The scrape band, a zone rather than an edge. Held down deliberately:
+     warm and saturated enough to read as a warning, but the drivable
+     surface has to stay the main event and the lip has to stay the
+     brightest thing out there. Straight off the wheel it sat about twice
+     as far above the road as the old blue one did and pulled the eye off
+     the middle of the track. */
+  SHOULDER_LIGHT:'#a63a15',
+  SHOULDER_DARK:'#87290f',
+  EDGE_LIGHT:   '#fff6dc',     // the brightest thing on screen, and it must stay that way
+  EDGE_DARK:    '#ffb03a',
+  LANE:         '#6b3524',     // dim on purpose, it must never read as an edge
 
-  EDGE_GLOW:    '109,236,255',  // the faint wide pass under the lip
-  SLAB_BOTTOM:  '#2f86ad',      // the underside line, dimmer than the top lip
-  SLAB_BOTTOM_GLOW: '47,134,173',
-  PYLON:        '#4fb4d6',
-  PYLON_MAJOR:  '#9cf0ff',
-  PYLON_GLOW:   '96,206,240',
-  SKYLINE:      '#091321',
-  SKYLINE_TOP:  '#164059',
+  EDGE_GLOW:    '255,146,44',   // the faint wide pass under the lip
+  SLAB_BOTTOM:  '#d2551a',      // the underside line, dimmer than the top lip
+  SLAB_BOTTOM_GLOW: '186,72,22',
+  PYLON:        '#d85a22',
+  PYLON_MAJOR:  '#ffc266',
+  PYLON_GLOW:   '224,104,40',
+  SKYLINE:      '#170906',
+  SKYLINE_TOP:  '#66200c',
 
   /* Deliberately duller than the edge lip. This is the secondary channel
-     and it must never pull the eye down off the road. */
-  BAR_TRACK:    'rgba(12,24,44,0.85)',
-  BAR_FILL:     '#3f9ec2',
-  BAR_LOW:      '#e0703c',
+     and it must never pull the eye down off the road. It carries its
+     warning in value rather than in hue, because a red bar on a red road
+     says nothing. */
+  BAR_TRACK:    'rgba(30,12,8,0.85)',
+  BAR_FILL:     '#3f93a6',
+  BAR_LOW:      '#ffd24a',
 
-  PAUSE_COVER:  '#040610',      // opaque, so the corner ahead cannot be studied
+  PAUSE_COVER:  '#0a0402',      // opaque, so the corner ahead cannot be studied
 
-  SCRAPE:       '#fff0a8',
-  SCRAPE_OUT:   '#ff5a3d',     // the flash shifts to this as the scrape timer runs out
-  SMOKE:        '176,226,255',
+  SCRAPE:       '#fff4d2',
+  SCRAPE_OUT:   '#ff2b4d',     // the flash shifts to this as the scrape timer runs out
+  SCRAPE_FADE:  '255,244,210',
+  SCRAPE_OUT_FADE: '255,43,77',
+  SMOKE:        '198,240,255',
   /* Flat per face, no gradients, no blurs. Section 7.5: cut and folded
      from paper. The shading is three fixed tones of one colour, which is
-     what tells the eye it is a solid and not a sticker. */
-  CAR_TOP:      '#ffc93a',
-  CAR_END:      '#e89a1c',
-  CAR_SIDE:     '#b06f12',
-  CAR_CABIN_TOP:'#ffe07a',
-  CAR_GLASS:    '#123044',
-  CAR_LIGHT:    '#ff4d5e',
-  CAR_LIGHT_GLOW: '255,77,94',
-  CAR_RIM:      '#ffd98a',
-  CAR_TYRE:     '#0d1220',
-  CAR_TYRE_TOP: '#1b2437',
+     what tells the eye it is a solid and not a sticker.
+
+     Cool, and the only cool solid in the world. The lights are white
+     rather than red for the same reason the body is: a red lamp on a red
+     road is not a lamp. They are held just under EDGE_LIGHT in value so
+     the road edges keep the top of the range. */
+  CAR_TOP:      '#7ef0ff',
+  CAR_END:      '#38bcd6',
+  CAR_SIDE:     '#1c7f9a',
+  CAR_CABIN_TOP:'#ccfaff',
+  CAR_GLASS:    '#08222c',
+  CAR_LIGHT:    '#e6fdff',
+  CAR_LIGHT_GLOW: '150,240,255',
+  CAR_RIM:      '#d6feff',
+  CAR_TYRE:     '#0a0f14',
+  CAR_TYRE_TOP: '#182430',
   CAR_SHADOW:   'rgba(0,0,0,0.5)',
-  TEXT:         '#dffbff',
-  TEXT_SHADOW:  'rgba(0,8,20,0.75)'
+  TEXT:         '#fff2e2',
+  TEXT_SHADOW:  'rgba(24,6,0,0.75)'
 };
 
 const STORAGE_PREFIX = 'driftfever.';
@@ -906,8 +1030,8 @@ function resize() {
   // all the way to the vanishing point.
   const fade = h * FEEL.HORIZON_FADE_FRACTION;
   hazeGradient = ctx.createLinearGradient(0, horizonY, 0, horizonY + fade);
-  hazeGradient.addColorStop(0, 'rgba(20,44,66,0.92)');
-  hazeGradient.addColorStop(1, 'rgba(20,44,66,0)');
+  hazeGradient.addColorStop(0, 'rgba(' + COLOUR.HAZE + ',0.92)');
+  hazeGradient.addColorStop(1, 'rgba(' + COLOUR.HAZE + ',0)');
 
   /* Section 7.3 wants a horizon to read curvature against, and taking the
      ground away would have removed it. This band puts it back: a glow on
@@ -915,25 +1039,25 @@ function resize() {
      near as bright as the road edges. */
   const glow = h * FEEL.HORIZON_GLOW_FRACTION;
   horizonGradient = ctx.createLinearGradient(0, horizonY - glow, 0, horizonY + glow);
-  horizonGradient.addColorStop(0, 'rgba(46,127,168,0)');
+  horizonGradient.addColorStop(0, 'rgba(' + COLOUR.HORIZON_FADE + ',0)');
   horizonGradient.addColorStop(0.5, COLOUR.HORIZON_GLOW);
-  horizonGradient.addColorStop(1, 'rgba(46,127,168,0)');
+  horizonGradient.addColorStop(1, 'rgba(' + COLOUR.HORIZON_FADE + ',0)');
 
   // Cached, because the scrape flash is drawn on the frames where the
   // player is under the most pressure and can least afford a hitch.
   scrapeBandWidth = w * 0.22;
   scrapeGradientLeft = ctx.createLinearGradient(0, 0, scrapeBandWidth, 0);
   scrapeGradientLeft.addColorStop(0, COLOUR.SCRAPE);
-  scrapeGradientLeft.addColorStop(1, 'rgba(255,240,168,0)');
+  scrapeGradientLeft.addColorStop(1, 'rgba(' + COLOUR.SCRAPE_FADE + ',0)');
   scrapeGradientRight = ctx.createLinearGradient(w, 0, w - scrapeBandWidth, 0);
   scrapeGradientRight.addColorStop(0, COLOUR.SCRAPE);
-  scrapeGradientRight.addColorStop(1, 'rgba(255,240,168,0)');
+  scrapeGradientRight.addColorStop(1, 'rgba(' + COLOUR.SCRAPE_FADE + ',0)');
   scrapeOutGradientLeft = ctx.createLinearGradient(0, 0, scrapeBandWidth, 0);
   scrapeOutGradientLeft.addColorStop(0, COLOUR.SCRAPE_OUT);
-  scrapeOutGradientLeft.addColorStop(1, 'rgba(255,90,61,0)');
+  scrapeOutGradientLeft.addColorStop(1, 'rgba(' + COLOUR.SCRAPE_OUT_FADE + ',0)');
   scrapeOutGradientRight = ctx.createLinearGradient(w, 0, w - scrapeBandWidth, 0);
   scrapeOutGradientRight.addColorStop(0, COLOUR.SCRAPE_OUT);
-  scrapeOutGradientRight.addColorStop(1, 'rgba(255,90,61,0)');
+  scrapeOutGradientRight.addColorStop(1, 'rgba(' + COLOUR.SCRAPE_OUT_FADE + ',0)');
 
   if (showDebug) measureChrome();
 }
@@ -1225,14 +1349,14 @@ tiltBtn.addEventListener('click', function (e) {
    is unlit on a fresh install and lit only once it has been touched, and
    so changing the shipped default later does not silently reverse the
    controls for everyone who already set one. */
-let tiltFlipped = storeGet('tiltflip') === '1';
+let tiltFlipped = storeGet('tiltflip2') === '1';
 function tiltSign() { return FEEL.TILT_DIRECTION * (tiltFlipped ? -1 : 1); }
 
 const tiltFlipBtn = document.getElementById('tiltFlipBtn');
 function setTiltFlipped(on) {
   tiltFlipped = on;
   tiltFlipBtn.classList.toggle('on', on);
-  storeSet('tiltflip', on ? '1' : '0');
+  storeSet('tiltflip2', on ? '1' : '0');
 }
 tiltFlipBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
 tiltFlipBtn.addEventListener('click', function (e) {
@@ -1256,6 +1380,9 @@ function firstGesture() {
   resumeAudio();
   if (gestureUsed) return;
   gestureUsed = true;
+  // Both of these need a real gesture behind them, and this is the only
+  // place that is guaranteed to have one.
+  startAudio();
   if (wantsTilt && tilt.supported) requestTilt();
 }
 
@@ -1271,7 +1398,6 @@ setTiltFlipped(tiltFlipped);
    Frame rate counter, toggled with the button or the F key, so it can
    be measured on a real device rather than assumed on this one.
    ------------------------------------------------------------------ */
-const fpsBtn = document.getElementById('fpsBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const tunerEl = document.getElementById('tuner');
 
@@ -1296,21 +1422,15 @@ function measureChrome() {
   if (box.height > 0) hudTop = Math.round(box.bottom) + 8;
 }
 
+/* No button. The counter is a development tool and the F key is enough
+   for it, where a permanent button on a phone is one more thing between
+   the player and the road. */
 function setDebug(on) {
   showDebug = on;
-  fpsBtn.classList.toggle('on', on);
   tunerEl.hidden = !on;
   fpsFrames = 0; fpsElapsed = 0; fpsWorst = 0;
   if (on) window.requestAnimationFrame(measureChrome);
 }
-fpsBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
-fpsBtn.addEventListener('click', function (e) {
-  e.stopPropagation();
-  fpsBtn.blur();
-  resumeAudio();
-  setDebug(!showDebug);
-});
-
 function sampleFps(rawDt) {
   fpsFrames++;
   fpsElapsed += rawDt;
@@ -1406,7 +1526,6 @@ function tunerDirty() {
 }
 
 function markTuning() {
-  fpsBtn.textContent = tunerDirty() ? 'FPS*' : 'FPS';
   recomputeCamera();
 }
 
@@ -1861,7 +1980,9 @@ let paused = false;
 function setPaused(on) {
   if (on && state !== DRIVING) return;
   paused = on;
-  pauseBtn.textContent = on ? 'Resume' : 'Pause';
+  // PLAY rather than RESUME, because six letters overflow a 48px circle.
+  pauseBtn.textContent = on ? 'PLAY' : 'PAUSE';
+  pauseBtn.classList.toggle('on', on);
 }
 
 function togglePause() {
@@ -2686,9 +2807,16 @@ function drawWalls(count) {
    the prettiest thing on screen is the thing risk buys. */
 const TRAIL_RAMP = [];
 (function () {
-  // Cool blue, through the magenta the palette already used, to a hot
-  // white. Precomputed, because this is read once per marked segment.
-  const stops = [[74, 134, 255], [186, 96, 236], [255, 94, 206], [255, 190, 240], [255, 255, 255]];
+  /* Deep blue, through cyan, to a hot white. Precomputed, because this
+     is read once per marked segment.
+
+     It went through magenta while the road was blue, and magenta was the
+     wrong choice the moment the road turned warm: it is close enough in
+     hue to the asphalt that the mark stopped separating from it. Blue to
+     cyan to white is the far side of the wheel from every road colour,
+     and it also puts the intensity in value, which survives a palette
+     change far better than a hue does. */
+  const stops = [[36, 74, 235], [0, 158, 255], [86, 224, 255], [190, 246, 255], [255, 255, 255]];
   for (let i = 0; i < 24; i++) {
     const t = i / 23 * (stops.length - 1);
     const a = stops[Math.floor(t)], b = stops[Math.min(stops.length - 1, Math.floor(t) + 1)];
@@ -3136,7 +3264,8 @@ function drawHud(w, h) {
   if (!showDebug) return;
   const pad = 10;
   const lines = [
-    fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms',
+    fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms'
+      + (tunerDirty() ? '   TUNED' : ''),
     tunerLine(0),
     tunerLine(1),
     tunerLine(2),
@@ -3156,7 +3285,7 @@ function drawHud(w, h) {
     if (tw > widest) widest = tw;
   }
   const top = hudTop;
-  ctx.fillStyle = 'rgba(10,30,45,0.6)';
+  ctx.fillStyle = 'rgba(26,10,4,0.66)';
   ctx.fillRect(pad - 5, top - 4, widest + 10, lines.length * 18 + 8);
   ctx.fillStyle = '#ffffff';
   for (let i = 0; i < lines.length; i++) {
@@ -3225,7 +3354,25 @@ function drawPauseCover(w, h) {
    is also what makes the skid sound like a tyre rather than like a sound
    effect being retriggered.
 
-   Off by default and off again next load, per section 5.
+   ON by default, which overrules sections 5 and 6. That was a deliberate
+   call and not an oversight, and it comes with the mitigations that make
+   it survivable for a classroom:
+
+     nothing is built or heard until the first gesture, which is what the
+     browser enforces anyway, so the graph is created inside that gesture
+     and starts unlocked rather than fighting the policy;
+
+     the first start fades from silence over AUDIO_FIRST_FADE rather than
+     arriving at level;
+
+     the mute pad is on screen and one tap away from the very first frame,
+     not behind a start screen or a menu;
+
+     and the choice is stored, so anyone who mutes once is never surprised
+     again on any later visit.
+
+   The dial still exists, but it now picks between tracks rather than
+   between silence and sound.
    ================================================================== */
 
 /* The stations. OFF is a real position on the dial rather than the
@@ -3246,8 +3393,25 @@ const STATIONS = [
     wave: 'square', root: 62, tempo: 1.12,
     arp: [0, 4, 7, 9, 12, 14, 12, 7], bass: [0, 0, 5, 0, 9, 0, 5, 4] }
 ];
-let station = 0;          // deliberately not restored from storage
-let audio = null;         // the graph, once there is one
+/* The stored choice wins over the default, always. Silence chosen once
+   is silence for good, which is the whole deal that makes defaulting to
+   sound defensible. An unrecognised or absent value falls back to the
+   default station rather than to silence, because a first visit should
+   have sound. */
+const DEFAULT_STATION = 'neon';
+function stationIndex(id) {
+  for (let i = 0; i < STATIONS.length; i++) if (STATIONS[i].id === id) return i;
+  return -1;
+}
+let station = (function () {
+  const i = stationIndex(storeGet('radio'));
+  return i >= 0 ? i : stationIndex(DEFAULT_STATION);
+})();
+/* Where an unmute returns to. It follows the last station that actually
+   made a sound, so muting and unmuting is a round trip rather than a
+   reset to the default. */
+let lastLoud = station || stationIndex(DEFAULT_STATION);
+let audio = null;         // the graph, once there is one, and never before one
 
 /* Equal temperament from a root, so the note tables above are semitone
    offsets and a station is a scale plus a waveform rather than a tune. */
@@ -3403,43 +3567,83 @@ STATIONS.forEach(function (s, i) {
   b.addEventListener('click', function (e) {
     e.stopPropagation();
     b.blur();
+    // Picking a station is itself a gesture, and it goes through the one
+    // gesture path so the tilt request is not skipped by tapping here
+    // before anything else.
+    firstGesture();
     setStation(i);
   });
   radioEl.appendChild(b);
   radioBtns.push(b);
 });
 
-function setStation(i) {
-  station = i;
+function silent(i) { return !STATIONS[i].sfx && !STATIONS[i].music; }
+
+/* The dial and the mute pad are two ways to say the same thing, so they
+   are painted from the one value and can never disagree. */
+function paintStation() {
   for (let k = 0; k < radioBtns.length; k++) {
-    radioBtns[k].classList.toggle('on', k === i);
+    radioBtns[k].classList.toggle('on', k === station);
   }
-  const s = STATIONS[i];
-  if (!s.sfx && !s.music) {
+  const off = silent(station);
+  muteBtn.classList.toggle('on', off);
+  muteBtn.textContent = off ? 'MUTED' : 'MUTE';
+}
+
+/* fade is the time to reach level, which is longer for the first start
+   than for a station change. Building the graph is deferred until a
+   gesture has happened: called before then this only moves the setting
+   and paints it, and firstGesture picks it up. */
+function setStation(i, fade) {
+  station = i;
+  if (!silent(i)) lastLoud = i;
+  storeSet('radio', STATIONS[i].id);
+  paintStation();
+  if (silent(i)) {
     if (audio) {
       ramp(audio.master.gain, 0, FEEL.AUDIO_FADE_TIME);
       // Suspending frees the audio thread entirely rather than leaving a
       // silent graph running, which matters on the Chromebooks in
       // section 6 far more than it does here.
       setTimeout(function () {
-        if (audio && !STATIONS[station].sfx) { try { audio.ac.suspend(); } catch (e) {} }
+        if (audio && silent(station)) { try { audio.ac.suspend(); } catch (e) {} }
       }, 400);
     }
     return;
   }
-  // Built on the gesture that asked for it, so it starts unlocked.
-  if (!audio) audio = buildAudio();
+  if (!audio) {
+    if (!gestureUsed) return;      // no gesture yet, so nothing may sound
+    audio = buildAudio();
+  }
   if (!audio) return;
   resumeAudio();
   audio.step = 0;
   audio.nextNote = audio.ac.currentTime + 0.06;
+  const s = STATIONS[i];
   if (s.music) {
     audio.arpOsc.type = s.wave;
     audio.octOsc.type = s.wave === 'square' ? 'square' : 'triangle';
   }
-  ramp(audio.master.gain, FEEL.AUDIO_MASTER, FEEL.AUDIO_START_TIME);
+  ramp(audio.master.gain, FEEL.AUDIO_MASTER, fade || FEEL.AUDIO_START_TIME);
 }
-setStation(0);
+
+/* Called once, from the first gesture. Until this runs there is no
+   AudioContext at all, which is both what the browser wants and what the
+   room wants. */
+function startAudio() {
+  if (audio || silent(station)) return;
+  setStation(station, FEEL.AUDIO_FIRST_FADE);
+}
+
+const muteBtn = document.getElementById('muteBtn');
+muteBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+muteBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  muteBtn.blur();
+  firstGesture();
+  setStation(silent(station) ? lastLoud : 0);
+});
+paintStation();
 
 /* Resumed from every gesture path there is, not just from the dial. A
    context can be suspended again by the tab going away, by an incoming
