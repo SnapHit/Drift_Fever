@@ -149,10 +149,12 @@ const FEEL = {
      a weak machine drops frames. FIELD_OF_VIEW_DEG is a sense of speed
      lever, not a rendering detail: wider reads as faster and distorts
      more, and narrower zooms everything in. */
-  FIELD_OF_VIEW_DEG:         82,     // LIVE
-  CAMERA_HEIGHT:           2200,     // LIVE
-  CAMERA_DISTANCE:         2900,     // LIVE, how far the camera sits behind the car
-  HORIZON_FRACTION:        0.34,     // LIVE, where the horizon sits down the screen
+  /* These four were found by playing on a phone and are settled. Treat
+     them the way the build order treats the rest of this block. */
+  FIELD_OF_VIEW_DEG:         84,     // LIVE
+  CAMERA_HEIGHT:           2300,     // LIVE
+  CAMERA_DISTANCE:         3100,     // LIVE, how far the camera sits behind the car
+  HORIZON_FRACTION:        0.46,     // LIVE, where the horizon sits down the screen
   DRAW_DISTANCE_SEGMENTS:   200,
   SEGMENT_LENGTH:           200,
   ROAD_HALF_WIDTH:         2000,
@@ -189,7 +191,8 @@ const FEEL = {
   CENTRIFUGAL:             0.11,
 
   /* The three bands from section 4.2, measured in road half widths, so
-     1.0 is the painted edge of the road and the car is CAR_WIDTH across.
+     1.0 is the painted edge of the road and the car is CAR_BODY_WIDTH
+     across, which is 0.30 of a half width.
      The band is wide on purpose: 4.4 wants the player to live in it, so
      it is a destination and not a mercy window. SCRAPE_START puts the
      outside wheels on the shoulder, OFF_ROAD takes them off the far side
@@ -215,27 +218,67 @@ const FEEL = {
   SCRAPE_FLASH_ALPHA:      0.32,
   DEATH_INPUT_LOCK:        0.30,     // seconds before a restart is accepted
 
-  /* Tilt. Untuned, because it has not been tested on a real handset yet.
-     TILT_SMOOTHING_TIME matters most on cheap Android handsets that
-     derive orientation from the accelerometer. */
+  /* Tilt. TILT_SMOOTHING_TIME matters most on cheap Android handsets that
+     derive orientation from the accelerometer.
+
+     The two LIVE ones move together or not at all. TILT_DEADZONE_DEG is
+     subtracted from TILT_FULL_LOCK_DEG to get the usable span, so shrinking
+     the full lock angle without shrinking the deadzone hands a bigger share
+     of the wrist to the dead part. The readout prints the deadzone as a
+     percentage of full lock for exactly that reason: hold that percentage
+     roughly steady while hunting for the lock angle. */
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
-  TILT_DEADZONE_DEG:          3,     // the neutral state from section 4.1
-  TILT_FULL_LOCK_DEG:        22,     // degrees from the calibrated zero to full lock
+  TILT_DEADZONE_DEG:          3,     // LIVE, the neutral state from section 4.1
+  TILT_FULL_LOCK_DEG:        22,     // LIVE, degrees from the calibrated zero to full lock
   TILT_SENSOR_TIMEOUT:      1.5,     // seconds to wait for a first real reading
 
-  /* The car. CAR_WIDTH is in road half widths and sets the perceived
-     margin, which is why it is a feel constant and not a drawing detail:
-     SCRAPE_START is set so the outside wheels reach the shoulder at
-     exactly the moment the scrape band begins. Move one, check the other.
-     Where the car sits on screen is no longer a constant, it falls out of
-     CAMERA_DISTANCE and HORIZON_FRACTION. */
-  CAR_WIDTH:               0.30,
+  /* The car, in world units, the same units as the road. It is a real box
+     in the world now, so these are its actual dimensions and they set the
+     perceived mass. Where it sits on screen is not a constant: it falls
+     out of CAMERA_DISTANCE and HORIZON_FRACTION, and the front of the car
+     is further from the camera than the back, so the two ends project at
+     different scales on their own.
+
+     The road is 4000 units across, so a unit is roughly three millimetres
+     and the car below is about 1.8 by 3.5 metres. BODY_WIDTH also sets the
+     margin: SCRAPE_START is 1 minus half the body width in road half
+     widths, so the outside wheels reach the shoulder as the scrape begins.
+     Move one, check the other.
+
+     One caution about the length. The ground plane is stretched along the
+     road by the same anisotropy the car's height dodges, so a car that is
+     twice as long as it is wide in world units reads closer to three times
+     on screen. The length below is set by how it looks, not by the ratio.
+     If the road ever gets an isotropic projection, lengthen it again. */
+  CAR_BODY_WIDTH:           600,
+  CAR_BODY_LENGTH:          880,
+  CAR_BODY_HEIGHT:          250,
+  CAR_RIDE_HEIGHT:           85,     // ground to the underside of the body
+  CAR_CABIN_LENGTH:         380,
+  CAR_CABIN_WIDTH:          450,
+  CAR_CABIN_HEIGHT:         175,
+  CAR_CABIN_OFFSET:         -40,     // negative sits the cabin back towards the rear
+  CAR_WHEEL_DIAMETER:       230,
+  CAR_WHEEL_WIDTH:          100,
+  CAR_TRACK:                630,     // wheel centre to wheel centre, wider than the body
+  CAR_WHEELBASE:            560,     // front axle to rear axle
+  CAR_FRONT_STEER_DEG:       30,     // how far the front wheels turn at full lock
+
+  /* Body roll. It leans away from the direction it is being accelerated,
+     which is what makes it read as having weight. Section 7 warns about
+     overdoing motion on a phone held close to the face, so this is small
+     on purpose. CAR_ROLL_REFERENCE is the sideways acceleration, in road
+     half widths per second squared, at which the lean saturates. */
+  CAR_ROLL_DEG:             7.0,
+  CAR_ROLL_REFERENCE:       8.0,
+  CAR_ROLL_PIVOT:            60,     // height of the axis it leans about
 
   /* Tyre marks. They live on the road segments, so they are bounded by
      the segment window and cannot grow through a long run. They are only
      visible between the camera and the car, which means CAMERA_DISTANCE
-     decides how much of your own line you get to see. */
-  TYRE_TRACK_HALF:        0.145,     // half the track width, road half widths
+     decides how much of your own line you get to see. They are laid from
+     the two rear wheel contact points, which yaw with the body, so the
+     pair sweeps apart as the car comes sideways. */
   TYRE_MARK_WIDTH:        0.028,     // road half widths
   TYRE_MARK_MIN_SLIP:       0.2,     // slip, normalised, below which no mark is laid
   TYRE_MARK_MAX_ALPHA:     0.45,
@@ -285,10 +328,19 @@ const COLOUR = {
   SCRAPE_OUT:   '#ff5a3d',     // the flash shifts to this as the scrape timer runs out
   TYRE_MARK:    '24,26,30',    // rgb only, the alpha is the slip angle
   SMOKE:        '242,246,250',
-  CAR_BODY:     '#ffd23d',
-  CAR_LINE:     '#191d23',
+  /* Flat per face, no gradients, no blurs. Section 7.5: cut and folded
+     from paper. The shading is three fixed tones of one colour, which is
+     what tells the eye it is a solid and not a sticker. */
+  CAR_TOP:      '#ffd94f',
+  CAR_END:      '#eaad24',
+  CAR_SIDE:     '#c1861a',
+  CAR_CABIN_TOP:'#fff0a0',
+  CAR_EDGE:     'rgba(60,38,4,0.55)',
   CAR_GLASS:    '#2b3138',
   CAR_LIGHT:    '#ff4d3d',
+  CAR_TYRE:     '#191d23',
+  CAR_TYRE_TOP: '#2c323c',
+  CAR_SHADOW:   'rgba(16,30,20,0.38)',
   TEXT:         '#ffffff',
   TEXT_SHADOW:  'rgba(10,30,45,0.55)'
 };
@@ -307,10 +359,12 @@ let horizonY = 0;
    button has something to go back to and so the game can say out loud
    when it is running on tuned numbers rather than these. */
 const TUNABLES = [
-  { key: 'CAMERA_HEIGHT',     label: 'height',  step: 100,  min: 400, max: 9000,  dp: 0 },
-  { key: 'CAMERA_DISTANCE',   label: 'dist',    step: 100,  min: 600, max: 14000, dp: 0 },
-  { key: 'FIELD_OF_VIEW_DEG', label: 'fov',     step: 2,    min: 40,  max: 130,   dp: 0 },
-  { key: 'HORIZON_FRACTION',  label: 'horizon', step: 0.02, min: 0.12, max: 0.70, dp: 2 }
+  { key: 'CAMERA_HEIGHT',      label: 'height',  step: 100,  min: 400,  max: 9000,  dp: 0, group: 0 },
+  { key: 'CAMERA_DISTANCE',    label: 'dist',    step: 100,  min: 600,  max: 14000, dp: 0, group: 0 },
+  { key: 'FIELD_OF_VIEW_DEG',  label: 'fov',     step: 2,    min: 40,   max: 130,   dp: 0, group: 0 },
+  { key: 'HORIZON_FRACTION',   label: 'horizon', step: 0.02, min: 0.12, max: 0.70,  dp: 2, group: 0 },
+  { key: 'TILT_FULL_LOCK_DEG', label: 'lock',    step: 1,    min: 4,    max: 45,    dp: 0, group: 1 },
+  { key: 'TILT_DEADZONE_DEG',  label: 'dead',    step: 0.5,  min: 0,    max: 12,    dp: 1, group: 1 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -718,11 +772,17 @@ function sampleFps(rawDt) {
    ------------------------------------------------------------------ */
 let tuneIndex = 0;
 
-function tunerLine() {
+function tunerLine(group) {
   let out = '';
   for (let i = 0; i < TUNABLES.length; i++) {
     const t = TUNABLES[i];
+    if (t.group !== group) continue;
     out += (i === tuneIndex ? '▸' : ' ') + t.label + ' ' + FEEL[t.key].toFixed(t.dp) + '  ';
+  }
+  if (group === 1) {
+    // The deadzone only means anything as a share of the usable span.
+    const share = FEEL.TILT_DEADZONE_DEG / Math.max(1, FEEL.TILT_FULL_LOCK_DEG) * 100;
+    out += '(' + share.toFixed(0) + '% dead)';
   }
   return out;
 }
@@ -742,11 +802,11 @@ function markTuning() {
 function saveTuning() {
   const out = {};
   TUNABLES.forEach(function (t) { out[t.key] = FEEL[t.key]; });
-  storeSet('camera', JSON.stringify(out));
+  storeSet('tune', JSON.stringify(out));
 }
 
 function loadTuning() {
-  const raw = storeGet('camera');
+  const raw = storeGet('tune');
   if (!raw) return;
   let parsed = null;
   try { parsed = JSON.parse(raw); } catch (e) { return; }
@@ -830,7 +890,10 @@ function addSegment(curve) {
   // and the car's road position entering and leaving it. Marks ride the
   // segments, so trimming the road behind the camera frees them too and
   // nothing accumulates over a run.
-  segments.push({ index: segBase + segments.length, curve: curve, ma: 0, m0: 0, m1: 0 });
+  segments.push({
+    index: segBase + segments.length, curve: curve,
+    ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0
+  });
 }
 
 function addRoad(enter, hold, leave, curve) {
@@ -913,7 +976,8 @@ const drift = {
   travelAngle: 0,    // radians off straight ahead
   slip: 0,           // signed radians, heading minus travel
   slipDeg: 0,        // signed degrees
-  slipNorm: 0        // magnitude, 0 to 1 against SLIP_MAX_DEG
+  slipNorm: 0,       // magnitude, 0 to 1 against SLIP_MAX_DEG
+  lateralAccel: 0    // road half widths per second squared, what the body leans on
 };
 
 function startRun() {
@@ -935,6 +999,8 @@ function startRun() {
   drift.slip = 0;
   drift.slipDeg = 0;
   drift.slipNorm = 0;
+  drift.lateralAccel = 0;
+  carCurveX = 0;
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
   smokeCount = 0;
   smokeAcc = 0;
@@ -976,6 +1042,11 @@ function update(dt) {
   const gripTarget = intent - curve * FEEL.CENTRIFUGAL * FEEL.STEER_RATE;
   drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME));
   drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
+
+  // The acceleration the model is actually applying sideways, straight out
+  // of the lerp rather than differenced between frames, so it is smooth
+  // enough to lean a body on without any filtering.
+  drift.lateralAccel = (gripTarget - drift.lateralV) / FEEL.GRIP_TIME;
 
   const prevX = playerX;
   playerX += drift.lateralV * dt;
@@ -1023,27 +1094,52 @@ function crash() {
    their own, so they curve with the road for free and get thrown away
    with it.
    ================================================================== */
+/* Where the two rear wheels touch the road, in road half widths, given a
+   centre position. They yaw with the body, so as the car comes sideways
+   the pair swings apart and the two marks sweep away from each other.
+   That divergence is the rotation, drawn. */
+const rearContact = { left: 0, right: 0 };
+function rearWheelOffsets(centreX) {
+  const yaw = drift.headingAngle * FEEL.CAR_YAW_GAIN;
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  const trackHalf = FEEL.CAR_TRACK / 2;
+  const back = -FEEL.CAR_WHEELBASE / 2;
+  const shared = back * s;
+  rearContact.left = centreX + (-trackHalf * c + shared) / FEEL.ROAD_HALF_WIDTH;
+  rearContact.right = centreX + (trackHalf * c + shared) / FEEL.ROAD_HALF_WIDTH;
+  return rearContact;
+}
+
 function layTyreMarks(carIndex, prevX) {
   const alpha = (drift.slipNorm - FEEL.TYRE_MARK_MIN_SLIP) / (1 - FEEL.TYRE_MARK_MIN_SLIP);
-  if (alpha <= 0) { lastMarkSeg = carIndex; return; }
+  // The marks come off the rear axle, which is behind the car's centre, so
+  // they start where the wheels are rather than where the middle is.
+  const axleZ = position + FEEL.CAMERA_DISTANCE - FEEL.CAR_WHEELBASE / 2;
+  const axleIndex = Math.floor(axleZ / FEEL.SEGMENT_LENGTH);
+  if (alpha <= 0) { lastMarkSeg = axleIndex; return; }
   const a = clamp(alpha, 0, 1) * FEEL.TYRE_MARK_MAX_ALPHA;
+
+  const prev = rearWheelOffsets(prevX);
+  const pl = prev.left, pr = prev.right;
+  const now = rearWheelOffsets(playerX);
 
   // Fill in any segment the car stepped over this frame, so a long frame
   // does not punch a hole in the line.
-  let from = carIndex;
-  if (lastMarkSeg >= 0 && carIndex - lastMarkSeg > 0 && carIndex - lastMarkSeg <= 4) {
+  let from = axleIndex;
+  if (lastMarkSeg >= 0 && axleIndex - lastMarkSeg > 0 && axleIndex - lastMarkSeg <= 4) {
     from = lastMarkSeg + 1;
   }
-  for (let i = from; i <= carIndex; i++) {
+  for (let i = from; i <= axleIndex; i++) {
     const s = segAt(i);
     if (!s) continue;
-    // m0 picks up where the previous segment's m1 was left, so the line
-    // is continuous across the join.
-    if (s.ma === 0) s.m0 = prevX;
-    s.m1 = playerX;
+    // The entry point picks up where the previous segment's exit was left,
+    // so the line is continuous across the join.
+    if (s.ma === 0) { s.ml0 = pl; s.mr0 = pr; }
+    s.ml1 = now.left;
+    s.mr1 = now.right;
     if (a > s.ma) s.ma = a;
   }
-  lastMarkSeg = carIndex;
+  lastMarkSeg = axleIndex;
 }
 
 /* Smoke is screen space. The car is pinned to one spot on screen, so
@@ -1062,12 +1158,13 @@ function spawnSmoke(side) {
   const p = smoke[smokeHead];
   smokeHead = (smokeHead + 1) % FEEL.SMOKE_MAX;
   if (smokeCount < FEEL.SMOKE_MAX) smokeCount++;
-  const geom = carGeometry(view.w, view.h);
-  p.x = geom.x + side * geom.w * 0.42 + (Math.random() * 2 - 1) * geom.w * 0.12;
-  p.y = geom.groundY - geom.h * 0.12;
+  // Off whichever rear wheel, at the position the last frame drew it.
+  const jitter = carParts.scale * 0.18;
+  p.x = (side < 0 ? carParts.rlx : carParts.rrx) + (Math.random() * 2 - 1) * jitter;
+  p.y = (side < 0 ? carParts.rly : carParts.rry) + (Math.random() * 2 - 1) * jitter * 0.4;
   p.vx = -drift.lateralV * 40 + (Math.random() * 2 - 1) * 45;
   p.vy = FEEL.SMOKE_BACK_SPEED * (0.75 + Math.random() * 0.5);
-  p.r = geom.w * FEEL.SMOKE_START_RADIUS;
+  p.r = carParts.scale * FEEL.SMOKE_START_RADIUS;
   p.life = FEEL.SMOKE_LIFE;
 }
 
@@ -1123,18 +1220,23 @@ function project(out, worldX, camX, dz, w, h) {
   return out;
 }
 
-/* Where the car sits and how big it is, both falling out of the camera
-   rather than being placed by hand. Used by the sprite and by the smoke,
-   so they cannot drift apart when the camera is tuned. */
-const carGeom = { x: 0, groundY: 0, w: 0, h: 0, roadHalf: 0 };
-function carGeometry(w, h) {
-  const scale = CAMERA_DEPTH / FEEL.CAMERA_DISTANCE;
-  carGeom.roadHalf = scale * FEEL.ROAD_HALF_WIDTH * w / 2;
-  carGeom.w = Math.max(16, FEEL.CAR_WIDTH * carGeom.roadHalf);
-  carGeom.h = carGeom.w * 1.1;
-  carGeom.x = w / 2;
-  carGeom.groundY = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2;
-  return carGeom;
+/* A general point projection, for anything that is not lying flat on the
+   road. Same camera, same segments, one deliberate difference.
+
+   The inherited projection is anisotropic: it scales across the screen by
+   half the width and down it by half the height, which on a portrait phone
+   is a two to one vertical stretch. A flat road never shows it up, and the
+   camera was tuned with it in place, so it stays. A box with real height
+   does show it up, and would come out twice as tall as it should be.
+
+   So the ground stays exactly where the road puts it, and only the rise
+   above the ground uses the horizontal scale. The wheels still touch the
+   road to the pixel, and the car keeps its own proportions. */
+function projectPoint(out, wx, wy, wz, camX, w, h) {
+  const scale = CAMERA_DEPTH / wz;
+  out.sx = w / 2 + scale * (wx - camX) * w / 2;
+  out.sy = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2 - scale * wy * w / 2;
+  return out;
 }
 
 function polygon(x1, y1, x2, y2, x3, y3, x4, y4) {
@@ -1150,6 +1252,13 @@ function polygon(x1, y1, x2, y2, x3, y3, x4, y4) {
 let p1 = { x: 0, y: 0, w: 0, z: 0 };
 let p2 = { x: 0, y: 0, w: 0, z: 0 };
 
+/* How far the road has wandered sideways by the time it reaches the car.
+   The curve in this technique is faked by sliding the segments across, so
+   a car drawn at a fixed screen position would sit off its own road in a
+   corner, and off its own tyre marks with it. Captured during the walk
+   and used to place the car. */
+let carCurveX = 0;
+
 function drawRoad(w, h) {
   const seg = FEEL.SEGMENT_LENGTH;
   const baseIndex = Math.floor(position / seg);
@@ -1162,6 +1271,10 @@ function drawRoad(w, h) {
   let dx = -(base.curve * percent);
   let maxy = h;
 
+  const carZ = position + FEEL.CAMERA_DISTANCE;
+  const carIdx = Math.floor(carZ / seg);
+  const carFrac = (carZ - carIdx * seg) / seg;
+
   project(p1, x, camX, baseIndex * seg - position, w, h);
 
   for (let n = 0; n < FEEL.DRAW_DISTANCE_SEGMENTS; n++) {
@@ -1170,6 +1283,8 @@ function drawRoad(w, h) {
     const z1 = (baseIndex + n) * seg - position;
     const x2 = x + dx;
     project(p2, x2, camX, z1 + seg, w, h);
+
+    if (baseIndex + n === carIdx) carCurveX = x + dx * carFrac;
 
     if (p1.z > CAMERA_DEPTH && p2.y < p1.y && p2.y < maxy) {
       drawSegment(s, w);
@@ -1216,14 +1331,12 @@ function drawSegment(s, w) {
   // Tyre marks, on top of the surface. A point at road offset m sits at
   // p.x + m * p.w, because p.w is the road half width in pixels.
   if (s.ma > 0) {
-    const t = FEEL.TYRE_TRACK_HALF, mw = FEEL.TYRE_MARK_WIDTH;
+    const mw = FEEL.TYRE_MARK_WIDTH;
     ctx.fillStyle = markFill(s.ma);
-    const a1 = s.m0 - t, a2 = s.m1 - t;
-    polygon(p1.x + (a1 - mw) * p1.w, y1, p1.x + (a1 + mw) * p1.w, y1,
-            p2.x + (a2 + mw) * p2.w, y2, p2.x + (a2 - mw) * p2.w, y2);
-    const b1 = s.m0 + t, b2 = s.m1 + t;
-    polygon(p1.x + (b1 - mw) * p1.w, y1, p1.x + (b1 + mw) * p1.w, y1,
-            p2.x + (b2 + mw) * p2.w, y2, p2.x + (b2 - mw) * p2.w, y2);
+    polygon(p1.x + (s.ml0 - mw) * p1.w, y1, p1.x + (s.ml0 + mw) * p1.w, y1,
+            p2.x + (s.ml1 + mw) * p2.w, y2, p2.x + (s.ml1 - mw) * p2.w, y2);
+    polygon(p1.x + (s.mr0 - mw) * p1.w, y1, p1.x + (s.mr0 + mw) * p1.w, y1,
+            p2.x + (s.mr1 + mw) * p2.w, y2, p2.x + (s.mr1 - mw) * p2.w, y2);
   }
 }
 
@@ -1239,42 +1352,200 @@ function markFill(a) {
   return MARK_FILLS[i];
 }
 
+/* ==================================================================
+   THE CAR
+
+   A real box in the world, not a sprite. Its corners are defined in car
+   local space, rolled, yawed, moved out to where the car is, and then
+   projected one at a time through the same projection the road uses. The
+   front corners are further from the camera than the rear ones, so they
+   come back smaller and the two ends move differently on screen without
+   anything animating them. That is the entire illusion.
+
+   Faces are filled flat, one tone each, and culled by their own normal
+   rather than by any winding convention. The box is convex, so culling
+   alone gives the right answer and nothing needs sorting.
+   ================================================================== */
+
+// Car local space: x right, y up from the road surface, z forward.
+const carT = { worldX: 0, worldZ: 0, cosY: 1, sinY: 0, cosR: 1, sinR: 0 };
+
+const boxPts = [];
+for (let i = 0; i < 8; i++) boxPts.push({ wx: 0, wy: 0, wz: 0, sx: 0, sy: 0 });
+
+const BOX_FACES = [
+  { idx: [0, 1, 2, 3], nx: 0, ny: 0, nz: -1 },   // rear, the one facing the camera
+  { idx: [5, 4, 7, 6], nx: 0, ny: 0, nz: 1 },    // front
+  { idx: [4, 0, 3, 7], nx: -1, ny: 0, nz: 0 },   // left
+  { idx: [1, 5, 6, 2], nx: 1, ny: 0, nz: 0 },    // right
+  { idx: [3, 2, 6, 7], nx: 0, ny: 1, nz: 0 },    // top
+  { idx: [4, 5, 1, 0], nx: 0, ny: -1, nz: 0 }    // bottom
+];
+
+/* Local to world. roll is applied about the forward axis first, so the
+   body leans while the wheels stay flat on the road, then yaw, then the
+   car's position. */
+function carToWorld(out, lx, ly, lz, rolled) {
+  let rx = lx, ry = ly;
+  if (rolled) {
+    const py = ly - FEEL.CAR_ROLL_PIVOT;
+    rx = lx * carT.cosR - py * carT.sinR;
+    ry = py * carT.cosR + lx * carT.sinR + FEEL.CAR_ROLL_PIVOT;
+  }
+  out.wx = carT.worldX + rx * carT.cosY + lz * carT.sinY;
+  out.wy = ry;
+  out.wz = carT.worldZ + lz * carT.cosY - rx * carT.sinY;
+  return out;
+}
+
+const dirOut = { wx: 0, wy: 0, wz: 0 };
+function carDirToWorld(lx, ly, lz, rolled) {
+  let rx = lx, ry = ly;
+  if (rolled) {
+    rx = lx * carT.cosR - ly * carT.sinR;
+    ry = ly * carT.cosR + lx * carT.sinR;
+  }
+  dirOut.wx = rx * carT.cosY + lz * carT.sinY;
+  dirOut.wy = ry;
+  dirOut.wz = lz * carT.cosY - rx * carT.sinY;
+  return dirOut;
+}
+
+/* Build, transform, project and fill one box. Offsets are in car local
+   space; yaw is an extra rotation about the box's own centre, which is
+   what turns the front wheels against the body. */
+function drawBox(ox, oy, oz, hw, hh, hl, extraYaw, rolled, faceColours, stroked, camX, w, h) {
+  const cy = Math.cos(extraYaw), sy = Math.sin(extraYaw);
+  for (let i = 0; i < 8; i++) {
+    const sx = (i === 0 || i === 3 || i === 4 || i === 7) ? -hw : hw;
+    const sh = (i === 2 || i === 3 || i === 6 || i === 7) ? hh : -hh;
+    const sl = (i >= 4) ? hl : -hl;
+    // Spin the box about its own vertical axis before it is placed.
+    const lx = ox + sx * cy + sl * sy;
+    const lz = oz + sl * cy - sx * sy;
+    carToWorld(boxPts[i], lx, oy + sh, lz, rolled);
+    projectPoint(boxPts[i], boxPts[i].wx, boxPts[i].wy, boxPts[i].wz, camX, w, h);
+  }
+
+  for (let f = 0; f < 6; f++) {
+    const face = BOX_FACES[f];
+    const colour = faceColours[f];
+    if (!colour) continue;
+    // The face normal, spun with the box and then transformed like any
+    // other direction. No winding convention to get wrong.
+    const nlx = face.nx * cy + face.nz * sy;
+    const nlz = face.nz * cy - face.nx * sy;
+    const n = carDirToWorld(nlx, face.ny, nlz, rolled);
+    const a = boxPts[face.idx[0]], b = boxPts[face.idx[1]];
+    const c = boxPts[face.idx[2]], d = boxPts[face.idx[3]];
+    // Centre of the face, against the camera at (camX, CAMERA_HEIGHT, 0).
+    const vx = (a.wx + b.wx + c.wx + d.wx) * 0.25 - camX;
+    const vy = (a.wy + b.wy + c.wy + d.wy) * 0.25 - FEEL.CAMERA_HEIGHT;
+    const vz = (a.wz + b.wz + c.wz + d.wz) * 0.25;
+    if (n.wx * vx + n.wy * vy + n.wz * vz >= 0) continue;   // facing away
+    if (f === 0) drawBox.drewRear = true;
+    ctx.fillStyle = colour;
+    polygon(a.sx, a.sy, b.sx, b.sy, c.sx, c.sy, d.sx, d.sy);
+    // The fold lines. At fifty pixels across, flat tones alone do not
+    // separate the roof from the boot from the side, and the car reads as
+    // one yellow blob. The edges are what make it read as folded paper.
+    if (stroked) ctx.stroke();
+  }
+}
+drawBox.drewRear = false;
+
+/* A sub rectangle of a face that has already been projected, by bilinear
+   interpolation of its four screen corners. Cheaper and exactly right for
+   putting lights on the flat back panel. */
+function faceInset(quad, u0, u1, v0, v1) {
+  const p = faceInset.buf;
+  const bl = quad[0], br = quad[1], tr = quad[2], tl = quad[3];
+  for (let i = 0; i < 4; i++) {
+    const u = (i === 0 || i === 3) ? u0 : u1;
+    const v = (i < 2) ? v0 : v1;
+    const bx = bl.sx + (br.sx - bl.sx) * u, by = bl.sy + (br.sy - bl.sy) * u;
+    const tx = tl.sx + (tr.sx - tl.sx) * u, tyy = tl.sy + (tr.sy - tl.sy) * u;
+    p[i].x = bx + (tx - bx) * v;
+    p[i].y = by + (tyy - by) * v;
+  }
+  return p;
+}
+faceInset.buf = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }];
+
+const rearFaceQuad = [{ sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }];
+
+/* Screen positions the smoke spawns from, filled in here and read on the
+   next frame. One frame of lag on a puff's starting point is invisible. */
+const carParts = { rlx: 0, rly: 0, rrx: 0, rry: 0, scale: 20 };
+
+const BODY_COLOURS = [COLOUR.CAR_END, COLOUR.CAR_END, COLOUR.CAR_SIDE, COLOUR.CAR_SIDE, COLOUR.CAR_TOP, null];
+/* Only the back of the cabin is glass. The sides are pillars and painted
+   metal, and colouring them dark made the roof read as a hole. */
+const CABIN_COLOURS = [COLOUR.CAR_GLASS, COLOUR.CAR_GLASS, COLOUR.CAR_SIDE, COLOUR.CAR_SIDE, COLOUR.CAR_CABIN_TOP, null];
+const WHEEL_COLOURS = [COLOUR.CAR_TYRE, COLOUR.CAR_TYRE, COLOUR.CAR_TYRE, COLOUR.CAR_TYRE, COLOUR.CAR_TYRE_TOP, null];
+const SHADOW_COLOURS = [null, null, null, null, COLOUR.CAR_SHADOW, null];
+
 function drawCar(w, h) {
-  const g = carGeometry(w, h);
-  const carW = g.w, carH = g.h;
+  const camX = playerX * FEEL.ROAD_HALF_WIDTH;
+  const yaw = drift.headingAngle * FEEL.CAR_YAW_GAIN;
+  const roll = clamp(drift.lateralAccel / FEEL.CAR_ROLL_REFERENCE, -1, 1)
+             * FEEL.CAR_ROLL_DEG * Math.PI / 180;
 
-  // The shadow stays square to the road, so the body visibly turns against
-  // something that does not.
-  ctx.fillStyle = 'rgba(0,0,0,0.26)';
-  ctx.beginPath();
-  ctx.ellipse(g.x, g.groundY - carH * 0.05, carW * 0.56, carH * 0.11, 0, 0, Math.PI * 2);
-  ctx.fill();
+  carT.worldX = camX + carCurveX;      // the car rides the road, curve and all
+  carT.worldZ = FEEL.CAMERA_DISTANCE;
+  carT.cosY = Math.cos(yaw);
+  carT.sinY = Math.sin(yaw);
+  carT.cosR = Math.cos(roll);
+  carT.sinR = Math.sin(roll);
 
-  ctx.save();
-  ctx.translate(g.x, g.groundY - carH * 0.5);
-  // The camera holds the car in the middle of the screen, so the yaw is
-  // the only thing on the car itself that shows the drift.
-  ctx.rotate(drift.headingAngle * FEEL.CAR_YAW_GAIN);
+  const halfW = FEEL.CAR_BODY_WIDTH / 2;
+  const halfL = FEEL.CAR_BODY_LENGTH / 2;
+  const wheelR = FEEL.CAR_WHEEL_DIAMETER / 2;
+  const trackHalf = FEEL.CAR_TRACK / 2;
+  const baseHalf = FEEL.CAR_WHEELBASE / 2;
+  const steer = steering.value * FEEL.CAR_FRONT_STEER_DEG * Math.PI / 180;
 
-  const ty = -carH * 0.5;
+  // The shadow is the yawed footprint of the box rather than a fixed
+  // ellipse. With a solid body a shape that did not turn read as a sticker
+  // underneath a car; the lane dashes, the shoulder and the tyre marks are
+  // the fixed reference, and they are far more legible than an ellipse.
+  drawBox(0, 1, 0, halfW * 0.96, 1, halfL * 0.96, 0, false, SHADOW_COLOURS, false, camX, w, h);
 
-  // Flat high contrast silhouette, seen from behind. Rear tyres first so
-  // the body sits over them.
-  ctx.fillStyle = COLOUR.CAR_LINE;
-  ctx.fillRect(-carW * 0.58, ty + carH * 0.52, carW * 0.18, carH * 0.44);
-  ctx.fillRect(carW * 0.40, ty + carH * 0.52, carW * 0.18, carH * 0.44);
+  ctx.strokeStyle = COLOUR.CAR_EDGE;
+  ctx.lineWidth = 1;
+  ctx.lineJoin = 'round';
 
-  ctx.fillStyle = COLOUR.CAR_BODY;
-  ctx.fillRect(-carW * 0.46, ty + carH * 0.30, carW * 0.92, carH * 0.62);
-  ctx.fillRect(-carW * 0.34, ty + carH * 0.06, carW * 0.68, carH * 0.30);   // cabin
-  ctx.fillStyle = COLOUR.CAR_GLASS;
-  ctx.fillRect(-carW * 0.28, ty + carH * 0.12, carW * 0.56, carH * 0.20);   // rear screen
+  // Far to near: front wheels, body, rear wheels.
+  drawBox(-trackHalf, wheelR, baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, steer, false, WHEEL_COLOURS, true, camX, w, h);
+  drawBox(trackHalf, wheelR, baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, steer, false, WHEEL_COLOURS, true, camX, w, h);
 
-  ctx.fillStyle = COLOUR.CAR_LIGHT;
-  ctx.fillRect(-carW * 0.42, ty + carH * 0.66, carW * 0.20, carH * 0.14);
-  ctx.fillRect(carW * 0.22, ty + carH * 0.66, carW * 0.20, carH * 0.14);
+  const bodyMid = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_BODY_HEIGHT / 2;
+  drawBox.drewRear = false;
+  drawBox(0, bodyMid, 0, halfW, FEEL.CAR_BODY_HEIGHT / 2, halfL, 0, true, BODY_COLOURS, true, camX, w, h);
+  // The rear face was just projected, so the lights are an inset of it.
+  for (let i = 0; i < 4; i++) {
+    rearFaceQuad[i].sx = boxPts[BOX_FACES[0].idx[i]].sx;
+    rearFaceQuad[i].sy = boxPts[BOX_FACES[0].idx[i]].sy;
+  }
+  if (drawBox.drewRear) {
+    ctx.fillStyle = COLOUR.CAR_LIGHT;
+    let q = faceInset(rearFaceQuad, 0.08, 0.32, 0.30, 0.62);
+    polygon(q[0].x, q[0].y, q[1].x, q[1].y, q[2].x, q[2].y, q[3].x, q[3].y);
+    q = faceInset(rearFaceQuad, 0.68, 0.92, 0.30, 0.62);
+    polygon(q[0].x, q[0].y, q[1].x, q[1].y, q[2].x, q[2].y, q[3].x, q[3].y);
+  }
 
-  ctx.restore();
+  const cabinMid = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_BODY_HEIGHT + FEEL.CAR_CABIN_HEIGHT / 2;
+  drawBox(0, cabinMid, FEEL.CAR_CABIN_OFFSET, FEEL.CAR_CABIN_WIDTH / 2,
+          FEEL.CAR_CABIN_HEIGHT / 2, FEEL.CAR_CABIN_LENGTH / 2, 0, true, CABIN_COLOURS, true, camX, w, h);
+
+  drawBox(-trackHalf, wheelR, -baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, 0, false, WHEEL_COLOURS, true, camX, w, h);
+  carParts.rlx = (boxPts[0].sx + boxPts[1].sx) * 0.5;
+  carParts.rly = (boxPts[0].sy + boxPts[1].sy) * 0.5;
+  drawBox(trackHalf, wheelR, -baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, 0, false, WHEEL_COLOURS, true, camX, w, h);
+  carParts.rrx = (boxPts[0].sx + boxPts[1].sx) * 0.5;
+  carParts.rry = (boxPts[0].sy + boxPts[1].sy) * 0.5;
+  carParts.scale = Math.max(8, Math.abs(carParts.rrx - carParts.rlx));
 }
 
 function drawScrapeFlash(w, h) {
@@ -1331,7 +1602,8 @@ function drawHud(w, h) {
   const pad = 10;
   const lines = [
     fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms',
-    tunerLine(),
+    tunerLine(0),
+    tunerLine(1),
     'slip ' + drift.slipDeg.toFixed(0) + '°   edge ' + (scrapeRisk * 100).toFixed(0) + '%'
   ];
   ctx.font = '600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
@@ -1355,14 +1627,18 @@ function render() {
   const w = view.w, h = view.h;
   ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
 
-  // Background is drawn oversized so screen shake never exposes an edge.
+  ctx.save();
+  ctx.translate(shakeX, shakeY);
+
+  /* The background shakes with the road. It used to be drawn outside the
+     shake, which slid the haze band off the sky and ground split and left
+     a bright line of unhazed grass along the horizon on every scrape. It is
+     oversized either way, so shake never exposes a canvas edge. */
   ctx.fillStyle = COLOUR.SKY;
   ctx.fillRect(-40, -40, w + 80, horizonY + 40);
   ctx.fillStyle = COLOUR.GRASS_DARK;
-  ctx.fillRect(-40, horizonY, w + 80, h - horizonY + 40);
+  ctx.fillRect(-40, horizonY, w + 80, h - horizonY + 80);
 
-  ctx.save();
-  ctx.translate(shakeX, shakeY);
   drawRoad(w, h);
   ctx.fillStyle = hazeGradient;
   ctx.fillRect(-40, horizonY - 1, w + 80, h * FEEL.HORIZON_FADE_FRACTION + 2);
