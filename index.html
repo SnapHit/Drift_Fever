@@ -131,6 +131,7 @@
       <button data-act="next" type="button">&#9654;</button>
       <button data-act="reset" type="button">reset</button>
       <button data-act="seed" type="button">seed</button>
+      <button data-act="ramp" type="button">ramp</button>
     </div>
     <button id="pauseBtn" type="button">Pause</button>
     <button id="fpsBtn" type="button">FPS</button>
@@ -187,6 +188,18 @@ const FEEL = {
      as one at all. */
   CAMERA_AIR_FOLLOW:       0.55,
   CAMERA_AIR_TIME:         0.28,     // seconds of lag on that follow
+
+  /* The camera looks into the corner: its x slides toward the way the road
+     is bending, so the far road stays in frame for longer. LIVE.
+
+     This is what buys the extra curvature. Curves here are faked by
+     sliding segments sideways, so a tight one walks the far road off the
+     side of the screen and the player cannot see where it goes, which is
+     section 4.3 broken. Offsetting the camera the same way pulls it back
+     into shot. Lagged, because a camera that snaps to curvature reads as
+     the road twitching rather than as the camera looking. */
+  CAMERA_LOOK:              105,     // LIVE, world units per unit of curvature
+  CAMERA_LOOK_TIME:        0.45,     // seconds of lag on it
   HORIZON_FRACTION:        0.50,     // LIVE, where the horizon sits down the screen
   DRAW_DISTANCE_SEGMENTS:   200,
   SEGMENT_LENGTH:           200,
@@ -332,7 +345,7 @@ const FEEL = {
      hold a line, and at 1.0 the corner is unsurvivable however well it is
      driven. The debug readout prints that product live, beside the largest
      curvature actually generated, so it can be walked up in full view. */
-  CENTRIFUGAL:             0.14,     // LIVE
+  CENTRIFUGAL:            0.064,     // LIVE
 
   /* The three bands from section 4.2, measured in road half widths, so
      1.0 is the painted edge of the road and the car is CAR_BODY_WIDTH
@@ -551,11 +564,31 @@ const FEEL = {
   RECOVERY_MAX:              44,
   STRAIGHT_WEIGHT:            1,     // against PHRASE_WEIGHT for everything else
   PHRASE_WEIGHT:              3,
+  /* Ramps get their own weight, well above the rest, and it is LIVE so it
+     can come back down once they stop being a novelty. At PHRASE_WEIGHT
+     they were about one section in fifteen, cut further by being locked
+     out while resting, and on a hard track most runs simply ended before
+     one arrived. */
+  LAUNCH_WEIGHT:             14,     // LIVE
   DIRECTION_FLIP_CHANCE:   0.68,     // how often a phrase turns the other way
   PHRASE_JITTER:           0.28,     // fractional variation on every length
+  /* The three corner strengths, and one gain over all of them.
+
+     Visual tightness and difficulty are two dials, not one. These values
+     and CURVE_SCALE decide how sharply the road bends on screen. That
+     product times CENTRIFUGAL decides how hard it throws the car, and only
+     the second one has a ceiling at 1.0. So the shape can be made far
+     tighter at unchanged difficulty by raising this and dropping
+     CENTRIFUGAL to match, and the two can then be tuned apart.
+
+     CURVE_SCALE is applied where the curvature is read rather than where
+     it is stored, so moving it live reshapes the road already on screen
+     instead of only the road not yet generated. The three below keep their
+     relationship to each other and are not separately tunable on purpose. */
   CURVE_GENTLE:             1.6,
   CURVE_MEDIUM:             3.2,
   CURVE_HARD:               5.0,
+  CURVE_SCALE:              2.2,     // LIVE
 
   /* Frame. Clamped so a stutter cannot teleport the player off the road. */
   MAX_FRAME_DELTA:      1 / 20
@@ -662,6 +695,8 @@ let horizonY = 0;
    loads, long before the game state further down exists. */
 let cameraLift = 0;      // the camera following the car up, damped
 let camHeight = 0;       // FEEL.CAMERA_HEIGHT plus that lift, what everything projects against
+let lookCurve = 0;       // the curvature the camera has caught up to
+let cameraX = 0;         // where the camera is across the road, car plus that look
 
 /* The authored defaults for the four LIVE values, kept so the reset
    button has something to go back to and so the game can say out loud
@@ -685,7 +720,10 @@ const TUNABLES = [
   { key: 'GRID_DEPTH',         label: 'depth',   step: 500,  min: 500,  max: 40000, dp: 0, group: 4 },
   { key: 'CENTRIFUGAL',        label: 'cent',    step: 0.005, min: 0,   max: 0.30,  dp: 3, group: 5 },
   { key: 'CAR_YAW_GAIN',       label: 'yaw',     step: 0.1,  min: 0,    max: 5.0,   dp: 1, group: 5 },
-  { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 }
+  { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 },
+  { key: 'CURVE_SCALE',        label: 'curve',   step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
+  { key: 'CAMERA_LOOK',        label: 'look',    step: 10,   min: 0,    max: 500,   dp: 0, group: 6 },
+  { key: 'LAUNCH_WEIGHT',      label: 'ramps',   step: 1,    min: 0,    max: 60,    dp: 0, group: 6 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -1157,10 +1195,19 @@ function tunerLine(group) {
   if (group === 5) {
     /* The ceiling, live. The share of full steering lock the hardest
        corner on the road consumes just to hold a line, against the largest
-       curvature the generator has actually produced rather than against
-       the constant. At 1.00 that corner cannot be driven at all. */
-    const peak = Math.max(maxCurveSeen, 0);
+       curvature the generator has actually produced and after the scale,
+       rather than against the constant. At 1.00 that corner cannot be
+       driven at all however well it is driven. */
+    const peak = maxCurveSeen * FEEL.CURVE_SCALE;
     out += 'ceil ' + (peak * FEEL.CENTRIFUGAL).toFixed(2) + ' @' + peak.toFixed(1);
+  }
+  if (group === 6) {
+    // Seconds of road still in frame. Below the 3.5 of section 4.3 the
+    // corner cannot be planned for, whatever the difficulty says.
+    const secs = sightSeg < 0
+      ? FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH / FEEL.SPEED
+      : sightSeg * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
+    out += 'sight ' + secs.toFixed(1) + 's' + (sightSeg < 0 ? '+' : '');
   }
   return out;
 }
@@ -1181,7 +1228,9 @@ function deadShare() {
    with the hardest corner pushing the same way, on the narrowest road. */
 const REVERSAL_FACTOR = 0.31;
 function worstOvershoot() {
-  const v = FEEL.STEER_RATE * (1 + FEEL.CURVE_HARD * FEEL.CENTRIFUGAL) / FEEL.ROAD_WIDTH_NARROW;
+  const v = FEEL.STEER_RATE
+          * (1 + FEEL.CURVE_HARD * FEEL.CURVE_SCALE * FEEL.CENTRIFUGAL)
+          / FEEL.ROAD_WIDTH_NARROW;
   return REVERSAL_FACTOR * v * FEEL.GRIP_TIME;
 }
 
@@ -1254,6 +1303,18 @@ function toggleSeed() {
   if (state !== TITLE) startRun();
 }
 
+/* Queue a ramp as the next phrase built. It does not cut into the road
+   already generated, because the joint would land a curve discontinuity a
+   few segments in front of the car. The road runs about four seconds
+   ahead, so the ramp arrives within roughly that plus whatever the phrase
+   in progress still has to run. */
+function forceRamp() {
+  forceNextPhrase = 'launch';
+  const wait = (segBase + segments.length) * FEEL.SEGMENT_LENGTH
+             - (position + FEEL.CAMERA_DISTANCE);
+  showNote('Ramp queued, about ' + Math.max(0, wait / FEEL.SPEED).toFixed(0) + 's away.', 2.5);
+}
+
 /* Held buttons repeat, because stepping the camera height a hundred at a
    time with single taps is not a thing anyone will do twice. */
 const repeat = { dir: 0, held: 0, fired: 0 };
@@ -1278,6 +1339,7 @@ tunerEl.addEventListener('pointerdown', function (e) {
   else if (act === 'next') selectTuning(1);
   else if (act === 'reset') resetTuning();
   else if (act === 'seed') toggleSeed();
+  else if (act === 'ramp') forceRamp();
   else if (act === 'dec') { nudgeTuning(-1); repeat.dir = -1; repeat.held = 0; repeat.fired = 0; }
   else if (act === 'inc') { nudgeTuning(1); repeat.dir = 1; repeat.held = 0; repeat.fired = 0; }
 });
@@ -1617,10 +1679,34 @@ function shapeRamp(from, lip, side) {
 let restOwed = 0;
 
 function phraseWeight(p) {
-  return p.name === 'straight' ? FEEL.STRAIGHT_WEIGHT : FEEL.PHRASE_WEIGHT;
+  if (p.name === 'straight') return FEEL.STRAIGHT_WEIGHT;
+  if (p.name === 'launch') return FEEL.LAUNCH_WEIGHT;
+  return FEEL.PHRASE_WEIGHT;
+}
+
+/* Set to a phrase name to make that phrase the next one built, once. Used
+   by the opening of every run to guarantee a ramp early, and by the debug
+   button, because waiting on a dice roll is not a way to test a feature. */
+let forceNextPhrase = '';
+
+function findPhrase(name) {
+  for (let i = 0; i < PHRASES.length; i++) {
+    if (PHRASES[i].name === name) return PHRASES[i];
+  }
+  return null;
 }
 
 function addPhrase() {
+  if (forceNextPhrase) {
+    const forced = findPhrase(forceNextPhrase);
+    forceNextPhrase = '';
+    if (forced) {
+      forced.build();
+      restOwed = forced.intensity >= 2 ? 1 : 0;
+      return;
+    }
+  }
+
   const resting = restOwed > 0;
   if (resting) restOwed--;
 
@@ -1660,6 +1746,10 @@ function resetRoad(seed) {
   addRun(90, FEEL.CURVE_GENTLE, FEEL.CURVE_GENTLE, 1, 1, false);
   addRun(30, FEEL.CURVE_GENTLE, 0, 1, 1, true);
   addRun(60, 0, 0, 1, 1, false);
+  /* And then a ramp, always, in the first stretch of every run. A feature
+     nobody meets is a feature nobody has, and on a hard track the runs are
+     short enough that a fair dice roll was losing most of them. */
+  forceNextPhrase = 'launch';
 }
 
 function topUpRoad(baseIndex) {
@@ -1812,6 +1902,12 @@ function update(dt) {
   const target = carY > 0 ? carY * FEEL.CAMERA_AIR_FOLLOW : 0;
   cameraLift += (target - cameraLift) * (1 - Math.exp(-dt / FEEL.CAMERA_AIR_TIME));
   camHeight = FEEL.CAMERA_HEIGHT + cameraLift;
+
+  // And across: it leans the way the road is bending, well behind the road
+  // itself, so the far end of a tight corner stays on screen.
+  lookCurve += (carCurve - lookCurve) * (1 - Math.exp(-dt / FEEL.CAMERA_LOOK_TIME));
+  cameraX = carX + lookCurve * FEEL.CAMERA_LOOK;
+
   if (ringFlash > 0) ringFlash -= dt;
 
   if (state === DEAD) { updateFall(dt); return; }
@@ -1821,7 +1917,9 @@ function update(dt) {
   const carIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
   carSegIndex = carIndex;
   const carSegment = segAt(carIndex);
-  const curve = carSegment ? carSegment.curve : 0;
+  // Curvature is stored as shape and scaled on read, so the live gain
+  // reshapes the road that is already on screen.
+  const curve = (carSegment ? carSegment.curve : 0) * FEEL.CURVE_SCALE;
   carCurve = curve;
   const localHalf = carSegment ? carSegment.hw : FEEL.ROAD_HALF_WIDTH_BASE;
 
@@ -2163,7 +2261,7 @@ function drawGrid(w, h) {
   if (nearScale) {
     const half = (FEEL.GRID_COLUMNS - 1) / 2;
     for (let i = -half; i <= half; i++) {
-      const wx = i * FEEL.GRID_COLUMN_SPACING - carX;
+      const wx = i * FEEL.GRID_COLUMN_SPACING - cameraX;
       ctx.moveTo(w / 2 + nearScale * wx * w / 2, nearY);
       ctx.lineTo(w / 2 + farScale * wx * w / 2, farY);
     }
@@ -2290,6 +2388,14 @@ const bt = new Float64Array(MAX_BOUNDS);
 const bf = new Float64Array(MAX_BOUNDS);
 const bh = new Float64Array(MAX_BOUNDS);   // world height to pixels at this boundary
 let anyRamp = false, anyRing = false;
+/* The nearest segment whose road centre has left the screen, or -1 while
+   the whole draw distance is still visible. */
+let sightSeg = -1;
+/* Segments between the camera and the car. Road under the car is road the
+   player is already committed to, so it is not lookahead and is left out
+   of the sight measure, which otherwise reports the near field swinging
+   out of frame whenever the camera leans. */
+const carAheadSegs = Math.ceil(FEEL.CAMERA_DISTANCE / FEEL.SEGMENT_LENGTH) + 2;
 const bvis = new Uint8Array(MAX_BOUNDS);
 const blight = new Uint8Array(MAX_BOUNDS);
 
@@ -2314,10 +2420,11 @@ function drawRoad(w, h) {
   const base = segAt(baseIndex);
   if (!base) return;
   const percent = (position - baseIndex * seg) / seg;
-  const camX = carX;
+  // The camera, which is the car plus its lean into the corner.
+  const camX = cameraX;
 
   let x = 0;
-  let dx = -(base.curve * percent);
+  let dx = -(base.curve * FEEL.CURVE_SCALE * percent);
 
   const carZ = position + FEEL.CAMERA_DISTANCE;
   const carIdx = Math.floor(carZ / seg);
@@ -2347,7 +2454,7 @@ function drawRoad(w, h) {
     if (baseIndex + k === carIdx) carCurveX = x + dx * carSegFrac;
     if (!s) break;
     x += dx;
-    dx += s.curve;
+    dx += s.curve * FEEL.CURVE_SCALE;
   }
 
   /* Decide once which segments are drawn and which stripe they are on,
@@ -2358,6 +2465,7 @@ function drawRoad(w, h) {
   let first = -1, last = -1;
   anyRamp = false;
   anyRing = false;
+  sightSeg = -1;
   for (let n = 0; n < count; n++) {
     const s = segAt(baseIndex + n);
     bvis[n] = 0;
@@ -2370,6 +2478,12 @@ function drawRoad(w, h) {
     // on every frame of a road that has neither.
     if (s.ramp) anyRamp = true;
     if (s.ringH > 0) anyRing = true;
+    /* How far ahead the road is still on screen. Curves are faked by
+       sliding segments sideways, so a tight enough corner walks the road
+       out of frame and the player cannot see where it goes. That distance,
+       in seconds, is the true ceiling on corner tightness, and it is worth
+       watching rather than discovering. */
+    if (sightSeg < 0 && n > carAheadSegs && (bx[n] < 0 || bx[n] > w)) sightSeg = n;
     if (first < 0) first = n;
     last = n;
     maxy = by[n + 1];
@@ -2956,12 +3070,15 @@ const CAR_POOL_GRADS = [];
 })();
 
 function drawCar(w, h) {
-  const camX = carX;
+  /* Projected against the camera, positioned at the car. Those were the
+     same thing until the camera started leaning into corners, and keeping
+     them apart is what slides the car off centre while it does. */
+  const camX = cameraX;
   const yaw = carYaw();
   const roll = clamp(drift.lateralAccel / FEEL.CAR_ROLL_REFERENCE, -1, 1)
              * FEEL.CAR_ROLL_DEG * Math.PI / 180;
 
-  carT.worldX = camX + carCurveX;      // the car rides the road, curve and all
+  carT.worldX = carX + carCurveX;      // the car rides the road, curve and all
   carT.worldY = carY;
   carT.worldZ = FEEL.CAMERA_DISTANCE;
   carT.cosY = Math.cos(yaw);
@@ -3158,6 +3275,7 @@ function drawHud(w, h) {
     tunerLine(3),
     tunerLine(4),
     tunerLine(5),
+    tunerLine(6),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free')
   ];
