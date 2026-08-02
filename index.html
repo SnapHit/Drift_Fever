@@ -256,11 +256,11 @@
 <div id="pads">
   <div class="padGroup">
     <button id="soundBtn" type="button" aria-label="Sound"></button>
-    <button id="pauseBtn" type="button" aria-label="Pause"></button>
+    <button id="musicBtn" type="button" aria-label="Music"></button>
   </div>
   <div class="padGroup">
     <button id="tiltBtn" type="button" hidden aria-label="Tilt steering"></button>
-    <button id="tiltFlipBtn" type="button" hidden aria-label="Reverse tilt"></button>
+    <button id="pauseBtn" type="button" aria-label="Pause"></button>
   </div>
 </div>
 <div id="safe"></div>
@@ -303,8 +303,45 @@ const FEEL = {
      more, and narrower zooms everything in. */
   /* These four were found by playing on a phone and are settled. Treat
      them the way the build order treats the rest of this block. */
-  FIELD_OF_VIEW_DEG:         80,     // LIVE
-  CAMERA_HEIGHT:           1800,     // LIVE
+  FIELD_OF_VIEW_DEG:         92,     // LIVE
+  /* ----------------------------------------------------------------
+     WHERE THE ROAD LEAVES THE SCREEN, written down so it is not worked
+     out again from scratch.
+
+     Curves are faked by sliding segments sideways, so a constant curve c
+     after the scale S accumulates a lateral offset of c*S*n(n-1)/2 world
+     units over n segments, while the distance to those segments is only
+     n*L. The projection divides by that distance, so the SCREEN offset of
+     the road centre grows LINEARLY in n, and the road centre crosses the
+     screen edge at
+
+         n = 2*L / (CAMERA_DEPTH * c * S) + 1     segments from the camera
+
+     where CAMERA_DEPTH is 1/tan(FOV/2). Three consequences, all measured
+     as well as derived:
+
+     CAMERA_HEIGHT DOES NOTHING HERE. It appears only in by[], never in
+     bx[]. Raising it from 1800 to 6000 moved the mean visible road by
+     0.02 seconds. A higher camera holding a bend in frame is true of a
+     real 3D camera and false of this projection. It is raised anyway,
+     because the more top down look was wanted for its own sake.
+
+     FOV IS THE ONLY CAMERA LEVER. n scales with tan(FOV/2).
+
+     CURVE SCALE IS THE OTHER, and it is the honest one, which is why
+     CURVE_SCALE_DEEP is now equal to CURVE_SCALE: the deep game escalates
+     through road width, phrase intensity and rest frequency instead.
+
+     At the values below, and at the hardest corner the generator makes
+     (CURVE_HARD 5.0, so a post scale curvature of 12.5), the road centre
+     leaves the frame 34 segments out, which is 0.30 seconds past the car.
+     Staying in frame a full second past the car needs the post scale
+     curvature under about 6.4, which is a raw curve of 2.6: between
+     CURVE_GENTLE and CURVE_MEDIUM. Every medium and hard corner in the
+     game is therefore partly off screen at its apex, and the only fixes
+     left are a wider FOV, a weaker CURVE_HARD, or yawing the camera into
+     the corner rather than sliding the road. */
+  CAMERA_HEIGHT:           2200,     // LIVE
   CAMERA_DISTANCE:         4100,     // LIVE, how far the camera sits behind the car
   /* CAMERA_LOOK slides the camera sideways toward the way the road is
      bending, so the far road stays in frame for longer. It is zero, and
@@ -659,15 +696,6 @@ const FEEL = {
   SCRAPE_Q:                  11,
   SCRAPE_RISK_LIFT:        0.35,     // how far under full it starts, so the max is the max
 
-  /* The engine. Low, quiet, and barely there, because it plays constantly
-     and anything with character in it becomes unbearable inside a minute.
-     Its pitch follows real forward speed, so the drop while scraping is
-     audible, which is free feedback. */
-  ENGINE_GAIN:             0.11,
-  ENGINE_FREQ:               58,     // Hz at full speed
-  ENGINE_SCRAPE_DROP:      0.72,     // pitch multiplier at the scraping speed
-  ENGINE_CUTOFF:            420,     // Hz, the lowpass that keeps it a rumble
-
   /* The crash, and then quiet. One envelope on a noise burst with the
      filter sweeping down, and every other voice pulled to nothing under
      it, so the wind down is clean rather than a skid that outlives the
@@ -715,14 +743,19 @@ const FEEL = {
      button beside Tilt reverses it permanently, rather than a sign error
      ever being a blocker again.
 
-     Session ten flipped this to -1 on a report that it read backwards,
-     against a rotation model that said +1 was right. Session eleven put
-     it back: the model was right, and what read as inverted was the
-     camera sliding sideways and the car yawing without being asked, both
-     of which are now zero. The stored preference key was renamed with it,
-     so a flip saved against the old default cannot silently reverse the
-     controls of anyone who set one. */
-  TILT_DIRECTION:             1,
+     This has been reversed three times across sessions ten, eleven and
+     thirteen. A rotation model of the W3C frame says +1 is the physically
+     correct sign; three separate reports from a real handset say it reads
+     backwards. The handset wins, because the model cannot account for
+     what a wrist actually does at the angle a phone is held, and because
+     gamma's decomposition is at a singularity near upright anyway.
+
+     There is no toggle any more, deliberately: a control that is wrong
+     until the player finds a second button to fix it is worse than one
+     that is simply right. That makes this constant the only place the
+     direction lives, so it is on the debug cycler behind ?debug=1 and can
+     be settled on the phone in one tap rather than in another session. */
+  TILT_DIRECTION:            -1,
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
   TILT_DEADZONE_DEG:       1.50,     // LIVE, the neutral state from section 4.1
   TILT_FULL_LOCK_DEG:        15,     // LIVE, degrees from the calibrated zero to full lock
@@ -908,7 +941,14 @@ const FEEL = {
   ONRAMP_INTENSITY:           1,     // hardest phrase the on ramp may use
   ONRAMP_REST:              0.7,     // chance of a forced breath after any phrase
   RAMP_SECONDS:             180,     // from the end of the on ramp to full difficulty
-  CURVE_SCALE_DEEP:         3.1,     // where the curve scale ends up
+  /* Equal to CURVE_SCALE, so the curve does not escalate past the on
+     ramp at all. It was 3.1, which pushed curvature 24% past anything the
+     camera was set up for and walked most of the drivable surface off the
+     side of the screen on every hard corner. Width, intensity and rest
+     frequency carry the deep game instead, and they are better levers in
+     this engine anyway. Raising this above CURVE_SCALE costs visible road
+     roughly in proportion: see the note above CAMERA_HEIGHT. */
+  CURVE_SCALE_DEEP:         2.5,     // where the curve scale ends up
   ROAD_SQUEEZE:            0.88,     // road width multiplier at full difficulty
   DEEP_INTENSITY:             3,
   /* How much the on ramp may soften for somebody who keeps dying in it.
@@ -1082,8 +1122,14 @@ const TUNABLES = [
   { key: 'CAR_YAW_GAIN',       label: 'yaw',     step: 0.1,  min: 0,    max: 5.0,   dp: 1, group: 5 },
   { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 },
   { key: 'CURVE_SCALE',        label: 'curve',   step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
-  { key: 'CAMERA_LOOK',        label: 'look',    step: 10,   min: 0,    max: 500,   dp: 0, group: 6 },
-  { key: 'CAMERA_LOOK_AHEAD',  label: 'ahead',   step: 500,  min: 0,    max: 30000, dp: 0, group: 6 }
+  { key: 'CURVE_SCALE_DEEP',   label: 'deep',    step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
+  { key: 'CAMERA_LOOK',        label: 'look',    step: 10,   min: 0,    max: 500,   dp: 0, group: 7 },
+  { key: 'CAMERA_LOOK_AHEAD',  label: 'ahead',   step: 500,  min: 0,    max: 30000, dp: 0, group: 7 },
+  /* Two positions only, and it is here because the flip button is gone
+     and this is now the single place the tilt direction lives. It has
+     been reversed three times; settling it on the phone beats settling it
+     in another session. */
+  { key: 'TILT_DIRECTION',     label: 'tiltdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -1227,15 +1273,15 @@ window.addEventListener('keydown', function (e) {
   const k = e.key;
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
-  else if (k === 'f' || k === 'F') { setDebug(!showDebug); return; }
+  else if (k === 'f' || k === 'F') { if (debugAllowed) setDebug(!showDebug); return; }
   else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
   // The tuning keys are the keyboard twin of the on screen buttons, and
   // like F they must not also start a run.
-  else if (k === '[') { selectTuning(-1); return; }
-  else if (k === ']') { selectTuning(1); return; }
-  else if (k === '-' || k === '_') { nudgeTuning(-1); return; }
-  else if (k === '=' || k === '+') { nudgeTuning(1); return; }
-  else if (k === '0') { resetTuning(); return; }
+  else if (debugAllowed && k === '[') { selectTuning(-1); return; }
+  else if (debugAllowed && k === ']') { selectTuning(1); return; }
+  else if (debugAllowed && (k === '-' || k === '_')) { nudgeTuning(-1); return; }
+  else if (debugAllowed && (k === '=' || k === '+')) { nudgeTuning(1); return; }
+  else if (debugAllowed && k === '0') { resetTuning(); return; }
   firstGesture();
   startOrRestart();
 });
@@ -1386,7 +1432,6 @@ function updateTilt(dt) {
       disableTilt();
       tilt.supported = false;
       tiltBtn.hidden = true;
-      tiltFlipBtn.hidden = true;
       showNote('No motion sensor on this device.', 4);
     }
     return;
@@ -1396,7 +1441,7 @@ function updateTilt(dt) {
   /* The direction is applied here rather than where the reading is taken,
      so that flipping mid run does not also flip the captured posture and
      force a recalibration. */
-  const rel = (tilt.rawDeg - tilt.zeroDeg) * tiltSign();
+  const rel = (tilt.rawDeg - tilt.zeroDeg) * FEEL.TILT_DIRECTION;
   const magnitude = Math.abs(rel);
   let target = 0;
   if (magnitude > FEEL.TILT_DEADZONE_DEG) {
@@ -1412,7 +1457,6 @@ function onTiltPermission(result) {
     // Denial is sticky on iOS. Never let the button appear to do nothing.
     tilt.active = false;
     tiltBtn.classList.remove('on');
-    syncTiltButtons();
     storeSet('tilt', '0');
     showNote('Tilt was blocked. This browser will not ask again for this page.', 5);
     return;
@@ -1426,7 +1470,6 @@ function onTiltPermission(result) {
   tilt.value = 0;
   tilt.zeroDeg = null;
   tiltBtn.classList.add('on');
-  syncTiltButtons();
   storeSet('tilt', '1');
   showNote('Tilt on. Hold the phone how you like, it zeroes to your posture at the start of every run.', 4);
 }
@@ -1445,7 +1488,6 @@ function disableTilt() {
   tilt.active = false;
   tilt.value = 0;
   tiltBtn.classList.remove('on');
-  syncTiltButtons();
 }
 
 tiltBtn.addEventListener('pointerdown', function (e) {
@@ -1466,14 +1508,6 @@ tiltBtn.addEventListener('click', function (e) {
   }
 });
 
-/* Which way round the tilt steers. Stored as the player's departure from
-   FEEL.TILT_DIRECTION rather than as an absolute sign, so the Flip button
-   is unlit on a fresh install and lit only once it has been touched, and
-   so changing the shipped default later does not silently reverse the
-   controls for everyone who already set one. */
-let tiltFlipped = storeGet('tiltflip2') === '1';
-function tiltSign() { return FEEL.TILT_DIRECTION * (tiltFlipped ? -1 : 1); }
-
 /* Seconds of pulse left. Zero means never, or never again. */
 let tiltHintLeft = 0;
 function stopTiltHint(remember) {
@@ -1486,26 +1520,6 @@ function updateTiltHint(dt) {
   tiltHintLeft -= dt;
   if (tiltHintLeft <= 0) stopTiltHint(false);
 }
-
-const tiltFlipBtn = document.getElementById('tiltFlipBtn');
-function setTiltFlipped(on) {
-  tiltFlipped = on;
-  tiltFlipBtn.classList.toggle('on', on);
-  storeSet('tiltflip2', on ? '1' : '0');
-}
-tiltFlipBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
-tiltFlipBtn.addEventListener('click', function (e) {
-  e.stopPropagation();
-  tiltFlipBtn.blur();
-  resumeAudio();
-  setTiltFlipped(!tiltFlipped);
-  // The reading itself is untouched, so the flip takes effect on the very
-  // next frame with no recalibration and no dead moment.
-  tilt.value = 0;
-  showNote(tiltFlipped
-    ? 'Tilt reversed. Tap Flip again to put it back.'
-    : 'Tilt back the way it ships.', 3);
-});
 
 /* The preference persists, the grant does not: most iOS versions want a
    fresh gesture every page load, so re-request on the first one. */
@@ -1523,16 +1537,6 @@ function firstGesture() {
 
 tilt.supported = detectTiltSupport();
 tiltBtn.hidden = !tilt.supported;
-setTiltFlipped(tiltFlipped);
-
-/* Flip appears only while tilt is actually on. It reverses a control that
-   is not running otherwise, and now that the shipped direction is the
-   right one almost nobody will touch it, so it has no business taking up
-   room in the main view. */
-function syncTiltButtons() {
-  tiltFlipBtn.hidden = !(tilt.supported && tilt.active);
-}
-syncTiltButtons();
 
 // Only where there is a sensor to find, and only until it has been found.
 if (tilt.supported && storeGet('tilthint') !== '1') {
@@ -1558,6 +1562,17 @@ pauseBtn.addEventListener('click', function (e) {
   resumeAudio();
   togglePause();
 });
+/* Live tuning, behind ?debug=1 and completely absent otherwise. Tuning by
+   playing has been the most useful thing on this project and it went away
+   with the FPS button, so it comes back on a URL rather than on a control
+   the audience can find. The F key still works once the parameter is
+   present, so it can be toggled off mid run without editing the URL. */
+const debugAllowed = (function () {
+  try {
+    const q = window.location.search;
+    return /[?&]debug=1(&|$)/.test(q);
+  } catch (e) { return false; }
+})();
 let showDebug = false;
 let fpsFrames = 0, fpsElapsed = 0, fpsWorst = 0, fpsShown = 0, fpsWorstShown = 0;
 
@@ -1573,6 +1588,7 @@ function measureChrome() {
    for it, where a permanent button on a phone is one more thing between
    the player and the road. */
 function setDebug(on) {
+  if (on && !debugAllowed) return;
   showDebug = on;
   tunerEl.hidden = !on;
   fpsFrames = 0; fpsElapsed = 0; fpsWorst = 0;
@@ -1633,8 +1649,10 @@ function tunerLine(group) {
     out += 'ceil ' + (peak * FEEL.CENTRIFUGAL).toFixed(2) + ' @' + peak.toFixed(1);
   }
   if (group === 6) {
-    // Seconds of road still in frame. Below the 3.5 of section 4.3 the
-    // corner cannot be planned for, whatever the difficulty says.
+    // Seconds of road still in frame, ahead of the car. Below the 3.5 of
+    // section 4.3 the corner cannot be planned for, whatever the
+    // difficulty says, and see the note above CAMERA_HEIGHT for why this
+    // is bounded by the curve scale rather than by the camera.
     const secs = sightSeg < 0
       ? FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH / FEEL.SPEED
       : sightSeg * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
@@ -3595,26 +3613,42 @@ function drawHud(w, h) {
     tunerLine(4),
     tunerLine(5),
     tunerLine(6),
+    tunerLine(7),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
       + '  width ' + widthScale.toFixed(2) + '  int ' + maxIntensity()
       + '  ease ' + ease.toFixed(2)
   ];
-  ctx.font = '600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
+  /* Sized to fit rather than fixed, because the readout gains a value
+     most sessions and a line that runs off the side of a phone is a line
+     that cannot be read at the moment it is needed. */
+  const pad2 = pad * 2 + 10;
+  let size = 13;
+  ctx.font = '600 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   let widest = 0;
   for (let i = 0; i < lines.length; i++) {
     const tw = ctx.measureText(lines[i]).width;
     if (tw > widest) widest = tw;
   }
+  if (widest > w - pad2) {
+    size = Math.max(8, Math.floor(size * (w - pad2) / widest));
+    ctx.font = '600 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    widest = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const tw = ctx.measureText(lines[i]).width;
+      if (tw > widest) widest = tw;
+    }
+  }
+  const lineH = Math.round(size * 1.38);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
   const top = hudTop;
   ctx.fillStyle = 'rgba(26,10,4,0.66)';
-  ctx.fillRect(pad - 5, top - 4, widest + 10, lines.length * 18 + 8);
+  ctx.fillRect(pad - 5, top - 4, widest + 10, lines.length * lineH + 8);
   ctx.fillStyle = '#ffffff';
   for (let i = 0; i < lines.length; i++) {
-    ctx.fillText(lines[i], pad, top + i * 18);
+    ctx.fillText(lines[i], pad, top + i * lineH);
   }
 }
 
@@ -3711,32 +3745,33 @@ function drawPauseCover(w, h) {
    and is most of what makes the drift read; music is unmistakably a game
    from across a room and is what gets somebody caught. Anyone who wants
    music is one tap away and their choice is remembered. */
-const STATIONS = [
-  { id: 'off',  sfx: false, music: false },
-  { id: 'sfx',  sfx: true,  music: false },
-  { id: 'neon', sfx: true,  music: true,
+const TRACKS = [
+  { id: 'neon',
     // A natural minor run, and a saw.
     wave: 'sawtooth', root: 55, tempo: 1,
     arp: [0, 3, 7, 10, 12, 10, 7, 3], bass: [0, 0, 7, 0, 10, 0, 7, 5] }
 ];
-/* The stored choice wins over the default, always. Silence chosen once
-   is silence for good, which is the whole deal that makes defaulting to
-   sound defensible. An unrecognised or absent value falls back to the
-   default station rather than to silence, because a first visit should
-   have sound. */
-const DEFAULT_STATION = 'sfx';
-function stationIndex(id) {
-  for (let i = 0; i < STATIONS.length; i++) if (STATIONS[i].id === id) return i;
-  return -1;
-}
-let station = (function () {
-  const i = stationIndex(storeGet('radio'));
-  return i >= 0 ? i : stationIndex(DEFAULT_STATION);
-})();
-/* Where an unmute returns to. It follows the last station that actually
-   made a sound, so muting and unmuting is a round trip rather than a
-   reset to the default. */
-let lastLoud = station || stationIndex(DEFAULT_STATION);
+let track = 0;            // only one for now, and the list is here so that
+                          // adding a second is a data change and not a
+                          // rewrite. Nothing selects between them yet.
+
+/* Two switches rather than one cycle, because they are two decisions and
+   they default differently.
+
+   SOUND is the tyres, the scrape and the crash, and it is on. The skid is
+   quiet, textural and is most of what makes the drift read at all.
+
+   MUSIC is off, and that is section 6 taken seriously rather than a taste
+   judgement: the skid could be a video playing in the next tab, but an
+   arpeggio at 148bpm is unmistakably a game from across a classroom and
+   it is what gets somebody caught. Anyone who wants it is one tap away
+   and the choice is remembered.
+
+   A stored value always wins over the default, in both directions. */
+let sfxOn = storeGet('sfx') !== '0';
+let musicOn = storeGet('music') === '1';
+function anySound() { return sfxOn || musicOn; }
+
 let audio = null;         // the graph, once there is one, and never before one
 
 /* Equal temperament from a root, so the note tables above are semitone
@@ -3805,14 +3840,6 @@ function buildAudio() {
   scrapeSrc.connect(scrapeA); scrapeA.connect(scrapeB);
   scrapeB.connect(scrapeGain); scrapeGain.connect(bus);
 
-  // --- The engine. One saw, well filtered, quiet. ---
-  const engineOsc = node('Oscillator');
-  engineOsc.type = 'sawtooth';
-  engineOsc.frequency.value = FEEL.ENGINE_FREQ;
-  const engineLow = filter('lowpass', FEEL.ENGINE_CUTOFF, 0.9);
-  const engineGain = gain(0);
-  engineOsc.connect(engineLow); engineLow.connect(engineGain); engineGain.connect(bus);
-
   // --- The crash. Idle until something hits it. ---
   const crashSrc = loopNoise();
   const crashLow = filter('lowpass', FEEL.CRASH_FREQ_FROM, 1.4);
@@ -3849,14 +3876,13 @@ function buildAudio() {
 
   const t0 = ac.currentTime;
   skidSrc.start(t0); scrapeSrc.start(t0); crashSrc.start(t0); hatSrc.start(t0);
-  wobble.start(t0); engineOsc.start(t0); bassOsc.start(t0);
+  wobble.start(t0); bassOsc.start(t0);
   arpOsc.start(t0); octOsc.start(t0);
 
   return {
     ac: ac, master: master, pauseFilter: pauseFilter,
     skidBand: skidBand, skidGain: skidGain,
     scrapeA: scrapeA, scrapeGain: scrapeGain,
-    engineOsc: engineOsc, engineGain: engineGain,
     crashLow: crashLow, crashGain: crashGain,
     musicGain: musicGain,
     bassOsc: bassOsc, bassGain: bassGain,
@@ -3891,12 +3917,20 @@ const ICON = {
     + ' stroke-linecap="round" stroke-linejoin="round">'
     + '<path d="M3 9.5h3.5L11 6v12L6.5 14.5H3z" fill="currentColor" stroke-linejoin="round"/>'
     + '<path d="M14.5 9.8a3.6 3.6 0 010 4.4"/></svg>',
-  speakerMusic:
+  // A note with a bar through it, and the same note plain.
+  noteOff:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
     + ' stroke-linecap="round" stroke-linejoin="round">'
-    + '<path d="M3 9.5h3.5L11 6v12L6.5 14.5H3z" fill="currentColor" stroke-linejoin="round"/>'
-    + '<path d="M14.5 9.8a3.6 3.6 0 010 4.4"/>'
-    + '<path d="M17.6 7.2a7.6 7.6 0 010 9.6"/></svg>',
+    + '<path d="M10 18V7.2l8-1.8V16"/>'
+    + '<circle cx="7.6" cy="18" r="2.6" fill="currentColor"/>'
+    + '<circle cx="15.6" cy="16" r="2.6" fill="currentColor"/>'
+    + '<path d="M3.4 21.2L20.6 3.4" stroke-width="2.2"/></svg>',
+  noteOn:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M10 18V7.2l8-1.8V16"/>'
+    + '<circle cx="7.6" cy="18" r="2.6" fill="currentColor"/>'
+    + '<circle cx="15.6" cy="16" r="2.6" fill="currentColor"/></svg>',
   pause:
     '<svg viewBox="0 0 24 24" fill="currentColor">'
     + '<rect x="6.5" y="5" width="4" height="14" rx="1.2"/>'
@@ -3917,41 +3951,34 @@ const ICON = {
     + '</g>'
     + '<path d="M2.6 8.6l1.7 1.5M21.4 13.4l-1.7-1.5" stroke-width="1.7"/></svg>',
   // Two ways through one handset, which is what the reverse does.
-  flip:
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
-    + ' stroke-linecap="round" stroke-linejoin="round">'
-    + '<rect x="9" y="4.5" width="6" height="15" rx="1.6"/>'
-    + '<path d="M6.5 12H2.5M4.6 9.9L2.5 12l2.1 2.1"/>'
-    + '<path d="M17.5 12h4M19.4 9.9L21.5 12l-2.1 2.1"/></svg>'
+  tiltEnd: 0
 };
 
-function silent(i) { return !STATIONS[i].sfx && !STATIONS[i].music; }
-
-/* The icon is the whole readout: crossed for silence, one arc for the
-   tyres, two for the tyres and the music. */
-function paintStation() {
-  soundBtn.innerHTML = silent(station) ? ICON.speakerOff
-                     : (STATIONS[station].music ? ICON.speakerMusic : ICON.speakerOn);
-  soundBtn.classList.toggle('on', !silent(station));
+/* The icons are the whole readout. There is no third state to show now
+   that the two switches are separate, so each is simply on or off. */
+function paintSound() {
+  soundBtn.innerHTML = sfxOn ? ICON.speakerOn : ICON.speakerOff;
+  soundBtn.classList.toggle('on', sfxOn);
+  musicBtn.innerHTML = musicOn ? ICON.noteOn : ICON.noteOff;
+  musicBtn.classList.toggle('on', musicOn);
 }
 
 /* fade is the time to reach level, which is longer for the first start
-   than for a state change. Building the graph is deferred until a
-   gesture has happened: called before then this only moves the setting
-   and paints it, and firstGesture picks it up. */
-function setStation(i, fade) {
-  station = i;
-  if (!silent(i)) lastLoud = i;
-  storeSet('radio', STATIONS[i].id);
-  paintStation();
-  if (silent(i)) {
+   than for a switch. Building the graph is deferred until a gesture has
+   happened: called before then this only moves the setting and paints it,
+   and firstGesture picks it up. */
+function applyAudio(fade) {
+  paintSound();
+  storeSet('sfx', sfxOn ? '1' : '0');
+  storeSet('music', musicOn ? '1' : '0');
+  if (!anySound()) {
     if (audio) {
       ramp(audio.master.gain, 0, FEEL.AUDIO_FADE_TIME);
       // Suspending frees the audio thread entirely rather than leaving a
       // silent graph running, which matters on the Chromebooks in
       // section 6 far more than it does here.
       setTimeout(function () {
-        if (audio && silent(station)) { try { audio.ac.suspend(); } catch (e) {} }
+        if (audio && !anySound()) { try { audio.ac.suspend(); } catch (e) {} }
       }, 400);
     }
     return;
@@ -3964,11 +3991,9 @@ function setStation(i, fade) {
   resumeAudio();
   audio.step = 0;
   audio.nextNote = audio.ac.currentTime + 0.06;
-  const st = STATIONS[i];
-  if (st.music) {
-    audio.arpOsc.type = st.wave;
-    audio.octOsc.type = st.wave === 'square' ? 'square' : 'triangle';
-  }
+  const t = TRACKS[track];
+  audio.arpOsc.type = t.wave;
+  audio.octOsc.type = t.wave === 'square' ? 'square' : 'triangle';
   ramp(audio.master.gain, FEEL.AUDIO_MASTER, fade || FEEL.AUDIO_START_TIME);
 }
 
@@ -3976,25 +4001,30 @@ function setStation(i, fade) {
    AudioContext at all, which is both what the browser wants and what the
    room wants. */
 function startAudio() {
-  if (audio || silent(station)) return;
-  setStation(station, FEEL.AUDIO_FIRST_FADE);
+  if (audio || !anySound()) return;
+  applyAudio(FEEL.AUDIO_FIRST_FADE);
 }
 
-/* The other three pads never change except through their own handlers,
-   so they are painted once here, where ICON exists. */
+/* The other two pads never change except through their own handlers, so
+   they are painted once here, where ICON exists. */
 pauseBtn.innerHTML = ICON.pause;
 tiltBtn.innerHTML = ICON.tilt;
-tiltFlipBtn.innerHTML = ICON.flip;
 
 const soundBtn = document.getElementById('soundBtn');
-soundBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
-soundBtn.addEventListener('click', function (e) {
-  e.stopPropagation();
-  soundBtn.blur();
-  firstGesture();
-  setStation((station + 1) % STATIONS.length);
-});
-paintStation();
+const musicBtn = document.getElementById('musicBtn');
+function padSwitch(btn, set) {
+  btn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    btn.blur();
+    firstGesture();
+    set();
+    applyAudio();
+  });
+}
+padSwitch(soundBtn, function () { sfxOn = !sfxOn; });
+padSwitch(musicBtn, function () { musicOn = !musicOn; });
+paintSound();
 
 /* Resumed from every gesture path there is, not just from the dial. A
    context can be suspended again by the tab going away, by an incoming
@@ -4005,7 +4035,7 @@ function resumeAudio() {
   if (audio.ac.state === 'suspended') { try { audio.ac.resume(); } catch (e) {} }
 }
 
-function audioOn() { return audio !== null && STATIONS[station].sfx; }
+function audioOn() { return audio !== null && sfxOn; }
 
 /* One envelope on a voice that is already running. cancel then hold the
    current value first, or retriggering mid decay steps and clicks. */
@@ -4021,9 +4051,9 @@ function pluck(g, peak, decay, when) {
    rather than on the frame they fall, so a long frame cannot make the
    music stumble. Nothing here allocates. */
 function updateMusic() {
-  const s = STATIONS[station];
+  const s = TRACKS[track];
   const a = audio;
-  if (!s.music) { ramp(a.musicGain.gain, 0, FEEL.AUDIO_FADE_TIME); return; }
+  if (!musicOn) { ramp(a.musicGain.gain, 0, FEEL.AUDIO_FADE_TIME); return; }
 
   const duck = a.ac.currentTime < a.crashUntil ? FEEL.MUSIC_DUCK : 1;
   ramp(a.musicGain.gain, FEEL.MUSIC_GAIN * duck, FEEL.AUDIO_FADE_TIME);
@@ -4094,11 +4124,6 @@ function updateAudio(dt) {
        FEEL.SCRAPE_GAIN_MAX * rasp * (1 - FEEL.SCRAPE_RISK_LIFT * (1 - scrapeRisk)), fade);
   ramp(a.scrapeA.frequency, FEEL.SCRAPE_FREQ * (1 + 0.25 * scrapeRisk), fade);
 
-  // The engine, following real forward speed rather than the constant.
-  const pitch = driving ? (scraping ? FEEL.ENGINE_SCRAPE_DROP : 1) : 0.55;
-  ramp(a.engineGain.gain, state === TITLE || paused ? 0 : FEEL.ENGINE_GAIN, fade);
-  ramp(a.engineOsc.frequency, FEEL.ENGINE_FREQ * pitch, fade);
-
   updateMusic();
 }
 
@@ -4164,6 +4189,7 @@ function frame(now) {
 }
 
 recomputeCamera();
+if (debugAllowed) setDebug(true);
 // Before the first road is built, or the title screen is generated at
 // deep game difficulty and the first thing anybody sees is a lie.
 updateDifficulty();
