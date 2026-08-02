@@ -104,55 +104,6 @@
   #note[hidden] {
     display: none;
   }
-  /* The radio dial, section 7's one idea worth stealing. It is a separate
-     fixed container rather than part of #chrome because it belongs at the
-     bottom of the start screen, where the eye already is, and #chrome is
-     pinned to the top. It carries its own copy of the pointer-events rule
-     for exactly the reason the note above gives: a full width container
-     over a game that steers on the left and right halves of the screen
-     will eat every tap across its band unless the container is
-     transparent to pointers and only the buttons are not. */
-  #radio {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 100px);
-    z-index: 2;
-    pointer-events: none;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 0 12px;
-  }
-  #radio[hidden] {
-    display: none;
-  }
-  #radio span {
-    width: 100%;
-    text-align: center;
-    font: 700 10px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: 0.22em;
-    color: rgba(255, 168, 110, 0.8);
-    margin-bottom: 2px;
-  }
-  #radio button {
-    pointer-events: auto;
-    font: 700 12px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: 0.08em;
-    color: #ffd7ae;
-    background: rgba(28, 10, 5, 0.72);
-    border: 1px solid rgba(255, 146, 44, 0.45);
-    border-radius: 999px;
-    padding: 9px 13px;
-    cursor: pointer;
-    touch-action: manipulation;
-  }
-  #radio button.on {
-    color: #2a0d02;
-    background: #ffb03a;
-    border-color: #fff6dc;
-  }
   /* The corner pads: mute, pause and the two tilt controls. Round, barely
      there until touched, and low enough in the frame that they are out of
      the way of the road.
@@ -187,35 +138,89 @@
   .padGroup {
     pointer-events: none;
     display: flex;
-    gap: 8px;
+    gap: 10px;
   }
+  /* 64 across, comfortably over the 56 point minimum a thumb needs, with
+     a lit body rather than a hairline so they read as objects. The inner
+     shadows are what give them a rim and a bevel; there is no image and no
+     filter, so four of them cost nothing. */
   #pads button {
     pointer-events: auto;
-    width: 48px;
-    height: 48px;
+    position: relative;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     padding: 0;
-    font: 700 9px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: 0.06em;
-    color: rgba(255, 226, 196, 0.72);
-    background: rgba(28, 10, 5, 0.34);
-    border: 1px solid rgba(255, 150, 80, 0.38);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 234, 210, 0.92);
+    background:
+      radial-gradient(circle at 50% 32%, rgba(255, 168, 92, 0.34), rgba(52, 18, 8, 0.66) 70%),
+      rgba(26, 10, 4, 0.5);
+    border: 2px solid rgba(255, 150, 80, 0.5);
+    box-shadow: inset 0 1px 0 rgba(255, 212, 170, 0.4),
+                inset 0 -7px 16px rgba(0, 0, 0, 0.45),
+                0 3px 10px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     touch-action: manipulation;
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    transition: transform 90ms ease-out, background 140ms ease-out;
   }
   #pads button[hidden] {
     display: none;
   }
-  #pads button:active {
-    background: rgba(255, 146, 44, 0.5);
-    color: #2a0d02;
+  #pads button svg {
+    width: 30px;
+    height: 30px;
+    display: block;
+    pointer-events: none;
   }
+  #pads button:active {
+    transform: scale(0.92);
+    background:
+      radial-gradient(circle at 50% 32%, rgba(255, 208, 140, 0.6), rgba(190, 74, 20, 0.75) 70%),
+      rgba(120, 44, 12, 0.7);
+  }
+  /* The active state, the same amber the tilt button already used. */
   #pads button.on {
-    color: #2a0d02;
-    background: rgba(255, 176, 58, 0.88);
+    color: #2e0e02;
+    background: radial-gradient(circle at 50% 30%, #ffd68a, #ffab34 72%);
     border-color: #fff6dc;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+                inset 0 -7px 16px rgba(150, 60, 0, 0.35),
+                0 3px 14px rgba(255, 140, 40, 0.4);
+  }
+  /* The tilt hint from section 5's one exception to no onboarding: a ring
+     that breathes out of the button and nothing else. No overlay, no words
+     and nothing to dismiss. It is added only where a sensor exists and it
+     is taken away for good on the first tap, on the first completed run,
+     or on a timer, whichever comes first. */
+  #pads button.hint::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 176, 58, 0.9);
+    animation: padPulse 1.7s ease-out infinite;
+  }
+  @keyframes padPulse {
+    0%   { transform: scale(1); opacity: 0.9; }
+    70%  { transform: scale(1.5); opacity: 0; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #pads button.hint::after { animation: none; opacity: 0.9; }
+  }
+  /* On the narrowest handsets, four 64s and their gaps leave barely a
+     finger of canvas between the two groups, and that band is where a tap
+     has to be able to reach the road. 58 is still clear of the 56 point
+     minimum a thumb needs. */
+  @media (max-width: 359px) {
+    #pads button { width: 58px; height: 58px; }
+    #pads button svg { width: 27px; height: 27px; }
+    .padGroup { gap: 7px; }
   }
   /* A probe for the safe area insets, so the canvas can keep the resource
      bar and the pause overlay clear of the home indicator and the gesture
@@ -250,15 +255,14 @@
 </div>
 <div id="pads">
   <div class="padGroup">
-    <button id="muteBtn" type="button">MUTE</button>
-    <button id="pauseBtn" type="button">PAUSE</button>
+    <button id="soundBtn" type="button" aria-label="Sound"></button>
+    <button id="pauseBtn" type="button" aria-label="Pause"></button>
   </div>
   <div class="padGroup">
-    <button id="tiltBtn" type="button" hidden>TILT</button>
-    <button id="tiltFlipBtn" type="button" hidden>FLIP</button>
+    <button id="tiltBtn" type="button" hidden aria-label="Tilt steering"></button>
+    <button id="tiltFlipBtn" type="button" hidden aria-label="Reverse tilt"></button>
   </div>
 </div>
-<div id="radio" hidden></div>
 <div id="safe"></div>
 <script>
 'use strict';
@@ -519,10 +523,10 @@ const FEEL = {
   BAR_WIDTH:               0.42,     // of screen width
   BAR_HEIGHT:                 6,     // pixels
   /* Above the safe area AND above the corner pads, which are 48 across
-     with a 12 margin. The bar is centred and the pads are in the corners
-     so they never actually touch, but sitting them on the same line read
-     as clutter. */
-  BAR_BOTTOM:                72,     // pixels above the safe area
+     with a 12 margin, so the row is 76 tall. The bar is centred and the
+     pads are in the corners so they never actually touch, but sitting
+     them on the same line read as clutter. */
+  BAR_BOTTOM:                92,     // pixels above the safe area
   BAR_FADE_TIME:           0.45,     // seconds to fade away once full again
   BAR_ALPHA:               0.70,
 
@@ -530,6 +534,66 @@ const FEEL = {
      the sideways speed that put it there, slides off the lip, and only
      then starts dropping, so it goes over the edge instead of sinking
      through the surface. The camera coasts rather than stopping dead. */
+  /* ----------------------------------------------------------------
+     Scoring, which is section 4.4: score the risk, not the distance.
+
+     The failure this is built against is a permanent shallow drift. If
+     time spent sideways is what pays, the whole game collapses into one
+     move held for ever, so time alone must pay almost nothing and the
+     multiplier has to be bought with depth and with proximity to the
+     edge, both at once.
+
+     That is why the two factors MULTIPLY rather than add, and why both
+     go to zero at their easy end. Sitting sideways in the middle of the
+     road earns a climb of exactly zero, not a small one, and a
+     multiplier that is not climbing is decaying. Sitting on the edge
+     without slip earns zero the same way. Only both together pay, and
+     the scrape timer from 4.2 is what stops the paying state being
+     somewhere you can live.
+
+     MULT_SLIP_POWER above 1 bends the slip term against shallow angles
+     specifically, so easing into a lazy slide barely registers while
+     committing to one pays quickly. */
+  /* Two rates, not one, and the split is the whole point.
+
+     SCORE_SURVIVE_RATE is what mere time is worth, and it is deliberately
+     small. SCORE_RISK_RATE is paid on the multiplier ABOVE one, so it is
+     paid for risk taken and for nothing else.
+
+     A single rate times the multiplier was the obvious shape and it does
+     not work. Thirty seconds of coasting sideways in the middle is ten
+     times the exposure of three seconds on the edge, so for the three
+     seconds to win, the mean multiplier across them has to clear ten.
+     With a cap of twelve that needs an instant climb to the cap and it
+     only just gets there; with any realistic climb the cap would have to
+     be past twenty, which is the runaway the cap exists to prevent. The
+     arithmetic does not care how the constants are tuned.
+
+     So time pays a trickle and risk pays the rest, which is a closer read
+     of 4.4 than the single rate was anyway: score the risk, not the
+     distance. Distance still pays something, because a run that survives
+     ought to beat one that does not. */
+  SCORE_SURVIVE_RATE:        10,     // points per second, just for still being on the road
+  SCORE_RISK_RATE:          110,     // points per second per multiplier above one
+  MULT_MIN_SLIP:           0.25,     // slipNorm under this is not drifting at all
+  MULT_SLIP_POWER:          1.6,     // above 1 punishes shallow angles
+  MULT_EDGE_START:         0.45,     // road half widths, where the edge term leaves zero
+  MULT_EDGE_PEAK:          1.15,     // and where it reaches full, inside the scrape band
+  MULT_CLIMB_RATE:          3.2,     // multiplier per second, at full slip on the edge
+  MULT_DECAY_RATE:          1.1,     // per second whenever nothing is being earned
+  MULT_MAX:                  12,
+  /* The readout. It has to teach the rule inside one corner without a
+     word, so the number is large, it sits where the eyes already are, and
+     it takes its colour from the same ramp the tyre marks run through, so
+     the trail on the road and the number on the screen are visibly the
+     same signal. */
+  SCORE_TOP:               0.05,     // of screen height
+  SCORE_SIZE:             0.062,     // of the smaller screen dimension
+  MULT_TOP:               0.125,
+  MULT_SIZE:              0.085,
+  MULT_GROWTH:             0.55,     // how much the number swells at full multiplier
+  MULT_POP_TIME:           0.18,     // seconds of kick each time it crosses a whole number
+
   CRASH_GRAVITY:          26000,     // world units per second squared
   CRASH_TUMBLE:             2.4,     // radians per second, nose over
   CRASH_COAST_TIME:        0.55,     // seconds for the camera to run down
@@ -668,6 +732,18 @@ const FEEL = {
      the deadzone, not to stop looking for sensitivity. */
   TILT_DEADZONE_WARN:      0.30,
   TILT_SENSOR_TIMEOUT:      1.5,     // seconds to wait for a first real reading
+  /* Section 5 says no tutorial and that stands. Tilt is the one exception
+     because it is an invisible option behind a button nobody has a reason
+     to press, and a ring that breathes around that button is not a
+     tutorial: no overlay, no words, nothing to dismiss.
+
+     The timer is the important half. It stops on the stored flag, but
+     storage fails silently on locked down school profiles, which is
+     precisely this audience, so first visit detection quietly becomes
+     every visit for some players. A pulse that gives up after a few
+     seconds regardless is fine. One that greets a returning player for
+     ever is not. Frame time, so it does not run down in a hidden tab. */
+  TILT_HINT_SECONDS:         10,
 
   /* The car, in world units, the same units as the road. It is a real box
      in the world now, so these are its actual dimensions and they set the
@@ -799,7 +875,49 @@ const FEEL = {
   CURVE_GENTLE:             1.6,
   CURVE_MEDIUM:             3.2,
   CURVE_HARD:               5.0,
-  CURVE_SCALE:              2.5,     // LIVE
+  CURVE_SCALE:              2.5,     // LIVE, the reference the ramp is built around
+
+  /* ----------------------------------------------------------------
+     Progressive difficulty, in two halves that are deliberately not the
+     same thing.
+
+     THE ON RAMP is the first ONRAMP_SECONDS and it replaces the tutorial
+     section 5 refuses to allow. Wide road, gentle curves, nothing above
+     ONRAMP_INTENSITY, and rests often. A player who understands nothing
+     should get through it, and a player who understands the game should
+     pass through it in a minute without ever noticing it was there.
+
+     THE DEEP GAME is everything after, and it keeps ramping over
+     RAMP_SECONDS: curve scale up, road down to ROAD_SQUEEZE, everything
+     unlocked, rests rare.
+
+     Difficulty comes from geometry, width and frequency, and never from
+     speed. Speed is the wrong lever in this engine: centrifugal is per
+     second, so a faster car spends less time in a corner and the corner
+     gets weaker, and all a speed ramp really buys is less reaction time.
+
+     ADAPTATION TOUCHES THE ON RAMP AND NOTHING ELSE. It moves where the
+     easy part ends inside the window, never where the window ends, so
+     difficulty past ONRAMP_SECONDS is a pure function of elapsed time and
+     identical for everybody. That is what keeps scores comparable: every
+     score worth comparing was earned in the shared part of the run. */
+  ONRAMP_SECONDS:            60,     // the whole on ramp, the same for everyone
+  ONRAMP_FLAT:               14,     // seconds of it that stay at the easiest setting
+  ONRAMP_CURVE:             1.1,     // curve scale at the start of a run
+  ONRAMP_WIDTH:            1.22,     // road width multiplier at the start of a run
+  ONRAMP_INTENSITY:           1,     // hardest phrase the on ramp may use
+  ONRAMP_REST:              0.7,     // chance of a forced breath after any phrase
+  RAMP_SECONDS:             180,     // from the end of the on ramp to full difficulty
+  CURVE_SCALE_DEEP:         3.1,     // where the curve scale ends up
+  ROAD_SQUEEZE:            0.88,     // road width multiplier at full difficulty
+  DEEP_INTENSITY:             3,
+  /* How much the on ramp may soften for somebody who keeps dying in it.
+     Nothing is announced and there is no menu, per section 7.7. */
+  ADAPT_DEATH_WINDOW:        30,     // dying inside this many seconds counts as struggling
+  ADAPT_STEP:              0.34,     // how fast the softening comes and goes
+  ADAPT_FLAT_EXTRA:          26,     // extra seconds of the easiest setting, at full ease
+  ADAPT_CURVE_EASE:         0.3,     // curve scale taken off the start, at full ease
+  ADAPT_WIDTH_EASE:        0.14,     // road width added at the start, at full ease
 
   /* Frame. Clamped so a stutter cannot teleport the player off the road. */
   MAX_FRAME_DELTA:      1 / 20
@@ -1294,6 +1412,7 @@ function onTiltPermission(result) {
     // Denial is sticky on iOS. Never let the button appear to do nothing.
     tilt.active = false;
     tiltBtn.classList.remove('on');
+    syncTiltButtons();
     storeSet('tilt', '0');
     showNote('Tilt was blocked. This browser will not ask again for this page.', 5);
     return;
@@ -1307,6 +1426,7 @@ function onTiltPermission(result) {
   tilt.value = 0;
   tilt.zeroDeg = null;
   tiltBtn.classList.add('on');
+  syncTiltButtons();
   storeSet('tilt', '1');
   showNote('Tilt on. Hold the phone how you like, it zeroes to your posture at the start of every run.', 4);
 }
@@ -1325,6 +1445,7 @@ function disableTilt() {
   tilt.active = false;
   tilt.value = 0;
   tiltBtn.classList.remove('on');
+  syncTiltButtons();
 }
 
 tiltBtn.addEventListener('pointerdown', function (e) {
@@ -1335,6 +1456,7 @@ tiltBtn.addEventListener('click', function (e) {
   // Drop focus, or the next space or enter meant for the game activates
   // the button again instead of starting the run.
   tiltBtn.blur();
+  stopTiltHint(true);
   if (tilt.active) {
     disableTilt();
     storeSet('tilt', '0');
@@ -1351,6 +1473,19 @@ tiltBtn.addEventListener('click', function (e) {
    controls for everyone who already set one. */
 let tiltFlipped = storeGet('tiltflip2') === '1';
 function tiltSign() { return FEEL.TILT_DIRECTION * (tiltFlipped ? -1 : 1); }
+
+/* Seconds of pulse left. Zero means never, or never again. */
+let tiltHintLeft = 0;
+function stopTiltHint(remember) {
+  tiltHintLeft = 0;
+  tiltBtn.classList.remove('hint');
+  if (remember) storeSet('tilthint', '1');
+}
+function updateTiltHint(dt) {
+  if (tiltHintLeft <= 0) return;
+  tiltHintLeft -= dt;
+  if (tiltHintLeft <= 0) stopTiltHint(false);
+}
 
 const tiltFlipBtn = document.getElementById('tiltFlipBtn');
 function setTiltFlipped(on) {
@@ -1388,10 +1523,22 @@ function firstGesture() {
 
 tilt.supported = detectTiltSupport();
 tiltBtn.hidden = !tilt.supported;
-// Beside Tilt, and gone wherever Tilt is gone, because on a device with
-// no sensor it is a button that reverses nothing.
-tiltFlipBtn.hidden = !tilt.supported;
 setTiltFlipped(tiltFlipped);
+
+/* Flip appears only while tilt is actually on. It reverses a control that
+   is not running otherwise, and now that the shipped direction is the
+   right one almost nobody will touch it, so it has no business taking up
+   room in the main view. */
+function syncTiltButtons() {
+  tiltFlipBtn.hidden = !(tilt.supported && tilt.active);
+}
+syncTiltButtons();
+
+// Only where there is a sensor to find, and only until it has been found.
+if (tilt.supported && storeGet('tilthint') !== '1') {
+  tiltHintLeft = FEEL.TILT_HINT_SECONDS;
+  tiltBtn.classList.add('hint');
+}
 
 
 /* ------------------------------------------------------------------
@@ -1482,7 +1629,7 @@ function tunerLine(group) {
        curvature the generator has actually produced and after the scale,
        rather than against the constant. At 1.00 that corner cannot be
        driven at all however well it is driven. */
-    const peak = maxCurveSeen * FEEL.CURVE_SCALE;
+    const peak = maxCurveSeen * curveScale;
     out += 'ceil ' + (peak * FEEL.CENTRIFUGAL).toFixed(2) + ' @' + peak.toFixed(1);
   }
   if (group === 6) {
@@ -1513,9 +1660,78 @@ function deadShare() {
 const REVERSAL_FACTOR = 0.31;
 function worstOvershoot() {
   const v = FEEL.STEER_RATE
-          * (1 + FEEL.CURVE_HARD * FEEL.CURVE_SCALE * FEEL.CENTRIFUGAL)
+          * (1 + FEEL.CURVE_HARD * curveScale * FEEL.CENTRIFUGAL)
           / FEEL.ROAD_WIDTH_NARROW;
   return REVERSAL_FACTOR * v * FEEL.GRIP_TIME;
+}
+
+/* ------------------------------------------------------------------
+   Difficulty, live. Everything here is a function of runTime and of one
+   adaptation value, and everything that reads the road reads these
+   rather than the constants.
+   ------------------------------------------------------------------ */
+let runTime = 0;          // seconds of the current run, DRIVING only
+/* Zero to one. Rises when a run ends inside ADAPT_DEATH_WINDOW, falls
+   when one gets through the on ramp. Held in memory rather than stored:
+   it is a read of how the last few minutes went, and a stored one would
+   follow a player who has since got better. */
+let ease = 0;
+
+function onRunEnded() {
+  if (runTime < FEEL.ADAPT_DEATH_WINDOW) ease = Math.min(1, ease + FEEL.ADAPT_STEP);
+  else if (runTime > FEEL.ONRAMP_SECONDS) ease = Math.max(0, ease - FEEL.ADAPT_STEP);
+}
+
+/* How far through the on ramp, 0 to 1. The flat part at the front is
+   what adaptation lengthens; the far end does not move, so this reaches
+   1 at ONRAMP_SECONDS for every player regardless of ease. */
+function onRampProgress() {
+  const flat = FEEL.ONRAMP_FLAT + ease * FEEL.ADAPT_FLAT_EXTRA;
+  const span = Math.max(1, FEEL.ONRAMP_SECONDS - flat);
+  return clamp((runTime - flat) / span, 0, 1);
+}
+
+/* And how far into the deep game after it, 0 to 1. No adaptation term
+   anywhere in here, on purpose. */
+function deepProgress() {
+  return clamp((runTime - FEEL.ONRAMP_SECONDS) / FEEL.RAMP_SECONDS, 0, 1);
+}
+
+/* The curve scale actually in force. FEEL.CURVE_SCALE stays the
+   reference the ramp is built around and the cycler still tunes it, so
+   moving it on a phone still moves the whole curve. */
+let curveScale = FEEL.CURVE_SCALE;
+let widthScale = 1;
+
+function updateDifficulty() {
+  const p = onRampProgress(), d = deepProgress();
+  const start = Math.max(0.2, FEEL.ONRAMP_CURVE - ease * FEEL.ADAPT_CURVE_EASE);
+  const base = start + (FEEL.CURVE_SCALE - start) * p;
+  curveScale = base + (FEEL.CURVE_SCALE_DEEP - FEEL.CURVE_SCALE) * d;
+  const wide = FEEL.ONRAMP_WIDTH + ease * FEEL.ADAPT_WIDTH_EASE;
+  widthScale = (wide + (1 - wide) * p) + (FEEL.ROAD_SQUEEZE - 1) * d;
+}
+
+/* The hardest phrase the generator may reach for, and how often it owes
+   a breath afterwards. Both open up across the run rather than at one
+   step, so a new kind of corner arrives as a thing to learn rather than
+   as a wall. */
+function maxIntensity() {
+  if (runTime < FEEL.ONRAMP_SECONDS) {
+    // 0 and 1 only for most of the on ramp, then a taste of 2 at the end.
+    return onRampProgress() > 0.75 ? FEEL.ONRAMP_INTENSITY + 1 : FEEL.ONRAMP_INTENSITY;
+  }
+  return FEEL.DEEP_INTENSITY;
+}
+
+function restChance() {
+  // The two halves meet at ONRAMP_REST/2 rather than stepping, or the
+  // road audibly changes rhythm on the stroke of sixty seconds.
+  const half = FEEL.ONRAMP_REST * 0.5;
+  if (runTime < FEEL.ONRAMP_SECONDS) {
+    return FEEL.ONRAMP_REST - half * onRampProgress();
+  }
+  return half * (1 - deepProgress());
 }
 
 function tunerDirty() {
@@ -1691,11 +1907,14 @@ function pickDir() {
    ================================================================== */
 let roadWidth = 1;      // current half width, as a multiple of the base
 
-function addRun(count, c0, c1, w0, w1, ease) {
-  const base = FEEL.ROAD_HALF_WIDTH_BASE;
+function addRun(count, c0, c1, w0, w1, easeIn) {
+  // widthScale is the difficulty's own squeeze, on top of whatever the
+  // phrase asked for. Applied here, at build time, so the road narrows
+  // over the run rather than under the car.
+  const base = FEEL.ROAD_HALF_WIDTH_BASE * widthScale;
   for (let i = 0; i < count; i++) {
     const p = count > 1 ? i / (count - 1) : 1;
-    const t = ease ? (1 - Math.cos(p * Math.PI)) / 2 : p;
+    const t = easeIn ? (1 - Math.cos(p * Math.PI)) / 2 : p;
     addSegment(c0 + (c1 - c0) * t, base * (w0 + (w1 - w0) * t));
   }
   roadWidth = w1;
@@ -1902,27 +2121,30 @@ function phraseWeight(p) {
 function addPhrase() {
   const resting = restOwed > 0;
   if (resting) restOwed--;
+  // Two ceilings at once: what the run has unlocked, and whether this one
+  // owes a breath. Resting drops it to the gentlest tier whatever the run
+  // has reached, so a breath is a real breath late on too.
+  const ceiling = resting ? 1 : maxIntensity();
 
-  // Weighted, so that resting means an easier corner far more often than
-  // it means a straight.
   let total = 0;
   for (let i = 0; i < PHRASES.length; i++) {
-    if (resting && PHRASES[i].intensity > 1) continue;
+    if (PHRASES[i].intensity > ceiling) continue;
     total += phraseWeight(PHRASES[i]);
   }
   let roll = rng() * total;
   let p = PHRASES[0];
   for (let i = 0; i < PHRASES.length; i++) {
-    if (resting && PHRASES[i].intensity > 1) continue;
+    if (PHRASES[i].intensity > ceiling) continue;
     roll -= phraseWeight(PHRASES[i]);
     if (roll <= 0) { p = PHRASES[i]; break; }
   }
 
   p.build();
-  // One breath after anything demanding, not two. The breath is usually a
-  // corner rather than a straight, so this reads as chaining rather than
-  // as a gap, and the hard phrases sit closer together than they did.
-  if (restOwed === 0 && p.intensity >= 2) restOwed = 1;
+  /* The breath after something demanding. Early in a run almost anything
+     buys one; deep in, only the hardest phrases do and often not even
+     then, which is most of what makes the late road relentless without a
+     single corner having changed. */
+  if (restOwed === 0 && p.intensity >= 2 && rng() < restChance()) restOwed = 1;
 }
 
 function resetRoad(seed) {
@@ -1980,8 +2202,7 @@ let paused = false;
 function setPaused(on) {
   if (on && state !== DRIVING) return;
   paused = on;
-  // PLAY rather than RESUME, because six letters overflow a 48px circle.
-  pauseBtn.textContent = on ? 'PLAY' : 'PAUSE';
+  pauseBtn.innerHTML = on ? ICON.play : ICON.pause;
   pauseBtn.classList.toggle('on', on);
 }
 
@@ -2034,6 +2255,8 @@ const drift = {
 };
 
 function startRun() {
+  runTime = 0;
+  updateDifficulty();
   resetRoad(nextSeed());
   position = 0;
   carX = 0;
@@ -2060,6 +2283,10 @@ function startRun() {
   carPitch = 0;
   coastSpeed = 0;
   barShow = 0;
+  score = 0;
+  multiplier = 1;
+  multPop = 0;
+  runTime = 0;
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
   smokeCount = 0;
   smokeAcc = 0;
@@ -2088,13 +2315,15 @@ function update(dt) {
   if (state === DEAD) { updateFall(dt); return; }
   if (state !== DRIVING) return;
 
+  runTime += dt;
+  updateDifficulty();
   topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
   const carIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
   carSegIndex = carIndex;
   const carSegment = segAt(carIndex);
   // Curvature is stored as shape and scaled on read, so the live gain
   // reshapes the road that is already on screen.
-  const curve = (carSegment ? carSegment.curve : 0) * FEEL.CURVE_SCALE;
+  const curve = (carSegment ? carSegment.curve : 0) * curveScale;
   carCurve = curve;
   const localHalf = carSegment ? carSegment.hw : FEEL.ROAD_HALF_WIDTH_BASE;
 
@@ -2176,11 +2405,16 @@ function lookAheadCurve() {
     sum += s.curve * w;
     weight += w;
   }
-  return weight > 0 ? sum * FEEL.CURVE_SCALE / weight : 0;
+  return weight > 0 ? sum * curveScale / weight : 0;
 }
 
 function crash() {
   audioCrash();
+  bankScore();
+  // A run has been played, so the tilt button has had its chance to be
+  // noticed and does not get to keep asking.
+  stopTiltHint(true);
+  onRunEnded();
   state = DEAD;
   deadFor = 0;
   scraping = false;
@@ -2524,7 +2758,7 @@ function drawRoad(w, h) {
   const camX = cameraX;
 
   let x = 0;
-  let dx = -(base.curve * FEEL.CURVE_SCALE * percent);
+  let dx = -(base.curve * curveScale * percent);
 
   const carZ = position + FEEL.CAMERA_DISTANCE;
   const carIdx = Math.floor(carZ / seg);
@@ -2554,7 +2788,7 @@ function drawRoad(w, h) {
     if (baseIndex + k === carIdx) carCurveX = x + dx * carSegFrac;
     if (!s) break;
     x += dx;
-    dx += s.curve * FEEL.CURVE_SCALE;
+    dx += s.curve * curveScale;
   }
 
   /* Decide once which segments are drawn and which stripe they are on,
@@ -3213,6 +3447,34 @@ function fittedSize(str, weight, want, maxWidth) {
   return width <= maxWidth ? want : Math.floor(want * maxWidth / width);
 }
 
+/* The score and the multiplier, and no words anywhere near them. The
+   number climbing while the trail runs hot is the whole explanation: one
+   corner taken deep and near the edge should make the rule obvious, and
+   if it does not then this display is what is wrong. */
+function drawScore(w, h) {
+  if (state !== DRIVING) return;
+  const s = Math.min(w, h);
+  const shown = Math.floor(score);
+  text(String(shown), w / 2, h * FEEL.SCORE_TOP, Math.round(s * FEEL.SCORE_SIZE), '800');
+
+  // Nothing to say until it is above 1, and then it says it loudly.
+  if (multiplier <= 1.005) return;
+  const t = clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1);
+  const pop = multPop > 0 ? multPop / FEEL.MULT_POP_TIME : 0;
+  const size = Math.round(s * FEEL.MULT_SIZE * (1 + FEEL.MULT_GROWTH * t + 0.18 * pop));
+  // The same ramp the tyre marks run through, so the line on the road and
+  // the number on the screen are visibly one signal rather than two.
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const label = '\u00d7' + multiplier.toFixed(1);
+  const y = h * FEEL.MULT_TOP + size * 0.3;
+  ctx.fillStyle = COLOUR.TEXT_SHADOW;
+  ctx.fillText(label, w / 2, y + Math.max(1, size * 0.06));
+  ctx.fillStyle = trailColour(t);
+  ctx.fillText(label, w / 2, y);
+}
+
 function drawOverlay(w, h) {
   if (state === TITLE) {
     const s = Math.min(w, h);
@@ -3223,9 +3485,14 @@ function drawOverlay(w, h) {
     text('tap or press any key to start', w / 2, h * 0.52, Math.round(s * 0.045), '600');
   } else if (state === DEAD) {
     const s = Math.min(w, h);
-    text('OFF THE ROAD', w / 2, h * 0.40, Math.round(s * 0.10), '800');
+    text('OFF THE ROAD', w / 2, h * 0.38, Math.round(s * 0.095), '800');
+    // The two numbers, and a crown on the score when it is the new best.
+    const final = Math.floor(score);
+    const beat = final >= bestScore && final > 0;
+    text((beat ? '\u2605 ' : '') + final, w / 2, h * 0.48, Math.round(s * 0.11), '800');
+    text('best ' + bestScore, w / 2, h * 0.55, Math.round(s * 0.042), '600');
     if (deadFor >= FEEL.DEATH_INPUT_LOCK) {
-      text('tap or press any key', w / 2, h * 0.50, Math.round(s * 0.05), '600');
+      text('tap or press any key', w / 2, h * 0.63, Math.round(s * 0.045), '600');
     }
   }
 }
@@ -3233,6 +3500,61 @@ function drawOverlay(w, h) {
 /* The scrape budget, drawn low and central. It shows what is left rather
    than what is spent, so a full bar means safe, and it fades out entirely
    when there is nothing to say. */
+/* The run's score and the live multiplier. Read by the display and by
+   nothing else, and reset by startRun with everything else. */
+let score = 0;
+let multiplier = 1;
+let multPop = 0;          // seconds left on the kick when it passes a whole number
+let bestScore = (function () {
+  const raw = storeGet('best');
+  const n = raw === null ? 0 : parseInt(raw, 10);
+  return isFinite(n) && n > 0 ? n : 0;
+})();
+
+/* Section 4.4. Two terms, multiplied, both zero at their easy end.
+
+   slipTerm  is how far past MULT_MIN_SLIP the car is sideways, bent by
+             MULT_SLIP_POWER so a shallow slide is worth far less than
+             half of a deep one.
+   edgeTerm  is how close to the edge it is, zero in the middle of the
+             road and full inside the scrape band.
+
+   Multiplied, so neither alone pays. Sideways in the middle earns
+   nothing. Parked on the edge pointing straight earns nothing. */
+function multiplierEarn() {
+  const slipTerm = Math.pow(
+    clamp((drift.slipNorm - FEEL.MULT_MIN_SLIP) / (1 - FEEL.MULT_MIN_SLIP), 0, 1),
+    FEEL.MULT_SLIP_POWER);
+  if (slipTerm <= 0) return 0;
+  const edgeTerm = clamp(
+    (Math.abs(carFrac) - FEEL.MULT_EDGE_START)
+    / Math.max(0.01, FEEL.MULT_EDGE_PEAK - FEEL.MULT_EDGE_START), 0, 1);
+  return slipTerm * edgeTerm;
+}
+
+function updateScore(dt) {
+  if (multPop > 0) multPop -= dt;
+  if (state !== DRIVING) return;
+  const earn = multiplierEarn();
+  const was = Math.floor(multiplier);
+  if (earn > 0) multiplier += FEEL.MULT_CLIMB_RATE * earn * dt;
+  else multiplier -= FEEL.MULT_DECAY_RATE * dt;
+  multiplier = clamp(multiplier, 1, FEEL.MULT_MAX);
+  // A kick on every whole number crossed upward, which is the only thing
+  // that has to be noticed for the rule to be worked out.
+  if (Math.floor(multiplier) > was) multPop = FEEL.MULT_POP_TIME;
+  score += (FEEL.SCORE_SURVIVE_RATE
+            + FEEL.SCORE_RISK_RATE * (multiplier - 1)) * dt;
+}
+
+function bankScore() {
+  const final = Math.floor(score);
+  if (final > bestScore) {
+    bestScore = final;
+    storeSet('best', String(bestScore));
+  }
+}
+
 let barShow = 0;
 function updateBar(dt) {
   const wanted = state === DRIVING && scrapeRisk > 0.01 ? 1 : 0;
@@ -3274,7 +3596,10 @@ function drawHud(w, h) {
     tunerLine(5),
     tunerLine(6),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
-      + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free')
+      + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
+    't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
+      + '  width ' + widthScale.toFixed(2) + '  int ' + maxIntensity()
+      + '  ease ' + ease.toFixed(2)
   ];
   ctx.font = '600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   ctx.textAlign = 'left';
@@ -3320,6 +3645,7 @@ function render() {
 
   drawScrapeFlash(w, h);
   drawBar(w, h);
+  drawScore(w, h);
   drawOverlay(w, h);
   drawPauseCover(w, h);
   drawHud(w, h);
@@ -3375,30 +3701,30 @@ function drawPauseCover(w, h) {
    between silence and sound.
    ================================================================== */
 
-/* The stations. OFF is a real position on the dial rather than the
-   absence of one, which is the whole point of section 7's radio idea:
-   silence is something you chose by not turning the knob.
+/* Three states, cycled by one button, in this order. The dial that used
+   to sit on the splash screen is gone: it was a menu on the way into a
+   game whose whole pitch is that there is nothing between you and the
+   road, and one button says the same thing in less space.
 
-   SFX exists because the skid is the most useful sound in the game and
-   it should not be behind a taste in music. */
+   TYRES rather than NEON is the default, and that is the classroom
+   argument from section 6 taken seriously. The skid is quiet, textural
+   and is most of what makes the drift read; music is unmistakably a game
+   from across a room and is what gets somebody caught. Anyone who wants
+   music is one tap away and their choice is remembered. */
 const STATIONS = [
-  { id: 'off',   label: 'OFF',    sfx: false, music: false },
-  { id: 'sfx',   label: 'TYRES',  sfx: true,  music: false },
-  { id: 'neon',  label: 'NEON',   sfx: true,  music: true,
-    // A natural minor run, and a saw, which is the darker of the two.
+  { id: 'off',  sfx: false, music: false },
+  { id: 'sfx',  sfx: true,  music: false },
+  { id: 'neon', sfx: true,  music: true,
+    // A natural minor run, and a saw.
     wave: 'sawtooth', root: 55, tempo: 1,
-    arp: [0, 3, 7, 10, 12, 10, 7, 3], bass: [0, 0, 7, 0, 10, 0, 7, 5] },
-  { id: 'chrome', label: 'CHROME', sfx: true, music: true,
-    // Major pentatonic and a square, brighter and a shade faster.
-    wave: 'square', root: 62, tempo: 1.12,
-    arp: [0, 4, 7, 9, 12, 14, 12, 7], bass: [0, 0, 5, 0, 9, 0, 5, 4] }
+    arp: [0, 3, 7, 10, 12, 10, 7, 3], bass: [0, 0, 7, 0, 10, 0, 7, 5] }
 ];
 /* The stored choice wins over the default, always. Silence chosen once
    is silence for good, which is the whole deal that makes defaulting to
    sound defensible. An unrecognised or absent value falls back to the
    default station rather than to silence, because a first visit should
    have sound. */
-const DEFAULT_STATION = 'neon';
+const DEFAULT_STATION = 'sfx';
 function stationIndex(id) {
   for (let i = 0; i < STATIONS.length; i++) if (STATIONS[i].id === id) return i;
   return -1;
@@ -3549,49 +3875,68 @@ function ramp(param, value, tau) {
 }
 
 /* --------------------------------------------------------------
-   The dial. Four positions, and OFF is one of them.
+   The sound pad. One button, three states, and the icon is the label.
    -------------------------------------------------------------- */
-const radioEl = document.getElementById('radio');
-const radioBtns = [];
-/* Named, because four unlabelled pills read as a difficulty picker. One
-   word is enough to make it a radio, and a radio is a thing you turn on
-   rather than a setting you enable. */
-const radioLabel = document.createElement('span');
-radioLabel.textContent = 'RADIO';
-radioEl.appendChild(radioLabel);
-STATIONS.forEach(function (s, i) {
-  const b = document.createElement('button');
-  b.type = 'button';
-  b.textContent = s.label;
-  b.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
-  b.addEventListener('click', function (e) {
-    e.stopPropagation();
-    b.blur();
-    // Picking a station is itself a gesture, and it goes through the one
-    // gesture path so the tilt request is not skipped by tapping here
-    // before anything else.
-    firstGesture();
-    setStation(i);
-  });
-  radioEl.appendChild(b);
-  radioBtns.push(b);
-});
+/* Inline SVG rather than glyphs or words: a font may not have the glyph,
+   and text at this size reads as a debug control. Nothing is fetched,
+   these are paths in the file. */
+const ICON = {
+  speakerOff:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M3 9.5h3.5L11 6v12L6.5 14.5H3z" fill="currentColor" stroke-linejoin="round"/>'
+    + '<path d="M15.5 9.5l5 5M20.5 9.5l-5 5"/></svg>',
+  speakerOn:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M3 9.5h3.5L11 6v12L6.5 14.5H3z" fill="currentColor" stroke-linejoin="round"/>'
+    + '<path d="M14.5 9.8a3.6 3.6 0 010 4.4"/></svg>',
+  speakerMusic:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M3 9.5h3.5L11 6v12L6.5 14.5H3z" fill="currentColor" stroke-linejoin="round"/>'
+    + '<path d="M14.5 9.8a3.6 3.6 0 010 4.4"/>'
+    + '<path d="M17.6 7.2a7.6 7.6 0 010 9.6"/></svg>',
+  pause:
+    '<svg viewBox="0 0 24 24" fill="currentColor">'
+    + '<rect x="6.5" y="5" width="4" height="14" rx="1.2"/>'
+    + '<rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>',
+  play:
+    '<svg viewBox="0 0 24 24" fill="currentColor">'
+    + '<path d="M7.5 5.2l11.2 6.4a0.45 0.45 0 010 0.8L7.5 18.8A0.45 0.45 0 016.8 18.4V5.6a0.45 0.45 0 01 0.7-0.4z"/></svg>',
+  /* A handset leaning over, with the screen drawn in so it reads as a
+     phone rather than as a shape, and a tick either side for the rocking.
+     The ticks sit clear of the body at every rotation. */
+  tilt:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<g transform="rotate(-24 12 12)">'
+    + '<rect x="8.4" y="3.4" width="7.2" height="17.2" rx="1.9"/>'
+    + '<path d="M10.8 5.6h2.4" stroke-width="1.5"/>'
+    + '<path d="M8.4 17.6h7.2" stroke-width="1.5"/>'
+    + '</g>'
+    + '<path d="M2.6 8.6l1.7 1.5M21.4 13.4l-1.7-1.5" stroke-width="1.7"/></svg>',
+  // Two ways through one handset, which is what the reverse does.
+  flip:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<rect x="9" y="4.5" width="6" height="15" rx="1.6"/>'
+    + '<path d="M6.5 12H2.5M4.6 9.9L2.5 12l2.1 2.1"/>'
+    + '<path d="M17.5 12h4M19.4 9.9L21.5 12l-2.1 2.1"/></svg>'
+};
 
 function silent(i) { return !STATIONS[i].sfx && !STATIONS[i].music; }
 
-/* The dial and the mute pad are two ways to say the same thing, so they
-   are painted from the one value and can never disagree. */
+/* The icon is the whole readout: crossed for silence, one arc for the
+   tyres, two for the tyres and the music. */
 function paintStation() {
-  for (let k = 0; k < radioBtns.length; k++) {
-    radioBtns[k].classList.toggle('on', k === station);
-  }
-  const off = silent(station);
-  muteBtn.classList.toggle('on', off);
-  muteBtn.textContent = off ? 'MUTED' : 'MUTE';
+  soundBtn.innerHTML = silent(station) ? ICON.speakerOff
+                     : (STATIONS[station].music ? ICON.speakerMusic : ICON.speakerOn);
+  soundBtn.classList.toggle('on', !silent(station));
 }
 
 /* fade is the time to reach level, which is longer for the first start
-   than for a station change. Building the graph is deferred until a
+   than for a state change. Building the graph is deferred until a
    gesture has happened: called before then this only moves the setting
    and paints it, and firstGesture picks it up. */
 function setStation(i, fade) {
@@ -3619,10 +3964,10 @@ function setStation(i, fade) {
   resumeAudio();
   audio.step = 0;
   audio.nextNote = audio.ac.currentTime + 0.06;
-  const s = STATIONS[i];
-  if (s.music) {
-    audio.arpOsc.type = s.wave;
-    audio.octOsc.type = s.wave === 'square' ? 'square' : 'triangle';
+  const st = STATIONS[i];
+  if (st.music) {
+    audio.arpOsc.type = st.wave;
+    audio.octOsc.type = st.wave === 'square' ? 'square' : 'triangle';
   }
   ramp(audio.master.gain, FEEL.AUDIO_MASTER, fade || FEEL.AUDIO_START_TIME);
 }
@@ -3635,13 +3980,19 @@ function startAudio() {
   setStation(station, FEEL.AUDIO_FIRST_FADE);
 }
 
-const muteBtn = document.getElementById('muteBtn');
-muteBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
-muteBtn.addEventListener('click', function (e) {
+/* The other three pads never change except through their own handlers,
+   so they are painted once here, where ICON exists. */
+pauseBtn.innerHTML = ICON.pause;
+tiltBtn.innerHTML = ICON.tilt;
+tiltFlipBtn.innerHTML = ICON.flip;
+
+const soundBtn = document.getElementById('soundBtn');
+soundBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+soundBtn.addEventListener('click', function (e) {
   e.stopPropagation();
-  muteBtn.blur();
+  soundBtn.blur();
   firstGesture();
-  setStation(silent(station) ? lastLoud : 0);
+  setStation((station + 1) % STATIONS.length);
 });
 paintStation();
 
@@ -3649,15 +4000,6 @@ paintStation();
    context can be suspended again by the tab going away, by an incoming
    call, or by the browser deciding the page was idle, and a game whose
    sound never comes back reads as broken. */
-/* The dial is on screen whenever the car is not moving: the start
-   screen, the death screen and the pause cover. That is not a settings
-   screen, it is the same four buttons in the three places a player is
-   already stopped and looking at them. */
-function syncRadio() {
-  const show = state !== DRIVING || paused;
-  if (radioEl.hidden === show) radioEl.hidden = !show;
-}
-
 function resumeAudio() {
   if (!audio) return;
   if (audio.ac.state === 'suspended') { try { audio.ac.resume(); } catch (e) {} }
@@ -3800,7 +4142,7 @@ function frame(now) {
   }
 
   updateRepeat(dt);
-  syncRadio();
+  updateTiltHint(dt);
   // Before the early return, so the pause sweep and the crash wind down
   // both keep running while nothing else does.
   updateAudio(dt);
@@ -3815,12 +4157,16 @@ function frame(now) {
   updateTilt(dt);
   updateSteering(dt);
   update(dt);
+  updateScore(dt);
   updateBar(dt);
   render();
   sampleFps(rawDt);
 }
 
 recomputeCamera();
+// Before the first road is built, or the title screen is generated at
+// deep game difficulty and the first thing anybody sees is a lie.
+updateDifficulty();
 resetRoad(nextSeed());
 resize();
 window.requestAnimationFrame(frame);
