@@ -106,6 +106,7 @@
       <button data-act="inc" type="button">+</button>
       <button data-act="next" type="button">&#9654;</button>
       <button data-act="reset" type="button">reset</button>
+      <button data-act="seed" type="button">seed</button>
     </div>
     <button id="fpsBtn" type="button">FPS</button>
     <button id="tiltBtn" type="button" hidden>Tilt</button>
@@ -140,7 +141,7 @@ const FEEL = {
      toggle, because they can only be judged by playing. Whatever is on
      screen in the debug readout is what the game is actually using.
 
-     CAMERA_HEIGHT only means anything relative to ROAD_HALF_WIDTH: those
+     CAMERA_HEIGHT only means anything relative to the road width: those
      two are one ratio, and raising the camera makes the road and the car
      smaller on screen. HORIZON_FRACTION buys that space back by moving
      the horizon up and giving the road more of the screen.
@@ -151,13 +152,22 @@ const FEEL = {
      more, and narrower zooms everything in. */
   /* These four were found by playing on a phone and are settled. Treat
      them the way the build order treats the rest of this block. */
-  FIELD_OF_VIEW_DEG:         84,     // LIVE
-  CAMERA_HEIGHT:           2300,     // LIVE
-  CAMERA_DISTANCE:         3100,     // LIVE, how far the camera sits behind the car
-  HORIZON_FRACTION:        0.46,     // LIVE, where the horizon sits down the screen
+  FIELD_OF_VIEW_DEG:         78,     // LIVE
+  CAMERA_HEIGHT:           1800,     // LIVE
+  CAMERA_DISTANCE:         3600,     // LIVE, how far the camera sits behind the car
+  HORIZON_FRACTION:        0.50,     // LIVE, where the horizon sits down the screen
   DRAW_DISTANCE_SEGMENTS:   200,
   SEGMENT_LENGTH:           200,
-  ROAD_HALF_WIDTH:         2000,
+
+  /* The road's width now lives on the segment, so phrases can squeeze and
+     open it. This is the reference width: everything expressed in road
+     half widths means half widths of this, and the live width only scales
+     what is drawn and how much margin there actually is. Narrowing makes
+     a corner harder without touching its strength, which is the whole
+     point, because the corner strengths are already at their ceiling. */
+  ROAD_HALF_WIDTH_BASE:    2000,
+  ROAD_WIDTH_NARROW:       0.74,     // tightest a phrase may squeeze to
+  ROAD_WIDTH_WIDE:         1.12,     // widest a phrase may open to
   RUMBLE_SEGMENTS:            4,     // stripe length, in segments
   RUMBLE_WIDTH_FRACTION:   0.65,     // of the road half width. This is the shoulder,
                                      // and it is drawn to match the scrape band below.
@@ -168,8 +178,14 @@ const FEEL = {
   /* Motion. Speed is constant in this build: speed escalation is step 3
      of the build order and is deliberately not here yet. */
   SPEED:                   9000,     // world units per second
-  STEER_RATE:               1.6,     // road half widths per second at full lock, once the
-                                     // tyres have caught up. It is a target now, not a jump.
+  /* LIVE. Base road half widths per second at full lock, once the tyres
+     have caught up. It is a target, not a jump. Raising it tightens the
+     turning circle and is safe against the centrifugal ceiling, because
+     the curve term below is scaled by this same number and the ratio does
+     not move. What it does change is how far the car overshoots when you
+     reverse out of a slide, which is bounded by STEER_RATE times GRIP_TIME
+     against the width of the scrape band. */
+  STEER_RATE:               2.2,     // LIVE
   STEER_RAMP_TIME:         0.10,     // seconds for keyboard or touch to reach full lock
 
   /* The drift. GRIP_TIME is the whole mechanic: the car's actual sideways
@@ -178,8 +194,10 @@ const FEEL = {
      stay well under GRIP_TIME or there is no gap between where the car
      points and where it is going, which is to say no drift. The angle
      between those two is the slip angle, and it is the number 4.4 will
-     score. Raise GRIP_TIME for a looser, slidier car. */
-  GRIP_TIME:               0.30,
+     score. Raise GRIP_TIME for a looser, slidier car. LIVE, and meant to
+     be balanced against STEER_RATE by playing: a tighter turn feeds more
+     sideways speed into the same grip and slides further. */
+  GRIP_TIME:               0.30,     // LIVE
   HEADING_SNAP_TIME:       0.06,
   SLIP_MAX_DEG:              30,     // slip angle that counts as fully sideways
   CAR_YAW_GAIN:             1.2,     // drawn yaw against real heading, for readability
@@ -228,8 +246,13 @@ const FEEL = {
      percentage of full lock for exactly that reason: hold that percentage
      roughly steady while hunting for the lock angle. */
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
-  TILT_DEADZONE_DEG:          3,     // LIVE, the neutral state from section 4.1
-  TILT_FULL_LOCK_DEG:        22,     // LIVE, degrees from the calibrated zero to full lock
+  TILT_DEADZONE_DEG:        2.0,     // LIVE, the neutral state from section 4.1
+  TILT_FULL_LOCK_DEG:        16,     // LIVE, degrees from the calibrated zero to full lock
+  /* Past this share of the full lock angle, the deadzone has eaten most of
+     the analogue range and the gyro is behaving like a switch. The readout
+     says so rather than clamping it, because the right answer is to shrink
+     the deadzone, not to stop looking for sensitivity. */
+  TILT_DEADZONE_WARN:      0.30,
   TILT_SENSOR_TIMEOUT:      1.5,     // seconds to wait for a first real reading
 
   /* The car, in world units, the same units as the road. It is a real box
@@ -295,11 +318,26 @@ const FEEL = {
   SMOKE_ALPHA:             0.16,
   SMOKE_MAX:                 70,     // hard cap on live puffs
 
-  /* Road generation. */
+  /* Road generation. The road is built from phrases rather than from an
+     independent random pick per section, so corners can set each other up.
+     Lengths below are in segments and every phrase jitters them, so these
+     are centres rather than exact values.
+
+     The corner strengths are at their ceiling and must not be raised.
+     CURVE_HARD times CENTRIFUGAL is already 55% of full lock, and at 100%
+     a corner is unsurvivable however well it is driven. Difficulty comes
+     from sequencing and from road width. */
   OPENING_STRAIGHT:         140,     // segments of calm before anything happens
-  SECTION_MIN:               45,
-  SECTION_MAX:              140,
-  STRAIGHT_CHANCE:         0.34,
+  RAMP_SHORT:                10,
+  RAMP_MED:                  26,
+  RAMP_LONG:                 48,
+  HOLD_SHORT:                16,
+  HOLD_MED:                  52,
+  HOLD_LONG:                125,
+  LINK_SHORT:                14,     // the breath between linked corners
+  RECOVERY_MIN:              45,     // a short straight is recovery, not filler
+  RECOVERY_MAX:              95,
+  PHRASE_JITTER:           0.28,     // fractional variation on every length
   CURVE_GENTLE:             1.6,
   CURVE_MEDIUM:             3.2,
   CURVE_HARD:               5.0,
@@ -364,7 +402,11 @@ const TUNABLES = [
   { key: 'FIELD_OF_VIEW_DEG',  label: 'fov',     step: 2,    min: 40,   max: 130,   dp: 0, group: 0 },
   { key: 'HORIZON_FRACTION',   label: 'horizon', step: 0.02, min: 0.12, max: 0.70,  dp: 2, group: 0 },
   { key: 'TILT_FULL_LOCK_DEG', label: 'lock',    step: 1,    min: 4,    max: 45,    dp: 0, group: 1 },
-  { key: 'TILT_DEADZONE_DEG',  label: 'dead',    step: 0.5,  min: 0,    max: 12,    dp: 1, group: 1 }
+  // A quarter of a degree, because the deadzone is the sensitivity control
+  // and half degree steps were too coarse to find its bottom end.
+  { key: 'TILT_DEADZONE_DEG',  label: 'dead',    step: 0.25, min: 0,    max: 12,    dp: 2, group: 1 },
+  { key: 'STEER_RATE',         label: 'steer',   step: 0.1,  min: 0.6,  max: 5.0,   dp: 1, group: 2 },
+  { key: 'GRIP_TIME',          label: 'grip',    step: 0.02, min: 0.04, max: 1.0,   dp: 2, group: 2 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -379,9 +421,6 @@ function recomputeCamera() {
    Small helpers.
    ------------------------------------------------------------------ */
 function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
-function randInt(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
-function easeIn(a, b, p) { return a + (b - a) * p * p; }
-function easeInOut(a, b, p) { return a + (b - a) * (1 - Math.cos(p * Math.PI)) / 2; }
 
 function storeGet(key) {
   try { return window.localStorage.getItem(STORAGE_PREFIX + key); }
@@ -442,6 +481,8 @@ function resize() {
   scrapeOutGradientRight = ctx.createLinearGradient(w, 0, w - scrapeBandWidth, 0);
   scrapeOutGradientRight.addColorStop(0, COLOUR.SCRAPE_OUT);
   scrapeOutGradientRight.addColorStop(1, 'rgba(255,90,61,0)');
+
+  if (showDebug) measureChrome();
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
@@ -735,11 +776,20 @@ const tunerEl = document.getElementById('tuner');
 let showDebug = false;
 let fpsFrames = 0, fpsElapsed = 0, fpsWorst = 0, fpsShown = 0, fpsWorstShown = 0;
 
+/* The readout sits under the button row, which wraps to two lines on a
+   narrow phone, so its height is measured rather than assumed. */
+let hudTop = 54;
+function measureChrome() {
+  const box = document.getElementById('buttons').getBoundingClientRect();
+  if (box.height > 0) hudTop = Math.round(box.bottom) + 8;
+}
+
 function setDebug(on) {
   showDebug = on;
   fpsBtn.classList.toggle('on', on);
   tunerEl.hidden = !on;
   fpsFrames = 0; fpsElapsed = 0; fpsWorst = 0;
+  if (on) window.requestAnimationFrame(measureChrome);
 }
 fpsBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
 fpsBtn.addEventListener('click', function (e) {
@@ -781,10 +831,34 @@ function tunerLine(group) {
   }
   if (group === 1) {
     // The deadzone only means anything as a share of the usable span.
-    const share = FEEL.TILT_DEADZONE_DEG / Math.max(1, FEEL.TILT_FULL_LOCK_DEG) * 100;
-    out += '(' + share.toFixed(0) + '% dead)';
+    out += '(' + Math.round(deadShare() * 100) + '% dead)';
+    if (deadShare() > FEEL.TILT_DEADZONE_WARN) out += ' SHRINK DEAD';
+  }
+  if (group === 2) {
+    out += 'slide ' + worstOvershoot().toFixed(2)
+        + '/' + (FEEL.OFF_ROAD - FEEL.SCRAPE_START).toFixed(2);
   }
   return out;
+}
+
+function deadShare() {
+  return FEEL.TILT_DEADZONE_DEG / Math.max(0.01, FEEL.TILT_FULL_LOCK_DEG);
+}
+
+/* How far the car keeps running outwards after the driver slams the lock
+   the other way, in road half widths, worst case.
+
+   Reversing sets a new target of minus the current sideways speed, so the
+   speed follows v0 minus 2 v0 exp(minus t over tau), which reaches zero at
+   tau ln2, and the ground covered getting there is 0.31 v0 tau rather than
+   the v0 tau a first guess gives. Compared against the width of the scrape
+   band, this is the number that says whether the current STEER_RATE and
+   GRIP_TIME leave a mistake recoverable. Worst case is full lock outwards
+   with the hardest corner pushing the same way, on the narrowest road. */
+const REVERSAL_FACTOR = 0.31;
+function worstOvershoot() {
+  const v = FEEL.STEER_RATE * (1 + FEEL.CURVE_HARD * FEEL.CENTRIFUGAL) / FEEL.ROAD_WIDTH_NARROW;
+  return REVERSAL_FACTOR * v * FEEL.GRIP_TIME;
 }
 
 function tunerDirty() {
@@ -802,11 +876,11 @@ function markTuning() {
 function saveTuning() {
   const out = {};
   TUNABLES.forEach(function (t) { out[t.key] = FEEL[t.key]; });
-  storeSet('tune', JSON.stringify(out));
+  storeSet('tune2', JSON.stringify(out));
 }
 
 function loadTuning() {
-  const raw = storeGet('tune');
+  const raw = storeGet('tune2');
   if (!raw) return;
   let parsed = null;
   try { parsed = JSON.parse(raw); } catch (e) { return; }
@@ -835,6 +909,27 @@ function resetTuning() {
   saveTuning();
 }
 
+/* Pinning the seed makes every run generate the same road, so two grip
+   settings can be compared on the same corners instead of on two
+   different tracks. Debug only, and off by default. */
+let seedPinned = false;
+const PINNED_SEED = 20260802;
+let lastSeed = PINNED_SEED;
+
+function nextSeed() {
+  lastSeed = seedPinned ? PINNED_SEED : ((Math.random() * 0xFFFFFFFF) >>> 0);
+  return lastSeed;
+}
+
+function toggleSeed() {
+  seedPinned = !seedPinned;
+  const btn = tunerEl.querySelector('[data-act="seed"]');
+  if (btn) btn.classList.toggle('on', seedPinned);
+  // Restart into the pinned road at once, or the toggle does nothing
+  // visible until the next crash.
+  if (state !== TITLE) startRun();
+}
+
 /* Held buttons repeat, because stepping the camera height a hundred at a
    time with single taps is not a thing anyone will do twice. */
 const repeat = { dir: 0, held: 0, fired: 0 };
@@ -858,6 +953,7 @@ tunerEl.addEventListener('pointerdown', function (e) {
   if (act === 'prev') selectTuning(-1);
   else if (act === 'next') selectTuning(1);
   else if (act === 'reset') resetTuning();
+  else if (act === 'seed') toggleSeed();
   else if (act === 'dec') { nudgeTuning(-1); repeat.dir = -1; repeat.held = 0; repeat.fired = 0; }
   else if (act === 'inc') { nudgeTuning(1); repeat.dir = 1; repeat.held = 0; repeat.fired = 0; }
 });
@@ -885,50 +981,212 @@ function segAt(index) {
   return segments[index - segBase];
 }
 
-function addSegment(curve) {
-  // ma, m0 and m1 are the tyre mark this segment carries: its darkness,
-  // and the car's road position entering and leaving it. Marks ride the
-  // segments, so trimming the road behind the camera frees them too and
-  // nothing accumulates over a run.
+function addSegment(curve, halfWidth) {
+  // hw is this segment's road half width, so phrases can squeeze and open
+  // the road. ma, ml and mr are the tyre marks it carries: darkness, and
+  // the two rear wheel positions entering and leaving, held as fractions
+  // of this segment's own width so they draw correctly wherever it is.
+  // Marks ride the segments, so trimming the road behind the camera frees
+  // them too and nothing accumulates over a run.
   segments.push({
-    index: segBase + segments.length, curve: curve,
+    index: segBase + segments.length, curve: curve, hw: halfWidth,
     ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0
   });
 }
 
-function addRoad(enter, hold, leave, curve) {
-  let i;
-  for (i = 0; i < enter; i++) addSegment(easeIn(0, curve, i / enter));
-  for (i = 0; i < hold; i++) addSegment(curve);
-  for (i = 0; i < leave; i++) addSegment(easeInOut(curve, 0, i / leave));
-}
 
-function addRandomSection() {
-  const len = randInt(FEEL.SECTION_MIN, FEEL.SECTION_MAX);
-  if (Math.random() < FEEL.STRAIGHT_CHANCE) {
-    addRoad(0, len, 0, 0);
-    return;
+/* ------------------------------------------------------------------
+   A seeded generator, so a pinned seed reproduces a track exactly and
+   two settings can be compared on the same road. Mulberry32.
+   ------------------------------------------------------------------ */
+let rngState = 1;
+function rng() {
+  rngState = (rngState + 0x6D2B79F5) | 0;
+  let t = Math.imul(rngState ^ (rngState >>> 15), 1 | rngState);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function vary(n) { return Math.max(3, Math.round(n * (1 + (rng() * 2 - 1) * FEEL.PHRASE_JITTER))); }
+function pickDir() { return rng() < 0.5 ? 1 : -1; }
+
+
+/* ==================================================================
+   THE PHRASE LIBRARY
+
+   The road is a sequence of phrases rather than a sequence of unrelated
+   random corners. Each phrase is a shape that means something to drive:
+   a corner that tightens as you commit, two hairpins that share an exit,
+   a squeeze that makes an ordinary bend serious. This is still entirely
+   procedural, and no track is authored: what is authored is the grammar.
+
+   Two things the old generator could not say, and every phrase here can.
+   The entry ramp and the exit ramp are independent, so a corner can open
+   differently from how it enters. And the curve moves during the hold, so
+   it can tighten or unwind under the car.
+   ================================================================== */
+let roadWidth = 1;      // current half width, as a multiple of the base
+
+function addRun(count, c0, c1, w0, w1, ease) {
+  const base = FEEL.ROAD_HALF_WIDTH_BASE;
+  for (let i = 0; i < count; i++) {
+    const p = count > 1 ? i / (count - 1) : 1;
+    const t = ease ? (1 - Math.cos(p * Math.PI)) / 2 : p;
+    addSegment(c0 + (c1 - c0) * t, base * (w0 + (w1 - w0) * t));
   }
-  const pick = Math.random();
-  const size = pick < 0.4 ? FEEL.CURVE_GENTLE : (pick < 0.8 ? FEEL.CURVE_MEDIUM : FEEL.CURVE_HARD);
-  const curve = size * (Math.random() < 0.5 ? -1 : 1);
-  const ramp = Math.max(8, Math.round(len * 0.4));
-  addRoad(ramp, len, ramp, curve);
+  roadWidth = w1;
 }
 
-function resetRoad() {
+const NARROW = function () {
+  return FEEL.ROAD_WIDTH_NARROW + rng() * (1 - FEEL.ROAD_WIDTH_NARROW) * 0.5;
+};
+
+const PHRASES = [
+  {
+    // Recovery. Not filler: it is where the player resets their line and
+    // the road comes back to its normal width.
+    name: 'straight', intensity: 0,
+    build: function () {
+      const len = FEEL.RECOVERY_MIN + Math.round(rng() * (FEEL.RECOVERY_MAX - FEEL.RECOVERY_MIN));
+      addRun(len, 0, 0, roadWidth, 1, true);
+    }
+  },
+  {
+    // A long constant radius corner. Nothing to solve, everything to hold,
+    // and it opens out wide so the exit is a reward.
+    name: 'sweeper', intensity: 1,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_MEDIUM * d;
+      addRun(vary(FEEL.RAMP_MED), 0, c, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_LONG), c, c, 1, FEEL.ROAD_WIDTH_WIDE, false);
+      addRun(vary(FEEL.RAMP_MED), c, 0, FEEL.ROAD_WIDTH_WIDE, 1, true);
+    }
+  },
+  {
+    // A flick. Short, sharp, over before it is a problem, and the thing
+    // the whole game is named after.
+    name: 'kink', intensity: 1,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_MEDIUM * d;
+      addRun(vary(FEEL.RAMP_SHORT), 0, c, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_SHORT), c, c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_SHORT), c, 0, 1, 1, true);
+    }
+  },
+  {
+    // Two opposite corners with no straight between them, so the exit of
+    // the first is the entry to the second and the car has to be placed
+    // rather than just steered.
+    name: 's-bend', intensity: 2,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_MEDIUM * d;
+      addRun(vary(FEEL.RAMP_MED), 0, c, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_MED), c, c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_MED), c, -c, 1, 1, true);      // straight through zero
+      addRun(vary(FEEL.HOLD_MED), -c, -c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_MED), -c, 0, 1, 1, true);
+    }
+  },
+  {
+    // The width lever on its own. An ordinary bend through a squeeze,
+    // which is harder than the same bend at full width without the corner
+    // itself being any stronger.
+    name: 'squeeze', intensity: 2,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_GENTLE * d, n = NARROW();
+      addRun(vary(FEEL.RAMP_MED), 0, c, roadWidth, n, true);
+      addRun(vary(FEEL.HOLD_MED), c, c * 1.6, n, n, false);
+      addRun(vary(FEEL.RAMP_MED), c * 1.6, 0, n, 1, true);
+    }
+  },
+  {
+    // Opens out. Hard on the way in, unwinding under the car, so the
+    // instinct to keep the lock on is wrong.
+    name: 'opening', intensity: 2,
+    build: function () {
+      const d = pickDir();
+      addRun(vary(FEEL.RAMP_SHORT), 0, FEEL.CURVE_HARD * d, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_MED), FEEL.CURVE_HARD * d, FEEL.CURVE_GENTLE * d, 1, 1, false);
+      addRun(vary(FEEL.RAMP_LONG), FEEL.CURVE_GENTLE * d, 0, 1, FEEL.ROAD_WIDTH_WIDE, true);
+      roadWidth = FEEL.ROAD_WIDTH_WIDE;
+    }
+  },
+  {
+    // Tightens as you commit. The long entry is deliberate: at this draw
+    // distance the whole corner is on screen before it is entered, so it
+    // is a decision rather than an ambush.
+    name: 'tightening', intensity: 3,
+    build: function () {
+      const d = pickDir();
+      addRun(vary(FEEL.RAMP_LONG), 0, FEEL.CURVE_GENTLE * d, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_MED), FEEL.CURVE_GENTLE * d, FEEL.CURVE_HARD * d, 1, 0.9, false);
+      addRun(vary(FEEL.RAMP_SHORT), FEEL.CURVE_HARD * d, 0, 0.9, 1, true);
+    }
+  },
+  {
+    // Left right left, narrow, quick. The one that punishes carrying too
+    // much sideways speed into it.
+    name: 'chicane', intensity: 3,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_MEDIUM * d, n = NARROW();
+      addRun(vary(FEEL.RAMP_SHORT), 0, c, roadWidth, n, true);
+      addRun(vary(FEEL.HOLD_SHORT), c, c, n, n, false);
+      addRun(vary(FEEL.RAMP_SHORT), c, -c, n, n, true);
+      addRun(vary(FEEL.HOLD_SHORT), -c, -c, n, n, false);
+      addRun(vary(FEEL.RAMP_SHORT), -c, c, n, n, true);
+      addRun(vary(FEEL.HOLD_SHORT), c, c, n, n, false);
+      addRun(vary(FEEL.RAMP_MED), c, 0, n, 1, true);
+    }
+  },
+  {
+    // Two tight corners the same way, sharing a very short breath. The
+    // second one is where the first one's exit line is paid for.
+    name: 'hairpins', intensity: 3,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_HARD * d;
+      addRun(vary(FEEL.RAMP_MED), 0, c, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_SHORT), c, c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_SHORT), c, 0, 1, 1, true);
+      addRun(vary(FEEL.LINK_SHORT), 0, 0, 1, 1, false);
+      addRun(vary(FEEL.RAMP_SHORT), 0, c, 1, 1, true);
+      addRun(vary(FEEL.HOLD_SHORT), c, c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_MED), c, 0, 1, 1, true);
+    }
+  }
+];
+
+/* Rhythm. A hard phrase buys the player calm on either side of it, so
+   pressure arrives in waves rather than as a flat wall. */
+let restOwed = 0;
+
+function addPhrase() {
+  let pool = PHRASES;
+  if (restOwed > 0) {
+    pool = PHRASES.filter(function (p) { return p.intensity <= 1; });
+    restOwed--;
+  }
+  const p = pool[Math.floor(rng() * pool.length)];
+  p.build();
+  if (restOwed === 0) restOwed = p.intensity >= 3 ? 2 : (p.intensity >= 2 ? 1 : 0);
+}
+
+function resetRoad(seed) {
   segments = [];
   segBase = 0;
-  // No tutorial. The opening is the tutorial: a calm straight, then one
-  // gentle curve that teaches hold to turn without a word.
-  addRoad(0, FEEL.OPENING_STRAIGHT, 0, 0);
-  addRoad(30, 90, 30, FEEL.CURVE_GENTLE);
-  addRoad(0, 60, 0, 0);
+  rngState = seed >>> 0;
+  roadWidth = 1;
+  restOwed = 0;
+  // No tutorial. The opening is the tutorial: a calm straight at full
+  // width, then one gentle curve that teaches hold to turn without a word.
+  addRun(FEEL.OPENING_STRAIGHT, 0, 0, 1, 1, false);
+  addRun(30, 0, FEEL.CURVE_GENTLE, 1, 1, true);
+  addRun(90, FEEL.CURVE_GENTLE, FEEL.CURVE_GENTLE, 1, 1, false);
+  addRun(30, FEEL.CURVE_GENTLE, 0, 1, 1, true);
+  addRun(60, 0, 0, 1, 1, false);
 }
 
 function topUpRoad(baseIndex) {
   const needed = baseIndex + FEEL.DRAW_DISTANCE_SEGMENTS + 4;
-  while (segBase + segments.length < needed) addRandomSection();
+  while (segBase + segments.length < needed) addPhrase();
   // Trim what is behind the camera, in one splice rather than one shift
   // per frame, so the array does not grow for the length of a run.
   const behind = baseIndex - segBase;
@@ -951,7 +1209,13 @@ const TITLE = 0, DRIVING = 1, DEAD = 2;
 let state = TITLE;
 
 let position = 0;        // camera z, world units
-let playerX = 0;         // road half widths, 0 is the centre line, 1 is the painted edge
+/* The car's offset from the road centre is held in world units, not in
+   road half widths. That is what makes a narrower road genuinely harder:
+   the steering covers the same ground per second either way, so on a
+   squeezed road it covers a larger share of what is left. carFrac is that
+   offset against the local half width, and it is what the bands read. */
+let carX = 0;
+let carFrac = 0;
 let scraping = false;
 let scrapeSide = 0;
 let scrapeMeter = 0;     // seconds of edge spent, against SCRAPE_TIME_LIMIT
@@ -981,9 +1245,10 @@ const drift = {
 };
 
 function startRun() {
-  resetRoad();
+  resetRoad(nextSeed());
   position = 0;
-  playerX = 0;
+  carX = 0;
+  carFrac = 0;
   scraping = false;
   scrapeSide = 0;
   scrapeMeter = 0;
@@ -1027,6 +1292,7 @@ function update(dt) {
   const carIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
   const carSegment = segAt(carIndex);
   const curve = carSegment ? carSegment.curve : 0;
+  const localHalf = carSegment ? carSegment.hw : FEEL.ROAD_HALF_WIDTH_BASE;
 
   const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1);
   position += speed * dt;
@@ -1038,8 +1304,13 @@ function update(dt) {
      curve pushes the car outwards but not the nose, so it drags the two
      apart for as long as the corner lasts. Flicking the wheel drags them
      apart hard and briefly. Both of those gaps are the drift. */
-  const intent = steering.value * FEEL.STEER_RATE;
-  const gripTarget = intent - curve * FEEL.CENTRIFUGAL * FEEL.STEER_RATE;
+  // Sideways speeds are world units per second. STEER_RATE is quoted in
+  // base half widths per second, so it converts once here and the ratio
+  // between steering and centrifugal is untouched by either the rate or
+  // the local width.
+  const rate = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE;
+  const intent = steering.value * rate;
+  const gripTarget = intent - curve * FEEL.CENTRIFUGAL * rate;
   drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME));
   drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
 
@@ -1048,14 +1319,14 @@ function update(dt) {
   // enough to lean a body on without any filtering.
   drift.lateralAccel = (gripTarget - drift.lateralV) / FEEL.GRIP_TIME;
 
-  const prevX = playerX;
-  playerX += drift.lateralV * dt;
+  const prevX = carX;
+  carX += drift.lateralV * dt;
+  carFrac = carX / localHalf;
 
   // Sideways speed against forward speed is an angle. The difference of
   // the two angles is the slip.
-  const rhw = FEEL.ROAD_HALF_WIDTH;
-  drift.headingAngle = Math.atan(drift.headingV * rhw / speed);
-  drift.travelAngle = Math.atan(drift.lateralV * rhw / speed);
+  drift.headingAngle = Math.atan(drift.headingV / speed);
+  drift.travelAngle = Math.atan(drift.lateralV / speed);
   drift.slip = drift.headingAngle - drift.travelAngle;
   drift.slipDeg = drift.slip * 180 / Math.PI;
   drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
@@ -1063,11 +1334,11 @@ function update(dt) {
   layTyreMarks(carIndex, prevX);
   updateSmoke(dt);
 
-  const offset = Math.abs(playerX);
+  const offset = Math.abs(carFrac);
   if (offset > FEEL.OFF_ROAD) { crash(); return; }
 
   scraping = offset > FEEL.SCRAPE_START;
-  scrapeSide = scraping ? Math.sign(playerX) : 0;
+  scrapeSide = scraping ? Math.sign(carFrac) : 0;
   if (scraping) {
     scrapeMeter += dt;
     if (shake < FEEL.SCRAPE_SHAKE_PX) shake = FEEL.SCRAPE_SHAKE_PX;
@@ -1094,19 +1365,18 @@ function crash() {
    their own, so they curve with the road for free and get thrown away
    with it.
    ================================================================== */
-/* Where the two rear wheels touch the road, in road half widths, given a
-   centre position. They yaw with the body, so as the car comes sideways
-   the pair swings apart and the two marks sweep away from each other.
-   That divergence is the rotation, drawn. */
+/* Where the two rear wheels touch the road, in world units, given a centre
+   position. They yaw with the body, so as the car comes sideways the pair
+   swings apart and the two marks sweep away from each other. That
+   divergence is the rotation, drawn. */
 const rearContact = { left: 0, right: 0 };
 function rearWheelOffsets(centreX) {
   const yaw = drift.headingAngle * FEEL.CAR_YAW_GAIN;
   const c = Math.cos(yaw), s = Math.sin(yaw);
   const trackHalf = FEEL.CAR_TRACK / 2;
-  const back = -FEEL.CAR_WHEELBASE / 2;
-  const shared = back * s;
-  rearContact.left = centreX + (-trackHalf * c + shared) / FEEL.ROAD_HALF_WIDTH;
-  rearContact.right = centreX + (trackHalf * c + shared) / FEEL.ROAD_HALF_WIDTH;
+  const shared = -FEEL.CAR_WHEELBASE / 2 * s;
+  rearContact.left = centreX - trackHalf * c + shared;
+  rearContact.right = centreX + trackHalf * c + shared;
   return rearContact;
 }
 
@@ -1121,7 +1391,7 @@ function layTyreMarks(carIndex, prevX) {
 
   const prev = rearWheelOffsets(prevX);
   const pl = prev.left, pr = prev.right;
-  const now = rearWheelOffsets(playerX);
+  const now = rearWheelOffsets(carX);
 
   // Fill in any segment the car stepped over this frame, so a long frame
   // does not punch a hole in the line.
@@ -1132,11 +1402,11 @@ function layTyreMarks(carIndex, prevX) {
   for (let i = from; i <= axleIndex; i++) {
     const s = segAt(i);
     if (!s) continue;
-    // The entry point picks up where the previous segment's exit was left,
-    // so the line is continuous across the join.
-    if (s.ma === 0) { s.ml0 = pl; s.mr0 = pr; }
-    s.ml1 = now.left;
-    s.mr1 = now.right;
+    // Stored against this segment's own width, because that is what the
+    // projection hands back when the segment is drawn.
+    if (s.ma === 0) { s.ml0 = pl / s.hw; s.mr0 = pr / s.hw; }
+    s.ml1 = now.left / s.hw;
+    s.mr1 = now.right / s.hw;
     if (a > s.ma) s.ma = a;
   }
   lastMarkSeg = axleIndex;
@@ -1208,15 +1478,16 @@ function drawSmoke() {
 /* ==================================================================
    RENDER
    ================================================================== */
-function project(out, worldX, camX, dz, w, h) {
+function project(out, worldX, camX, dz, w, h, halfWidth) {
   // Everything hangs off the horizon line rather than the middle of the
   // screen, so HORIZON_FRACTION decides how the screen is split between
-  // sky and road without touching the perspective.
+  // sky and road without touching the perspective. The half width comes
+  // from the segment, so the road can narrow and open.
   const scale = CAMERA_DEPTH / dz;
   out.z = dz;
   out.x = w / 2 + scale * (worldX - camX) * w / 2;
   out.y = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2;
-  out.w = scale * FEEL.ROAD_HALF_WIDTH * w / 2;
+  out.w = scale * halfWidth * w / 2;
   return out;
 }
 
@@ -1265,7 +1536,7 @@ function drawRoad(w, h) {
   const base = segAt(baseIndex);
   if (!base) return;
   const percent = (position - baseIndex * seg) / seg;
-  const camX = playerX * FEEL.ROAD_HALF_WIDTH;
+  const camX = carX;
 
   let x = 0;
   let dx = -(base.curve * percent);
@@ -1273,18 +1544,19 @@ function drawRoad(w, h) {
 
   const carZ = position + FEEL.CAMERA_DISTANCE;
   const carIdx = Math.floor(carZ / seg);
-  const carFrac = (carZ - carIdx * seg) / seg;
+  const carSegFrac = (carZ - carIdx * seg) / seg;
 
-  project(p1, x, camX, baseIndex * seg - position, w, h);
+  project(p1, x, camX, baseIndex * seg - position, w, h, base.hw);
 
   for (let n = 0; n < FEEL.DRAW_DISTANCE_SEGMENTS; n++) {
     const s = segAt(baseIndex + n);
     if (!s) break;
+    const next = segAt(baseIndex + n + 1);
     const z1 = (baseIndex + n) * seg - position;
     const x2 = x + dx;
-    project(p2, x2, camX, z1 + seg, w, h);
+    project(p2, x2, camX, z1 + seg, w, h, next ? next.hw : s.hw);
 
-    if (baseIndex + n === carIdx) carCurveX = x + dx * carFrac;
+    if (baseIndex + n === carIdx) carCurveX = x + dx * carSegFrac;
 
     if (p1.z > CAMERA_DEPTH && p2.y < p1.y && p2.y < maxy) {
       drawSegment(s, w);
@@ -1331,7 +1603,9 @@ function drawSegment(s, w) {
   // Tyre marks, on top of the surface. A point at road offset m sits at
   // p.x + m * p.w, because p.w is the road half width in pixels.
   if (s.ma > 0) {
-    const mw = FEEL.TYRE_MARK_WIDTH;
+    // A tyre is a fixed width in the world, so on a squeezed segment it is
+    // a larger share of the road and the stored fraction has to follow.
+    const mw = FEEL.TYRE_MARK_WIDTH * FEEL.ROAD_HALF_WIDTH_BASE / s.hw;
     ctx.fillStyle = markFill(s.ma);
     polygon(p1.x + (s.ml0 - mw) * p1.w, y1, p1.x + (s.ml0 + mw) * p1.w, y1,
             p2.x + (s.ml1 + mw) * p2.w, y2, p2.x + (s.ml1 - mw) * p2.w, y2);
@@ -1486,7 +1760,7 @@ const WHEEL_COLOURS = [COLOUR.CAR_TYRE, COLOUR.CAR_TYRE, COLOUR.CAR_TYRE, COLOUR
 const SHADOW_COLOURS = [null, null, null, null, COLOUR.CAR_SHADOW, null];
 
 function drawCar(w, h) {
-  const camX = playerX * FEEL.ROAD_HALF_WIDTH;
+  const camX = carX;
   const yaw = drift.headingAngle * FEEL.CAR_YAW_GAIN;
   const roll = clamp(drift.lateralAccel / FEEL.CAR_ROLL_REFERENCE, -1, 1)
              * FEEL.CAR_ROLL_DEG * Math.PI / 180;
@@ -1604,7 +1878,9 @@ function drawHud(w, h) {
     fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms',
     tunerLine(0),
     tunerLine(1),
-    'slip ' + drift.slipDeg.toFixed(0) + '°   edge ' + (scrapeRisk * 100).toFixed(0) + '%'
+    tunerLine(2),
+    'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
+      + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free')
   ];
   ctx.font = '600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   ctx.textAlign = 'left';
@@ -1614,7 +1890,7 @@ function drawHud(w, h) {
     const tw = ctx.measureText(lines[i]).width;
     if (tw > widest) widest = tw;
   }
-  const top = pad + 44;   // clear of the button row
+  const top = hudTop;
   ctx.fillStyle = 'rgba(10,30,45,0.6)';
   ctx.fillRect(pad - 5, top - 4, widest + 10, lines.length * 18 + 8);
   ctx.fillStyle = '#ffffff';
@@ -1678,7 +1954,7 @@ function frame(now) {
 }
 
 recomputeCamera();
-resetRoad();
+resetRoad(nextSeed());
 resize();
 window.requestAnimationFrame(frame);
 </script>
