@@ -1039,20 +1039,41 @@ const FEEL = {
      same split the difficulty ramp already uses and it does the
      forgiveness work for free. EVERY is a mean gap in segments, so
      smaller is more often. All six are LIVE. */
-  BLOCKER_TIME:              62,     // seconds, just past the on ramp
-  SPLITTER_TIME:            105,
-  MOVER_TIME:               155,
-  /* Mean segments between ATTEMPTS, not between hazards. Most attempts
-     are refused: every hazard sterilises its own length plus a warning
-     run either side, so nothing under about 2 x HAZARD_WARN_SEGMENTS can
-     ever place twice in a row, and the readability gate throws out any
-     candidate whose warning run passes through a real corner. Measured
-     over half an hour of deep game road that lands at roughly 1.5 hazards
-     a minute all told, and the corner gate rather than these numbers is
-     what caps it. All three are LIVE. */
-  BLOCKER_EVERY:             90,     // LIVE, segments between attempts
-  SPLITTER_EVERY:           650,     // LIVE
-  MOVER_EVERY:              450,     // LIVE
+  /* A hazard is SCHEDULED first and the road is then built to suit it,
+     rather than a suitable gap being hunted for in road that already
+     exists. That is the right dependency order and it is what makes them
+     common enough to be a mechanic: hunting refused about 1160 of every
+     1600 candidates, almost all of them warning runs that fell inside a
+     corner, and it capped the whole system at roughly one hazard a
+     minute.
+
+     It also improves the road rather than costing anything. A readable
+     approach IS the planning time section 4.3 asks for, and a hazard that
+     resolves properly beats one that appears out of a bend.
+
+     The approach is a lazy bend rather than a dead straight most of the
+     time, because a game that lays sixty segments of nothing every time
+     it wants to show you something has traded one kind of boring for
+     another. Anything up to CURVE_GENTLE stays inside the readability
+     gate with room to spare. */
+  HAZARD_APPROACH_CURVE:    0.7,     // of CURVE_GENTLE, the lazy bend it arrives on
+  HAZARD_STRAIGHT_CHANCE:  0.40,     // how often the approach is dead straight instead
+  HAZARD_RUNOUT:             16,     // segments of gathering up afterwards
+
+  /* The first blocker is inside the on ramp on purpose. A blocker on a
+     wide road at eighteen seconds is not a threat, it is the teaching
+     moment section 5 says to use instead of words: it is unmissable, it
+     is survivable, and it explains itself. */
+  BLOCKER_TIME:              18,     // seconds, inside the on ramp
+  SPLITTER_TIME:             55,
+  MOVER_TIME:                85,
+  /* Mean segments between hazards of that kind, and now that the road is
+     built to suit them these are the real spacing rather than an attempt
+     rate that mostly failed. A segment is about a fortieth of a second,
+     so a thousand segments is roughly twenty two seconds. All LIVE. */
+  BLOCKER_EVERY:           1000,     // LIVE
+  SPLITTER_EVERY:          3200,     // LIVE
+  MOVER_EVERY:             2400,     // LIVE
 
   /* ----------------------------------------------------------------
      Progressive difficulty, in two halves that are deliberately not the
@@ -1078,13 +1099,25 @@ const FEEL = {
      difficulty past ONRAMP_SECONDS is a pure function of elapsed time and
      identical for everybody. That is what keeps scores comparable: every
      score worth comparing was earned in the shared part of the run. */
-  ONRAMP_SECONDS:            60,     // the whole on ramp, the same for everyone
-  ONRAMP_FLAT:               14,     // seconds of it that stay at the easiest setting
-  ONRAMP_CURVE:             1.1,     // curve scale at the start of a run
-  ONRAMP_WIDTH:            1.22,     // road width multiplier at the start of a run
-  ONRAMP_INTENSITY:           1,     // hardest phrase the on ramp may use
-  ONRAMP_REST:              0.7,     // chance of a forced breath after any phrase
-  RAMP_SECONDS:             180,     // from the end of the on ramp to full difficulty
+  /* FORGIVENESS COMES FROM MARGIN, NOT FROM ABSENCE. The first version of
+     this on ramp was specified as an absence of things: rests seven times
+     in ten, most of the phrase library locked out, corners that barely
+     bent, for a whole minute. It was survivable and it was the least
+     interesting minute in the game, which is the minute almost everybody
+     plays.
+
+     What actually stops a new player dying is the width and the scrape
+     band, so those stay generous and everything else comes back. Corners
+     that are real corners on a road wide enough to survive them are the
+     thing worth learning; a straight is punctuation. All of these are
+     LIVE so the balance can be found by playing rather than by argument. */
+  ONRAMP_SECONDS:            30,     // LIVE, the whole on ramp, the same for everyone
+  ONRAMP_FLAT:                6,     // seconds of it that stay at the easiest setting
+  ONRAMP_CURVE:             1.9,     // LIVE, curve scale at the start of a run
+  ONRAMP_WIDTH:            1.22,     // LIVE, road width multiplier at the start
+  ONRAMP_INTENSITY:           2,     // LIVE, hardest phrase the on ramp may use
+  ONRAMP_REST:             0.22,     // LIVE, chance of a forced breath after a phrase
+  RAMP_SECONDS:             100,     // LIVE, on ramp end to full difficulty
   /* Equal to CURVE_SCALE, so the curve does not escalate past the on
      ramp at all. It was 3.1, which pushed curvature 24% past anything the
      camera was set up for and walked most of the drivable surface off the
@@ -1099,7 +1132,10 @@ const FEEL = {
      Nothing is announced and there is no menu, per section 7.7. */
   ADAPT_DEATH_WINDOW:        30,     // dying inside this many seconds counts as struggling
   ADAPT_STEP:              0.34,     // how fast the softening comes and goes
-  ADAPT_FLAT_EXTRA:          26,     // extra seconds of the easiest setting, at full ease
+  /* Kept under ONRAMP_SECONDS with room, or the eased flat runs past the
+     end of the window and difficulty stops being identical for everybody
+     after it, which is the one thing the on ramp must not break. */
+  ADAPT_FLAT_EXTRA:          12,     // extra seconds of the easiest setting, at full ease
   ADAPT_CURVE_EASE:         0.3,     // curve scale taken off the start, at full ease
   ADAPT_WIDTH_EASE:        0.14,     // road width added at the start, at full ease
 
@@ -1275,15 +1311,19 @@ const TUNABLES = [
   { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 },
   { key: 'CURVE_SCALE',        label: 'curve',   step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
   { key: 'CURVE_SCALE_DEEP',   label: 'deep',    step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
-  // The minimums are above 2 x HAZARD_WARN_SEGMENTS, under which
-  // consecutive attempts always collide with each other's warning runs.
-  { key: 'BLOCKER_EVERY',      label: 'block',   step: 10,   min: 100,  max: 1200,  dp: 0, group: 8 },
-  { key: 'SPLITTER_EVERY',     label: 'split',   step: 25,   min: 100,  max: 2000,  dp: 0, group: 8 },
-  { key: 'MOVER_EVERY',        label: 'mover',   step: 25,   min: 100,  max: 2000,  dp: 0, group: 8 },
+  { key: 'BLOCKER_EVERY',      label: 'block',   step: 50,   min: 200,  max: 8000,  dp: 0, group: 8 },
+  { key: 'SPLITTER_EVERY',     label: 'split',   step: 100,  min: 300,  max: 12000, dp: 0, group: 8 },
+  { key: 'MOVER_EVERY',        label: 'mover',   step: 100,  min: 300,  max: 12000, dp: 0, group: 8 },
   { key: 'BLOCKER_TIME',       label: 'bAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
   { key: 'SPLITTER_TIME',      label: 'sAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
   { key: 'MOVER_TIME',         label: 'mAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
   { key: 'MOVER_PERIOD',       label: 'sweep',   step: 0.5,  min: 1.5,  max: 20,    dp: 1, group: 9 },
+  { key: 'ONRAMP_SECONDS',     label: 'ramp',    step: 5,    min: 5,    max: 180,   dp: 0, group: 10 },
+  { key: 'RAMP_SECONDS',       label: 'deepAt',  step: 10,   min: 20,   max: 600,   dp: 0, group: 10 },
+  { key: 'ONRAMP_CURVE',       label: 'rCurve',  step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 10 },
+  { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
+  { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
+  { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
   { key: 'CAMERA_LOOK',        label: 'look',    step: 10,   min: 0,    max: 500,   dp: 0, group: 7 },
   { key: 'CAMERA_LOOK_AHEAD',  label: 'ahead',   step: 500,  min: 0,    max: 30000, dp: 0, group: 7 },
   /* Two positions only, and it is here because the flip button is gone
@@ -1388,6 +1428,11 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
+// resize fires on rotation too, and on some Android browsers it is the
+// only one that does, so the tilt re zero hangs off it as well.
+window.addEventListener('resize', function () {
+  if (typeof onOrientationChanged === 'function') onOrientationChanged();
+});
 
 
 /* ==================================================================
@@ -1564,17 +1609,51 @@ function onDeviceOrientation(e) {
   if (e.gamma === null || e.gamma === undefined) return;   // no real sensor behind the event
   tilt.seenSensor = true;
 
-  // gamma is left to right tilt in portrait. In landscape gamma and beta
-  // swap roles, so remap off the screen angle.
+  /* gamma is left to right tilt in portrait. In landscape gamma and beta
+     swap roles, so remap off the screen angle.
+
+     The two landscape signs were the wrong way round until session
+     sixteen and had never been driven on a real handset, only modelled.
+     The convention every branch has to agree with is the one written
+     above TILT_DIRECTION: dropping the SCREEN'S right edge steers right.
+     180 stays negated because the device is upside down under an upright
+     picture, which is the one case where the model and the handset never
+     disagreed. */
   const angle = orientationAngle();
   let deg;
-  if (angle === 90) deg = -e.beta;
+  if (angle === 90) deg = e.beta;
   else if (angle === 180) deg = -e.gamma;
-  else if (angle === 270) deg = e.beta;
+  else if (angle === 270) deg = -e.beta;
   else deg = e.gamma;
 
   tilt.rawDeg = deg;
   if (tilt.zeroDeg === null) tilt.zeroDeg = deg;
+}
+
+/* Rotating the handset mid run changes which physical axis the reading
+   comes off, so a zero captured in portrait is being subtracted from a
+   completely different quantity in landscape. The result feels exactly
+   like a sign bug and is not one. Re assemble the zero from whatever the
+   new orientation reports.
+
+   The reading is dropped as well as the zero, because the first event
+   after a rotation can still carry the old frame on some browsers, and
+   updateTilt sits out the frame or two until a fresh pair arrives. */
+let lastOrientation = -1;
+function onOrientationChanged() {
+  const angle = orientationAngle();
+  if (angle === lastOrientation) return;
+  lastOrientation = angle;
+  tilt.rawDeg = null;
+  tilt.zeroDeg = null;
+  tilt.value = 0;
+}
+window.addEventListener('orientationchange', onOrientationChanged);
+if (window.screen && window.screen.orientation
+    && typeof window.screen.orientation.addEventListener === 'function') {
+  // The modern event. Both are bound because coverage of each still
+  // varies, and the guard above makes a double fire a no op.
+  window.screen.orientation.addEventListener('change', onOrientationChanged);
 }
 
 function calibrateTilt() {
@@ -2308,6 +2387,12 @@ function phraseWeight(p) {
 }
 
 function addPhrase() {
+  /* A due hazard writes the next phrase itself. Ahead of the library
+     rather than instead of it: the schedules are sparse, so most phrases
+     are still whatever the grammar picks. */
+  const due = dueHazardKind();
+  if (due) { buildHazardPhrase(due); return; }
+
   const resting = restOwed > 0;
   if (resting) restOwed--;
   // Two ceilings at once: what the run has unlocked, and whether this one
@@ -2521,54 +2606,77 @@ function hazardX(h) {
   return h.x + h.swing * Math.sin(h.phase + runTime * (Math.PI * 2 / FEEL.MOVER_PERIOD));
 }
 
-/* Tried as the road is built, one kind at a time and only once the run
-   has earned it. Each kind keeps its own next-attempt marker, so the
-   frequencies are independent and tunable apart. */
-function placeHazards(from, to) {
-  /* Longest and rarest first. Every hazard claims its own stretch of
-     road including both warning runs, so whoever is tried first wins the
-     ground, and blockers are short and frequent enough to leave a
-     splitter nowhere to go if they go first. */
-  const kinds = [
-    { k: HAZ_SPLITTER, time: FEEL.SPLITTER_TIME, every: FEEL.SPLITTER_EVERY },
-    { k: HAZ_MOVER,    time: FEEL.MOVER_TIME,    every: FEEL.MOVER_EVERY },
-    { k: HAZ_BLOCKER,  time: FEEL.BLOCKER_TIME,  every: FEEL.BLOCKER_EVERY }
+/* Which kind is due, rarest and longest first so that whoever gets the
+   ground is the one that needs most of it. Zero if none is. */
+function dueHazardKind() {
+  const at = segBase + segments.length;
+  const order = [
+    { k: HAZ_SPLITTER, time: FEEL.SPLITTER_TIME },
+    { k: HAZ_MOVER,    time: FEEL.MOVER_TIME },
+    { k: HAZ_BLOCKER,  time: FEEL.BLOCKER_TIME }
   ];
-  for (let n = 0; n < kinds.length; n++) {
-    const spec = kinds[n];
-    if (runTime < spec.time) { hazardDue[spec.k] = to + spec.every; continue; }
-    if (hazardDue[spec.k] < from) hazardDue[spec.k] = from;
-    while (hazardDue[spec.k] <= to) {
-      const at = hazardDue[spec.k];
-      // Jittered, so the spacing never reads as a metronome.
-      hazardDue[spec.k] = at + Math.round(spec.every * (0.65 + rng() * 0.7));
-      if (spec.k === HAZ_BLOCKER) {
-        const side = rng() < 0.5 ? -1 : 1;
-        const off = FEEL.BLOCKER_OFFSET_MIN
-                  + rng() * (FEEL.BLOCKER_OFFSET_MAX - FEEL.BLOCKER_OFFSET_MIN);
-        addHazard(HAZ_BLOCKER, at, at + FEEL.BLOCKER_SEGMENTS - 1,
-                  side * off, FEEL.BLOCKER_HALF, 0);
-      } else if (spec.k === HAZ_SPLITTER) {
-        addHazard(HAZ_SPLITTER, at, at + FEEL.SPLITTER_SEGMENTS - 1,
-                  0, FEEL.SPLITTER_HALF, 0);
-      } else {
-        addHazard(HAZ_MOVER, at, at + FEEL.MOVER_SEGMENTS - 1,
-                  0, FEEL.MOVER_HALF, FEEL.MOVER_SWING);
-      }
-    }
+  for (let i = 0; i < order.length; i++) {
+    if (runTime < order[i].time) continue;
+    if (hazardDue[order[i].k] <= at) return order[i].k;
   }
+  return 0;
+}
+
+function hazardLength(kind) {
+  if (kind === HAZ_SPLITTER) return FEEL.SPLITTER_SEGMENTS;
+  if (kind === HAZ_MOVER) return FEEL.MOVER_SEGMENTS;
+  return FEEL.BLOCKER_SEGMENTS;
+}
+
+/* Build the road a hazard needs and then put it on it. This IS a phrase,
+   in the same sense as everything in the library: an approach the player
+   can read the warning on, the hazard, and a run out to gather up.
+
+   Nothing here weakens the guarantee. The candidate still goes through
+   hazardFits, which still checks the real curvature of the real segments,
+   the real width, the crossing and the overlap. Building the road first
+   only means the check now almost always passes instead of almost always
+   failing. */
+function buildHazardPhrase(kind) {
+  const warn = FEEL.HAZARD_WARN_SEGMENTS;
+  const len = hazardLength(kind);
+  const every = kind === HAZ_SPLITTER ? FEEL.SPLITTER_EVERY
+              : kind === HAZ_MOVER ? FEEL.MOVER_EVERY : FEEL.BLOCKER_EVERY;
+  // Jittered, so the spacing never reads as a metronome.
+  hazardDue[kind] = segBase + segments.length
+                  + Math.round(every * (0.65 + rng() * 0.7));
+
+  let runIn = warn + 2;
+  // Clear of the previous hazard's exclusion zone, so the overlap rule
+  // never has to refuse a phrase that has already been laid down.
+  if (hazards.length) {
+    const last = hazards[hazards.length - 1];
+    const earliest = last.to + warn + 2;
+    const start = segBase + segments.length;
+    if (start + runIn < earliest) runIn = earliest - start;
+  }
+
+  const c = rng() < FEEL.HAZARD_STRAIGHT_CHANCE ? 0
+          : pickDir() * FEEL.CURVE_GENTLE * FEEL.HAZARD_APPROACH_CURVE;
+  addRun(runIn, c, c, roadWidth, 1, true);
+  const at = segBase + segments.length;
+  addRun(len + FEEL.HAZARD_RUNOUT, c, 0, 1, 1, true);
+
+  if (kind === HAZ_BLOCKER) {
+    const side = rng() < 0.5 ? -1 : 1;
+    const off = FEEL.BLOCKER_OFFSET_MIN
+              + rng() * (FEEL.BLOCKER_OFFSET_MAX - FEEL.BLOCKER_OFFSET_MIN);
+    return addHazard(HAZ_BLOCKER, at, at + len - 1, side * off, FEEL.BLOCKER_HALF, 0);
+  }
+  if (kind === HAZ_SPLITTER) {
+    return addHazard(HAZ_SPLITTER, at, at + len - 1, 0, FEEL.SPLITTER_HALF, 0);
+  }
+  return addHazard(HAZ_MOVER, at, at + len - 1, 0, FEEL.MOVER_HALF, FEEL.MOVER_SWING);
 }
 
 function topUpRoad(baseIndex) {
   const needed = baseIndex + FEEL.DRAW_DISTANCE_SEGMENTS + 4;
-  while (segBase + segments.length < needed) {
-    const before = segBase + segments.length;
-    addPhrase();
-    /* Placed after the phrase exists, because the checks read the curve
-       and the width of the segments they are going onto, and they need
-       the warning run behind the candidate to exist too. */
-    placeHazards(before, segBase + segments.length - 1);
-  }
+  while (segBase + segments.length < needed) addPhrase();
   // Trim what is behind the camera, in one splice rather than one shift
   // per frame, so the array does not grow for the length of a run.
   const behind = baseIndex - segBase;
@@ -4180,6 +4288,8 @@ function drawHud(w, h) {
     tunerLine(7),
     tunerLine(8),
     tunerLine(9),
+    tunerLine(10),
+    tunerLine(11),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
