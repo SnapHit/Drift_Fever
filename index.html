@@ -168,6 +168,33 @@ const FEEL = {
   ROAD_HALF_WIDTH_BASE:    2000,
   ROAD_WIDTH_NARROW:       0.74,     // tightest a phrase may squeeze to
   ROAD_WIDTH_WIDE:         1.12,     // widest a phrase may open to
+
+  /* The road is a slab in space, not a ribbon painted on ground. LIVE,
+     because how thick it reads is the difference between a solid object
+     and a decal, and that can only be judged by driving.
+
+     The grid below it is what stops the void being nothing to fall into.
+     GRID_DEPTH is how far under the road it sits, GRID_SPACING how far
+     apart its lines are along the road, and GRID_LINES how many of each
+     kind get drawn before it is too far away to matter. */
+  ROAD_THICKNESS:           300,     // LIVE
+  /* The slab is battered: wider at the bottom than at the top. A truly
+     vertical side is invisible here, and not by a small margin. A slab
+     seen from a camera directly above and behind it occludes its own
+     sides completely, and each segment's wall is hidden by the next
+     nearer segment's surface. The flare has to beat that: it only shows
+     from a distance where it exceeds 1.65 times the width one segment
+     gains by being closer, which works out at about 660000 over the
+     distance. Below roughly 350 the cliff simply is not there.
+     LIVE, because it and the thickness are one shape. */
+  ROAD_FLARE:               380,     // LIVE
+  EDGE_LIP_FRACTION:       0.13,     // of the half width, the bright lip itself
+  GRID_DEPTH:              4200,
+  GRID_SPACING:            2400,
+  GRID_ROWS:                 26,
+  GRID_COLUMNS:              15,
+  GRID_COLUMN_SPACING:     4200,
+  HORIZON_GLOW_FRACTION:   0.09,     // of screen height
   RUMBLE_SEGMENTS:            4,     // stripe length, in segments
   RUMBLE_WIDTH_FRACTION:   0.65,     // of the road half width. This is the shoulder,
                                      // and it is drawn to match the scrape band below.
@@ -232,6 +259,13 @@ const FEEL = {
      sickness on a phone held close to the face. Keep these low. */
   SCRAPE_SHAKE_PX:            4,
   CRASH_SHAKE_PX:            16,
+  /* Leaving the road is a fall now rather than a freeze. The car keeps
+     the sideways speed that put it there, slides off the lip, and only
+     then starts dropping, so it goes over the edge instead of sinking
+     through the surface. The camera coasts rather than stopping dead. */
+  CRASH_GRAVITY:          26000,     // world units per second squared
+  CRASH_TUMBLE:             2.4,     // radians per second, nose over
+  CRASH_COAST_TIME:        0.55,     // seconds for the camera to run down
   SHAKE_DECAY_TIME:        0.22,     // seconds to fall to about a third
   SCRAPE_FLASH_ALPHA:      0.32,
   DEATH_INPUT_LOCK:        0.30,     // seconds before a restart is accepted
@@ -304,7 +338,10 @@ const FEEL = {
      pair sweeps apart as the car comes sideways. */
   TYRE_MARK_WIDTH:        0.028,     // road half widths
   TYRE_MARK_MIN_SLIP:       0.2,     // slip, normalised, below which no mark is laid
-  TYRE_MARK_MAX_ALPHA:     0.45,
+  /* Higher than it was, because the road underneath is far darker now.
+     At the old value the marks came out a muted purple instead of the
+     glow the palette needs them to be. Still nowhere near the edge. */
+  TYRE_MARK_MAX_ALPHA:     0.70,
 
   /* Tyre smoke. Screen space, because the car is at a fixed screen
      position, and capped so a long slide cannot grow the buffer. */
@@ -335,8 +372,16 @@ const FEEL = {
   HOLD_MED:                  52,
   HOLD_LONG:                125,
   LINK_SHORT:                14,     // the breath between linked corners
-  RECOVERY_MIN:              45,     // a short straight is recovery, not filler
-  RECOVERY_MAX:              95,
+  /* Straights are connectors, not scenery. Long enough to read the next
+     corner and reset the line, short enough that they are never the thing
+     you are doing. They are not deleted, because without them the hard
+     sequences have nothing to be hard against, and section 4.3 needs
+     somewhere to look ahead from. */
+  RECOVERY_MIN:              20,
+  RECOVERY_MAX:              44,
+  STRAIGHT_WEIGHT:            1,     // against PHRASE_WEIGHT for everything else
+  PHRASE_WEIGHT:              3,
+  DIRECTION_FLIP_CHANCE:   0.68,     // how often a phrase turns the other way
   PHRASE_JITTER:           0.28,     // fractional variation on every length
   CURVE_GENTLE:             1.6,
   CURVE_MEDIUM:             3.2,
@@ -348,39 +393,65 @@ const FEEL = {
 
 
 /* ------------------------------------------------------------------
-   PALETTE. Placeholder, not art direction, which is step 7.
-   Bright and saturated per section 7, dark road, bright verges, and
-   deliberately not synthwave.
+   PALETTE. Neon on dark.
+
+   Section 7 refuses this look and the reasoning there is about
+   distinctiveness and about readability. The distinctiveness argument has
+   been overruled deliberately by the author. The readability argument has
+   not, and it is binding, so this block is ordered by luminance and the
+   order is the specification:
+
+     1. the road edge, brightest thing on screen, nothing may beat it
+     2. the car, bright and warm so it never reads as part of the road
+     3. tyre marks, glowing, a third hue so they are never an edge
+     4. the road surface, dark but plainly lighter than the void
+     5. the centre line, dimmer than the edge and never competing
+     6. the walls of the slab, darker than its top, so the edge catches
+        light and the wall does not
+     7. the grid and the void
+
+   The Beakdown failure this is closest to is a dark surface lost against
+   a dark background, so item 4 above is the one to check first if any of
+   this is changed.
    ------------------------------------------------------------------ */
 const COLOUR = {
-  SKY:          '#68c8f0',
-  HAZE:         '#cdeeff',
-  GRASS_LIGHT:  '#4fbc52',
-  GRASS_DARK:   '#43a747',
-  ROAD_LIGHT:   '#4b5058',
-  ROAD_DARK:    '#43484f',
-  RUMBLE_LIGHT: '#fff4d6',
-  RUMBLE_DARK:  '#ff8a3d',
-  LANE:         '#f2f6ff',
+  VOID:         '#04060e',
+  GRID:         'rgba(64,148,196,0.20)',
+  GRID_NEAR:    'rgba(88,196,240,0.30)',
+  HORIZON_GLOW: '#2e7fa8',
+
+  ROAD_LIGHT:   '#1b2440',     // the surface, plainly above the void
+  ROAD_DARK:    '#161d35',
+  /* The side of the slab. It has to sit below the road surface in value,
+     which is what was asked for, and still be separable from the void,
+     which is nearly black. There is not much room between those, so most
+     of the silhouette comes from this occluding the grid behind it. */
+  WALL:         '#111a35',
+  SHOULDER_LIGHT:'#2a6a8c',    // the scrape band, a zone rather than an edge
+  SHOULDER_DARK:'#215671',
+  EDGE_LIGHT:   '#dcfeff',     // the brightest thing on screen, and it must stay that way
+  EDGE_DARK:    '#8af2ff',
+  LANE:         '#31507e',     // dim on purpose, it must never read as an edge
+
   SCRAPE:       '#fff0a8',
   SCRAPE_OUT:   '#ff5a3d',     // the flash shifts to this as the scrape timer runs out
-  TYRE_MARK:    '24,26,30',    // rgb only, the alpha is the slip angle
-  SMOKE:        '242,246,250',
+  TYRE_MARK:    '255,94,206',  // rgb only, the alpha is the slip angle
+  SMOKE:        '176,226,255',
   /* Flat per face, no gradients, no blurs. Section 7.5: cut and folded
      from paper. The shading is three fixed tones of one colour, which is
      what tells the eye it is a solid and not a sticker. */
-  CAR_TOP:      '#ffd94f',
-  CAR_END:      '#eaad24',
-  CAR_SIDE:     '#c1861a',
-  CAR_CABIN_TOP:'#fff0a0',
-  CAR_EDGE:     'rgba(60,38,4,0.55)',
-  CAR_GLASS:    '#2b3138',
-  CAR_LIGHT:    '#ff4d3d',
-  CAR_TYRE:     '#191d23',
-  CAR_TYRE_TOP: '#2c323c',
-  CAR_SHADOW:   'rgba(16,30,20,0.38)',
-  TEXT:         '#ffffff',
-  TEXT_SHADOW:  'rgba(10,30,45,0.55)'
+  CAR_TOP:      '#ffc93a',
+  CAR_END:      '#e89a1c',
+  CAR_SIDE:     '#b06f12',
+  CAR_CABIN_TOP:'#ffe07a',
+  CAR_EDGE:     'rgba(24,12,0,0.65)',
+  CAR_GLASS:    '#123044',
+  CAR_LIGHT:    '#ff4d5e',
+  CAR_TYRE:     '#0d1220',
+  CAR_TYRE_TOP: '#1b2437',
+  CAR_SHADOW:   'rgba(0,0,0,0.45)',
+  TEXT:         '#dffbff',
+  TEXT_SHADOW:  'rgba(0,8,20,0.75)'
 };
 
 const STORAGE_PREFIX = 'tailflick.';
@@ -406,7 +477,9 @@ const TUNABLES = [
   // and half degree steps were too coarse to find its bottom end.
   { key: 'TILT_DEADZONE_DEG',  label: 'dead',    step: 0.25, min: 0,    max: 12,    dp: 2, group: 1 },
   { key: 'STEER_RATE',         label: 'steer',   step: 0.1,  min: 0.6,  max: 5.0,   dp: 1, group: 2 },
-  { key: 'GRIP_TIME',          label: 'grip',    step: 0.02, min: 0.04, max: 1.0,   dp: 2, group: 2 }
+  { key: 'GRIP_TIME',          label: 'grip',    step: 0.02, min: 0.04, max: 1.0,   dp: 2, group: 2 },
+  { key: 'ROAD_THICKNESS',     label: 'thick',   step: 20,   min: 0,    max: 1200,  dp: 0, group: 3 },
+  { key: 'ROAD_FLARE',         label: 'flare',   step: 20,   min: 0,    max: 1400,  dp: 0, group: 3 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -439,6 +512,7 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d', { alpha: false });
 const view = { w: 0, h: 0, dpr: 1 };
 let hazeGradient = null;
+let horizonGradient = null;
 let scrapeGradientLeft = null;
 let scrapeGradientRight = null;
 let scrapeOutGradientLeft = null;
@@ -461,10 +535,22 @@ function resize() {
 
   horizonY = Math.round(h * FEEL.HORIZON_FRACTION);
 
+  // The distant road fades into the horizon glow rather than staying sharp
+  // all the way to the vanishing point.
   const fade = h * FEEL.HORIZON_FADE_FRACTION;
   hazeGradient = ctx.createLinearGradient(0, horizonY, 0, horizonY + fade);
-  hazeGradient.addColorStop(0, COLOUR.HAZE);
-  hazeGradient.addColorStop(1, 'rgba(205,238,255,0)');
+  hazeGradient.addColorStop(0, 'rgba(20,44,66,0.92)');
+  hazeGradient.addColorStop(1, 'rgba(20,44,66,0)');
+
+  /* Section 7.3 wants a horizon to read curvature against, and taking the
+     ground away would have removed it. This band puts it back: a glow on
+     the line the road converges to, brighter than the void and nowhere
+     near as bright as the road edges. */
+  const glow = h * FEEL.HORIZON_GLOW_FRACTION;
+  horizonGradient = ctx.createLinearGradient(0, horizonY - glow, 0, horizonY + glow);
+  horizonGradient.addColorStop(0, 'rgba(46,127,168,0)');
+  horizonGradient.addColorStop(0.5, COLOUR.HORIZON_GLOW);
+  horizonGradient.addColorStop(1, 'rgba(46,127,168,0)');
 
   // Cached, because the scrape flash is drawn on the frames where the
   // player is under the most pressure and can least afford a hitch.
@@ -838,6 +924,11 @@ function tunerLine(group) {
     out += 'slide ' + worstOvershoot().toFixed(2)
         + '/' + (FEEL.OFF_ROAD - FEEL.SCRAPE_START).toFixed(2);
   }
+  if (group === 3) {
+    // Below this the flare loses to the width one segment gains by being
+    // nearer, and the cliff stops being visible at all.
+    out += 'min ' + Math.round(660000 / FEEL.CAMERA_DISTANCE);
+  }
   return out;
 }
 
@@ -1007,7 +1098,13 @@ function rng() {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 function vary(n) { return Math.max(3, Math.round(n * (1 + (rng() * 2 - 1) * FEEL.PHRASE_JITTER))); }
-function pickDir() { return rng() < 0.5 ? 1 : -1; }
+/* Biased against repeating itself, so the road does not wander off in one
+   direction for three phrases running. */
+let lastDir = 1;
+function pickDir() {
+  lastDir = (rng() < FEEL.DIRECTION_FLIP_CHANCE) ? -lastDir : lastDir;
+  return lastDir;
+}
 
 
 /* ==================================================================
@@ -1138,6 +1235,77 @@ const PHRASES = [
     }
   },
   {
+    // A dogleg. Out and straight back, over in a moment, and the shape
+    // that most rewards a flick rather than a steer.
+    name: 'jink', intensity: 1,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_MEDIUM * d;
+      addRun(vary(FEEL.RAMP_SHORT), 0, c, roadWidth, 1, true);
+      addRun(6, c, c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_SHORT), c, -c, 1, 1, true);
+      addRun(6, -c, -c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_SHORT), -c, 0, 1, 1, true);
+    }
+  },
+  {
+    // A run of alternating bends with nothing between them. Whichever way
+    // the car is already going decides how the next one goes, all the way
+    // down, so it is one problem rather than four.
+    name: 'esses', intensity: 2,
+    build: function () {
+      let d = pickDir();
+      const c = FEEL.CURVE_MEDIUM;
+      const n = 4 + Math.floor(rng() * 2);
+      addRun(vary(FEEL.RAMP_SHORT), 0, c * d, roadWidth, 1, true);
+      for (let i = 0; i < n; i++) {
+        addRun(vary(FEEL.HOLD_SHORT), c * d, c * d, 1, 1, false);
+        if (i < n - 1) { addRun(vary(FEEL.RAMP_MED), c * d, -c * d, 1, 1, true); d = -d; }
+      }
+      addRun(vary(FEEL.RAMP_MED), c * d, 0, 1, 1, true);
+      lastDir = d;
+    }
+  },
+  {
+    // A very long gentle corner through a sustained squeeze. Nothing about
+    // it is sharp and it goes on long enough to become a test of holding
+    // a line rather than of reacting.
+    name: 'carousel', intensity: 2,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_GENTLE * 1.4 * d, n = NARROW();
+      addRun(vary(FEEL.RAMP_LONG), 0, c, roadWidth, n, true);
+      addRun(vary(FEEL.HOLD_LONG), c, c, n, n, false);
+      addRun(vary(FEEL.RAMP_LONG), c, 0, n, 1, true);
+    }
+  },
+  {
+    // One corner with two apexes. It opens in the middle, which invites
+    // the lock to come off, and then loads up again.
+    name: 'double-apex', intensity: 3,
+    build: function () {
+      const d = pickDir();
+      addRun(vary(FEEL.RAMP_MED), 0, FEEL.CURVE_MEDIUM * d, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_SHORT), FEEL.CURVE_MEDIUM * d, FEEL.CURVE_HARD * d, 1, 1, false);
+      addRun(vary(FEEL.HOLD_SHORT), FEEL.CURVE_HARD * d, FEEL.CURVE_GENTLE * d, 1, 1, false);
+      addRun(vary(FEEL.HOLD_SHORT), FEEL.CURVE_GENTLE * d, FEEL.CURVE_HARD * d, 1, 1, false);
+      addRun(vary(FEEL.RAMP_MED), FEEL.CURVE_HARD * d, 0, 1, 1, true);
+    }
+  },
+  {
+    // Hard one way straight into hard the other, with no eased transition
+    // and nothing in between. The reversal is linear on purpose: it snaps
+    // rather than flows, and it is the hardest thing on the road.
+    name: 'switchback', intensity: 3,
+    build: function () {
+      const d = pickDir(), c = FEEL.CURVE_HARD * d;
+      addRun(vary(FEEL.RAMP_MED), 0, c, roadWidth, 1, true);
+      addRun(vary(FEEL.HOLD_SHORT), c, c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_SHORT), c, -c, 1, 1, false);
+      addRun(vary(FEEL.HOLD_SHORT), -c, -c, 1, 1, false);
+      addRun(vary(FEEL.RAMP_MED), -c, 0, 1, 1, true);
+      lastDir = -d;
+    }
+  },
+  {
     // Two tight corners the same way, sharing a very short breath. The
     // second one is where the first one's exit line is paid for.
     name: 'hairpins', intensity: 3,
@@ -1158,15 +1326,34 @@ const PHRASES = [
    pressure arrives in waves rather than as a flat wall. */
 let restOwed = 0;
 
+function phraseWeight(p) {
+  return p.name === 'straight' ? FEEL.STRAIGHT_WEIGHT : FEEL.PHRASE_WEIGHT;
+}
+
 function addPhrase() {
-  let pool = PHRASES;
-  if (restOwed > 0) {
-    pool = PHRASES.filter(function (p) { return p.intensity <= 1; });
-    restOwed--;
+  const resting = restOwed > 0;
+  if (resting) restOwed--;
+
+  // Weighted, so that resting means an easier corner far more often than
+  // it means a straight.
+  let total = 0;
+  for (let i = 0; i < PHRASES.length; i++) {
+    if (resting && PHRASES[i].intensity > 1) continue;
+    total += phraseWeight(PHRASES[i]);
   }
-  const p = pool[Math.floor(rng() * pool.length)];
+  let roll = rng() * total;
+  let p = PHRASES[0];
+  for (let i = 0; i < PHRASES.length; i++) {
+    if (resting && PHRASES[i].intensity > 1) continue;
+    roll -= phraseWeight(PHRASES[i]);
+    if (roll <= 0) { p = PHRASES[i]; break; }
+  }
+
   p.build();
-  if (restOwed === 0) restOwed = p.intensity >= 3 ? 2 : (p.intensity >= 2 ? 1 : 0);
+  // One breath after anything demanding, not two. The breath is usually a
+  // corner rather than a straight, so this reads as chaining rather than
+  // as a gap, and the hard phrases sit closer together than they did.
+  if (restOwed === 0 && p.intensity >= 2) restOwed = 1;
 }
 
 function resetRoad(seed) {
@@ -1175,6 +1362,7 @@ function resetRoad(seed) {
   rngState = seed >>> 0;
   roadWidth = 1;
   restOwed = 0;
+  lastDir = 1;
   // No tutorial. The opening is the tutorial: a calm straight at full
   // width, then one gentle curve that teaches hold to turn without a word.
   addRun(FEEL.OPENING_STRAIGHT, 0, 0, 1, 1, false);
@@ -1224,6 +1412,10 @@ let shake = 0;
 let shakeX = 0, shakeY = 0;
 let deadFor = 0;
 let lastMarkSeg = -1;
+let carY = 0;            // height above the road, only ever negative, while falling
+let carFallV = 0;
+let carPitch = 0;
+let coastSpeed = 0;
 
 /* The drift state, in one place, because the slip angle is what 4.4
    scores and it should be read from here rather than recomputed. Nothing
@@ -1266,6 +1458,10 @@ function startRun() {
   drift.slipNorm = 0;
   drift.lateralAccel = 0;
   carCurveX = 0;
+  carY = 0;
+  carFallV = 0;
+  carPitch = 0;
+  coastSpeed = 0;
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
   smokeCount = 0;
   smokeAcc = 0;
@@ -1285,7 +1481,7 @@ function update(dt) {
   shakeX = (Math.random() * 2 - 1) * shake;
   shakeY = (Math.random() * 2 - 1) * shake;
 
-  if (state === DEAD) { deadFor += dt; return; }
+  if (state === DEAD) { updateFall(dt); return; }
   if (state !== DRIVING) return;
 
   topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
@@ -1354,6 +1550,32 @@ function crash() {
   deadFor = 0;
   scraping = false;
   shake = FEEL.CRASH_SHAKE_PX;
+  carFallV = 0;
+  carY = 0;
+  carPitch = 0;
+  coastSpeed = FEEL.SPEED;
+}
+
+/* The fall. Cheap, because the car is already a box in the world: it just
+   needs a height and a rotation about its own lateral axis. */
+function updateFall(dt) {
+  deadFor += dt;
+
+  coastSpeed *= Math.exp(-dt / FEEL.CRASH_COAST_TIME);
+  position += coastSpeed * dt;
+  carX += drift.lateralV * dt;
+
+  const seg = segAt(Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH));
+  const localHalf = seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE;
+  carFrac = carX / localHalf;
+
+  // Nothing drops until it is actually past the lip, or the car would sink
+  // through a road it is still standing on.
+  if (Math.abs(carFrac) > EDGE_OUT) {
+    carFallV += FEEL.CRASH_GRAVITY * dt;
+    carY -= carFallV * dt;
+    carPitch -= FEEL.CRASH_TUMBLE * dt;
+  }
 }
 
 
@@ -1459,6 +1681,43 @@ function updateSmoke(dt) {
   if (smokeAcc > 1) smokeAcc = 1;
 }
 
+/* Something under the cliff. A plane of lines well below the road, so the
+   void has a floor and a sense of speed of its own. The rows scroll with
+   the camera, the columns slide with the car, and the whole thing is two
+   stroked paths. Kept dim: nothing down here may compete with the edges. */
+function drawGrid(w, h) {
+  const rise = FEEL.CAMERA_HEIGHT + FEEL.GRID_DEPTH;
+  const spacing = FEEL.GRID_SPACING;
+  const offset = position - Math.floor(position / spacing) * spacing;
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = COLOUR.GRID;
+  ctx.beginPath();
+
+  let nearY = 0, farY = 0, nearScale = 0, farScale = 0;
+  for (let i = 1; i <= FEEL.GRID_ROWS; i++) {
+    const dz = i * spacing - offset;
+    if (dz <= CAMERA_DEPTH) continue;
+    const scale = CAMERA_DEPTH / dz;
+    const y = horizonY + scale * rise * h / 2;
+    if (y > h + 40) continue;
+    if (!nearScale) { nearScale = scale; nearY = y; }
+    farScale = scale; farY = y;
+    ctx.moveTo(-40, y);
+    ctx.lineTo(w + 40, y);
+  }
+
+  if (nearScale) {
+    const half = (FEEL.GRID_COLUMNS - 1) / 2;
+    for (let i = -half; i <= half; i++) {
+      const wx = i * FEEL.GRID_COLUMN_SPACING - carX;
+      ctx.moveTo(w / 2 + nearScale * wx * w / 2, nearY);
+      ctx.lineTo(w / 2 + farScale * wx * w / 2, farY);
+    }
+  }
+  ctx.stroke();
+}
+
 function drawSmoke() {
   if (smokeCount === 0) return;
   ctx.fillStyle = SMOKE_FILL;
@@ -1530,6 +1789,21 @@ let p2 = { x: 0, y: 0, w: 0, z: 0 };
    and used to place the car. */
 let carCurveX = 0;
 
+/* The road is walked once into these, then drawn from them twice: the
+   walls of the slab, and its top surface. Boundary k is where segment k
+   starts, so segment n runs between boundary n and boundary n + 1. */
+const MAX_BOUNDS = 520;
+const bx = new Float64Array(MAX_BOUNDS);
+const by = new Float64Array(MAX_BOUNDS);
+const bw = new Float64Array(MAX_BOUNDS);
+const bz = new Float64Array(MAX_BOUNDS);
+const bt = new Float64Array(MAX_BOUNDS);
+const bf = new Float64Array(MAX_BOUNDS);
+// The outer lip of the slab, half width plus the shoulder, as a multiple
+// of the half width. The shoulder is the scrape band, so the drawn edge of
+// the road really is the last place the car may be.
+const EDGE_OUT = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
+
 function drawRoad(w, h) {
   const seg = FEEL.SEGMENT_LENGTH;
   const baseIndex = Math.floor(position / seg);
@@ -1540,55 +1814,113 @@ function drawRoad(w, h) {
 
   let x = 0;
   let dx = -(base.curve * percent);
-  let maxy = h;
 
   const carZ = position + FEEL.CAMERA_DISTANCE;
   const carIdx = Math.floor(carZ / seg);
   const carSegFrac = (carZ - carIdx * seg) / seg;
 
-  project(p1, x, camX, baseIndex * seg - position, w, h, base.hw);
+  /* One walk, recording every boundary between segments, because the road
+     is now drawn in two passes over the same geometry and walking it twice
+     would mean accumulating the curve twice. */
+  const want = Math.min(FEEL.DRAW_DISTANCE_SEGMENTS, MAX_BOUNDS - 1);
+  let count = 0;
+  let lastHw = base.hw;
+  for (let k = 0; k <= want; k++) {
+    const s = segAt(baseIndex + k);
+    if (s) lastHw = s.hw;
+    const dz = (baseIndex + k) * seg - position;
+    const scale = CAMERA_DEPTH / dz;
+    bx[k] = w / 2 + scale * (x - camX) * w / 2;
+    by[k] = horizonY + scale * FEEL.CAMERA_HEIGHT * h / 2;
+    bw[k] = scale * lastHw * w / 2;
+    bz[k] = dz;
+    // Thickness is a height, so it uses the horizontal scale, the same way
+    // the car's height does and for the same reason.
+    bt[k] = scale * FEEL.ROAD_THICKNESS * w / 2;
+    bf[k] = scale * FEEL.ROAD_FLARE * w / 2;
+    count = k;
+    if (baseIndex + k === carIdx) carCurveX = x + dx * carSegFrac;
+    if (!s) break;
+    x += dx;
+    dx += s.curve;
+  }
 
-  for (let n = 0; n < FEEL.DRAW_DISTANCE_SEGMENTS; n++) {
+  drawWalls(count);
+
+  let maxy = h;
+  for (let n = 0; n < count; n++) {
     const s = segAt(baseIndex + n);
     if (!s) break;
-    const next = segAt(baseIndex + n + 1);
-    const z1 = (baseIndex + n) * seg - position;
-    const x2 = x + dx;
-    project(p2, x2, camX, z1 + seg, w, h, next ? next.hw : s.hw);
-
-    if (baseIndex + n === carIdx) carCurveX = x + dx * carSegFrac;
-
-    if (p1.z > CAMERA_DEPTH && p2.y < p1.y && p2.y < maxy) {
-      drawSegment(s, w);
-      maxy = p2.y;
-    }
-
-    x = x2;
-    dx += s.curve;
-    const swap = p1; p1 = p2; p2 = swap;   // the next p1 is exactly this p2
+    if (bz[n] <= CAMERA_DEPTH || by[n + 1] >= by[n] || by[n + 1] >= maxy) continue;
+    p1.x = bx[n]; p1.y = by[n]; p1.w = bw[n]; p1.z = bz[n];
+    p2.x = bx[n + 1]; p2.y = by[n + 1]; p2.w = bw[n + 1]; p2.z = bz[n + 1];
+    drawSegment(s, w);
+    maxy = by[n + 1];
   }
+}
+
+/* The sides of the slab, every visible one batched into a single path so
+   the whole cliff costs one fill rather than one per segment.
+
+   These are drawn on both sides regardless of which way the road turns.
+   Strictly the outside wall of a corner faces away from the camera and
+   should not be there, and on a dead straight road neither wall is
+   visible at all, because a vertical plane seen from directly behind and
+   above is exactly edge on. Drawing only the true ones would mean the
+   road has no thickness on any straight, which is the flat decal the
+   whole change is meant to avoid. So this is a stylisation and the one
+   place here where the look wins over the geometry. */
+function drawWalls(count) {
+  ctx.beginPath();
+  for (let n = 0; n < count; n++) {
+    if (bz[n] <= CAMERA_DEPTH) continue;
+    if (by[n + 1] >= by[n]) continue;
+    const o1 = bw[n] * EDGE_OUT, o2 = bw[n + 1] * EDGE_OUT;
+    const l1 = bx[n] - o1, l2 = bx[n + 1] - o2;
+    const r1 = bx[n] + o1, r2 = bx[n + 1] + o2;
+    const y1 = by[n], y2 = by[n + 1];
+    const d1 = y1 + bt[n], d2 = y2 + bt[n + 1];
+    const f1 = bf[n], f2 = bf[n + 1];
+    ctx.moveTo(l1, y1); ctx.lineTo(l2, y2);
+    ctx.lineTo(l2 - f2, d2); ctx.lineTo(l1 - f1, d1);
+    ctx.closePath();
+    ctx.moveTo(r1, y1); ctx.lineTo(r2, y2);
+    ctx.lineTo(r2 + f2, d2); ctx.lineTo(r1 + f1, d1);
+    ctx.closePath();
+  }
+  ctx.fillStyle = COLOUR.WALL;
+  ctx.fill();
 }
 
 function drawSegment(s, w) {
   const index = s.index;
   const light = (Math.floor(index / FEEL.RUMBLE_SEGMENTS) & 1) === 0;
-  const grass = light ? COLOUR.GRASS_LIGHT : COLOUR.GRASS_DARK;
   const road = light ? COLOUR.ROAD_LIGHT : COLOUR.ROAD_DARK;
-  let rumble = light ? COLOUR.RUMBLE_LIGHT : COLOUR.RUMBLE_DARK;
 
-  const y1 = p1.y, y2 = p2.y;
-  const r1 = p1.w * FEEL.RUMBLE_WIDTH_FRACTION;
-  const r2 = p2.w * FEEL.RUMBLE_WIDTH_FRACTION;
-
+  const y1 = p1.y;
   // The overlap pixel goes upwards, into the segment that has not been
-  // drawn yet. Downwards would paint grass over the nearer segment's road
-  // and stripe the whole surface green.
-  ctx.fillStyle = grass;
-  ctx.fillRect(-40, y2 - 1, w + 80, y1 - y2 + 1);
+  // drawn yet. Downwards would paint over the nearer segment. Without it
+  // the void shows through as hairlines between every pair of segments.
+  const y2 = p2.y - 1;
 
-  ctx.fillStyle = rumble;
-  polygon(p1.x - p1.w - r1, y1, p1.x - p1.w, y1, p2.x - p2.w, y2, p2.x - p2.w - r2, y2);
-  polygon(p1.x + p1.w + r1, y1, p1.x + p1.w, y1, p2.x + p2.w, y2, p2.x + p2.w + r2, y2);
+  /* The shoulder is the scrape band, so it has to be legible as a zone,
+     and the outer lip has to be the brightest thing on screen. Those two
+     fight if the whole band is at maximum brightness: a near white strip
+     that wide stops being an edge and becomes most of the picture. So the
+     band is a mid tone that says danger and the lip is a thin bright line
+     that says edge. */
+  const lip = FEEL.EDGE_LIP_FRACTION;
+  const band = FEEL.RUMBLE_WIDTH_FRACTION - lip;
+  const b1 = p1.w * band, b2 = p2.w * band;
+  const e1 = p1.w * FEEL.RUMBLE_WIDTH_FRACTION, e2 = p2.w * FEEL.RUMBLE_WIDTH_FRACTION;
+
+  ctx.fillStyle = light ? COLOUR.SHOULDER_LIGHT : COLOUR.SHOULDER_DARK;
+  polygon(p1.x - p1.w - b1, y1, p1.x - p1.w, y1, p2.x - p2.w, y2, p2.x - p2.w - b2, y2);
+  polygon(p1.x + p1.w + b1, y1, p1.x + p1.w, y1, p2.x + p2.w, y2, p2.x + p2.w + b2, y2);
+
+  ctx.fillStyle = light ? COLOUR.EDGE_LIGHT : COLOUR.EDGE_DARK;
+  polygon(p1.x - p1.w - e1, y1, p1.x - p1.w - b1, y1, p2.x - p2.w - b2, y2, p2.x - p2.w - e2, y2);
+  polygon(p1.x + p1.w + e1, y1, p1.x + p1.w + b1, y1, p2.x + p2.w + b2, y2, p2.x + p2.w + e2, y2);
 
   ctx.fillStyle = road;
   polygon(p1.x - p1.w, y1, p1.x + p1.w, y1, p2.x + p2.w, y2, p2.x - p2.w, y2);
@@ -1642,7 +1974,7 @@ function markFill(a) {
    ================================================================== */
 
 // Car local space: x right, y up from the road surface, z forward.
-const carT = { worldX: 0, worldZ: 0, cosY: 1, sinY: 0, cosR: 1, sinR: 0 };
+const carT = { worldX: 0, worldY: 0, worldZ: 0, cosY: 1, sinY: 0, cosR: 1, sinR: 0, cosP: 1, sinP: 0 };
 
 const boxPts = [];
 for (let i = 0; i < 8; i++) boxPts.push({ wx: 0, wy: 0, wz: 0, sx: 0, sy: 0 });
@@ -1666,9 +1998,13 @@ function carToWorld(out, lx, ly, lz, rolled) {
     rx = lx * carT.cosR - py * carT.sinR;
     ry = py * carT.cosR + lx * carT.sinR + FEEL.CAR_ROLL_PIVOT;
   }
-  out.wx = carT.worldX + rx * carT.cosY + lz * carT.sinY;
-  out.wy = ry;
-  out.wz = carT.worldZ + lz * carT.cosY - rx * carT.sinY;
+  // Pitch about the car's own lateral axis. Flat while driving, and the
+  // tumble once it has gone over the edge.
+  const pz = lz * carT.cosP - ry * carT.sinP;
+  const py2 = ry * carT.cosP + lz * carT.sinP;
+  out.wx = carT.worldX + rx * carT.cosY + pz * carT.sinY;
+  out.wy = carT.worldY + py2;
+  out.wz = carT.worldZ + pz * carT.cosY - rx * carT.sinY;
   return out;
 }
 
@@ -1679,9 +2015,11 @@ function carDirToWorld(lx, ly, lz, rolled) {
     rx = lx * carT.cosR - ly * carT.sinR;
     ry = ly * carT.cosR + lx * carT.sinR;
   }
-  dirOut.wx = rx * carT.cosY + lz * carT.sinY;
-  dirOut.wy = ry;
-  dirOut.wz = lz * carT.cosY - rx * carT.sinY;
+  const pz = lz * carT.cosP - ry * carT.sinP;
+  const py2 = ry * carT.cosP + lz * carT.sinP;
+  dirOut.wx = rx * carT.cosY + pz * carT.sinY;
+  dirOut.wy = py2;
+  dirOut.wz = pz * carT.cosY - rx * carT.sinY;
   return dirOut;
 }
 
@@ -1766,11 +2104,14 @@ function drawCar(w, h) {
              * FEEL.CAR_ROLL_DEG * Math.PI / 180;
 
   carT.worldX = camX + carCurveX;      // the car rides the road, curve and all
+  carT.worldY = carY;
   carT.worldZ = FEEL.CAMERA_DISTANCE;
   carT.cosY = Math.cos(yaw);
   carT.sinY = Math.sin(yaw);
   carT.cosR = Math.cos(roll);
   carT.sinR = Math.sin(roll);
+  carT.cosP = Math.cos(carPitch);
+  carT.sinP = Math.sin(carPitch);
 
   const halfW = FEEL.CAR_BODY_WIDTH / 2;
   const halfL = FEEL.CAR_BODY_LENGTH / 2;
@@ -1783,7 +2124,10 @@ function drawCar(w, h) {
   // ellipse. With a solid body a shape that did not turn read as a sticker
   // underneath a car; the lane dashes, the shoulder and the tyre marks are
   // the fixed reference, and they are far more legible than an ellipse.
-  drawBox(0, 1, 0, halfW * 0.96, 1, halfL * 0.96, 0, false, SHADOW_COLOURS, false, camX, w, h);
+  // No shadow once it has left the road, because there is nothing under it.
+  if (carY === 0) {
+    drawBox(0, 1, 0, halfW * 0.96, 1, halfL * 0.96, 0, false, SHADOW_COLOURS, false, camX, w, h);
+  }
 
   ctx.strokeStyle = COLOUR.CAR_EDGE;
   ctx.lineWidth = 1;
@@ -1879,6 +2223,7 @@ function drawHud(w, h) {
     tunerLine(0),
     tunerLine(1),
     tunerLine(2),
+    tunerLine(3),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free')
   ];
@@ -1906,15 +2251,16 @@ function render() {
   ctx.save();
   ctx.translate(shakeX, shakeY);
 
-  /* The background shakes with the road. It used to be drawn outside the
-     shake, which slid the haze band off the sky and ground split and left
-     a bright line of unhazed grass along the horizon on every scrape. It is
-     oversized either way, so shake never exposes a canvas edge. */
-  ctx.fillStyle = COLOUR.SKY;
-  ctx.fillRect(-40, -40, w + 80, horizonY + 40);
-  ctx.fillStyle = COLOUR.GRASS_DARK;
-  ctx.fillRect(-40, horizonY, w + 80, h - horizonY + 80);
+  /* Everything shakes together. There is no ground any more, so the void
+     is the whole background and the road is an object floating in it. */
+  ctx.fillStyle = COLOUR.VOID;
+  ctx.fillRect(-40, -40, w + 80, h + 80);
 
+  const glow = h * FEEL.HORIZON_GLOW_FRACTION;
+  ctx.fillStyle = horizonGradient;
+  ctx.fillRect(-40, horizonY - glow, w + 80, glow * 2);
+
+  drawGrid(w, h);
   drawRoad(w, h);
   ctx.fillStyle = hazeGradient;
   ctx.fillRect(-40, horizonY - 1, w + 80, h * FEEL.HORIZON_FADE_FRACTION + 2);
