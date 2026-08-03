@@ -311,6 +311,73 @@
      instant the credit clears, and the credit can only ever happen once
      per page load, so nothing in play is ever hidden by this. */
   html.booting #chrome, html.booting #pads { display: none; }
+
+  /* ----------------------------------------------------------------
+     THE BOOT SPLASH. The publisher lockup on the near black field the
+     brand is drawn for, over everything, for well under a second.
+
+     COLD LOAD ONLY, and that guarantee lives in the script rather than
+     here: bootFlash is set once where it is declared and is never
+     assigned anything but zero anywhere else. This element is removed
+     from the flow entirely when it ends, so there is nothing left for a
+     restart to reveal.
+
+     SIZED BY BOTH DIMENSIONS. The lockup is 1780 by 1263, which is
+     landscape itself, so a width alone gives a mark that fits in
+     portrait and runs off the top and bottom of a 844 by 390 screen.
+     max-width in vh, times the aspect ratio, is what caps the height,
+     and it is written as a calc rather than a min() so it works on
+     anything that can run the game at all. */
+  #boot {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 4;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* The game's own void, written out rather than read from COLOUR,
+       because COLOUR is what a biome rotates and a publisher lockup that
+       changed field colour with the scenery would not be a brand. */
+    background: #0b0503;
+    /* Set by the frame loop from bootFlash, so the fade out is the same
+       countdown the rest of the boot behaviour reads. */
+    opacity: 1;
+  }
+  #boot[hidden] { display: none; }
+  #boot svg {
+    display: block;
+    width: 82vw;
+    height: auto;
+    /* 1780 / 1263, so the height cap is expressed as a width. */
+    max-width: calc(62vh * 1.40935);
+  }
+
+  /* ----------------------------------------------------------------
+     THE CREDIT ON THE END SCREENS. Cropped to the SNAPHIT wordmark: the
+     taglines are unreadable at any width this screen can spare, and the
+     measurement is in the report. Positioned by the script from the same
+     numbers the canvas lays the rest of that screen out with, and only
+     when they change, so nothing here is touched per frame.
+
+     It is drawn OVER the canvas, and the canvas draws a dimmed plate
+     underneath it. That plate is what keeps an orange lockup legible on
+     an orange biome, and it is on the canvas rather than in CSS here so
+     it can be measured in the same pixels as everything else. */
+  #credit {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    pointer-events: none;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  #credit[hidden] { display: none; }
+  #credit svg { display: block; width: 100%; height: auto; }
   /* A probe for the safe area insets, so the canvas can keep the resource
      bar and the pause overlay clear of the home indicator and the gesture
      bar. Canvas cannot read env() itself. Zero sized and never hit
@@ -354,6 +421,57 @@
     <button id="pauseBtn" type="button" aria-label="Pause"></button>
   </div>
 </div>
+<!-- ==================================================================
+     THE SNAPHIT LOCKUPS, INLINE, AS SVG MARKUP.
+
+     WHY MARKUP AND NOT Path2D, which is what the Drift Fever wordmark
+     uses twenty lines further down the script. These are LAYERED: three
+     stroked copies of the same outline at 0.070, 0.140 and 0.300
+     opacity under a filled copy, which is how the neon bloom is built
+     without a filter. Reproducing that on canvas would be four passes
+     with alpha bookkeeping per lockup for a mark that never animates and
+     never has to sit in the world. Inline SVG does it for nothing and
+     stays sharp at any device pixel ratio with no work at all.
+
+     STILL ZERO REQUESTS AND STILL ONE FILE. There is no <image>, no
+     <use>, no @font-face and no <text>: every letter arrived as an
+     outline, so nothing here can fall back to a system font and nothing
+     here can be blocked. The only http in either one is the SVG
+     namespace, which is an identifier and not an address.
+
+     POINTER EVENTS NONE ON BOTH, AND THAT IS NOT A PRECAUTION. It is
+     the same rule #chrome and #pads carry, for the reason recorded in
+     the stylesheet: a full width overlay that eats taps is the worst bug
+     this project has shipped. The boot splash covers the whole viewport
+     and it MUST let the tap through, because the tap is how it is
+     skipped.
+
+     The source SVGs live in brand/ and are reference only. These are the
+     shipped copies. Editing one without the other is how they part.
+     ================================================================== -->
+<div id="boot" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1780 1263" aria-hidden="true" focusable="false">
+  <g transform="translate(666.43 90.00) scale(6.98667)"><g fill="none" stroke="#00e5ff" stroke-linecap="round" stroke-linejoin="round"><g opacity=".12" stroke-width="11"><ellipse cx="32" cy="46" rx="21" ry="7.5"/><path d="M32 43.5 V25"/><circle cx="32" cy="17" r="8.5"/></g><g opacity=".30" stroke-width="6"><ellipse cx="32" cy="46" rx="21" ry="7.5"/><path d="M32 43.5 V25"/><circle cx="32" cy="17" r="8.5"/></g><g stroke-width="2.2"><ellipse cx="32" cy="46" rx="21" ry="7.5"/><ellipse cx="32" cy="46" rx="11" ry="3.9" opacity=".55"/><path d="M32 43.5 V25"/><circle cx="32" cy="17" r="8.5"/></g></g></g>
+  <g transform="translate(90.00 608.40) scale(0.33410)">
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="none" stroke="#ff9424" stroke-width="212" stroke-linejoin="round" stroke-linecap="round" opacity="0.070"/>
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="none" stroke="#ff9424" stroke-width="148" stroke-linejoin="round" stroke-linecap="round" opacity="0.140"/>
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="none" stroke="#ff9424" stroke-width="96" stroke-linejoin="round" stroke-linecap="round" opacity="0.300"/>
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="#ffffff" stroke="#ff9424" stroke-width="62" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(554.00 931.82) scale(0.11871)">
+  <path d="M122 512H0Q0 572 32 617Q64 662 120 686.5Q176 711 246 711Q320 711 374.5 682.5Q429 654 457.5 607Q486 560 486 507Q486 441 455.5 401.5Q425 362 381.5 343Q338 324 269 305Q217 291 187 279Q157 267 137.5 246.5Q118 226 118 194Q118 147 149 122Q180 97 229 97Q283 97 316 124Q349 151 352 189H478Q471 101 406.5 50.5Q342 0 241 0Q170 0 116 24Q62 48 32 93Q2 138 2 198Q2 263 32 302Q62 341 104.5 359.5Q147 378 215 396Q269 410 299.5 422Q330 434 350.5 456Q371 478 371 513Q371 558 338 586.5Q305 615 246 615Q189 615 157.5 586Q126 557 122 512ZM1330 102V9H845V102H1031V704H1145V102H1330ZM1818 452V9H1704V450Q1704 535 1740 594Q1776 653 1837.5 682Q1899 711 1974 711Q2049 711 2111 682Q2173 653 2210 594Q2247 535 2247 450V9H2133V452Q2133 531 2091.5 571Q2050 611 1975 611Q1901 611 1859.5 571Q1818 531 1818 452ZM3205.5 543Q3251 465 3251 359Q3251 253 3205.5 173.5Q3160 94 3076.5 51.5Q2993 9 2882 9H2655V704H2882Q2993 704 3076.5 662.5Q3160 621 3205.5 543ZM3069 170Q3134 238 3134 359Q3134 479 3069 545Q3004 611 2882 611H2769V102H2882Q3004 102 3069 170ZM3624 9V704H3738V9ZM4157.5 172Q4110 253 4110 355Q4110 457 4157.5 538.5Q4205 620 4286.5 665.5Q4368 711 4465 711Q4563 711 4644.5 665.5Q4726 620 4773 538.5Q4820 457 4820 355Q4820 253 4773 172Q4726 91 4644.5 45.5Q4563 0 4465 0Q4368 0 4286.5 45.5Q4205 91 4157.5 172ZM4672.5 220Q4703 278 4703 355Q4703 432 4672.5 490.5Q4642 549 4588 580.5Q4534 612 4465 612Q4396 612 4342 580.5Q4288 549 4257.5 490.5Q4227 432 4227 355Q4227 278 4257.5 220Q4288 162 4342 131Q4396 100 4465 100Q4534 100 4588 131Q4642 162 4672.5 220ZM5297 512H5175Q5175 572 5207 617Q5239 662 5295 686.5Q5351 711 5421 711Q5495 711 5549.5 682.5Q5604 654 5632.5 607Q5661 560 5661 507Q5661 441 5630.5 401.5Q5600 362 5556.5 343Q5513 324 5444 305Q5392 291 5362 279Q5332 267 5312.5 246.5Q5293 226 5293 194Q5293 147 5324 122Q5355 97 5404 97Q5458 97 5491 124Q5524 151 5527 189H5653Q5646 101 5581.5 50.5Q5517 0 5416 0Q5345 0 5291 24Q5237 48 5207 93Q5177 138 5177 198Q5177 263 5207 302Q5237 341 5279.5 359.5Q5322 378 5390 396Q5444 410 5474.5 422Q5505 434 5525.5 456Q5546 478 5546 513Q5546 558 5513 586.5Q5480 615 5421 615Q5364 615 5332.5 586Q5301 557 5297 512Z" fill="#ffd9a2"/>
+  </g>
+  <g transform="translate(362.00 1104.22) scale(0.09604)">
+  <path d="M0 9V704H114V9ZM981 704H1095V8H981V526L638 8H524V704H638V185L981 704ZM1610 512H1488Q1488 572 1520 617Q1552 662 1608 686.5Q1664 711 1734 711Q1808 711 1862.5 682.5Q1917 654 1945.5 607Q1974 560 1974 507Q1974 441 1943.5 401.5Q1913 362 1869.5 343Q1826 324 1757 305Q1705 291 1675 279Q1645 267 1625.5 246.5Q1606 226 1606 194Q1606 147 1637 122Q1668 97 1717 97Q1771 97 1804 124Q1837 151 1840 189H1966Q1959 101 1894.5 50.5Q1830 0 1729 0Q1658 0 1604 24Q1550 48 1520 93Q1490 138 1490 198Q1490 263 1520 302Q1550 341 1592.5 359.5Q1635 378 1703 396Q1757 410 1787.5 422Q1818 434 1838.5 456Q1859 478 1859 513Q1859 558 1826 586.5Q1793 615 1734 615Q1677 615 1645.5 586Q1614 557 1610 512ZM2818 102V9H2333V102H2519V704H2633V102H2818ZM3321 562H3612L3662 704H3782L3533 8H3401L3152 704H3271L3321 562ZM3467 146 3580 469H3353L3467 146ZM4607 704H4721V8H4607V526L4264 8H4150V704H4264V185L4607 704ZM5580 102V9H5095V102H5281V704H5395V102H5580ZM5928 638Q5928 669 5949 690Q5970 711 6001 711Q6031 711 6052 690Q6073 669 6073 638Q6073 607 6052 586Q6031 565 6001 565Q5970 565 5949 586Q5928 607 5928 638ZM7610 422H7736Q7822 422 7877 392.5Q7932 363 7957 316Q7982 269 7982 216Q7982 158 7954.5 111Q7927 64 7871.5 36.5Q7816 9 7736 9H7496V704H7610V422ZM7736 102Q7865 102 7865 216Q7865 270 7833 299.5Q7801 329 7736 329H7610V102H7736ZM8700 612H8465V9H8351V704H8700V612ZM9183 562H9474L9524 704H9644L9395 8H9263L9014 704H9133L9183 562ZM9329 146 9442 469H9215L9329 146ZM10297 452 10527 9H10401L10240 350L10079 9H9952L10183 452V704H10297V452ZM10850 638Q10850 669 10871 690Q10892 711 10923 711Q10953 711 10974 690Q10995 669 10995 638Q10995 607 10974 586Q10953 565 10923 565Q10892 565 10871 586Q10850 607 10850 638Z" fill="#ff9424"/>
+  </g>
+</svg></div>
+<div id="credit" aria-hidden="true" hidden><svg xmlns="http://www.w3.org/2000/svg" viewBox="46.6 46.6 1686.8 327.0" aria-hidden="true" focusable="false">
+  <g transform="translate(90.00 90.00) scale(0.33410)">
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="none" stroke="#ff9424" stroke-width="212" stroke-linejoin="round" stroke-linecap="round" opacity="0.070"/>
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="none" stroke="#ff9424" stroke-width="148" stroke-linejoin="round" stroke-linecap="round" opacity="0.140"/>
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="none" stroke="#ff9424" stroke-width="96" stroke-linejoin="round" stroke-linecap="round" opacity="0.300"/>
+  <path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="#ffffff" stroke="#ff9424" stroke-width="62" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+</svg></div>
 <div id="safe"></div>
 <script>
 'use strict';
@@ -1270,25 +1388,44 @@ const FEEL = {
      Skippable on the first tap or key, which is SWALLOWED rather than
      also starting a run, so dismissing the credit cannot accidentally
      begin a game the player has not looked at yet. */
-  BOOT_TIME:               0.55,     // seconds the credit holds
+  BOOT_TIME:               0.55,     // seconds the lockup holds
   BOOT_FADE:               0.18,     // of that, the fade out at the end
-  BOOT_SIZE:              0.085,     // of the smaller screen dimension
-  BOOT_TRACK:              0.28,     // letter spacing, as a share of the size
   /* Small and quiet on the death screen, under the score. It must not
-     crowd the score, the records or the continue button, which are what
-     that screen is for. */
-  BRAND_DEATH_SIZE:       0.022,     // of the smaller dimension
-  BRAND_DEATH_ALPHA:       0.34,
-  /* The mark beside it, set from the credit's own type size rather than
-     from the screen, so shrinking the credit shrinks the pair together.
-     The D is a squarish mark next to a line of caps, so it wants to be
-     taller than the cap height or it reads as a full stop. */
-  BRAND_DEATH_MARK:        1.75,     // of the credit's type size, the D's ink height
-  BRAND_DEATH_GAP:         0.55,     // of the credit's type size, mark to word
-  /* The same mark on the boot credit, over the publisher name. Bigger,
-     because the boot flash is the one moment branding is expected. */
-  BOOT_MARK:               2.10,     // of the boot type size, the D's ink height
-  BOOT_MARK_GAP:           0.55,     // of the boot type size, mark down to word
+     crowd the score, the records, the continue button or the share
+     button, which are what that screen is for.
+
+     THE LOCKUP IS CROPPED TO THE SNAPHIT WORDMARK, and the width below
+     is why. Measured on a 390 wide handset, the full lockup needs to be
+     180 pixels across, 46 per cent of the screen, before INSTANT. PLAY.
+     reaches a 7 pixel cap height and becomes readable at arm's length.
+     That is a billboard on the screen the score lives on. At the width
+     that actually fits, the taglines measure 3 to 4 pixels, which is
+     shipping text nobody can read. So they are not shipped. */
+  CREDIT_WIDTH:           0.185,     // of the smaller dimension
+  CREDIT_ALPHA:            0.72,     // the lockup is dimmer than the plate is dark
+  /* THE PLATE BEHIND IT, and it exists because the biome hue rotates at
+     every gate and the lockup's orange can land on an orange world. It
+     is a soft radial rather than a box: a hard edged panel on the death
+     screen reads as a dialog, and this has to read as a credit.
+
+     RADIUS IS A MULTIPLE OF THE LOCKUP'S OWN WIDTH, so it cannot come
+     adrift of it at any screen size. */
+  /* MEASURED, AND THE FIRST TRY WAS NOWHERE NEAR ENOUGH. In landscape
+     the death screen stack sits high and the credit lands INSIDE the
+     horizon glow, which is the one part of the world that is bright and
+     is orange at some hues. Without a plate the lockup's own orange
+     measured 1.24 to 1 against it. That is invisible, and it is exactly
+     the failure this constant exists to stop.
+
+     The plate is FLAT ACROSS THE MARK and only falls off outside it, so
+     the whole lockup sits on one even field rather than on a bright rim.
+     The radii are multiples of the lockup's own size, so the shape
+     cannot come adrift of it at any screen size, and both are wide
+     enough that the box corners are still inside the flat part. */
+  CREDIT_PLATE_ALPHA:      0.70,     // over the mark, then fading to nothing
+  CREDIT_PLATE_FLAT:       0.62,     // of the radius, the evenly dark part
+  CREDIT_PLATE_WIDE:       1.00,     // of the lockup width, the radius across
+  CREDIT_PLATE_TALL:       2.60,     // of the lockup height, the radius down
 
   DEATH_BOTTOM:              96,     // pixels above the safe area, the button's centre
   DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
@@ -2551,7 +2688,16 @@ const BRAND = {
   },
   icon: {
     /* One heavy italic D, which is the wordmark's own first
-       letter and therefore cannot drift away from it. */
+       letter and therefore cannot drift away from it.
+
+       IT IS NOT DRAWN ANYWHERE ANY MORE, and that is worth saying
+       plainly rather than leaving somebody to grep for it. Its two uses,
+       the boot flash and the death screen credit, both became the
+       SnapHit lockup, which is a publisher mark and not a game mark. It
+       lives on as the FAVICON, whose href in the head is generated from
+       exactly this path data by brand/make-favicon.js, and it is kept
+       here so the tab icon and the file can be checked against each
+       other. Delete it and that check goes with it. */
     x: -3.0, y: -50.0, w: 264.0, h: 264.0,
     ink: { l: 0.1350, r: 0.9125, t: 0.1525, b: 0.9025 },
     dx: 12, dy: 14, stroke: 30,
@@ -8710,20 +8856,126 @@ function text(str, x, y, size, weight, align, fill) {
    the road while somebody is driving is the exact opposite of section
    7's argument that the road edge owns the top of the value range.
    ------------------------------------------------------------------ */
+/* ==================================================================
+   THE SNAPHIT LOCKUPS, WHICH ARE DOM AND NOT CANVAS.
+
+   The markup is inlined in the body, above the canvas, and the whole of
+   the script's involvement is deciding where the credit sits and when
+   each one is visible. Nothing here draws anything.
+
+   THE ASPECT RATIO IS READ OFF THE MARKUP, not written down twice. Both
+   viewBoxes are in the body and the browser has already parsed them, so
+   asking the element is both shorter and impossible to get out of step
+   with the artwork. It falls back to the measured crop ratio only if the
+   element is missing entirely, which would mean the markup is gone.
+   ================================================================== */
+const bootEl = document.getElementById('boot');
+const creditEl = document.getElementById('credit');
+
+function lockupAspect(el, fallback) {
+  const svg = el && el.querySelector('svg');
+  const vb = svg && svg.viewBox && svg.viewBox.baseVal;
+  return (vb && vb.height > 0) ? vb.width / vb.height : fallback;
+}
+const LOCKUP_ASPECT = lockupAspect(creditEl, 1686.8 / 327.0);
+
+/* Written only when something actually moved. The death screen and the
+   completion screen put the credit at different heights and both are
+   pure functions of the viewport, so in practice this writes on a resize
+   and on a change of screen and never once per frame. */
+let creditKey = '';
+let creditWant = false;      // did this frame ask for it
+/* Starts false because the markup starts `hidden`, and those two have to
+   agree or the reconcile below sees no change and never writes. They
+   disagreed on the first attempt and the credit sat on the title screen
+   and over the whole of a run, which is precisely what section 4 of this
+   session's brief forbids. */
+let creditShown = false;     // and is it actually in the document
+
+function placeCredit(cx, cy, width, height) {
+  creditWant = true;
+  const key = Math.round(cx) + ':' + Math.round(cy) + ':' + Math.round(width);
+  if (key === creditKey) return;
+  creditKey = key;
+  creditEl.style.width = width + 'px';
+  creditEl.style.opacity = FEEL.CREDIT_ALPHA;
+  // transform rather than left and top, so this never triggers a layout.
+  creditEl.style.transform = 'translate(' + (cx - width / 2) + 'px,'
+                                          + (cy - height / 2) + 'px)';
+}
+
+/* ONE RECONCILE AT THE END OF THE FRAME, and it writes only on a change.
+
+   A DOM overlay does not disappear because nothing drew it, so its
+   absence has to be as deliberate as its presence. It is only ever on
+   the death and completion screens, which is what creditWant carries.
+   Everything else, including the title screen and the whole of a run,
+   gets nothing: section 4 of this session's brief, and section 6 of the
+   game's, which is strict about anything that makes this look like a
+   portal rather than a single purpose site.
+
+   The pause term is belt and braces rather than a live case. setPaused
+   refuses to pause outside DRIVING, and DRIVING never asks for the
+   credit, so the two cannot currently overlap. If that guard ever moves,
+   this stops an opaque cover from having a lockup floating over it. */
+function syncCredit() {
+  const want = creditWant && !paused;
+  creditWant = false;
+  if (want === creditShown) return;
+  creditShown = want;
+  creditEl.hidden = !want;
+}
+
+/* The lockup is an HTML overlay and the plate under it is canvas, and
+   that split is deliberate. The overlay stays sharp at any device pixel
+   ratio for free and costs nothing per frame; the plate has to be in the
+   canvas so it sits UNDER the lockup and OVER the road, and so it can be
+   measured in the same pixels as the road it is dimming.
+
+   THE PLATE IS THE CONTRAST ANSWER. The biome hue rotates at every gate,
+   which puts the whole world through twelve palettes, and one of them is
+   orange, which is the lockup's own colour. Measured across all twelve,
+   the plate lifts the worst case contrast from unreadable to comfortable
+   and the numbers are in the session report. It is a soft radial rather
+   than a panel because a hard edged box on a death screen reads as a
+   dialog asking a question. */
+let creditPlate = null;
+let creditPlateKey = '';
+
 function drawCredit(w, s, cy) {
-  const size = Math.round(s * FEEL.BRAND_DEATH_SIZE);
-  const markH = size * FEEL.BRAND_DEATH_MARK;
-  const markW = markH * brandInkAspect(BRAND.icon);
-  const gap = size * FEEL.BRAND_DEATH_GAP;
-  ctx.font = '700 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const tw = ctx.measureText('SNAPHIT').width;
-  const showMark = brandReady();
-  const total = (showMark ? markW + gap : 0) + tw;
-  const left = w / 2 - total / 2;
-  if (showMark) drawBrandInk(BRAND.icon, left + markW / 2, cy, markW, FEEL.BRAND_DEATH_ALPHA);
-  ctx.globalAlpha = FEEL.BRAND_DEATH_ALPHA;
-  text('SNAPHIT', left + total - tw / 2, cy, size, '700');
-  ctx.globalAlpha = 1;
+  const width = s * FEEL.CREDIT_WIDTH;
+  const height = width / LOCKUP_ASPECT;
+  const rx = width * FEEL.CREDIT_PLATE_WIDE;
+  const ry = height * FEEL.CREDIT_PLATE_TALL;
+
+  /* Built on demand and cached, like every other gradient in this file,
+     because a radial rebuilt sixty times a second is pure waste on the
+     hardware section 6 describes. The key is every number that shapes
+     it, so nothing can go stale. */
+  const key = Math.round(w) + ':' + Math.round(cy) + ':' + Math.round(rx) + ':' + Math.round(ry);
+  if (key !== creditPlateKey) {
+    const g2 = ctx.createRadialGradient(w / 2, cy, 0, w / 2, cy, 1);
+    g2.addColorStop(0, 'rgba(6,3,2,' + FEEL.CREDIT_PLATE_ALPHA + ')');
+    // Flat out to here, so the mark never sits half on a bright rim.
+    g2.addColorStop(clamp(FEEL.CREDIT_PLATE_FLAT, 0, 0.99),
+                    'rgba(6,3,2,' + FEEL.CREDIT_PLATE_ALPHA + ')');
+    g2.addColorStop(1, 'rgba(6,3,2,0)');
+    creditPlate = g2;
+    creditPlateKey = key;
+  }
+  // The gradient is built in a unit circle and stretched by the
+  // transform, which is how a canvas radial becomes an ellipse.
+  ctx.save();
+  ctx.translate(w / 2, cy);
+  ctx.scale(rx, ry);
+  ctx.translate(-w / 2, -cy);
+  ctx.fillStyle = creditPlate;
+  ctx.fillRect(w / 2 - 1, cy - 1, 2, 2);
+  ctx.restore();
+
+  // And the lockup itself, which is DOM. Nothing is written unless the
+  // geometry actually moved.
+  placeCredit(w / 2, cy, width, height);
 }
 
 /* The size that makes a string fill a share of the width and no more,
@@ -9012,7 +9264,12 @@ function drawResult(w, h) {
      run figures. Low alpha and a third of the size of anything around it,
      because the score, the records and the continue button are what this
      screen is for and none of them may be crowded by it. */
-  drawCredit(w, s, y0 + s * 0.169);
+  /* MEASURED, NOT PICKED. The clear band between the score block and
+     the stats row was scanned off the rendered frame at three screen
+     sizes and came out 0.105 of the smaller dimension tall, centred
+     here, at every one of them. The credit was at 0.169, which sat it
+     nearer the score than the stats row for no reason. */
+  drawCredit(w, s, y0 + s * 0.1625);
 
   /* The run in figures on one line. Cheap, and it turns a number into a
      story: how far, how sideways, how many gates, and on a continued run
@@ -9178,7 +9435,8 @@ function drawFinish(w, h) {
   arcadeNumber(String(shown), w / 2, y0 + s * 0.168, Math.round(s * 0.108),
                finishRecord ? COLOUR.SCORE_BEST : COLOUR.SCORE);
 
-  drawCredit(w, s, y0 + s * 0.238);
+  // The same scan on the completion screen. See drawResult.
+  drawCredit(w, s, y0 + s * 0.2349);
 
   /* The run in figures. TIME is what the ghost is raced against, so the
      margin against it sits directly under the time rather than in a
@@ -9479,6 +9737,9 @@ function dailyStateLine() {
    are the same number. The death screen paid for that lesson first.
    ================================================================== */
 function drawOverlay(w, h) {
+  /* The credit is asked for by drawResult and drawFinish and by nothing
+     else. Every other screen simply does not ask, and syncCredit takes
+     it off the document at the end of the frame. */
   if (state === TITLE) {
     const s = Math.min(w, h);
     /* Pushed down the taller screen, pulled up so the stack cannot reach
@@ -10896,7 +11157,11 @@ function render() {
      nobody answers. Under the boot credit, which owns the first second
      of the page outright. */
   drawTiltCal(w, h);
-  drawBoot(w, h);
+  /* Both lockups are DOM, so the frame ends by making the document agree
+     with what was just drawn rather than by drawing them. Neither writes
+     anything unless something actually changed. */
+  syncBoot();
+  syncCredit();
   drawHud(w, h);
 }
 
@@ -11696,59 +11961,35 @@ function endBootChrome() {
   if (!bootChromeHidden) return;
   bootChromeHidden = false;
   try { document.documentElement.classList.remove('booting'); } catch (e) {}
+  // Whichever way the splash ended, skipped or expired, it goes now.
+  if (bootShown) { bootShown = false; bootEl.hidden = true; }
   /* The pad row was display:none for the whole of the boot flash, so the
      measurement resize took of it was zero. This is the moment it exists,
      so this is the moment to measure it again. */
   resize();
 }
 
-/* The credit itself. The game's own arcade treatment on the game's own
-   void, letter spaced, rather than a logo laid over the top. */
-function drawBoot(w, h) {
-  if (bootFlash <= 0) return;
-  const s = Math.min(w, h);
-  ctx.fillStyle = COLOUR.VOID;
-  ctx.fillRect(0, 0, w, h);
+/* THE BOOT SPLASH, which is now the publisher lockup and not type.
+
+   Everything about WHEN it happens is unchanged and deliberately so.
+   bootFlash is set once where it is declared, is never assigned anything
+   but zero anywhere else, and startRun, continueRun, switchMode and
+   resetSpectacle do not mention it and must not. Section 5 says restart
+   is instant on the same input, and that outranks any flourish: a
+   splash between attempts is exactly the thing that breaks the one more
+   go loop. This function only makes the overlay agree with the
+   countdown; it cannot start one.
+
+   The element is REMOVED, not faded to transparent, so there is nothing
+   left over the game for a stray opacity to bring back. */
+let bootShown = true;
+function syncBoot() {
+  if (bootFlash <= 0) {
+    if (bootShown) { bootShown = false; bootEl.hidden = true; }
+    return;
+  }
   const t = bootFlash / FEEL.BOOT_TIME;
-  ctx.globalAlpha = t < FEEL.BOOT_FADE ? t / FEEL.BOOT_FADE : 1;
-  const size = Math.round(s * FEEL.BOOT_SIZE);
-  const track = size * FEEL.BOOT_TRACK;
-  const word = 'SNAPHIT';
-  ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = Math.max(3, size * 0.14);
-
-  /* THE MARK ABOVE THE NAME, which is the arcade order: the game first
-     and the company that made it underneath. The pair is centred as a
-     unit on the middle of the screen, so adding the mark did not move
-     the credit off centre, it moved the whole thing up by half a mark.
-
-     Drawn at the same fading alpha as the word, which is why the fade
-     is computed before either of them and not per element. */
-  const markH = brandReady() ? size * FEEL.BOOT_MARK : 0;
-  const markGap = markH > 0 ? size * FEEL.BOOT_MARK_GAP : 0;
-  const wordCy = h * 0.5 + (markH + markGap) / 2;
-  if (markH > 0) {
-    drawBrandInk(BRAND.icon, w / 2, wordCy - size / 2 - markGap - markH / 2,
-                 markH * brandInkAspect(BRAND.icon), ctx.globalAlpha);
-  }
-
-  // Letter spaced by hand, because canvas has no letterSpacing everywhere
-  // and a manufacturer credit wants the air.
-  let total = -track;
-  for (let i = 0; i < word.length; i++) total += ctx.measureText(word[i]).width + track;
-  let x = w / 2 - total / 2;
-  for (let i = 0; i < word.length; i++) {
-    const cw = ctx.measureText(word[i]).width;
-    ctx.strokeStyle = COLOUR.SCORE_EDGE;
-    ctx.strokeText(word[i], x + cw / 2, wordCy);
-    ctx.fillStyle = COLOUR.SCORE;
-    ctx.fillText(word[i], x + cw / 2, wordCy);
-    x += cw + track;
-  }
-  ctx.globalAlpha = 1;
+  bootEl.style.opacity = t < FEEL.BOOT_FADE ? (t / FEEL.BOOT_FADE) : 1;
 }
 
 let lastTime = 0;
