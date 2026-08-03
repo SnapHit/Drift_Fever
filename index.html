@@ -242,6 +242,11 @@
     #pads button svg { width: 26px; height: 26px; }
     .padGroup { gap: 6px; }
   }
+  /* The boot credit owns the whole screen for its half second, so the
+     game's own chrome is out of the way while it is up. It comes back the
+     instant the credit clears, and the credit can only ever happen once
+     per page load, so nothing in play is ever hidden by this. */
+  html.booting #chrome, html.booting #pads { display: none; }
   /* A probe for the safe area insets, so the canvas can keep the resource
      bar and the pause overlay clear of the home indicator and the gesture
      bar. Canvas cannot read env() itself. Zero sized and never hit
@@ -457,6 +462,33 @@ const FEEL = {
      stops meaning anything if everything has it. */
   EDGE_GLOW_SPREAD:        0.22,     // of the half width, each side of the lip
   EDGE_GLOW_ALPHA:         0.46,
+
+  /* LIGHT BLEEDING DOWN ONTO THE DARK, just below and outside the edges.
+     Light spilling onto nothing is what sells altitude: the slab reads as
+     radiating rather than as pasted on.
+
+     THE VOID STAYS EMPTY AND THAT IS THE POINT. The road only reads as a
+     slab at altitude because there is nothing out there to measure it
+     against, and that vertigo is the distinctive thing here, more so than
+     the neon. So this is a SHORT FALLOFF hugging the edge and not an
+     ambient wash: the moment the void looks like a surface, the height is
+     gone and the effect has cost more than it bought.
+
+     Three stacked bands rather than a gradient, each further down and
+     further out than the last, drawn faintest first. Stacking is what
+     makes the falloff, so the innermost strip gets all three alphas and
+     the outermost gets one, and it costs three batched fills for the
+     whole road rather than a gradient per segment. Both LIVE and both
+     defaulted low. */
+  EDGE_BLEED_ALPHA:        0.11,     // LIVE, per band, so the innermost strip is three times this
+  EDGE_BLEED_PX:          0.022,     // LIVE, of the smaller screen dimension, the widest band
+  EDGE_BLEED_BANDS:           3,
+  /* The floor under the road lifting with the drift, and it is a tenth of
+     what the skyline does on purpose. The skyline is BEYOND the void and
+     can be loud; the grid is behind the road and the empty space beside
+     the road is load bearing. LIVE, and zero leaves the grid exactly as
+     it was. */
+  GRID_DRIFT_LIFT:         0.35,     // LIVE, of the way toward the near grid colour
 
   /* The underside line. Two glowing lines with dark between them read as a
      solid with thickness far better than one line and an occlusion. This
@@ -1157,6 +1189,32 @@ const FEEL = {
      than off a fraction of the height, which is what keeps them clear of
      the car in both orientations. Above the safe area and above the
      corner pads, which are 64 across with a 12 margin. */
+  /* ----------------------------------------------------------------
+     THE BOOT FLASH. The arcade convention of a manufacturer credit before
+     the attract loop, and the right home for a publisher name: it is the
+     one moment where branding is expected rather than intrusive.
+
+     IT CAN ONLY EVER HAPPEN ON A COLD LOAD. bootFlash is a module level
+     countdown set once where it is declared and never assigned anywhere
+     else except to zero when it is skipped. startRun, continueRun and
+     resetSpectacle do not mention it and must not: section 5 says restart
+     is instant on the same input, and that is worth more than any
+     flourish. A flourish between attempts is exactly the thing that
+     breaks the one more go loop.
+
+     Skippable on the first tap or key, which is SWALLOWED rather than
+     also starting a run, so dismissing the credit cannot accidentally
+     begin a game the player has not looked at yet. */
+  BOOT_TIME:               0.55,     // seconds the credit holds
+  BOOT_FADE:               0.18,     // of that, the fade out at the end
+  BOOT_SIZE:              0.085,     // of the smaller screen dimension
+  BOOT_TRACK:              0.28,     // letter spacing, as a share of the size
+  /* Small and quiet on the death screen, under the score. It must not
+     crowd the score, the records or the continue button, which are what
+     that screen is for. */
+  BRAND_DEATH_SIZE:       0.022,     // of the smaller dimension
+  BRAND_DEATH_ALPHA:       0.34,
+
   DEATH_BOTTOM:              96,     // pixels above the safe area, the button's centre
   DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
   RESUME_FLASH_TIME:       0.45,     // the wash on arriving back at the gate
@@ -1306,11 +1364,25 @@ const FEEL = {
      the car goes right. Drop the left edge and it goes left. That is the
      direction a driver expects and it is what this must be.
 
-     At -1 it was exactly inverted, which is the bug reported in sessions
-     ten, twelve and thirteen. Session eleven had it right and session
-     thirteen broke it again. It is on the debug cycler behind ?debug=1
-     so it can be settled on a handset rather than in another session. */
+     At -1 it is exactly inverted.
+
+     THE FOURTH REVERSAL WAS NOT A SIGN AT ALL, and this is the important
+     part. The source has read +1 since session fourteen and has never
+     changed since. What changed the running game was localStorage: the
+     cycler wrote a nudged TILT_DIRECTION into it during a handset session
+     and loadTuning applied that on every ordinary load afterwards,
+     silently, overriding this constant. See the tuning persistence block.
+     TILT_DIRECTION is now marked noSave and can never be stored again, so
+     this line is the only place the direction lives. Do not flip it
+     without driving it; the last three times it was flipped, it was not
+     the thing that was wrong. */
   TILT_DIRECTION:             1,
+  /* The sign on the sine term of the screen space remap, which is the one
+     value that can make the two landscape orientations disagree with
+     portrait. It flips 90 and 270 together and cannot touch portrait, so
+     landscape being backwards is now a one value question rather than two
+     independent guesses. See onDeviceOrientation. LIVE. */
+  TILT_LANDSCAPE_SENSE:       1,
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
   TILT_DEADZONE_DEG:       1.50,     // LIVE, the neutral state from section 4.1
   TILT_FULL_LOCK_DEG:        15,     // LIVE, degrees from the calibrated zero to full lock
@@ -1792,6 +1864,7 @@ function applyBiome(i) {
   // The roof lights run toward this biome's own hot hue, so the ramp has
   // to follow the place.
   SKYLINE_HOT_RAMP = rampBetween(COLOUR.SKYLINE_TOP, COLOUR.HORIZON_FADE);
+  GRID_HOT_RAMP = rampBetween(COLOUR.GRID, COLOUR.GRID_NEAR);
   // The horizon and haze gradients are cached, so they have to be rebuilt.
   if (view.h) resize();
 }
@@ -1936,22 +2009,29 @@ const COLOUR = {
    below the point where the eye can see the stepping on a smooth swell
    and it keeps the tables tiny. */
 const RAMP_STEPS = 16;
+/* Accepts #rrggbb, a bare "r,g,b" triple, and rgba(...), and always
+   returns four components so a ramp can carry alpha. The grid is the only
+   palette entry with alpha baked into it, and it needs to ramp. */
 function rgbOf(c) {
   if (c.charAt(0) === '#') {
     return [parseInt(c.slice(1, 3), 16),
             parseInt(c.slice(3, 5), 16),
-            parseInt(c.slice(5, 7), 16)];
+            parseInt(c.slice(5, 7), 16), 1];
   }
-  const p = c.split(',');
-  return [+p[0], +p[1], +p[2]];
+  const p = c.replace(/^rgba?\(/, '').replace(/\)$/, '').split(',');
+  return [+p[0], +p[1], +p[2], p.length > 3 ? +p[3] : 1];
 }
 function rampBetween(from, to) {
   const a = rgbOf(from), b = rgbOf(to), out = [];
+  const opaque = a[3] >= 1 && b[3] >= 1;
   for (let i = 0; i < RAMP_STEPS; i++) {
     const f = i / (RAMP_STEPS - 1);
-    out.push('rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ','
-                    + Math.round(a[1] + (b[1] - a[1]) * f) + ','
-                    + Math.round(a[2] + (b[2] - a[2]) * f) + ')');
+    const r = Math.round(a[0] + (b[0] - a[0]) * f);
+    const g = Math.round(a[1] + (b[1] - a[1]) * f);
+    const bl = Math.round(a[2] + (b[2] - a[2]) * f);
+    out.push(opaque ? 'rgb(' + r + ',' + g + ',' + bl + ')'
+                    : 'rgba(' + r + ',' + g + ',' + bl + ','
+                      + (a[3] + (b[3] - a[3]) * f).toFixed(3) + ')');
   }
   return out;
 }
@@ -1972,6 +2052,10 @@ const EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
    own hot hue, so it changes place with the place. Rebuilt by applyBiome,
    which is the only thing that moves either endpoint. */
 let SKYLINE_HOT_RAMP = rampBetween(COLOUR.SKYLINE_TOP, COLOUR.HORIZON_FADE);
+/* The floor under the road, answering the drift far more faintly than the
+   skyline does. Both ends already exist in the palette, so this only
+   changes WHEN the near colour is used rather than adding a colour. */
+let GRID_HOT_RAMP = rampBetween(COLOUR.GRID, COLOUR.GRID_NEAR);
 
 const STORAGE_PREFIX = 'driftfever.';
 
@@ -2008,6 +2092,9 @@ const TUNABLES = [
   { key: 'PYLON_SPACING',      label: 'pylons',  step: 1,    min: 2,    max: 40,    dp: 0, group: 4 },
   { key: 'PYLON_HEIGHT',       label: 'post',    step: 30,   min: 60,   max: 2400,  dp: 0, group: 4 },
   { key: 'EDGE_GLOW_ALPHA',    label: 'glow',    step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 4 },
+  { key: 'EDGE_BLEED_ALPHA',   label: 'bleed',   step: 0.01, min: 0,    max: 0.4,   dp: 2, group: 4 },
+  { key: 'EDGE_BLEED_PX',      label: 'bleedLen',step: 0.002,min: 0,    max: 0.12,  dp: 3, group: 4 },
+  { key: 'GRID_DRIFT_LIFT',    label: 'gridLift',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 4 },
   { key: 'GRID_DEPTH',         label: 'depth',   step: 500,  min: 500,  max: 40000, dp: 0, group: 4 },
   { key: 'CENTRIFUGAL',        label: 'cent',    step: 0.005, min: 0,   max: 0.30,  dp: 3, group: 5 },
   { key: 'CAR_YAW_GAIN',       label: 'yaw',     step: 0.1,  min: 0,    max: 5.0,   dp: 1, group: 5 },
@@ -2040,7 +2127,11 @@ const TUNABLES = [
      and this is now the single place the tilt direction lives. It has
      been reversed three times; settling it on the phone beats settling it
      in another session. */
-  { key: 'TILT_DIRECTION',     label: 'tiltdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1 },
+  /* noSave: this one is never written to storage. A stored copy of it
+     overrode the source for three sessions and was the whole of the tilt
+     regression. See the tuning persistence block. */
+  { key: 'TILT_DIRECTION',     label: 'tiltdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1, noSave: true },
+  { key: 'TILT_LANDSCAPE_SENSE',label:'landdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1, noSave: true },
   /* The spectacle, and the world reaction especially, because that is the
      one thing in it that can only be judged by driving with it on. Group
      13 is the intensity of the world reaction, 14 is the callouts and 15
@@ -2299,6 +2390,9 @@ window.addEventListener('keydown', function (e) {
   else if (debugAllowed && (k === '=' || k === '+')) { nudgeTuning(1); return; }
   else if (debugAllowed && k === '0') { resetTuning(); return; }
   firstGesture();
+  // The credit is dismissed by the first input and that input goes no
+  // further, so skipping it cannot also start a run.
+  if (bootFlash > 0) { skipBoot(); return; }
   startOrRestart();
 });
 
@@ -2353,6 +2447,7 @@ canvas.addEventListener('pointerdown', function (e) {
   applyTouchSides();
   if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
   firstGesture();
+  if (bootFlash > 0) { skipBoot(); return; }
   startOrRestart();
 });
 
@@ -2423,26 +2518,45 @@ function orientationAngle() {
   return (typeof window.orientation === 'number') ? ((window.orientation + 360) % 360) : 0;
 }
 
+/* Exact cos and sin for the four quarter turns, so the remap never picks
+   up float dust and the four cases stay exactly four cases. */
+const ORIENT_COS = [1, 0, -1, 0];
+const ORIENT_SIN = [0, 1, 0, -1];
+
 function onDeviceOrientation(e) {
   if (e.gamma === null || e.gamma === undefined) return;   // no real sensor behind the event
   tilt.seenSensor = true;
 
-  /* gamma is left to right tilt in portrait. In landscape gamma and beta
-     swap roles, so remap off the screen angle.
+  /* THE READING, REMAPPED INTO SCREEN SPACE. See the convention block
+     above TILT_DIRECTION for what the number means once it is here.
 
-     The two landscape signs were the wrong way round until session
-     sixteen and had never been driven on a real handset, only modelled.
-     The convention every branch has to agree with is the one written
-     above TILT_DIRECTION: dropping the SCREEN'S right edge steers right.
-     180 stays negated because the device is upside down under an upright
-     picture, which is the one case where the model and the handset never
-     disagreed. */
-  const angle = orientationAngle();
-  let deg;
-  if (angle === 90) deg = e.beta;
-  else if (angle === 180) deg = -e.gamma;
-  else if (angle === 270) deg = -e.beta;
-  else deg = e.gamma;
+     gamma and beta are in the DEVICE's frame and the screen is rotated
+     inside that frame by screen.orientation.angle, so getting the screen's
+     own left to right tilt is one rotation of the pair, not four separate
+     cases:
+
+         screenTilt = gamma * cos(angle) + beta * sin(angle)
+
+     which lands on gamma, beta, -gamma, -beta at 0, 90, 180 and 270. That
+     is the same four values the old code listed, and writing it as the
+     rotation is the point: every branch is now DERIVED from the portrait
+     one instead of carrying a sign somebody chose separately, so 90 and
+     270 cannot drift apart from each other or from portrait.
+
+     The cosines and sines are exact integers from a table rather than
+     Math.cos of a converted angle, so nothing here is ever 6e-17 instead
+     of zero, and the angle is snapped to the nearest quarter turn because
+     a handset mid rotation can report something in between.
+
+     TILT_LANDSCAPE_SENSE is the single sign on the sine term. It is the
+     only thing that can make landscape disagree with portrait, and it
+     flips BOTH landscape branches together. The two landscape cases have
+     been modelled twice in this project and driven on a handset never, so
+     if landscape is ever backwards while portrait is right, this is the
+     one value to move and it is on the cycler. */
+  const q = ((Math.round(orientationAngle() / 90) % 4) + 4) % 4;
+  const deg = e.gamma * ORIENT_COS[q]
+            + (e.beta || 0) * ORIENT_SIN[q] * FEEL.TILT_LANDSCAPE_SENSE;
 
   tilt.rawDeg = deg;
   if (tilt.zeroDeg === null) tilt.zeroDeg = deg;
@@ -2864,22 +2978,63 @@ function markTuning() {
   recomputeCamera();
 }
 
+/* ------------------------------------------------------------------
+   TUNING PERSISTENCE, AND THE BUG IT CAUSED, WRITTEN DOWN SO IT CANNOT
+   HAPPEN AGAIN.
+
+   This block used to load stored tuning on EVERY page load, with no debug
+   flag and nothing on screen to say so. The cycler exists so values can be
+   settled on a real handset, which is exactly what was done with
+   TILT_DIRECTION in session fourteen: it was nudged on a phone under
+   ?debug=1, that nudge was written to localStorage, and from then on it
+   was reapplied silently on every ordinary load and OVERRODE THE SOURCE.
+
+   That is the whole of the tilt "regression" that came back three times.
+   The source constant was correct and unchanged the entire time; the
+   running game was reading a stored value nobody could see. Flipping the
+   sign in the source could never have fixed it, because the stored value
+   is applied afterwards and wins.
+
+   Three things stop it:
+
+     1. STORED TUNING IS ONLY APPLIED UNDER ?debug=1. A tuning session is a
+        debug session and it does not get to follow the player into
+        ordinary play. This is the fix; the other two are belt and braces.
+     2. TILT_DIRECTION IS NEVER STORED AT ALL, marked noSave below. It is a
+        correctness value rather than a feel value, and after four
+        reversals the source is the only place it may live.
+     3. THE STORAGE KEY IS VERSIONED. Bumping it abandons every blob
+        written by an older build in one move, including the one currently
+        overriding this player's tilt.
+
+   And when tuning IS loaded, it says so on screen. Silence is what made
+   this cost three sessions. */
+const TUNE_KEY = 'tune3';
+
 function saveTuning() {
   const out = {};
-  TUNABLES.forEach(function (t) { out[t.key] = FEEL[t.key]; });
-  storeSet('tune2', JSON.stringify(out));
+  TUNABLES.forEach(function (t) { if (!t.noSave) out[t.key] = FEEL[t.key]; });
+  storeSet(TUNE_KEY, JSON.stringify(out));
 }
 
 function loadTuning() {
-  const raw = storeGet('tune2');
+  // The one line that matters. See the block above.
+  if (!debugAllowed) return;
+  const raw = storeGet(TUNE_KEY);
   if (!raw) return;
   let parsed = null;
   try { parsed = JSON.parse(raw); } catch (e) { return; }
   if (!parsed || typeof parsed !== 'object') return;
+  let n = 0;
   TUNABLES.forEach(function (t) {
+    if (t.noSave) return;
     const v = parsed[t.key];
-    if (typeof v === 'number' && isFinite(v)) FEEL[t.key] = clamp(v, t.min, t.max);
+    if (typeof v === 'number' && isFinite(v) && v !== FEEL[t.key]) {
+      FEEL[t.key] = clamp(v, t.min, t.max);
+      n++;
+    }
   });
+  if (n > 0) showNote(n + ' stored tuning values loaded. Press 0 or tap reset for the defaults.', 6);
 }
 
 function nudgeTuning(dir) {
@@ -4188,7 +4343,12 @@ function drawGrid(w, h) {
   const offset = position - Math.floor(position / spacing) * spacing;
 
   ctx.lineWidth = 1;
-  ctx.strokeStyle = COLOUR.GRID;
+  /* The floor answers the drift too, far more faintly than the skyline
+     does, because it sits BEHIND the road rather than beyond it and the
+     void beside the road has to stay empty. One ramp lookup and no extra
+     geometry, no extra pass and no extra fill, so it is genuinely free.
+     At a lift of zero this is exactly COLOUR.GRID, as it always was. */
+  ctx.strokeStyle = rampAt(GRID_HOT_RAMP, cityGlow * FEEL.GRID_DRIFT_LIFT);
   ctx.beginPath();
 
   let nearY = 0, farY = 0, nearScale = 0, farScale = 0;
@@ -4501,6 +4661,13 @@ function drawRoad(w, h) {
 
   drawWalls(count);
   drawSlabUnderline(first, last);
+  /* AFTER the underline, not before. The underline's own glow is drawn
+     around the slab bottom and is up to three pixels tall, against a mean
+     bleed drop of six, so putting the bleed underneath it hid most of the
+     effect: measured, only 44 pixels in the whole frame changed. It also
+     reads better this way round, because the underline is the thing doing
+     the radiating and the spill belongs on top of it. */
+  edgeBleedPass(first, last);
 
   const lip = FEEL.EDGE_LIP_FRACTION;
   const band = FEEL.RUMBLE_WIDTH_FRACTION - lip;
@@ -4914,6 +5081,72 @@ function glowBandPath(first, last, inner, outer, keep) {
     ctx.lineTo(bx[n + 1] + a2, y2); ctx.lineTo(bx[n + 1] + c2, y2);
     ctx.closePath();
   }
+}
+
+/* The bleed. Hangs off the outer bottom corner of the slab, downward and
+   outward onto the void, and dies fast.
+
+   Its top edge lies exactly on the slab's outer bottom corner and it only
+   ever goes down and out from there, so it never touches the drivable
+   surface, the lip or the shoulder and cannot move any of the numbers the
+   hard rule is about. */
+function edgeBleedPass(first, last) {
+  // Zero means off, and off costs nothing rather than three transparent
+  // fills. The cycler can take it to zero, so this is the real path.
+  if (FEEL.EDGE_BLEED_ALPHA <= 0) return;
+  const w = view.w;
+  const bands = Math.max(1, Math.round(FEEL.EDGE_BLEED_BANDS));
+  const px = Math.min(w, view.h) * FEEL.EDGE_BLEED_PX;
+
+  /* STROKED, NOT FILLED, and that is a performance decision with a
+     measurement behind it. The first version filled a quad per segment
+     per band: about 380 subpaths in each of three paths, and it measured
+     between two and five milliseconds a frame for roughly six hundred
+     visible pixels, because the rasteriser pays for path complexity and
+     bounding boxes rather than for lit pixels. On a five year old Celeron
+     that is a tenth of the frame budget for a subtle glow, which is not a
+     trade worth making.
+
+     The edge is a line, so stroke the line. Two polylines, one per side,
+     in a single path, offset DOWNWARD by half the stroke width so the
+     whole stroke lands below the slab's outer corner and none of it
+     spills back up onto the road. Wider and fainter first, so the stack
+     is the falloff exactly as before.
+
+     The width is in screen pixels rather than scaled per segment, which
+     is the one thing given up by stroking. It is the right thing to give
+     up: a spill that is tight to the edge everywhere is what was asked
+     for, and a spill that grew with the near geometry was the part most
+     at risk of reading as ground. */
+  ctx.lineCap = 'butt';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = EDGE_GLOW_FILL;
+  for (let k = bands; k >= 1; k--) {
+    const t = k / bands;
+    const lw = px * t;
+    let any = false;
+    ctx.beginPath();
+    for (const side of [-1, 1]) {
+      let started = false;
+      for (let n = first; n <= last; n++) {
+        if (!bvis[n]) continue;
+        if (bw[n] < GLOW_CULL_PX) break;
+        const x = bx[n] + side * (bw[n] * EDGE_OUT + bf[n]);
+        // Off the side of the screen near the camera, where the corner is
+        // hundreds of pixels wide of the frame and costs the most.
+        if (x < -lw || x > w + lw) { started = false; continue; }
+        const y = by[n] + bt[n] + lw * 0.5;
+        if (started) ctx.lineTo(x, y); else { ctx.moveTo(x, y); started = true; }
+        any = true;
+      }
+    }
+    if (!any) continue;
+    ctx.lineWidth = lw;
+    ctx.globalAlpha = FEEL.EDGE_BLEED_ALPHA;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = 1;
 }
 
 /* A second glowing line, along the bottom of the slab. Two lit lines with
@@ -5896,6 +6129,14 @@ function drawResult(w, h) {
 
   arcadeNumber(String(shown), w / 2, y0 + s * 0.095, Math.round(s * 0.145),
                beat ? COLOUR.SCORE_BEST : COLOUR.SCORE);
+
+  /* The publisher, small and quiet, in the air between the score and the
+     run figures. Low alpha and a third of the size of anything around it,
+     because the score, the records and the continue button are what this
+     screen is for and none of them may be crowded by it. */
+  ctx.globalAlpha = FEEL.BRAND_DEATH_ALPHA;
+  text('SNAPHIT', w / 2, y0 + s * 0.169, Math.round(s * FEEL.BRAND_DEATH_SIZE), '700');
+  ctx.globalAlpha = 1;
 
   /* The run in figures on one line. Cheap, and it turns a number into a
      story: how far, how sideways, how many gates, and on a continued run
@@ -6914,6 +7155,7 @@ function render() {
   drawCallout(w, h);
   drawOverlay(w, h);
   drawPauseCover(w, h);
+  drawBoot(w, h);
   drawHud(w, h);
 }
 
@@ -7558,6 +7800,55 @@ function audioCrash() {
 /* ==================================================================
    MAIN LOOP
    ================================================================== */
+/* THE ONLY ASSIGNMENT THAT STARTS IT, and it happens once, at load. There
+   is deliberately no function anywhere that sets this to anything other
+   than zero, so no run, restart or continue can bring the credit back.
+   See the BOOT_TIME block. */
+let bootFlash = FEEL.BOOT_TIME;
+
+function skipBoot() { bootFlash = 0; endBootChrome(); }
+
+/* The chrome comes back once, whichever way the credit ends. */
+let bootChromeHidden = true;
+function endBootChrome() {
+  if (!bootChromeHidden) return;
+  bootChromeHidden = false;
+  try { document.documentElement.classList.remove('booting'); } catch (e) {}
+}
+
+/* The credit itself. The game's own arcade treatment on the game's own
+   void, letter spaced, rather than a logo laid over the top. */
+function drawBoot(w, h) {
+  if (bootFlash <= 0) return;
+  const s = Math.min(w, h);
+  ctx.fillStyle = COLOUR.VOID;
+  ctx.fillRect(0, 0, w, h);
+  const t = bootFlash / FEEL.BOOT_TIME;
+  ctx.globalAlpha = t < FEEL.BOOT_FADE ? t / FEEL.BOOT_FADE : 1;
+  const size = Math.round(s * FEEL.BOOT_SIZE);
+  const track = size * FEEL.BOOT_TRACK;
+  const word = 'SNAPHIT';
+  ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(3, size * 0.14);
+  // Letter spaced by hand, because canvas has no letterSpacing everywhere
+  // and a manufacturer credit wants the air.
+  let total = -track;
+  for (let i = 0; i < word.length; i++) total += ctx.measureText(word[i]).width + track;
+  let x = w / 2 - total / 2;
+  for (let i = 0; i < word.length; i++) {
+    const cw = ctx.measureText(word[i]).width;
+    ctx.strokeStyle = COLOUR.SCORE_EDGE;
+    ctx.strokeText(word[i], x + cw / 2, h * 0.5);
+    ctx.fillStyle = COLOUR.SCORE;
+    ctx.fillText(word[i], x + cw / 2, h * 0.5);
+    x += cw + track;
+  }
+  ctx.globalAlpha = 1;
+}
+
 let lastTime = 0;
 
 function frame(now) {
@@ -7572,6 +7863,7 @@ function frame(now) {
     if (noteTimer <= 0) noteEl.hidden = true;
   }
 
+  if (bootFlash > 0) { bootFlash -= dt; if (bootFlash <= 0) { bootFlash = 0; endBootChrome(); } }
   updateRepeat(dt);
   updateTiltHint(dt);
   // Before the early return, so the pause sweep and the crash wind down
@@ -7611,6 +7903,8 @@ function frame(now) {
   sampleFps(rawDt);
 }
 
+if (bootFlash > 0) { try { document.documentElement.classList.add('booting'); } catch (e) {} }
+else bootChromeHidden = false;
 recomputeCamera();
 if (debugAllowed) setDebug(true);
 // Before the first road is built, or the title screen is generated at
