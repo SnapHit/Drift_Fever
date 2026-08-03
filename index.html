@@ -1727,6 +1727,68 @@ const FEEL = {
   MOVER_EVERY:             2400,     // LIVE
 
   /* ----------------------------------------------------------------
+     JUMPS, AND THEY ARE FOR FUN RATHER THAN FOR CHALLENGE.
+
+     Ramps went out with the old rings in session nine and never came
+     back. The version that was removed was an edge commitment with a
+     collectible on top and it added nothing, so this is deliberately the
+     opposite of it: centred, unmissable, forgiving to land, and worth
+     doing because the air is good rather than because it is scored.
+
+     THE DRIFT SURVIVES THE AIR, which is the whole point. Nothing here
+     touches drift.headingV or drift.lateralV, so the slip angle the
+     driver launched with is the slip angle they land on. The multiplier
+     is held rather than decayed while airborne and the chain does not
+     lapse, so a jump is part of a drift rather than an interruption to
+     one. Landing a slide is meant to be the best thing in the game.
+
+     LANDING IS FORGIVING. Only landing off the road kills. Landing in the
+     scrape band is a bad landing and costs speed and a shake; landing on
+     the road costs almost nothing. The three bands are the road's own, so
+     there is nothing new to learn. */
+  JUMP_RAMP_SEGMENTS:         9,     // how long the ramp itself is
+  JUMP_RAMP_HEIGHT:        1100,     // world units at the lip, and the height the car leaves at
+  JUMP_RAMP_HALF:          0.62,     // of the local half width, so it is centred and wide
+  JUMP_LAUNCH_V:          14000,     // LIVE, world units a second, straight up off the lip
+  JUMP_GRAVITY:           30000,     // LIVE, world units per second squared
+  /* Enough to correct a bad launch, not enough to make the launch free.
+     A share of the ground steering rate. */
+  JUMP_AIR_STEER:          0.34,     // LIVE
+  JUMP_LAND_SLOW_TIME:     0.45,     // seconds the landing costs speed for
+  JUMP_LAND_SLOW:          0.82,     // speed multiplier on a clean landing
+  JUMP_LAND_SLOW_BAD:      0.58,     // and on a landing in the scrape band
+  JUMP_LAND_SHAKE:            5,     // pixels, clean
+  JUMP_LAND_SHAKE_BAD:       11,     // pixels, bad, and still capped with everything else
+  /* Some jumps carry time and some do not. No rings, no collectibles and
+     no new economy: hitting the ramp is the whole of the earning. */
+  JUMP_BOOST_CHANCE:       0.45,     // LIVE
+  JUMP_BOOST_SECONDS:       2.5,     // LIVE
+  /* The camera follows the car up, damped, so the jump reads as height
+     without the car leaving the frame. A share of the car's height, with
+     a lag on it. */
+  JUMP_CAM_FOLLOW:         0.62,     // LIVE
+  JUMP_CAM_TIME:           0.18,     // seconds of lag on that
+  /* THE ARROW, and it must never be confused with the hazard warning.
+     The hazard's arrow lies FLAT ON THE ROAD and points ALONG it: it says
+     move sideways, now. This one STANDS UP off the road and points at the
+     SKY: it says aim here and go up. Different plane, different axis,
+     different colour family, and a cold player read the old ramp markings
+     as a hazard once already. */
+  JUMP_ARROW_COUNT:           4,     // chevrons standing before the ramp
+  JUMP_ARROW_SPACING:        11,     // segments between them
+  JUMP_ARROW_HEIGHT:        820,     // world units, taller than a pylon so it reads far out
+  JUMP_ARROW_HALF:         0.26,     // of the half width
+  JUMP_ARROW_THICK:        0.34,     // of the chevron height, the stroke
+  /* When the first one turns up and how often after that. Inside the
+     first minute and often enough to meet several in a normal run, which
+     is the lesson the hazards paid for: a feature met once every few runs
+     may as well not exist. Both LIVE. */
+  JUMP_TIME:                 30,     // LIVE, seconds into the run
+  JUMP_EVERY:              1200,     // LIVE, mean segments between them, about 52s
+  JUMP_RUNOUT:               34,     // segments of landing room past the lip, and
+                                    // it must exceed the flight, which is about 23
+
+  /* ----------------------------------------------------------------
      Progressive difficulty, in two halves that are deliberately not the
      same thing.
 
@@ -1956,6 +2018,23 @@ const COLOUR = {
      two can never be confused at speed. Anything added later that means
      "aim at this" needs a third treatment again, not this one. */
   HAZARD_WARN:  '#7ef0ff',
+
+  /* THE JUMP, and it is a fourth family on purpose.
+
+     Pink says do not touch. Cyan on the ground says move sideways now.
+     GREEN, STANDING UP, says aim here and go up. A cold player once read
+     the old ramp markings as a hazard, so this differs on every axis at
+     once: different hue, different plane, opaque rather than washed, and
+     pointing at the sky rather than along the road.
+
+     JUMP_LIP is held below EDGE_LIGHT in value, because the road edge
+     owns the top of the range and nothing added here may take it. */
+  JUMP_DECK:    '#8a5a30',      // the deck at the lip, lit
+  JUMP_DECK_DARK:'#3a1c18',     // and where it leaves the road, barely off it
+  JUMP_SIDE:    '#2a1210',      // the wedge's own flanks, just off the wall value
+  JUMP_LIP:     '#4dff7a',      // the edge you leave from
+  JUMP_GLOW:    '77,255,122',
+  JUMP_ARROW:   '#4dff7a',
 
   SCRAPE:       '#fff4d2',
   SCRAPE_OUT:   '#ff2b4d',     // the flash shifts to this as the scrape timer runs out
@@ -2216,7 +2295,32 @@ const TUNABLES = [
   { key: 'RESUME_STRAIGHT',    label: 'resumeIn',step: 10,   min: 0,    max: 400,   dp: 0, group: 20 },
   { key: 'RESUME_FLASH_TIME',  label: 'resumeFx',step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 20 },
   { key: 'DEATH_BOTTOM',       label: 'deadBtm', step: 4,    min: 20,   max: 300,   dp: 0, group: 20 },
-  { key: 'DEATH_PROMPT_GAP',   label: 'deadGap', step: 0.005,min: 0.02, max: 0.30,  dp: 3, group: 20 }
+  { key: 'DEATH_PROMPT_GAP',   label: 'deadGap', step: 0.005,min: 0.02, max: 0.30,  dp: 3, group: 20 },
+  /* The jumps. Two groups, because the air and the placement are tuned on
+     different days: how the flight feels, then how often it turns up. */
+  { key: 'JUMP_LAUNCH_V',      label: 'launch',  step: 500,  min: 2000, max: 40000, dp: 0, group: 23 },
+  { key: 'JUMP_GRAVITY',       label: 'gravity', step: 1000, min: 4000, max: 90000, dp: 0, group: 23 },
+  { key: 'JUMP_AIR_STEER',     label: 'airSteer',step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 23 },
+  { key: 'JUMP_CAM_FOLLOW',    label: 'camUp',   step: 0.02, min: 0,    max: 1.2,   dp: 2, group: 23 },
+  { key: 'JUMP_CAM_TIME',      label: 'camLag',  step: 0.01, min: 0.01, max: 1.0,   dp: 2, group: 23 },
+  { key: 'JUMP_LAND_SLOW',     label: 'landOk',  step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 23 },
+  { key: 'JUMP_LAND_SLOW_BAD', label: 'landBad', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 23 },
+  { key: 'JUMP_LAND_SLOW_TIME',label: 'landFor', step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 23 },
+  { key: 'JUMP_LAND_SHAKE',    label: 'landHit', step: 1,    min: 0,    max: 30,    dp: 0, group: 23 },
+  { key: 'JUMP_LAND_SHAKE_BAD',label: 'landBmp', step: 1,    min: 0,    max: 40,    dp: 0, group: 23 },
+  { key: 'JUMP_TIME',          label: 'jumpAt',  step: 5,    min: 0,    max: 300,   dp: 0, group: 24 },
+  { key: 'JUMP_EVERY',         label: 'jumpGap', step: 50,   min: 200,  max: 8000,  dp: 0, group: 24 },
+  { key: 'JUMP_BOOST_CHANCE',  label: 'jumpPay', step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_BOOST_SECONDS', label: 'jumpSec', step: 0.5,  min: 0,    max: 15,    dp: 1, group: 24 },
+  { key: 'JUMP_RAMP_SEGMENTS', label: 'rampLen', step: 1,    min: 2,    max: 30,    dp: 0, group: 24 },
+  { key: 'JUMP_RAMP_HEIGHT',   label: 'rampTop', step: 20,   min: 60,   max: 2000,  dp: 0, group: 24 },
+  { key: 'JUMP_RAMP_HALF',     label: 'rampWide',step: 0.02, min: 0.1,  max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_RUNOUT',        label: 'runout',  step: 2,    min: 4,    max: 80,    dp: 0, group: 24 },
+  { key: 'JUMP_ARROW_COUNT',   label: 'chevs',   step: 1,    min: 1,    max: 10,    dp: 0, group: 24 },
+  { key: 'JUMP_ARROW_SPACING', label: 'chevGap', step: 1,    min: 3,    max: 40,    dp: 0, group: 24 },
+  { key: 'JUMP_ARROW_HEIGHT',  label: 'chevTall',step: 20,   min: 80,   max: 2000,  dp: 0, group: 24 },
+  { key: 'JUMP_ARROW_HALF',    label: 'chevWide',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
+  { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -2847,6 +2951,23 @@ function tunerLine(group) {
   if (group === 22) {
     out += 'throb ' + cityPulse.toFixed(2);
   }
+  if (group === 23) {
+    // The flight, live. Apex and hang time are what the launch speed and
+    // the gravity actually mean, and neither is readable from the pair.
+    const apex = FEEL.JUMP_LAUNCH_V * FEEL.JUMP_LAUNCH_V / (2 * FEEL.JUMP_GRAVITY);
+    out += 'apex ' + Math.round(apex) + '  hang '
+        + (2 * FEEL.JUMP_LAUNCH_V / FEEL.JUMP_GRAVITY).toFixed(2) + 's'
+        + (airborne ? '  UP ' + Math.round(carY) : '  down');
+  }
+  if (group === 24) {
+    let next = -1;
+    for (let i = 0; i < jumps.length; i++) {
+      if (!jumps[i].done) { next = jumps[i].from - carSegIndex; break; }
+    }
+    out += 'live ' + jumps.length + (next >= 0 ? '  next ' + next : '  none')
+        + '  due ' + (jumpDue - segBase - segments.length)
+        + (jumpUnlocked() ? '' : '  LOCKED');
+  }
   if (group === 20) {
     out += 'cont ' + continues + (cpValid ? '  gate@' + cpSeg + ' t' + cpTime.toFixed(0) + 's' : '  no gate')
         + '  far ' + furthest + 'm' + (skipOnRamp ? '  NO RAMP' : '');
@@ -3398,6 +3519,13 @@ function addPhrase() {
      are still whatever the grammar picks. */
   const due = dueHazardKind();
   if (due) { buildHazardPhrase(due); return; }
+  /* Jumps are scheduled exactly as hazards are, and after them, so a
+     hazard that is already due keeps the ground it needs. */
+  // If it does not fit it builds nothing and falls through to the
+  // grammar, because a phrase that adds no segments would leave the top
+  // up loop spinning against a road that never grows.
+  if (jumpUnlocked() && jumpDue <= segBase + segments.length
+      && buildJumpPhrase()) return;
 
   const resting = restOwed > 0;
   if (resting) restOwed--;
@@ -3430,6 +3558,8 @@ function addPhrase() {
 function resetRoad(seed) {
   segments = [];
   hazards = [];
+  jumps = [];
+  jumpDue = 0;
   hazardDue[HAZ_BLOCKER] = 0;
   hazardDue[HAZ_SPLITTER] = 0;
   hazardDue[HAZ_MOVER] = 0;
@@ -3686,6 +3816,78 @@ function buildHazardPhrase(kind) {
   return addHazard(HAZ_MOVER, at, at + len - 1, 0, FEEL.MOVER_HALF, FEEL.MOVER_SWING);
 }
 
+/* ==================================================================
+   JUMPS
+
+   Held in their own list beside the road, exactly as the hazards are, and
+   scheduled the same way: the feature is due first and the road is then
+   BUILT to suit it, rather than a suitable gap being hunted for in road
+   that already exists. That dependency order is what made the hazards
+   common enough to be a mechanic and it does the same here.
+
+   A jump occupies segments [from, to] and is centred, always. It is never
+   an edge commitment: the old ramps were, and being asked to commit to an
+   edge to reach a ramp is a challenge rather than a treat, which is the
+   opposite of what this is for.
+   ================================================================== */
+let jumps = [];
+let jumpDue = 0;
+
+function jumpUnlocked() { return runTime >= FEEL.JUMP_TIME; }
+
+function jumpLead() { return FEEL.JUMP_ARROW_COUNT * FEEL.JUMP_ARROW_SPACING + 4; }
+
+/* The same exclusion rule the hazards live under, asked BEFORE the road
+   is built rather than after, so a jump that does not fit costs nothing.
+
+   Curvature is not tested here and does not need to be: the whole span
+   this covers, from the first chevron to the end of the run out, is road
+   this function is about to lay down dead straight and flat. That is the
+   readability bound, met by construction rather than by rejection.
+   The old ramps were placed onto whatever road happened to be there and
+   needed a curvature bound to stay readable. This does the opposite, so
+   there is no such constant here to get wrong. */
+function jumpFits(from, to) {
+  const lead = jumpLead();
+  const a = from - lead, b = to + FEEL.JUMP_RUNOUT;
+  for (let i = 0; i < hazards.length; i++) {
+    const h = hazards[i];
+    if (h.to + FEEL.HAZARD_WARN_SEGMENTS + 2 >= a
+        && h.from - FEEL.HAZARD_WARN_SEGMENTS - 2 <= b) return false;
+  }
+  for (let i = 0; i < jumps.length; i++) {
+    if (jumps[i].to + FEEL.JUMP_RUNOUT >= a && jumps[i].from - lead <= b) return false;
+  }
+  /* And never under a gate. A gate is the one thing on the road that is
+     purely good news, and flying over one would take a checkpoint away
+     for doing the fun thing. */
+  for (let g = nextGate; g <= b; g += FEEL.CHECKPOINT_EVERY) {
+    if (g >= a) return false;
+  }
+  return true;
+}
+
+/* The road a jump needs, and then the jump on it. A straight run in so the
+   chevrons stand clean, the ramp, and a long flat run out to land on. */
+function buildJumpPhrase() {
+  const lead = jumpLead();
+  const at = segBase + segments.length + lead + 2;
+  const to = at + FEEL.JUMP_RAMP_SEGMENTS - 1;
+  if (!jumpFits(at, to)) {
+    // Try again soon rather than waiting out a whole interval, or a jump
+    // that lands beside a hazard would silently cost the player a jump.
+    jumpDue = segBase + segments.length + Math.round(FEEL.JUMP_EVERY * 0.25);
+    return false;
+  }
+  jumpDue = to + FEEL.JUMP_RUNOUT
+          + Math.round(FEEL.JUMP_EVERY * (0.7 + rng() * 0.6));
+  addRun(lead + 2, 0, 0, roadWidth, 1, true);
+  addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
+  jumps.push({ from: at, to: to, riding: false,
+               boost: rng() < FEEL.JUMP_BOOST_CHANCE, done: false });
+  return true;
+}
+
 function topUpRoad(baseIndex) {
   const needed = baseIndex + FEEL.DRAW_DISTANCE_SEGMENTS + 4;
   while (segBase + segments.length < needed) addPhrase();
@@ -3697,6 +3899,7 @@ function topUpRoad(baseIndex) {
     segments.splice(0, drop);
     segBase += drop;
     while (hazards.length && hazards[0].to < segBase) hazards.shift();
+    while (jumps.length && jumps[0].to < segBase) jumps.shift();
   }
 }
 
@@ -3755,7 +3958,26 @@ let carSegIndex = 0;     // the segment the car is on, read by the trail fade
 let prevCarIndex = 0;    // so a long frame cannot tunnel through a hazard
 let carCurve = 0;        // road curvature under the car, read by the drawn yaw
 let maxCurveSeen = 0;    // largest curvature the generator has actually produced
-let carY = 0;            // height above the road, which is the death fall
+let carY = 0;            // height above the road, the jump AND the death fall
+/* The air. carVY is the only thing the jump adds to the physics: nothing
+   here touches drift.headingV or drift.lateralV, which is what preserves
+   the slip angle through the whole flight. */
+let airborne = false;
+let carVY = 0;
+let airTime = 0;
+let landSlow = 0;         // seconds of the landing speed penalty left
+let landSlowTo = 1;       // and how much it costs
+let landedBoost = false;  // this ramp carries a time extension
+// The two velocities the car left the lip with. Air steering moves both
+// of these together, which is what freezes the slip angle in flight.
+let airHeadingV = 0;
+let airLateralV = 0;
+/* The camera rise, expressed as the FRACTION OF THE CAR'S OWN RISE that
+   the camera cancels, damped. Kept unitless here and converted to a
+   camera height at the point of use, because the projection is
+   anisotropic: a height on screen is scaled by w/2 and the camera's own
+   height by h/2, so a world for world lift would over correct. */
+let camLift = 0;
 let carFallV = 0;
 let carPitch = 0;
 let coastSpeed = 0;
@@ -3807,6 +4029,15 @@ function startRun() {
   carFallV = 0;
   carPitch = 0;
   coastSpeed = 0;
+  airborne = false;
+  carVY = 0;
+  airTime = 0;
+  landSlow = 0;
+  landSlowTo = 1;
+  landedBoost = false;
+  airHeadingV = 0;
+  airLateralV = 0;
+  camLift = 0;
   carSegIndex = 0;
   prevCarIndex = 0;
   hazardSide = 0;
@@ -3892,6 +4123,8 @@ function resumeRoad(carSeg) {
                           / FEEL.SEGMENT_LENGTH);
   segments = [];
   hazards = [];
+  jumps = [];
+  jumpDue = base + Math.round(FEEL.JUMP_EVERY * 0.5);
   /* Each kind gets its ordinary spacing before it is due again, NOT the
      resume point itself. Setting them due immediately guaranteed a hazard
      within a second of every single resume, which measured as four
@@ -3942,6 +4175,15 @@ function continueRun() {
   carFallV = 0;
   carPitch = 0;
   coastSpeed = 0;
+  airborne = false;
+  carVY = 0;
+  airTime = 0;
+  landSlow = 0;
+  landSlowTo = 1;
+  landedBoost = false;
+  airHeadingV = 0;
+  airLateralV = 0;
+  camLift = 0;
   carSegIndex = cpSeg;
   prevCarIndex = cpSeg;
   hazardSide = 0;
@@ -4013,8 +4255,19 @@ function update(dt) {
   carCurve = curve;
   const localHalf = carSegment ? carSegment.hw : FEEL.ROAD_HALF_WIDTH_BASE;
 
-  const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1);
+  /* The landing penalty, which is the whole cost of a bad landing beyond
+     the shake. It runs down on its own and never stacks. */
+  if (landSlow > 0) landSlow = Math.max(0, landSlow - dt);
+  const landFactor = landSlow > 0 ? landSlowTo : 1;
+  const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1) * landFactor;
   position += speed * dt;
+
+  // Up the wedge and off the lip: the one moment the jump adds to the
+  // physics. carY is a drawn height until the lip, and a real one after.
+  if (!airborne) {
+    rampRide(carIndex, (position + FEEL.CAMERA_DISTANCE)
+                       / FEEL.SEGMENT_LENGTH - carIndex, localHalf);
+  }
 
   /* The only place steering is consumed, and the whole drift model.
 
@@ -4029,15 +4282,36 @@ function update(dt) {
   // the local width.
   const rate = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE;
   const intent = steering.value * rate;
-  // The nose comes round to where the driver is pointing.
-  drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME));
 
-  const gripTarget = intent - curve * FEEL.CENTRIFUGAL * rate;
-  drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
-  // The acceleration the model is actually applying sideways, straight
-  // out of the lerp rather than differenced between frames, so it is
-  // smooth enough to lean a body on without any filtering.
-  drift.lateralAccel = (gripTarget - drift.lateralV) / FEEL.GRIP_TIME;
+  if (airborne) {
+    /* IN THE AIR THE SLIP IS FROZEN, and this is the whole point of the
+       feature. Running the ordinary model at a reduced rate was tried
+       first and it was wrong: both velocities chase the same target, so
+       the gap between them, which IS the drift, closes on its own and
+       the car lands straight. Measured, it landed straight every time.
+
+       So air steering shifts the WHOLE FRAME instead. Heading and travel
+       are nudged by the same amount, from the values the car left the lip
+       with, using the same time constant. Their difference is untouched
+       to the last decimal. The driver can move the car sideways to find
+       the road again; they cannot straighten it out, and they cannot make
+       it more sideways either. Whatever angle went up comes down. */
+    const nudge = intent * FEEL.JUMP_AIR_STEER;
+    const k = 1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME);
+    drift.headingV += (airHeadingV + nudge - drift.headingV) * k;
+    drift.lateralV += (airLateralV + nudge - drift.lateralV) * k;
+    // Nothing is pushing sideways on it, so it flies level.
+    drift.lateralAccel = 0;
+  } else {
+    // The nose comes round to where the driver is pointing.
+    drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME));
+    const gripTarget = intent - curve * FEEL.CENTRIFUGAL * rate;
+    drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
+    // The acceleration the model is actually applying sideways, straight
+    // out of the lerp rather than differenced between frames, so it is
+    // smooth enough to lean a body on without any filtering.
+    drift.lateralAccel = (gripTarget - drift.lateralV) / FEEL.GRIP_TIME;
+  }
 
   const prevX = carX;
   carX += drift.lateralV * dt;
@@ -4051,6 +4325,25 @@ function update(dt) {
   drift.slipDeg = drift.slip * 180 / Math.PI;
   drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
 
+  /* The camera starts coming up the moment the wheels leave the road,
+     which is the climb rather than the launch, so there is no step in it
+     at the lip. It is damped in both directions by the same constant. */
+  const camWant = carY > 0 ? FEEL.JUMP_CAM_FOLLOW : 0;
+  camLift += (camWant - camLift) * (1 - Math.exp(-dt / FEEL.JUMP_CAM_TIME));
+
+  if (airborne) {
+    /* Flying. Gravity, and the ground rules are all suspended: no tyre
+       marks, no scrape band, no hazard collision, and the road edge
+       cannot kill because there is nothing under the wheels to leave. */
+    airTime += dt;
+    carVY -= FEEL.JUMP_GRAVITY * dt;
+    carY += carVY * dt;
+    if (carY <= 0) { carY = 0; land(localHalf); }
+    scraping = false;
+    scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
+    scrapeRisk = clamp(scrapeMeter / FEEL.SCRAPE_TIME_LIMIT, 0, 1);
+    return;
+  }
   layTyreMarks(carIndex, prevX);
   updateSmoke(dt);
 
@@ -4080,6 +4373,71 @@ function update(dt) {
     scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
   }
   scrapeRisk = clamp(scrapeMeter / FEEL.SCRAPE_TIME_LIMIT, 0, 1);
+}
+
+/* Up the wedge and off the lip.
+
+   The car RIDES the ramp rather than teleporting off it: while it is on
+   the deck its height is the deck's height, so the wheels are on the
+   surface the player can see rather than through it, and the launch
+   happens at the lip with that height already banked. Every segment
+   crossed this frame is considered, the same way the hazard band is,
+   because at this speed a long frame covers more than one segment and
+   would otherwise drive straight through a ramp without noticing it. */
+function rampRide(carIndex, carFracZ, localHalf) {
+  for (let i = 0; i < jumps.length; i++) {
+    const j = jumps[i];
+    if (j.done) continue;
+    if (j.to < prevCarIndex || j.from > carIndex) continue;
+    /* THE WIDTH IS ASKED ONCE, AT THE FOOT OF THE RAMP. Drive past it on
+       the outside and nothing happens, which is what makes the chevrons
+       worth aiming at. But once the wheels are on the deck the jump is
+       yours whatever the drift does with you after that: being carried
+       off sideways up a ramp is the good part, not a mistake. */
+    if (!j.riding) {
+      if (Math.abs(carX / localHalf) > FEEL.JUMP_RAMP_HALF) { j.done = true; continue; }
+      j.riding = true;
+    }
+    if (carIndex <= j.to) {
+      // Still climbing. Nothing else changes: no grip change, no speed
+      // change, no steering change. It is a shape, not a mechanic.
+      carY = jumpHeightAt(j, carIndex + carFracZ);
+      return;
+    }
+    j.done = true;
+    airborne = true;
+    airTime = 0;
+    airHeadingV = drift.headingV;
+    airLateralV = drift.lateralV;
+    carVY = FEEL.JUMP_LAUNCH_V;
+    carY = FEEL.JUMP_RAMP_HEIGHT;
+    landedBoost = j.boost;
+    audioSting(STING_JUMP);
+    return;
+  }
+  carY = 0;
+}
+
+/* Back on the ground. FORGIVING BY DESIGN: only landing off the road
+   kills. The scrape band is a bad landing rather than a fatal one, and it
+   costs speed and a shake, which is a cost the player can drive out of. */
+function land(localHalf) {
+  airborne = false;
+  carVY = 0;
+  airTime = 0;
+  const offset = Math.abs(carX / localHalf);
+  if (offset > FEEL.OFF_ROAD) { crash(); return; }
+  const bad = offset > FEEL.SCRAPE_START;
+  landSlow = FEEL.JUMP_LAND_SLOW_TIME;
+  landSlowTo = bad ? FEEL.JUMP_LAND_SLOW_BAD : FEEL.JUMP_LAND_SLOW;
+  addShake(bad ? FEEL.JUMP_LAND_SHAKE_BAD : FEEL.JUMP_LAND_SHAKE);
+  audioSting(bad ? STING_CLOSE : STING_LAND);
+  if (landedBoost) {
+    // Hitting the ramp is the whole of the earning. No ring, no pickup.
+    clock = Math.min(FEEL.CLOCK_MAX, clock + FEEL.JUMP_BOOST_SECONDS);
+    clockPop = FEEL.CLOCK_POP_TIME;
+    landedBoost = false;
+  }
 }
 
 /* The curvature the camera leans on. An average of the road ahead of the
@@ -4686,6 +5044,7 @@ function drawRoad(w, h) {
   drawTrail(first, last, baseIndex);
   drawGate(first, last, baseIndex);
   drawHazardWarnings(first, last, baseIndex);
+  drawJumps(first, last, baseIndex);
   drawPylons(first, last, baseIndex, w);
   drawHazards(first, last, baseIndex);
 }
@@ -4785,6 +5144,155 @@ function laneArrows(h, warn) {
     return [leftRoom >= rightRoom ? lanes[0] : lanes[1]];
   }
   return lanes;
+}
+
+/* ==================================================================
+   THE RAMP, AND THE CHEVRONS THAT LEAD UP TO IT.
+
+   The ramp is a wedge: two flanks, a deck banded across its length so the
+   rise is legible, and a lit lip at the top which is the edge the car
+   leaves from. Built from the same boundary tables everything else is, so
+   it sits in the world, and drawn one colour at a time like the road.
+
+   THE CHEVRONS ARE THE HALF OF THIS THAT MATTERS. The hazard warning
+   lies FLAT on the road, points ALONG it, is washed out to half alpha and
+   is cyan. This STANDS UP off the road, points at the SKY, is opaque and
+   is green. Four axes of difference at once, and at speed the standing
+   one has a silhouette against the sky that the flat one physically
+   cannot have. They are not confusable, and they were never meant to be
+   told apart by hue alone.
+   ================================================================== */
+const JUMP_GLOW_FILL = 'rgb(' + COLOUR.JUMP_GLOW + ')';
+const JUMP_DECK_RAMP = rampBetween(COLOUR.JUMP_DECK_DARK, COLOUR.JUMP_DECK);
+
+function jumpHeightAt(j, i) {
+  return FEEL.JUMP_RAMP_HEIGHT
+       * clamp((i - j.from) / (j.to - j.from + 1), 0, 1);
+}
+
+function drawJumps(first, last, baseIndex) {
+  if (!jumps.length) return;
+  for (let k = 0; k < jumps.length; k++) drawRamp(jumps[k], first, last, baseIndex);
+  /* Wide and faint, then solid. The same two pass glow the road edges
+     use, and still no shadowBlur anywhere in this file. */
+  if (jumpChevrons(first, last, baseIndex, 1.22)) {
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = JUMP_GLOW_FILL;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  if (jumpChevrons(first, last, baseIndex, 1)) {
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = COLOUR.JUMP_ARROW;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+const rampL = [], rampR = [], rampY = [];
+function drawRamp(j, first, last, baseIndex) {
+  const RH = FEEL.JUMP_RAMP_HALF;
+  const a = Math.max(j.from - baseIndex, first);
+  const b = Math.min(j.to + 1 - baseIndex, last + 1);
+  if (b - a < 1) return;
+  for (let n = a; n < b; n++) if (!bvis[n]) return;
+  rampL.length = 0; rampR.length = 0; rampY.length = 0;
+  for (let n = a; n <= b; n++) {
+    const rise = bh[n] * jumpHeightAt(j, n + baseIndex);
+    rampL.push(bx[n] - bw[n] * RH);
+    rampR.push(bx[n] + bw[n] * RH);
+    rampY.push(by[n] - rise);
+  }
+  const top = rampY.length - 1;
+
+  // The flanks, so the wedge is a solid rather than a decal.
+  ctx.beginPath();
+  for (const side of [rampL, rampR]) {
+    ctx.moveTo(side[0], rampY[0]);
+    for (let i = 1; i <= top; i++) ctx.lineTo(side[i], rampY[i]);
+    for (let i = top; i >= 0; i--) ctx.lineTo(side[i], by[a + i]);
+    ctx.closePath();
+  }
+  ctx.fillStyle = COLOUR.JUMP_SIDE;
+  ctx.fill();
+
+  /* The deck, one quad per segment, running from the road's own value at
+     the bottom to nearly the lip's at the top.
+
+     BANDS WERE TRIED FIRST AND FAILED. Alternating light and dark stripes
+     across a rising surface read as a zebra crossing painted flat on the
+     road, which is the exact opposite of the thing being built. A value
+     that climbs with the deck reads as a surface turning up into the
+     light, and that is what says ramp. */
+  for (let i = 0; i < top; i++) {
+    ctx.beginPath();
+    ctx.moveTo(rampL[i], rampY[i]);
+    ctx.lineTo(rampR[i], rampY[i]);
+    ctx.lineTo(rampR[i + 1], rampY[i + 1]);
+    ctx.lineTo(rampL[i + 1], rampY[i + 1]);
+    ctx.closePath();
+    ctx.fillStyle = rampAt(JUMP_DECK_RAMP,
+                           jumpHeightAt(j, a + i + baseIndex + 1) / FEEL.JUMP_RAMP_HEIGHT);
+    ctx.fill();
+  }
+
+  /* Rails up both sides. A line that visibly climbs away from the road is
+     the single clearest statement that a surface rises, and it is what
+     carries the ramp at draw distance once the deck is only a few pixels
+     across. */
+  ctx.lineWidth = Math.max(1.5, bh[a] * FEEL.JUMP_RAMP_HEIGHT * 0.06);
+  ctx.strokeStyle = COLOUR.JUMP_LIP;
+  ctx.globalAlpha = 0.55;
+  for (const side of [rampL, rampR]) {
+    ctx.beginPath();
+    ctx.moveTo(side[0], rampY[0]);
+    for (let i = 1; i <= top; i++) ctx.lineTo(side[i], rampY[i]);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // The lip, only when the real lip is the boundary on screen.
+  if (b !== j.to + 1 - baseIndex) return;
+  const thick = Math.max(2, bh[b] * FEEL.JUMP_RAMP_HEIGHT * 0.12);
+  ctx.globalAlpha = 0.3;
+  ctx.fillStyle = JUMP_GLOW_FILL;
+  ctx.fillRect(rampL[top] - thick, rampY[top] - thick * 1.6,
+               rampR[top] - rampL[top] + thick * 2, thick * 3.2);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = COLOUR.JUMP_LIP;
+  ctx.fillRect(rampL[top], rampY[top], rampR[top] - rampL[top], thick);
+}
+
+/* The run of standing chevrons. One path for every chevron in shot,
+   whatever else is on the road, which is the same batching discipline the
+   rest of the frame is drawn under. */
+function jumpChevrons(first, last, baseIndex, grow) {
+  let any = false;
+  ctx.beginPath();
+  for (let k = 0; k < jumps.length; k++) {
+    const j = jumps[k];
+    if (j.done) continue;                    // taken, and behind the player
+    for (let m = 1; m <= FEEL.JUMP_ARROW_COUNT; m++) {
+      const n = j.from - m * FEEL.JUMP_ARROW_SPACING - baseIndex;
+      if (n < first || n > last || !bvis[n]) continue;
+      any = true;
+      // The run grows toward the ramp, so it reads as leading somewhere
+      // rather than as a row of identical markers.
+      const shrink = grow * (1 - (m - 1) * 0.12);
+      const hy = bh[n] * FEEL.JUMP_ARROW_HEIGHT * shrink;
+      const hx = bw[n] * FEEL.JUMP_ARROW_HALF * shrink;
+      const tx = hx * FEEL.JUMP_ARROW_THICK, ty = hy * FEEL.JUMP_ARROW_THICK;
+      const cx = bx[n], base = by[n];
+      ctx.moveTo(cx, base - hy);
+      ctx.lineTo(cx + hx, base);
+      ctx.lineTo(cx + hx - tx, base);
+      ctx.lineTo(cx, base - hy + ty);
+      ctx.lineTo(cx - hx + tx, base);
+      ctx.lineTo(cx - hx, base);
+      ctx.closePath();
+    }
+  }
+  return any;
 }
 
 function drawHazardWarnings(first, last, baseIndex) {
@@ -6351,7 +6859,12 @@ function updateScore(dt) {
   if (carSegIndex >= nextGate) crossGate();
   const earn = multiplierEarn();
   const was = Math.floor(multiplier);
-  if (earn > 0) multiplier += FEEL.MULT_CLIMB_RATE * earn * dt;
+  /* THE AIR HOLDS. There is no grip in flight, so there is no slip to
+     earn from, and a decaying multiplier would make every jump a
+     punishment for taking it. It neither climbs nor falls until the
+     wheels are back on the road. */
+  if (airborne) { /* held */ }
+  else if (earn > 0) multiplier += FEEL.MULT_CLIMB_RATE * earn * dt;
   else multiplier -= FEEL.MULT_DECAY_RATE * dt;
   multiplier = clamp(multiplier, 1, FEEL.MULT_MAX);
   // A kick on every whole number crossed upward, which is the only thing
@@ -6711,6 +7224,12 @@ function updateSpectacle(dt) {
   /* The chain. Every link steps the pitch of the audio blip, which is the
      continuous reward and costs nothing on screen; the text only speaks
      when a whole tier is reached. */
+  /* THE AIR IS NOT A LAPSE. A jump taken straight would otherwise read as
+     letting go of the wheel and cost the chain, which would teach the
+     player to avoid the ramps. Frozen rather than fed: the chain neither
+     grows nor breaks in flight, and picks up exactly where it left off. */
+  if (airborne) { resolveCloseCalls(); return; }
+
   if (drift.slipNorm >= FEEL.CHAIN_MIN_SLIP) {
     chainLapse = 0;
     chainTime += dt;
@@ -7106,6 +7625,17 @@ function drawHud(w, h) {
 function render() {
   const w = view.w, h = view.h;
   ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+
+  /* THE CAMERA FOLLOWS THE CAR UP, damped, and only ever partly. camLift
+     is the fraction of the rise the camera cancels, so the conversion to
+     a camera height has to undo the projection's anisotropy: a world
+     height lands on screen through w/2 and the camera's height through
+     h/2. Raising the camera pushes the whole world down the screen, which
+     is what sells the height; the car still climbs the part the camera
+     does not take, so it never leaves the frame either. */
+  // Clamped at zero because carY also carries the death fall, and the
+  // camera must not chase a car that is dropping into the void.
+  camHeight = FEEL.CAMERA_HEIGHT + camLift * Math.max(0, carY) * (w / h);
 
   ctx.save();
   ctx.translate(shakeX, shakeY);
@@ -7733,6 +8263,10 @@ const STING_BEST  = { notes: [12, 19, 24, 31], step: 0.075, gain: 0.16, decay: 0
 const STING_GATE  = { notes: [12, 19, 24],     step: 0.070, gain: 0.13, decay: 0.24 };
 const STING_CLOSE = { notes: [24, 31],         step: 0.055, gain: 0.09, decay: 0.16 };
 const STING_CHAIN = { notes: [19, 24, 28],     step: 0.065, gain: 0.12, decay: 0.22 };
+// Up off the lip, and back down onto the road. The jump rises, the
+// landing falls, so the pair reads as one arc without a word of copy.
+const STING_JUMP  = { notes: [7, 14, 21, 26],  step: 0.045, gain: 0.13, decay: 0.20 };
+const STING_LAND  = { notes: [26, 19, 12],     step: 0.050, gain: 0.12, decay: 0.26 };
 
 function audioSting(sting) {
   if (!audioOn()) return;
