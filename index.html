@@ -758,6 +758,184 @@ const FEEL = {
   DEATH_INPUT_LOCK:        0.30,     // seconds before a restart is accepted
 
   /* ----------------------------------------------------------------
+     SPECTACLE, and one rule governs the whole block:
+
+     RAZZMATAZZ IS EARNED, NEVER DECORATIVE. Nothing here fires on a wall
+     clock or on a random roll. Every value below is a response to
+     something the driver did, so the game is louder when it is driven
+     better and it is quiet when it is not. The pulse is the closest thing
+     to an exception and it is not one: its phase runs off distance
+     travelled rather than time, and its depth is zero unless the
+     multiplier has bought it.
+
+     TWO HARD LIMITS BIND EVERYTHING IN THIS BLOCK, and they beat any
+     effect in it:
+
+       1. The road edge stays the brightest, most readable thing on
+          screen. That is what keeps the player alive.
+       2. Nothing here may reduce the contrast of the drivable surface
+          against the void.
+
+     Both are satisfied by construction, and both had to be MADE true
+     rather than assumed. Nothing here touches ROAD_LIGHT, ROAD_DARK,
+     WALL or VOID, so the palette's own contrast is untouched, but two
+     effects broke the limits anyway and both were caught by measuring
+     the rendered frame rather than by reading the code:
+
+       The edge glow band covers the lip, so raising its alpha dimmed the
+       brightest thing on screen. The lip fell from 207 to 182 in
+       luminance from a multiplier of one to the cap. Fixed by drawing
+       the heat half of the glow inboard and outboard of the lip and
+       never over it, in edgeGlowPass.
+
+       The horizon band is centred on the horizon line, and the road
+       converges to that line from BELOW, so deepening the whole band lit
+       the void behind the far road without lighting the road. Contrast
+       between 1.7 and 3.3 seconds out, which is the planning horizon,
+       moved 4.4 luminance units the wrong way. Fixed by deepening only
+       the half above the line, which is sky and only sky.
+
+     Measured after both fixes: the lip sits at 207.3 at every multiplier
+     from one to the cap, and it is the brightest thing in the world at
+     every one of them. If a heat term is ever added, render it at both
+     ends and measure the frame. Reasoning about it is not enough: this
+     block got it wrong twice. */
+  /* HEAT is the multiplier as an analogue value, lagged, and it is the
+     only input the world reaction has. Continuous and smooth: nothing
+     switches between states in steps.
+
+     HEAT_CURVE above one is what makes a small multiplier a hint and a
+     big one unmistakable, and it has to be set against where the
+     multiplier actually lives rather than against its range. Measured
+     over twelve runs of committed edge driving, it is 1.3 at the median,
+     2.2 at the upper quartile, 4.8 at the ninetieth and 9.8 at the
+     ninety ninth, so it spends most of its life near the bottom and only
+     a good run takes it up. At 1.7 that made three quarters of all
+     driving produce a heat under 0.02, which is not a hint, it is
+     nothing. At this value a multiplier of 3 gives about a tenth of the
+     reaction, 6 gives a bit over a third, and only the cap gives all of
+     it. */
+  HEAT_TIME:               0.55,     // LIVE, seconds of lag, so it swells
+  HEAT_CURVE:              1.25,     // LIVE, above 1 ramps it in gently
+  /* The heat half of the edge glow, drawn as its own pass INBOARD AND
+     OUTBOARD OF THE LIP AND NEVER OVER IT. See edgeGlowPass: putting it
+     over the lip dims the brightest thing on screen as the multiplier
+     climbs, which breaks hard limit one. */
+  HEAT_EDGE_GLOW:          0.34,     // LIVE, alpha of the heat only glow pass
+  HEAT_EDGE_SPREAD:        0.50,     // extra glow width, as a multiple of the base
+  HEAT_EDGE_LIFT:          0.60,     // how far the dim half of the lip runs toward the light one
+  HEAT_PYLON_GLOW:         0.34,     // LIVE, extra alpha on the pylon glow
+  HEAT_PYLON_SPREAD:       0.90,     // extra glow width, as a multiple of the base
+  /* The pulse. Phase comes from DISTANCE TRAVELLED, not from a clock, so
+     it is the world going past rather than a timer running, and its depth
+     is multiplied by heat so at a multiplier of one there is no pulse at
+     all. */
+  HEAT_PULSE_LENGTH:       5200,     // world units per pulse cycle
+  HEAT_PULSE_DEPTH:        0.35,     // LIVE, how much of the glow the trough takes
+  HEAT_SKYLINE_LIFT:       0.70,     // LIVE, how far the roof lights run toward the biome's own hot hue
+  HEAT_SKYLINE_THICK:       2.6,     // extra pixels on the lit roof line
+  HEAT_HORIZON:            0.55,     // LIVE, a second pass of the horizon band at this alpha
+  HEAT_MUSIC:              0.85,     // LIVE, how much of the music's heat the multiplier may drive
+
+  /* Breaking the stored best, live, mid run. One comparison a frame and
+     it is the strongest moment this game has: it makes the previous run
+     present inside this one.
+
+     It fires on the number on the screen, which is banked plus pending,
+     because that is the number the player is reading and the moment they
+     mean. The pending half is still at risk until the next gate, which is
+     the tension rather than a bug, and the death screen still only calls
+     a new best when the banked figure actually cleared it.
+
+     It CANNOT fire when there is no stored best to beat. bestKnown is
+     false on a fresh install and false when localStorage is unavailable,
+     which section 6 says is common on school profiles, and in both cases
+     the whole effect stays switched off for the run. */
+  BEST_FLASH_TIME:         0.55,     // LIVE, seconds of the screen wash
+  BEST_FLASH_ALPHA:        0.30,     // and how strong it is allowed to get
+  BEST_SHAKE_PX:              9,     // under the crash, and capped with everything else
+  BEST_GLOW_ALPHA:         0.34,     // the permanent halo the score keeps for the run
+  BEST_GLOW_SPREAD:        0.34,     // of the score size
+
+  /* Drift callouts. Transient text that flies in, reads and dies.
+
+     THE DISCIPLINE IS THE FEATURE. Three sessions were spent stripping
+     the HUD back and this must not put it back, so: nothing persists,
+     nothing is ever drawn over the driving line, only one is on screen at
+     a time and the newest wins, and the chatty kind is rate limited so a
+     long chain cannot produce a stream of text.
+
+     Placement is derived rather than fixed. It sits in the band of sky
+     between the bottom of the HUD stack and the horizon, which is empty
+     in both orientations and is never road, and it is offset to whichever
+     side of the screen the car is NOT on, so it can never sit over the
+     car or over the line the player is reading. */
+  CALLOUT_TIME:            1.05,     // LIVE, seconds on screen, in and out included
+  CALLOUT_IN:              0.14,     // of that, the fly in
+  CALLOUT_OUT:             0.38,     // of that, the fade
+  CALLOUT_SLIDE:           0.05,     // of screen width, how far it flies. Kept tiny: section 7.
+  CALLOUT_SIZE:           0.042,     // of the smaller screen dimension
+  CALLOUT_SIDE:            0.24,     // of screen width, offset from centre
+  CALLOUT_MAX_WIDTH:       0.52,     // of screen width, the widest a callout may be
+  CALLOUT_RISE:            0.06,     // of the smaller dimension, how far above the horizon it sits
+  CALLOUT_GAP_TOP:         0.05,     // and the least it may sit below the HUD stack
+  /* The rate limit, and it has to beat CALLOUT_TIME by a clear margin or
+     the callouts butt up against each other and the result is a stream
+     with holes in it rather than an occasional remark. A committed edge
+     driver touches the edge often enough to earn a perfect entry every
+     few seconds, so this is what actually decides how chatty the game is.
+     At 1.3 it measured thirteen a minute, which was too many. */
+  CALLOUT_GAP:             3.20,     // LIVE, seconds before another drift callout is allowed
+  CALLOUT_LOCK:            0.70,     // LIVE, seconds a louder callout suppresses quieter ones for
+  /* An ENTRY has to be an entry. Slip alone is not enough: a driver
+     living on the edge re touches it every second or two, and calling
+     each of those a perfect entry measured nine in eighty seconds, which
+     is exactly the clutter three sessions were spent removing. So the car
+     must have been clear of the band for CALLOUT_ENTRY_CLEAR first, and
+     then arrive at it already committed. */
+  CALLOUT_ENTRY_SLIP:      0.72,     // slip needed on touching the edge for a perfect entry
+  CALLOUT_ENTRY_CLEAR:     1.60,     // LIVE, seconds clear of the band before one counts
+  CALLOUT_CHAIN_STEP:      2.20,     // LIVE, seconds of unbroken earning per chain link
+  CALLOUT_CHAIN_GRACE:     0.30,     // seconds the earning may lapse without breaking the chain
+
+  /* Close calls. Section 4.4's philosophy applied to obstacles rather
+     than to the road edge: the risky line is the rewarding one. The
+     geometry is known exactly, so this is measured rather than guessed.
+     The margin is the clear air in WORLD UNITS between the side of the
+     car and the outside of the hazard's clip shoulder, at its closest
+     over the whole pass, and clipping the hazard at any point disqualifies
+     it. The car is 600 wide, so this is two thirds of a car. Measured over
+     28 hazards passed cleanly, it calls 39% of them close, at a median
+     gap of 215. */
+  HAZARD_CLOSE_MARGIN:      400,     // LIVE, world units of clear air that counts as close
+  HAZARD_CLOSE_BONUS:       260,     // LIVE, points
+
+  /* The checkpoint, which is the structural beat of the run. Light runs
+     down the posts as the car closes on it, which is earned because the
+     approach is the player's, and the crossing fires.
+
+     GATE_FLASH_ALPHA is deliberately low. It has to land as a moment and
+     also has to not blind anybody at the exact instant a new biome and a
+     new stretch of road arrive. */
+  GATE_SWEEP_SEGMENTS:      260,     // LIVE, how far out the light starts running down
+  GATE_SWEEP_LENGTH:       0.16,     // of the post height, the lit band itself
+  GATE_FLASH_ALPHA:        0.26,     // LIVE
+  GATE_BAR_WIDTH:          0.05,     // of screen width, the posts sweeping past
+  GATE_SHAKE_PX:              7,
+
+  /* SHAKE FROM DIFFERENT SOURCES MUST NOT SUM WITHOUT A CAP. Section 7
+     warns that overdoing shake tips into disorientation and that the
+     threshold is lower on a phone held close to the face, and this
+     session added three new sources to a system that had two.
+
+     Everything goes through addShake, which takes the LOUDEST claim
+     rather than adding them up, and then clamps. So a best score break
+     landing on a gate crossing beside a hazard scrape is exactly as
+     violent as the loudest one of those alone, and nothing in the game
+     can ever shake harder than a crash. */
+  SHAKE_MAX_PX:              16,     // LIVE, and equal to CRASH_SHAKE_PX on purpose
+
+  /* ----------------------------------------------------------------
      Audio. Everything here is synthesised: oscillators and one generated
      noise buffer. Nothing is fetched, nothing is decoded, and there is no
      sample data in the file, because section 6's audience is behind a
@@ -1385,6 +1563,9 @@ function applyBiome(i) {
   biome = ((i % BIOMES.length) + BIOMES.length) % BIOMES.length;
   const b = BIOMES[biome];
   for (const k in b) COLOUR[k] = b[k];
+  // The roof lights run toward this biome's own hot hue, so the ramp has
+  // to follow the place.
+  SKYLINE_HOT_RAMP = rampBetween(COLOUR.SKYLINE_TOP, COLOUR.HORIZON_FADE);
   // The horizon and haze gradients are cached, so they have to be rebuilt.
   if (view.h) resize();
 }
@@ -1453,6 +1634,12 @@ const COLOUR = {
      else on screen uses. */
   SCORE:        '#ffd24a',
   SCORE_BEST:   '#fff4c4',
+  /* Once the stored best has been passed the score keeps a halo for the
+     rest of the run, and runs a hotter ramp than the ordinary one. It is
+     the score's own colour rather than a new one, because the thing that
+     changed is the score. */
+  SCORE_RECORD: '#ffffff',
+  SCORE_GLOW:   '255,244,196',
   SCORE_EDGE:   'rgba(24,6,0,0.85)',
   GATE:         '#8dfbe0',
   GATE_POST:    '#1d7f70',
@@ -1503,6 +1690,54 @@ const COLOUR = {
   TEXT:         '#fff2e2',
   TEXT_SHADOW:  'rgba(24,6,0,0.75)'
 };
+
+/* ------------------------------------------------------------------
+   Colour ramps, precomputed.
+
+   Every one of these is read once or twice a frame and they all say the
+   same handful of things, so building a colour string per frame would be
+   pure waste. Both endpoints always come out of the palette above rather
+   than being written again here, so a repalette moves the ramps with
+   everything else, and RAMP_STEPS is coarse on purpose: sixteen steps is
+   below the point where the eye can see the stepping on a smooth swell
+   and it keeps the tables tiny. */
+const RAMP_STEPS = 16;
+function rgbOf(c) {
+  if (c.charAt(0) === '#') {
+    return [parseInt(c.slice(1, 3), 16),
+            parseInt(c.slice(3, 5), 16),
+            parseInt(c.slice(5, 7), 16)];
+  }
+  const p = c.split(',');
+  return [+p[0], +p[1], +p[2]];
+}
+function rampBetween(from, to) {
+  const a = rgbOf(from), b = rgbOf(to), out = [];
+  for (let i = 0; i < RAMP_STEPS; i++) {
+    const f = i / (RAMP_STEPS - 1);
+    out.push('rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ','
+                    + Math.round(a[1] + (b[1] - a[1]) * f) + ','
+                    + Math.round(a[2] + (b[2] - a[2]) * f) + ')');
+  }
+  return out;
+}
+function rampAt(ramp, t) {
+  let i = Math.round(t * (ramp.length - 1));
+  if (i < 0) i = 0; else if (i >= ramp.length) i = ramp.length - 1;
+  return ramp[i];
+}
+
+/* The score, at rest and once the stored best has been passed. */
+const SCORE_RAMP = rampBetween(COLOUR.SCORE, COLOUR.SCORE_BEST);
+const SCORE_RECORD_RAMP = rampBetween(COLOUR.SCORE_BEST, COLOUR.SCORE_RECORD);
+/* The road lip burning hotter: the dim half of the edge running toward
+   the light half. This only ever RAISES the edge, which is why it is safe
+   against hard limit one. */
+const EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
+/* The skyline lights coming up: the roof line running toward the biome's
+   own hot hue, so it changes place with the place. Rebuilt by applyBiome,
+   which is the only thing that moves either endpoint. */
+let SKYLINE_HOT_RAMP = rampBetween(COLOUR.SKYLINE_TOP, COLOUR.HORIZON_FADE);
 
 const STORAGE_PREFIX = 'driftfever.';
 
@@ -1571,7 +1806,57 @@ const TUNABLES = [
      and this is now the single place the tilt direction lives. It has
      been reversed three times; settling it on the phone beats settling it
      in another session. */
-  { key: 'TILT_DIRECTION',     label: 'tiltdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1 }
+  { key: 'TILT_DIRECTION',     label: 'tiltdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1 },
+  /* The spectacle, and the world reaction especially, because that is the
+     one thing in it that can only be judged by driving with it on. Group
+     13 is the intensity of the world reaction, 14 is the callouts and 15
+     is the earned moments. */
+  { key: 'HEAT_CURVE',         label: 'heatK',   step: 0.1,  min: 0.4,  max: 4.0,   dp: 1, group: 13 },
+  { key: 'HEAT_TIME',          label: 'heatLag', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 13 },
+  { key: 'HEAT_EDGE_GLOW',     label: 'hEdge',   step: 0.02, min: 0,    max: 0.54,  dp: 2, group: 13 },
+  { key: 'HEAT_PYLON_GLOW',    label: 'hPylon',  step: 0.02, min: 0,    max: 0.78,  dp: 2, group: 13 },
+  { key: 'HEAT_PULSE_DEPTH',   label: 'hPulse',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
+  { key: 'HEAT_HORIZON',       label: 'hSky',    step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
+  { key: 'HEAT_SKYLINE_LIFT',  label: 'hCity',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
+  { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
+  { key: 'CALLOUT_TIME',       label: 'callFor', step: 0.05, min: 0.3,  max: 4.0,   dp: 2, group: 14 },
+  { key: 'CALLOUT_GAP',        label: 'callGap', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 14 },
+  { key: 'CALLOUT_LOCK',       label: 'callLock',step: 0.1,  min: 0,    max: 4.0,   dp: 1, group: 14 },
+  { key: 'CALLOUT_CHAIN_STEP', label: 'chain',   step: 0.1,  min: 0.4,  max: 10,    dp: 1, group: 14 },
+  { key: 'CALLOUT_ENTRY_SLIP', label: 'entry',   step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 14 },
+  { key: 'HAZARD_CLOSE_MARGIN',label: 'close',   step: 25,   min: 0,    max: 2000,  dp: 0, group: 15 },
+  { key: 'HAZARD_CLOSE_BONUS', label: 'closePts',step: 20,   min: 0,    max: 2000,  dp: 0, group: 15 },
+  { key: 'GATE_SWEEP_SEGMENTS',label: 'sweep',   step: 20,   min: 20,   max: 1400,  dp: 0, group: 15 },
+  { key: 'GATE_FLASH_ALPHA',   label: 'gFlash',  step: 0.02, min: 0,    max: 0.8,   dp: 2, group: 15 },
+  { key: 'BEST_FLASH_TIME',    label: 'bFlash',  step: 0.05, min: 0,    max: 3.0,   dp: 2, group: 15 },
+  { key: 'SHAKE_MAX_PX',       label: 'shakeCap',step: 1,    min: 0,    max: 40,    dp: 0, group: 15 },
+  /* The rest of the block. Every constant this session added is on here,
+     which is what was asked for, and the readout sizes itself to the
+     screen so extra lines cost legibility rather than fitting. Groups 16
+     and 17 are the second order values: the shapes of the effects rather
+     than their strengths. */
+  { key: 'HEAT_EDGE_SPREAD',   label: 'hEdgeW',  step: 0.05, min: 0,    max: 3.0,   dp: 2, group: 16 },
+  { key: 'HEAT_EDGE_LIFT',     label: 'hLip',    step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 16 },
+  { key: 'HEAT_PYLON_SPREAD',  label: 'hPylonW', step: 0.05, min: 0,    max: 3.0,   dp: 2, group: 16 },
+  { key: 'HEAT_PULSE_LENGTH',  label: 'hWave',   step: 200,  min: 600,  max: 30000, dp: 0, group: 16 },
+  { key: 'HEAT_SKYLINE_THICK', label: 'hCityPx', step: 0.2,  min: 0,    max: 12,    dp: 1, group: 16 },
+  { key: 'CALLOUT_SIZE',       label: 'callSize',step: 0.002,min: 0.015,max: 0.12,  dp: 3, group: 16 },
+  { key: 'CALLOUT_SIDE',       label: 'callX',   step: 0.02, min: 0,    max: 0.45,  dp: 2, group: 16 },
+  { key: 'CALLOUT_MAX_WIDTH',  label: 'callWide',step: 0.02, min: 0.15, max: 0.95,  dp: 2, group: 16 },
+  { key: 'CALLOUT_RISE',       label: 'callUp',  step: 0.01, min: 0,    max: 0.30,  dp: 2, group: 16 },
+  { key: 'CALLOUT_GAP_TOP',    label: 'callDown',step: 0.01, min: 0,    max: 0.30,  dp: 2, group: 16 },
+  { key: 'CALLOUT_IN',         label: 'callIn',  step: 0.02, min: 0,    max: 0.5,   dp: 2, group: 17 },
+  { key: 'CALLOUT_OUT',        label: 'callOut', step: 0.02, min: 0,    max: 0.8,   dp: 2, group: 17 },
+  { key: 'CALLOUT_SLIDE',      label: 'callFly', step: 0.01, min: 0,    max: 0.30,  dp: 2, group: 17 },
+  { key: 'CALLOUT_ENTRY_CLEAR',label: 'entryGap',step: 0.2,  min: 0,    max: 8.0,   dp: 1, group: 17 },
+  { key: 'CALLOUT_CHAIN_GRACE',label: 'chainOk', step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 17 },
+  { key: 'BEST_FLASH_ALPHA',   label: 'bWash',   step: 0.02, min: 0,    max: 0.8,   dp: 2, group: 17 },
+  { key: 'BEST_GLOW_ALPHA',    label: 'bHalo',   step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 17 },
+  { key: 'BEST_GLOW_SPREAD',   label: 'bHaloW',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 17 },
+  { key: 'BEST_SHAKE_PX',      label: 'bShake',  step: 1,    min: 0,    max: 30,    dp: 0, group: 17 },
+  { key: 'GATE_SWEEP_LENGTH',  label: 'sweepLen',step: 0.02, min: 0.02, max: 0.8,   dp: 2, group: 17 },
+  { key: 'GATE_BAR_WIDTH',     label: 'gBars',   step: 0.01, min: 0,    max: 0.35,  dp: 2, group: 17 },
+  { key: 'GATE_SHAKE_PX',      label: 'gShake',  step: 1,    min: 0,    max: 30,    dp: 0, group: 17 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -2141,6 +2426,16 @@ function tunerLine(group) {
   }
   if (group === 12) {
     out += 'clock ' + clock.toFixed(1) + '  banked ' + banked + '  biome ' + biome;
+  }
+  if (group === 13) {
+    // The world reaction, live, because an intensity that cannot be seen
+    // as a number beside the thing it is driving cannot be tuned.
+    out += 'heat ' + worldHeat.toFixed(2) + '  pulse ' + heatPulse.toFixed(2)
+        + '  ×' + multiplier.toFixed(1);
+  }
+  if (group === 15) {
+    out += 'best ' + bestScore + (bestKnown ? '' : ' (none)')
+        + (beatBest ? ' BEATEN' : '') + '  shake ' + shake.toFixed(1);
   }
   if (group === 8) {
     // What is actually on the road in front of you, live, because spawn
@@ -2848,7 +3143,13 @@ function addHazard(kind, from, to, xFrac, halfWorld, swingFrac) {
   if (!hazardFits(from, to, xFrac, halfWorld, swingFrac)) return false;
   hazards.push({ kind: kind, from: from, to: to, x: xFrac,
                  half: halfWorld, swing: swingFrac,
-                 phase: rng() * Math.PI * 2 });
+                 phase: rng() * Math.PI * 2,
+                 /* The close call ledger. gap is the least clear air seen
+                    over the whole pass, hit records whether it was ever
+                    clipped, and done says it has been settled up. All
+                    three are written by hazardBand while the car is
+                    alongside and read once by resolveCloseCalls. */
+                 gap: Infinity, hit: false, done: false });
   return true;
 }
 
@@ -3064,6 +3365,7 @@ function startRun() {
   multiplier = 1;
   multPop = 0;
   runTime = 0;
+  resetSpectacle();
   nextGate = Math.round(FEEL.CHECKPOINT_EVERY * 0.7);
   applyBiome(0);
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
@@ -3174,7 +3476,7 @@ function update(dt) {
              : (scraping ? Math.sign(carFrac) : 0);
   if (scraping) {
     scrapeMeter += dt;
-    if (shake < FEEL.SCRAPE_SHAKE_PX) shake = FEEL.SCRAPE_SHAKE_PX;
+    addShake(FEEL.SCRAPE_SHAKE_PX);
     if (scrapeMeter > FEEL.SCRAPE_TIME_LIMIT) { crash(); return; }
   } else {
     scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
@@ -3226,7 +3528,15 @@ function hazardBand(carIndex, localHalf) {
     const x = hazardX(h);
     const core = h.half / localHalf;
     const clip = (h.half + FEEL.HAZARD_CLIP) / localHalf;
+    /* The close call ledger, kept here because this is the one place that
+       already knows the car is alongside this hazard and already has the
+       geometry out. Clear air between the side of the car and the outside
+       of the clip shoulder, back in world units, at its narrowest over the
+       whole pass. */
+    const air = (Math.abs(carFrac - x) - clip - carHalf) * localHalf;
+    if (air < h.gap) h.gap = air;
     if (hi <= x - clip || lo >= x + clip) continue;
+    h.hit = true;
     if (hi > x - core && lo < x + core) return 2;
     worst = 1;
     // The flash belongs on the side the hazard is, not the side of the
@@ -3247,7 +3557,7 @@ function crash() {
   state = DEAD;
   deadFor = 0;
   scraping = false;
-  shake = FEEL.CRASH_SHAKE_PX;
+  addShake(FEEL.CRASH_SHAKE_PX);
   carFallV = 0;
   carY = 0;
   carPitch = 0;
@@ -3470,18 +3780,23 @@ function drawSkyline(w, h) {
   ctx.fillStyle = COLOUR.SKYLINE;
   ctx.fill();
 
-  // A dim lit line on the roofs, so they read as built rather than as a
-  // ragged hole in the background.
+  /* A dim lit line on the roofs, so they read as built rather than as a
+     ragged hole in the background. This is where the city lights come up
+     with the multiplier: the line thickens and runs toward this biome's
+     own hot hue. The building bodies are deliberately left alone, because
+     they are the silhouette the far road is read against and lifting them
+     would cost contrast rather than buy anything. */
+  const lit = 1.5 + FEEL.HEAT_SKYLINE_THICK * worldHeat * heatPulse;
   ctx.beginPath();
   for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
     for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
       const x = shift + rep * period + i * step;
       if (x > w + step || x < -step * 2) continue;
       const th = minH + skylineH[i] * spanH;
-      ctx.rect(x, baseY - th, step * 0.86, 1.5);
+      ctx.rect(x, baseY - th, step * 0.86, lit);
     }
   }
-  ctx.fillStyle = COLOUR.SKYLINE_TOP;
+  ctx.fillStyle = rampAt(SKYLINE_HOT_RAMP, worldHeat * FEEL.HEAT_SKYLINE_LIFT);
   ctx.fill();
 }
 
@@ -3654,7 +3969,11 @@ function drawRoad(w, h) {
   bandPass(first, last, 1, band, EDGE_OUT - lip, COLOUR.SHOULDER_LIGHT);
   bandPass(first, last, 0, band, EDGE_OUT - lip, COLOUR.SHOULDER_DARK);
   bandPass(first, last, 1, EDGE_OUT - lip, EDGE_OUT, COLOUR.EDGE_LIGHT);
-  bandPass(first, last, 0, EDGE_OUT - lip, EDGE_OUT, COLOUR.EDGE_DARK);
+  // The dim half of the lip runs toward the light half as the multiplier
+  // climbs, so the edge stripe burns hotter and the edge as a whole only
+  // ever gains luminance.
+  bandPass(first, last, 0, EDGE_OUT - lip, EDGE_OUT,
+           rampAt(EDGE_HOT_RAMP, worldHeat * FEEL.HEAT_EDGE_LIFT));
   surfacePass(first, last, 1, COLOUR.ROAD_LIGHT);
   surfacePass(first, last, 0, COLOUR.ROAD_DARK);
   lanePass(first, last);
@@ -3710,6 +4029,21 @@ function drawGate(first, last, baseIndex) {
   ctx.fillStyle = COLOUR.GATE;
   ctx.fillRect(Math.min(lx, rx) - pw / 2, top - beam / 2,
                Math.abs(rx - lx) + pw, beam);
+
+  /* Light running down the posts as the car closes. Driven by the
+     distance still to run rather than by a clock, so it is the player's
+     own approach that moves it and a gate that is never reached never
+     finishes its sweep. Two rects. */
+  const away = nextGate - carSegIndex;
+  if (away > 0 && away < FEEL.GATE_SWEEP_SEGMENTS && state === DRIVING) {
+    const u = 1 - away / FEEL.GATE_SWEEP_SEGMENTS;
+    const postH = by[n] - top;
+    const band = Math.max(2, postH * FEEL.GATE_SWEEP_LENGTH);
+    const y = top + (postH - band) * u;
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillRect(lx - pw * 0.85, y, pw * 1.7, band);
+    ctx.fillRect(rx - pw * 0.85, y, pw * 1.7, band);
+  }
 }
 
 /* The warning, painted on the road a full second before the hazard, and
@@ -3989,12 +4323,44 @@ function lanePass(first, last) {
 }
 
 /* The wide faint half of the glow, over the road and the void alike so it
-   spills both ways. One fill for both edges and the whole draw distance. */
+   spills both ways. One fill for both edges and the whole draw distance.
+
+   THE HEAT HALF IS A SEPARATE PASS AND IT SKIPS THE LIP, and that is not
+   tidiness, it is hard limit one holding. The glow band covers the lip,
+   so simply raising its alpha with the multiplier DARKENS the brightest
+   thing on screen: measured, the lip fell from 207 to 182 in luminance
+   going from a multiplier of one to the cap, while the car sat unmoved at
+   246. That is the spectacle making the road harder to read, which is
+   exactly the failure the limits are there to catch.
+
+   So the resting pass is untouched, to the pixel, and the heat pass is
+   drawn inboard and outboard of the lip only. The edge therefore gains
+   width and glow as the multiplier climbs and the lip itself can only
+   ever gain luminance, from the hot ramp on its dim stripe. */
 function edgeGlowPass(first, last) {
-  const spread = FEEL.EDGE_GLOW_SPREAD;
-  const inner = EDGE_OUT - FEEL.EDGE_LIP_FRACTION - spread;
-  const outer = EDGE_OUT + spread;
+  glowBandPath(first, last, EDGE_OUT - FEEL.EDGE_LIP_FRACTION - FEEL.EDGE_GLOW_SPREAD,
+               EDGE_OUT + FEEL.EDGE_GLOW_SPREAD);
+  ctx.globalAlpha = FEEL.EDGE_GLOW_ALPHA;
+  ctx.fillStyle = EDGE_GLOW_FILL;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  if (worldHeat <= 0.01) return;
+
+  const lip = FEEL.EDGE_LIP_FRACTION;
+  const spread = FEEL.EDGE_GLOW_SPREAD * (1 + FEEL.HEAT_EDGE_SPREAD * worldHeat);
   ctx.beginPath();
+  glowBandPath(first, last, EDGE_OUT - lip - spread, EDGE_OUT - lip, true);
+  glowBandPath(first, last, EDGE_OUT, EDGE_OUT + spread, true);
+  ctx.globalAlpha = FEEL.HEAT_EDGE_GLOW * worldHeat;
+  ctx.fillStyle = EDGE_GLOW_FILL;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+/* Both edges, the whole draw distance, between two fractions of the half
+   width. Pass keep to add to a path already open rather than start one. */
+function glowBandPath(first, last, inner, outer, keep) {
+  if (!keep) ctx.beginPath();
   for (let n = first; n <= last; n++) {
     if (!bvis[n]) continue;
     // The band is under a pixel from here on, so it costs fill rate and
@@ -4010,10 +4376,6 @@ function edgeGlowPass(first, last) {
     ctx.lineTo(bx[n + 1] + a2, y2); ctx.lineTo(bx[n + 1] + c2, y2);
     ctx.closePath();
   }
-  ctx.globalAlpha = FEEL.EDGE_GLOW_ALPHA;
-  ctx.fillStyle = EDGE_GLOW_FILL;
-  ctx.fill();
-  ctx.globalAlpha = 1;
 }
 
 /* A second glowing line, along the bottom of the slab. Two lit lines with
@@ -4054,8 +4416,15 @@ function underlinePath(first, last, thick) {
 function drawPylons(first, last, baseIndex, w) {
   const spacing = FEEL.PYLON_SPACING;
   const scaleH = 1 / FEEL.ROAD_HALF_WIDTH_BASE;
-  pylonPath(first, last, baseIndex, spacing, FEEL.PYLON_GLOW_SPREAD, scaleH, 2);
-  ctx.globalAlpha = FEEL.PYLON_GLOW_ALPHA;
+  /* The pylons pulsing with the multiplier. The pulse rides the glow pass
+     only, so the posts themselves never move or change size and the road
+     edge outboard of which they stand is untouched. heatPulse is exactly
+     1 at a multiplier of one, so at rest this is the old drawing to the
+     pixel and there is no pulse to notice. */
+  const glow = FEEL.PYLON_GLOW_SPREAD * (1 + FEEL.HEAT_PYLON_SPREAD * worldHeat);
+  pylonPath(first, last, baseIndex, spacing, glow, scaleH, 2);
+  ctx.globalAlpha = Math.min(1,
+    (FEEL.PYLON_GLOW_ALPHA + FEEL.HEAT_PYLON_GLOW * worldHeat) * heatPulse);
   ctx.fillStyle = PYLON_GLOW_FILL;
   ctx.fill();
   ctx.globalAlpha = 1;
@@ -4705,13 +5074,13 @@ function drawScrapeFlash(w, h) {
   ctx.restore();
 }
 
-function text(str, x, y, size, weight, align) {
+function text(str, x, y, size, weight, align, fill) {
   ctx.font = weight + ' ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   ctx.textAlign = align || 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = COLOUR.TEXT_SHADOW;
   ctx.fillText(str, x, y + Math.max(1, size * 0.06));
-  ctx.fillStyle = COLOUR.TEXT;
+  ctx.fillStyle = fill || COLOUR.TEXT;
   ctx.fillText(str, x, y);
 }
 
@@ -4788,33 +5157,34 @@ function drawScore(w, h) {
     * (1 + 0.3 * flash + FEEL.SCORE_HEAT_GROWTH * heat + FEEL.SCORE_HEAT_POP * pop));
   scoreTop = safeTop + h * FEEL.SCORE_TOP;
   scoreSize = size;
-  arcadeNumber(String(banked + Math.floor(score)), w / 2, scoreTop,
+  const label = String(banked + Math.floor(score));
+  /* Once the stored best has been passed the score keeps a halo for the
+     rest of the run. It is the same wide then normal glow everything lit
+     in this game uses, and it is the one piece of this session that is
+     allowed to persist, because the whole point of it is that the player
+     is in new territory until the run ends. */
+  if (beatBest) {
+    ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(4, size * FEEL.BEST_GLOW_SPREAD);
+    ctx.globalAlpha = FEEL.BEST_GLOW_ALPHA;
+    ctx.strokeStyle = 'rgb(' + COLOUR.SCORE_GLOW + ')';
+    ctx.strokeText(label, w / 2, scoreTop);
+    ctx.globalAlpha = 1;
+  }
+  arcadeNumber(label, w / 2, scoreTop,
                size, flash > 0 ? COLOUR.GATE : scoreHeatColour(heat));
   drawClock(w, h);
 }
 
-/* Precomputed, because it is read every frame and building a colour
-   string per frame to say the same thing is waste. The resting gold at
-   the cold end running to the best score cream at the cap, both taken
-   from the palette rather than written out again here, so a repalette
-   moves the whole ramp with everything else. */
-const SCORE_RAMP = [];
-(function () {
-  const hex = c => [parseInt(c.slice(1, 3), 16),
-                    parseInt(c.slice(3, 5), 16),
-                    parseInt(c.slice(5, 7), 16)];
-  const a = hex(COLOUR.SCORE), b = hex(COLOUR.SCORE_BEST);
-  for (let i = 0; i < 16; i++) {
-    const f = i / 15;
-    SCORE_RAMP.push('rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ','
-      + Math.round(a[1] + (b[1] - a[1]) * f) + ','
-      + Math.round(a[2] + (b[2] - a[2]) * f) + ')');
-  }
-})();
+/* The resting gold running to the best score cream, and once the stored
+   best has been passed, that cream running on to white. Both tables are
+   built up with the rest of the ramps, beside the palette they come out
+   of. */
 function scoreHeatColour(t) {
-  let i = Math.round(t * (SCORE_RAMP.length - 1));
-  if (i < 0) i = 0; else if (i >= SCORE_RAMP.length) i = SCORE_RAMP.length - 1;
-  return SCORE_RAMP[i];
+  return rampAt(beatBest ? SCORE_RECORD_RAMP : SCORE_RAMP, t);
 }
 
 /* The pit timer. A plate, tabular digits, and the distance to the next
@@ -4852,6 +5222,9 @@ function drawClock(w, h) {
      score swells with the multiplier or flashes at a gate. scoreTop is a
      middle baseline, so half the score size clears the digits. */
   const y = scoreTop + scoreSize * 0.5 + s * FEEL.CLOCK_GAP + boxH * 0.5;
+  // The bottom of the whole HUD stack, so anything placed under it can
+  // measure rather than assume. The callouts are the only reader.
+  hudBottom = y + boxH * 0.5;
   const bx0 = w / 2 - boxW / 2, by0 = y - boxH / 2;
 
   ctx.globalAlpha = 0.72 * dim;
@@ -5013,7 +5386,7 @@ let gateFlash = 0;        // seconds left on the crossing response
 let clockPop = 0;         // seconds left on the big time payout
 /* Where the score was drawn this frame, so the timer can hang off it
    rather than guessing at a fraction of the screen. */
-let scoreTop = 0, scoreSize = 0;
+let scoreTop = 0, scoreSize = 0, hudBottom = 0;
 let runBestMult = 1;      // the best multiplier this run reached
 let gatesPassed = 0;
 let runDistance = 0;      // metres, for the summary
@@ -5069,13 +5442,22 @@ function updateClock(dt) {
 /* Crossing a gate. Everything a gate does happens here, once, on the
    frame the car passes it. */
 function crossGate() {
-  banked += Math.floor(score);
+  const took = Math.floor(score);
+  banked += took;
   score = 0;
   clock = Math.min(FEEL.CLOCK_MAX, clock + FEEL.CLOCK_CHECKPOINT);
   gateFlash = FEEL.CHECKPOINT_FLASH;
   clockPop = FEEL.CLOCK_POP_TIME;
   nextGate += FEEL.CHECKPOINT_EVERY;
   gatesPassed++;
+  /* The peak of the stage, and it lands as a moment rather than as a
+     fade: the wash and the shake fire on this frame and the new biome
+     arrives underneath them, so the turnover is something that happened
+     rather than something that was noticed later. */
+  gateFlash2 = FEEL.CHECKPOINT_FLASH;
+  addShake(FEEL.GATE_SHAKE_PX);
+  audioSting(STING_GATE);
+  sayCallout('BANKED  +' + took, CALL_GATE, COLOUR.GATE);
   applyBiome(biome + 1);
 }
 
@@ -5101,7 +5483,256 @@ function bankScore() {
   const final = banked;
   if (final > bestScore) {
     bestScore = final;
+    // In memory even if the write failed, so the NEXT run has something
+    // real to chase whether or not this profile allows storage.
+    bestKnown = true;
     storeSet('best', String(bestScore));
+  }
+}
+
+
+/* ==================================================================
+   SPECTACLE
+
+   Everything here is a RESPONSE. Nothing in this section fires on a wall
+   clock or on a random roll: the heat is the multiplier, the callouts are
+   things the player just did, the close call is measured geometry, and
+   the gate is a place on the road. That is the whole design rule and it
+   is what stops this being decoration.
+
+   PRECEDENCE, decided explicitly rather than left to emerge, because a
+   hard corner beside a hazard on a run that is beating its best can put
+   four of these in the same frame:
+
+       best score break  >  checkpoint  >  close call  >  drift callout
+
+   Higher suppresses lower for CALLOUT_LOCK seconds. Shake is separate and
+   is combined by addShake, which takes the loudest rather than the sum.
+   ================================================================== */
+
+/* Shake, from every source in the game, through one door.
+
+   Section 7 says overdoing shake tips into disorientation and that the
+   threshold is lower on a phone held close to the face. Two sources were
+   already here and this session adds three, so they combine by MAXIMUM
+   rather than by sum and the result is clamped. Simultaneous events are
+   therefore exactly as violent as the loudest one of them, and nothing in
+   the game can shake harder than a crash. */
+function addShake(px) {
+  if (px > shake) shake = px;
+  if (shake > FEEL.SHAKE_MAX_PX) shake = FEEL.SHAKE_MAX_PX;
+}
+
+/* The world's reaction to the multiplier, as one analogue number from 0
+   to 1. Continuous, lagged so it swells rather than flickers, and bent by
+   HEAT_CURVE so a small multiplier is a hint and a big one is
+   unmistakable. Everything the world does reads this and nothing reads
+   the multiplier directly. */
+let worldHeat = 0;
+let heatPulse = 1;        // the travelling pulse, 1 at rest, and exactly 1 at zero heat
+
+/* Callouts. One slot, because one at a time and newest wins. */
+const CALL_DRIFT = 1, CALL_CLOSE = 2, CALL_GATE = 3, CALL_BEST = 4;
+let calloutText = '';
+let calloutColour = '';
+let calloutPri = 0;
+let calloutLife = 0;
+let calloutSide = 1;
+let calloutLock = 0;      // a louder callout holding the channel
+let calloutGap = 0;       // the rate limit on the chatty kind
+
+function sayCallout(str, pri, colour) {
+  // Deferred, not queued: a callout that lost its moment has nothing left
+  // to say by the time the channel is free.
+  if (calloutLock > 0 && pri < calloutPri) return;
+  if (pri <= CALL_DRIFT && calloutGap > 0) return;
+  calloutText = str;
+  calloutColour = colour;
+  calloutPri = pri;
+  calloutLife = FEEL.CALLOUT_TIME;
+  calloutLock = FEEL.CALLOUT_LOCK;
+  calloutGap = FEEL.CALLOUT_GAP;
+  // Away from the car, so it can never sit over the car or over the line
+  // the player is actually reading.
+  calloutSide = carFrac >= 0 ? -1 : 1;
+}
+
+/* The best score break. bestKnown is the whole of the fresh install and
+   no storage handling: with nothing stored there is nothing to beat, so
+   the effect simply does not exist for that run. */
+let bestKnown = bestScore > 0;
+let beatBest = false;
+let beatFlash = 0;
+
+/* The chain: unbroken earning. It survives CALLOUT_CHAIN_GRACE of not
+   earning, so a corner exit does not break it, and every
+   CALLOUT_CHAIN_STEP of it is one link. */
+let chainTime = 0;
+let chainLapse = 0;
+let chainLinks = 0;
+
+let gateFlash2 = 0;       // the crossing wash, separate from the score's own flash
+let wasScraping = false;
+let edgeClear = 0;        // seconds since the car was last in the scrape band
+
+function resetSpectacle() {
+  worldHeat = 0;
+  heatPulse = 1;
+  calloutText = '';
+  calloutLife = 0;
+  calloutPri = 0;
+  calloutLock = 0;
+  calloutGap = 0;
+  beatBest = false;
+  beatFlash = 0;
+  chainTime = 0;
+  chainLapse = 0;
+  chainLinks = 0;
+  gateFlash2 = 0;
+  wasScraping = false;
+  edgeClear = 0;
+}
+
+function updateSpectacle(dt) {
+  if (calloutLife > 0) calloutLife -= dt;
+  if (calloutLock > 0) calloutLock -= dt;
+  if (calloutGap > 0) calloutGap -= dt;
+  if (beatFlash > 0) beatFlash -= dt;
+  if (gateFlash2 > 0) gateFlash2 -= dt;
+
+  const driving = state === DRIVING;
+  const want = driving
+    ? Math.pow(clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1), FEEL.HEAT_CURVE)
+    : 0;
+  worldHeat += (want - worldHeat) * (1 - Math.exp(-dt / FEEL.HEAT_TIME));
+  /* Phase off distance travelled rather than off a clock, so it is the
+     world going past. Depth is multiplied by heat, so at a multiplier of
+     one this is exactly 1 and there is no pulse at all. */
+  const wave = 0.5 + 0.5 * Math.sin(position * (Math.PI * 2 / FEEL.HEAT_PULSE_LENGTH));
+  heatPulse = 1 - FEEL.HEAT_PULSE_DEPTH * worldHeat * (1 - wave);
+
+  if (!driving) { wasScraping = false; edgeClear = 0; return; }
+
+  // The strongest moment available, and one comparison to find it.
+  if (bestKnown && !beatBest && banked + Math.floor(score) > bestScore) {
+    beatBest = true;
+    beatFlash = FEEL.BEST_FLASH_TIME;
+    addShake(FEEL.BEST_SHAKE_PX);
+    audioSting(STING_BEST);
+    sayCallout('NEW BEST', CALL_BEST, COLOUR.SCORE_BEST);
+  }
+
+  /* A perfect entry: arriving in the scrape band already committed,
+     rather than sliding wide into it. The edge itself only, because
+     clipping a hazard is not an entry, it is a mistake, and only after
+     genuinely leaving the band, because a re touch is not an arrival. */
+  const onEdge = scraping && Math.abs(carFrac) > FEEL.SCRAPE_START;
+  if (onEdge) {
+    if (!wasScraping && edgeClear >= FEEL.CALLOUT_ENTRY_CLEAR
+        && drift.slipNorm >= FEEL.CALLOUT_ENTRY_SLIP) {
+      sayCallout('PERFECT ENTRY', CALL_DRIFT, COLOUR.HAZARD_WARN);
+    }
+    edgeClear = 0;
+  } else {
+    edgeClear += dt;
+  }
+  wasScraping = onEdge;
+
+  // The chain, which is the multiplier's own earning made countable.
+  if (multiplierEarn() > 0) {
+    chainLapse = 0;
+    chainTime += dt;
+    const links = Math.floor(chainTime / FEEL.CALLOUT_CHAIN_STEP);
+    if (links > chainLinks) {
+      chainLinks = links;
+      sayCallout('CHAIN ×' + (links + 1), CALL_DRIFT, COLOUR.SCORE);
+    }
+  } else {
+    chainLapse += dt;
+    if (chainLapse > FEEL.CALLOUT_CHAIN_GRACE) { chainTime = 0; chainLinks = 0; }
+  }
+
+  resolveCloseCalls();
+}
+
+/* Close calls, section 4.4 applied to obstacles. The gap is recorded by
+   hazardBand while the car is alongside, in world units of clear air
+   between the side of the car and the outside of the clip shoulder, and
+   this settles up once the hazard is behind. Clipping it at any point
+   during the pass disqualifies it: the reward is for the line that was
+   nearly a mistake and was not one. */
+function resolveCloseCalls() {
+  for (let i = 0; i < hazards.length; i++) {
+    const h = hazards[i];
+    if (h.done || h.to >= carSegIndex) continue;
+    h.done = true;
+    if (h.hit || h.gap > FEEL.HAZARD_CLOSE_MARGIN) continue;
+    score += FEEL.HAZARD_CLOSE_BONUS;
+    audioSting(STING_CLOSE);
+    sayCallout('CLOSE CALL  +' + FEEL.HAZARD_CLOSE_BONUS, CALL_CLOSE, COLOUR.HAZARD_LIP);
+  }
+}
+
+/* The callout itself. Flies in a very short way, reads, and dies. The
+   slide is deliberately tiny: section 7 warns that motion is the thing
+   most easily overdone here, and the job is legibility not choreography. */
+function drawCallout(w, h) {
+  if (calloutLife <= 0) return;
+  const s = Math.min(w, h);
+  const t = 1 - calloutLife / FEEL.CALLOUT_TIME;      // 0 at birth, 1 at death
+  let alpha = 1, slide = 0;
+  if (t < FEEL.CALLOUT_IN) {
+    const u = t / FEEL.CALLOUT_IN;
+    alpha = u;
+    slide = (1 - u) * w * FEEL.CALLOUT_SLIDE;
+  } else if (t > 1 - FEEL.CALLOUT_OUT) {
+    alpha = (1 - t) / FEEL.CALLOUT_OUT;
+  }
+  /* In the band of sky between the bottom of the HUD stack and the
+     horizon. Both ends are measured rather than assumed, so it holds in
+     portrait and in landscape and it is never over road: everything above
+     the horizon line is sky by construction. */
+  const y = Math.max(hudBottom + s * FEEL.CALLOUT_GAP_TOP,
+                     horizonY - s * FEEL.CALLOUT_RISE);
+  /* Sized to fit and then clamped on screen. Offset to the side plus a
+     long string plus a narrow handset runs the text off the edge, and a
+     callout that cannot be read has cost clutter and bought nothing.
+     CLOSE CALL carries a number and is the long one. */
+  const size = fittedSize(calloutText, '800', Math.round(s * FEEL.CALLOUT_SIZE),
+                          w * FEEL.CALLOUT_MAX_WIDTH);
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const half = ctx.measureText(calloutText).width / 2;
+  const edge = s * FEEL.CALLOUT_GAP_TOP;
+  let x = w / 2 + calloutSide * (w * FEEL.CALLOUT_SIDE + slide);
+  x = clamp(x, half + edge, w - half - edge);
+  ctx.globalAlpha = alpha;
+  text(calloutText, x, y, size, '800', 'center', calloutColour);
+  ctx.globalAlpha = 1;
+}
+
+/* The two full screen washes, both short and both capped low. They are
+   the only things in the game that cover the road, so they are the ones
+   that get checked hardest against hard limit two. */
+function drawSpectacleFlash(w, h) {
+  if (gateFlash2 > 0) {
+    const u = gateFlash2 / FEEL.CHECKPOINT_FLASH;
+    ctx.globalAlpha = FEEL.GATE_FLASH_ALPHA * u * u;
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillRect(0, 0, w, h);
+    // The posts sweeping past, which is what a gate crossing looks like
+    // from inside the car.
+    const bar = w * FEEL.GATE_BAR_WIDTH;
+    ctx.globalAlpha = FEEL.GATE_FLASH_ALPHA * u;
+    ctx.fillRect(0, 0, bar * (0.4 + u), h);
+    ctx.fillRect(w - bar * (0.4 + u), 0, bar * (0.4 + u), h);
+    ctx.globalAlpha = 1;
+  }
+  if (beatFlash > 0) {
+    const u = beatFlash / FEEL.BEST_FLASH_TIME;
+    ctx.globalAlpha = FEEL.BEST_FLASH_ALPHA * u * u;
+    ctx.fillStyle = COLOUR.SCORE_BEST;
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1;
   }
 }
 
@@ -5135,7 +5766,7 @@ function drawBar(w, h) {
 function drawHud(w, h) {
   if (!showDebug) return;
   const pad = 10;
-  const lines = [
+  let lines = [
     fpsShown.toFixed(0) + ' fps   worst ' + fpsWorstShown.toFixed(1) + ' ms'
       + (tunerDirty() ? '   TUNED' : ''),
     tunerLine(0),
@@ -5151,31 +5782,69 @@ function drawHud(w, h) {
     tunerLine(10),
     tunerLine(11),
     tunerLine(12),
+    tunerLine(13),
+    tunerLine(14),
+    tunerLine(15),
+    tunerLine(16),
+    tunerLine(17),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
       + '  width ' + widthScale.toFixed(2) + '  int ' + maxIntensity()
       + '  ease ' + ease.toFixed(2)
   ];
-  /* Sized to fit rather than fixed, because the readout gains a value
-     most sessions and a line that runs off the side of a phone is a line
-     that cannot be read at the moment it is needed. */
+  /* Sized to fit AND wrapped, because the readout gains values most
+     sessions and a line that runs off the side of a phone is a line that
+     cannot be read at the moment it is needed. Shrinking alone stopped
+     being enough: it is clamped at eight pixels, and the spectacle
+     session took several groups past what eight pixels could hold, so
+     anything still too wide is now folded at a space instead of being
+     cut off. Continuation lines are indented so a fold cannot be
+     mistaken for a new group. */
   const pad2 = pad * 2 + 10;
   let size = 13;
-  ctx.font = '600 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const font = s => '600 ' + s + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.font = font(size);
+  const room = w - pad2;
   let widest = 0;
   for (let i = 0; i < lines.length; i++) {
     const tw = ctx.measureText(lines[i]).width;
     if (tw > widest) widest = tw;
   }
-  if (widest > w - pad2) {
-    size = Math.max(8, Math.floor(size * (w - pad2) / widest));
-    ctx.font = '600 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-    widest = 0;
-    for (let i = 0; i < lines.length; i++) {
-      const tw = ctx.measureText(lines[i]).width;
-      if (tw > widest) widest = tw;
+  if (widest > room) {
+    size = Math.max(8, Math.floor(size * room / widest));
+    ctx.font = font(size);
+  }
+  const wrapped = [];
+  for (let i = 0; i < lines.length; i++) {
+    /* Every tuner line begins with the cursor column, which is a space on
+       all but one of them, so the search for a fold point starts at index
+       one. Starting at zero finds that leading space, measures an empty
+       string, and quietly decides the line already fits. */
+    let rest = lines[i];
+    let lead = '';
+    for (;;) {
+      if (ctx.measureText(lead + rest).width <= room) break;
+      let cut = -1;
+      for (let k = rest.indexOf(' ', 1); k > 0; k = rest.indexOf(' ', k + 1)) {
+        if (ctx.measureText(lead + rest.slice(0, k)).width > room) break;
+        cut = k;
+      }
+      if (cut <= 0) break;
+      wrapped.push(lead + rest.slice(0, cut));
+      // The groups are separated by two spaces, so skip whatever run of
+      // them the fold landed on rather than starting the next line on one.
+      while (cut < rest.length && rest.charAt(cut) === ' ') cut++;
+      rest = rest.slice(cut);
+      lead = '   ';
     }
+    wrapped.push(lead + rest);
+  }
+  lines = wrapped;
+  widest = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const tw = ctx.measureText(lines[i]).width;
+    if (tw > widest) widest = tw;
   }
   const lineH = Math.round(size * 1.38);
   ctx.textAlign = 'left';
@@ -5204,6 +5873,23 @@ function render() {
   const glow = h * FEEL.HORIZON_GLOW_FRACTION;
   ctx.fillStyle = horizonGradient;
   ctx.fillRect(-40, horizonY - glow, w + 80, glow * 2);
+  /* The horizon deepening with the multiplier. A second pass of the band
+     that is already cached rather than a rebuilt gradient, so it costs
+     one fill and nothing else.
+
+     ONLY THE HALF ABOVE THE HORIZON LINE, and that is hard limit two
+     holding. The road converges to the horizon from BELOW, so the lower
+     half of this band sits directly behind the far road: deepening it
+     there lit the void without lighting the road, and the surface against
+     void contrast between 1.7 and 3.3 seconds out, which is the planning
+     horizon section 4.3 is about, fell from a difference of 0.4 to one of
+     4.8 the wrong way. Above the line is sky and only sky, so the glow
+     can swell as much as it likes there and the road cannot lose by it. */
+  if (worldHeat > 0.01) {
+    ctx.globalAlpha = FEEL.HEAT_HORIZON * worldHeat;
+    ctx.fillRect(-40, horizonY - glow, w + 80, glow);
+    ctx.globalAlpha = 1;
+  }
 
   drawSkyline(w, h);
   drawGrid(w, h);
@@ -5215,8 +5901,12 @@ function render() {
   ctx.restore();
 
   drawScrapeFlash(w, h);
+  drawSpectacleFlash(w, h);
   drawBar(w, h);
+  // The score first, because the callout measures itself against the
+  // bottom of the HUD stack and the clock is what sets it.
   drawScore(w, h);
+  drawCallout(w, h);
   drawOverlay(w, h);
   drawPauseCover(w, h);
   drawHud(w, h);
@@ -5411,10 +6101,21 @@ function buildAudio() {
   hatSrc.connect(hatHigh); hatHigh.connect(hatGain);
   hatGain.connect(hatLevel); hatLevel.connect(musicGain);
 
+  /* --- The sting. One voice for every earned moment in the game.
+     It hangs off the BUS rather than off musicGain, because these are
+     responses to what the player did and they have to be there for
+     somebody who has never turned the music on. It is a mono voice like
+     everything else here: started once, never rebuilt, and a sting is a
+     handful of scheduled frequency changes on it. --- */
+  const stingOsc = node('Oscillator');
+  stingOsc.type = 'triangle';
+  const stingGain = gain(0);
+  stingOsc.connect(stingGain); stingGain.connect(bus);
+
   const t0 = ac.currentTime;
   skidSrc.start(t0); scrapeSrc.start(t0); crashSrc.start(t0); hatSrc.start(t0);
   wobble.start(t0); bassOsc.start(t0);
-  arpOsc.start(t0); octOsc.start(t0);
+  arpOsc.start(t0); octOsc.start(t0); stingOsc.start(t0);
 
   return {
     ac: ac, master: master, pauseFilter: pauseFilter,
@@ -5426,6 +6127,7 @@ function buildAudio() {
     arpOsc: arpOsc, arpLow: arpLow, arpGain: arpGain,
     octOsc: octOsc, octGain: octGain, octLevel: octLevel,
     hatGain: hatGain, hatLevel: hatLevel,
+    stingOsc: stingOsc, stingGain: stingGain,
     step: 0, nextNote: 0, heat: 0, crashUntil: 0
   };
 }
@@ -5731,9 +6433,16 @@ function updateAudio(dt) {
   const driving = state === DRIVING && !paused;
   const slip = driving ? drift.slipNorm : 0;
 
-  // The heat the music reads. Slip and the spent budget both count, and
-  // it lags hard, so the arrangement swells rather than flickering.
-  const want = Math.max(slip, driving ? scrapeRisk : 0);
+  /* The heat the music reads. Slip and the spent budget both count, and
+     it lags hard, so the arrangement swells rather than flickering.
+
+     The multiplier is the third term, so the octave layer and the hats
+     come up with the rest of the world rather than on their own schedule.
+     It goes in by MAXIMUM rather than by sum, the same discipline the
+     shake uses, so three loud things at once are as loud as the loudest
+     and the arrangement cannot pile up. */
+  const want = Math.max(slip, driving ? scrapeRisk : 0,
+                        driving ? worldHeat * FEEL.HEAT_MUSIC : 0);
   a.heat += (want - a.heat) * (1 - Math.exp(-dt / FEEL.MUSIC_HEAT_TIME));
 
   // The skid. Level, band and Q, all off the one slip value.
@@ -5752,6 +6461,34 @@ function updateAudio(dt) {
   updateMusic();
 }
 
+/* The stings. Three moments, three shapes, one voice.
+
+   Each is a short rising figure scheduled on the sting oscillator that is
+   already running. Nothing is built here, nothing allocates, and the note
+   tables are semitone offsets from the music's own root so a sting always
+   belongs to the same key the arpeggio is in.
+
+   They are all responses. There is no sting anywhere in this game that
+   fires because time passed. */
+const STING_BEST  = { notes: [12, 19, 24, 31], step: 0.075, gain: 0.16, decay: 0.30 };
+const STING_GATE  = { notes: [12, 19, 24],     step: 0.070, gain: 0.13, decay: 0.24 };
+const STING_CLOSE = { notes: [24, 31],         step: 0.055, gain: 0.09, decay: 0.16 };
+
+function audioSting(sting) {
+  if (!audioOn()) return;
+  const a = audio, root = TRACKS[track].root;
+  const p = a.stingGain.gain;
+  const t = a.ac.currentTime;
+  p.cancelScheduledValues(t);
+  p.setValueAtTime(p.value, t);
+  for (let i = 0; i < sting.notes.length; i++) {
+    const at = t + i * sting.step;
+    a.stingOsc.frequency.setValueAtTime(semis(root * 8, sting.notes[i]), at);
+    p.setValueAtTime(sting.gain, at);
+    p.exponentialRampToValueAtTime(0.0001, at + sting.decay);
+  }
+}
+
 /* The crash, and then a clean wind down. One envelope and one sweep on
    voices that already exist, so nothing is built at the worst possible
    moment for the frame budget. */
@@ -5768,9 +6505,12 @@ function audioCrash() {
   f.cancelScheduledValues(t);
   f.setValueAtTime(FEEL.CRASH_FREQ_FROM, t);
   f.exponentialRampToValueAtTime(FEEL.CRASH_FREQ_TO, t + FEEL.CRASH_TIME);
-  // Nothing survives the car. The skid especially must not outlive it.
+  // Nothing survives the car. The skid especially must not outlive it,
+  // and neither does a sting that was mid figure when it happened.
   ramp(a.skidGain.gain, 0, 0.05);
   ramp(a.scrapeGain.gain, 0, 0.05);
+  a.stingGain.gain.cancelScheduledValues(t);
+  ramp(a.stingGain.gain, 0, 0.05);
 }
 
 
@@ -5809,6 +6549,10 @@ function frame(now) {
   update(dt);
   updateScore(dt);
   updateClock(dt);
+  // After the score, because the best score break compares the number the
+  // score has just settled on, and after update, because the close call
+  // ledger is written by the collision pass.
+  updateSpectacle(dt);
   updateBar(dt);
   render();
   sampleFps(rawDt);
