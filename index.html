@@ -228,10 +228,19 @@
      finger of canvas between the two groups, and that band is where a tap
      has to be able to reach the road. 58 is still clear of the 56 point
      minimum a thumb needs. */
-  @media (max-width: 359px) {
-    #pads button { width: 58px; height: 58px; }
-    #pads button svg { width: 27px; height: 27px; }
-    .padGroup { gap: 7px; }
+  /* Five buttons across a phone held upright is tight, and the steering
+     band between the two groups has to stay tappable, so they step down
+     twice on the way to the narrowest handsets. 56 is the floor: below
+     that a thumb stops hitting them reliably. */
+  @media (max-width: 429px) {
+    #pads button { width: 60px; height: 60px; }
+    #pads button svg { width: 28px; height: 28px; }
+    .padGroup { gap: 8px; }
+  }
+  @media (max-width: 379px) {
+    #pads button { width: 56px; height: 56px; }
+    #pads button svg { width: 26px; height: 26px; }
+    .padGroup { gap: 6px; }
   }
   /* A probe for the safe area insets, so the canvas can keep the resource
      bar and the pause overlay clear of the home indicator and the gesture
@@ -722,6 +731,9 @@ const FEEL = {
   CLOCK_GATE_SIZE:        0.036,     // the distance to the next gate, beside it
   CLOCK_PAY_SIZE:         0.030,     // the live payback readout
   CLOCK_POP_TIME:          1.30,     // seconds the gate payout stays up
+  /* Purely cosmetic. Nothing waits on it and a tap during it restarts,
+     so it can be as long as it likes without costing anything. */
+  RESULT_ROLL_TIME:        0.85,     // seconds the result counts up over
 
   CRASH_GRAVITY:          26000,     // world units per second squared
   CRASH_TUMBLE:             2.4,     // radians per second, nose over
@@ -924,6 +936,45 @@ const FEEL = {
   CAR_BODY_LENGTH:          880,
   CAR_BODY_HEIGHT:          250,
   CAR_RIDE_HEIGHT:           85,     // ground to the underside of the body
+  /* The body is lofted through stations along its length rather than
+     built from boxes, because a box is exactly what it looked like.
+
+     Every number below is a fraction, of the half width or of the body
+     height, at a station given as a fraction of the half length from the
+     tail (0) to the nose (1). Three things make it read as a car rather
+     than a crate and all three live here: it TAPERS, so no two sides are
+     parallel; every hard edge is CHAMFERED, which is the sill and shoulder
+     rows below and costs twice the faces for a dramatically softer read;
+     and it is WIDEST AT THE AXLES, which is what a flared arch is.
+
+     The camera is behind and above and essentially never sees the nose,
+     so the stations are packed toward the tail. The rear three quarter is
+     the only view that matters and it gets the geometry. */
+  CAR_STATIONS: [
+    // z,    sill,  hip,   shoulder, roof,  yLow,  yHip,  yShoulder, yRoof
+    [-1.00,  0.72,  0.86,  0.80,     0.50,  0.10,  0.34,  0.70,      0.94],
+    [-0.80,  0.80,  1.06,  0.92,     0.62,  0.04,  0.32,  0.74,      1.06],
+    [-0.42,  0.82,  0.99,  0.93,     0.72,  0.02,  0.32,  0.80,      1.30],
+    [-0.05,  0.84,  0.98,  0.94,     0.70,  0.02,  0.32,  0.82,      1.34],
+    [ 0.34,  0.82,  0.97,  0.88,     0.52,  0.03,  0.32,  0.72,      0.96],
+    [ 0.68,  0.74,  1.02,  0.80,     0.44,  0.06,  0.30,  0.56,      0.62],
+    [ 1.00,  0.52,  0.68,  0.58,     0.34,  0.14,  0.28,  0.44,      0.48]
+  ],
+  CAR_GLASS_FROM:         -0.50,     // stations between these two are glass
+  CAR_GLASS_TO:            0.36,
+  /* The rear light bar, which is the detail the player sees most of and
+     therefore the one worth spending on. Fractions of the tail station. */
+  CAR_LIGHT_Y:             0.62,     // of body height, up the tail
+  CAR_LIGHT_HALF:          0.74,     // of the tail half width
+  CAR_LIGHT_THICK:         0.10,     // of body height
+  CAR_SPOILER_Z:          -1.02,     // of half length
+  CAR_SPOILER_Y:           1.16,     // of body height
+  CAR_SPOILER_HALF:        0.92,     // of half width
+  CAR_SPOILER_CHORD:       0.16,     // of half length
+  CAR_SPOILER_THICK:         26,     // world units
+  CAR_SPOILER_POST:         0.5,     // of half width, how far out the posts sit
+  CAR_RIM_GLOW_SPREAD:      1.9,
+  CAR_RIM_GLOW_ALPHA:      0.30,
   CAR_CABIN_LENGTH:         380,
   CAR_CABIN_WIDTH:          450,
   CAR_CABIN_HEIGHT:         175,
@@ -1372,6 +1423,12 @@ const COLOUR = {
   /* The gate. Bright, cool and unmistakably not a hazard, because the one
      thing on the road you are allowed to drive straight through must not
      wear the colour of the things that kill you. */
+  /* The arcade score. Gold on a dark outline, which is the one treatment
+     that says prize rather than readout, and it is not a colour anything
+     else on screen uses. */
+  SCORE:        '#ffd24a',
+  SCORE_BEST:   '#fff4c4',
+  SCORE_EDGE:   'rgba(24,6,0,0.85)',
   GATE:         '#8dfbe0',
   GATE_POST:    '#1d7f70',
   GATE_GLOW:    '141,251,224',
@@ -1399,8 +1456,17 @@ const COLOUR = {
   CAR_SIDE:     '#1c7f9a',
   CAR_CABIN_TOP:'#ccfaff',
   CAR_GLASS:    '#08222c',
-  CAR_LIGHT:    '#e6fdff',
-  CAR_LIGHT_GLOW: '150,240,255',
+  /* Red, finally. The car is the one cool object in a warm world and the
+     lights are the one warm thing on it, which is exactly why they read:
+     they are the only place those two palettes touch. Kept below
+     EDGE_LIGHT in value so the road edges still own the top of the
+     range. */
+  CAR_LIGHT:    '#ff3a4f',
+  CAR_LIGHT_GLOW: '255,58,79',
+  CAR_LIGHT_HOT:'#ffd2d8',
+  CAR_HIP:      '#2aa3c0',      // the flank between shoulder and sill
+  CAR_SILL:     '#12596e',      // under the widest line, always in shade
+  CAR_SPOILER:  '#9df6ff',
   CAR_RIM:      '#d6feff',
   CAR_TYRE:     '#0a0f14',
   CAR_TYRE_TOP: '#182430',
@@ -2957,6 +3023,9 @@ function startRun() {
   clock = FEEL.CLOCK_START;
   gateFlash = 0;
   clockPop = 0;
+  runBestMult = 1;
+  gatesPassed = 0;
+  runDistance = 0;
   multiplier = 1;
   multPop = 0;
   runTime = 0;
@@ -3134,6 +3203,7 @@ function hazardBand(carIndex, localHalf) {
 
 function crash() {
   audioCrash();
+  runDistance = Math.round(position / 100);   // world units are centimetres
   bankScore();
   // A run has been played, so the tilt button has had its chance to be
   // noticed and does not get to keep asking.
@@ -4163,6 +4233,120 @@ function carDirToWorld(lx, ly, lz, rolled) {
 /* Build, transform, project and fill one box. Offsets are in car local
    space; yaw is an extra rotation about the box's own centre, which is
    what turns the front wheels against the body. */
+/* ------------------------------------------------------------------
+   THE BODY, lofted through the stations in FEEL.CAR_STATIONS.
+
+   Each station is a closed ring of eight points: sill, hip, shoulder and
+   roof, mirrored. Consecutive rings are joined into quads, which gives a
+   chamfered, tapered solid with a fastback roofline and arches flared at
+   the axles, out of nothing but numbers. Flat fills per face, no
+   gradients, no textures: section 7.5's cut and folded from paper, which
+   is what this technique is actually good at.
+
+   Backfaces are culled from a real cross product in world space rather
+   than a table, because a lofted hull has no fixed winding to rely on.
+   With a convex hull that is the whole visibility problem solved and no
+   sort is needed.
+   ------------------------------------------------------------------ */
+const RING = 8;
+const ringPts = [];
+for (let i = 0; i < 128; i++) ringPts.push({ wx: 0, wy: 0, wz: 0, sx: 0, sy: 0 });
+
+/* One station's eight points, anticlockwise seen from the front:
+   0 sill left, 1 sill right, 2 hip right, 3 shoulder right, 4 roof right,
+   5 roof left, 6 shoulder left, 7 hip left. */
+function stationRing(st, halfW, bodyH, y0, out, base, camX, w, h) {
+  const z = st[0], sill = st[1], hip = st[2], sh = st[3], roof = st[4];
+  const yl = st[5], yh = st[6], ys = st[7], yr = st[8];
+  const xs = [-sill, sill, hip, sh, roof, -roof, -sh, -hip];
+  const ys2 = [yl, yl, yh, ys, yr, yr, ys, yh];
+  for (let i = 0; i < RING; i++) {
+    const pt = out[base + i];
+    carToWorld(pt, xs[i] * halfW, y0 + ys2[i] * bodyH, z * halfW * 0, false);
+    // z is a fraction of the half LENGTH and is applied separately so the
+    // ring maths above stays in width units.
+    carToWorld(pt, xs[i] * halfW, y0 + ys2[i] * bodyH, z * carMesh.halfL, false);
+    projectPoint(pt, pt.wx, pt.wy, pt.wz, camX, w, h);
+  }
+}
+
+const carMesh = { halfL: 0 };
+const meshN = { wx: 0, wy: 0, wz: 0 };
+
+function faceVisible(a, b, c, d, camX) {
+  const ux = b.wx - a.wx, uy = b.wy - a.wy, uz = b.wz - a.wz;
+  const vx = c.wx - a.wx, vy = c.wy - a.wy, vz = c.wz - a.wz;
+  meshN.wx = uy * vz - uz * vy;
+  meshN.wy = uz * vx - ux * vz;
+  meshN.wz = ux * vy - uy * vx;
+  const cx = (a.wx + b.wx + c.wx + d.wx) * 0.25 - camX;
+  const cy = (a.wy + b.wy + c.wy + d.wy) * 0.25 - camHeight;
+  const cz = (a.wz + b.wz + c.wz + d.wz) * 0.25;
+  return meshN.wx * cx + meshN.wy * cy + meshN.wz * cz < 0;
+}
+
+/* Which tone a face of the hull takes. The band it sits in does the
+   shading, exactly the way a flat shaded model has to: roof catches the
+   sky, shoulder is the upper flank, hip is the widest and brightest edge
+   of the side, sill is always in its own shadow. */
+function hullColour(i, z0, z1) {
+  const mid = (z0 + z1) * 0.5;
+  const glass = mid > FEEL.CAR_GLASS_FROM && mid < FEEL.CAR_GLASS_TO;
+  // The roof stays body coloured and the upper flanks become glass over
+  // the cabin, which is a glasshouse rather than a painted lid and reads
+  // correctly from behind and above, the only angle that matters.
+  if (i === 4) return COLOUR.CAR_TOP;                               // roof
+  if (i === 3 || i === 5) return glass ? COLOUR.CAR_GLASS : COLOUR.CAR_CABIN_TOP;
+  if (i === 2 || i === 6) return COLOUR.CAR_END;                    // shoulder
+  if (i === 1 || i === 7) return COLOUR.CAR_HIP;                    // hip, widest
+  return COLOUR.CAR_SILL;                                           // sill
+}
+
+function drawHull(halfW, bodyH, y0, camX, w, h, seam) {
+  const st = FEEL.CAR_STATIONS;
+  const n = st.length;
+  for (let k = 0; k < n; k++) {
+    stationRing(st[k], halfW, bodyH, y0, ringPts, k * RING, camX, w, h);
+  }
+  // The skin.
+  for (let k = 0; k < n - 1; k++) {
+    const a0 = k * RING, b0 = (k + 1) * RING;
+    for (let i = 0; i < RING; i++) {
+      const j = (i + 1) % RING;
+      const p1 = ringPts[a0 + i], p2 = ringPts[a0 + j];
+      const p3 = ringPts[b0 + j], p4 = ringPts[b0 + i];
+      if (!faceVisible(p1, p2, p3, p4, camX)) continue;
+      ctx.fillStyle = hullColour(i, st[k][0], st[k + 1][0]);
+      polygon(p1.sx, p1.sy, p2.sx, p2.sy, p3.sx, p3.sy, p4.sx, p4.sy);
+      if (seam) ctx.stroke();
+    }
+  }
+  // The tail cap, which is the face the player looks at all run.
+  const t = 0;
+  ctx.beginPath();
+  ctx.moveTo(ringPts[t].sx, ringPts[t].sy);
+  for (let i = 1; i < RING; i++) ctx.lineTo(ringPts[t + i].sx, ringPts[t + i].sy);
+  ctx.closePath();
+  ctx.fillStyle = COLOUR.CAR_END;
+  ctx.fill();
+  if (seam) ctx.stroke();
+}
+
+/* A flat quad placed in car space, used for the light bar. Four points,
+   no culling: it sits on the tail and the camera is behind the tail. */
+const quadPts = [{wx:0,wy:0,wz:0,sx:0,sy:0},{wx:0,wy:0,wz:0,sx:0,sy:0},
+                 {wx:0,wy:0,wz:0,sx:0,sy:0},{wx:0,wy:0,wz:0,sx:0,sy:0}];
+function quadInCar(x0, y0, z0, x1, y1, z1, camX, w, h) {
+  const xs = [x0, x1, x1, x0], ys = [y0, y0, y1, y1];
+  for (let i = 0; i < 4; i++) {
+    const pt = quadPts[i];
+    carToWorld(pt, xs[i], ys[i], z0, false);
+    projectPoint(pt, pt.wx, pt.wy, pt.wz, camX, w, h);
+  }
+  polygon(quadPts[0].sx, quadPts[0].sy, quadPts[1].sx, quadPts[1].sy,
+          quadPts[2].sx, quadPts[2].sy, quadPts[3].sx, quadPts[3].sy);
+}
+
 function drawBox(ox, oy, oz, hw, hh, hl, extraYaw, rolled, faceColours, stroked, camX, w, h) {
   const cy = Math.cos(extraYaw), sy = Math.sin(extraYaw);
   for (let i = 0; i < 8; i++) {
@@ -4222,6 +4406,9 @@ function faceInset(quad, u0, u1, v0, v1) {
 faceInset.buf = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }];
 
 const rearFaceQuad = [{ sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }];
+const WING_COLOURS = [COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER, COLOUR.CAR_TOP,
+                      COLOUR.CAR_SILL, COLOUR.CAR_END, COLOUR.CAR_END];
+const CAR_RIM_GLOW_FILL = 'rgb(214,254,255)';
 const CAR_LIGHT_GLOW_FILL = 'rgb(' + COLOUR.CAR_LIGHT_GLOW + ')';
 
 /* Copy the rear face of whichever box was drawn last, so an inset can be
@@ -4262,7 +4449,11 @@ const CAR_SEAM_RAMP = [];
     const g = Math.round(a[1] + (b[1] - a[1]) * f);
     const bl = Math.round(a[2] + (b[2] - a[2]) * f);
     CAR_GLOW_RAMP.push('rgb(' + r + ',' + g + ',' + bl + ')');
-    CAR_SEAM_RAMP.push('rgba(' + r + ',' + g + ',' + bl + ',0.55)');
+    /* The fold lines. Dark rather than lit: on a body this chamfered the
+       seams are already doing their job by separating tones, and a bright
+       outline on every face turns a solid into a wireframe and eats the
+       silhouette section 7 asks for. */
+    CAR_SEAM_RAMP.push('rgba(4,20,28,0.5)');
   }
 })();
 function carGlowIndex() {
@@ -4299,6 +4490,19 @@ const CAR_POOL_GRADS = [];
     CAR_POOL_GRADS.push(grad);
   }
 })();
+
+/* The rim, glowed like everything else lit in this world: wide and faint
+   under a solid core. It is a small thing but it is at the corners of the
+   silhouette, where the eye already is. */
+function rimGlow() {
+  captureRearFace();
+  ctx.globalAlpha = FEEL.CAR_RIM_GLOW_ALPHA;
+  ctx.fillStyle = CAR_RIM_GLOW_FILL;
+  lightStrip(0.5, 0.30 * FEEL.CAR_RIM_GLOW_SPREAD, 0.5, 0.09 * FEEL.CAR_RIM_GLOW_SPREAD);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = COLOUR.CAR_RIM;
+  lightStrip(0.5, 0.30, 0.5, 0.09);
+}
 
 function drawCar(w, h) {
   /* Projected against the camera, positioned at the car. Those were the
@@ -4362,37 +4566,55 @@ function drawCar(w, h) {
   drawBox(-trackHalf, wheelR, baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, steer, false, WHEEL_COLOURS, false, camX, w, h);
   drawBox(trackHalf, wheelR, baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, steer, false, WHEEL_COLOURS, false, camX, w, h);
 
-  const bodyMid = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_BODY_HEIGHT / 2;
-  drawBox.drewRear = false;
-  drawBox(0, bodyMid, 0, halfW, FEEL.CAR_BODY_HEIGHT / 2, halfL, 0, true, BODY_COLOURS, true, camX, w, h);
-  // The rear face was just projected, so the lights are an inset of it.
-  captureRearFace();
-  if (drawBox.drewRear) {
-    // The light strips, glowed the same way the road edges are: once wide
-    // and faint, once normal. Two extra fills and no shadowBlur.
-    const s = FEEL.CAR_LIGHT_GLOW_SPREAD;
-    ctx.globalAlpha = FEEL.CAR_LIGHT_GLOW_ALPHA;
-    ctx.fillStyle = CAR_LIGHT_GLOW_FILL;
-    lightStrip(0.20, 0.12 * s, 0.46, 0.16 * s);
-    lightStrip(0.80, 0.12 * s, 0.46, 0.16 * s);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = COLOUR.CAR_LIGHT;
-    lightStrip(0.20, 0.12, 0.46, 0.16);
-    lightStrip(0.80, 0.12, 0.46, 0.16);
-  }
+  /* The body. One lofted hull rather than a box and a box on top of it,
+     so the roofline can fall into the tail and the flanks can taper. */
+  carMesh.halfL = halfL;
+  drawHull(halfW, FEEL.CAR_BODY_HEIGHT, FEEL.CAR_RIDE_HEIGHT, camX, w, h, true);
 
-  const cabinMid = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_BODY_HEIGHT + FEEL.CAR_CABIN_HEIGHT / 2;
-  drawBox(0, cabinMid, FEEL.CAR_CABIN_OFFSET, FEEL.CAR_CABIN_WIDTH / 2,
-          FEEL.CAR_CABIN_HEIGHT / 2, FEEL.CAR_CABIN_LENGTH / 2, 0, true, CABIN_COLOURS, true, camX, w, h);
+  /* The rear light bar. The camera lives behind this car, so this is the
+     single detail it sees most of, and it gets the same two pass glow the
+     road edges get: once wide and faint, once solid, no shadowBlur.
+
+     It burns brighter under braking, which here means scraping, so the
+     one thing always in view also reports the one state that is about to
+     kill you. */
+  const tail = FEEL.CAR_STATIONS[0];
+  const lightY = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_LIGHT_Y * FEEL.CAR_BODY_HEIGHT;
+  const lightHalf = halfW * tail[2] * FEEL.CAR_LIGHT_HALF;
+  const lightT = FEEL.CAR_BODY_HEIGHT * FEEL.CAR_LIGHT_THICK;
+  const lightZ = tail[0] * halfL - 6;
+  const hot = scraping ? 1 : 0;
+  for (let pass = 0; pass < 2; pass++) {
+    const grow = pass === 0 ? FEEL.CAR_LIGHT_GLOW_SPREAD : 1;
+    ctx.globalAlpha = pass === 0 ? FEEL.CAR_LIGHT_GLOW_ALPHA * (1 + hot * 0.8) : 1;
+    ctx.fillStyle = pass === 0 ? CAR_LIGHT_GLOW_FILL
+                  : (hot ? COLOUR.CAR_LIGHT_HOT : COLOUR.CAR_LIGHT);
+    quadInCar(-lightHalf * grow, lightY - lightT * grow, lightZ,
+              lightHalf * grow, lightY + lightT * grow, lightZ, camX, w, h);
+  }
+  ctx.globalAlpha = 1;
+
+  /* The spoiler. Two posts and a blade above the tail: it reads as
+     performance instantly and it gives the silhouette something along its
+     top edge, which is the line the player actually sees against the
+     sky. */
+  const spY = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_SPOILER_Y * FEEL.CAR_BODY_HEIGHT;
+  const spZ = FEEL.CAR_SPOILER_Z * halfL;
+  const postX = halfW * FEEL.CAR_SPOILER_POST;
+  const postH = (spY - (FEEL.CAR_RIDE_HEIGHT + 0.9 * FEEL.CAR_BODY_HEIGHT)) / 2;
+  drawBox(-postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
+  drawBox(postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
+  drawBox(0, spY, spZ, halfW * FEEL.CAR_SPOILER_HALF, FEEL.CAR_SPOILER_THICK / 2,
+          halfL * FEEL.CAR_SPOILER_CHORD, 0, false, WING_COLOURS, true, camX, w, h);
 
   drawBox.drewRear = false;
   drawBox(-trackHalf, wheelR, -baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, 0, false, WHEEL_COLOURS, false, camX, w, h);
   carParts.rlx = (boxPts[0].sx + boxPts[1].sx) * 0.5;
   carParts.rly = (boxPts[0].sy + boxPts[1].sy) * 0.5;
-  if (drawBox.drewRear) { captureRearFace(); ctx.fillStyle = COLOUR.CAR_RIM; lightStrip(0.5, 0.30, 0.5, 0.09); }
+  if (drawBox.drewRear) rimGlow();
   drawBox.drewRear = false;
   drawBox(trackHalf, wheelR, -baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, 0, false, WHEEL_COLOURS, false, camX, w, h);
-  if (drawBox.drewRear) { captureRearFace(); ctx.fillStyle = COLOUR.CAR_RIM; lightStrip(0.5, 0.30, 0.5, 0.09); }
+  if (drawBox.drewRear) rimGlow();
   carParts.rrx = (boxPts[0].sx + boxPts[1].sx) * 0.5;
   carParts.rry = (boxPts[0].sy + boxPts[1].sy) * 0.5;
   carParts.scale = Math.max(8, Math.abs(carParts.rrx - carParts.rlx));
@@ -4442,144 +4664,240 @@ function fittedSize(str, weight, want, maxWidth) {
    number climbing while the trail runs hot is the whole explanation: one
    corner taken deep and near the edge should make the rule obvious, and
    if it does not then this display is what is wrong. */
+/* ------------------------------------------------------------------
+   THE READOUT. Three quantities, three treatments, one representation
+   each, because five numbers in one typeface is five numbers nobody can
+   tell apart at a glance.
+
+   SCORE is an arcade score: heavy, gold, outlined, the biggest thing up
+   there. It is the prize.
+   TIME is a pit timer: tabular monospace on a dark plate, in minutes and
+   seconds, so it cannot possibly be mistaken for points.
+   MULTIPLIER is neither: it sits off to one side in the colour the tyre
+   marks run through, so the line on the road and the number are one
+   signal.
+
+   What was there before, and why it was unreadable: the banked score and
+   the pending score were the SAME quantity in two forms side by side, the
+   clock and the seconds to the next gate were two more numbers in the
+   same typeface, and the live payback rate was a fifth. All five were
+   white or cyan sans digits at similar sizes. The pending score is gone,
+   the payback rate is now an arrow rather than a number, and the gate is
+   inside the time plate where it belongs.
+   ------------------------------------------------------------------ */
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
+
+/* Minutes and seconds, always the same width, so the digits do not
+   jitter as they count. That stillness is most of what makes a readout
+   look like a stopwatch rather than a score. */
+function timeLabel(sec) {
+  const t = Math.max(0, sec);
+  const m = Math.floor(t / 60);
+  const r = t - m * 60;
+  return m + ':' + (r < 10 ? '0' : '') + r.toFixed(1);
+}
+
+/* The arcade treatment: an outline behind a heavy fill. Two draws, no
+   shadow blur, exactly the discipline everything else lit in this game
+   uses. */
+function arcadeNumber(str, x, y, size, fill) {
+  ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(3, size * 0.14);
+  ctx.strokeStyle = COLOUR.SCORE_EDGE;
+  ctx.strokeText(str, x, y);
+  ctx.fillStyle = fill;
+  ctx.fillText(str, x, y);
+}
+
 function drawScore(w, h) {
   if (state !== DRIVING) return;
   const s = Math.min(w, h);
-  /* The banked total is the number, and what is pending sits beside it in
-     smaller type. Crossing a gate visibly rolls one into the other, which
-     is the whole explanation of banking and needs no words. */
   const flash = gateFlash > 0 ? gateFlash / FEEL.CHECKPOINT_FLASH : 0;
-  const bankSize = Math.round(s * FEEL.SCORE_SIZE * (1 + 0.35 * flash));
-  text(String(banked), w / 2, h * FEEL.SCORE_TOP, bankSize, '800');
-  const pend = Math.floor(score);
-  if (pend > 0) {
-    ctx.font = '700 ' + Math.round(s * FEEL.SCORE_SIZE * 0.52)
-             + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = COLOUR.TEXT_SHADOW;
-    ctx.fillText('+' + pend, w / 2 + bankSize * 0.9, h * FEEL.SCORE_TOP + 2);
-    ctx.fillStyle = COLOUR.GATE;
-    ctx.fillText('+' + pend, w / 2 + bankSize * 0.9, h * FEEL.SCORE_TOP);
-  }
+  const size = Math.round(s * FEEL.SCORE_SIZE * (1 + 0.3 * flash));
+  // One score, not two. It is the whole total, and a gate is what makes
+  // the part of it that was pending safe.
+  arcadeNumber(String(banked + Math.floor(score)), w / 2, h * FEEL.SCORE_TOP,
+               size, flash > 0 ? COLOUR.GATE : COLOUR.SCORE);
   drawClock(w, h);
-
-  // Nothing to say until it is above 1, and then it says it loudly.
-  if (multiplier <= 1.005) return;
-  const t = clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1);
-  const pop = multPop > 0 ? multPop / FEEL.MULT_POP_TIME : 0;
-  const size = Math.round(s * FEEL.MULT_SIZE * (1 + FEEL.MULT_GROWTH * t + 0.18 * pop));
-  // The same ramp the tyre marks run through, so the line on the road and
-  // the number on the screen are visibly one signal rather than two.
-  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const label = '\u00d7' + multiplier.toFixed(1);
-  const y = h * FEEL.MULT_TOP + size * 0.3;
-  ctx.fillStyle = COLOUR.TEXT_SHADOW;
-  ctx.fillText(label, w / 2, y + Math.max(1, size * 0.06));
-  ctx.fillStyle = trailColour(t);
-  ctx.fillText(label, w / 2, y);
+  drawMultiplier(w, h);
 }
 
-/* The clock. Same discipline as the scrape bar: it must be readable at a
-   glance and must never pull the eye off the road, so it is a short bar
-   with the seconds on it, and it only raises its voice when it is
-   genuinely running out. Silent during the on ramp, because it is not
-   running then. */
-/* The clock, and next to it the only question that makes a clock mean
-   anything: can I reach the next gate on what I have.
-
-   A bare countdown is abstract. A countdown beside the time to the gate
-   is a comparison the player can answer at a glance, and the colour makes
-   the answer for them: cool while the clock is bigger than the distance,
-   warm the moment it is not.
-
-   Same discipline as the scrape bar. It sits high and small, it never
-   competes with the road, and it only raises its voice when the answer
-   is actually no. */
+/* The pit timer. A plate, tabular digits, and the distance to the next
+   gate as a second, quieter figure on the same plate, because that is
+   also time and it belongs in the time element rather than being a fifth
+   number somewhere else. */
 function drawClock(w, h) {
   if (runTime < FEEL.ONRAMP_SECONDS) return;
   const s = Math.min(w, h);
   const size = Math.round(s * FEEL.CLOCK_SIZE);
-  const gateSecs = Math.max(0, (nextGate - carSegIndex))
-                 * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
-  /* Two signals, each saying one thing. The number goes warm only when
-     the clock is genuinely short. Whether the next gate is reachable is
-     the gate readout's job, below, because for the first half of every
-     cycle the honest answer is "not on what you are holding, but you will
-     earn more on the way", and a warning colour that is on for half the
-     game is not a warning. */
+  const gateSecs = Math.max(0, nextGate - carSegIndex) * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
   const low = clock < FEEL.CLOCK_LOW;
   const reachable = clock >= gateSecs;
   const y = h * FEEL.CLOCK_TOP;
 
+  const main = timeLabel(clock);
+  const gl = timeLabel(gateSecs);
+  ctx.font = '700 ' + size + 'px ' + MONO;
+  const mw = ctx.measureText(main).width;
+  const gsize = Math.round(size * 0.62);
+  ctx.font = '600 ' + gsize + 'px ' + MONO;
+  const gw = ctx.measureText(gl).width;
+
+  const padx = size * 0.42, pady = size * 0.30, gap = size * 0.5;
+  const boxW = mw + gap + gw + padx * 2;
+  const boxH = size + pady * 2;
+  const bx0 = w / 2 - boxW / 2, by0 = y - boxH / 2;
+
+  ctx.globalAlpha = 0.72;
+  ctx.fillStyle = COLOUR.BAR_TRACK;
+  roundRect(bx0, by0, boxW, boxH, boxH * 0.28);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
   ctx.textBaseline = 'middle';
-  ctx.textAlign = 'center';
-  const label = clock.toFixed(1);
-  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const half = ctx.measureText(label).width / 2;
-  ctx.fillStyle = COLOUR.TEXT_SHADOW;
-  ctx.fillText(label, w / 2, y + Math.max(1, size * 0.06));
-  ctx.globalAlpha = low ? 0.6 + 0.4 * Math.abs(Math.sin(runTime * 6)) : 1;
-  ctx.fillStyle = low ? COLOUR.BAR_LOW : COLOUR.GATE;
-  ctx.fillText(label, w / 2, y);
-  ctx.globalAlpha = 1;
-
-  // The gate, to the right of it. An arrow and the seconds to reach it.
-  const gsize = Math.round(s * FEEL.CLOCK_GATE_SIZE);
-  ctx.font = '700 ' + gsize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   ctx.textAlign = 'left';
-  const gl = '\u25b8 ' + gateSecs.toFixed(1);
-  ctx.fillStyle = COLOUR.TEXT_SHADOW;
-  ctx.fillText(gl, w / 2 + half + gsize * 0.5, y + 1 + gsize * 0.06);
-  // Cool once the gate is inside what is in hand, which is the moment
-  // the answer to "can I make it" turns from no to yes.
-  ctx.fillStyle = reachable ? COLOUR.GATE : COLOUR.TEXT;
-  ctx.globalAlpha = reachable ? 0.95 : 0.7;
-  ctx.fillText(gl, w / 2 + half + gsize * 0.5, y + 1);
+  ctx.font = '700 ' + size + 'px ' + MONO;
+  ctx.globalAlpha = low ? 0.62 + 0.38 * Math.abs(Math.sin(runTime * 6)) : 1;
+  ctx.fillStyle = low ? COLOUR.BAR_LOW : COLOUR.GATE;
+  ctx.fillText(main, bx0 + padx, y + 1);
   ctx.globalAlpha = 1;
 
-  /* The earning, live, to the left. If scarcity is not allowed to be the
-     pressure then flow has to be, and flow has to be visible: this is the
-     clock answering the driving, second by second. */
-  const pay = FEEL.CLOCK_DRIFT_RATE * slipPay() - 1;
-  if (pay > 0.02) {
-    const psize = Math.round(s * FEEL.CLOCK_PAY_SIZE);
-    ctx.font = '800 ' + psize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-    ctx.textAlign = 'right';
-    const pl = '+' + pay.toFixed(1);
-    ctx.fillStyle = COLOUR.TEXT_SHADOW;
-    ctx.fillText(pl, w / 2 - half - psize * 0.5, y + 1 + psize * 0.06);
+  // The gate, quieter, and cool once it is inside what is in hand.
+  ctx.font = '600 ' + gsize + 'px ' + MONO;
+  ctx.globalAlpha = reachable ? 0.9 : 0.55;
+  ctx.fillStyle = reachable ? COLOUR.GATE : COLOUR.TEXT;
+  ctx.fillText(gl, bx0 + padx + mw + gap, y + 1);
+  ctx.globalAlpha = 1;
+  // A divider, so the two figures read as one instrument with two hands.
+  ctx.globalAlpha = 0.3;
+  ctx.fillStyle = COLOUR.TEXT;
+  ctx.fillRect(bx0 + padx + mw + gap * 0.45, by0 + pady * 0.7, 1, boxH - pady * 1.4);
+  ctx.globalAlpha = 1;
+
+  /* Earning, as an arrow rather than a number. Flow has to be visible,
+     but it does not have to be another figure to read. */
+  if (slipPay() > 0.02) {
+    const a = size * 0.3;
+    const ax = bx0 - a * 1.5, ay = y;
+    ctx.globalAlpha = 0.55 + 0.45 * Math.min(1, slipPay() * 1.6);
     ctx.fillStyle = COLOUR.GATE;
-    ctx.fillText(pl, w / 2 - half - psize * 0.5, y + 1);
-  } else if (pay < -0.02 && slipPay() > 0.01) {
-    // Still paying something back, just not all of it. Worth showing,
-    // because it is the difference between drifting and not.
-    const psize = Math.round(s * FEEL.CLOCK_PAY_SIZE);
-    ctx.font = '800 ' + psize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-    ctx.textAlign = 'right';
-    const pl = '+' + (FEEL.CLOCK_DRIFT_RATE * slipPay()).toFixed(1);
-    ctx.globalAlpha = 0.75;
-    ctx.fillStyle = COLOUR.GATE;
-    ctx.fillText(pl, w / 2 - half - psize * 0.5, y + 1);
+    ctx.beginPath();
+    ctx.moveTo(ax, ay - a); ctx.lineTo(ax + a * 0.85, ay + a * 0.6);
+    ctx.lineTo(ax - a * 0.85, ay + a * 0.6);
+    ctx.closePath();
+    ctx.fill();
     ctx.globalAlpha = 1;
   }
 
-  /* The payout, big and loud and rising, and deliberately nothing like
-     the score bonus beside it: one is time and green, the other is points
-     and rolls into a total. Two rewards that look alike teach nothing. */
   if (clockPop > 0) {
     const t = clockPop / FEEL.CLOCK_POP_TIME;
-    const psize = Math.round(s * FEEL.CLOCK_SIZE * (1.5 + 0.7 * (1 - t)));
-    ctx.font = '800 ' + psize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    const psize = Math.round(size * (1.5 + 0.7 * (1 - t)));
+    ctx.font = '700 ' + psize + 'px ' + MONO;
     ctx.textAlign = 'center';
     ctx.globalAlpha = Math.min(1, t * 2.2);
-    const pl = '+' + FEEL.CLOCK_CHECKPOINT + 's';
+    const pl = '+' + FEEL.CLOCK_CHECKPOINT;
     ctx.fillStyle = COLOUR.TEXT_SHADOW;
-    ctx.fillText(pl, w / 2, y - size * 1.25 - (1 - t) * s * 0.09 + 2);
+    ctx.fillText(pl, w / 2, y - boxH * 0.9 - (1 - t) * s * 0.09 + 2);
     ctx.fillStyle = COLOUR.GATE;
-    ctx.fillText(pl, w / 2, y - size * 1.25 - (1 - t) * s * 0.09);
+    ctx.fillText(pl, w / 2, y - boxH * 0.9 - (1 - t) * s * 0.09);
+    ctx.globalAlpha = 1;
+  }
+}
+
+/* Off to the side, in the trail's own colour, and nothing like either of
+   the other two. */
+function drawMultiplier(w, h) {
+  if (multiplier <= 1.005) return;
+  const s = Math.min(w, h);
+  const t = clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1);
+  const pop = multPop > 0 ? multPop / FEEL.MULT_POP_TIME : 0;
+  const size = Math.round(s * FEEL.MULT_SIZE * (1 + FEEL.MULT_GROWTH * t + 0.2 * pop));
+  ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  const label = '\u00d7' + multiplier.toFixed(1);
+  const x = w - Math.round(s * 0.045);
+  const y = h * FEEL.MULT_TOP;
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(2.5, size * 0.13);
+  ctx.strokeStyle = COLOUR.SCORE_EDGE;
+  ctx.strokeText(label, x, y);
+  ctx.fillStyle = trailColour(t);
+  ctx.fillText(label, x, y);
+}
+
+function roundRect(x, y, w2, h2, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w2 - r, y); ctx.quadraticCurveTo(x + w2, y, x + w2, y + r);
+  ctx.lineTo(x + w2, y + h2 - r); ctx.quadraticCurveTo(x + w2, y + h2, x + w2 - r, y + h2);
+  ctx.lineTo(x + r, y + h2); ctx.quadraticCurveTo(x, y + h2, x, y + h2 - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+/* The result. Not a notification: nobody needs telling they left the
+   road, they watched it happen. This is the end of an arcade race, and
+   the score is the hero of it.
+
+   The count up is PURELY cosmetic and gates nothing. A tap or a key
+   restarts the moment DEATH_INPUT_LOCK is up, mid animation or not,
+   because section 5's one more go loop is worth more than any flourish.
+   The impatient path is the fast one by construction: nothing here is
+   ever waited on. */
+function drawResult(w, h) {
+  const s = Math.min(w, h);
+  const final = banked;
+  const beat = final > 0 && final >= bestScore;
+  // Counts up over ROLL seconds and then sits still. Reading it early
+  // costs nothing, because the run is over and the number is already
+  // decided.
+  const roll = clamp(deadFor / FEEL.RESULT_ROLL_TIME, 0, 1);
+  const eased = 1 - Math.pow(1 - roll, 3);
+  const shown = Math.round(final * eased);
+
+  arcadeNumber(String(shown), w / 2, h * 0.36,
+               Math.round(s * 0.155), beat ? COLOUR.SCORE_BEST : COLOUR.SCORE);
+
+  if (beat) {
+    // Unmistakable, because this is the moment somebody plays again for.
+    const t = 0.72 + 0.28 * Math.abs(Math.sin(deadFor * 5));
+    ctx.globalAlpha = t;
+    text('NEW BEST', w / 2, h * 0.27, Math.round(s * 0.055), '900');
+    ctx.globalAlpha = 1;
+  } else {
+    text('BEST  ' + bestScore, w / 2, h * 0.27, Math.round(s * 0.042), '700');
+  }
+
+  /* The run, in three figures on one line. Cheap, and it turns a number
+     into a story: how far, how sideways, how many gates. */
+  const rowY = h * 0.47;
+  const cols = [
+    ['DIST', runDistance + 'm'],
+    ['BEST \u00d7', runBestMult.toFixed(1)],
+    ['GATES', String(gatesPassed)]
+  ];
+  const span = Math.min(w * 0.82, s * 1.05);
+  for (let i = 0; i < cols.length; i++) {
+    const cx = w / 2 + (i - 1) * (span / 3);
+    ctx.globalAlpha = 0.6;
+    text(cols[i][0], cx, rowY, Math.round(s * 0.028), '700');
+    ctx.globalAlpha = 1;
+    ctx.font = '700 ' + Math.round(s * 0.048) + 'px ' + MONO;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = COLOUR.TEXT_SHADOW;
+    ctx.fillText(cols[i][1], cx, rowY + s * 0.048 + 2);
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillText(cols[i][1], cx, rowY + s * 0.048);
+  }
+
+  if (deadFor >= FEEL.DEATH_INPUT_LOCK) {
+    ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
+    text('tap or press any key', w / 2, h * 0.62, Math.round(s * 0.042), '600');
     ctx.globalAlpha = 1;
   }
 }
@@ -4593,16 +4911,7 @@ function drawOverlay(w, h) {
     text('hold left or right to steer', w / 2, h * 0.45, Math.round(s * 0.045), '600');
     text('tap or press any key to start', w / 2, h * 0.52, Math.round(s * 0.045), '600');
   } else if (state === DEAD) {
-    const s = Math.min(w, h);
-    text('OFF THE ROAD', w / 2, h * 0.38, Math.round(s * 0.095), '800');
-    // The two numbers, and a crown on the score when it is the new best.
-    const final = banked;
-    const beat = final >= bestScore && final > 0;
-    text((beat ? '\u2605 ' : '') + final, w / 2, h * 0.48, Math.round(s * 0.11), '800');
-    text('best ' + bestScore, w / 2, h * 0.55, Math.round(s * 0.042), '600');
-    if (deadFor >= FEEL.DEATH_INPUT_LOCK) {
-      text('tap or press any key', w / 2, h * 0.63, Math.round(s * 0.045), '600');
-    }
+    drawResult(w, h);
   }
 }
 
@@ -4621,6 +4930,9 @@ let clock = 0;
 let nextGate = 0;         // segment index of the gate not yet crossed
 let gateFlash = 0;        // seconds left on the crossing response
 let clockPop = 0;         // seconds left on the big time payout
+let runBestMult = 1;      // the best multiplier this run reached
+let gatesPassed = 0;
+let runDistance = 0;      // metres, for the summary
 let bestScore = (function () {
   const raw = storeGet('best');
   const n = raw === null ? 0 : parseInt(raw, 10);
@@ -4679,6 +4991,7 @@ function crossGate() {
   gateFlash = FEEL.CHECKPOINT_FLASH;
   clockPop = FEEL.CLOCK_POP_TIME;
   nextGate += FEEL.CHECKPOINT_EVERY;
+  gatesPassed++;
   applyBiome(biome + 1);
 }
 
@@ -4693,6 +5006,7 @@ function updateScore(dt) {
   multiplier = clamp(multiplier, 1, FEEL.MULT_MAX);
   // A kick on every whole number crossed upward, which is the only thing
   // that has to be noticed for the rule to be worked out.
+  if (multiplier > runBestMult) runBestMult = multiplier;
   if (Math.floor(multiplier) > was) multPop = FEEL.MULT_POP_TIME;
   score += (FEEL.SCORE_SURVIVE_RATE
             + FEEL.SCORE_RISK_RATE * (multiplier - 1)) * dt;
@@ -5229,11 +5543,9 @@ document.addEventListener('webkitfullscreenchange', onFullscreenChange);
    narrow portrait screen it stands down. Re evaluated on every resize,
    so rotating the handset brings it back. */
 function syncFullButton() {
-  /* 420 rather than 380: at 390 the fifth button left only sixteen
-     pixels of canvas between the two groups, and that band has to stay
-     tappable for steering. Landscape always has room. */
-  const roomy = view.w >= 420 || view.w > view.h;
-  fullBtn.hidden = !(canFullscreen && roomy);
+  // Wherever fullscreen actually works, in both orientations. Feature
+  // detection is the only reason to hide it.
+  fullBtn.hidden = !canFullscreen;
 }
 paintFull();
 fullReady = true;
