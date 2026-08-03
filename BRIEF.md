@@ -328,7 +328,7 @@ These are to be answered by playing rather than in advance. Putting answers here
 - Whether the multiplier banks at checkpoints or only on death.
 - What the escalating road features are, and in what order they appear.
 - Whether there are lives, recoveries, or neither.
-- ~~Whether the ghost is your best run, your last run, or a choice.~~ Settled in session twenty eight: it is your best CLEAN run on today's track, and it exists only on the daily.
+- ~~Whether the ghost is your best run, your last run, or a choice.~~ Settled in session twenty eight as your best CLEAN run, and **corrected in session thirty two: it is your LAST run**, every run, crashed and continued ones included. It exists only on the daily. The correction is worth recording because the first answer was borrowed from BEST SCORE and that was the mistake: a record has to be hard to take or it means nothing, while a ghost has to be recent or it teaches nothing. Those two want opposite rules and only one of them is a scoreboard. BEST SCORE, the daily record and the completion time are all still closed to a run with a continue on it.
 - ~~Whether a seeded daily run, where everyone drives the same road and ghosts are directly comparable, is worth building.~~ Settled in session twenty eight: yes, and it is what made the ghost possible at all. The seed is the LOCAL date hashed, never UTC, because UTC rolls over mid afternoon in the United States and that audience is the whole point.
 - The art direction in detail, within the constraints of section 7.
 - Whether it lives on a new domain or alongside the existing game. The existing domain uses a `.fun` TLD, which carries slightly higher blanket-block rates with school filters. Not urgent, worth knowing.

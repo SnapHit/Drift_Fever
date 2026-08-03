@@ -1372,8 +1372,13 @@ const FEEL = {
      SET FROM THE HANDSET, NEVER FROM A DERIVATION. The spec's reading of
      gamma argues one way and the phone has done the other, and the phone
      is the thing being played. See the convention block for why the older
-     reports could not pin this and the latest one can. */
-  TILT_DIRECTION:            -1,
+     reports could not pin this and the latest one can.
+
+     AND IT NOW MATTERS FAR LESS THAN IT DID, which is the point of the
+     calibration gesture: on the first enable the device is asked which
+     way it reads, and the answer replaces this. This is the fallback for
+     a player who skips the gesture and nothing more. */
+  TILT_DIRECTION:             1,
   /* The sign on the sine term of the screen space remap, which is the one
      value that can make the two landscape orientations disagree with
      portrait. It flips 90 and 270 together and cannot touch portrait, so
@@ -1390,6 +1395,26 @@ const FEEL = {
      the deadzone, not to stop looking for sensitivity. */
   TILT_DEADZONE_WARN:      0.30,
   TILT_SENSOR_TIMEOUT:      1.5,     // seconds to wait for a first real reading
+  /* THE CALIBRATION GESTURE. Hold the phone how you want to play, then
+     tilt left. The sign of the change IS the direction, so the handset
+     answers a question this file has guessed wrong seven times, and the
+     posture it was held in is the zero point section 8.4 asks for. One
+     gesture, two jobs.
+
+     TILT_CAL_SETTLE is how long the posture has to be still before the
+     gesture is read at all, so the movement of picking the phone up is
+     not mistaken for the answer. TILT_CAL_ANGLE is the excursion that
+     decides it, comfortably past TILT_FULL_LOCK_DEG's deadzone and well
+     inside a wrist. TILT_CAL_MIN_DEG is the floor: below it the gesture
+     said nothing and the source default stands. TILT_CAL_SECONDS is how
+     long it waits before giving up, and giving up is not a failure, it is
+     the skip path. TILT_CAL_HOLD is the press on the flip button that
+     runs the whole thing again. */
+  TILT_CAL_SETTLE:         0.45,     // seconds of stillness before the read starts
+  TILT_CAL_ANGLE:             8,     // degrees of change that decide it
+  TILT_CAL_MIN_DEG:           3,     // below this the gesture said nothing
+  TILT_CAL_SECONDS:         6.0,     // then give up and keep the source default
+  TILT_CAL_HOLD:           0.55,     // seconds on the flip button to run it again
   /* Section 5 says no tutorial and that stands. Tilt is the one exception
      because it is an invisible option behind a button nobody has a reason
      to press, and a ring that breathes around that button is not a
@@ -2557,6 +2582,14 @@ const TUNABLES = [
      regression. See the tuning persistence block. */
   { key: 'TILT_DIRECTION',     label: 'tiltdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1, noSave: true },
   { key: 'TILT_LANDSCAPE_SENSE',label:'landdir', step: 2,    min: -1,   max: 1,     dp: 0, group: 1, noSave: true },
+  /* The calibration gesture. Tunable because how far a wrist actually
+     moves when somebody is told to tilt left is a thing to find out by
+     handing a phone to somebody, not by picking a number here. */
+  { key: 'TILT_CAL_SETTLE',    label: 'calStill',step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 1 },
+  { key: 'TILT_CAL_ANGLE',     label: 'calDeg',  step: 1,    min: 2,    max: 40,    dp: 0, group: 1 },
+  { key: 'TILT_CAL_MIN_DEG',   label: 'calMin',  step: 0.5,  min: 0.5,  max: 20,    dp: 1, group: 1 },
+  { key: 'TILT_CAL_SECONDS',   label: 'calWait', step: 0.5,  min: 1,    max: 20,    dp: 1, group: 1 },
+  { key: 'TILT_CAL_HOLD',      label: 'calHold', step: 0.05, min: 0.2,  max: 2.0,   dp: 2, group: 1 },
   /* The spectacle, and the world reaction especially, because that is the
      one thing in it that can only be judged by driving with it on. Group
      13 is the intensity of the world reaction, 14 is the callouts and 15
@@ -2721,6 +2754,7 @@ let hazeGradient = null;
 let horizonGradient = null;
 let safeTop = 0;         // notch or camera cutout, measured from CSS
 let safeBottom = 0;      // home indicator and gesture bar, measured from CSS
+let padsTop = 1e9;       // top of the corner pad row, measured from the DOM
 let scrapeGradientLeft = null;
 let scrapeGradientRight = null;
 let scrapeOutGradientLeft = null;
@@ -2750,6 +2784,22 @@ function resize() {
      rotation and on entering and leaving fullscreen, which is exactly the
      three moments this changes. */
   safeTop = parseFloat(probe.paddingTop) || 0;
+  /* WHERE THE CORNER PADS START, measured rather than derived. The pad
+     row's height is a fixed pixel size in the stylesheet with four media
+     queries on it, while everything on the canvas is a fraction of the
+     smaller screen dimension. On a tablet those two disagree badly
+     enough that a canvas button sized in s reaches down into a pad row
+     sized in pixels, which is exactly what the share button did at 768
+     wide. Read here, on the three occasions it can change, so nothing in
+     the draw loop ever touches layout. */
+  const padRow = document.getElementById('pads');
+  const padBox = padRow ? padRow.getBoundingClientRect() : null;
+  /* A zero height means the row is display:none, which it is for the
+     whole of the boot flash. Fall back to the bottom of the safe area,
+     which constrains nothing, rather than to zero, which would push
+     every button that respects this clean off the top of the screen.
+     endBootChrome calls resize again the moment the row exists. */
+  padsTop = (padBox && padBox.height > 0) ? padBox.top : (h - safeBottom);
 
   // The distant road fades into the horizon glow rather than staying sharp
   // all the way to the vanishing point.
@@ -2861,8 +2911,20 @@ window.addEventListener('keydown', function (e) {
                    && deadFor >= FEEL.DEATH_INPUT_LOCK))) {
     firstGesture(); startDaily(); return;
   }
-  else if ((k === 'e' || k === 'E') && state === TITLE && bootFlash <= 0) {
+  /* R FOR THE RANDOM TRACK, on the title screen only, because R on the
+     death screen is RESTART and those two states are disjoint. E still
+     works, silently, so anyone who learned it when the mode was called
+     endless is not stranded by the rename. */
+  else if ((k === 'r' || k === 'R' || k === 'e' || k === 'E')
+           && state === TITLE && bootFlash <= 0) {
     firstGesture(); startEndless(); return;
+  }
+  /* S SHARES, because section 6 says many sessions are keyboard only and
+     a canvas button is a target a keyboard cannot reach at all. */
+  else if ((k === 's' || k === 'S')
+           && (state === DEAD || state === FINISHED)
+           && deadFor >= FEEL.DEATH_INPUT_LOCK) {
+    firstGesture(); shareRun(); return;
   }
   else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
   /* R is the keyboard twin of the RESTART button, for the same reason it
@@ -2881,6 +2943,9 @@ window.addEventListener('keydown', function (e) {
   // The credit is dismissed by the first input and that input goes no
   // further, so skipping it cannot also start a run.
   if (bootFlash > 0) { skipBoot(); return; }
+  // A key while the calibration is up is the skip, and it goes no
+  // further, exactly like the boot credit above it.
+  if (endTiltCal(false)) return;
   startOrRestart();
 });
 
@@ -2946,9 +3011,18 @@ canvas.addEventListener('pointerdown', function (e) {
     startMode(altRect.to);
     return;
   }
-  if (bootFlash <= 0 && hitDaily(e) && deadFor >= FEEL.DEATH_INPUT_LOCK) {
+  if (bootFlash <= 0 && hitDaily(e)
+      && (state === TITLE || deadFor >= FEEL.DEATH_INPUT_LOCK)) {
     firstGesture();
     startDaily();
+    return;
+  }
+  /* SHARE. Tested before the reflex tap like every other canvas button,
+     and it sits off to the side of RESTART rather than under it so the
+     reflex tap can never land on it. */
+  if (hitShare(e) && deadFor >= FEEL.DEATH_INPUT_LOCK) {
+    firstGesture();
+    shareRun();
     return;
   }
   touchSides.set(e.pointerId, pointerSide(e));
@@ -2956,6 +3030,9 @@ canvas.addEventListener('pointerdown', function (e) {
   if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
   firstGesture();
   if (bootFlash > 0) { skipBoot(); return; }
+  // A tap while the calibration is up is the skip. It still steers, like
+  // every other tap on the canvas, so nothing is taken away by it.
+  if (endTiltCal(false)) return;
   startOrRestart();
 });
 
@@ -3091,15 +3168,35 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
      sessions after that leak was closed and by a route that had just
      been opened.
 
-     So THIS reads -1, which is the value the author reported directly
-     and without a stored flip standing between it and the phone, and
-     TILT_FLIP_KEY was bumped in the same edit so no device can carry a
-     departure from the OLD default into the new one. Those two changes
-     belong together and neither is safe alone. See TILT_FLIP_KEY.
+     Session thirty one shipped -1 with the key bumped, and it was
+     reported backwards for the SEVENTH time. That is the end of the
+     argument: seven reports, seven sign flips, and every one of them a
+     guess dressed up as a derivation.
 
-   AND BECAUSE NO SINGLE DEFAULT CAN BE RIGHT FOR EVERYONE, there is a
-   FLIP BUTTON beside the tilt button, stored as the player's departure
-   from this constant rather than as an absolute sign. See tiltSign.
+   SO THE DEVICE IS ASKED, AND THAT IS WHAT SESSION THIRTY TWO DID.
+
+     The finding this file already recorded is the answer to it. If
+     gamma's sign varies by handset and this file cannot see which
+     handset it is on, then NO SHIPPED DEFAULT IS RIGHT FOR EVERYONE and
+     some share of players get inverted tilt whatever is shipped.
+     Guessing harder cannot fix that. Only the device can.
+
+     ON THE FIRST ENABLE, the player is asked to hold the phone how they
+     want to play and then tilt LEFT. The SIGN OF THE CHANGE is the
+     direction, and the posture it started from is the zero point that
+     section 8.4 requires anyway. One gesture, two jobs. See tiltCal.
+
+     WHICH MAKES TILT_DIRECTION NEARLY IRRELEVANT, and that is the point
+     of it. It is the fallback for a player who skips the gesture, for a
+     device that reports nothing, and for nothing else. It was inverted
+     to +1 in the same edit for the ordinary reason, that the author
+     reported -1 backwards, and TILT_FLIP_KEY was bumped with it so no
+     device can carry a departure from the OLD default into the new one.
+     Those two changes belong together and neither is safe alone.
+
+   AND THE FLIP BUTTON STAYS, as the override for anyone the gesture got
+   wrong, stored as the player's departure from this constant rather than
+   as an absolute sign. Holding it re-runs the calibration. See tiltSign.
    ------------------------------------------------------------------ */
 const tilt = {
   supported: false,
@@ -3207,12 +3304,19 @@ function tiltReading(gamma, beta, angle) {
                   old default, so 'tiltflip2' on that device says FLIP.
                   Left alone it would have inverted the new default
                   straight back and produced a seventh identical report.
+     'tiltflip4'  Session thirty two. The default moved back to +1 and the
+                  same rule applies, but this key now carries a second
+                  job: IT IS ALSO THE RECORD THAT THE DEVICE HAS SPOKEN.
+                  Written by the calibration gesture as well as by the
+                  button, and its presence is what "never ask again"
+                  reads. One key, because "has a direction been settled
+                  on this device" and "what is it" are one question.
 
    A STORED FLIP IS A DEPARTURE FROM A PARTICULAR DEFAULT, so it means
    nothing once that default changes. Moving TILT_DIRECTION without
    moving this key is therefore not a smaller change, it is a broken one.
    ------------------------------------------------------------------ */
-const TILT_FLIP_KEY = 'tiltflip3';
+const TILT_FLIP_KEY = 'tiltflip4';
 let tiltFlipped = (function () {
   const raw = storeGet(TILT_FLIP_KEY);
   // Only an explicit stored choice counts. Anything else, including a
@@ -3279,13 +3383,20 @@ if (window.screen && window.screen.orientation
 
    What each one would have caught:
 
-     WHAT THEY CANNOT COVER, SAID FIRST BECAUSE IT IS THE LESSON. These
-     check that the four orientations agree WITH EACH OTHER and that the
-     pipeline is sign preserving. They CANNOT check that any of them
-     agrees with the handset, because this file cannot see the handset.
-     Internally consistent at the wrong sign is still wrong, and that is
-     exactly what shipped last session with every assertion passing. The
-     handset is the oracle and the flip button is what settles it.
+     WHAT THEY CANNOT COVER, SAID FIRST BECAUSE IT IS THE LESSON. Checks
+     1 to 5 verify that the four orientations agree WITH EACH OTHER and
+     that the pipeline is sign preserving. They CANNOT check that any of
+     them agrees with the handset, because this file cannot see the
+     handset. Internally consistent at the wrong sign is still wrong,
+     and that is exactly what shipped for seven sessions running with
+     every assertion passing.
+
+     CHECK 6 IS THE ONE THAT CAN, and it is new in session thirty two.
+     The calibration gesture takes the handset's own reading as its
+     input, so the loop from "the player tilted left" to "the car goes
+     left" is closed inside this file and CAN be asserted. It holds
+     whichever way round the handset reports gamma, which is the whole
+     reason the gesture exists.
 
      1. THE PORTRAIT SIGN. Asserts that a rising reading steers the way
         TILT_DIRECTION says, so a flip of the constant without a matching
@@ -3329,6 +3440,9 @@ function tiltAssert() {
      itself is checked separately, on its own terms. */
   const D0 = FEEL.TILT_DIRECTION;
   const steer = function (g, b2, a, z) { return tiltSteer(g, b2, a, z, D0); };
+  // The same function with the sign left open, for the calibration checks,
+  // which are about a sign this file does not know in advance.
+  const steerDir = function (g, b2, a, z, d) { return tiltSteer(g, b2, a, z, d); };
 
   // 3. The constants are the source's, not something that arrived later.
   ok('TILT_DIRECTION is not its source default',
@@ -3395,6 +3509,40 @@ function tiltAssert() {
        tiltReading(g, b, angle + 8) === tiltReading(g, b, angle));
   }
 
+  /* 6. THE CALIBRATION GESTURE, which is the one thing here that CAN be
+        checked against a handset, because it is the only part of the
+        path that takes the handset's own answer as its input.
+
+        The player was asked to tilt LEFT, so whatever the reading did,
+        the sign it settles on must steer LEFT for that same movement,
+        at every orientation and from any posture. That is a closed loop
+        and it holds whichever way round the handset's gamma runs, which
+        is exactly what seven sessions of guessing could not achieve. */
+  for (const rel of [-30, -9, -3.2, 3.2, 9, 30]) {
+    const sign = tiltCalSign(rel);
+    for (const z of [-40, 0, 22]) {
+      ok('calibrating on a change of ' + rel + ' from posture ' + z
+         + ' does not then steer left',
+         steerDir(z + rel, 0, 0, z, sign) < 0);
+      ok('calibrating on a change of ' + rel + ' from posture ' + z
+         + ' does not then steer right the other way',
+         steerDir(z - rel, 0, 0, z, sign) > 0);
+    }
+    for (const angle of [0, 90, 180, 270]) {
+      // The same gesture in landscape. tiltReading is the identity at
+      // angle 0, which is the space rawDeg is already in, so this drives
+      // the raw pair the handset would report at each quarter turn.
+      const g = angle === 0 ? rel : (angle === 180 ? -rel : 0);
+      const b3 = angle === 90 ? rel / FEEL.TILT_LANDSCAPE_SENSE
+               : (angle === 270 ? -rel / FEEL.TILT_LANDSCAPE_SENSE : 0);
+      ok('the calibrated sign does not steer left at orientation ' + angle,
+         steerDir(g, b3, angle, 0, sign) < 0);
+    }
+  }
+  // And a gesture that said nothing leaves the source constant in charge.
+  ok('a zero movement does not fall back to the source default',
+     tiltCalSign(0) === FEEL.TILT_DIRECTION);
+
   // 1. Portrait against the table in the convention block, spelled out
   //    rather than derived, so the table and the code cannot part company.
   ok('portrait: a rising reading does not steer ' + WAY,
@@ -3444,6 +3592,175 @@ function calibrateTilt() {
   tilt.value = 0;
 }
 
+/* ==================================================================
+   THE CALIBRATION GESTURE, WHICH IS WHAT ENDS THE SIGN ARGUMENT.
+
+   Hold the phone how you want to play, then tilt LEFT. That is the whole
+   of it. The sign of the change is the direction, and the posture it
+   started from is the zero point. ONE GESTURE, TWO JOBS, and the second
+   one is required by section 8.4 whether the first is wanted or not.
+
+   WHY THIS RATHER THAN AN EIGHTH GUESS. Seven reports of backwards tilt
+   and seven sign flips, each one reasoned from gamma's definition and
+   each one wrong for somebody. The finding underneath all seven is that
+   gamma's physical sense varies by handset, which means no single
+   shipped constant can be right for everyone. The device knows. Ask it.
+
+   IT IS NOT A SETTINGS SCREEN AND IT MUST NOT FEEL LIKE ONE:
+
+     - It runs ONCE, on the first enable, and never again unless the
+       player holds the flip button to ask for it.
+     - It is one arrow and two words on the canvas, over whatever is
+       already there. It does not pause, it does not cover the screen,
+       and it does not take the game away.
+     - Tilt contributes NOTHING to steering while it runs, so a player
+       who ignores it entirely is playing on touch or keys exactly as
+       before rather than fighting a half calibrated sensor.
+     - ANY TAP OR KEY ENDS IT. That is the skip, and skipping falls back
+       to the source default rather than blocking anybody.
+     - It gives up on its own after TILT_CAL_SECONDS. Giving up is a
+       normal outcome, not an error.
+
+   WHAT IT DOES WITH A GESTURE IT CANNOT READ:
+
+     TILTED THE WRONG WAY. It believes them, because it has no way not
+     to, and tilt is then reversed. The flip button is one tap away and
+     is exactly the fix, and holding it runs this again.
+     BARELY MOVED. Nothing reaches TILT_CAL_ANGLE, it times out, and the
+     peak excursion is checked against TILT_CAL_MIN_DEG: above that the
+     sign of the peak is used, below it the gesture said nothing at all
+     and the source default stands with nothing written to storage, so
+     the next enable asks again.
+     NEVER STILL. The settle phase restarts whenever the reading moves
+     more than the deadzone, so a phone being carried never starts a
+     read it would immediately misinterpret. The overall timeout still
+     ends it, and a gesture that never settled is treated as a skip.
+   ================================================================== */
+const CAL_OFF = 0, CAL_SETTLE = 1, CAL_READ = 2, CAL_DONE = 3;
+const tiltCal = {
+  phase: CAL_OFF,
+  base: 0,          // the posture, which becomes the zero point
+  still: 0,         // seconds held steady so far
+  waited: 0,        // seconds since the whole thing started
+  peak: 0,          // signed largest excursion seen
+  said: 0,          // seconds left on the result flash
+  ok: false,        // did the result flash come from a reading
+  asked: false,     // this page load has already offered it
+  pending: false    // owed, but the car is moving, so it waits
+};
+
+function tiltCalRunning() { return tiltCal.phase === CAL_SETTLE || tiltCal.phase === CAL_READ; }
+/* Including the result flash, because that occupies the same band and
+   the row underneath has to stay out of it for the whole of both. */
+function tiltCalOnScreen() { return tiltCal.phase !== CAL_OFF; }
+
+/* Started from the tilt button on a first enable, and from a hold on the
+   flip button whenever the player wants it back. `force` is the second of
+   those: it runs even on a device that has already settled a direction. */
+function startTiltCal(force) {
+  if (!tilt.supported || !tilt.active) return false;
+  if (!force && (tiltFlipChosen || tiltCal.asked)) return false;
+  tiltCal.asked = true;
+  /* NOT WHILE THE CAR IS MOVING, and this is the case that matters most.
+     The preference persists but the grant does not, so a returning player
+     who skipped the gesture last time gets the permission re-request on
+     their FIRST GESTURE, which is the tap that starts the run. Asking
+     somebody to hold a phone still while they are driving is asking for
+     an answer they cannot give, and it would time out having taken tilt
+     away from them for six seconds of an actual run. It waits instead. */
+  if (state === DRIVING) {
+    tiltCal.pending = true;
+    if (force) showNote('Tilt calibration will run when this run ends.', 3);
+    return false;
+  }
+  tiltCal.pending = false;
+  tiltCal.phase = CAL_SETTLE;
+  tiltCal.base = tilt.rawDeg === null ? 0 : tilt.rawDeg;
+  tiltCal.still = 0;
+  tiltCal.waited = 0;
+  tiltCal.peak = 0;
+  tiltCal.said = 0;
+  tilt.value = 0;
+  return true;
+}
+
+/* The skip, and every route out that is not a reading comes through here.
+   A skip writes NOTHING: the source default stands and the next enable is
+   free to ask again, which is the correct behaviour for somebody who was
+   in the middle of something rather than somebody who has an opinion. */
+function endTiltCal(flash) {
+  if (!tiltCalRunning()) return false;
+  tiltCal.phase = flash ? CAL_DONE : CAL_OFF;
+  tiltCal.said = flash ? 1.1 : 0;
+  tiltCal.ok = false;
+  // Whatever posture they are in now is the zero, so a skip still leaves
+  // tilt usable rather than referenced to a posture from a minute ago.
+  calibrateTilt();
+  return true;
+}
+
+/* The reading, and the ONLY place a direction is ever derived from a
+   handset. `rel` is how far the reading moved from the posture, and the
+   player was asked to move LEFT, so the sign that must come out of
+   tiltSteer for that reading is negative. rel * sign < 0 gives
+   sign = -Math.sign(rel), and the stored flip is that against the source
+   default rather than an absolute, which is what makes a later change to
+   TILT_DIRECTION safe. */
+function tiltCalSign(rel) { return -Math.sign(rel) || FEEL.TILT_DIRECTION; }
+
+function settleTiltCal(rel) {
+  const want = tiltCalSign(rel);
+  tiltCal.phase = CAL_DONE;
+  tiltCal.said = 1.4;
+  tiltCal.ok = true;
+  tilt.zeroDeg = tiltCal.base;
+  tilt.value = 0;
+  setTiltFlipped(want !== FEEL.TILT_DIRECTION, true);
+}
+
+function updateTiltCal(dt) {
+  if (tiltCal.said > 0) {
+    tiltCal.said -= dt;
+    if (tiltCal.said <= 0 && tiltCal.phase === CAL_DONE) tiltCal.phase = CAL_OFF;
+  }
+  if (tiltCal.pending && tiltCal.phase === CAL_OFF && state !== DRIVING) {
+    tiltCal.pending = false;
+    startTiltCal(true);
+  }
+  if (!tiltCalRunning()) return;
+  // Tilt is switched off underneath it, or the sensor never turned up.
+  if (!tilt.active) { tiltCal.phase = CAL_OFF; tiltCal.pending = false; return; }
+  tiltCal.waited += dt;
+  if (tilt.rawDeg === null) return;
+
+  if (tiltCal.phase === CAL_SETTLE) {
+    /* Still means still. Any movement past the deadzone restarts the
+       count, so the movement of picking the phone up and looking at it
+       can never be read as the answer. */
+    if (Math.abs(tilt.rawDeg - tiltCal.base) > FEEL.TILT_DEADZONE_DEG) {
+      tiltCal.base = tilt.rawDeg;
+      tiltCal.still = 0;
+    } else {
+      tiltCal.base += (tilt.rawDeg - tiltCal.base) * 0.25;   // settle onto the posture
+      tiltCal.still += dt;
+      if (tiltCal.still >= FEEL.TILT_CAL_SETTLE) tiltCal.phase = CAL_READ;
+    }
+  } else {
+    const rel = tilt.rawDeg - tiltCal.base;
+    if (Math.abs(rel) > Math.abs(tiltCal.peak)) tiltCal.peak = rel;
+    // Decided the moment the wrist gets there, because waiting out a
+    // fixed window when the answer is already in is what makes a thing
+    // feel like a form to fill in.
+    if (Math.abs(rel) >= FEEL.TILT_CAL_ANGLE) { settleTiltCal(rel); return; }
+  }
+
+  if (tiltCal.waited < FEEL.TILT_CAL_SECONDS) return;
+  // Out of time. A small but real movement is still an answer; anything
+  // less said nothing and the source default keeps the job.
+  if (Math.abs(tiltCal.peak) >= FEEL.TILT_CAL_MIN_DEG) settleTiltCal(tiltCal.peak);
+  else endTiltCal(true);
+}
+
 function updateTilt(dt) {
   if (!tilt.active) return;
 
@@ -3458,6 +3775,11 @@ function updateTilt(dt) {
     return;
   }
   if (tilt.rawDeg === null || tilt.zeroDeg === null) return;
+  /* NOTHING WHILE THE GESTURE IS BEING READ. The direction is exactly
+     what is not known yet, so steering from it would be a coin toss
+     against the player's own wrist. Touch and keys are untouched, so the
+     game stays fully playable through the whole of it. */
+  if (tiltCalRunning()) { tilt.value = 0; return; }
 
   /* rawDeg is already through tiltReading, so this passes it back in at
      angle 0, where tiltReading is the identity. One function decides the
@@ -3487,7 +3809,12 @@ function onTiltPermission(result) {
   tiltBtn.classList.add('on');
   syncFlipBtn();
   storeSet('tilt', '1');
-  showNote('Tilt on. Hold the phone how you like, it zeroes to your posture at the start of every run.', 4);
+  /* THE FIRST ENABLE ON THIS DEVICE ASKS THE DEVICE WHICH WAY IT READS,
+     and that gesture also captures the posture, so there is nothing left
+     for a sentence about zeroing to say. Every later enable goes
+     straight to driving with the answer already stored. */
+  if (startTiltCal(false)) return;
+  showNote('Tilt on. It zeroes to your posture at the start of every run.', 3);
 }
 
 function requestTilt() {
@@ -3519,24 +3846,56 @@ function syncFlipBtn() {
   padsEl.classList.toggle('six', show);
 }
 
-function setTiltFlipped(on) {
+/* `quiet` is the calibration writing its result: the flash on the canvas
+   has already said it and a note underneath would be the same sentence
+   twice. Everything else about the two routes is identical, and
+   deliberately so, because the stored value has to mean exactly one
+   thing however it got there. */
+function setTiltFlipped(on, quiet) {
   tiltFlipped = on;
   tiltFlipChosen = true;
   syncFlipBtn();
   storeSet(TILT_FLIP_KEY, on ? '1' : '0');
-  showNote(on ? 'Tilt reversed. Tap again to put it back.'
-              : 'Tilt back to the default direction.', 3);
+  if (quiet) return;
+  showNote(on ? 'Tilt reversed. Tap again to put it back. Hold to set it from the phone.'
+              : 'Tilt back to the default direction. Hold to set it from the phone.', 3);
 }
 
-flipBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
-flipBtn.addEventListener('click', function (e) {
+/* TAP REVERSES, HOLD RE CALIBRATES. Section 8.4 asks for a recalibrate
+   that cannot be triggered by accident, and a hold on the button that
+   already owns the tilt direction is exactly that: no second pad, no
+   settings screen, and the two actions are the same question asked
+   coarsely and precisely. A hold does not also fire the tap, which is why
+   the reversal moved out of the click handler and into pointerup. */
+let flipHeld = -1;              // negative means no finger down
+let flipFired = false;
+flipBtn.addEventListener('pointerdown', function (e) {
   e.stopPropagation();
-  // Drop focus, or the next space or enter meant for the game presses
-  // this again instead of steering.
-  flipBtn.blur();
   resumeAudio();
-  setTiltFlipped(!tiltFlipped);
+  flipHeld = 0;
+  flipFired = false;
+  if (flipBtn.setPointerCapture) { try { flipBtn.setPointerCapture(e.pointerId); } catch (err) {} }
 });
+function endFlipPress(fire) {
+  flipBtn.blur();
+  const held = flipHeld;
+  flipHeld = -1;
+  if (!fire || flipFired || held < 0) return;
+  setTiltFlipped(!tiltFlipped);
+}
+flipBtn.addEventListener('pointerup', function (e) { e.stopPropagation(); endFlipPress(true); });
+flipBtn.addEventListener('pointercancel', function (e) { e.stopPropagation(); endFlipPress(false); });
+// The click still has to be swallowed, or it reaches the canvas and
+// starts a run behind the button.
+flipBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+
+function updateFlipHold(dt) {
+  if (flipHeld < 0) return;
+  flipHeld += dt;
+  if (flipFired || flipHeld < FEEL.TILT_CAL_HOLD) return;
+  flipFired = true;
+  startTiltCal(true);
+}
 
 tiltBtn.addEventListener('pointerdown', function (e) {
   e.stopPropagation();
@@ -3745,7 +4104,8 @@ function tunerLine(group) {
   if (group === 26) {
     // The ghost, live, because a replay that is somewhere else cannot be
     // tuned against a number that is not on screen.
-    out += (mode === DAILY ? 'DAILY ' + todayStamp : 'ENDLESS, no ghost')
+    out += (mode === DAILY ? 'TRACK #' + trackNumber(todayStamp) + ' ' + todayStamp
+                           : 'RANDOM, no ghost')
         + (ghost.live ? '  line ' + ghost.n + ' pts ' + dailyGhostBytes + 'B' : '  no line')
         + (ghost.shown ? '  gap ' + Math.round((ghost.pos - position) / 100) + 'm'
                        + (ghost.ahead ? ' ahead' : ' behind') : '')
@@ -4043,11 +4403,19 @@ function resetTuning() {
 /* ==================================================================
    THE TWO MODES.
 
-   ENDLESS is the game as it has always been: a fresh road every run, and
-   it is what a cold player gets by tapping. DAILY is one road that
-   everybody in the world drives for the length of their own local day,
-   and it is what makes a ghost worth recording, because a recorded line
-   is only worth watching if it was driven on the road you are on.
+   DAILY is one road that everybody in the world drives for the length of
+   their own local day, and it is what makes a ghost worth recording,
+   because a recorded line is only worth watching if it was driven on the
+   road you are on. It is what a tap gets, for everybody.
+
+   ENDLESS is the game as it has always been: a fresh road every run.
+   THE PLAYER IS TOLD IT IS CALLED THE RANDOM TRACK, and the rename is
+   the whole reason to mention it in a comment. "Endless" describes the
+   ending, which only means something to somebody who has already played;
+   "random" describes the ROAD, which is what a first timer is choosing
+   between. The internal name is left alone because renaming a constant
+   that appears in fifty places to match a button label buys nothing and
+   risks a typo in each of them.
 
    THE SEED COMES FROM THE LOCAL DATE, NOT UTC, and that is a decision
    about the audience rather than about tidiness. UTC rolls over in the
@@ -4057,21 +4425,23 @@ function resetTuning() {
    what a player means by today.
    ================================================================== */
 const ENDLESS = 0, DAILY = 1;
-/* THE PRIMARY MODE, and it is decided by whether this browser has ever
-   driven. See the entry block: a first ever visit gets endless and no
-   concept to learn, a returning visit gets the thing that is worth
-   coming back for. Set once, here, so every route into a run reads the
-   same variable and there is no second path to keep in step.
+/* THE DAILY IS THE DEFAULT FOR EVERYBODY, FIRST VISIT INCLUDED.
 
-   hasPlayedBefore is declared with the rest of the entry code further
-   down the file, so this reads storage directly rather than reordering
-   the file around one line. */
-let mode = (function () {
-  try {
-    return window.localStorage.getItem(STORAGE_PREFIX + 'played') === '1'
-           ? DAILY : ENDLESS;
-  } catch (e) { return ENDLESS; }      // no memory means treat them as new
-})();
+   It was briefly decided by whether the browser had played before, so a
+   first timer got endless and a returning player got the daily. That is
+   gone. It was more machinery than the question deserved and it made the
+   thing worth coming back for depend on a localStorage key that this
+   audience's locked down profiles frequently refuse to keep.
+
+   ONE ROAD, EVERY VISITOR, AND STILL ONE TAP TO PLAY. Section 5 asks
+   that the game start on one action and it does; it says nothing about
+   which road, and today's is the better answer for everyone. The random
+   road is the clearly marked second button.
+
+   `mode` is still the single variable every route into a run reads, so
+   the front door stays consistent by construction with no second code
+   path to keep in step. */
+let mode = DAILY;
 
 /* The day as one integer, yyyymmdd, off the LOCAL clock. */
 function localDayStamp(when) {
@@ -4092,6 +4462,56 @@ function dailySeedFor(stamp) {
 
 let todayStamp = localDayStamp();
 function dailySeed() { return dailySeedFor(todayStamp); }
+
+/* ------------------------------------------------------------------
+   THE TRACK NUMBER, AND THE COUNTDOWN TO THE NEXT ONE.
+
+   Neither one changes a single thing about the road. They are both about
+   the daily HAVING AN IDENTITY: a track with a number is a thing that
+   happened on a particular day and can be talked about afterwards, and a
+   number that goes up is a history the player is part of. A countdown is
+   the return hook and it costs nothing to draw.
+
+   THE EPOCH IS THE DAY THE DAILY ACTUALLY STARTED. Numbering from an
+   invented earlier date would open at a bigger number and would be a
+   claim about days of tracks that never existed. Move this constant if
+   the game is ever relaunched with a history behind it; do not move it
+   to look older than it is.
+   ------------------------------------------------------------------ */
+const DAILY_EPOCH = 20260802;        // track number one
+
+/* Local noon, deliberately. Midnight plus a daylight saving jump lands on
+   the previous day and would make the number stutter twice a year. */
+function stampDate(stamp) {
+  return new Date(Math.floor(stamp / 10000),
+                  Math.floor(stamp / 100) % 100 - 1,
+                  stamp % 100, 12, 0, 0, 0);
+}
+
+function trackNumber(stamp) {
+  const days = Math.round((stampDate(stamp) - stampDate(DAILY_EPOCH)) / 86400000);
+  return Math.max(1, days + 1);
+}
+
+/* Seconds to the next LOCAL midnight, which is when the seed rolls, for
+   the same reason the seed is local in the first place. */
+function untilNextTrack() {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+  return Math.max(0, (next - now) / 1000);
+}
+
+/* Coarse on purpose. Nobody is timing the rollover to the second from
+   seven hours out, and a seconds field ticking on the title screen is a
+   thing the eye cannot stop reading. */
+function countdownLabel() {
+  const left = untilNextTrack();
+  const h = Math.floor(left / 3600);
+  const m = Math.floor((left - h * 3600) / 60);
+  if (h > 0) return h + 'h ' + m + 'm';
+  if (m > 0) return m + 'm';
+  return Math.max(1, Math.floor(left)) + 's';
+}
 
 /* ------------------------------------------------------------------
    HOW LONG TODAY'S TRACK IS.
@@ -5035,9 +5455,12 @@ const drift = {
 };
 
 function startRun() {
-  // From the second page load on, this browser is a returning player and
-  // the front door changes for it. See the entry block.
-  markPlayed();
+  /* Driving ends the calibration, whichever route into a run was taken.
+     startTiltCal refuses to begin one while the car is moving; this is
+     the other half of that invariant, for the player who starts a run
+     with one already up. A run is a clear enough answer to "are you
+     doing this now" and nothing is written, so it is a skip. */
+  endTiltCal(false);
   // Midnight can pass with the tab open, and this is the only moment the
   // answer can change anything.
   rollDayIfNeeded();
@@ -5216,17 +5639,21 @@ function resumeRoad(carSeg) {
 
 function continueRun() {
   if (!cpValid) { startRun(); return; }
+  endTiltCal(false);              // see startRun
   continues++;
   // Same reason as startRun: the difficulty is read off the car's segment.
   carSegIndex = cpSeg;
   prevCarIndex = cpSeg;
   position = cpSeg * FEEL.SEGMENT_LENGTH - FEEL.CAMERA_DISTANCE;
-  /* A continued run is never recorded. The record is closed to it, so a
-     line from it could only ever be a ghost of a lap that did not
-     happen. Replay CARRIES ON, because racing the ghost is still the
-     point of being back on the road, so the pass state is reset with the
-     clock rather than left over from the run that just ended. */
-  ghostRec.live = false;
+  /* THE RECORDING REWINDS TO THE CHECKPOINT AND CARRIES ON. It used to
+     stop dead here, on the reasoning that a continued run is not a lap,
+     which is true of the RECORD and was the wrong rule for the ghost: a
+     ghost is a learning tool, and the section you are about to drive
+     again is exactly the section you most want to see driven.
+
+     Replay carries on too, as it always has, with the pass state reset
+     with the clock rather than left over from the run that just ended. */
+  ghostRewind();
   ghost.i = 0;
   ghost.said = 0;
   ghost.shown = false;
@@ -5295,7 +5722,12 @@ function continueRun() {
 }
 
 function startOrRestart() {
-  if (state === TITLE) { startRun(); return; }
+  /* THE TAP ON THE TITLE SCREEN IS TODAY'S TRACK, and it says so rather
+     than leaning on `mode` happening to hold DAILY there. It does hold
+     it, because that is what it is set to at load and the only routes
+     that change it start a run themselves, but the guarantee the front
+     door makes should not depend on that staying true. */
+  if (state === TITLE) { startDaily(); return; }
   /* A finished run restarts and never continues. There is nothing to
      continue from: the track is over, and the one action stays one
      action. */
@@ -5411,7 +5843,7 @@ function update(dt) {
   const prevX = carX;
   carX += drift.lateralV * dt;
   carFrac = carX / localHalf;
-  ghostRecord(prevPos, prevX);
+  ghostRecord(prevPos, prevX, dt);
 
   // Sideways speed against forward speed is an angle. The difference of
   // the two angles is the slip.
@@ -5616,6 +6048,10 @@ function crash(kind) {
   audioCrash();
   runDistance = Math.round(position / 100);   // world units are centimetres
   bankScore();
+  /* THE LINE IS KEPT WHETHER THE RUN WAS ANY GOOD OR NOT. A crash is
+     still the most recent thing that happened on this road, and the
+     ghost is the last run. See the ghost block header. */
+  ghostBank();
   // A run has been played, so the tilt button has had its chance to be
   // noticed and does not get to keep asking.
   stopTiltHint(true);
@@ -6539,8 +6975,33 @@ function jumpChevrons(first, last, baseIndex, grow) {
    Five bytes a sample at nine samples a second is under fifty bytes a
    second of driving. A two minute run is about five and a half kilobytes.
 
-   ONLY CLEAN RUNS ARE EVER RECORDED. A continued run is not a lap, and
-   the same rule already governs BEST SCORE.
+   ------------------------------------------------------------------
+   THE GHOST IS YOUR LAST RUN. EVERY RUN. THIS IS A CHANGED RULE.
+
+   It used to be the best CLEAN run, borrowed from BEST SCORE, and that
+   was wrong. A GHOST IS A LEARNING TOOL AND A RECORD IS A SCOREBOARD
+   ENTRY, and those two want opposite rules:
+
+     A RECORD has to be hard to take, or it means nothing. BEST SCORE,
+     today's record and the completion time are therefore still closed to
+     any run with a continue on it, and none of that is relaxed here.
+
+     A GHOST has to be RECENT, or it teaches nothing. The line worth
+     watching is the one you drove a minute ago on the corner you are
+     about to arrive at, not a line from an hour ago that happened to
+     score well. So every run records: continued runs, and runs that
+     ended in a crash, both included, and the newest always wins.
+
+   WHAT A CONTINUE DOES TO THE RECORDING. It rewinds it to the checkpoint
+   and carries on writing from there, so the stored line is the path the
+   attempt actually took through each section rather than a splice of the
+   failed excursions. Which means that on a resume the ghost shows what
+   was done on THAT section last time, which is the whole point of having
+   one there.
+
+   The one thing that will not overwrite a line is a run too short to be
+   a line at all. Two samples is the floor, because one point cannot be
+   interpolated between and storing it would only wipe what is there.
    ================================================================== */
 const GHOST_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 const GHOST_INDEX = (function () {
@@ -6612,9 +7073,29 @@ function ghostDecode(str) {
 
 /* Recording. Called once a frame while driving, after the car has moved.
    `prevPos` and `prevX` are what update already has to hand for the tyre
-   marks, so nothing extra is tracked to get the crossing right. */
-function ghostRecord(prevPos, prevX) {
+   marks, so nothing extra is tracked to get the crossing right, and `dt`
+   is this frame's own delta.
+
+   THE FRAME DELTA IS NOT OPTIONAL AND LEAVING IT OUT IS WHAT MADE THE
+   GHOST JUDDER. This used to reconstruct the crossing time as
+
+       at = runTime - (1 - f) * (runTime - ghostRec.lastT)
+
+   where f is the fraction of THIS FRAME at which the step was crossed.
+   The quantity it multiplied f by has to be the frame, and
+   runTime - lastT is the gap since the previous SAMPLE, which is seven
+   frames long. So every recorded interval came out as f times the true
+   interval, with f effectively uniform over 0 to 1.
+
+   Measured on shipped road, the recorded intervals ran 0.078, 0.052,
+   0.204, 0.078, 0.052, 0.204 where the truth is a steady 0.111. The
+   ghost's replay speed therefore changed by a factor of four nine times
+   a second, which is exactly the bobbing that was reported. The total
+   time was right, because the error telescopes, which is why nothing
+   downstream ever noticed. */
+function ghostRecord(prevPos, prevX, dt) {
   if (!ghostRec.live) return;
+  const frameT0 = runTime - dt;              // runTime is the END of this frame
   while (position >= ghostRec.nextZ && ghostRec.n < FEEL.GHOST_MAX_SAMPLES) {
     /* Interpolated to the exact crossing rather than snapped to the
        frame. A frame covers about an eighth of a step at speed, and
@@ -6622,7 +7103,7 @@ function ghostRecord(prevPos, prevX) {
        of every sample. */
     const span = Math.max(1e-6, position - prevPos);
     const f = clamp((ghostRec.nextZ - prevPos) / span, 0, 1);
-    const at = runTime - (1 - f) * (runTime - ghostRec.lastT);
+    const at = frameT0 + f * dt;
     ghostRec.x.push(prevX + (carX - prevX) * f);
     ghostRec.yaw.push(carYaw());
     ghostRec.dt.push(Math.max(0, at - ghostRec.lastT));
@@ -6638,8 +7119,86 @@ function ghostStartRecording() {
   ghostRec.n = 0;
   ghostRec.nextZ = 0;
   ghostRec.lastT = 0;
-  // Daily only, and clean runs only. A continue is not a lap.
+  /* Daily only, and there is no longer a second condition. Every run on
+     today's road records, because the ghost is the last run and not the
+     best one. See the block header. */
   ghostRec.live = mode === DAILY;
+}
+
+/* A CONTINUE REWINDS THE RECORDING TO THE CHECKPOINT rather than ending
+   it, which is what makes the stored line the attempt's real path instead
+   of a splice with a dead end in the middle of it.
+
+   Sample i is at exactly i * step, so which samples are behind the resume
+   point is arithmetic and not a search. The time axis follows: runTime is
+   put back to the checkpoint's time by continueRun, and the cumulative
+   time of the last kept sample is at or before that, so the next sample
+   recorded spans the join correctly with nothing to reconcile. */
+function ghostRewind() {
+  if (mode !== DAILY) { ghostRec.live = false; return; }
+  const step = ghostStep();
+  const keep = clamp(Math.floor(position / step) + 1, 0, ghostRec.n);
+  let t = 0;
+  for (let i = 0; i < keep; i++) t += ghostRec.dt[i];
+  ghostRec.x.length = keep;
+  ghostRec.yaw.length = keep;
+  ghostRec.dt.length = keep;
+  ghostRec.n = keep;
+  ghostRec.nextZ = keep * step;
+  ghostRec.lastT = t;
+  ghostRec.live = keep < FEEL.GHOST_MAX_SAMPLES;
+}
+
+/* Stored at the end of every daily run, which is the whole of the new
+   rule, and decoded straight back so the very next attempt, restart or
+   continue, is already racing it. */
+function ghostBank() {
+  if (mode !== DAILY) return false;
+  if (ghostRec.n < 2) return false;          // too short to be a line
+  const blob = ghostEncode();
+  dailyGhostBytes = blob.length;
+  storeSet('daily.ghost', blob);
+  ghostDecode(blob);
+  return true;
+}
+
+/* ------------------------------------------------------------------
+   THE LINE BETWEEN SAMPLES, AND WHY IT IS A CURVE AND NOT A CHORD.
+
+   The samples are evenly spaced in DISTANCE, so index space is the
+   natural parameter for the line across the road and for the heading:
+   both are functions of how far along the road the car was, and neither
+   has anything to do with how long it took to get there. A uniform
+   Catmull-Rom through four consecutive samples is therefore exactly the
+   right shape, and it costs nothing at all in storage.
+
+   WHAT IT FIXES. Joining the samples with straight lines puts a corner
+   at every one of them, nine times a second. Measured on shipped road
+   the sideways velocity stepped by 36 units at the median join and 810
+   at the ninety fifth, on a car whose own sideways velocity is moved
+   smoothly by GRIP_TIME and never steps at all. A rival that changes
+   direction instantaneously does not read as a car being driven.
+
+   It is not applied to the position along the road. That one has to stay
+   MONOTONIC, because a ghost that goes backwards for a frame is a far
+   worse artefact than the one being fixed, and a cubic through four
+   points carries no such guarantee. It does not need it either: with the
+   frame delta bug fixed its speed steps measure zero at the median.
+   ------------------------------------------------------------------ */
+function ghostSpline(arr, i, f) {
+  const n = ghost.n;
+  // The ends have no neighbour outside, so they lean on themselves,
+  // which is the ordinary clamped end condition and keeps the curve
+  // inside the data there.
+  const p0 = arr[i > 0 ? i - 1 : 0];
+  const p1 = arr[i];
+  const p2 = arr[i + 1];
+  const p3 = arr[i + 2 < n ? i + 2 : n - 1];
+  const f2 = f * f, f3 = f2 * f;
+  return 0.5 * (2 * p1
+              + (p2 - p0) * f
+              + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f2
+              + (3 * p1 - 3 * p2 + p3 - p0) * f3);
 }
 
 /* Replay. The cursor only ever goes forward, so this is a step and not a
@@ -6676,8 +7235,8 @@ function ghostUpdate(dt) {
   const a = ghost.t[ghost.i], b = ghost.t[ghost.i + 1];
   const f = b > a ? clamp((t - a) / (b - a), 0, 1) : 0;
   ghost.pos = (ghost.i + f) * ghostStep();
-  ghost.frac = ghost.x[ghost.i] + (ghost.x[ghost.i + 1] - ghost.x[ghost.i]) * f;
-  ghost.yawNow = ghost.yaw[ghost.i] + (ghost.yaw[ghost.i + 1] - ghost.yaw[ghost.i]) * f;
+  ghost.frac = ghostSpline(ghost.x, ghost.i, f);
+  ghost.yawNow = ghostSpline(ghost.yaw, ghost.i, f);
   ghost.shown = true;
   ghostPass();
 }
@@ -8208,9 +8767,14 @@ function drawResult(w, h) {
     ctx.fillText(cols[i][1], cx, rowY + s * 0.046);
   }
 
+  /* WHICH TRACK THAT WAS, first, because it is what the rest of the line
+     is about and it is what a shared score has to name. A random road
+     says so, which is the same information: there is nothing to compare
+     it against. */
+  const which = daily ? 'TRACK #' + trackNumber(todayStamp) : 'RANDOM TRACK';
   /* The two records on one line, always both, so the split between them
      is obvious without a word of explanation. */
-  const rec = (daily ? "TODAY " + dayLabel(todayStamp) + '  ' + dailyBest + '     ' : '')
+  const rec = which + '     ' + (daily ? 'TODAY  ' + dailyBest + '     ' : '')
             + 'BEST  ' + bestScore + '     FURTHEST  ' + furthest + 'm';
   ctx.globalAlpha = 0.72;
   text(rec, w / 2, y0 + s * 0.30,
@@ -8222,27 +8786,32 @@ function drawResult(w, h) {
      orientations by construction and sit above the corner pads. */
   restartRect.live = false;
   dailyRect.live = false;
+  shareRect.live = false;
   if (deadFor < FEEL.DEATH_INPUT_LOCK) return;
+  // See the title screen: the calibration owns this band while it is up.
+  if (tiltCalOnScreen()) return;
   const resume = canContinue();
   const btnY = h - safeBottom - FEEL.DEATH_BOTTOM;
   const size = Math.round(s * 0.038);
   const rowH = size * 2.2 * 1.35;
+  drawShareButton(w, h, s, btnY, size);
 
   /* THE DAILY, OFFERED AT THE MOMENT THE PLAYER IS DECIDING WHETHER TO
      GO AGAIN. That is the honest place to say there is something else,
-     and it is only offered after an ENDLESS run: on a daily death the
-     player is already there and a button saying so would be noise.
+     and it is only offered after a RANDOM TRACK run: on a daily death
+     the player is already there and a button saying so would be noise.
 
      IT DOES NOT TOUCH THE REFLEX TAP. The tap anywhere still continues
      or restarts the run that just ended, exactly as section 5 requires;
      this is a separate deliberate target, stacked ABOVE the restart
      button so the position restart has always occupied does not move. */
-  /* RESTART DOES NOT MOVE. It has been at btnY since it was added and
-     that position is muscle memory, so the daily offer stacks ABOVE it
-     rather than taking its place. When there is no restart button the
-     daily still sits one row up and the bottom row stays empty, because
-     the bottom row is where a reflex tap lands hardest and nothing that
-     changes mode belongs there.
+  /* RESTART DOES NOT MOVE, AND SHARE ARRIVING BESIDE IT DID NOT MOVE IT.
+     It has been at btnY and centred since it was added and that position
+     is muscle memory, so the daily offer stacks ABOVE it and share sits
+     OFF TO THE SIDE of it. The centre of the bottom row is left free
+     whenever restart is not drawn, because the centre of the bottom row
+     is where a reflex tap lands hardest and nothing that changes mode or
+     opens a share sheet belongs there.
 
      Restart is a separate, deliberate action because the reflex tap now
      continues. It is only here when continuing is possible: with no gate
@@ -8254,7 +8823,8 @@ function drawResult(w, h) {
   if (mode === ENDLESS) {
     canvasButton(dailyRect, "TODAY'S TRACK", w / 2, stack, size, COLOUR.GATE, w);
     ctx.globalAlpha = 0.55;
-    const sub = dailyGateCountFor(todayStamp) + ' gates, one road for everyone'
+    const sub = 'track #' + trackNumber(todayStamp) + ', '
+              + dailyGateCountFor(todayStamp) + ' gates, one road for everyone'
               + (ghost.live ? ', your ghost is waiting' : '')
               + (hasKeyboard ? '     press T' : '');
     text(sub, w / 2, stack - size * 1.5,
@@ -8376,7 +8946,7 @@ function drawFinish(w, h) {
   } else if (!finishClean) {
     line = 'A CLEAN RUN IS THE ONE THAT COUNTS';
   } else {
-    line = 'GHOST RECORDED';
+    line = 'THIS RUN IS YOUR NEW GHOST';
     colour = COLOUR.GATE;
   }
   ctx.globalAlpha = 0.82;
@@ -8384,8 +8954,8 @@ function drawFinish(w, h) {
        fittedSize(line, '700', Math.round(s * 0.031), w * 0.9), '700', 'center', colour);
   ctx.globalAlpha = 1;
 
-  const rec = "TODAY " + dayLabel(todayStamp) + '  ' + dailyBest
-            + (dailyTime > 0 ? '  ' + timeLabel(dailyTime) : '');
+  const rec = 'TRACK #' + trackNumber(todayStamp) + '     TODAY  ' + dailyBest
+            + (dailyTime > 0 ? '     ' + timeLabel(dailyTime) : '');
   ctx.globalAlpha = 0.66;
   text(rec, w / 2, y0 + s * 0.405,
        fittedSize(rec, '700', Math.round(s * 0.028), w * 0.9), '700');
@@ -8396,11 +8966,23 @@ function drawFinish(w, h) {
      the reflex tap already restarts and a second way to do the same
      thing is clutter. That is the death screen's own rule. */
   restartRect.live = false;
+  shareRect.live = false;
   if (deadFor < FEEL.DEATH_INPUT_LOCK) return;
+  if (tiltCalOnScreen()) return;
   const btnY = h - safeBottom - FEEL.DEATH_BOTTOM;
+  /* The completion screen gets the same button in the same place. This
+     is the screen somebody most wants to send to a friend, and having it
+     on the crash screen and not on the win would be an odd thing to
+     explain. */
+  drawShareButton(w, h, s, btnY, Math.round(s * 0.038));
+  /* THE PROMPT MOVED UP A ROW, because it used to sit centred on btnY
+     and the share button now occupies that row. It goes above the row
+     rather than beside it, which is where the death screen has always
+     put its own prompt and for the same reason: the row is for targets
+     and the line above it is for words. */
   ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
   const prompt = 'tap or press any key to run it again';
-  text(prompt, w / 2, btnY,
+  text(prompt, w / 2, btnY - s * FEEL.DEATH_PROMPT_GAP,
        fittedSize(prompt, '600', Math.round(s * 0.040), w * 0.88), '600');
   ctx.globalAlpha = 1;
 }
@@ -8418,58 +9000,45 @@ function hitRestart(e) {
       && y >= restartRect.y && y <= restartRect.y + restartRect.h;
 }
 
-/* The date, short, so the player can see WHICH day's road they are on
-   and tell yesterday's record from today's. Local, like the seed. */
-const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-function dayLabel(stamp) {
-  return (stamp % 100) + ' ' + MONTHS[(Math.floor(stamp / 100) % 100) - 1];
-}
+/* THE DATE LABEL IS GONE. The TRACK NUMBER replaced it everywhere: it is
+   shorter, it is the thing two players can quote at each other, and it
+   is a history rather than a calendar. Nothing needs a formatted date,
+   so nothing formats one. */
 
 /* ==================================================================
    ENTRY, AND THERE IS STILL NO MENU. Section 12 forbids one.
 
-   THE FRONT DOOR DEPENDS ON WHO IS ARRIVING, because the two visitors
-   want opposite things and serving both with one screen is what made the
-   daily undiscoverable.
+   THE DAILY IS THE FRONT DOOR FOR EVERYBODY, first visit included.
 
-     A FIRST EVER VISIT is somebody who followed a search result and has
-     no idea what any of this is. Tap anywhere, drive, no concept to
-     learn. Unchanged, and it is not up for negotiation.
+   The previous session made it depend on whether the browser had played
+   before: a first timer got endless, a returning player got the daily.
+   That is gone, and it is a simplification rather than a retreat. Two
+   front doors is two things to keep right, the split rested on a
+   localStorage key that this audience's locked down profiles frequently
+   refuse to keep, and a first timer being handed today's track loses
+   them nothing at all: it is a road with a finish line on it.
 
-     A RETURNING VISIT is somebody who already knows how to drive and is
-     here for a reason. TODAY'S TRACK is that reason: a road everyone
-     shares for the day, a finish line, a ghost of their own best. So for
-     them it is the PRIMARY, and endless is the clearly marked button
-     beside it.
+   STILL ONE TAP TO PLAY, which is what section 5 actually asks for. Tap
+   anywhere, press any key, or press the primary button, and all three
+   start today's track. The random road is one clearly marked button and
+   nothing has to be read to ignore it.
 
-   THE PRIMARY IS `mode` ITSELF, not a visual emphasis. Tapping anywhere,
-   pressing any key and every other route into a run all read `mode`, so
-   setting it once at load makes the whole front door consistent by
-   construction. There is no second code path to keep in step.
+   IT IS A TITLE SCREEN AND NOT A MENU. Section 12 forbids menus,
+   settings screens and difficulty selection. There is none of that here:
+   one headline, one primary action, one alternative, and nothing the
+   player has to answer before driving.
 
-   WHY THIS AND NOT "REMEMBER THE LAST MODE". Remembering would send a
-   returning endless player straight back to endless, which is exactly
-   the loop that had to be broken: the author chose the daily, the page
-   reloaded, and endless quietly became the default again. The whole
-   point is that coming back means being offered the thing that is worth
-   coming back FOR.
+   WHY NOT "REMEMBER THE LAST MODE". Remembering would send a player who
+   tried the random road once straight back to it every visit after,
+   which is the loop that had to be broken in the first place. Coming
+   back means being offered the thing that is worth coming back for.
 
-   And after death there is still no choice: the reflex tap restarts the
-   run you were in, one action, nothing to hunt for. Section 5 holds.
+   And after death there is still no choice: the reflex tap continues or
+   restarts the run you were in, one action, nothing to hunt for.
    ================================================================== */
 const dailyRect = { x: 0, y: 0, w: 0, h: 0, live: false };
 const altRect = { x: 0, y: 0, w: 0, h: 0, live: false, to: 0 };
 
-/* Has this browser ever driven? Written on the first run start, so it is
-   true from the second page load onward. With storage unavailable it is
-   false forever, which is the correct degradation: a player the game
-   cannot remember is a player it should treat as new. */
-let hasPlayedBefore = storeGet('played') === '1';
-function markPlayed() {
-  if (hasPlayedBefore) return;
-  hasPlayedBefore = true;
-  storeSet('played', '1');
-}
 /* Fine pointer means a trackpad or a mouse, which on this audience's
    hardware means a Chromebook, which means a keyboard. The same media
    query the tilt button already uses, read the other way round. */
@@ -8507,92 +9076,212 @@ function hitRect(rect, e) {
   return x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 }
 
-/* WHAT TODAY'S TRACK ACTUALLY GIVES YOU, which is the half that was
-   missing. A button labelled TODAY'S TRACK names a thing; these lines
-   are the reason to press it. Everything here is a fact about today
-   rather than a description of a feature. */
-function dailyPitchLines() {
-  /* ALWAYS EXACTLY THREE. A variable stack was tried and the four line
-     case ran into the car in landscape, where h and s are the same
-     number and there is no spare height at all. Three lines is what the
-     shortest screen this game is played on can hold, so the third one
-     carries whichever fact is worth the most right now. */
-  let third;
-  if (dailyTime > 0) {
-    third = 'YOUR TIME  ' + timeLabel(dailyTime)
-          + (ghost.live ? '     GHOST WAITING' : '');
-  } else if (ghost.live) {
-    third = 'YOUR GHOST IS WAITING';
-  } else if (dailyBest > 0) {
-    third = 'BEST TODAY  ' + dailyBest + '     NOT FINISHED YET';
+/* ==================================================================
+   SHARING A RUN.
+
+   WHICH TRACK IT WAS is the whole reason this can exist at all. A score
+   off a random road is a number nobody can check; a score off track 47
+   is a claim two people can settle, because they drove the same corners.
+   That is what the daily bought and this is what spends it.
+
+   NOT ONE EXTERNAL REQUEST, and there was never a risk of one. The Web
+   Share API hands a string to the operating system's own sheet and the
+   clipboard fallback does not leave the page at all. Nothing is fetched,
+   nothing is posted, and the game works identically with both missing:
+   the text goes to the on screen note and can be read off it.
+
+   The URL is the page the player is actually on, so it stays right
+   through any move of the game, and it is left out entirely off http
+   and https, where it would be somebody's local file path.
+   ================================================================== */
+function shareRun() {
+  const daily = mode === DAILY;
+  const head = 'DRIFT FEVER   '
+             + (daily ? 'TRACK #' + trackNumber(todayStamp) : 'RANDOM TRACK');
+  let body;
+  if (state === FINISHED) {
+    body = banked + ' points, finished in ' + timeLabel(finishTime)
+         + (finishClean ? ', clean'
+            : ', on ' + continues + (continues === 1 ? ' continue' : ' continues'));
   } else {
-    third = 'FINISH CLEAN TO RECORD A GHOST';
+    body = banked + ' points, ' + gatesPassed
+         + (gatesPassed === 1 ? ' gate' : ' gates') + ', ' + runDistance + 'm';
   }
-  return [dailyGateCountFor(todayStamp) + ' GATES TO THE FINISH',
-          'THE SAME ROAD FOR EVERYONE TODAY',
-          third];
+  let url = '';
+  const proto = window.location.protocol;
+  if (proto === 'http:' || proto === 'https:') {
+    url = window.location.origin + window.location.pathname;
+  }
+  const text = head + '\n' + body + (url ? '\n' + url : '');
+
+  /* Every one of these can throw or be absent, and a share button that
+     breaks the death screen would be far worse than one that quietly
+     shows the text instead. */
+  try {
+    if (navigator.share) {
+      const p2 = navigator.share({ text: text });
+      if (p2 && p2.then) p2.then(function () {}, function () {});
+      return;
+    }
+  } catch (e) {}
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { showNote('Copied. Paste it anywhere.', 3); },
+        function () { showNote(text, 7); });
+      return;
+    }
+  } catch (e) {}
+  showNote(text, 8);
 }
 
+const shareRect = { x: 0, y: 0, w: 0, h: 0, live: false };
+function hitShare(e) {
+  if (!shareRect.live) return false;
+  if (state !== DEAD && state !== FINISHED) return false;
+  return hitRect(shareRect, e);
+}
+
+/* Beside RESTART rather than in place of it, and RESTART DOES NOT MOVE:
+   it stays centred on btnY where it has always been, because that
+   position is muscle memory and the reflex tap is the loop the whole
+   game hangs off. Share is offset into the right hand side, far enough
+   out to clear the restart button at every screen width and close enough
+   in to clear the corner pads. It sits in the same place whether restart
+   is drawn or not, so it never migrates under a thumb heading for the
+   centre. */
+function drawShareButton(w, h, s, btnY, size) {
+  const dx = Math.min(w * 0.30, s * 0.28);
+  /* AND IT IS THE ONE THING IN THIS ROW THAT SITS OVER THE PADS, so it
+     is the one thing that has to clear them. btnY is a fixed pixel drop
+     from the bottom while this button's height is a fraction of s, and
+     on a tablet those two disagree by enough to put the corner of the
+     button inside the fullscreen pad, where the tap would go to the pad
+     and the share would appear to be broken. Lifted just far enough,
+     which on every phone is not at all. */
+  const y = Math.min(btnY, padsTop - size * 1.1 - 6);
+  canvasButton(shareRect, 'SHARE', w / 2 + dx, y, size, COLOUR.GATE, w);
+}
+
+/* WHERE THE PLAYER STANDS ON TODAY'S TRACK, in one line, and only the
+   parts of it that exist. An empty slot is left out rather than shown as
+   a dash: a first visit should read as a clean start and not as a form
+   with nothing filled in. */
+function dailyStateLine() {
+  const bits = [];
+  if (bestScore > 0) bits.push('BEST  ' + bestScore);
+  if (dailyBest > 0) bits.push('TODAY  ' + dailyBest);
+  if (dailyTime > 0) bits.push('TIME  ' + timeLabel(dailyTime));
+  if (ghost.live) bits.push('GHOST READY');
+  return bits.join('     ');
+}
+
+/* ==================================================================
+   THE TITLE SCREEN. A TITLE SCREEN, NOT A MENU.
+
+   Section 12 forbids menus and this is not one: there is a headline, one
+   primary action, and one clearly marked alternative. Nothing is
+   required of the player, nothing has to be chosen, and the whole thing
+   is skipped by tapping anywhere, which starts TODAY'S TRACK. Section 5
+   holds because it is still one tap to play.
+
+   WHAT IS ON IT AND WHY EACH THING EARNS ITS ROOM:
+
+     THE TRACK NUMBER gives the daily an identity. "Track 47" is a thing
+     that can be talked about; "the daily" is a feature name.
+     THE COUNTDOWN is the return hook, and it is the one thing here that
+     says come back tomorrow without saying it.
+     THE COPY is three short facts, not a description: same road for
+     everyone, new one tomorrow, comparable with anybody. That is the
+     entire pitch and it does not need a fourth line.
+     THE STATE LINE is what the player has done on today's track, and it
+     is empty on a first visit, which is correct.
+     THE RANDOM TRACK BUTTON is the alternative, named for what it is
+     rather than for how long it lasts, because "endless" describes the
+     ending to somebody who already knows the game and "random" describes
+     the road to somebody who does not.
+
+   THE STACK IS MEASURED IN s, THE SMALLER SCREEN DIMENSION, and only its
+   starting height comes from h. Laid out in fractions of h it fits in
+   portrait and runs straight across the car in landscape, where h and s
+   are the same number. The death screen paid for that lesson first.
+   ================================================================== */
 function drawOverlay(w, h) {
   if (state === TITLE) {
-    /* MEASURED IN s, THE SMALLER SCREEN DIMENSION, and only the starting
-       height comes from h. This block was laid out in fractions of h and
-       it fitted in portrait and ran straight across the car in landscape,
-       where h and s are the same number. That is the identical mistake
-       the death screen already paid for, so it takes the identical fix:
-       the top is pushed down the taller screen and clamped so the stack
-       can never reach the middle band, which is where the car is. */
     const s = Math.min(w, h);
-    const daily = mode === DAILY;
-    const y0 = Math.min(Math.max(s * 0.09, h * 0.14), Math.max(0, h * 0.5 - s * 0.38));
+    /* Pushed down the taller screen, pulled up so the stack cannot reach
+       the middle band where the car is, and then FLOORED, because the
+       floor is what keeps the title's own height on screen. Written as
+       max(floor, min(want, ceiling)) rather than min(max(...), ceiling):
+       the second form lets a low ceiling win outright and clipped the
+       top of the title off in landscape, where h and s are the same
+       number and the ceiling is at its tightest. */
+    const y0 = Math.max(s * 0.082, Math.min(h * 0.11, h * 0.5 - s * 0.44));
     const title = 'DRIFT FEVER';
     text(title, w / 2, y0,
-         fittedSize(title, '800', Math.round(s * 0.125), w * 0.88), '800');
-    text('hold left or right to steer', w / 2, y0 + s * 0.125,
-         Math.round(s * 0.042), '600');
+         fittedSize(title, '800', Math.round(s * 0.115), w * 0.88), '800');
+    text('hold left or right to steer', w / 2, y0 + s * 0.105,
+         Math.round(s * 0.038), '600');
 
-    /* The prompt names the mode the tap will actually start. It used to
-       say "to start", which was true and useless: the whole failure this
-       is fixing is a player who did not know which mode a tap gave
-       them. */
-    const go = daily ? "tap or press any key for TODAY'S TRACK"
-                     : 'tap or press any key to start';
-    text(go, w / 2, y0 + s * 0.182,
-         fittedSize(go, '600', Math.round(s * 0.042), w * 0.92), '600',
-         'center', daily ? COLOUR.GATE : COLOUR.TEXT);
+    /* The identity and the clock, on one line because they are one
+       thought: this is which track, and this is how long it is yours. */
+    const ident = 'TRACK #' + trackNumber(todayStamp) + '      NEW TRACK IN ' + countdownLabel();
+    text(ident, w / 2, y0 + s * 0.152,
+         fittedSize(ident, '700', Math.round(s * 0.030), w * 0.9), '700',
+         'center', COLOUR.GATE);
 
-    /* THE PITCH, and only for the returning player, because a first
-       timer has nothing to compare it to and four lines of copy in front
-       of somebody who has never driven is a tutorial. */
-    if (daily) {
-      const lines = dailyPitchLines();
-      ctx.globalAlpha = 0.72;
-      for (let i = 0; i < lines.length; i++) {
-        text(lines[i], w / 2, y0 + s * (0.238 + i * 0.036),
-             fittedSize(lines[i], '700', Math.round(s * 0.030), w * 0.9), '700',
-             'center', i === 0 ? COLOUR.GATE : COLOUR.TEXT);
-      }
+    /* THE PRIMARY, in the gate colour, which is the colour today's track
+       already wears everywhere else in the game. Tapping anywhere does
+       the same thing, so this is not the only way in; it is the thing
+       that says what the tap will do. */
+    canvasButton(dailyRect, "PLAY TODAY'S TRACK", w / 2, y0 + s * 0.240,
+                 Math.round(s * 0.046), COLOUR.GATE, w);
+
+    /* ONE LINE, and it was two. Landscape is the shortest screen this
+       game is played on, h and s are the same number there, and every
+       extra row in this stack is a row nearer the car. The whole pitch
+       fits on one line once it is fitted to the width, so it goes on
+       one line. */
+    ctx.globalAlpha = 0.70;
+    const pitch = 'one road for everyone today, a new one tomorrow, compare with anyone'
+                + (hasKeyboard ? '     press T' : '');
+    text(pitch, w / 2, y0 + s * 0.315,
+         fittedSize(pitch, '700', Math.round(s * 0.029), w * 0.94), '700');
+    ctx.globalAlpha = 1;
+
+    const standing = dailyStateLine();
+    if (standing) {
+      ctx.globalAlpha = 0.8;
+      text(standing, w / 2, y0 + s * 0.358,
+           fittedSize(standing, '700', Math.round(s * 0.030), w * 0.92), '700',
+           'center', COLOUR.GATE);
       ctx.globalAlpha = 1;
     }
 
-    /* The other mode, anchored to the bottom edge where RESTART sits on
-       the death screen and the mode switch sits on the pause overlay, so
-       it clears the car in both orientations by construction and stays
-       above the corner pads. */
-    const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
-    const label = daily ? 'ENDLESS' : "TODAY'S TRACK";
-    altRect.to = daily ? ENDLESS : DAILY;
-    const bh = canvasButton(altRect, label, w / 2, by0, Math.round(s * 0.040),
-                            daily ? COLOUR.TEXT : COLOUR.GATE, w);
-    dailyRect.live = false;
+    /* THE SECOND CHOICE, anchored to the bottom edge where RESTART sits
+       on the death screen and the mode switch sits on the pause overlay,
+       so it clears the car in both orientations by construction.
 
+       Its explanation goes UNDERNEATH it, which is the one place on this
+       screen where the order matters: a caption above a button reads as
+       belonging to whatever is above THAT, and this one is specifically
+       about what pressing this button gets you. The whole pair is lifted
+       clear of the corner pads, which is what the offsets are for. */
+    altRect.live = false;
+    /* THE CALIBRATION OWNS THIS BAND WHILE IT IS UP, and it is the only
+       thing in the game that ever takes a row off another screen. It is
+       a few seconds, it is asked for deliberately, and the alternative
+       is a prompt drawn straight through a button. */
+    if (tiltCalOnScreen()) return;
+    const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
+    altRect.to = ENDLESS;
+    canvasButton(altRect, 'RANDOM TRACK', w / 2, by0 - s * 0.050,
+                 Math.round(s * 0.038), COLOUR.TEXT, w);
     ctx.globalAlpha = 0.6;
-    const sub = daily
-      ? 'the infinite road, no finish, no ghost' + (hasKeyboard ? '     press E' : '')
-      : dayLabel(todayStamp) + '     ' + dailyGateCountFor(todayStamp) + ' gates, one road for everyone'
-        + (hasKeyboard ? '     press T' : '');
-    text(sub, w / 2, by0 - bh * 0.95,
-         fittedSize(sub, '700', Math.round(s * 0.029), w * 0.92), '700');
+    const sub = 'a fresh layout right now, not scored against the world'
+              + (hasKeyboard ? '     press R' : '');
+    text(sub, w / 2, by0 + s * 0.012,
+         fittedSize(sub, '700', Math.round(s * 0.027), w * 0.92), '700');
     ctx.globalAlpha = 1;
   } else if (state === DEAD) {
     dailyRect.live = false;
@@ -8609,8 +9298,9 @@ function drawOverlay(w, h) {
 }
 
 function hitDaily(e) {
-  if (dailyRect.live && state === DEAD && hitRect(dailyRect, e)) return true;
-  return false;
+  if (!dailyRect.live) return false;
+  if (state !== TITLE && state !== DEAD) return false;
+  return hitRect(dailyRect, e);
 }
 
 function hitAlt(e) {
@@ -8793,6 +9483,9 @@ function finishRun() {
      meaningful if that run reached the line too. */
   finishMargin = (finishClean && dailyTime > 0) ? finishTime - dailyTime : null;
   finishRecord = bankScore(true);
+  // The margin above is read off the record's time, so the line is kept
+  // after it, not before, or a run would be measured against itself.
+  ghostBank();
   stopTiltHint(true);
   onRunEnded();
   state = FINISHED;
@@ -8908,12 +9601,11 @@ function bankDaily(finished) {
   storeSet('daily.day', String(todayStamp));
   storeSet('daily.best', String(dailyBest));
   storeSet('daily.time', dailyTime ? dailyTime.toFixed(2) : '0');
-  /* The line goes with the record, so the ghost is always the run that
-     set it rather than merely the last clean one. */
-  const blob = ghostEncode();
-  dailyGhostBytes = blob.length;
-  storeSet('daily.ghost', blob);
-  ghostDecode(blob);                      // live for the next attempt at once
+  /* THE LINE NO LONGER GOES WITH THE RECORD. It used to be written here,
+     which tied the ghost to the best clean run; it is written by
+     ghostBank at the end of every run instead. The record and the ghost
+     are answering different questions and want opposite rules, and this
+     line moving out of this function is that separation. */
   return true;
 }
 
@@ -9477,14 +10169,15 @@ function resolveCloseCalls() {
 
    THE SECOND LINE IS THE ANSWER TO "WHERE IS THE GHOST". Everything the
    ghost can be doing is a state the player cannot otherwise see: daily
-   only, needs a completed clean run, and never records from a continue.
-   Each of those now says itself, at the start of the run, and then gets
-   out of the way. */
+   only, and it is the LAST run rather than the best one, which is the
+   half that decides whether the line ahead is worth trusting. Each of
+   those now says itself, at the start of the run, and then gets out of
+   the way. */
 function modeSecondLine() {
   if (mode !== DAILY) return null;
-  if (continues > 0) return 'CONTINUED RUN, THIS ONE WILL NOT RECORD A GHOST';
-  if (!ghost.live) return 'NO GHOST YET, FINISH A CLEAN RUN TO RECORD ONE';
-  return 'CHASING YOUR BEST CLEAN RUN';
+  if (continues > 0) return 'CONTINUED RUN, IT CANNOT TAKE THE RECORD';
+  if (!ghost.live) return 'NO GHOST YET, THIS RUN BECOMES ONE';
+  return 'CHASING YOUR LAST RUN';
 }
 
 /* ------------------------------------------------------------------
@@ -9555,11 +10248,11 @@ function drawModeMark(w, h) {
      hunting for the ghost read it and carried on hunting. */
   let line, colour;
   if (mode !== DAILY) {
-    line = 'ENDLESS   NO FINISH, NO GHOST';
+    line = 'RANDOM TRACK   NO FINISH, NO GHOST';
     colour = COLOUR.TEXT;
   } else {
     colour = COLOUR.GATE;
-    line = "TODAY " + dayLabel(todayStamp)
+    line = 'TRACK #' + trackNumber(todayStamp)
          + (dailyBest > 0 ? '   BEST ' + dailyBest : '');
     if (continues > 0) line += '   CONTINUED';
     else if (ghost.live) line += '   ' + ghostGapLabel();
@@ -9886,8 +10579,70 @@ function render() {
   drawCallout(w, h);
   drawOverlay(w, h);
   drawPauseCover(w, h);
+  /* Over the pause cover, because the gesture keeps running while the
+     game does not and a prompt hidden behind the cover would be a prompt
+     nobody answers. Under the boot credit, which owns the first second
+     of the page outright. */
+  drawTiltCal(w, h);
   drawBoot(w, h);
   drawHud(w, h);
+}
+
+/* ------------------------------------------------------------------
+   THE CALIBRATION PROMPT. An arrow, two words and a line of state, sat
+   in the band above the pads where nothing else lives.
+
+   IT IS NOT A SCREEN. No cover, no dimming, no dismissal: the game is
+   still there behind it and still fully playable on touch and keys. That
+   is deliberate, because a modal here would be the settings screen
+   section 12 forbids wearing a different hat.
+
+   The arrow points LEFT because left is what is being asked for, and it
+   is the whole instruction. The two words underneath are for anybody who
+   does not read an arrow as an instruction, which on a first ever visit
+   is most people.
+   ------------------------------------------------------------------ */
+function drawTiltCal(w, h) {
+  if (tiltCal.phase === CAL_OFF) return;
+  const s = Math.min(w, h);
+  const y = h - safeBottom - FEEL.DEATH_BOTTOM - s * 0.10;
+
+  if (tiltCal.phase === CAL_DONE) {
+    const line = tiltCal.ok ? 'TILT SET' : 'KEEPING THE DEFAULT';
+    ctx.globalAlpha = clamp(tiltCal.said, 0, 1);
+    text(line, w / 2, y, fittedSize(line, '800', Math.round(s * 0.05), w * 0.8),
+         '800', 'center', tiltCal.ok ? COLOUR.GATE : COLOUR.TEXT);
+    ctx.globalAlpha = 1;
+    return;
+  }
+
+  const reading = tiltCal.phase === CAL_READ;
+  /* The arrow only wakes up once the posture has settled, so the two
+     phases are told apart without a word: hold still, then move. */
+  const pulse = reading ? 0.55 + 0.45 * Math.abs(Math.sin(tiltCal.waited * 4)) : 0.3;
+  const a = s * 0.068;
+  const cx = w / 2, cy = y - s * 0.055;
+  ctx.globalAlpha = pulse;
+  ctx.strokeStyle = COLOUR.GATE;
+  ctx.lineWidth = Math.max(4, s * 0.015);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(cx + a * 0.85, cy - a * 0.6);
+  ctx.lineTo(cx - a * 0.55, cy);
+  ctx.lineTo(cx + a * 0.85, cy + a * 0.6);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  const line = reading ? 'TILT LEFT' : 'HOLD STILL';
+  text(line, w / 2, y + s * 0.030,
+       fittedSize(line, '800', Math.round(s * 0.055), w * 0.8), '800',
+       'center', COLOUR.GATE);
+  ctx.globalAlpha = 0.55;
+  const sub = 'hold the phone how you want to play     tap to skip';
+  text(sub, w / 2, y + s * 0.072,
+       fittedSize(sub, '600', Math.round(s * 0.028), w * 0.9), '600');
+  ctx.globalAlpha = 1;
 }
 
 /* The cover. Opaque, over everything except the debug readout, because
@@ -9928,7 +10683,7 @@ function drawPauseCover(w, h) {
      screen and where TODAY'S TRACK sits on the title screen. Three canvas
      buttons, one place: a player who has met one already knows the next. */
   const daily = mode === DAILY;
-  const label = daily ? 'SWITCH TO ENDLESS' : "SWITCH TO TODAY'S TRACK";
+  const label = daily ? 'SWITCH TO A RANDOM TRACK' : "SWITCH TO TODAY'S TRACK";
   const size = Math.round(s * 0.038);
   ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   const bw = ctx.measureText(label).width + size * 2.2;
@@ -10629,6 +11384,10 @@ function endBootChrome() {
   if (!bootChromeHidden) return;
   bootChromeHidden = false;
   try { document.documentElement.classList.remove('booting'); } catch (e) {}
+  /* The pad row was display:none for the whole of the boot flash, so the
+     measurement resize took of it was zero. This is the moment it exists,
+     so this is the moment to measure it again. */
+  resize();
 }
 
 /* The credit itself. The game's own arcade treatment on the game's own
@@ -10681,6 +11440,10 @@ function frame(now) {
   if (bootFlash > 0) { bootFlash -= dt; if (bootFlash <= 0) { bootFlash = 0; endBootChrome(); } }
   updateRepeat(dt);
   updateTiltHint(dt);
+  updateFlipHold(dt);
+  /* Before the pause return, because the gesture is not part of the game
+     and must finish whether the game is running or not. */
+  updateTiltCal(dt);
   // Before the early return, so the pause sweep and the crash wind down
   // both keep running while nothing else does.
   updateAudio(dt);
