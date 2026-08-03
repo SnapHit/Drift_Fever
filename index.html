@@ -1427,6 +1427,55 @@ const FEEL = {
   CREDIT_PLATE_WIDE:       1.00,     // of the lockup width, the radius across
   CREDIT_PLATE_TALL:       2.60,     // of the lockup height, the radius down
 
+  /* ----------------------------------------------------------------
+     THE TITLE SCREEN, WHICH IS AN ARCADE SPLASH AND NOT A WEB PAGE.
+
+     THE SCRIM IS THE ROOT OF IT AND EVERYTHING ELSE FOLLOWS. The game
+     keeps running underneath, which is the attract mode and is worth
+     keeping, but at full brightness the road, the pylons and the car
+     compete with every word on top of them. A dark wash between the two
+     lets the type sit on near black without stopping the road moving.
+
+     IT IS ALSO THE PERMANENT CONTRAST ANSWER. The biome hue rotates
+     through twelve palettes, so without a scrim the legibility of this
+     screen is a different number at every hue and can only ever be
+     checked, never fixed. With one, the backdrop is the scrim and the
+     hue underneath stops mattering.
+
+     THE SIZES AND GAPS ARE ALL SHARES OF s, THE SMALLER SCREEN
+     DIMENSION, so the whole hierarchy scales as one thing. Only the top
+     margin comes off h. The wordmark then takes whatever height is left
+     once the three lines under it, the air above the bottom button and
+     the bottom button itself have taken theirs, which is what makes
+     landscape work without a second layout. */
+  TITLE_SCRIM_ALPHA:       0.84,     // LIVE, the wash over the running game
+  TITLE_TOP:              0.055,     // of h, the margin above the wordmark
+  TITLE_WM_WIDTH:          0.88,     // of w, the wordmark's ink width
+  /* AND A CAP ON ITS HEIGHT AS A SHARE OF h, which only ever bites in
+     landscape. Cutting three rows of text off this screen handed the
+     wordmark all of the room they used to take, and on a 844 by 390
+     screen that made it two fifths of the height, which is a mark
+     dominating a splash rather than heading one. Portrait is still
+     governed by the width and this does not touch it. */
+  TITLE_WM_TALL:           0.34,     // of h, the ceiling on its ink height
+  TITLE_WM_MIN:            0.14,     // of s, the floor under its ink height
+  TITLE_GAP_PROMPT:       0.075,     // of s, wordmark down to the prompt
+  TITLE_PROMPT_SIZE:      0.058,     // of s
+  TITLE_GAP_FACTS:        0.072,     // of s, prompt down to the track line
+  TITLE_FACT_SIZE:        0.029,     // of s
+  TITLE_GAP_CLOCK:        0.055,     // of s, track line down to the countdown
+  TITLE_CLOCK_SIZE:       0.025,     // of s
+  TITLE_AIR:               0.10,     // of s, the least air above the bottom button
+  /* THE BLINK, and it is a blink and not a pulse. A sine fade reads as a
+     web page breathing; a hard on and off reads as a cabinet asking for
+     a coin, which is the whole point of the change. Lit for most of the
+     cycle so it is never missed by somebody who glanced away. */
+  TITLE_BLINK_PERIOD:      1.15,     // LIVE, seconds
+  TITLE_BLINK_ON:          0.62,     // LIVE, share of the period lit
+  TITLE_FACT_ALPHA:        0.80,
+  TITLE_CLOCK_ALPHA:       0.52,
+  TITLE_SUB_ALPHA:         0.55,
+
   DEATH_BOTTOM:              96,     // pixels above the safe area, the button's centre
   DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
   RESUME_FLASH_TIME:       0.45,     // the wash on arriving back at the gate
@@ -2313,7 +2362,9 @@ function rotateHue(colour, deg, was, now) {
    jumps, the tyre marks and the smoke, turns together. */
 const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         SCORE_EDGE: 1, TEXT: 1, TEXT_SHADOW: 1,
-                        BAR_TRACK: 1, BAR_FILL: 1, BAR_LOW: 1 };
+                        BAR_TRACK: 1, BAR_FILL: 1, BAR_LOW: 1,
+                        // The title screen's own family. See COLOUR.
+                        TITLE_DIM: 1, TITLE_SCRIM: 1 };
 
 let PALETTE_BASE = null;
 let BIOMES = [];
@@ -2628,7 +2679,18 @@ const COLOUR = {
   CAR_HEAT_3:   '255,255,255',
   CAR_SEAM:     'rgba(4,20,28,0.5)',
   TEXT:         '#fff2e2',
-  TEXT_SHADOW:  'rgba(24,6,0,0.75)'
+  TEXT_SHADOW:  'rgba(24,6,0,0.75)',
+  /* THE TITLE SCREEN'S OWN TWO COLOURS, and both are exempt from the
+     hue rotation, which is the point of them. The screen used to draw
+     its secondary lines in GATE, a mint that rotates with the biome and
+     fought both the world and the wordmark at every hue. One warm
+     family now: cream for the primary, this amber for everything
+     secondary, and the wordmark's own colours untouched. Cyan belongs
+     to the car and to nothing else on this screen. */
+  TITLE_DIM:    '#f2b464',
+  // The wash between the running game and the type, as an rgb triple so
+  // the alpha can be a feel constant. Warm, like the void it sits on.
+  TITLE_SCRIM:  '5,2,1'
 };
 
 /* ==================================================================
@@ -3066,6 +3128,25 @@ const TUNABLES = [
   { key: 'CONTINUE_CLOCK_GRACE',label:'resumeSec',step: 0.5, min: 0,    max: 20,    dp: 1, group: 20 },
   { key: 'RESUME_STRAIGHT',    label: 'resumeIn',step: 10,   min: 0,    max: 400,   dp: 0, group: 20 },
   { key: 'RESUME_FLASH_TIME',  label: 'resumeFx',step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 20 },
+  /* The title screen. Group 20 is the end screens and this is the other
+     side of the same coin: the screens with no car being driven on them.
+     Tunable because an arcade splash is judged by looking at it. */
+  { key: 'TITLE_SCRIM_ALPHA',  label: 'ttlDim',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
+  { key: 'TITLE_TOP',          label: 'ttlTop',  step: 0.005,min: 0,    max: 0.30,  dp: 3, group: 20 },
+  { key: 'TITLE_WM_WIDTH',     label: 'ttlMark', step: 0.02, min: 0.30, max: 1.00,  dp: 2, group: 20 },
+  { key: 'TITLE_WM_TALL',      label: 'ttlTall', step: 0.02, min: 0.10, max: 0.80,  dp: 2, group: 20 },
+  { key: 'TITLE_GAP_PROMPT',   label: 'ttlGap1', step: 0.005,min: 0,    max: 0.30,  dp: 3, group: 20 },
+  { key: 'TITLE_PROMPT_SIZE',  label: 'ttlGo',   step: 0.002,min: 0.02, max: 0.14,  dp: 3, group: 20 },
+  { key: 'TITLE_GAP_FACTS',    label: 'ttlGap2', step: 0.005,min: 0,    max: 0.30,  dp: 3, group: 20 },
+  { key: 'TITLE_FACT_SIZE',    label: 'ttlFact', step: 0.002,min: 0.01, max: 0.08,  dp: 3, group: 20 },
+  { key: 'TITLE_GAP_CLOCK',    label: 'ttlGap3', step: 0.004,min: 0,    max: 0.20,  dp: 3, group: 20 },
+  { key: 'TITLE_CLOCK_SIZE',   label: 'ttlClk',  step: 0.002,min: 0.01, max: 0.08,  dp: 3, group: 20 },
+  { key: 'TITLE_AIR',          label: 'ttlAir',  step: 0.01, min: 0,    max: 0.50,  dp: 2, group: 20 },
+  { key: 'TITLE_BLINK_PERIOD', label: 'blinkT',  step: 0.05, min: 0.2,  max: 4.0,   dp: 2, group: 20 },
+  { key: 'TITLE_BLINK_ON',     label: 'blinkOn', step: 0.02, min: 0.05, max: 1.0,   dp: 2, group: 20 },
+  { key: 'TITLE_FACT_ALPHA',   label: 'ttlFctA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
+  { key: 'TITLE_CLOCK_ALPHA',  label: 'ttlClkA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
+  { key: 'TITLE_SUB_ALPHA',    label: 'ttlSubA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
   { key: 'DEATH_BOTTOM',       label: 'deadBtm', step: 4,    min: 20,   max: 300,   dp: 0, group: 20 },
   { key: 'DEATH_PROMPT_GAP',   label: 'deadGap', step: 0.005,min: 0.02, max: 0.30,  dp: 3, group: 20 },
   /* The jumps. Two groups, because the air and the placement are tuned on
@@ -4568,6 +4649,7 @@ function worstOvershoot() {
    rather than the constants.
    ------------------------------------------------------------------ */
 let runTime = 0;          // seconds of the current run, DRIVING only
+let titleTime = 0;        // seconds on the title screen, for the blink
 /* Zero to one. Rises when a run ends inside ADAPT_DEATH_WINDOW, falls
    when one gets through the on ramp. Held in memory rather than stored:
    it is a read of how the last few minutes went, and a stored one would
@@ -6159,6 +6241,11 @@ function update(dt) {
      runs, and it runs on real time so the input lock and the score roll
      behave exactly as they do on the death screen. */
   if (state === FINISHED) { deadFor += dt; return; }
+  /* THE TITLE SCREEN NEEDS A CLOCK OF ITS OWN. Nothing else advances
+     there: runTime belongs to a run and deadFor to a run that ended, so
+     a blink hung off either would sit frozen. This is the only thing
+     that moves on that screen and it moves nothing in the world. */
+  if (state === TITLE) { titleTime += dt; return; }
   if (state !== DRIVING) return;
 
   runTime += dt;
@@ -9693,48 +9780,85 @@ function drawShareButton(w, h, s, btnY, size) {
   canvasButton(shareRect, 'SHARE', w / 2 + dx, y, size, COLOUR.GATE, w);
 }
 
-/* WHERE THE PLAYER STANDS ON TODAY'S TRACK, in one line, and only the
-   parts of it that exist. An empty slot is left out rather than shown as
-   a dash: a first visit should read as a clean start and not as a form
-   with nothing filled in. */
-function dailyStateLine() {
-  const bits = [];
-  if (bestScore > 0) bits.push('BEST  ' + bestScore);
-  if (dailyBest > 0) bits.push('TODAY  ' + dailyBest);
-  if (dailyTime > 0) bits.push('TIME  ' + timeLabel(dailyTime));
+/* THE TWO LINES OF FACT UNDER THE PROMPT, and there are two rather than
+   six because six was the problem.
+
+   ONLY WHAT EXISTS IS SHOWN. An empty slot is left out rather than drawn
+   as a dash or a zero: a first visit should read as a clean start and
+   not as a form with nothing filled in. On a cold profile the first line
+   is the track number alone, which is exactly right.
+
+   TIME IS NOT HERE ANY MORE. It is on the completion screen and on the
+   death screen, which are where a time means something, and a fourth
+   figure on a title screen is a figure nobody reads. */
+function titleFactLine() {
+  const bits = ['TRACK #' + trackNumber(todayStamp)];
+  if (bestScore > 0) bits.push('BEST ' + bestScore);
+  if (dailyBest > 0) bits.push('TODAY ' + dailyBest);
   if (ghost.live) bits.push('GHOST READY');
-  return bits.join('     ');
+  return bits.join('  \u00b7  ');
+}
+
+/* The rhythm of the thing, in one line, and it carries the whole pitch
+   that used to take a sentence. A numbered track plus a countdown to a
+   NEW one says daily without the word, and the three words in front of
+   it say the only other thing that matters about it. */
+function titleClockLine() {
+  return 'SAME ROAD FOR EVERYONE  \u00b7  NEW TRACK IN ' + countdownLabel();
+}
+
+/* THE BLINK. Hard on, hard off, in the arcade tradition, which is the
+   single change that makes this read as a splash rather than a page. A
+   sine fade was the obvious alternative and it is wrong: a fade reads as
+   a web page breathing at you. */
+function titleBlinkLit() {
+  const period = Math.max(0.05, FEEL.TITLE_BLINK_PERIOD);
+  const phase = (titleTime % period) / period;
+  return phase < FEEL.TITLE_BLINK_ON;
 }
 
 /* ==================================================================
-   THE TITLE SCREEN. A TITLE SCREEN, NOT A MENU.
+   THE TITLE SCREEN. AN ARCADE SPLASH, NOT A MENU AND NOT A PAGE.
 
-   Section 12 forbids menus and this is not one: there is a headline, one
-   primary action, and one clearly marked alternative. Nothing is
-   required of the player, nothing has to be chosen, and the whole thing
-   is skipped by tapping anywhere, which starts TODAY'S TRACK. Section 5
-   holds because it is still one tap to play.
+   IT WAS SIX BLOCKS OF TEXT ON A LIT SCENE AND IT IS NOW THREE ON A
+   DARK ONE. What went, and why:
 
-   WHAT IS ON IT AND WHY EACH THING EARNS ITS ROOM:
+     THE PLAY TODAY'S TRACK BUTTON. Tapping anywhere already started
+     today's track, so a button saying so was a second way to do the
+     thing the whole screen already does, and it was the biggest object
+     competing with the wordmark. A blinking prompt says the same thing,
+     takes a fifth of the room and is the oldest convention in the
+     genre.
+     THE PITCH SENTENCE. "One road for everyone today, a new one
+     tomorrow, compare with anyone" was a paragraph on a splash screen.
+     Three words of it survive on the countdown line, where they belong.
+     THE STEERING LINE. Section 5: the first ten seconds of the game are
+     the tutorial, and one gentle corner teaches hold to turn without a
+     word. A line of instructions on the title screen is the thing that
+     rule exists to prevent.
+     THE PRESS T HINT. Any key starts today's track, and on a keyboard
+     the prompt itself now says so.
+     THE TIME FIGURE AND THE LONG RANDOM TRACK CAPTION. Both shortened
+     into the lines that were already there.
 
-     THE TRACK NUMBER gives the daily an identity. "Track 47" is a thing
-     that can be talked about; "the daily" is a feature name.
-     THE COUNTDOWN is the return hook, and it is the one thing here that
-     says come back tomorrow without saying it.
-     THE COPY is three short facts, not a description: same road for
-     everyone, new one tomorrow, comparable with anybody. That is the
-     entire pitch and it does not need a fourth line.
-     THE STATE LINE is what the player has done on today's track, and it
-     is empty on a first visit, which is correct.
-     THE RANDOM TRACK BUTTON is the alternative, named for what it is
-     rather than for how long it lasts, because "endless" describes the
-     ending to somebody who already knows the game and "random" describes
-     the road to somebody who does not.
+   AND THE SCRIM UNDER ALL OF IT, which is the change the rest depends
+   on. The game keeps running behind, because an attract loop is worth
+   having, but it runs behind a dark wash rather than in front of the
+   type. See TITLE_SCRIM_ALPHA.
 
-   THE STACK IS MEASURED IN s, THE SMALLER SCREEN DIMENSION, and only its
-   starting height comes from h. Laid out in fractions of h it fits in
-   portrait and runs straight across the car in landscape, where h and s
-   are the same number. The death screen paid for that lesson first.
+   ONE WARM FAMILY. Cream for the prompt, amber for the two fact lines,
+   and the wordmark's own orange untouched. Nothing on this screen is
+   drawn in a colour that the biome rotates, which is why the mint went:
+   it was a different colour at every hue and it fought the wordmark at
+   all of them.
+
+   THE EMPTY SPACE IS THE DESIGN. Nothing goes between the countdown and
+   the bottom button. It is not a gap waiting to be filled.
+
+   ONE LAYOUT, BOTH ORIENTATIONS. The wordmark takes whatever height is
+   left once the three lines, the air and the bottom button have taken
+   theirs, so landscape is the same arrangement with the mark smaller
+   rather than a second set of rules to keep in step.
    ================================================================== */
 function drawOverlay(w, h) {
   /* The credit is asked for by drawResult and drawFinish and by nothing
@@ -9742,119 +9866,93 @@ function drawOverlay(w, h) {
      it off the document at the end of the frame. */
   if (state === TITLE) {
     const s = Math.min(w, h);
-    /* Pushed down the taller screen, pulled up so the stack cannot reach
-       the middle band where the car is, and then FLOORED, because the
-       floor is what keeps the title's own height on screen. Written as
-       max(floor, min(want, ceiling)) rather than min(max(...), ceiling):
-       the second form lets a low ceiling win outright and clipped the
-       top of the title off in landscape, where h and s are the same
-       number and the ceiling is at its tightest. */
-    /* ----------------------------------------------------------------
-       THE WORDMARK, AND THE ONE PLACE THE TWO ORIENTATIONS GENUINELY
-       DISAGREE.
 
-       It is two stacked lines at roughly two to one, so it is TALL in a
-       way a single line of type never was, and height is exactly what
-       landscape does not have. Sizing it as a share of the width alone
-       gives a mark that is right in portrait and taller than the whole
-       screen in landscape.
+    /* THE SCRIM, FIRST, over everything the world has drawn and under
+       everything this screen will. Sized past the edges like every other
+       full screen wash here, because the shake transform is not the
+       identity on the frame a run ends. */
+    ctx.globalAlpha = clamp(FEEL.TITLE_SCRIM_ALPHA, 0, 1);
+    ctx.fillStyle = 'rgb(' + COLOUR.TITLE_SCRIM + ')';
+    ctx.fillRect(-40, -40, w + 80, h + 80);
+    ctx.globalAlpha = 1;
 
-       So it is sized by BOTH and the smaller wins: a share of the width,
-       which is what "close to full width" means and what portrait is
-       governed by, capped by whatever height is left once the stack
-       below it and the bottom row have taken theirs, which is what
-       governs landscape. Neither number is orientation aware; the
-       geometry does the choosing.
+    /* The stack under the mark, measured rather than assumed, so the
+       wordmark can be handed the rest. */
+    const promptSize = Math.round(s * FEEL.TITLE_PROMPT_SIZE);
+    const factSize = Math.round(s * FEEL.TITLE_FACT_SIZE);
+    const clockSize = Math.round(s * FEEL.TITLE_CLOCK_SIZE);
+    const below = s * FEEL.TITLE_GAP_PROMPT + promptSize / 2
+                + s * FEEL.TITLE_GAP_FACTS + s * FEEL.TITLE_GAP_CLOCK
+                + clockSize;
+    const top = Math.max(safeTop + s * 0.030, h * FEEL.TITLE_TOP);
+    // The top of the RANDOM TRACK button, which the stack must clear.
+    const bottomTop = h - safeBottom - FEEL.DEATH_BOTTOM - s * 0.092;
+    const wmMaxH = Math.min(h * FEEL.TITLE_WM_TALL,
+                            Math.max(s * FEEL.TITLE_WM_MIN,
+                                     bottomTop - top - below - s * FEEL.TITLE_AIR));
+    const aspect = brandInkAspect(BRAND.wordmark);
+    const wmW = Math.min(w * FEEL.TITLE_WM_WIDTH, wmMaxH * aspect);
 
-       The rest of the stack keeps EXACTLY the spacing it had, measured
-       from the first line under the mark rather than from the heading's
-       centre, so nothing below this moved. Every offset below is the old
-       one minus the 0.105 that used to sit between the heading and the
-       first line.
-       ---------------------------------------------------------------- */
-    const stackBelow = s * 0.273;              // the hint down to the standing line
-    const wmGap = s * 0.055;                   // air under the mark
-    const wmTop = Math.max(safeTop + s * 0.030, h * 0.055);
-    // The top of the RANDOM TRACK button, which the stack must not reach.
-    const wmFloor = h - safeBottom - FEEL.DEATH_BOTTOM - s * 0.092;
-    const wmMaxH = Math.max(s * 0.15,
-                            wmFloor - wmTop - wmGap - stackBelow - s * 0.030);
-    const wmW = Math.min(w * 0.88, wmMaxH * brandInkAspect(BRAND.wordmark));
-    let y0;
+    let y;
     if (brandReady()) {
-      const wmH = drawBrandInk(BRAND.wordmark, w / 2, wmTop + (wmW / brandInkAspect(BRAND.wordmark)) / 2, wmW);
-      y0 = wmTop + wmH + wmGap;
+      y = top + drawBrandInk(BRAND.wordmark, w / 2, top + (wmW / aspect) / 2, wmW);
     } else {
       // Path2D missing, which should never happen. Type, so the screen
       // still has a heading rather than a hole where one was.
       const title = 'DRIFT FEVER';
-      const cy = wmTop + s * 0.06;
+      const cy = top + s * 0.06;
       text(title, w / 2, cy,
            fittedSize(title, '800', Math.round(s * 0.115), w * 0.88), '800');
-      y0 = cy + s * 0.105;
+      y = cy + s * 0.06;
     }
-    text('hold left or right to steer', w / 2, y0,
-         Math.round(s * 0.038), '600');
 
-    /* The identity and the clock, on one line because they are one
-       thought: this is which track, and this is how long it is yours. */
-    const ident = 'TRACK #' + trackNumber(todayStamp) + '      NEW TRACK IN ' + countdownLabel();
-    text(ident, w / 2, y0 + s * 0.047,
-         fittedSize(ident, '700', Math.round(s * 0.030), w * 0.9), '700',
-         'center', COLOUR.GATE);
+    /* THE PROMPT. Blinking, centred, no border and no box, which is the
+       whole of the arcade convention. It names the action the player
+       actually has: a tap on a phone, a key on a Chromebook. */
+    y += s * FEEL.TITLE_GAP_PROMPT + promptSize / 2;
+    if (titleBlinkLit()) {
+      const go = hasKeyboard ? 'PRESS ANY KEY' : 'TAP TO START';
+      text(go, w / 2, y, fittedSize(go, '800', promptSize, w * 0.9), '800');
+    }
 
-    /* THE PRIMARY, in the gate colour, which is the colour today's track
-       already wears everywhere else in the game. Tapping anywhere does
-       the same thing, so this is not the only way in; it is the thing
-       that says what the tap will do. */
-    canvasButton(dailyRect, "PLAY TODAY'S TRACK", w / 2, y0 + s * 0.135,
-                 Math.round(s * 0.046), COLOUR.GATE, w);
-
-    /* ONE LINE, and it was two. Landscape is the shortest screen this
-       game is played on, h and s are the same number there, and every
-       extra row in this stack is a row nearer the car. The whole pitch
-       fits on one line once it is fitted to the width, so it goes on
-       one line. */
-    ctx.globalAlpha = 0.70;
-    const pitch = 'one road for everyone today, a new one tomorrow, compare with anyone'
-                + (hasKeyboard ? '     press T' : '');
-    text(pitch, w / 2, y0 + s * 0.210,
-         fittedSize(pitch, '700', Math.round(s * 0.029), w * 0.94), '700');
+    y += promptSize / 2 + s * FEEL.TITLE_GAP_FACTS;
+    ctx.globalAlpha = FEEL.TITLE_FACT_ALPHA;
+    const facts = titleFactLine();
+    text(facts, w / 2, y, fittedSize(facts, '700', factSize, w * 0.92), '700',
+         'center', COLOUR.TITLE_DIM);
     ctx.globalAlpha = 1;
 
-    const standing = dailyStateLine();
-    if (standing) {
-      ctx.globalAlpha = 0.8;
-      text(standing, w / 2, y0 + s * 0.253,
-           fittedSize(standing, '700', Math.round(s * 0.030), w * 0.92), '700',
-           'center', COLOUR.GATE);
-      ctx.globalAlpha = 1;
-    }
+    y += s * FEEL.TITLE_GAP_CLOCK;
+    ctx.globalAlpha = FEEL.TITLE_CLOCK_ALPHA;
+    const clock2 = titleClockLine();
+    text(clock2, w / 2, y, fittedSize(clock2, '700', clockSize, w * 0.92), '700',
+         'center', COLOUR.TITLE_DIM);
+    ctx.globalAlpha = 1;
 
-    /* THE SECOND CHOICE, anchored to the bottom edge where RESTART sits
-       on the death screen and the mode switch sits on the pause overlay,
-       so it clears the car in both orientations by construction.
-
-       Its explanation goes UNDERNEATH it, which is the one place on this
-       screen where the order matters: a caption above a button reads as
-       belonging to whatever is above THAT, and this one is specifically
-       about what pressing this button gets you. The whole pair is lifted
-       clear of the corner pads, which is what the offsets are for. */
+    /* AND THEN NOTHING, ALL THE WAY DOWN TO THE BOTTOM BUTTON. That
+       emptiness is the design and not an oversight. */
+    dailyRect.live = false;
     altRect.live = false;
     /* THE CALIBRATION OWNS THIS BAND WHILE IT IS UP, and it is the only
        thing in the game that ever takes a row off another screen. It is
        a few seconds, it is asked for deliberately, and the alternative
        is a prompt drawn straight through a button. */
     if (tiltCalOnScreen()) return;
+
+    /* THE SECOND CHOICE, anchored to the bottom edge where RESTART sits
+       on the death screen and the mode switch sits on the pause overlay.
+       Its one line of explanation goes UNDERNEATH it, because a caption
+       above a button reads as belonging to whatever is above THAT. */
     const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
     altRect.to = ENDLESS;
     canvasButton(altRect, 'RANDOM TRACK', w / 2, by0 - s * 0.050,
                  Math.round(s * 0.038), COLOUR.TEXT, w);
-    ctx.globalAlpha = 0.6;
-    const sub = 'a fresh layout right now, not scored against the world'
+    ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
+    const sub = 'not scored against the world'
               + (hasKeyboard ? '     press R' : '');
     text(sub, w / 2, by0 + s * 0.012,
-         fittedSize(sub, '700', Math.round(s * 0.027), w * 0.92), '700');
+         fittedSize(sub, '700', Math.round(s * 0.027), w * 0.92), '700',
+         'center', COLOUR.TITLE_DIM);
     ctx.globalAlpha = 1;
   } else if (state === DEAD) {
     dailyRect.live = false;
