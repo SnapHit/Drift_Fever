@@ -242,6 +242,34 @@
     #pads button svg { width: 26px; height: 26px; }
     .padGroup { gap: 6px; }
   }
+  /* SIX PADS, which only ever happens while tilt is on, because the flip
+     button is not there otherwise. Six at the sizes above run off the
+     right hand edge of every phone this game is played on: measured, the
+     pause button ended 14 pixels past the edge at 390 wide and 52 past
+     it at 320.
+
+     The whole row shrinks rather than wrapping to a second one. A second
+     row would put a button up where the driver's thumb is steering, and
+     the pointer-events discipline in the stylesheet at the top of this
+     file exists precisely because a strip of screen that eats taps is
+     the worst bug this project has shipped. Shrinking keeps the row
+     where it has always been.
+
+     44 is the floor and it is Apple's own minimum target, reached only
+     on the narrowest handsets. */
+  #pads.six button { width: 54px; height: 54px; }
+  #pads.six button svg { width: 25px; height: 25px; }
+  #pads.six .padGroup { gap: 7px; }
+  @media (max-width: 429px) {
+    #pads.six button { width: 50px; height: 50px; }
+    #pads.six button svg { width: 23px; height: 23px; }
+    #pads.six .padGroup { gap: 6px; }
+  }
+  @media (max-width: 379px) {
+    #pads.six button { width: 44px; height: 44px; }
+    #pads.six button svg { width: 21px; height: 21px; }
+    #pads.six .padGroup { gap: 5px; }
+  }
   /* The boot credit owns the whole screen for its half second, so the
      game's own chrome is out of the way while it is up. It comes back the
      instant the credit clears, and the credit can only ever happen once
@@ -286,6 +314,7 @@
   <div class="padGroup">
     <button id="fullBtn" type="button" hidden aria-label="Fullscreen"></button>
     <button id="tiltBtn" type="button" hidden aria-label="Tilt steering"></button>
+    <button id="flipBtn" type="button" hidden aria-label="Reverse tilt direction"></button>
     <button id="pauseBtn" type="button" aria-label="Pause"></button>
   </div>
 </div>
@@ -1340,10 +1369,11 @@ const FEEL = {
      the table of correct signs at 0, 90, 180 and 270, and tiltAssert
      below it checks every claim that block makes.
 
-     Set by DRIVING it, never by deriving it. The spec's reading of
-     gamma argues for +1; the handset has said backwards at +1 five times
-     running. The handset wins, because it is the thing being played. */
-  TILT_DIRECTION:            -1,
+     SET FROM THE HANDSET, NEVER FROM A DERIVATION. The spec's reading of
+     gamma argues one way and the phone has done the other, and the phone
+     is the thing being played. See the convention block for why the older
+     reports could not pin this and the latest one can. */
+  TILT_DIRECTION:             1,
   /* The sign on the sine term of the screen space remap, which is the one
      value that can make the two landscape orientations disagree with
      portrait. It flips 90 and 270 together and cannot touch portrait, so
@@ -1765,6 +1795,10 @@ const FEEL = {
      Both LIVE, and changing the count regenerates the wheel. */
   BIOME_COUNT:               12,     // LIVE
   BIOME_MIN_STEP:            90,     // LIVE, degrees
+  /* How long the one sentence under the mode marker stays up. Long
+     enough to read on the way into the first corner, short enough that
+     it is gone before it becomes furniture. */
+  MODE_NOTE_SECONDS:          5,     // LIVE
 
   /* ----------------------------------------------------------------
      THE GHOST, WHICH ONLY EXISTS ON THE DAILY.
@@ -2597,6 +2631,7 @@ const TUNABLES = [
   { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 36,    dp: 0, group: 25 },
   { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 },
+  { key: 'MODE_NOTE_SECONDS',  label: 'modeSay', step: 1,    min: 0,    max: 30,    dp: 0, group: 26 },
   { key: 'GHOST_ALPHA',        label: 'ghostA',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 26 },
   { key: 'GHOST_HEIGHT',       label: 'ghostTop',step: 20,   min: 40,   max: 900,   dp: 0, group: 26 },
   { key: 'GHOST_CABIN_WIDE',   label: 'ghostCw', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 26 },
@@ -2830,8 +2865,14 @@ function applyTouchSides() {
 
 canvas.addEventListener('pointerdown', function (e) {
   e.preventDefault();
-  // A tap anywhere on the covered view resumes, and does not also steer.
-  if (paused) { setPaused(false); return; }
+  /* A tap anywhere on the covered view resumes, and does not also steer.
+     The mode button is tested FIRST, or the resume eats it: it is the
+     only thing on that screen that is not "tap to resume". */
+  if (paused) {
+    if (hitMode(e)) { firstGesture(); switchMode(); }
+    else setPaused(false);
+    return;
+  }
   /* The restart button is drawn on the canvas, so it is tested here,
      before the reflex tap is read. It only exists on the death screen and
      only when continuing is possible, so this cannot eat a steering tap. */
@@ -2934,38 +2975,58 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
         positive is the right hand side of the road.
 
    THE CORRECT SIGN AT EACH ORIENTATION. Two tables, because there are
-   two different claims and running them together is the mistake.
+   two different claims and running them together is the mistake that has
+   cost this project six sessions.
 
-   FIRST, WHAT THE CODE GUARANTEES. A MORE POSITIVE READING STEERS LEFT,
-   at every orientation, and here is the raw quantity that has to rise
-   for that to happen:
+   FIRST, WHAT THIS FILE GUARANTEES, which tiltAssert checks and which is
+   true on every device. A MORE POSITIVE READING STEERS THE WAY
+   TILT_DIRECTION SAYS, at every orientation, and here is the raw
+   quantity that has to rise for that to happen:
 
-        angle    reading is     so the car goes LEFT when
+        angle    reading is     rises when
           0        gamma          gamma rises
          90         beta          beta  rises
         180       -gamma          gamma falls
         270        -beta          beta  falls
 
-   That is TILT_DIRECTION = -1, and tiltAssert checks all eight of those
-   cells. It is a fact about this file and it is true on every device.
+   All four come out of one rotation formula, so no orientation can drift
+   away from portrait. THAT IS ALL AN ASSERTION CAN EVER CHECK. Four
+   orientations agreeing with each other says nothing about whether any
+   of them agrees with the phone: internally consistent at the wrong sign
+   is still wrong, which is exactly why they all passed while the handset
+   was still backwards.
 
-   SECOND, WHAT THE HANDSET DOES, which this file cannot check and which
-   is the whole of the five reversals. TILTING THE PHONE LEFT MUST TURN
-   THE CAR LEFT. On the handset this game is played on, that is what
-   TILT_DIRECTION = -1 delivers, driven and confirmed. It follows that on
-   that handset a more positive gamma is the LEFT edge dropping, which is
-   the opposite of what the W3C spec says gamma means.
+   SECOND, WHAT THE HANDSET DOES, and THE HANDSET IS THE ORACLE. TILTING
+   THE PHONE LEFT MUST TURN THE CAR LEFT. This file cannot check that and
+   must not try to derive it: which physical edge a positive gamma means
+   varies across handsets and browsers, and no amount of reasoning here
+   changes what the phone in someone's hands does.
 
-   The source said +1 from session fifteen to session twenty seven on the
-   strength of the spec, and the phone said backwards every single time it
-   was driven. Four sessions changed the plumbing around this number
-   instead of changing it, each on a fresh derivation from the spec, and
-   each time the derivation was sound and the premise was wrong.
+   WHY THE OLDER REPORTS COULD NOT PIN THIS AND THE LATEST ONE CAN, which
+   is the thing that was missing every previous time:
 
-   SO: THIS CONSTANT IS SET BY DRIVING IT, NEVER BY DERIVING IT. It is
-   one number, it flips all four orientations together, and tiltAssert
-   proves everything around it is consistent, so "backwards" is now a one
-   line change and never an investigation.
+     Between sessions ten and thirteen a FLIP BUTTON existed and wrote
+     'tiltflip' to localStorage. From session fourteen the tuning cycler
+     could write TILT_DIRECTION to storage as well. Through that whole
+     stretch the sign actually in force was the source constant TIMES a
+     stored value that nobody could see and this file no longer reads. So
+     every report of "backwards" before session twenty six was a report
+     about an unknown product, not about this constant, and flipping the
+     constant on the strength of one could never have been more than a
+     coin toss. It was flipped four times on exactly that basis.
+
+     Session twenty six closed both leaks: stored tuning is debug only,
+     these two constants are noSave, and the key is versioned. From that
+     point the source constant IS the sign in force, and a report of
+     backwards finally means something about this line.
+
+     Session twenty eight shipped -1 under those conditions. It was
+     driven and reported backwards. THAT is the observation that pins it,
+     and it is why this reads +1.
+
+   AND BECAUSE NO SINGLE DEFAULT CAN BE RIGHT FOR EVERYONE, there is a
+   FLIP BUTTON beside the tilt button, stored as the player's departure
+   from this constant rather than as an absolute sign. See tiltSign.
    ------------------------------------------------------------------ */
 const tilt = {
   supported: false,
@@ -2979,6 +3040,7 @@ const tilt = {
 };
 
 const tiltBtn = document.getElementById('tiltBtn');
+const flipBtn = document.getElementById('flipBtn');
 const noteEl = document.getElementById('note');
 let noteTimer = 0;
 
@@ -3035,11 +3097,56 @@ function tiltReading(gamma, beta, angle) {
        + (beta || 0) * ORIENT_SIN[q] * FEEL.TILT_LANDSCAPE_SENSE;
 }
 
-function tiltSteer(gamma, beta, angle, zeroDeg) {
+/* ------------------------------------------------------------------
+   THE PLAYER'S OWN REVERSAL.
+
+   This exists because of a finding rather than as a convenience. If
+   gamma's sign genuinely varies across handsets, and this file cannot
+   see which handset it is on, then NO SINGLE SHIPPED DEFAULT IS CORRECT
+   FOR EVERYONE and some share of players will get inverted tilt whatever
+   is shipped. One tap has to fix it, on their device, for good.
+
+   STORED AS A DEPARTURE FROM THE SHIPPED DEFAULT, never as an absolute
+   sign. Three things follow from that and all three matter:
+
+     - The button is unlit on a fresh install and lit only once it has
+       been deliberately touched, so it reads as "you changed this".
+     - THE SOURCE DEFAULT WINS UNTIL THE PLAYER SETS ONE. A missing key
+       is not a stored 'off'; it is no opinion at all, and the constant
+       decides. Session twenty six was lost to a stored value silently
+       beating the source and that is not coming back.
+     - Changing the shipped default later cannot silently reverse the
+       controls for everybody who already set one.
+
+   THE KEY IS VERSIONED, AND THAT IS NOT A PRECAUTION. A flip button
+   existed between sessions ten and thirteen and wrote 'tiltflip'. It was
+   then removed, so any device that played in that window still carries
+   that value, including the author's. Reusing the name would have had a
+   three year old preference override the shipped default on the one
+   handset this is being fixed for, which is precisely the failure being
+   designed out. Nothing in this file reads the old key.
+   ------------------------------------------------------------------ */
+const TILT_FLIP_KEY = 'tiltflip2';
+let tiltFlipped = (function () {
+  const raw = storeGet(TILT_FLIP_KEY);
+  // Only an explicit stored choice counts. Anything else, including a
+  // key that is not there at all, leaves the source constant in charge.
+  return raw === '1';
+})();
+let tiltFlipChosen = (function () {
+  const raw = storeGet(TILT_FLIP_KEY);
+  return raw === '1' || raw === '0';
+})();
+
+function tiltSign() { return FEEL.TILT_DIRECTION * (tiltFlipped ? -1 : 1); }
+
+function tiltSteer(gamma, beta, angle, zeroDeg, dir) {
   /* The direction is applied HERE rather than where the reading is taken,
      so that flipping it mid run does not also flip the captured posture
-     and force a recalibration. */
-  const rel = (tiltReading(gamma, beta, angle) - (zeroDeg || 0)) * FEEL.TILT_DIRECTION;
+     and force a recalibration. The flip therefore takes effect on the
+     very next frame with no recalibration and no dead moment. */
+  const sign = dir === undefined ? tiltSign() : dir;
+  const rel = (tiltReading(gamma, beta, angle) - (zeroDeg || 0)) * sign;
   const magnitude = Math.abs(rel);
   if (magnitude <= FEEL.TILT_DEADZONE_DEG) return 0;
   const span = Math.max(1, FEEL.TILT_FULL_LOCK_DEG - FEEL.TILT_DEADZONE_DEG);
@@ -3086,10 +3193,17 @@ if (window.screen && window.screen.orientation
 
    What each one would have caught:
 
-     1. THE PORTRAIT SIGN. Reversals one, three, four and five. Asserts
-        that a right edge drop steers the way the convention block says,
-        so flipping TILT_DIRECTION without also editing the table above
-        fails immediately instead of shipping.
+     WHAT THEY CANNOT COVER, SAID FIRST BECAUSE IT IS THE LESSON. These
+     check that the four orientations agree WITH EACH OTHER and that the
+     pipeline is sign preserving. They CANNOT check that any of them
+     agrees with the handset, because this file cannot see the handset.
+     Internally consistent at the wrong sign is still wrong, and that is
+     exactly what shipped last session with every assertion passing. The
+     handset is the oracle and the flip button is what settles it.
+
+     1. THE PORTRAIT SIGN. Asserts that a rising reading steers the way
+        TILT_DIRECTION says, so a flip of the constant without a matching
+        edit to the table above fails immediately instead of shipping.
      2. THE FOUR ORIENTATIONS AGREEING. Reversal two, where a session
         rewrote the landscape pair by hand and inverted 90 and 270
         together while portrait stayed right. Asserts that the SAME
@@ -3098,7 +3212,8 @@ if (window.screen && window.screen.orientation
      3. THE STORED OVERRIDE. The one found in session twenty six, where
         localStorage carried a nudged direction that beat the source
         silently. Asserts the live constants still equal their source
-        defaults, so a value arriving from anywhere else is visible.
+        defaults, so a value arriving from anywhere else is visible, and
+        that the player's flip is OFF unless it was deliberately set.
      4. THE ZERO POINT. Asserts that the calibrated posture reads as
         neutral whatever it was, and that the subtraction has not been
         turned round.
@@ -3121,6 +3236,13 @@ function tiltAssert() {
      reading means is a property of the handset and not of this file. */
   const SIGN = Math.sign(FEEL.TILT_DIRECTION);
   const WAY = SIGN < 0 ? 'left' : 'right';
+  /* Everything below drives the pipeline with the SHIPPED constant
+     explicitly, not with the live sign. A player who has deliberately
+     flipped has not broken anything, and telling them the tilt is broken
+     for using the button correctly would be worse than useless. The flip
+     itself is checked separately, on its own terms. */
+  const D0 = FEEL.TILT_DIRECTION;
+  const steer = function (g, b2, a, z) { return tiltSteer(g, b2, a, z, D0); };
 
   // 3. The constants are the source's, not something that arrived later.
   ok('TILT_DIRECTION is not its source default',
@@ -3129,6 +3251,28 @@ function tiltAssert() {
      FEEL.TILT_LANDSCAPE_SENSE === TUNABLE_DEFAULTS.TILT_LANDSCAPE_SENSE);
   ok('TILT_DIRECTION is not plus or minus one', Math.abs(FEEL.TILT_DIRECTION) === 1);
   ok('the deadzone has eaten the whole range', D < L);
+  // The source default is in charge until the player says otherwise. A
+  // key that is not there is no opinion, not a stored 'off'.
+  ok('the flip is on without the player having chosen it',
+     tiltFlipChosen || !tiltFlipped);
+  ok('the effective sign is not the constant when the flip is off',
+     tiltFlipped || tiltSign() === FEEL.TILT_DIRECTION);
+  ok('the flip does not reverse the effective sign',
+     tiltSign() === FEEL.TILT_DIRECTION * (tiltFlipped ? -1 : 1));
+  /* THE FLIP REVERSES EVERY ORIENTATION TOGETHER, which is the whole
+     point of it: a player whose handset reads the other way taps once
+     and is right in portrait and in both landscapes, not in one of
+     them. Driven through the real function with an explicit sign so
+     nothing is mutated to test it. */
+  for (const angle of [0, 90, 180, 270]) {
+    const g = angle === 0 ? past : (angle === 180 ? -past : 0);
+    const b2 = angle === 90 ? past / FEEL.TILT_LANDSCAPE_SENSE
+             : (angle === 270 ? -past / FEEL.TILT_LANDSCAPE_SENSE : 0);
+    const plain = tiltSteer(g, b2, angle, 0, FEEL.TILT_DIRECTION);
+    const flipped = tiltSteer(g, b2, angle, 0, -FEEL.TILT_DIRECTION);
+    ok('the flip does not reverse orientation ' + angle,
+       Math.abs(plain + flipped) < 1e-12 && Math.abs(plain) > 0);
+  }
 
   /* 2. The four orientations, driven from ONE physical description.
 
@@ -3151,14 +3295,14 @@ function tiltAssert() {
     ok(name + ': the reading does not rise when ' + moves,
        tiltReading(g, b, angle) > 0);
     ok(name + ': ' + moves + ' does not steer ' + WAY,
-       Math.sign(tiltSteer(g, b, angle, 0)) === SIGN);
+       Math.sign(steer(g, b, angle, 0)) === SIGN);
     ok(name + ': the opposite movement does not steer the other way',
-       Math.sign(tiltSteer(-g, -b, angle, 0)) === -SIGN);
+       Math.sign(steer(-g, -b, angle, 0)) === -SIGN);
     // The same physical movement, so the same steering value, to the
     // last decimal and not merely the same sign. This is the one that
     // catches a landscape branch drifting away from portrait.
     ok(name + ': does not match portrait exactly for the same movement',
-       Math.abs(tiltSteer(g, b, angle, 0) - tiltSteer(past, 0, 0, 0)) < 1e-12);
+       Math.abs(steer(g, b, angle, 0) - steer(past, 0, 0, 0)) < 1e-12);
     // And an angle reported a few degrees off a quarter turn is the same
     // orientation, because a handset mid rotation reports exactly that.
     ok(name + ': an angle a few degrees off a quarter turn changed orientation',
@@ -3167,29 +3311,31 @@ function tiltAssert() {
 
   // 1. Portrait against the table in the convention block, spelled out
   //    rather than derived, so the table and the code cannot part company.
-  ok('portrait: a rising reading does not steer left', tiltSteer(past, 0, 0, 0) < 0);
-  ok('portrait: a falling reading does not steer right', tiltSteer(-past, 0, 0, 0) > 0);
+  ok('portrait: a rising reading does not steer ' + WAY,
+     Math.sign(steer(past, 0, 0, 0)) === SIGN);
+  ok('portrait: a falling reading does not steer the other way',
+     Math.sign(steer(-past, 0, 0, 0)) === -SIGN);
 
   // 4. The zero point. Any posture reads neutral once it is the zero.
   for (const z of [-40, -12, 0, 7, 33]) {
-    ok('zero ' + z + ' does not read neutral', tiltSteer(z, 0, 0, z) === 0);
+    ok('zero ' + z + ' does not read neutral', steer(z, 0, 0, z) === 0);
     ok('zero ' + z + ' does not steer ' + WAY + ' past the deadzone',
-       Math.sign(tiltSteer(z + past, 0, 0, z)) === SIGN);
+       Math.sign(steer(z + past, 0, 0, z)) === SIGN);
     // The zero is a subtraction and nothing else: shifting the posture
     // and the reading together cannot change the answer.
     ok('zero ' + z + ' is not a pure subtraction',
-       Math.abs(tiltSteer(z + past, 0, 0, z) - tiltSteer(past, 0, 0, 0)) < 1e-12);
+       Math.abs(steer(z + past, 0, 0, z) - steer(past, 0, 0, 0)) < 1e-12);
   }
 
   // 5. The deadzone, the normalise, and the clamp.
-  ok('the deadzone is not neutral', tiltSteer(D * 0.99, 0, 0, 0) === 0);
-  ok('the deadzone edge is not neutral', tiltSteer(D, 0, 0, 0) === 0);
-  ok('just past the deadzone is not moving', Math.abs(tiltSteer(D + 0.5, 0, 0, 0)) > 0);
-  ok('full lock is not full', Math.abs(tiltSteer(L, 0, 0, 0)) > 0.999);
-  ok('past full lock is not clamped', Math.abs(tiltSteer(L * 4, 0, 0, 0)) <= 1.0000001);
+  ok('the deadzone is not neutral', steer(D * 0.99, 0, 0, 0) === 0);
+  ok('the deadzone edge is not neutral', steer(D, 0, 0, 0) === 0);
+  ok('just past the deadzone is not moving', Math.abs(steer(D + 0.5, 0, 0, 0)) > 0);
+  ok('full lock is not full', Math.abs(steer(L, 0, 0, 0)) > 0.999);
+  ok('past full lock is not clamped', Math.abs(steer(L * 4, 0, 0, 0)) <= 1.0000001);
   let last = 0;
   for (let d = D; d <= L; d += (L - D) / 12) {
-    const v = Math.abs(tiltSteer(d, 0, 0, 0));
+    const v = Math.abs(steer(d, 0, 0, 0));
     ok('the ramp to full lock is not monotonic', v >= last - 1e-9);
     last = v;
   }
@@ -3253,6 +3399,7 @@ function onTiltPermission(result) {
   tilt.value = 0;
   tilt.zeroDeg = null;
   tiltBtn.classList.add('on');
+  syncFlipBtn();
   storeSet('tilt', '1');
   showNote('Tilt on. Hold the phone how you like, it zeroes to your posture at the start of every run.', 4);
 }
@@ -3271,7 +3418,39 @@ function disableTilt() {
   tilt.active = false;
   tilt.value = 0;
   tiltBtn.classList.remove('on');
+  syncFlipBtn();
 }
+
+/* Only visible while tilt is on. It is meaningless otherwise and the pad
+   row is already tight on a phone held upright, which is why the
+   stylesheet shrinks the pads twice on narrow screens. */
+const padsEl = document.getElementById('pads');
+function syncFlipBtn() {
+  const show = !!(tilt.supported && tilt.active);
+  flipBtn.hidden = !show;
+  flipBtn.classList.toggle('on', tiltFlipped);
+  // Six across does not fit at the ordinary size. See the stylesheet.
+  padsEl.classList.toggle('six', show);
+}
+
+function setTiltFlipped(on) {
+  tiltFlipped = on;
+  tiltFlipChosen = true;
+  syncFlipBtn();
+  storeSet(TILT_FLIP_KEY, on ? '1' : '0');
+  showNote(on ? 'Tilt reversed. Tap again to put it back.'
+              : 'Tilt back to the default direction.', 3);
+}
+
+flipBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+flipBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  // Drop focus, or the next space or enter meant for the game presses
+  // this again instead of steering.
+  flipBtn.blur();
+  resumeAudio();
+  setTiltFlipped(!tiltFlipped);
+});
 
 tiltBtn.addEventListener('pointerdown', function (e) {
   e.stopPropagation();
@@ -4843,9 +5022,14 @@ function continueRun() {
   position = cpSeg * FEEL.SEGMENT_LENGTH - FEEL.CAMERA_DISTANCE;
   /* A continued run is never recorded. The record is closed to it, so a
      line from it could only ever be a ghost of a lap that did not
-     happen. Replay carries on, because racing the ghost is still the
-     point of being back on the road. */
+     happen. Replay CARRIES ON, because racing the ghost is still the
+     point of being back on the road, so the pass state is reset with the
+     clock rather than left over from the run that just ended. */
   ghostRec.live = false;
+  ghost.i = 0;
+  ghost.said = 0;
+  ghost.shown = false;
+  ghost.ahead = true;
   skipOnRamp = true;
   runTime = cpTime;
   updateDifficulty();
@@ -6143,6 +6327,21 @@ function ghostUpdate(dt) {
   if (ghost.said > 0) ghost.said -= dt;
   if (!ghost.live || mode !== DAILY || state !== DRIVING) return;
   const t = runTime;
+  /* THE CURSOR HAS TO BE ABLE TO GO BACKWARDS, and this is a bug fix.
+
+     A CONTINUE sets runTime back to the checkpoint's time, which is
+     EARLIER than wherever the cursor had walked to on the run that just
+     ended. A forward only walk cannot follow that: the cursor stayed
+     ahead, the interpolation clamped, and the ghost froze thousands of
+     units up the road where it was never drawn again. The ghost was
+     therefore missing for the whole of every continued run, which is
+     exactly half of what was reported.
+
+     Reset and re walk rather than search: it costs one pass over at most
+     four thousand entries on the single frame a resume happens, and it
+     is right for any backwards jump rather than only for the one that
+     was found. */
+  if (t < ghost.t[ghost.i]) ghost.i = 0;
   while (ghost.i < ghost.n - 2 && ghost.t[ghost.i + 1] <= t) ghost.i++;
   if (t >= ghost.t[ghost.n - 1]) {
     /* The recorded run ended here. Nothing is invented past the end: the
@@ -8585,25 +8784,75 @@ function resolveCloseCalls() {
 
    Both lanes go through one drawing routine and differ only in which row
    of the sky band they sit on and how big they are. */
-/* WHICH DAY'S TRACK, in play, small and dim and always in the same
-   place. It hangs off hudBottom the way everything else in this stack
-   does rather than off a fraction of the height, and it says GHOST when
-   there is one to race so the player knows before it appears. Endless
-   draws nothing at all: there is no second mode to be confused with. */
-function drawDailyMark(w, h) {
+/* WHICH MODE, AND WHAT THE GHOST IS DOING. In play, small and dim and
+   always in the same place, hanging off hudBottom the way everything
+   else in this stack does rather than off a fraction of the height.
+
+   ENDLESS USED TO DRAW NOTHING, on the reasoning that there was no
+   second mode to be confused with. There is now, and the consequence was
+   that a player looking for the ghost had no way to tell whether they
+   were in the mode that has one. Silence is not the same as "you are in
+   the ordinary mode", so endless says so too.
+
+   THE SECOND LINE IS THE ANSWER TO "WHERE IS THE GHOST". Everything the
+   ghost can be doing is a state the player cannot otherwise see: daily
+   only, needs a completed clean run, and never records from a continue.
+   Each of those now says itself, at the start of the run, and then gets
+   out of the way. */
+function modeSecondLine() {
+  if (mode !== DAILY) return null;
+  if (continues > 0) return 'CONTINUED RUN, THIS ONE WILL NOT RECORD A GHOST';
+  if (!ghost.live) return 'NO GHOST YET, FINISH A CLEAN RUN TO RECORD ONE';
+  return 'CHASING YOUR BEST CLEAN RUN';
+}
+
+function drawModeMark(w, h) {
   /* WHILE DRIVING ONLY. The death screen says all of this in its own
      records line, and drawing both put two lines of teal on top of each
      other at the top of that screen. */
-  if (mode !== DAILY || state !== DRIVING) return;
+  if (state !== DRIVING) return;
   const s = Math.min(w, h);
-  const line = "TODAY " + dayLabel(todayStamp)
-             + (dailyBest > 0 ? '   BEST ' + dailyBest : '')
-             + (ghost.live ? '   GHOST' : '');
+  const y = hudBottom + s * 0.026;
+
+  let line, colour;
+  if (mode !== DAILY) {
+    line = 'ENDLESS';
+    colour = COLOUR.TEXT;
+  } else {
+    colour = COLOUR.GATE;
+    line = "TODAY " + dayLabel(todayStamp)
+         + (dailyBest > 0 ? '   BEST ' + dailyBest : '');
+    if (continues > 0) line += '   CONTINUED';
+    else if (ghost.live) line += '   ' + ghostGapLabel();
+  }
   ctx.globalAlpha = 0.42;
-  text(line, w / 2, hudBottom + s * 0.026,
-       fittedSize(line, '700', Math.round(s * 0.026), w * 0.8), '700',
-       'center', COLOUR.GATE);
+  text(line, w / 2, y, fittedSize(line, '700', Math.round(s * 0.026), w * 0.85),
+       '700', 'center', colour);
+
+  /* Once, at the start of the run, then gone. It is the one thing here
+     that is a sentence rather than a readout, and a sentence that stays
+     on screen becomes furniture and stops being read. */
+  const second = modeSecondLine();
+  if (second && runTime < FEEL.MODE_NOTE_SECONDS) {
+    const fade = clamp((FEEL.MODE_NOTE_SECONDS - runTime) / 0.8, 0, 1);
+    ctx.globalAlpha = 0.42 * fade;
+    text(second, w / 2, y + s * 0.032,
+         fittedSize(second, '700', Math.round(s * 0.023), w * 0.9), '700',
+         'center', continues > 0 ? COLOUR.SCORE : colour);
+  }
   ctx.globalAlpha = 1;
+}
+
+/* Where you stand against the ghost, in seconds, which is the only unit
+   a driver thinks in. It is here rather than only in the callouts
+   because the ghost spends most of a run outside the draw distance: the
+   callouts say when you pass it, this says where it is the rest of the
+   time. */
+function ghostGapLabel() {
+  if (runTime >= ghost.t[ghost.n - 1]) return 'GHOST OUTLASTED';
+  const gap = (position - ghost.pos) / FEEL.SPEED;
+  if (Math.abs(gap) < 0.05) return 'GHOST LEVEL';
+  return 'GHOST ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 's';
 }
 
 function drawCallout(w, h) {
@@ -8888,7 +9137,7 @@ function render() {
   // The score first, because the callout measures itself against the
   // bottom of the HUD stack and the clock is what sets it.
   drawScore(w, h);
-  drawDailyMark(w, h);
+  drawModeMark(w, h);
   drawCallout(w, h);
   drawOverlay(w, h);
   drawPauseCover(w, h);
@@ -8899,13 +9148,83 @@ function render() {
 /* The cover. Opaque, over everything except the debug readout, because
    leaving the road visible turns the pause into a free look at the corner
    ahead. */
+/* ==================================================================
+   THE WAY BACK, AND WHY IT IS ON THE PAUSE OVERLAY.
+
+   Once you are in the daily there has to be a way out of it, and there
+   are only three places it could go.
+
+   NOT THE DEATH SCREEN. That is the one action restart from section 5
+   and it stays one action: the reflex tap continues or restarts, and it
+   is never a question. Putting a mode choice there would make the loop
+   that the whole game hangs off into a decision.
+
+   NOT THE TITLE SCREEN ALONE, because you only get back to it by
+   reloading, which is the problem being solved.
+
+   PAUSE. It is already a deliberate action, it is already off the
+   restart path, and it already obscures the view, so nothing is being
+   given up. Section 12 forbids menus and this is not one: it is a single
+   button on a screen that already exists, and nothing is ever asked of
+   a player who does not press pause.
+   ================================================================== */
+const modeRect = { x: 0, y: 0, w: 0, h: 0, live: false };
+
 function drawPauseCover(w, h) {
+  modeRect.live = false;
   if (!paused) return;
   ctx.fillStyle = COLOUR.PAUSE_COVER;
   ctx.fillRect(0, 0, w, h);
   const s = Math.min(w, h);
   text('PAUSED', w / 2, h * 0.44, Math.round(s * 0.11), '800');
   text('tap to resume', w / 2, h * 0.53, Math.round(s * 0.045), '600');
+
+  /* Anchored to the bottom edge, exactly where RESTART sits on the death
+     screen and where TODAY'S TRACK sits on the title screen. Three canvas
+     buttons, one place: a player who has met one already knows the next. */
+  const daily = mode === DAILY;
+  const label = daily ? 'SWITCH TO ENDLESS' : "SWITCH TO TODAY'S TRACK";
+  const size = Math.round(s * 0.038);
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const bw = ctx.measureText(label).width + size * 2.2;
+  const bh = size * 2.2;
+  const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
+  modeRect.x = w / 2 - bw / 2;
+  modeRect.y = by0 - bh / 2;
+  modeRect.w = bw;
+  modeRect.h = bh;
+  modeRect.live = true;
+
+  // It starts a fresh run, so say so. Switching mid run cannot mean
+  // anything else: the road under the car belongs to the mode it is in.
+  ctx.globalAlpha = 0.6;
+  text('starts a new run', w / 2, by0 - bh * 0.95,
+       Math.round(s * 0.030), '700');
+  ctx.globalAlpha = 1;
+
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = COLOUR.BAR_TRACK;
+  roundRect(modeRect.x, modeRect.y, bw, bh, bh * 0.3);
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = daily ? COLOUR.SCORE : COLOUR.GATE;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  text(label, w / 2, by0, size, '800', 'center', daily ? COLOUR.SCORE : COLOUR.GATE);
+}
+
+function hitMode(e) {
+  if (!modeRect.live || !paused) return false;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  return x >= modeRect.x && x <= modeRect.x + modeRect.w
+      && y >= modeRect.y && y <= modeRect.y + modeRect.h;
+}
+
+function switchMode() {
+  mode = mode === DAILY ? ENDLESS : DAILY;
+  setPaused(false);
+  startRun();
 }
 
 
@@ -9142,6 +9461,14 @@ function ramp(param, value, tau) {
    and text at this size reads as a debug control. Nothing is fetched,
    these are paths in the file. */
 const ICON = {
+  /* The flip. Two arrows curving into each other, which says reverse
+     without a word, and it is the only pad icon that is about a direction
+     rather than about a thing being on or off. */
+  flip:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M4 9h11a4 4 0 010 8h-3"/><path d="M7.5 5.5L4 9l3.5 3.5"/>'
+    + '<path d="M16.5 20.5L20 17l-3.5-3.5"/></svg>',
   speakerOff:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
     + ' stroke-linecap="round" stroke-linejoin="round">'
@@ -9252,6 +9579,8 @@ function startAudio() {
    they are painted once here, where ICON exists. */
 pauseBtn.innerHTML = ICON.pause;
 tiltBtn.innerHTML = ICON.tilt;
+flipBtn.innerHTML = ICON.flip;
+syncFlipBtn();
 
 
 /* ----------------------------------------------------------------
