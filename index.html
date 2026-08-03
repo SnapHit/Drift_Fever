@@ -1767,6 +1767,30 @@ const FEEL = {
   BIOME_MIN_STEP:            90,     // LIVE, degrees
 
   /* ----------------------------------------------------------------
+     THE GHOST, WHICH ONLY EXISTS ON THE DAILY.
+
+     A recorded car is only worth watching if it drove the road you are
+     on. In endless the road is fresh every run, so a replayed line would
+     drive through hazards and off the edge inside seconds; there is
+     deliberately no fallback for it and there should not be one.
+
+     SAMPLED BY DISTANCE, NOT BY TIME, which is what makes the record
+     small and the replay exact. Sample i is at exactly i * step world
+     units, so the ghost's position along the road needs no storage at
+     all and cannot drift. What IS stored per sample is the time it took
+     to get there, which is the only thing that varies between two runs
+     of the same road, and it is what lets the ghost be passed. */
+  GHOST_STEP_SEGMENTS:        5,     // 1000 world units, about nine samples a second
+  GHOST_MAX_SAMPLES:       4000,     // a bit over seven minutes, then it stops recording
+  GHOST_ALPHA:             0.42,     // LIVE, it must never compete with the road
+  GHOST_HEIGHT:             320,     // world units to the roof
+  GHOST_CABIN_WIDE:        0.66,     // the roof, as a share of the footprint
+  GHOST_CABIN_LONG:        0.46,
+  GHOST_CABIN_BACK:        0.22,     // and set back, so it has a bonnet
+  GHOST_PASS_GAP:           900,     // world units of hysteresis, so a dead heat is not a strobe
+  GHOST_PASS_COOLDOWN:      2.5,     // seconds between pass callouts
+
+  /* ----------------------------------------------------------------
      Progressive difficulty, in two halves that are deliberately not the
      same thing.
 
@@ -2054,12 +2078,28 @@ function hueGap(a, b) {
    before any repeats, and the tail of a bag falls back to the FARTHEST
    remaining rather than to nothing, so the rule never simply gives up.
 
-   Math.random on purpose. rng() belongs to the road generator and drawing
-   from it here would move the road, which is the bug that pinned seeds
-   exist to catch. */
+   THE STREAM IT DRAWS FROM IS NOT rng(). rng() belongs to the road
+   generator and drawing from it here would move the road, which is the
+   bug that pinned seeds exist to catch. So the bag has a mulberry32 of
+   its own.
+
+   On ENDLESS that generator is seeded from Math.random and the order is
+   different every run, which is what it should be. ON THE DAILY IT IS
+   SEEDED FROM THE DAY, so two devices see the same twelve places in the
+   same order on the same road. The biome sequence is a generator input
+   like any other and the brief lists it by name. */
 const biomeBag = [];
 const biomeRecent = [];
 let lastBiomeHue = -999;
+
+let biomeRngState = 1;
+function biomeSeed(v) { biomeRngState = (v >>> 0) || 1; }
+function biomeRandom() {
+  biomeRngState = (biomeRngState + 0x6D2B79F5) | 0;
+  let t = Math.imul(biomeRngState ^ (biomeRngState >>> 15), 1 | biomeRngState);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
 
 /* One greedy shuffle: take everything still far enough from the hue
    before it and from the last few seen at all, pick at random among
@@ -2080,7 +2120,7 @@ function biomeOrder() {
       ok.push(i);
     }
     let pick;
-    if (ok.length) pick = ok[Math.floor(Math.random() * ok.length)];
+    if (ok.length) pick = ok[Math.floor(biomeRandom() * ok.length)];
     else {
       pick = 0;
       for (let i = 1; i < left.length; i++) {
@@ -2247,6 +2287,13 @@ const COLOUR = {
   JUMP_LIP:     '#4dff7a',      // the edge you leave from
   JUMP_GLOW:    '77,255,122',
   JUMP_ARROW:   '#4dff7a',
+
+  /* The ghost. The car's own family, because it IS the car, and held far
+     enough down in value that it can never take the road edge's place at
+     the top of the range or read as a hazard. Drawn at GHOST_ALPHA on top
+     of that, so what lands on screen is dimmer again. */
+  GHOST:        '#2f7a8f',
+  GHOST_EDGE:   '#79c5d8',
 
   SCRAPE:       '#fff4d2',
   SCRAPE_OUT:   '#ff2b4d',     // the flash shifts to this as the scrape timer runs out
@@ -2549,7 +2596,15 @@ const TUNABLES = [
   { key: 'JUMP_ARROW_HALF',    label: 'chevWide',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 36,    dp: 0, group: 25 },
-  { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 }
+  { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 },
+  { key: 'GHOST_ALPHA',        label: 'ghostA',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 26 },
+  { key: 'GHOST_HEIGHT',       label: 'ghostTop',step: 20,   min: 40,   max: 900,   dp: 0, group: 26 },
+  { key: 'GHOST_CABIN_WIDE',   label: 'ghostCw', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 26 },
+  { key: 'GHOST_CABIN_LONG',   label: 'ghostCl', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 26 },
+  { key: 'GHOST_CABIN_BACK',   label: 'ghostCb', step: 0.02, min: -0.5, max: 0.5,   dp: 2, group: 26 },
+  { key: 'GHOST_PASS_GAP',     label: 'passGap', step: 100,  min: 0,    max: 6000,  dp: 0, group: 26 },
+  { key: 'GHOST_PASS_COOLDOWN',label: 'passWait',step: 0.5,  min: 0,    max: 20,    dp: 1, group: 26 },
+  { key: 'GHOST_STEP_SEGMENTS',label: 'ghostHz', step: 1,    min: 1,    max: 40,    dp: 0, group: 26 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -2709,6 +2764,15 @@ window.addEventListener('keydown', function (e) {
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
   else if (k === 'f' || k === 'F') { if (debugAllowed) setDebug(!showDebug); return; }
+  /* T for today's track, and it is not optional. Section 6 says many
+     sessions are keyboard only, and a canvas button is a tap target that
+     a keyboard cannot reach at all. Title screen only, so it can never
+     take a key away from a run in progress, and both cases so caps lock
+     is not a dead key. It carves T out of "any key starts endless" the
+     same way R and P are already carved out. */
+  else if ((k === 't' || k === 'T') && state === TITLE && bootFlash <= 0) {
+    firstGesture(); startDaily(); return;
+  }
   else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
   /* R is the keyboard twin of the RESTART button, for the same reason it
      exists: the reflex key now continues, so starting over has to be a
@@ -2774,6 +2838,14 @@ canvas.addEventListener('pointerdown', function (e) {
   if (hitRestart(e) && deadFor >= FEEL.DEATH_INPUT_LOCK) {
     firstGesture();
     startRun();
+    return;
+  }
+  /* Same rule as the restart button: it is only on the title screen, so
+     it cannot eat a steering tap, and it is tested before the reflex tap
+     so that the one place a choice exists is the one place it is asked. */
+  if (hitDaily(e) && bootFlash <= 0) {
+    firstGesture();
+    startDaily();
     return;
   }
   touchSides.set(e.pointerId, pointerSide(e));
@@ -3398,6 +3470,15 @@ function tunerLine(group) {
     out += 'at ' + biome + '/' + BIOMES.length + '  hue ' + Math.round(biomeHue(biome))
         + '  bag ' + biomeBag.length;
   }
+  if (group === 26) {
+    // The ghost, live, because a replay that is somewhere else cannot be
+    // tuned against a number that is not on screen.
+    out += (mode === DAILY ? 'DAILY ' + todayStamp : 'ENDLESS, no ghost')
+        + (ghost.live ? '  line ' + ghost.n + ' pts ' + dailyGhostBytes + 'B' : '  no line')
+        + (ghost.shown ? '  gap ' + Math.round((ghost.pos - position) / 100) + 'm'
+                       + (ghost.ahead ? ' ahead' : ' behind') : '')
+        + (ghostRec.live ? '  REC ' + ghostRec.n : '  not recording');
+  }
   if (group === 24) {
     let next = -1;
     for (let i = 0; i < jumps.length; i++) {
@@ -3468,26 +3549,75 @@ let runTime = 0;          // seconds of the current run, DRIVING only
    follow a player who has since got better. */
 let ease = 0;
 
+/* THE ADAPTATION IS OFF ON THE DAILY, and it is the only system in the
+   game that has to be. Everything else about the road is a pure function
+   of the seed and the elapsed time, so it is already the same for
+   everyone; the adaptation is a pure function of how the PLAYER has been
+   doing, which is exactly the thing that would make two people's daily
+   roads differ and break the shared premise.
+
+   THE FIXED ON RAMP STAYS. ONRAMP_SECONDS, ONRAMP_CURVE, ONRAMP_WIDTH
+   and the rest are the same for everyone and are the tutorial section 5
+   refuses to allow, so removing them from the daily would hand a cold
+   player the deep game. Only the ADAPT_ terms go.
+
+   Read through this everywhere instead of reading `ease` directly. */
+function adaptEase() { return mode === DAILY ? 0 : ease; }
+
 function onRunEnded() {
+  // A daily run neither reads the adaptation nor feeds it. Struggling on
+  // a road nobody chose should not quietly soften the endless one.
+  if (mode === DAILY) return;
   if (runTime < FEEL.ADAPT_DEATH_WINDOW) ease = Math.min(1, ease + FEEL.ADAPT_STEP);
   else if (runTime > FEEL.ONRAMP_SECONDS) ease = Math.max(0, ease - FEEL.ADAPT_STEP);
 }
 
+/* ------------------------------------------------------------------
+   THE CLOCK THE ROAD IS BUILT AGAINST, AND WHY THE DAILY NEEDS ITS OWN.
+
+   In ENDLESS it is the run's elapsed time, exactly as it always has
+   been, and nothing about endless changes.
+
+   ON THE DAILY IT IS DISTANCE. Elapsed time is a property of the PLAYER,
+   not of the road: a scrape costs speed, so does a bad landing, so two
+   players reach segment five thousand at measurably different moments,
+   and every input the generator reads off the clock would then differ
+   between them. The phrase it picks, whether it owes a breath, how wide
+   it builds the road, whether a hazard or a jump has unlocked yet: all of
+   it. The daily road has to be a property of the DAY, so on the daily
+   every one of those becomes a pure function of the seed and the segment
+   index, and nothing the player does can move it.
+
+   SPEED / SEGMENT_LENGTH is the nominal segments a second, so on a clean
+   run the two clocks agree to within a few per cent and the escalation
+   feels exactly as it always has.
+
+   Two callers, two indices. The GENERATOR asks about the segment it is
+   about to build; the live difficulty asks about the segment the car is
+   on. Both are the same for every player at the same place. */
+function roadClock(segIndex) {
+  if (mode !== DAILY) return runTime;
+  return segIndex * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
+}
+function buildClock() { return roadClock(segBase + segments.length); }
+function liveClock() { return roadClock(carSegIndex); }
+
 /* How far through the on ramp, 0 to 1. The flat part at the front is
    what adaptation lengthens; the far end does not move, so this reaches
    1 at ONRAMP_SECONDS for every player regardless of ease. */
-function onRampProgress() {
+function onRampProgress(t) {
   // A continue is past it by definition. See the continues block.
   if (skipOnRamp) return 1;
-  const flat = FEEL.ONRAMP_FLAT + ease * FEEL.ADAPT_FLAT_EXTRA;
+  const flat = FEEL.ONRAMP_FLAT + adaptEase() * FEEL.ADAPT_FLAT_EXTRA;
   const span = Math.max(1, FEEL.ONRAMP_SECONDS - flat);
-  return clamp((runTime - flat) / span, 0, 1);
+  return clamp(((t === undefined ? runTime : t) - flat) / span, 0, 1);
 }
 
 /* And how far into the deep game after it, 0 to 1. No adaptation term
    anywhere in here, on purpose. */
-function deepProgress() {
-  return clamp((runTime - FEEL.ONRAMP_SECONDS) / FEEL.RAMP_SECONDS, 0, 1);
+function deepProgress(t) {
+  return clamp(((t === undefined ? runTime : t) - FEEL.ONRAMP_SECONDS)
+               / FEEL.RAMP_SECONDS, 0, 1);
 }
 
 /* The curve scale actually in force. FEEL.CURVE_SCALE stays the
@@ -3497,11 +3627,13 @@ let curveScale = FEEL.CURVE_SCALE;
 let widthScale = 1;
 
 function updateDifficulty() {
-  const p = onRampProgress(), d = deepProgress();
-  const start = Math.max(0.2, FEEL.ONRAMP_CURVE - ease * FEEL.ADAPT_CURVE_EASE);
+  const t = liveClock();
+  const p = onRampProgress(t), d = deepProgress(t);
+  const e = adaptEase();
+  const start = Math.max(0.2, FEEL.ONRAMP_CURVE - e * FEEL.ADAPT_CURVE_EASE);
   const base = start + (FEEL.CURVE_SCALE - start) * p;
   curveScale = base + (FEEL.CURVE_SCALE_DEEP - FEEL.CURVE_SCALE) * d;
-  const wide = FEEL.ONRAMP_WIDTH + ease * FEEL.ADAPT_WIDTH_EASE;
+  const wide = FEEL.ONRAMP_WIDTH + e * FEEL.ADAPT_WIDTH_EASE;
   widthScale = (wide + (1 - wide) * p) + (FEEL.ROAD_SQUEEZE - 1) * d;
 }
 
@@ -3510,9 +3642,12 @@ function updateDifficulty() {
    step, so a new kind of corner arrives as a thing to learn rather than
    as a wall. */
 function maxIntensity() {
-  if (!skipOnRamp && runTime < FEEL.ONRAMP_SECONDS) {
+  // The BUILD clock: this decides what goes on the road ahead, not what
+  // is under the car.
+  const t = buildClock();
+  if (!skipOnRamp && t < FEEL.ONRAMP_SECONDS) {
     // 0 and 1 only for most of the on ramp, then a taste of 2 at the end.
-    return onRampProgress() > 0.75 ? FEEL.ONRAMP_INTENSITY + 1 : FEEL.ONRAMP_INTENSITY;
+    return onRampProgress(t) > 0.75 ? FEEL.ONRAMP_INTENSITY + 1 : FEEL.ONRAMP_INTENSITY;
   }
   return FEEL.DEEP_INTENSITY;
 }
@@ -3521,10 +3656,11 @@ function restChance() {
   // The two halves meet at ONRAMP_REST/2 rather than stepping, or the
   // road audibly changes rhythm on the stroke of sixty seconds.
   const half = FEEL.ONRAMP_REST * 0.5;
-  if (!skipOnRamp && runTime < FEEL.ONRAMP_SECONDS) {
-    return FEEL.ONRAMP_REST - half * onRampProgress();
+  const t = buildClock();
+  if (!skipOnRamp && t < FEEL.ONRAMP_SECONDS) {
+    return FEEL.ONRAMP_REST - half * onRampProgress(t);
   }
-  return half * (1 - deepProgress());
+  return half * (1 - deepProgress(t));
 }
 
 function tunerDirty() {
@@ -3620,6 +3756,60 @@ function resetTuning() {
   saveTuning();
 }
 
+/* ==================================================================
+   THE TWO MODES.
+
+   ENDLESS is the game as it has always been: a fresh road every run, and
+   it is what a cold player gets by tapping. DAILY is one road that
+   everybody in the world drives for the length of their own local day,
+   and it is what makes a ghost worth recording, because a recorded line
+   is only worth watching if it was driven on the road you are on.
+
+   THE SEED COMES FROM THE LOCAL DATE, NOT UTC, and that is a decision
+   about the audience rather than about tidiness. UTC rolls over in the
+   middle of the afternoon in the United States, which would hand a
+   player a different track at lunchtime than at first period, and school
+   children in the United States are the entire market. The local date is
+   what a player means by today.
+   ================================================================== */
+const ENDLESS = 0, DAILY = 1;
+let mode = ENDLESS;
+
+/* The day as one integer, yyyymmdd, off the LOCAL clock. */
+function localDayStamp(when) {
+  const d = when || new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+/* And that integer hashed, so consecutive days are not consecutive roads.
+   The stamp itself would give three near identical seeds in a row, and
+   mulberry32 started at 20260803 and 20260804 produces two openings that
+   are recognisably the same corner. */
+function dailySeedFor(stamp) {
+  let h = (stamp >>> 0) ^ 0x9e3779b9;
+  h = Math.imul(h ^ (h >>> 16), 0x7feb352d);
+  h = Math.imul(h ^ (h >>> 15), 0x846ca68b);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
+let todayStamp = localDayStamp();
+function dailySeed() { return dailySeedFor(todayStamp); }
+
+/* Midnight can pass with the tab open. Checked at the start of every run
+   rather than on a timer, because that is the only moment the answer can
+   change anything, and it is where the records have to be rolled over. */
+function rollDayIfNeeded() {
+  const now = localDayStamp();
+  if (now === todayStamp) return false;
+  todayStamp = now;
+  dailyBest = 0;
+  ghostClear();
+  storeSet('daily.day', String(todayStamp));
+  storeSet('daily.best', '0');
+  storeSet('daily.ghost', '');
+  return true;
+}
+
 /* Pinning the seed makes every run generate the same road, so two grip
    settings can be compared on the same corners instead of on two
    different tracks. Debug only, and off by default. */
@@ -3627,7 +3817,16 @@ let seedPinned = false;
 const PINNED_SEED = 20260802;
 let lastSeed = PINNED_SEED;
 
-function nextSeed() {
+/* THE ONE PLACE A ROAD SEED COMES FROM. On the daily it is the day, every
+   time, on every device, which is the whole premise. `salt` is for the
+   road a continue builds: it has to be deterministic too, or two players
+   resuming from the same gate would drive different corners, but it must
+   not be the opening road again. */
+function nextSeed(salt) {
+  if (mode === DAILY) {
+    lastSeed = salt ? (dailySeed() ^ Math.imul(salt | 0, 0x9E3779B1)) >>> 0 : dailySeed();
+    return lastSeed;
+  }
   lastSeed = seedPinned ? PINNED_SEED : ((Math.random() * 0xFFFFFFFF) >>> 0);
   return lastSeed;
 }
@@ -3746,11 +3945,26 @@ function pickDir() {
    ================================================================== */
 let roadWidth = 1;      // current half width, as a multiple of the base
 
+/* The squeeze the generator bakes in. In endless it is the live one, as
+   it always has been. ON THE DAILY it comes off the BUILD clock, because
+   the live one is a function of where the CAR is, and the car is a
+   different distance behind the build head on a device that is a frame
+   slower. Baked width is the one difficulty term that is written into the
+   road permanently, so it is the one that has to be asked about the
+   segment being written and not about the segment being driven. */
+function buildWidthScale() {
+  if (mode !== DAILY) return widthScale;
+  const t = buildClock();
+  const wide = FEEL.ONRAMP_WIDTH;                 // adaptEase is zero here
+  return (wide + (1 - wide) * onRampProgress(t))
+       + (FEEL.ROAD_SQUEEZE - 1) * deepProgress(t);
+}
+
 function addRun(count, c0, c1, w0, w1, easeIn) {
-  // widthScale is the difficulty's own squeeze, on top of whatever the
-  // phrase asked for. Applied here, at build time, so the road narrows
-  // over the run rather than under the car.
-  const base = FEEL.ROAD_HALF_WIDTH_BASE * widthScale;
+  // The difficulty's own squeeze, on top of whatever the phrase asked
+  // for. Applied here, at build time, so the road narrows over the run
+  // rather than under the car.
+  const base = FEEL.ROAD_HALF_WIDTH_BASE * buildWidthScale();
   for (let i = 0; i < count; i++) {
     const p = count > 1 ? i / (count - 1) : 1;
     const t = easeIn ? (1 - Math.cos(p * Math.PI)) / 2 : p;
@@ -4189,7 +4403,12 @@ function addHazard(kind, from, to, xFrac, halfWorld, swingFrac) {
    the same for the drawing and for the collision test. */
 function hazardX(h) {
   if (h.kind !== HAZ_MOVER) return h.x;
-  return h.x + h.swing * Math.sin(h.phase + runTime * (Math.PI * 2 / FEEL.MOVER_PERIOD));
+  /* THE SWING IS ON THE ROAD'S CLOCK, not the run's. A mover that swung
+     on elapsed time would be in a different place for two players who
+     arrived at it a second apart, and a hazard that is somewhere else for
+     everybody is the one thing a shared road cannot have. */
+  return h.x + h.swing * Math.sin(h.phase
+         + liveClock() * (Math.PI * 2 / FEEL.MOVER_PERIOD));
 }
 
 /* Which kind is due, rarest and longest first so that whoever gets the
@@ -4201,8 +4420,9 @@ function dueHazardKind() {
     { k: HAZ_MOVER,    time: FEEL.MOVER_TIME },
     { k: HAZ_BLOCKER,  time: FEEL.BLOCKER_TIME }
   ];
+  const t = buildClock();
   for (let i = 0; i < order.length; i++) {
-    if (runTime < order[i].time) continue;
+    if (t < order[i].time) continue;
     if (hazardDue[order[i].k] <= at) return order[i].k;
   }
   return 0;
@@ -4277,7 +4497,7 @@ function buildHazardPhrase(kind) {
 let jumps = [];
 let jumpDue = 0;
 
-function jumpUnlocked() { return runTime >= FEEL.JUMP_TIME; }
+function jumpUnlocked() { return buildClock() >= FEEL.JUMP_TIME; }
 
 function jumpLead() { return FEEL.JUMP_ARROW_COUNT * FEEL.JUMP_ARROW_SPACING + 4; }
 
@@ -4446,9 +4666,27 @@ const drift = {
 };
 
 function startRun() {
+  // Midnight can pass with the tab open, and this is the only moment the
+  // answer can change anything.
+  rollDayIfNeeded();
   runTime = 0;
+  /* Before updateDifficulty, not after. On the daily the difficulty is a
+     function of the car's segment, so leaving last run's index in place
+     would build the opening at deep game width. */
+  carSegIndex = 0;
+  prevCarIndex = 0;
+  position = 0;
   updateDifficulty();
+  /* The biome order is a generator input like any other, so on the daily
+     it comes off the day and not off Math.random. Its own stream: rng()
+     belongs to the road and drawing from it here would move the road. */
+  biomeSeed(mode === DAILY ? (dailySeed() ^ 0x5bf03635) : ((Math.random() * 0xFFFFFFFF) >>> 0));
   resetRoad(nextSeed());
+  ghost.i = 0;
+  ghost.said = 0;
+  ghost.shown = false;
+  ghost.ahead = true;
+  ghostStartRecording();
   position = 0;
   carX = 0;
   carFrac = 0;
@@ -4586,7 +4824,7 @@ function resumeRoad(carSeg) {
   hazardDue[HAZ_SPLITTER] = base + Math.round(FEEL.SPLITTER_EVERY * 0.5);
   hazardDue[HAZ_MOVER] = base + Math.round(FEEL.MOVER_EVERY * 0.5);
   segBase = base;
-  rngState = nextSeed() >>> 0;
+  rngState = nextSeed(base + 1) >>> 0;
   roadWidth = 1;
   restOwed = 0;
   lastDir = 1;
@@ -4599,6 +4837,15 @@ function resumeRoad(carSeg) {
 function continueRun() {
   if (!cpValid) { startRun(); return; }
   continues++;
+  // Same reason as startRun: the difficulty is read off the car's segment.
+  carSegIndex = cpSeg;
+  prevCarIndex = cpSeg;
+  position = cpSeg * FEEL.SEGMENT_LENGTH - FEEL.CAMERA_DISTANCE;
+  /* A continued run is never recorded. The record is closed to it, so a
+     line from it could only ever be a ghost of a lap that did not
+     happen. Replay carries on, because racing the ghost is still the
+     point of being back on the road. */
+  ghostRec.live = false;
   skipOnRamp = true;
   runTime = cpTime;
   updateDifficulty();
@@ -4712,6 +4959,7 @@ function update(dt) {
   if (landSlow > 0) landSlow = Math.max(0, landSlow - dt);
   const landFactor = landSlow > 0 ? landSlowTo : 1;
   const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1) * landFactor;
+  const prevPos = position;
   position += speed * dt;
 
   // Up the wedge and off the lip: the one moment the jump adds to the
@@ -4768,6 +5016,7 @@ function update(dt) {
   const prevX = carX;
   carX += drift.lateralV * dt;
   carFrac = carX / localHalf;
+  ghostRecord(prevPos, prevX);
 
   // Sideways speed against forward speed is an angle. The difference of
   // the two angles is the slip.
@@ -5499,6 +5748,9 @@ function drawRoad(w, h) {
   drawJumps(first, last, baseIndex);
   drawPylons(first, last, baseIndex, w);
   drawHazards(first, last, baseIndex);
+  // Last in the world and before the car, which render draws afterwards,
+  // so the ghost can never sit on top of the thing you are steering.
+  drawGhost(first, last, baseIndex);
 }
 
 /* The warning, painted on the road surface a full second before the
@@ -5745,6 +5997,260 @@ function jumpChevrons(first, last, baseIndex, grow) {
     }
   }
   return any;
+}
+
+/* ==================================================================
+   THE GHOST. DAILY ONLY, AND THERE IS NO FALLBACK FOR ENDLESS.
+
+   Section 4.5 asks for a recorded rival and gives the reason: a visible
+   opponent turns an abstract number into a race, and it solves the cold
+   start problem because the second player is always yourself. What it
+   could not have on an endless road is a road to be recorded ON. A line
+   replayed over a different generation drives through the hazards and off
+   the edge inside seconds, so the ghost waited for the daily and arrives
+   with it.
+
+   THE RECORD. Sampled by DISTANCE rather than by time, which is what
+   makes it both small and exact:
+
+     - Sample i is at exactly i * GHOST_STEP world units. The ghost's
+       position along the road therefore costs nothing to store and
+       cannot accumulate drift over a long run, which a delta encoded
+       z would.
+     - What is stored is where it was ACROSS the road, how far round the
+       car was, and how long it took to get there. The first two are the
+       line the player is trying to learn. The third is the only thing
+       that differs between two runs of the same road, and it is what
+       makes the ghost passable rather than a rail.
+
+   THE ENCODING is thirty bits a sample, written as five characters of a
+   sixty four character alphabet:
+
+       x    12 bits   world units across, two unit steps, plus or minus 4096
+       yaw   9 bits   plus or minus 90 degrees, about a third of a degree
+       dt    9 bits   zero to half a second, about a millisecond
+
+   Five bytes a sample at nine samples a second is under fifty bytes a
+   second of driving. A two minute run is about five and a half kilobytes.
+
+   ONLY CLEAN RUNS ARE EVER RECORDED. A continued run is not a lap, and
+   the same rule already governs BEST SCORE.
+   ================================================================== */
+const GHOST_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+const GHOST_INDEX = (function () {
+  const m = {};
+  for (let i = 0; i < GHOST_ALPHABET.length; i++) m[GHOST_ALPHABET.charAt(i)] = i;
+  return m;
+})();
+
+function ghostStep() { return FEEL.GHOST_STEP_SEGMENTS * FEEL.SEGMENT_LENGTH; }
+
+/* What is being recorded this run, and what is being replayed. Two
+   separate things on purpose: the run in progress is not the ghost, and
+   only becomes one if it turns out to be the day's best. */
+const ghostRec = { x: [], yaw: [], dt: [], n: 0, live: false, nextZ: 0, lastT: 0 };
+const ghost = {
+  x: [], yaw: [], t: [], n: 0,
+  live: false,        // there is a line to replay
+  shown: false,       // and it is on screen right now
+  i: 0,               // replay cursor, monotonic
+  pos: 0,             // where it is along the road, same space as `position`
+  frac: 0, yawNow: 0,
+  ahead: true,        // is it in front of the player
+  said: 0             // seconds until another pass callout may fire
+};
+
+function ghostClear() {
+  ghost.x.length = 0; ghost.yaw.length = 0; ghost.t.length = 0;
+  ghost.n = 0; ghost.live = false; ghost.shown = false;
+}
+
+function ghostEncode() {
+  const out = [];
+  for (let i = 0; i < ghostRec.n; i++) {
+    const x = clamp(Math.round(ghostRec.x[i] / 2) + 2048, 0, 4095);
+    const y = clamp(Math.round(ghostRec.yaw[i] * 180 / Math.PI * 2.83) + 256, 0, 511);
+    const d = clamp(Math.round(ghostRec.dt[i] * 1000), 0, 511);
+    // Thirty bits, most significant first, five characters.
+    let v = x * 262144 + y * 512 + d;
+    const five = ['', '', '', '', ''];
+    for (let k = 4; k >= 0; k--) { five[k] = GHOST_ALPHABET.charAt(v & 63); v = Math.floor(v / 64); }
+    out.push(five.join(''));
+  }
+  return out.join('');
+}
+
+function ghostDecode(str) {
+  ghostClear();
+  if (!str || str.length < 5) return false;
+  const n = Math.floor(str.length / 5);
+  let t = 0;
+  for (let i = 0; i < n; i++) {
+    let v = 0;
+    for (let k = 0; k < 5; k++) {
+      const c = GHOST_INDEX[str.charAt(i * 5 + k)];
+      if (c === undefined) { ghostClear(); return false; }   // not ours, or truncated
+      v = v * 64 + c;
+    }
+    const d = v % 512; v = Math.floor(v / 512);
+    const y = v % 512; v = Math.floor(v / 512);
+    t += d / 1000;
+    ghost.x.push((v - 2048) * 2);
+    ghost.yaw.push((y - 256) / 2.83 * Math.PI / 180);
+    ghost.t.push(t);
+  }
+  ghost.n = n;
+  ghost.live = n > 1;
+  return ghost.live;
+}
+
+/* Recording. Called once a frame while driving, after the car has moved.
+   `prevPos` and `prevX` are what update already has to hand for the tyre
+   marks, so nothing extra is tracked to get the crossing right. */
+function ghostRecord(prevPos, prevX) {
+  if (!ghostRec.live) return;
+  while (position >= ghostRec.nextZ && ghostRec.n < FEEL.GHOST_MAX_SAMPLES) {
+    /* Interpolated to the exact crossing rather than snapped to the
+       frame. A frame covers about an eighth of a step at speed, and
+       snapping would put an eighth of a step of jitter into the timing
+       of every sample. */
+    const span = Math.max(1e-6, position - prevPos);
+    const f = clamp((ghostRec.nextZ - prevPos) / span, 0, 1);
+    const at = runTime - (1 - f) * (runTime - ghostRec.lastT);
+    ghostRec.x.push(prevX + (carX - prevX) * f);
+    ghostRec.yaw.push(carYaw());
+    ghostRec.dt.push(Math.max(0, at - ghostRec.lastT));
+    ghostRec.lastT = at;
+    ghostRec.n++;
+    ghostRec.nextZ += ghostStep();
+  }
+  if (ghostRec.n >= FEEL.GHOST_MAX_SAMPLES) ghostRec.live = false;
+}
+
+function ghostStartRecording() {
+  ghostRec.x.length = 0; ghostRec.yaw.length = 0; ghostRec.dt.length = 0;
+  ghostRec.n = 0;
+  ghostRec.nextZ = 0;
+  ghostRec.lastT = 0;
+  // Daily only, and clean runs only. A continue is not a lap.
+  ghostRec.live = mode === DAILY;
+}
+
+/* Replay. The cursor only ever goes forward, so this is a step and not a
+   search however long the record is. */
+function ghostUpdate(dt) {
+  ghost.shown = false;
+  if (ghost.said > 0) ghost.said -= dt;
+  if (!ghost.live || mode !== DAILY || state !== DRIVING) return;
+  const t = runTime;
+  while (ghost.i < ghost.n - 2 && ghost.t[ghost.i + 1] <= t) ghost.i++;
+  if (t >= ghost.t[ghost.n - 1]) {
+    /* The recorded run ended here. Nothing is invented past the end: the
+       ghost simply is not there any more, which is exactly what having
+       outlasted it means. */
+    ghost.pos = (ghost.n - 1) * ghostStep();
+    ghostPass();
+    return;
+  }
+  const a = ghost.t[ghost.i], b = ghost.t[ghost.i + 1];
+  const f = b > a ? clamp((t - a) / (b - a), 0, 1) : 0;
+  ghost.pos = (ghost.i + f) * ghostStep();
+  ghost.frac = ghost.x[ghost.i] + (ghost.x[ghost.i + 1] - ghost.x[ghost.i]) * f;
+  ghost.yawNow = ghost.yaw[ghost.i] + (ghost.yaw[ghost.i + 1] - ghost.yaw[ghost.i]) * f;
+  ghost.shown = true;
+  ghostPass();
+}
+
+/* Passing, and being passed, in the DRIFT lane. It goes there rather than
+   in the event lane because the event lane is the checkpoint and the best
+   score break, and a ghost pass must not push either of those aside. The
+   gap is hysteresis: without it a dead heat strobes the callout on every
+   other frame, which is the failure this cost on the chain in session
+   twenty three. */
+function ghostPass() {
+  const ahead = ghost.pos > position;
+  if (ahead === ghost.ahead) return;
+  if (Math.abs(ghost.pos - position) < FEEL.GHOST_PASS_GAP) return;
+  ghost.ahead = ahead;
+  if (ghost.said > 0) return;
+  ghost.said = FEEL.GHOST_PASS_COOLDOWN;
+  if (ahead) sayDrift('GHOST AHEAD', COLOUR.GHOST_EDGE, 1, true);
+  else sayDrift('PASSED THE GHOST', COLOUR.GATE, 1.1, true);
+}
+
+/* Drawn from the SAME boundary tables the road is, so it sits in the
+   world rather than on the screen and it rides the curve for free.
+
+   bw[k] / hw is scale * w / 2, which is exactly bh[k], so a world x at
+   boundary k lands at bx[k] + bh[k] * x with no width lookup at all and
+   no chance of using the wrong segment's half width. */
+const ghostPt = { sx: 0, sy: 0, ok: false };
+function ghostPoint(worldZ, worldX, worldY, first, last, baseIndex) {
+  const k = (worldZ + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH - baseIndex;
+  const i = Math.floor(k);
+  ghostPt.ok = false;
+  if (i < first || i + 1 > last || !bvis[i]) return ghostPt;
+  const f = k - i;
+  const bxk = bx[i] + (bx[i + 1] - bx[i]) * f;
+  const byk = by[i] + (by[i + 1] - by[i]) * f;
+  const bhk = bh[i] + (bh[i + 1] - bh[i]) * f;
+  ghostPt.sx = bxk + bhk * worldX;
+  ghostPt.sy = byk - bhk * worldY;
+  ghostPt.ok = true;
+  return ghostPt;
+}
+
+const ghostCorners = [0, 0, 0, 0, 0, 0, 0, 0];      // four x,y pairs, road plane
+const ghostRoof = [0, 0, 0, 0, 0, 0, 0, 0];
+function drawGhost(first, last, baseIndex) {
+  /* The state test belongs here as well as in ghostUpdate. The frame loop
+     returns early on a pause and on the hit stop without updating, so a
+     rival left frozen beside the wreck is one early return away at any
+     time. The invariant is that the ghost is only ever on screen while
+     the car is being driven, so it is asserted where the drawing happens. */
+  if (!ghost.shown || state !== DRIVING) return;
+  const c = Math.cos(ghost.yawNow), sn = Math.sin(ghost.yawNow);
+  const hw = FEEL.CAR_BODY_WIDTH / 2, hl = FEEL.CAR_BODY_LENGTH / 2;
+  /* The roof is INSET, and it is what makes this read as a car rather
+     than as two slabs floating one above the other. A cabin narrower and
+     shorter than the footprint gives the silhouette its shoulders, which
+     is the whole of section 7's argument about detail living in the
+     shape and not in the shading. */
+  const rw = hw * FEEL.GHOST_CABIN_WIDE, rl = hl * FEEL.GHOST_CABIN_LONG;
+  const back = hl * FEEL.GHOST_CABIN_BACK;
+  const corners = [[-hw, -hl], [hw, -hl], [hw, hl], [-hw, hl]];
+  const cabin = [[-rw, -rl + back], [rw, -rl + back], [rw, rl + back], [-rw, rl + back]];
+  for (let i = 0; i < 4; i++) {
+    const lx = corners[i][0], lz = corners[i][1];
+    const wx = ghost.frac + lx * c - lz * sn;
+    const wz = ghost.pos + lx * sn + lz * c;
+    const p = ghostPoint(wz, wx, 0, first, last, baseIndex);
+    if (!p.ok) return;                       // any corner off the tables, skip the frame
+    ghostCorners[i * 2] = p.sx; ghostCorners[i * 2 + 1] = p.sy;
+    const cx2 = cabin[i][0], cz2 = cabin[i][1];
+    const qx = ghost.frac + cx2 * c - cz2 * sn;
+    const qz = ghost.pos + cx2 * sn + cz2 * c;
+    const q = ghostPoint(qz, qx, FEEL.GHOST_HEIGHT, first, last, baseIndex);
+    if (!q.ok) return;
+    ghostRoof[i * 2] = q.sx; ghostRoof[i * 2 + 1] = q.sy;
+  }
+  /* Footprint, then roof, then the roof outlined. Three operations, no
+     side walls: a filled box at this alpha reads as a smear where the
+     faces overlap, and the gap between two quads reads as height without
+     putting anything solid over the road. */
+  ctx.globalAlpha = FEEL.GHOST_ALPHA * 0.5;
+  ctx.fillStyle = COLOUR.GHOST;
+  polygon(ghostCorners[0], ghostCorners[1], ghostCorners[2], ghostCorners[3],
+          ghostCorners[4], ghostCorners[5], ghostCorners[6], ghostCorners[7]);
+  ctx.fill();
+  ctx.globalAlpha = FEEL.GHOST_ALPHA;
+  polygon(ghostRoof[0], ghostRoof[1], ghostRoof[2], ghostRoof[3],
+          ghostRoof[4], ghostRoof[5], ghostRoof[6], ghostRoof[7]);
+  ctx.fill();
+  ctx.strokeStyle = COLOUR.GHOST_EDGE;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
 }
 
 function drawHazardWarnings(first, last, baseIndex) {
@@ -7101,8 +7607,13 @@ function drawResult(w, h) {
   const s = Math.min(w, h);
   const final = banked;
   const clean = continues === 0;
-  const beat = clean && final > 0 && final >= bestScore;
-  const far = runDistance > 0 && runDistance >= furthest;
+  const daily = mode === DAILY;
+  /* On the daily the headline is TODAY's record, because that is the one
+     the run was actually competing for. BEST SCORE and FURTHEST are still
+     kept and still shown, they are just not what this run was about. */
+  const beatToday = daily && clean && final > 0 && final >= dailyBest;
+  const beat = !daily && clean && final > 0 && final >= bestScore;
+  const far = !daily && runDistance > 0 && runDistance >= furthest;
   // Counts up over ROLL seconds and then sits still. Reading it early
   // costs nothing, because the run is over and the number is already
   // decided.
@@ -7118,7 +7629,11 @@ function drawResult(w, h) {
      screen and clamped so the block can never reach the middle band,
      which is where the car is and which stays empty. */
   const y0 = Math.min(Math.max(s * 0.085, h * 0.125), Math.max(0, h * 0.5 - s * 0.34));
-  if (beat) {
+  if (beatToday) {
+    ctx.globalAlpha = 0.72 + 0.28 * Math.abs(Math.sin(deadFor * 5));
+    text("TODAY'S BEST", w / 2, y0, Math.round(s * 0.05), '900', 'center', COLOUR.GATE);
+    ctx.globalAlpha = 1;
+  } else if (beat) {
     // Unmistakable, because this is the moment somebody plays again for.
     ctx.globalAlpha = 0.72 + 0.28 * Math.abs(Math.sin(deadFor * 5));
     text('NEW BEST', w / 2, y0, Math.round(s * 0.055), '900');
@@ -7128,12 +7643,14 @@ function drawResult(w, h) {
     text('FURTHEST YET', w / 2, y0, Math.round(s * 0.05), '900', 'center', COLOUR.GATE);
     ctx.globalAlpha = 1;
   } else {
-    text(clean ? 'BEST  ' + bestScore : 'CONTINUED RUN',
+    text(!clean ? 'CONTINUED RUN'
+         : daily ? "TODAY  " + dailyBest
+         : 'BEST  ' + bestScore,
          w / 2, y0, Math.round(s * 0.042), '700');
   }
 
   arcadeNumber(String(shown), w / 2, y0 + s * 0.095, Math.round(s * 0.145),
-               beat ? COLOUR.SCORE_BEST : COLOUR.SCORE);
+               (beat || beatToday) ? COLOUR.SCORE_BEST : COLOUR.SCORE);
 
   /* The publisher, small and quiet, in the air between the score and the
      run figures. Low alpha and a third of the size of anything around it,
@@ -7172,7 +7689,8 @@ function drawResult(w, h) {
 
   /* The two records on one line, always both, so the split between them
      is obvious without a word of explanation. */
-  const rec = 'BEST  ' + bestScore + '     FURTHEST  ' + furthest + 'm';
+  const rec = (daily ? "TODAY " + dayLabel(todayStamp) + '  ' + dailyBest + '     ' : '')
+            + 'BEST  ' + bestScore + '     FURTHEST  ' + furthest + 'm';
   ctx.globalAlpha = 0.72;
   text(rec, w / 2, y0 + s * 0.30,
        fittedSize(rec, '700', Math.round(s * 0.032), w * 0.9), '700');
@@ -7233,17 +7751,107 @@ function hitRestart(e) {
       && y >= restartRect.y && y <= restartRect.y + restartRect.h;
 }
 
+/* The date, short, so the player can see WHICH day's road they are on
+   and tell yesterday's record from today's. Local, like the seed. */
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function dayLabel(stamp) {
+  return (stamp % 100) + ' ' + MONTHS[(Math.floor(stamp / 100) % 100) - 1];
+}
+
+/* ENTRY, AND THERE IS NO MENU. Section 12 forbids one and it is right to.
+
+   Tapping anywhere or pressing any key starts ENDLESS, exactly as it
+   always has, so a player arriving cold plays immediately and is never
+   asked to choose anything. The daily is a clearly marked button
+   ALONGSIDE that, for the returning player who is looking for it, and it
+   is drawn on the canvas rather than added to #chrome for the same reason
+   the restart button is: a fourth overlay is a fourth chance to repeat
+   the Beakdown incident, and a rect the drawing code publishes cannot eat
+   a tap it is not under.
+
+   And after death there is no choice at all. Restart goes back into
+   whichever mode the run was already in, so the one action restart from
+   section 5 is untouched. */
+const dailyRect = { x: 0, y: 0, w: 0, h: 0, live: false };
+/* Fine pointer means a trackpad or a mouse, which on this audience's
+   hardware means a Chromebook, which means a keyboard. The same media
+   query the tilt button already uses, read the other way round. */
+const hasKeyboard = !(window.matchMedia
+                      && window.matchMedia('(any-pointer: coarse)').matches);
+
 function drawOverlay(w, h) {
   if (state === TITLE) {
+    /* MEASURED IN s, THE SMALLER SCREEN DIMENSION, and only the starting
+       height comes from h. This block was laid out in fractions of h and
+       it fitted in portrait and ran straight across the car in landscape,
+       where h and s are the same number. That is the identical mistake
+       the death screen already paid for, so it takes the identical fix:
+       the top is pushed down the taller screen and clamped so the stack
+       can never reach the middle band, which is where the car is. */
     const s = Math.min(w, h);
+    const y0 = Math.min(Math.max(s * 0.10, h * 0.16), Math.max(0, h * 0.5 - s * 0.30));
     const title = 'DRIFT FEVER';
-    text(title, w / 2, h * 0.34,
+    text(title, w / 2, y0,
          fittedSize(title, '800', Math.round(s * 0.13), w * 0.88), '800');
-    text('hold left or right to steer', w / 2, h * 0.45, Math.round(s * 0.045), '600');
-    text('tap or press any key to start', w / 2, h * 0.52, Math.round(s * 0.045), '600');
+    text('hold left or right to steer', w / 2, y0 + s * 0.135,
+         Math.round(s * 0.045), '600');
+    text('tap or press any key to start', w / 2, y0 + s * 0.20,
+         Math.round(s * 0.045), '600');
+
+    /* The daily button sits EXACTLY where RESTART sits on the death
+       screen: anchored to the bottom edge rather than to a fraction of
+       the height, so it clears the car in both orientations by
+       construction and above the corner pads. Two canvas buttons, one
+       place, and a player who has seen one already knows the other. */
+    const label = "TODAY'S TRACK";
+    const size = Math.round(s * 0.040);
+    ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    const bw = ctx.measureText(label).width + size * 2.4;
+    const bh = size * 2.2;
+    const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
+    dailyRect.x = w / 2 - bw / 2;
+    dailyRect.y = by0 - bh / 2;
+    dailyRect.w = bw;
+    dailyRect.h = bh;
+    dailyRect.live = true;
+
+    ctx.globalAlpha = 0.62;
+    const sub = dayLabel(todayStamp)
+              + (hasKeyboard ? '     press T' : '')
+              + (dailyBest > 0 ? '     BEST TODAY  ' + dailyBest : '')
+              + (ghost.live ? '     GHOST READY' : '');
+    text(sub, w / 2, by0 - bh * 0.95,
+         fittedSize(sub, '700', Math.round(s * 0.030), w * 0.9), '700');
+    ctx.globalAlpha = 1;
+
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = COLOUR.BAR_TRACK;
+    roundRect(dailyRect.x, dailyRect.y, bw, bh, bh * 0.3);
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = COLOUR.GATE;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    text(label, w / 2, by0, size, '800', 'center', COLOUR.GATE);
   } else if (state === DEAD) {
+    dailyRect.live = false;
     drawResult(w, h);
+  } else {
+    dailyRect.live = false;
   }
+}
+
+function hitDaily(e) {
+  if (!dailyRect.live || state !== TITLE) return false;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  return x >= dailyRect.x && x <= dailyRect.x + dailyRect.w
+      && y >= dailyRect.y && y <= dailyRect.y + dailyRect.h;
+}
+
+function startDaily() {
+  mode = DAILY;
+  startRun();
 }
 
 /* The scrape budget, drawn low and central. It shows what is left rather
@@ -7376,7 +7984,62 @@ function updateScore(dt) {
             + FEEL.SCORE_RISK_RATE * (multiplier - 1)) * dt;
 }
 
+/* ==================================================================
+   TODAY'S RECORD, AND THE LINE THAT WENT WITH IT.
+
+   Its own record, separate from BEST SCORE and FURTHEST, because it is
+   answering a different question: those two are "how good are you", this
+   is "how good are you at TODAY'S road". It resets when the local date
+   changes and it takes the ghost with it, because a line recorded on
+   yesterday's generation is a line through a road that no longer exists.
+
+   Continues are allowed on the daily and unlimited attempts are the
+   point, but the RECORD is closed to a continued run, which is the same
+   rule BEST SCORE already lives under and for the same reason.
+
+   Every read and write goes through storeGet and storeSet, which are
+   already try/catch wrapped. With storage unavailable dailyBest simply
+   stays at zero for the session and the ghost never appears: the daily
+   is still fully playable and remembers nothing, which is the required
+   behaviour rather than a degradation.
+   ================================================================== */
+let dailyBest = 0;
+let dailyGhostBytes = 0;
+
+(function loadDaily() {
+  const day = parseInt(storeGet('daily.day'), 10);
+  if (day !== todayStamp) {
+    // A different day, or nothing stored. Either way there is nothing
+    // here that belongs to today's road.
+    storeSet('daily.day', String(todayStamp));
+    storeSet('daily.best', '0');
+    storeSet('daily.ghost', '');
+    return;
+  }
+  const b = parseInt(storeGet('daily.best'), 10);
+  if (isFinite(b) && b > 0) dailyBest = b;
+  const g = storeGet('daily.ghost');
+  if (g) { dailyGhostBytes = g.length; ghostDecode(g); }
+})();
+
+/* Called at the end of a run, before anything is reset. */
+function bankDaily() {
+  if (mode !== DAILY) return;
+  if (continues > 0) return;              // not a lap
+  if (banked <= dailyBest) return;
+  dailyBest = banked;
+  storeSet('daily.day', String(todayStamp));
+  storeSet('daily.best', String(dailyBest));
+  /* The line goes with the score, so the ghost is always the run that
+     set the record rather than merely the last clean one. */
+  const blob = ghostEncode();
+  dailyGhostBytes = blob.length;
+  storeSet('daily.ghost', blob);
+  ghostDecode(blob);                      // live for the next attempt at once
+}
+
 function bankScore() {
+  bankDaily();
   /* FURTHEST is open to every run, continued or not, because seeing more
      of the track is exactly what a continue is for and it deserves to be
      worth something. */
@@ -7824,23 +8487,31 @@ function explode() {
   const cy = (carParts.rly + carParts.rry) * 0.5;
   const n = Math.min(debris.length, Math.round(FEEL.EXPLODE_PARTICLES));
   debrisCount = n;
+  /* Math.random, NOT rng(). This drew nine values a particle off the ROAD
+     GENERATOR'S stream for four sessions, so every crash permanently
+     shifted every corner generated after it: a pinned seed stopped
+     reproducing its own road the moment anybody died on it, and two
+     players on the same daily road who had crashed a different number of
+     times were driving different roads from that point on. Nothing this
+     side of the game may draw from rng(). It is the road's, and only the
+     road's, and debris is decoration. */
   for (let i = 0; i < n; i++) {
     const p = debris[i];
-    const a = rng() * Math.PI * 2;
+    const a = Math.random() * Math.PI * 2;
     // Biased upward and outward, because that is what an impact throws.
     const speed = FEEL.EXPLODE_SPEED * (FEEL.EXPLODE_SPREAD
-                  + (1 - FEEL.EXPLODE_SPREAD) * rng());
-    p.x = cx + (rng() * 2 - 1) * s * 0.02;
-    p.y = cy + (rng() * 2 - 1) * s * 0.02;
+                  + (1 - FEEL.EXPLODE_SPREAD) * Math.random());
+    p.x = cx + (Math.random() * 2 - 1) * s * 0.02;
+    p.y = cy + (Math.random() * 2 - 1) * s * 0.02;
     p.vx = Math.cos(a) * speed;
     p.vy = Math.sin(a) * speed - speed * 0.45;
-    p.r = s * FEEL.EXPLODE_SIZE * (0.35 + 0.65 * rng());
-    p.rot = rng() * Math.PI;
-    p.spin = (rng() * 2 - 1) * FEEL.EXPLODE_SPIN;
-    p.life = FEEL.EXPLODE_TIME * (0.6 + 0.4 * rng());
+    p.r = s * FEEL.EXPLODE_SIZE * (0.35 + 0.65 * Math.random());
+    p.rot = Math.random() * Math.PI;
+    p.spin = (Math.random() * 2 - 1) * FEEL.EXPLODE_SPIN;
+    p.life = FEEL.EXPLODE_TIME * (0.6 + 0.4 * Math.random());
     // A third of the pieces are hot: they are the fire and the rest are
     // the car. Two colours, two batched fills, and it reads as both.
-    p.hot = rng() < 0.38 ? 1 : 0;
+    p.hot = Math.random() < 0.38 ? 1 : 0;
   }
 }
 
@@ -7914,6 +8585,27 @@ function resolveCloseCalls() {
 
    Both lanes go through one drawing routine and differ only in which row
    of the sky band they sit on and how big they are. */
+/* WHICH DAY'S TRACK, in play, small and dim and always in the same
+   place. It hangs off hudBottom the way everything else in this stack
+   does rather than off a fraction of the height, and it says GHOST when
+   there is one to race so the player knows before it appears. Endless
+   draws nothing at all: there is no second mode to be confused with. */
+function drawDailyMark(w, h) {
+  /* WHILE DRIVING ONLY. The death screen says all of this in its own
+     records line, and drawing both put two lines of teal on top of each
+     other at the top of that screen. */
+  if (mode !== DAILY || state !== DRIVING) return;
+  const s = Math.min(w, h);
+  const line = "TODAY " + dayLabel(todayStamp)
+             + (dailyBest > 0 ? '   BEST ' + dailyBest : '')
+             + (ghost.live ? '   GHOST' : '');
+  ctx.globalAlpha = 0.42;
+  text(line, w / 2, hudBottom + s * 0.026,
+       fittedSize(line, '700', Math.round(s * 0.026), w * 0.8), '700',
+       'center', COLOUR.GATE);
+  ctx.globalAlpha = 1;
+}
+
 function drawCallout(w, h) {
   drawLane(w, h, calloutText, calloutColour, calloutLife, calloutSide,
            FEEL.CALLOUT_ROW_EVENT, 1);
@@ -8052,11 +8744,24 @@ function drawHud(w, h) {
     tunerLine(20),
     tunerLine(21),
     tunerLine(22),
+    /* 23 to 26 were added in the last two sessions and never listed here,
+       so the jump, biome and ghost groups could be cycled to and tuned
+       but never read. A cycler with an invisible group is a cycler that
+       lies about what is selected. */
+    tunerLine(23),
+    tunerLine(24),
+    tunerLine(25),
+    tunerLine(26),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
       + '  width ' + widthScale.toFixed(2) + '  int ' + maxIntensity()
-      + '  ease ' + ease.toFixed(2)
+      + '  ease ' + ease.toFixed(2) + ' used ' + adaptEase().toFixed(2),
+    (mode === DAILY ? 'DAILY ' + todayStamp + ' seed ' + dailySeed() : 'endless')
+      + '  today ' + dailyBest
+      + '  ghost ' + (ghost.live ? ghost.n + ' pts ' + dailyGhostBytes + 'B' : 'none')
+      + (ghostRec.live ? '  REC ' + ghostRec.n : '')
+      + (ghost.shown ? '  gap ' + Math.round((ghost.pos - position) / 100) + 'm' : '')
   ];
   /* Sized to fit AND wrapped, because the readout gains values most
      sessions and a line that runs off the side of a phone is a line that
@@ -8183,6 +8888,7 @@ function render() {
   // The score first, because the callout measures itself against the
   // bottom of the HUD stack and the clock is what sets it.
   drawScore(w, h);
+  drawDailyMark(w, h);
   drawCallout(w, h);
   drawOverlay(w, h);
   drawPauseCover(w, h);
@@ -8933,6 +9639,9 @@ function frame(now) {
   // score has just settled on, and after update, because the close call
   // ledger is written by the collision pass.
   updateSpectacle(dt);
+  // After the spectacle, so a ghost pass takes the drift lane only if
+  // nothing louder has already claimed it this frame.
+  ghostUpdate(dt);
   updateBar(dt);
   render();
   sampleFps(rawDt);
