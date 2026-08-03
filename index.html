@@ -973,6 +973,16 @@ const FEEL = {
   CAR_SPOILER_CHORD:       0.16,     // of half length
   CAR_SPOILER_THICK:         26,     // world units
   CAR_SPOILER_POST:         0.5,     // of half width, how far out the posts sit
+  CAR_SPOILER_SHADOW:      0.55,     // alpha of the gap band under the blade
+  /* The glow may spread upward and backward as much as it likes, because
+     that reads as light on air. It may NOT spread sideways past the car's
+     own tail, because that reads as bodywork: at a spread of 2.3 on a
+     strip already 0.74 of the tail half width, the red bloom finished up
+     70% wider than the rear of the car and looked like a bar bolted
+     across it. This is a hard ceiling in tail half widths and the spread
+     is clamped to it however large it gets. */
+  CAR_LIGHT_GLOW_MAX:      0.98,     // of the tail half width, laterally
+  CAR_LIGHT_GLOW_BACK:       34,     // world units the glow sits behind the strip
   CAR_RIM_GLOW_SPREAD:      1.9,
   CAR_RIM_GLOW_ALPHA:      0.30,
   CAR_CABIN_LENGTH:         380,
@@ -1466,7 +1476,11 @@ const COLOUR = {
   CAR_LIGHT_HOT:'#ffd2d8',
   CAR_HIP:      '#2aa3c0',      // the flank between shoulder and sill
   CAR_SILL:     '#12596e',      // under the widest line, always in shade
-  CAR_SPOILER:  '#9df6ff',
+  /* Distinct from BOTH the roof and the body, or from overhead it is
+     just more of the same surface. Nearly white against the roof's mid
+     cyan, over a near black gap. */
+  CAR_SPOILER:  '#eafeff',
+  CAR_WING_GAP: '#03141b',
   CAR_RIM:      '#d6feff',
   CAR_TYRE:     '#0a0f14',
   CAR_TYRE_TOP: '#182430',
@@ -1577,6 +1591,7 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const view = { w: 0, h: 0, dpr: 1 };
 let hazeGradient = null;
 let horizonGradient = null;
+let safeTop = 0;         // notch or camera cutout, measured from CSS
 let safeBottom = 0;      // home indicator and gesture bar, measured from CSS
 let scrapeGradientLeft = null;
 let scrapeGradientRight = null;
@@ -1602,6 +1617,11 @@ function resize() {
 
   const probe = window.getComputedStyle(document.getElementById('safe'));
   safeBottom = parseFloat(probe.paddingBottom) || 0;
+  /* The top inset only bites in fullscreen, where the browser chrome is
+     no longer sitting over the cutout for us. resize already runs on
+     rotation and on entering and leaving fullscreen, which is exactly the
+     three moments this changes. */
+  safeTop = parseFloat(probe.paddingTop) || 0;
 
   // The distant road fades into the horizon glow rather than staying sharp
   // all the way to the vanishing point.
@@ -4292,11 +4312,15 @@ function faceVisible(a, b, c, d, camX) {
 function hullColour(i, z0, z1) {
   const mid = (z0 + z1) * 0.5;
   const glass = mid > FEEL.CAR_GLASS_FROM && mid < FEEL.CAR_GLASS_TO;
-  // The roof stays body coloured and the upper flanks become glass over
-  // the cabin, which is a glasshouse rather than a painted lid and reads
-  // correctly from behind and above, the only angle that matters.
-  if (i === 4) return COLOUR.CAR_TOP;                               // roof
-  if (i === 3 || i === 5) return glass ? COLOUR.CAR_GLASS : COLOUR.CAR_CABIN_TOP;
+  /* From directly above, which is what portrait gives you, the top face
+     is nearly all you see. Painting it one colour for the whole length is
+     what turned the car into a blob. So the roof over the cabin is GLASS
+     and the roof either side of it is body, which reads top down as body,
+     glass, body: three bands that describe the taper instead of hiding
+     it. The upper flanks stay light, so the dark glass is framed rather
+     than bleeding into the sides. */
+  if (i === 4) return glass ? COLOUR.CAR_GLASS : COLOUR.CAR_TOP;    // roof
+  if (i === 3 || i === 5) return COLOUR.CAR_CABIN_TOP;              // shoulder
   if (i === 2 || i === 6) return COLOUR.CAR_END;                    // shoulder
   if (i === 1 || i === 7) return COLOUR.CAR_HIP;                    // hip, widest
   return COLOUR.CAR_SILL;                                           // sill
@@ -4337,10 +4361,15 @@ function drawHull(halfW, bodyH, y0, camX, w, h, seam) {
 const quadPts = [{wx:0,wy:0,wz:0,sx:0,sy:0},{wx:0,wy:0,wz:0,sx:0,sy:0},
                  {wx:0,wy:0,wz:0,sx:0,sy:0},{wx:0,wy:0,wz:0,sx:0,sy:0}];
 function quadInCar(x0, y0, z0, x1, y1, z1, camX, w, h) {
-  const xs = [x0, x1, x1, x0], ys = [y0, y0, y1, y1];
+  // Upright when z0 and z1 match, flat on its back when they do not, which
+  // is how the same helper draws both the light strip and the wing shadow.
+  const flat = z0 !== z1;
+  const xs = [x0, x1, x1, x0];
+  const ys = flat ? [y0, y0, y1, y1] : [y0, y0, y1, y1];
+  const zs = flat ? [z0, z0, z1, z1] : [z0, z0, z0, z0];
   for (let i = 0; i < 4; i++) {
     const pt = quadPts[i];
-    carToWorld(pt, xs[i], ys[i], z0, false);
+    carToWorld(pt, xs[i], ys[i], zs[i], false);
     projectPoint(pt, pt.wx, pt.wy, pt.wz, camX, w, h);
   }
   polygon(quadPts[0].sx, quadPts[0].sy, quadPts[1].sx, quadPts[1].sy,
@@ -4406,8 +4435,8 @@ function faceInset(quad, u0, u1, v0, v1) {
 faceInset.buf = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }];
 
 const rearFaceQuad = [{ sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }];
-const WING_COLOURS = [COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER, COLOUR.CAR_TOP,
-                      COLOUR.CAR_SILL, COLOUR.CAR_END, COLOUR.CAR_END];
+const WING_COLOURS = [COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER,
+                      COLOUR.CAR_WING_GAP, COLOUR.CAR_END, COLOUR.CAR_END];
 const CAR_RIM_GLOW_FILL = 'rgb(214,254,255)';
 const CAR_LIGHT_GLOW_FILL = 'rgb(' + COLOUR.CAR_LIGHT_GLOW + ')';
 
@@ -4584,13 +4613,17 @@ function drawCar(w, h) {
   const lightT = FEEL.CAR_BODY_HEIGHT * FEEL.CAR_LIGHT_THICK;
   const lightZ = tail[0] * halfL - 6;
   const hot = scraping ? 1 : 0;
+  // Laterally clamped, vertically and rearwardly free.
+  const glowHalf = Math.min(lightHalf * FEEL.CAR_LIGHT_GLOW_SPREAD,
+                            halfW * tail[2] * FEEL.CAR_LIGHT_GLOW_MAX);
   for (let pass = 0; pass < 2; pass++) {
-    const grow = pass === 0 ? FEEL.CAR_LIGHT_GLOW_SPREAD : 1;
+    const wide = pass === 0 ? glowHalf : lightHalf;
+    const tall = pass === 0 ? lightT * FEEL.CAR_LIGHT_GLOW_SPREAD : lightT;
+    const z = pass === 0 ? lightZ - FEEL.CAR_LIGHT_GLOW_BACK : lightZ;
     ctx.globalAlpha = pass === 0 ? FEEL.CAR_LIGHT_GLOW_ALPHA * (1 + hot * 0.8) : 1;
     ctx.fillStyle = pass === 0 ? CAR_LIGHT_GLOW_FILL
                   : (hot ? COLOUR.CAR_LIGHT_HOT : COLOUR.CAR_LIGHT);
-    quadInCar(-lightHalf * grow, lightY - lightT * grow, lightZ,
-              lightHalf * grow, lightY + lightT * grow, lightZ, camX, w, h);
+    quadInCar(-wide, lightY - tall, z, wide, lightY + tall, z, camX, w, h);
   }
   ctx.globalAlpha = 1;
 
@@ -4604,6 +4637,21 @@ function drawCar(w, h) {
   const postH = (spY - (FEEL.CAR_RIDE_HEIGHT + 0.9 * FEEL.CAR_BODY_HEIGHT)) / 2;
   drawBox(-postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
   drawBox(postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
+  /* The shadow the wing casts on the boot. Seen from above, a spoiler is
+     a horizontal plane floating over another horizontal plane and the two
+     merge into one surface: the ONLY thing that separates them is the gap
+     underneath. So the gap is drawn. A dark band on the boot lid, wider
+     and longer than the blade, and it is what makes the wing exist at all
+     in a top down framing. */
+  ctx.globalAlpha = FEEL.CAR_SPOILER_SHADOW;
+  ctx.fillStyle = COLOUR.CAR_WING_GAP;
+  quadInCar(-halfW * FEEL.CAR_SPOILER_HALF * 1.06,
+            spY - FEEL.CAR_SPOILER_THICK * 1.5,
+            spZ + halfL * FEEL.CAR_SPOILER_CHORD * 1.5,
+            halfW * FEEL.CAR_SPOILER_HALF * 1.06,
+            spY - FEEL.CAR_SPOILER_THICK * 1.5,
+            spZ - halfL * FEEL.CAR_SPOILER_CHORD * 1.5, camX, w, h);
+  ctx.globalAlpha = 1;
   drawBox(0, spY, spZ, halfW * FEEL.CAR_SPOILER_HALF, FEEL.CAR_SPOILER_THICK / 2,
           halfL * FEEL.CAR_SPOILER_CHORD, 0, false, WING_COLOURS, true, camX, w, h);
 
@@ -4719,7 +4767,7 @@ function drawScore(w, h) {
   const size = Math.round(s * FEEL.SCORE_SIZE * (1 + 0.3 * flash));
   // One score, not two. It is the whole total, and a gate is what makes
   // the part of it that was pending safe.
-  arcadeNumber(String(banked + Math.floor(score)), w / 2, h * FEEL.SCORE_TOP,
+  arcadeNumber(String(banked + Math.floor(score)), w / 2, safeTop + h * FEEL.SCORE_TOP,
                size, flash > 0 ? COLOUR.GATE : COLOUR.SCORE);
   drawClock(w, h);
   drawMultiplier(w, h);
@@ -4730,13 +4778,20 @@ function drawScore(w, h) {
    also time and it belongs in the time element rather than being a fifth
    number somewhere else. */
 function drawClock(w, h) {
-  if (runTime < FEEL.ONRAMP_SECONDS) return;
+  /* Drawn from the first frame, not from the end of the on ramp. It used
+     to return early for the whole thirty seconds, so a run that ended
+     inside the on ramp had no clock in it at all and a player never saw
+     one until they had already survived twice. Not running is a state the
+     readout can show; being absent is not. */
+  const running = runTime >= FEEL.ONRAMP_SECONDS;
   const s = Math.min(w, h);
   const size = Math.round(s * FEEL.CLOCK_SIZE);
   const gateSecs = Math.max(0, nextGate - carSegIndex) * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
-  const low = clock < FEEL.CLOCK_LOW;
+  const low = running && clock < FEEL.CLOCK_LOW;
   const reachable = clock >= gateSecs;
-  const y = h * FEEL.CLOCK_TOP;
+  // Paused during the on ramp: present, legible, and visibly not counting.
+  const dim = running ? 1 : 0.45;
+  const y = safeTop + h * FEEL.CLOCK_TOP;
 
   const main = timeLabel(clock);
   const gl = timeLabel(gateSecs);
@@ -4751,7 +4806,7 @@ function drawClock(w, h) {
   const boxH = size + pady * 2;
   const bx0 = w / 2 - boxW / 2, by0 = y - boxH / 2;
 
-  ctx.globalAlpha = 0.72;
+  ctx.globalAlpha = 0.72 * dim;
   ctx.fillStyle = COLOUR.BAR_TRACK;
   roundRect(bx0, by0, boxW, boxH, boxH * 0.28);
   ctx.fill();
@@ -4760,26 +4815,26 @@ function drawClock(w, h) {
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
   ctx.font = '700 ' + size + 'px ' + MONO;
-  ctx.globalAlpha = low ? 0.62 + 0.38 * Math.abs(Math.sin(runTime * 6)) : 1;
+  ctx.globalAlpha = (low ? 0.62 + 0.38 * Math.abs(Math.sin(runTime * 6)) : 1) * dim;
   ctx.fillStyle = low ? COLOUR.BAR_LOW : COLOUR.GATE;
   ctx.fillText(main, bx0 + padx, y + 1);
   ctx.globalAlpha = 1;
 
   // The gate, quieter, and cool once it is inside what is in hand.
   ctx.font = '600 ' + gsize + 'px ' + MONO;
-  ctx.globalAlpha = reachable ? 0.9 : 0.55;
+  ctx.globalAlpha = (reachable ? 0.9 : 0.55) * dim;
   ctx.fillStyle = reachable ? COLOUR.GATE : COLOUR.TEXT;
   ctx.fillText(gl, bx0 + padx + mw + gap, y + 1);
   ctx.globalAlpha = 1;
   // A divider, so the two figures read as one instrument with two hands.
-  ctx.globalAlpha = 0.3;
+  ctx.globalAlpha = 0.3 * dim;
   ctx.fillStyle = COLOUR.TEXT;
   ctx.fillRect(bx0 + padx + mw + gap * 0.45, by0 + pady * 0.7, 1, boxH - pady * 1.4);
   ctx.globalAlpha = 1;
 
   /* Earning, as an arrow rather than a number. Flow has to be visible,
      but it does not have to be another figure to read. */
-  if (slipPay() > 0.02) {
+  if (running && slipPay() > 0.02) {
     const a = size * 0.3;
     const ax = bx0 - a * 1.5, ay = y;
     ctx.globalAlpha = 0.55 + 0.45 * Math.min(1, slipPay() * 1.6);
@@ -4810,9 +4865,13 @@ function drawClock(w, h) {
 /* Off to the side, in the trail's own colour, and nothing like either of
    the other two. */
 function drawMultiplier(w, h) {
-  if (multiplier <= 1.005) return;
+  /* Always drawn, and quiet at rest rather than absent. A player who
+     never gets near the edge early on used to see nothing here at all,
+     so the one number that explains what the game rewards was invisible
+     to exactly the person who needed it. */
   const s = Math.min(w, h);
   const t = clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1);
+  const idle = multiplier <= 1.005;
   const pop = multPop > 0 ? multPop / FEEL.MULT_POP_TIME : 0;
   const size = Math.round(s * FEEL.MULT_SIZE * (1 + FEEL.MULT_GROWTH * t + 0.2 * pop));
   ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
@@ -4820,13 +4879,15 @@ function drawMultiplier(w, h) {
   ctx.textBaseline = 'middle';
   const label = '\u00d7' + multiplier.toFixed(1);
   const x = w - Math.round(s * 0.045);
-  const y = h * FEEL.MULT_TOP;
+  const y = safeTop + h * FEEL.MULT_TOP;
   ctx.lineJoin = 'round';
   ctx.lineWidth = Math.max(2.5, size * 0.13);
+  ctx.globalAlpha = idle ? 0.4 : 1;
   ctx.strokeStyle = COLOUR.SCORE_EDGE;
   ctx.strokeText(label, x, y);
   ctx.fillStyle = trailColour(t);
   ctx.fillText(label, x, y);
+  ctx.globalAlpha = 1;
 }
 
 function roundRect(x, y, w2, h2, r) {
