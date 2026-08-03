@@ -343,13 +343,24 @@
        because COLOUR is what a biome rotates and a publisher lockup that
        changed field colour with the scenery would not be a brand. */
     background: #0b0503;
-    /* Set by the frame loop from bootFlash, so the fade out is the same
-       countdown the rest of the boot behaviour reads. */
+    /* THE FIELD IS OPAQUE FROM THE FIRST PAINT AND STAYS THAT WAY UNTIL
+       THE SPLASH LEAVES. It is in the markup, so the browser paints this
+       near black before the script has even been parsed, which is what
+       covers the load. Measured, that gap is about 180ms of script parse
+       and road build on a desktop and more on a phone, and it used to be
+       covered by exactly this. Fading the CONTAINER in would have
+       uncovered it and shown a flash of the orange page background and
+       a half drawn road. Only the lockup fades in; the container fades
+       out at the end, taking the field with it. */
     opacity: 1;
   }
   #boot[hidden] { display: none; }
   #boot svg {
     display: block;
+    /* The lockup ARRIVES, so it starts absent and the frame loop brings
+       it in. Until the first frame runs there is a plain dark field,
+       which is the right thing to be looking at while a page loads. */
+    opacity: 0;
     width: 82vw;
     height: auto;
     /* 1780 / 1263, so the height cap is expressed as a width. */
@@ -1387,9 +1398,27 @@ const FEEL = {
 
      Skippable on the first tap or key, which is SWALLOWED rather than
      also starting a run, so dismissing the credit cannot accidentally
-     begin a game the player has not looked at yet. */
-  BOOT_TIME:               0.55,     // seconds the lockup holds
-  BOOT_FADE:               0.18,     // of that, the fade out at the end
+     begin a game the player has not looked at yet.
+
+     THREE PHASES, NOT ONE DURATION, and the middle one is the point. It
+     was 0.55 seconds with a fade at the tail, which was too fast to read
+     STUDIOS and INSTANT. PLAY. without effort: the eye had barely
+     finished arriving before the thing began to leave. The hold is now
+     long enough to read the whole lockup at a glance, and it is a HOLD,
+     at full opacity, with nothing moving. A beat of stillness is what
+     makes a splash feel deliberate rather than slow.
+
+     THE FADES ARE SHORT ON PURPOSE. They exist so the lockup arrives and
+     leaves rather than being cut in and out, and that is all. Together
+     they add under half a second to the hold; making them long enough to
+     be noticed as animation would turn a 1.5 second splash into a three
+     second wait, which is a different and much worse thing.
+
+     TOTAL IS THE SUM OF ALL THREE, and it is derived rather than written
+     down a fourth time. bootTotal() is the one place it exists. */
+  BOOT_FADE_IN:            0.18,     // LIVE, seconds, arriving
+  BOOT_HOLD:               1.50,     // LIVE, seconds at full opacity
+  BOOT_FADE_OUT:           0.28,     // LIVE, seconds, leaving
   /* Small and quiet on the death screen, under the score. It must not
      crowd the score, the records, the continue button or the share
      button, which are what that screen is for.
@@ -3131,6 +3160,12 @@ const TUNABLES = [
   /* The title screen. Group 20 is the end screens and this is the other
      side of the same coin: the screens with no car being driven on them.
      Tunable because an arcade splash is judged by looking at it. */
+  /* The boot splash. Changing these mid splash cannot restart it, which
+     is correct: it is a cold load event and nothing may re trigger it.
+     Reload to see a change, which is what the author does anyway. */
+  { key: 'BOOT_FADE_IN',       label: 'bootIn',  step: 0.02, min: 0,    max: 2.0,   dp: 2, group: 20 },
+  { key: 'BOOT_HOLD',          label: 'bootHold',step: 0.10, min: 0,    max: 6.0,   dp: 2, group: 20 },
+  { key: 'BOOT_FADE_OUT',      label: 'bootOut', step: 0.02, min: 0,    max: 2.0,   dp: 2, group: 20 },
   { key: 'TITLE_SCRIM_ALPHA',  label: 'ttlDim',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
   { key: 'TITLE_TOP',          label: 'ttlTop',  step: 0.005,min: 0,    max: 0.30,  dp: 3, group: 20 },
   { key: 'TITLE_WM_WIDTH',     label: 'ttlMark', step: 0.02, min: 0.30, max: 1.00,  dp: 2, group: 20 },
@@ -3364,6 +3399,20 @@ function clearHeldInput() {
 /* --- Keyboard. Both cases of every letter, so caps lock is not a dead key. --- */
 window.addEventListener('keydown', function (e) {
   if (e.repeat) { return; }
+  /* THE SPLASH IS DISMISSED BY ANY KEY, AND THIS IS THE FIRST THING THE
+     HANDLER DOES, which is the whole of "any key".
+
+     It used to sit at the bottom, after every named key had had a look,
+     so Escape and P reached togglePause and returned without dismissing
+     anything. That was invisible at half a second and is not at a second
+     and a half. Somebody who has seen this a hundred times must never be
+     held up by it, and on a phone, where tabs are evicted and restored
+     constantly, a cold load happens far more often than it sounds.
+
+     The key is SWALLOWED rather than also starting a run, exactly as the
+     tap is, so dismissing the credit cannot begin a game nobody has
+     looked at yet. */
+  if (bootFlash > 0) { firstGesture(); skipBoot(); return; }
   const k = e.key;
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
@@ -3414,11 +3463,10 @@ window.addEventListener('keydown', function (e) {
   else if (debugAllowed && (k === '=' || k === '+')) { nudgeTuning(1); return; }
   else if (debugAllowed && k === '0') { resetTuning(); return; }
   firstGesture();
-  // The credit is dismissed by the first input and that input goes no
-  // further, so skipping it cannot also start a run.
-  if (bootFlash > 0) { skipBoot(); return; }
+  // The boot credit was already dealt with at the top of this handler,
+  // before any named key got a look at the event.
   // A key while the calibration is up is the skip, and it goes no
-  // further, exactly like the boot credit above it.
+  // further, exactly as the boot credit does.
   if (endTiltCal(false)) return;
   startOrRestart();
 });
@@ -8957,6 +9005,9 @@ function text(str, x, y, size, weight, align, fill) {
    element is missing entirely, which would mean the markup is gone.
    ================================================================== */
 const bootEl = document.getElementById('boot');
+// The lockup inside it, which fades in on its own while the field
+// behind it stays opaque. See syncBoot.
+const bootMark = bootEl ? bootEl.querySelector('svg') : null;
 const creditEl = document.getElementById('credit');
 
 function lockupAspect(el, fallback) {
@@ -12048,8 +12099,13 @@ function audioCrash() {
 /* THE ONLY ASSIGNMENT THAT STARTS IT, and it happens once, at load. There
    is deliberately no function anywhere that sets this to anything other
    than zero, so no run, restart or continue can bring the credit back.
-   See the BOOT_TIME block. */
-let bootFlash = FEEL.BOOT_TIME;
+   See the BOOT_FADE_IN block. */
+/* The three phases added up, in the one place they are ever added up. */
+function bootTotal() {
+  return Math.max(0, FEEL.BOOT_FADE_IN) + Math.max(0, FEEL.BOOT_HOLD)
+       + Math.max(0, FEEL.BOOT_FADE_OUT);
+}
+let bootFlash = bootTotal();
 
 function skipBoot() { bootFlash = 0; endBootChrome(); }
 
@@ -12081,13 +12137,44 @@ function endBootChrome() {
    The element is REMOVED, not faded to transparent, so there is nothing
    left over the game for a stray opacity to bring back. */
 let bootShown = true;
+
+/* IN, HOLD, OUT, read off the ONE countdown rather than off a second
+   clock, so there is still exactly one number that can end the splash
+   and it is still only ever set once and zeroed.
+
+   THE TWO FADES ARE ON DIFFERENT ELEMENTS, and that is not an oddity, it
+   is the whole reason the load is covered:
+
+     IN is the LOCKUP arriving over a field that has been opaque since
+     the first paint. Fading the field in as well would uncover the page
+     while the script is still parsing.
+     OUT is the WHOLE THING leaving, field included, because what is
+     underneath at that point is the title screen and that is what the
+     player should be fading through to.
+
+   The fade in is measured from the start and the fade out from the end,
+   so the hold is simply whatever is between them and needs no arithmetic
+   of its own. Both guard against a zero length phase, because both are
+   tunable and zero is a reasonable thing to want: a fade of nothing
+   should be a hard cut, not a division by nothing. */
+function bootMarkAlpha() {
+  const gone = bootTotal() - bootFlash;           // seconds since it appeared
+  if (!(FEEL.BOOT_FADE_IN > 0)) return 1;
+  return clamp(gone / FEEL.BOOT_FADE_IN, 0, 1);
+}
+
+function bootFieldAlpha() {
+  if (!(FEEL.BOOT_FADE_OUT > 0)) return 1;
+  return clamp(bootFlash / FEEL.BOOT_FADE_OUT, 0, 1);
+}
+
 function syncBoot() {
   if (bootFlash <= 0) {
     if (bootShown) { bootShown = false; bootEl.hidden = true; }
     return;
   }
-  const t = bootFlash / FEEL.BOOT_TIME;
-  bootEl.style.opacity = t < FEEL.BOOT_FADE ? (t / FEEL.BOOT_FADE) : 1;
+  if (bootMark) bootMark.style.opacity = bootMarkAlpha();
+  bootEl.style.opacity = bootFieldAlpha();
 }
 
 let lastTime = 0;
