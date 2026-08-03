@@ -17,9 +17,45 @@
 <meta name="apple-mobile-web-app-title" content="Drift Fever">
 <!-- The Android equivalent, also manifest free. -->
 <meta name="mobile-web-app-capable" content="yes">
-<!-- An empty data URI, so the browser does not go and ask for a favicon.
-     That request would be same origin and harmless, but the rule is zero. -->
-<link rel="icon" href="data:,">
+<!-- THE FAVICON IS THE ARTWORK ITSELF, INLINE, so it still costs zero
+     requests. It used to be an empty data URI, which stopped the browser
+     going and asking for one; this stops it asking AND puts the mark in
+     the tab. Same three draws as everywhere else, in the same order,
+     with the same fill-rule, so the tab and the title screen cannot
+     disagree.
+
+     FULLY URL ENCODED. An SVG data URI carries angle brackets, quotes
+     and a hash in every colour, and a raw hash truncates the href at the
+     fragment. Encoding the lot removes the whole class of argument. It
+     is generated from the same path data as the game by the brand
+     tooling; do not hand edit it. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%22-3%20-50%20264%20264%22%3E%3Cg%20fill-rule%3D%22evenodd%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%2230%22%3E%3Cpath%20transform%3D%22translate%2812%2014%29%22%20fill%3D%22%23a8300a%22%20stroke%3D%22%23a8300a%22%20d%3D%22M86.8%208.2c-0.5%202.2%20-5.3%2020.6%20-14.8%2057.3%20-4.1%2015.6%20-6.0%2023.0%20-17.6%2067.5%20-3.1%2011.8%20-5.9%2022.5%20-6.1%2023.7l-0.5%202.3%2037.3%20-0.0c39.9%20-0.0%2047.5%20-0.6%2063.5%20-5.3%2029.9%20-8.6%2050.8%20-34.4%2059.4%20-73.2%208.3%20-37.5%20-2.0%20-61.2%20-31.0%20-71.3l-7.5%20-2.6%20-41.1%20-0.4%20-41.1%20-0.4%20-0.5%202.4Zm66.7%2034.3c11.3%205.6%2013.1%2024.5%204.6%2049.1%20-7.8%2022.9%20-20.6%2032.4%20-43.6%2032.4%20-13.8%20-0.0%20-13.0%202.2%20-7.0%20-21.1%202.5%20-9.6%207.1%20-27.1%2010.1%20-38.9%203.0%20-11.8%205.7%20-22.1%206.0%20-22.9%200.7%20-2.2%2024.8%20-1.1%2029.9%201.4Z%22%2F%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23ef5a17%22%20d%3D%22M86.8%208.2c-0.5%202.2%20-5.3%2020.6%20-14.8%2057.3%20-4.1%2015.6%20-6.0%2023.0%20-17.6%2067.5%20-3.1%2011.8%20-5.9%2022.5%20-6.1%2023.7l-0.5%202.3%2037.3%20-0.0c39.9%20-0.0%2047.5%20-0.6%2063.5%20-5.3%2029.9%20-8.6%2050.8%20-34.4%2059.4%20-73.2%208.3%20-37.5%20-2.0%20-61.2%20-31.0%20-71.3l-7.5%20-2.6%20-41.1%20-0.4%20-41.1%20-0.4%20-0.5%202.4Zm66.7%2034.3c11.3%205.6%2013.1%2024.5%204.6%2049.1%20-7.8%2022.9%20-20.6%2032.4%20-43.6%2032.4%20-13.8%20-0.0%20-13.0%202.2%20-7.0%20-21.1%202.5%20-9.6%207.1%20-27.1%2010.1%20-38.9%203.0%20-11.8%205.7%20-22.1%206.0%20-22.9%200.7%20-2.2%2024.8%20-1.1%2029.9%201.4Z%22%2F%3E%3Cpath%20fill%3D%22%23fbbf45%22%20d%3D%22M86.8%208.2c-0.5%202.2%20-5.3%2020.6%20-14.8%2057.3%20-4.1%2015.6%20-6.0%2023.0%20-17.6%2067.5%20-3.1%2011.8%20-5.9%2022.5%20-6.1%2023.7l-0.5%202.3%2037.3%20-0.0c39.9%20-0.0%2047.5%20-0.6%2063.5%20-5.3%2029.9%20-8.6%2050.8%20-34.4%2059.4%20-73.2%208.3%20-37.5%20-2.0%20-61.2%20-31.0%20-71.3l-7.5%20-2.6%20-41.1%20-0.4%20-41.1%20-0.4%20-0.5%202.4Zm66.7%2034.3c11.3%205.6%2013.1%2024.5%204.6%2049.1%20-7.8%2022.9%20-20.6%2032.4%20-43.6%2032.4%20-13.8%20-0.0%20-13.0%202.2%20-7.0%20-21.1%202.5%20-9.6%207.1%20-27.1%2010.1%20-38.9%203.0%20-11.8%205.7%20-22.1%206.0%20-22.9%200.7%20-2.2%2024.8%20-1.1%2029.9%201.4Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<!-- The one file iOS will not take as a data URI. Never fetched by the
+     game's own code, so loading and playing is still request free; this
+     is only read when somebody adds the page to their home screen. -->
+<link rel="apple-touch-icon" href="apple-touch-icon-180.png">
+
+<!-- Share previews. Social scrapers do not execute the page and will not
+     render a data URI, so the card has to be a real file, and og:image
+     has to be ABSOLUTE because most scrapers do not resolve a relative
+     one. og-card.png is generated from the same path data as everything
+     above by the brand tooling.
+
+     SITE_URL, in effect, is the four absolute URLs below. It is the
+     GitHub Pages address the game is served from today. If the game ever
+     moves to its own domain, these are the lines to change and they are
+     deliberately together so it is one edit. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://snaphit.github.io/Drift_Fever/">
+<meta property="og:title" content="Drift Fever">
+<meta property="og:description" content="A drift game in one file. Everybody drives the same road today, a new one tomorrow. No downloads, nothing to install.">
+<meta property="og:image" content="https://snaphit.github.io/Drift_Fever/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Drift Fever">
+<meta name="twitter:description" content="A drift game in one file. Everybody drives the same road today, a new one tomorrow. No downloads, nothing to install.">
+<meta name="twitter:image" content="https://snaphit.github.io/Drift_Fever/og-card.png">
 <style>
   html, body {
     margin: 0;
@@ -1243,6 +1279,16 @@ const FEEL = {
      that screen is for. */
   BRAND_DEATH_SIZE:       0.022,     // of the smaller dimension
   BRAND_DEATH_ALPHA:       0.34,
+  /* The mark beside it, set from the credit's own type size rather than
+     from the screen, so shrinking the credit shrinks the pair together.
+     The D is a squarish mark next to a line of caps, so it wants to be
+     taller than the cap height or it reads as a full stop. */
+  BRAND_DEATH_MARK:        1.75,     // of the credit's type size, the D's ink height
+  BRAND_DEATH_GAP:         0.55,     // of the credit's type size, mark to word
+  /* The same mark on the boot credit, over the publisher name. Bigger,
+     because the boot flash is the one moment branding is expected. */
+  BOOT_MARK:               2.10,     // of the boot type size, the D's ink height
+  BOOT_MARK_GAP:           0.55,     // of the boot type size, mark down to word
 
   DEATH_BOTTOM:              96,     // pixels above the safe area, the button's centre
   DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
@@ -2447,6 +2493,207 @@ const COLOUR = {
   TEXT:         '#fff2e2',
   TEXT_SHADOW:  'rgba(24,6,0,0.75)'
 };
+
+/* ==================================================================
+   THE BRAND ARTWORK. PATH DATA, NOT PIXELS.
+
+   THIS IS ARTWORK AND NOT TUNING. Nothing in this block is a feel
+   constant, nothing in it may be cycled by the debug tuner, and none of
+   it is to be edited by hand. The numbers are an artist's, they arrived
+   as SVG, and the only correct way to change them is to replace them
+   wholesale from a new export. That is why they sit here beside the
+   palette rather than in FEEL.
+
+   WHY PATH DATA AND NOT AN IMAGE. Section 6's rule is zero external
+   requests and section 1's is one self contained file, and a logo is
+   exactly the thing that usually breaks both. Path2D takes an SVG d
+   string straight from a constructor, so there is no Image(), no data
+   URI to decode, no onload to wait for and nothing for a content filter
+   to block. The mark draws in the same pass as everything else.
+
+   THE THREE DRAWS, IN THIS ORDER, OFF THE ONE PATH:
+
+     1. THE SHADOW, offset by dx, dy, then FILLED AND STROKED in the
+        shadow colour. Both, not just filled: the stroke is what makes
+        the shadow the same silhouette as the mark above it rather than
+        a thinner copy peeking out from behind it.
+     2. THE OUTLINE, stroked only.
+     3. THE FACE, filled.
+
+   EVENODD ON EVERY FILL. The default nonzero rule fills the counters of
+   the D, the R and the E solid, because the counters are wound the same
+   way as the outsides. There is no version of this that looks nearly
+   right with the wrong rule; it is either evenodd or the letters have no
+   holes in them.
+
+   THE COLOURS ARE NOT PALETTE AND DO NOT ROTATE. Every other colour in
+   this game is swapped at a gate by applyBiome, which copies a biome's
+   keys over COLOUR. These three deliberately live HERE and not in
+   COLOUR, so no hue rotation can reach them. A brand mark that changes
+   colour with the scenery is not a brand mark.
+
+   SCALE IS APPLIED TO THE WHOLE CONTEXT, which is what keeps the
+   treatment intact at any size. The stroke width and the shadow offset
+   are in the path's own coordinate space, so scaling the transform
+   scales them with the drawing for free. A fixed pixel stroke would
+   swallow the counters at icon size and vanish at wordmark size.
+   ================================================================== */
+const BRAND = {
+  SHADOW:  '#a8300a',
+  OUTLINE: '#ef5a17',
+  FILL:    '#fbbf45',
+  wordmark: {
+    /* DRIFT over FEVER, two lines, a shade under two to one. */
+    x: -52.1, y: -53.1, w: 920.2, h: 475.2,
+    ink: { l: 0.0500, r: 0.9615, t: 0.0978, b: 0.9320 },
+    dx: 11, dy: 13, stroke: 24,
+    d: 'M86.8 8.2c-0.5 2.2 -5.3 20.6 -14.8 57.3 -4.1 15.6 -6.0 23.0 -17.6 67.5 -3.1 11.8 -5.9 22.5 -6.1 23.7l-0.5 2.3 37.3 -0.0c39.9 -0.0 47.5 -0.6 63.5 -5.3 29.9 -8.6 50.8 -34.4 59.4 -73.2 8.3 -37.5 -2.0 -61.2 -31.0 -71.3l-7.5 -2.6 -41.1 -0.4 -41.1 -0.4 -0.5 2.4Zm66.7 34.3c11.3 5.6 13.1 24.5 4.6 49.1 -7.8 22.9 -20.6 32.4 -43.6 32.4 -13.8 -0.0 -13.0 2.2 -7.0 -21.1 2.5 -9.6 7.1 -27.1 10.1 -38.9 3.0 -11.8 5.7 -22.1 6.0 -22.9 0.7 -2.2 24.8 -1.1 29.9 1.4ZM270.6 7.2c-0.2 0.7 -1.6 6.0 -3.1 11.8 -1.5 5.8 -3.5 13.4 -4.5 17.0 -1.0 3.6 -4.4 16.6 -7.5 29.0 -5.3 20.7 -8.6 33.4 -18.1 70.0 -1.9 7.4 -3.9 14.5 -4.5 15.8 -0.5 1.3 -0.9 3.6 -0.9 5.2l0.0 3.0 22.0 -0.0c22.0 -0.0 22.1 -0.0 22.9 -2.3 0.4 -1.2 3.7 -13.6 7.2 -27.5l6.3 -25.2 7.8 -0.0c6.4 -0.0 7.7 0.3 8.2 1.7 0.2 1.0 2.5 11.5 5.1 23.3 2.5 11.8 5.0 23.4 5.7 25.7l1.1 4.3 23.8 -0.0c13.2 -0.0 23.9 -0.4 23.9 -0.8 0.0 -0.4 -0.7 -3.5 -1.6 -6.7 -5.1 -19.8 -13.4 -53.0 -13.4 -53.9 0.0 -0.6 2.8 -2.4 6.2 -4.0 28.6 -13.6 40.5 -58.6 20.2 -76.5 -4.9 -4.3 -9.3 -6.6 -16.9 -8.9 -7.1 -2.1 -89.3 -3.1 -89.9 -1.0Zm62.9 32.2c12.3 3.7 10.6 22.8 -2.8 29.8 -4.1 2.2 -31.7 4.2 -31.7 2.3 0.0 -1.2 8.0 -31.7 8.6 -32.6 0.8 -1.3 21.3 -0.9 25.9 0.5ZM445.5 6.8c-0.6 1.0 -3.9 13.1 -9.6 35.2 -2.3 8.5 -5.9 22.2 -8.0 30.5 -14.6 54.9 -21.9 83.4 -22.0 85.2 0.0 2.3 44.6 1.8 45.3 -0.5 1.7 -6.1 12.2 -46.3 20.2 -77.7 3.1 -12.1 7.0 -27.2 8.6 -33.5 8.0 -30.3 9.9 -38.0 9.9 -39.0 0.0 -1.2 -43.6 -1.4 -44.4 -0.2ZM538.4 7.2c-0.2 0.7 -0.9 3.1 -1.4 5.3 -0.5 2.2 -4.1 16.4 -8.1 31.5 -3.9 15.1 -9.8 37.6 -12.9 50.0 -3.2 12.4 -8.1 31.4 -11.0 42.3 -2.8 11.0 -5.1 20.5 -5.1 21.3 0.0 1.2 3.7 1.4 22.0 1.4l22.0 -0.0 1.0 -2.6c0.6 -1.4 4.1 -14.6 7.8 -29.2l6.8 -26.7 26.6 -0.5c14.7 -0.3 26.9 -0.7 27.1 -1.0 0.7 -0.7 7.7 -27.5 7.7 -29.4 0.0 -1.4 -2.9 -1.6 -25.7 -1.8l-25.8 -0.3 -0.3 -2.5c-0.1 -1.4 1.2 -7.7 3.0 -14.0l3.3 -11.5 31.2 -0.3 31.2 -0.2 1.1 -4.3c0.6 -2.3 2.4 -9.0 4.1 -14.9 1.6 -5.9 2.9 -11.4 2.9 -12.3 0.0 -2.1 -106.8 -2.3 -107.5 -0.3ZM679.0 22.7c-2.2 9.2 -3.9 17.0 -3.6 17.5 0.3 0.4 9.3 0.8 20.1 0.8l19.5 -0.0 -0.4 2.7c-0.6 3.6 -15.1 60.0 -21.3 82.8 -1.4 4.9 -3.6 13.5 -4.9 19.0 -1.4 5.5 -2.8 10.8 -3.1 11.7 -0.7 1.7 0.8 1.8 22.1 1.8l22.9 -0.0 4.4 -16.8c7.2 -27.7 12.6 -48.5 18.6 -71.7 3.1 -12.1 6.1 -23.7 6.6 -25.8l1.0 -3.7 20.0 -0.0 19.9 -0.0 1.1 -2.7c1.4 -3.7 7.9 -29.1 7.9 -30.9 0.0 -1.2 -8.7 -1.4 -63.3 -1.4l-63.3 -0.0 -4.2 16.7ZM273.8 222.7c-3.4 0.4 -3.7 0.6 -3.3 3.1 0.3 1.5 1.4 14.4 2.5 28.7 1.1 14.3 2.4 31.2 3.0 37.5 0.6 6.3 2.1 24.7 3.5 40.8 1.3 16.1 2.7 29.7 3.0 30.2 0.4 0.6 9.9 1.0 23.9 1.0l23.3 -0.0 13.3 -23.8c14.8 -26.2 43.2 -76.9 47.5 -84.7 1.5 -2.8 4.2 -7.5 6.0 -10.5 4.8 -8.2 11.5 -20.7 11.5 -21.4 0.0 -0.3 -9.8 -0.5 -21.7 -0.4l-21.8 0.3 -16.7 33.0c-9.3 18.1 -19.8 39.2 -23.5 46.7 -3.6 7.6 -6.9 13.8 -7.3 13.8 -0.4 -0.0 -1.0 -12.7 -1.3 -28.3 -0.4 -15.5 -1.0 -36.6 -1.4 -47.0l-0.6 -18.7 -12.2 -0.0c-6.7 -0.0 -14.9 -0.2 -18.1 -0.4 -3.2 -0.2 -7.6 -0.2 -9.6 0.1ZM419.2 223.5c-0.4 0.5 -1.9 5.5 -3.3 11.0 -1.5 5.5 -3.6 13.6 -4.8 18.0 -1.2 4.4 -4.7 17.7 -7.7 29.5 -3.0 11.8 -6.4 24.4 -7.4 28.0 -1.7 5.9 -11.2 42.0 -13.0 49.7 -0.4 1.8 -0.5 3.4 -0.2 3.7 1.3 1.3 105.3 0.6 105.6 -0.7 2.4 -7.8 7.6 -28.0 7.6 -29.2 0.0 -1.3 -3.7 -1.5 -31.5 -1.5 -17.3 -0.0 -31.5 -0.2 -31.5 -0.5 0.0 -0.3 1.4 -6.2 3.2 -13.0l3.1 -12.5 25.9 -0.0c14.2 -0.0 25.8 -0.1 25.8 -0.3 0.0 -0.1 1.6 -6.4 3.5 -14.0 1.9 -7.6 3.5 -14.2 3.5 -14.7 0.0 -0.6 -9.5 -1.0 -24.8 -1.0 -13.7 -0.0 -25.1 -0.2 -25.4 -0.5 -0.3 -0.3 0.3 -3.6 1.4 -7.3 1.0 -3.7 2.3 -8.4 2.9 -10.5l1.0 -3.7 29.9 -0.0c27.6 -0.0 29.9 -0.1 30.4 -1.8 3.3 -11.5 7.7 -28.5 7.4 -28.8 -1.0 -0.9 -101.0 -0.8 -101.6 0.1ZM42.5 224.2c-0.7 2.2 -9.5 35.7 -13.2 49.8 -1.9 7.4 -5.5 20.9 -7.9 30.0 -2.5 9.1 -6.3 23.2 -8.4 31.5 -2.1 8.2 -4.6 17.7 -5.5 20.9 -0.8 3.3 -1.2 6.3 -0.7 6.8 0.5 0.5 10.0 0.7 21.3 0.6l20.4 -0.3 5.6 -22.0c3.1 -12.1 6.2 -24.3 7.0 -27.0l1.5 -5.0 26.1 -0.3 26.1 -0.2 3.1 -13.3c1.8 -7.2 3.4 -14.0 3.7 -14.9 0.5 -1.6 -1.3 -1.8 -25.3 -2.0 -22.3 -0.3 -25.8 -0.5 -25.5 -1.8 0.1 -0.8 1.5 -6.2 3.0 -12.0l2.8 -10.5 30.5 -0.3 30.5 -0.2 3.7 -13.9c2.0 -7.6 3.7 -14.5 3.7 -15.4 0.0 -2.2 -101.8 -2.6 -102.5 -0.5ZM160.5 224.2c-0.5 1.5 -7.2 26.5 -12.4 46.8 -4.2 16.1 -14.0 53.4 -20.0 76.5 -2.2 8.2 -3.7 15.3 -3.2 15.8 0.4 0.4 24.1 0.6 52.7 0.5l51.9 -0.3 1.2 -3.8c1.4 -4.2 7.3 -26.2 7.3 -27.1 0.0 -0.3 -14.2 -0.6 -31.6 -0.6l-31.6 -0.0 0.7 -3.8c0.3 -2.0 1.5 -6.6 2.5 -10.2 1.0 -3.6 2.1 -7.7 2.4 -9.3l0.6 -2.7 25.6 -0.0c20.7 -0.0 25.6 -0.3 26.0 -1.4 1.6 -4.2 7.2 -27.1 6.8 -27.8 -0.3 -0.4 -11.5 -0.8 -24.9 -0.8 -13.4 -0.0 -24.6 -0.3 -24.9 -0.8 -0.2 -0.4 0.8 -5.2 2.3 -10.7l2.6 -10.0 30.3 -0.3c16.6 -0.1 30.2 -0.4 30.2 -0.7 0.0 -0.4 6.4 -24.7 7.6 -28.8 0.7 -2.2 -101.3 -2.7 -102.1 -0.5ZM539.1 226.7c-7.3 27.7 -12.0 45.7 -15.7 59.8 -8.6 33.5 -14.3 55.2 -16.8 64.5 -3.9 14.4 -6.0 13.0 18.4 13.0l20.9 -0.0 1.0 -3.8c0.6 -2.0 3.3 -12.7 6.1 -23.7 2.8 -11.0 5.3 -20.8 5.6 -21.8 0.4 -1.4 1.8 -1.7 7.8 -1.7l7.2 -0.0 5.0 25.3 5.0 25.2 21.7 0.3c18.0 0.2 21.8 -0.0 22.3 -1.2 0.4 -1.1 -7.2 -34.6 -11.6 -50.7 -1.5 -5.5 -1.5 -5.6 5.6 -8.9 30.7 -14.7 37.6 -62.8 10.9 -75.5 -8.4 -3.9 -14.4 -4.4 -54.2 -4.5l-38.2 -0.0 -1.0 3.7Zm62.0 28.6c6.2 4.1 6.3 13.5 0.3 20.7 -4.5 5.3 -7.6 6.3 -21.7 6.8l-12.8 0.5 0.7 -2.9c0.8 -3.4 6.3 -24.4 6.9 -26.2 0.9 -2.5 22.6 -1.6 26.6 1.1Z'
+  },
+  icon: {
+    /* One heavy italic D, which is the wordmark's own first
+       letter and therefore cannot drift away from it. */
+    x: -3.0, y: -50.0, w: 264.0, h: 264.0,
+    ink: { l: 0.1350, r: 0.9125, t: 0.1525, b: 0.9025 },
+    dx: 12, dy: 14, stroke: 30,
+    d: 'M86.8 8.2c-0.5 2.2 -5.3 20.6 -14.8 57.3 -4.1 15.6 -6.0 23.0 -17.6 67.5 -3.1 11.8 -5.9 22.5 -6.1 23.7l-0.5 2.3 37.3 -0.0c39.9 -0.0 47.5 -0.6 63.5 -5.3 29.9 -8.6 50.8 -34.4 59.4 -73.2 8.3 -37.5 -2.0 -61.2 -31.0 -71.3l-7.5 -2.6 -41.1 -0.4 -41.1 -0.4 -0.5 2.4Zm66.7 34.3c11.3 5.6 13.1 24.5 4.6 49.1 -7.8 22.9 -20.6 32.4 -43.6 32.4 -13.8 -0.0 -13.0 2.2 -7.0 -21.1 2.5 -9.6 7.1 -27.1 10.1 -38.9 3.0 -11.8 5.7 -22.1 6.0 -22.9 0.7 -2.2 24.8 -1.1 29.9 1.4Z'
+  }
+};
+
+/* Built once, at load, because a Path2D constructed per frame would be a
+   parse of five kilobytes of d string sixty times a second.
+
+   The try/catch is not decoration. Path2D has been everywhere since 2014
+   and section 6's Chromebooks are far newer than that, but a title screen
+   with no heading on it would be a bad way to find out otherwise. A null
+   path makes drawBrand a no op and the callers fall back to type. */
+function brandPath(art) {
+  try { return new Path2D(art.d); } catch (e) { return null; }
+}
+BRAND.wordmark.path = brandPath(BRAND.wordmark);
+BRAND.icon.path = brandPath(BRAND.icon);
+function brandReady() { return !!(BRAND.wordmark.path && BRAND.icon.path); }
+
+/* Draws one mark centred on cx, cy at the given width, and returns the
+   height it took, so a caller can lay out under it without duplicating
+   the aspect ratio. Nothing about the treatment is exposed: a caller
+   picks a position and a width and gets the mark, which is the whole
+   point of it being brand rather than art direction. */
+function drawBrand(g, art, cx, cy, width, alpha) {
+  if (!art.path || !(width > 0)) return 0;
+  const k = width / art.w;
+  const height = art.h * k;
+  g.save();
+  if (alpha !== undefined) g.globalAlpha = alpha;
+  // Into the artwork's own coordinate space, viewBox origin included, so
+  // everything below is written in the numbers the export used.
+  g.translate(cx - width / 2, cy - height / 2);
+  g.scale(k, k);
+  g.translate(-art.x, -art.y);
+  g.lineJoin = 'round';
+  g.lineCap = 'round';
+  g.lineWidth = art.stroke;
+
+  g.save();
+  g.translate(art.dx, art.dy);
+  g.fillStyle = BRAND.SHADOW;
+  g.strokeStyle = BRAND.SHADOW;
+  g.fill(art.path, 'evenodd');
+  g.stroke(art.path);
+  g.restore();
+
+  g.strokeStyle = BRAND.OUTLINE;
+  g.stroke(art.path);
+
+  g.fillStyle = BRAND.FILL;
+  g.fill(art.path, 'evenodd');
+  g.restore();
+  return height;
+}
+
+/* ------------------------------------------------------------------
+   LAYING OUT BY THE INK RATHER THAN BY THE BOX.
+
+   Both viewBoxes carry a margin, and neither margin is symmetrical: the
+   export sized them to hold the stroke AND the offset shadow, so there
+   is more room on the right and underneath than on the left and above.
+   Centring the BOX therefore leaves the letters visibly off centre, and
+   asking for a box width gives a mark noticeably smaller than the number
+   asked for.
+
+   These four shares per mark are MEASURED off a real render at 520 and
+   400 pixels wide, not derived from the d string, because the d string
+   is relative and says nothing about where the stroke and the shadow
+   land. Re measure them if the artwork is ever replaced.
+   ------------------------------------------------------------------ */
+function brandInkAspect(art) {
+  return (art.w * (art.ink.r - art.ink.l)) / (art.h * (art.ink.b - art.ink.t));
+}
+
+/* ------------------------------------------------------------------
+   DRAWN ONCE PER SIZE, NOT ONCE PER FRAME.
+
+   The treatment is four fills and strokes of a five kilobyte path, and
+   MEASURED on the title screen that came to 1.66ms a frame on a machine
+   far quicker than section 6's Chromebooks. The title screen was already
+   the most expensive screen in the game because it draws the whole road
+   behind a stationary car, so adding a seventh of a frame to it for a
+   mark that never moves is exactly the thing that turns a 60fps target
+   into a 40fps one on the hardware that matters.
+
+   So each mark is rasterised into its own offscreen canvas the first
+   time a size is asked for and blitted after that. The key is the box
+   width in DEVICE pixels, so a rotation or a resize rebuilds it and
+   nothing else does. Two canvases, a few hundred kilobytes between them
+   at the largest size either is ever drawn.
+
+   THE DESTINATION IS SNAPPED TO WHOLE DEVICE PIXELS. Blitting a bitmap
+   to a fractional offset resamples it, and on a mark with a one pixel
+   outline at icon size that reads as a smear. Snapping costs at most
+   half a device pixel of position on a thing that is centred by eye
+   anyway.
+   ------------------------------------------------------------------ */
+function brandBitmap(art, boxW, boxH, dpr) {
+  const pw = Math.max(1, Math.round(boxW * dpr));
+  const ph = Math.max(1, Math.round(boxH * dpr));
+  const key = pw + 'x' + ph;
+  if (art.cacheKey === key && art.cache) return art.cache;
+  let c = art.cache;
+  if (!c) { c = document.createElement('canvas'); art.cache = c; }
+  c.width = pw;
+  c.height = ph;
+  const g = c.getContext('2d');
+  if (!g) { art.cache = null; return null; }
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, pw, ph);
+  drawBrand(g, art, pw / 2, ph / 2, pw);
+  art.cacheKey = key;
+  return c;
+}
+
+/* Centres the INK on cx, cy at the given ink width, and returns the ink
+   height so callers can stack under it. */
+function drawBrandInk(art, cx, cy, inkWidth, alpha) {
+  const boxW = inkWidth / (art.ink.r - art.ink.l);
+  const boxH = boxW * art.h / art.w;
+  const inkH = boxH * (art.ink.b - art.ink.t);
+  if (!art.path || !(boxW > 0)) return inkH;
+  // Where the ink's own centre sits inside the box, as a share, so the
+  // box is pushed the other way by exactly the asymmetry.
+  const bcx = cx - ((art.ink.l + art.ink.r) / 2 - 0.5) * boxW;
+  const bcy = cy - ((art.ink.t + art.ink.b) / 2 - 0.5) * boxH;
+  const dpr = view.dpr || 1;
+  const bmp = brandBitmap(art, boxW, boxH, dpr);
+  if (!bmp) { drawBrand(ctx, art, bcx, bcy, boxW, alpha); return inkH; }
+  ctx.save();
+  if (alpha !== undefined) ctx.globalAlpha = alpha;
+  ctx.drawImage(bmp,
+                Math.round((bcx - boxW / 2) * dpr) / dpr,
+                Math.round((bcy - boxH / 2) * dpr) / dpr,
+                bmp.width / dpr, bmp.height / dpr);
+  ctx.restore();
+  return inkH;
+}
+
 
 /* ------------------------------------------------------------------
    Colour ramps, precomputed.
@@ -8450,6 +8697,35 @@ function text(str, x, y, size, weight, align, fill) {
   ctx.fillText(str, x, y);
 }
 
+/* ------------------------------------------------------------------
+   THE PUBLISHER CREDIT, with the game's own mark beside it.
+
+   Small and quiet, and the mark does not change that: it is drawn at the
+   credit's own alpha and at a height set from the credit's own type
+   size, so making the credit smaller makes the mark smaller and there is
+   no second number to keep in step. The pair is centred as a unit, which
+   is why the word is measured before anything is drawn.
+
+   NEVER IN THE HUD. This is an end of run screen only. A logo sitting on
+   the road while somebody is driving is the exact opposite of section
+   7's argument that the road edge owns the top of the value range.
+   ------------------------------------------------------------------ */
+function drawCredit(w, s, cy) {
+  const size = Math.round(s * FEEL.BRAND_DEATH_SIZE);
+  const markH = size * FEEL.BRAND_DEATH_MARK;
+  const markW = markH * brandInkAspect(BRAND.icon);
+  const gap = size * FEEL.BRAND_DEATH_GAP;
+  ctx.font = '700 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const tw = ctx.measureText('SNAPHIT').width;
+  const showMark = brandReady();
+  const total = (showMark ? markW + gap : 0) + tw;
+  const left = w / 2 - total / 2;
+  if (showMark) drawBrandInk(BRAND.icon, left + markW / 2, cy, markW, FEEL.BRAND_DEATH_ALPHA);
+  ctx.globalAlpha = FEEL.BRAND_DEATH_ALPHA;
+  text('SNAPHIT', left + total - tw / 2, cy, size, '700');
+  ctx.globalAlpha = 1;
+}
+
 /* The size that makes a string fill a share of the width and no more,
    so the game's own name cannot clip off the side of a narrow handset. */
 function fittedSize(str, weight, want, maxWidth) {
@@ -8736,9 +9012,7 @@ function drawResult(w, h) {
      run figures. Low alpha and a third of the size of anything around it,
      because the score, the records and the continue button are what this
      screen is for and none of them may be crowded by it. */
-  ctx.globalAlpha = FEEL.BRAND_DEATH_ALPHA;
-  text('SNAPHIT', w / 2, y0 + s * 0.169, Math.round(s * FEEL.BRAND_DEATH_SIZE), '700');
-  ctx.globalAlpha = 1;
+  drawCredit(w, s, y0 + s * 0.169);
 
   /* The run in figures on one line. Cheap, and it turns a number into a
      story: how far, how sideways, how many gates, and on a continued run
@@ -8904,9 +9178,7 @@ function drawFinish(w, h) {
   arcadeNumber(String(shown), w / 2, y0 + s * 0.168, Math.round(s * 0.108),
                finishRecord ? COLOUR.SCORE_BEST : COLOUR.SCORE);
 
-  ctx.globalAlpha = FEEL.BRAND_DEATH_ALPHA;
-  text('SNAPHIT', w / 2, y0 + s * 0.238, Math.round(s * FEEL.BRAND_DEATH_SIZE), '700');
-  ctx.globalAlpha = 1;
+  drawCredit(w, s, y0 + s * 0.238);
 
   /* The run in figures. TIME is what the ghost is raced against, so the
      margin against it sits directly under the time rather than in a
@@ -9216,17 +9488,57 @@ function drawOverlay(w, h) {
        the second form lets a low ceiling win outright and clipped the
        top of the title off in landscape, where h and s are the same
        number and the ceiling is at its tightest. */
-    const y0 = Math.max(s * 0.082, Math.min(h * 0.11, h * 0.5 - s * 0.44));
-    const title = 'DRIFT FEVER';
-    text(title, w / 2, y0,
-         fittedSize(title, '800', Math.round(s * 0.115), w * 0.88), '800');
-    text('hold left or right to steer', w / 2, y0 + s * 0.105,
+    /* ----------------------------------------------------------------
+       THE WORDMARK, AND THE ONE PLACE THE TWO ORIENTATIONS GENUINELY
+       DISAGREE.
+
+       It is two stacked lines at roughly two to one, so it is TALL in a
+       way a single line of type never was, and height is exactly what
+       landscape does not have. Sizing it as a share of the width alone
+       gives a mark that is right in portrait and taller than the whole
+       screen in landscape.
+
+       So it is sized by BOTH and the smaller wins: a share of the width,
+       which is what "close to full width" means and what portrait is
+       governed by, capped by whatever height is left once the stack
+       below it and the bottom row have taken theirs, which is what
+       governs landscape. Neither number is orientation aware; the
+       geometry does the choosing.
+
+       The rest of the stack keeps EXACTLY the spacing it had, measured
+       from the first line under the mark rather than from the heading's
+       centre, so nothing below this moved. Every offset below is the old
+       one minus the 0.105 that used to sit between the heading and the
+       first line.
+       ---------------------------------------------------------------- */
+    const stackBelow = s * 0.273;              // the hint down to the standing line
+    const wmGap = s * 0.055;                   // air under the mark
+    const wmTop = Math.max(safeTop + s * 0.030, h * 0.055);
+    // The top of the RANDOM TRACK button, which the stack must not reach.
+    const wmFloor = h - safeBottom - FEEL.DEATH_BOTTOM - s * 0.092;
+    const wmMaxH = Math.max(s * 0.15,
+                            wmFloor - wmTop - wmGap - stackBelow - s * 0.030);
+    const wmW = Math.min(w * 0.88, wmMaxH * brandInkAspect(BRAND.wordmark));
+    let y0;
+    if (brandReady()) {
+      const wmH = drawBrandInk(BRAND.wordmark, w / 2, wmTop + (wmW / brandInkAspect(BRAND.wordmark)) / 2, wmW);
+      y0 = wmTop + wmH + wmGap;
+    } else {
+      // Path2D missing, which should never happen. Type, so the screen
+      // still has a heading rather than a hole where one was.
+      const title = 'DRIFT FEVER';
+      const cy = wmTop + s * 0.06;
+      text(title, w / 2, cy,
+           fittedSize(title, '800', Math.round(s * 0.115), w * 0.88), '800');
+      y0 = cy + s * 0.105;
+    }
+    text('hold left or right to steer', w / 2, y0,
          Math.round(s * 0.038), '600');
 
     /* The identity and the clock, on one line because they are one
        thought: this is which track, and this is how long it is yours. */
     const ident = 'TRACK #' + trackNumber(todayStamp) + '      NEW TRACK IN ' + countdownLabel();
-    text(ident, w / 2, y0 + s * 0.152,
+    text(ident, w / 2, y0 + s * 0.047,
          fittedSize(ident, '700', Math.round(s * 0.030), w * 0.9), '700',
          'center', COLOUR.GATE);
 
@@ -9234,7 +9546,7 @@ function drawOverlay(w, h) {
        already wears everywhere else in the game. Tapping anywhere does
        the same thing, so this is not the only way in; it is the thing
        that says what the tap will do. */
-    canvasButton(dailyRect, "PLAY TODAY'S TRACK", w / 2, y0 + s * 0.240,
+    canvasButton(dailyRect, "PLAY TODAY'S TRACK", w / 2, y0 + s * 0.135,
                  Math.round(s * 0.046), COLOUR.GATE, w);
 
     /* ONE LINE, and it was two. Landscape is the shortest screen this
@@ -9245,14 +9557,14 @@ function drawOverlay(w, h) {
     ctx.globalAlpha = 0.70;
     const pitch = 'one road for everyone today, a new one tomorrow, compare with anyone'
                 + (hasKeyboard ? '     press T' : '');
-    text(pitch, w / 2, y0 + s * 0.315,
+    text(pitch, w / 2, y0 + s * 0.210,
          fittedSize(pitch, '700', Math.round(s * 0.029), w * 0.94), '700');
     ctx.globalAlpha = 1;
 
     const standing = dailyStateLine();
     if (standing) {
       ctx.globalAlpha = 0.8;
-      text(standing, w / 2, y0 + s * 0.358,
+      text(standing, w / 2, y0 + s * 0.253,
            fittedSize(standing, '700', Math.round(s * 0.030), w * 0.92), '700',
            'center', COLOUR.GATE);
       ctx.globalAlpha = 1;
@@ -11407,6 +11719,22 @@ function drawBoot(w, h) {
   ctx.textBaseline = 'middle';
   ctx.lineJoin = 'round';
   ctx.lineWidth = Math.max(3, size * 0.14);
+
+  /* THE MARK ABOVE THE NAME, which is the arcade order: the game first
+     and the company that made it underneath. The pair is centred as a
+     unit on the middle of the screen, so adding the mark did not move
+     the credit off centre, it moved the whole thing up by half a mark.
+
+     Drawn at the same fading alpha as the word, which is why the fade
+     is computed before either of them and not per element. */
+  const markH = brandReady() ? size * FEEL.BOOT_MARK : 0;
+  const markGap = markH > 0 ? size * FEEL.BOOT_MARK_GAP : 0;
+  const wordCy = h * 0.5 + (markH + markGap) / 2;
+  if (markH > 0) {
+    drawBrandInk(BRAND.icon, w / 2, wordCy - size / 2 - markGap - markH / 2,
+                 markH * brandInkAspect(BRAND.icon), ctx.globalAlpha);
+  }
+
   // Letter spaced by hand, because canvas has no letterSpacing everywhere
   // and a manufacturer credit wants the air.
   let total = -track;
@@ -11415,9 +11743,9 @@ function drawBoot(w, h) {
   for (let i = 0; i < word.length; i++) {
     const cw = ctx.measureText(word[i]).width;
     ctx.strokeStyle = COLOUR.SCORE_EDGE;
-    ctx.strokeText(word[i], x + cw / 2, h * 0.5);
+    ctx.strokeText(word[i], x + cw / 2, wordCy);
     ctx.fillStyle = COLOUR.SCORE;
-    ctx.fillText(word[i], x + cw / 2, h * 0.5);
+    ctx.fillText(word[i], x + cw / 2, wordCy);
     x += cw + track;
   }
   ctx.globalAlpha = 1;
