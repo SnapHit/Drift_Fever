@@ -834,6 +834,63 @@ const FEEL = {
   HEAT_PULSE_DEPTH:        0.35,     // LIVE, how much of the glow the trough takes
   HEAT_SKYLINE_LIFT:       0.70,     // LIVE, how far the roof lights run toward the biome's own hot hue
   HEAT_SKYLINE_THICK:       2.6,     // extra pixels on the lit roof line
+
+  /* ----------------------------------------------------------------
+     THE CITY LIGHTS UP AS YOU DRIFT.
+
+     The roof line already came up with the multiplier. This takes it down
+     into the buildings: windows, lit in the track's own colour, more of
+     them as the drift goes deeper and longer.
+
+     WHY THIS IS THE ONE PLACE IT CAN BE LOUD. The far background is the
+     only part of the screen with no readability cost. The road edge, the
+     surface, the void and the hazards all carry meaning the player needs;
+     the skyline sits below the horizon, behind everything, and carries
+     none. So it can take the whole reaction that the road itself must
+     not. The hard rule still binds absolutely: the edge stays the
+     brightest and most readable thing on screen, and if a lit window ever
+     approaches it the alpha comes down, not the edge up.
+
+     DRIVEN BY WHAT THE PLAYER IS DOING NOW, not by the multiplier. The
+     multiplier is a decaying number with an edge term in it, so a tidy
+     drift down the middle moves it not at all and a lapse takes seconds
+     to show. Slip depth says how tight the drift is and the chain says
+     how long it has been going, and those two are exactly the question
+     "how well am I drifting right now".
+
+     PROGRESSIVE, NOT UNIFORM. Every window carries a fixed threshold and
+     lights when the glow passes it, so raising the glow turns more
+     windows ON rather than turning every window UP. The thresholds are
+     clustered per building, so the city wakes up block by block rather
+     than as a uniform speckle, which is the whole reason this reads as a
+     city rather than as a brightness slider. */
+  CITY_ALPHA:              0.62,     // LIVE, the lit window at full glow
+  /* THE CHAIN IS THE LONG TERM AND SLIP IS THE TIGHT TERM, in that order,
+     and the order matters. The chain only accrues while the car is above
+     CHAIN_MIN_SLIP, so a non zero chain already means "this player is
+     drifting" and the chain length already means "and has been for a
+     while". Slip depth then decides how hard it burns on top of that.
+
+     Both numbers come off measurement rather than taste. Over 3595 frames
+     of drifting: slip sits at 0.70 at the lower quartile, 0.74 at the
+     median and 1.00 from the upper quartile up, so it is high whenever it
+     is anything at all and a power above 1 on it just throws the low end
+     away. Chain length sits at 5 links at the median, 10 at the ninetieth
+     and 15 at the ninety ninth, so a full mark of 26 was far past
+     anywhere real play ever reaches: the first version peaked at a glow of
+     0.20 in play, which is forty windows out of three hundred and sixty.
+
+     Measured at these values over 9056 frames of play: the median frame
+     lights 80 windows of 360, the upper quartile 227, and the top tenth
+     the whole city. Ordinary drifting wakes a corner of it, a strong
+     chain wakes all of it, and the difference is visible. */
+  CITY_SLIP_POWER:          1.0,     // LIVE, how sharply depth counts
+  CITY_SLIP_BASE:          0.55,     // LIVE, the share a chain lights at shallow slip
+  CITY_CHAIN_FULL:           12,     // LIVE, links at which the chain term is full
+  CITY_RISE_TIME:          0.30,     // seconds, so it comes up with the drift
+  CITY_FADE_TIME:          2.10,     // LIVE, and much slower, so the city cools rather than switching off
+  CITY_WINDOW_FILL:        0.46,     // of the cell, so windows are small and regular
+  CITY_MIN_BUILDING_PX:       9,     // shorter than this and a window is not worth drawing
   HEAT_HORIZON:            0.55,     // LIVE, a second pass of the horizon band at this alpha
   HEAT_MUSIC:              0.85,     // LIVE, how much of the music's heat the multiplier may drive
 
@@ -951,6 +1008,31 @@ const FEEL = {
      chain visibly worth more than a short one. */
   DRIFT_TIER_LINKS:  [1, 2, 4, 7, 11, 16, 22],
   DRIFT_TIER_GROWTH:       0.12,     // LIVE, size added per tier, of the base size
+  /* PAST THE TOP OF THE LADDER THE PRAISE MUST NOT STOP, and this is the
+     constant that stops it stopping.
+
+     Measured over a forty second run: the chain never broke once, reached
+     56 links, hit the top tier at 18 seconds, and after that the only
+     drift callout left was the occasional perfect entry. Thirteen
+     callouts in the first thirty seconds and two in the next ten. The
+     better the driving, the quieter it went, which is exactly backwards
+     and is the same failure the Beakdown spec records for escalation
+     freezing at wave 32: anything gated on a new maximum goes silent as
+     soon as the player is good.
+
+     A tier IS a maximum, per chain. The tier reset on a chain break was
+     already correct and was not the cause. The cause was that a good
+     driver's chain does not break, so the ladder ran out underneath a
+     chain that was still going. Past the last threshold the top rung
+     therefore repeats every this many further links, carrying the count,
+     so a chain that keeps going keeps being acknowledged. */
+  DRIFT_TOP_REPEAT:           8,     // LIVE, links between repeats past the top rung
+  /* A chain that beats anything else this run is a separate, louder
+     event in the OTHER lane. It is not allowed to be the gate on ordinary
+     praise, which is what created the silence in the first place: it sits
+     beside the normal ladder rather than in front of it, and it fires at
+     most once per chain. */
+  DRIFT_BEST_MIN:            12,     // LIVE, links before a run best is worth announcing
   /* The blip itself. Quiet: it fires about once a second through a good
      stretch of driving, so it has to sit under the tyres rather than over
      them, and a short decay keeps it a tick rather than a tone. */
@@ -1738,6 +1820,14 @@ const COLOUR = {
   PYLON_GLOW:   '224,104,40',
   SKYLINE:      '#170906',
   SKYLINE_TOP:  '#66200c',
+  /* The lit windows, and this one deliberately does NOT change with the
+     biome the way SKYLINE and SKYLINE_TOP do. It is the ROAD EDGE's own
+     amber, because the city is being lit by the driving rather than by
+     the place: the same fire that runs down the verges is what comes on
+     out there. It reads against all four biome silhouettes, which are all
+     very dark, and it ties the far background to the track instead of
+     giving it a fifth colour family of its own. */
+  SKYLINE_WINDOW: '#ffb03a',
 
   /* Deliberately duller than the edge lip. This is the secondary channel
      and it must never pull the eye down off the road. It carries its
@@ -1948,6 +2038,14 @@ const TUNABLES = [
   { key: 'HEAT_PULSE_DEPTH',   label: 'hPulse',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
   { key: 'HEAT_HORIZON',       label: 'hSky',    step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
   { key: 'HEAT_SKYLINE_LIFT',  label: 'hCity',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
+  { key: 'CITY_ALPHA',         label: 'winLit',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'CITY_SLIP_BASE',     label: 'winBase', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'CITY_CHAIN_FULL',    label: 'winFull', step: 2,    min: 2,    max: 120,   dp: 0, group: 21 },
+  { key: 'CITY_SLIP_POWER',    label: 'winSlip', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 21 },
+  { key: 'CITY_FADE_TIME',     label: 'winFade', step: 0.1,  min: 0.1,  max: 10,    dp: 1, group: 21 },
+  { key: 'CITY_RISE_TIME',     label: 'winRise', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 21 },
+  { key: 'CITY_WINDOW_FILL',   label: 'winSize', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 21 },
+  { key: 'CITY_MIN_BUILDING_PX',label:'winMinPx',step: 1,    min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
   { key: 'CALLOUT_TIME',       label: 'callFor', step: 0.05, min: 0.3,  max: 4.0,   dp: 2, group: 14 },
   { key: 'CALLOUT_GAP',        label: 'callGap', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 14 },
@@ -1991,6 +2089,8 @@ const TUNABLES = [
   { key: 'CALLOUT_CHAIN_GRACE',label: 'chainHold',step: 0.1, min: 0.1,  max: 6.0,   dp: 1, group: 18 },
   { key: 'CHAIN_MIN_SLIP',     label: 'chainSlip',step: 0.02, min: 0,   max: 1.0,   dp: 2, group: 18 },
   { key: 'DRIFT_TIER_GROWTH',  label: 'tierUp',  step: 0.02, min: 0,    max: 0.6,   dp: 2, group: 18 },
+  { key: 'DRIFT_TOP_REPEAT',   label: 'topAgain',step: 1,    min: 1,    max: 60,    dp: 0, group: 18 },
+  { key: 'DRIFT_BEST_MIN',     label: 'bestMin', step: 1,    min: 1,    max: 80,    dp: 0, group: 18 },
   { key: 'CHAIN_GAIN',         label: 'blip',    step: 0.01, min: 0,    max: 0.5,   dp: 2, group: 18 },
   { key: 'CHAIN_DECAY',        label: 'blipLen', step: 0.02, min: 0.02, max: 1.0,   dp: 2, group: 18 },
   { key: 'CALLOUT_ROW_DRIFT',  label: 'driftRow',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 18 },
@@ -2605,8 +2705,13 @@ function tunerLine(group) {
   if (group === 18) {
     // The chain, live, because it is the one thing here that has to be
     // watched while driving to know whether the numbers are right.
-    out += 'link ' + chainLinks + ' tier ' + chainTier
+    out += 'link ' + chainLinks + ' tier ' + chainTier + ' said@' + chainSaidAt
+        + '  runBest ' + runBestChain
         + '  held ' + chainTime.toFixed(1) + 's  lapse ' + chainLapse.toFixed(2) + 's';
+  }
+  if (group === 21) {
+    out += 'city ' + cityGlow.toFixed(2) + '  slip ' + drift.slipNorm.toFixed(2)
+        + '  link ' + chainLinks;
   }
   if (group === 20) {
     out += 'cont ' + continues + (cpValid ? '  gate@' + cpSeg + ' t' + cpTime.toFixed(0) + 's' : '  no gate')
@@ -4097,11 +4202,39 @@ function drawGrid(w, h) {
    anchor to read the road against, and it must never pull the eye off the
    edges, so nothing here goes anywhere near their brightness. */
 const skylineH = [];
+/* The window layout, generated once at load and never again. Each
+   building gets a grid and each window a fixed threshold, so lighting the
+   city is a comparison per window and nothing else: no allocation, no
+   randomness at draw time, and the same city every frame.
+
+   THE THRESHOLDS ARE CLUSTERED PER BUILDING. A window's threshold is its
+   building's base plus a small jitter, so buildings come on roughly whole
+   and one after another rather than as a uniform speckle spreading across
+   the skyline. That is the difference between a city waking up block by
+   block and a brightness slider.
+
+   Its own generator, not rng(), which belongs to the road: consuming from
+   that stream here would change the track a pinned seed produces. */
+const cityRows = [];
+const cityCols = [];
+const cityStart = [];
+const cityThr = [];
 (function () {
   let seed = 1337;
+  function next() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 1000) / 1000; }
   for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    skylineH.push((seed % 1000) / 1000);
+    skylineH.push(next());
+    const rows = 2 + (i % 4);
+    const cols = 2 + (i % 2);
+    cityRows.push(rows);
+    cityCols.push(cols);
+    cityStart.push(cityThr.length);
+    // Taller buildings light later, so the skyline fills from the low
+    // blocks upward and the tallest are the reward for a long chain.
+    const base = 0.06 + 0.72 * (0.45 * next() + 0.55 * skylineH[i]);
+    for (let k = 0; k < rows * cols; k++) {
+      cityThr.push(clamp(base + (next() - 0.5) * 0.22, 0, 1));
+    }
   }
 })();
 
@@ -4125,6 +4258,45 @@ function drawSkyline(w, h) {
   }
   ctx.fillStyle = COLOUR.SKYLINE;
   ctx.fill();
+
+  /* The windows, between the silhouettes and the roof line so the roofs
+     stay on top of them. One batched fill for every lit window in shot,
+     using the same repeat loop and the same culling the bodies use. */
+  if (cityGlow > 0.01) {
+    ctx.beginPath();
+    let any = false;
+    for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
+      for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
+        const x = shift + rep * period + i * step;
+        if (x > w + step || x < -step * 2) continue;
+        const th = minH + skylineH[i] * spanH;
+        // Too short to hold a window that would read as one.
+        if (th < FEEL.CITY_MIN_BUILDING_PX) continue;
+        const rows = cityRows[i], cols = cityCols[i], at = cityStart[i];
+        const bwid = step * 0.86;
+        const cellW = bwid / cols, cellH = th / rows;
+        const ww = Math.max(1, cellW * FEEL.CITY_WINDOW_FILL);
+        const wh = Math.max(1, cellH * FEEL.CITY_WINDOW_FILL);
+        const top = baseY - th;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (cityThr[at + r * cols + c] > cityGlow) continue;
+            any = true;
+            ctx.rect(x + (c + 0.5) * cellW - ww / 2,
+                     top + (r + 0.5) * cellH - wh / 2, ww, wh);
+          }
+        }
+      }
+    }
+    if (any) {
+      // Brighter as well as more numerous, but the alpha is the thing the
+      // hard rule bites on and it is capped by CITY_ALPHA.
+      ctx.globalAlpha = FEEL.CITY_ALPHA * (0.45 + 0.55 * cityGlow);
+      ctx.fillStyle = COLOUR.SKYLINE_WINDOW;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
 
   /* A dim lit line on the roofs, so they read as built rather than as a
      ragged hole in the background. This is where the city lights come up
@@ -5994,6 +6166,33 @@ function addShake(px) {
 let worldHeat = 0;
 let heatPulse = 1;        // the travelling pulse, 1 at rest, and exactly 1 at zero heat
 
+/* How much of the city is awake, 0 to 1. Its own value rather than a
+   second reader of worldHeat, because the two answer different questions:
+   worldHeat is the multiplier, which decays and which needs the edge, and
+   this is how well the car is being driven RIGHT NOW. */
+let cityGlow = 0;
+
+function updateCity(dt) {
+  const driving = state === DRIVING;
+  /* Slip is required for any of it, so drifting is the only thing that
+     lights the city. The chain then decides how far it goes, which is
+     what makes a long drift wake more of the city than a short one of the
+     same depth. */
+  const slipTerm = Math.pow(
+    clamp((drift.slipNorm - FEEL.CHAIN_MIN_SLIP) / (1 - FEEL.CHAIN_MIN_SLIP), 0, 1),
+    FEEL.CITY_SLIP_POWER);
+  const chainTerm = clamp(chainLinks / Math.max(1, FEEL.CITY_CHAIN_FULL), 0, 1);
+  const want = driving
+    ? chainTerm * (FEEL.CITY_SLIP_BASE + (1 - FEEL.CITY_SLIP_BASE) * slipTerm)
+    : 0;
+  /* Up fast and down slow, which is the whole of "let it linger". A city
+     that snaps off the instant a drift ends is a switch; one that cools
+     over a couple of seconds is an afterglow, and the afterglow is what
+     makes the end of a drift feel like something rather than nothing. */
+  const tau = want > cityGlow ? FEEL.CITY_RISE_TIME : FEEL.CITY_FADE_TIME;
+  cityGlow += (want - cityGlow) * (1 - Math.exp(-dt / tau));
+}
+
 /* TWO LANES.
 
    The EVENT lane carries the things that happen to a run: a checkpoint, a
@@ -6007,7 +6206,7 @@ let heatPulse = 1;        // the travelling pulse, 1 at rest, and exactly 1 at z
    break, which is the one moment loud enough to deserve the whole screen.
 
    Each lane holds one callout, newest wins. Neither ever stacks. */
-const CALL_CLOSE = 2, CALL_GATE = 3, CALL_BEST = 4;
+const CALL_CLOSE = 2, CALL_CHAIN = 3, CALL_GATE = 4, CALL_BEST = 5;
 let calloutText = '';
 let calloutColour = '';
 let calloutPri = 0;
@@ -6077,11 +6276,32 @@ let beatFlash = 0;
    moves on every single link, which is the continuous reward and costs no
    screen space at all, and the text only changes when a tier is reached,
    which is what keeps the praise loud without becoming clutter. */
-const DRIFT_TIERS = ['DRIFT', 'NICE', 'GREAT', 'SUPERB', 'BLISTERING', 'UNREAL'];
+/* Alternates per rung, so the same word is not read back twice running.
+   The variant is picked off a counter rather than off rng(), which is the
+   road generator's seeded stream: consuming from it here would change the
+   road a pinned seed produces and quietly break every A/B comparison in
+   the project. */
+const DRIFT_TIERS = [
+  ['DRIFT', 'SIDEWAYS', 'HOLD IT'],
+  ['NICE', 'CLEAN', 'TIDY'],
+  ['GREAT', 'LOVELY', 'SWEET'],
+  ['SUPERB', 'SUBLIME', 'MASTERFUL'],
+  ['BLISTERING', 'SCORCHING', 'ON FIRE'],
+  ['UNREAL', 'MONSTROUS', 'RIDICULOUS']
+];
 let chainTime = 0;
 let chainLapse = 0;
 let chainLinks = 0;
 let chainTier = 0;
+let chainSaidAt = 0;      // links at the last thing said, for the repeats past the top
+let chainBestSaid = false;   // this chain has already claimed the run best
+let driftWordN = 0;       // which alternate, so a rung never repeats its own word
+let runBestChain = 0;     // the longest chain this run, for the louder event
+
+function driftWord(tier) {
+  const words = DRIFT_TIERS[Math.min(tier, DRIFT_TIERS.length) - 1];
+  return words[driftWordN++ % words.length];
+}
 
 let gateFlash2 = 0;       // the crossing wash, separate from the score's own flash
 let wasScraping = false;
@@ -6090,6 +6310,7 @@ let edgeClear = 0;        // seconds since the car was last in the scrape band
 function resetSpectacle() {
   worldHeat = 0;
   heatPulse = 1;
+  cityGlow = 0;
   calloutText = '';
   calloutLife = 0;
   calloutPri = 0;
@@ -6101,16 +6322,25 @@ function resetSpectacle() {
   beatBest = false;
   beatFlash = 0;
   breakChain();
+  runBestChain = 0;
   gateFlash2 = 0;
   wasScraping = false;
   edgeClear = 0;
 }
 
+/* Called when the chain LAPSES, not when the run ends, so every new chain
+   earns its praise from scratch: a tier four chain at four minutes is
+   worth exactly what a tier four chain at twenty seconds is worth,
+   because it is harder. runBestChain is deliberately NOT reset here, and
+   it is deliberately not a gate on anything: it only decides whether the
+   separate louder event fires. */
 function breakChain() {
   chainTime = 0;
   chainLapse = 0;
   chainLinks = 0;
   chainTier = 0;
+  chainSaidAt = 0;
+  chainBestSaid = false;
 }
 
 /* Which tier a link count has reached, 0 for none. The thresholds widen,
@@ -6144,6 +6374,9 @@ function updateSpectacle(dt) {
      one this is exactly 1 and there is no pulse at all. */
   const wave = 0.5 + 0.5 * Math.sin(position * (Math.PI * 2 / FEEL.HEAT_PULSE_LENGTH));
   heatPulse = 1 - FEEL.HEAT_PULSE_DEPTH * worldHeat * (1 - wave);
+  // After the chain has been updated it would lag a frame, and before the
+  // early return so the city still cools down over a death screen.
+  updateCity(dt);
 
   if (!driving) { wasScraping = false; edgeClear = 0; return; }
 
@@ -6186,16 +6419,33 @@ function updateSpectacle(dt) {
       chainLinks = links;
       audioChain(links);
       const tier = chainTierFor(links);
-      if (tier > chainTier) {
+      const top = DRIFT_TIERS.length;
+      /* Two reasons to speak, and the second is what stops the silence.
+         A NEW RUNG, or, once the ladder has run out, every further
+         DRIFT_TOP_REPEAT links of a chain that is still going. */
+      const rung = tier > chainTier;
+      const past = tier >= FEEL.DRIFT_TIER_LINKS.length
+                   && links >= chainSaidAt + FEEL.DRIFT_TOP_REPEAT;
+      if (rung || past) {
         chainTier = tier;
-        const top = DRIFT_TIERS.length;
-        // Past the top of the ladder the word stops growing and the count
-        // takes over, so a very long chain still reads as bigger.
-        const label = tier <= top ? DRIFT_TIERS[tier - 1]
-                                  : DRIFT_TIERS[top - 1] + '  ×' + links;
-        sayDrift(label, scoreHeatColour((tier - 1) / Math.max(1, top - 1)),
-                 1 + FEEL.DRIFT_TIER_GROWTH * (tier - 1), tier > 1);
+        chainSaidAt = links;
+        const shown = Math.min(tier, top);
+        // Past the top the word stops growing and the count takes over,
+        // so a chain that keeps going keeps reading as bigger.
+        const label = tier <= top ? driftWord(shown)
+                                  : driftWord(shown) + '  ×' + links;
+        sayDrift(label, scoreHeatColour((shown - 1) / Math.max(1, top - 1)),
+                 1 + FEEL.DRIFT_TIER_GROWTH * (shown - 1), tier > 1);
       }
+      /* The run's longest chain, once per chain, in the EVENT lane so it
+         is louder and so it is beside the ordinary praise rather than in
+         front of it. */
+      if (!chainBestSaid && links > runBestChain && links >= FEEL.DRIFT_BEST_MIN) {
+        chainBestSaid = true;
+        sayCallout('LONGEST CHAIN  ×' + links, CALL_CHAIN, COLOUR.SCORE_BEST);
+        audioSting(STING_CHAIN);
+      }
+      if (links > runBestChain) runBestChain = links;
     }
   } else {
     chainLapse += dt;
@@ -6480,6 +6730,7 @@ function drawHud(w, h) {
     tunerLine(18),
     tunerLine(19),
     tunerLine(20),
+    tunerLine(21),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
@@ -7179,6 +7430,7 @@ function updateAudio(dt) {
 const STING_BEST  = { notes: [12, 19, 24, 31], step: 0.075, gain: 0.16, decay: 0.30 };
 const STING_GATE  = { notes: [12, 19, 24],     step: 0.070, gain: 0.13, decay: 0.24 };
 const STING_CLOSE = { notes: [24, 31],         step: 0.055, gain: 0.09, decay: 0.16 };
+const STING_CHAIN = { notes: [19, 24, 28],     step: 0.065, gain: 0.12, decay: 0.22 };
 
 function audioSting(sting) {
   if (!audioOn()) return;
