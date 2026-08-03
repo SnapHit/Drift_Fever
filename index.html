@@ -865,11 +865,19 @@ const FEEL = {
      a time and the newest wins, and the chatty kind is rate limited so a
      long chain cannot produce a stream of text.
 
-     Placement is derived rather than fixed. It sits in the band of sky
-     between the bottom of the HUD stack and the horizon, which is empty
-     in both orientations and is never road, and it is offset to whichever
-     side of the screen the car is NOT on, so it can never sit over the
-     car or over the line the player is reading. */
+     TWO LANES, NOT ONE PRIORITY LIST. The first version put drift
+     feedback at the bottom of a single queue behind checkpoints and close
+     calls, which put the core loop of the game last and meant that in
+     practice it never spoke. Drifting is what this game IS, so it gets a
+     channel of its own, at its own height, with its own slot and its own
+     timing, and it never competes with an event for the screen. Only a
+     best score break may interrupt it.
+
+     Placement is derived rather than fixed. Both lanes sit in the band of
+     sky between the bottom of the HUD stack and the horizon, which is
+     empty in both orientations and is never road, on separate rows so
+     they can both be up at once without stacking, and offset to whichever
+     side of the screen the car is NOT on. */
   CALLOUT_TIME:            1.05,     // LIVE, seconds on screen, in and out included
   CALLOUT_IN:              0.14,     // of that, the fly in
   CALLOUT_OUT:             0.38,     // of that, the fade
@@ -879,13 +887,17 @@ const FEEL = {
   CALLOUT_MAX_WIDTH:       0.52,     // of screen width, the widest a callout may be
   CALLOUT_RISE:            0.06,     // of the smaller dimension, how far above the horizon it sits
   CALLOUT_GAP_TOP:         0.05,     // and the least it may sit below the HUD stack
-  /* The rate limit, and it has to beat CALLOUT_TIME by a clear margin or
-     the callouts butt up against each other and the result is a stream
-     with holes in it rather than an occasional remark. A committed edge
-     driver touches the edge often enough to earn a perfect entry every
-     few seconds, so this is what actually decides how chatty the game is.
-     At 1.3 it measured thirteen a minute, which was too many. */
-  CALLOUT_GAP:             3.20,     // LIVE, seconds before another drift callout is allowed
+  /* The two rows, as a share of the sky band between the HUD and the
+     horizon. Events sit high in it and drift feedback low, nearer the
+     road, because that is the one the eyes should catch while driving. */
+  CALLOUT_ROW_EVENT:       0.10,
+  CALLOUT_ROW_DRIFT:       0.78,
+  /* The rate floor on the DRIFT lane, which is the only lane that can be
+     chatty. Events are rare by their nature and are not limited.
+     Dropped from 3.20, which was tuned when drift feedback shared a lane
+     with everything else and had to be held back to protect it. It has
+     its own lane now, so praise can come often. */
+  CALLOUT_GAP:             1.60,     // LIVE, seconds between repeatable drift callouts
   CALLOUT_LOCK:            0.70,     // LIVE, seconds a louder callout suppresses quieter ones for
   /* An ENTRY has to be an entry. Slip alone is not enough: a driver
      living on the edge re touches it every second or two, and calling
@@ -895,8 +907,55 @@ const FEEL = {
      then arrive at it already committed. */
   CALLOUT_ENTRY_SLIP:      0.72,     // slip needed on touching the edge for a perfect entry
   CALLOUT_ENTRY_CLEAR:     1.60,     // LIVE, seconds clear of the band before one counts
-  CALLOUT_CHAIN_STEP:      2.20,     // LIVE, seconds of unbroken earning per chain link
-  CALLOUT_CHAIN_GRACE:     0.30,     // seconds the earning may lapse without breaking the chain
+
+  /* THE CHAIN, which is the reward for drifting and therefore the reward
+     for playing the game at all. Both numbers below were measured off the
+     phrase library rather than guessed, because they are a property of
+     the road and not a matter of taste. Over 166 seconds of driving, with
+     a beginner holding the middle of the on ramp and a committed driver
+     riding the edge:
+
+       a continuous stretch of drifting is 0.50s at the median, 1.10 at
+       the upper quartile and 2.52 at the ninetieth
+       a gap between two of them is 0.20s at the median, 0.63 at the
+       upper quartile, 1.80 at the ninetieth and 2.45 at the ninety fifth
+
+     The old values were a step of 2.20 and a grace of 0.30. Almost no
+     corner in this game gives 2.2 seconds of continuous slip, and three
+     gaps in four are longer than 0.3 seconds, so LINKING CORNERS, which
+     is the best driving available here, broke the chain every time and
+     link one was never reached. A player finished a run of 7322m at a
+     best multiplier of 6.2 and the game never once said anything.
+
+     So: a step at the median stretch, which means one ordinary corner is
+     worth a link, and a grace above the upper quartile gap, which means
+     A CHAIN SURVIVES THE STRAIGHT BETWEEN TWO CORNERS and only breaks
+     when the driving actually stops. About one gap in eight is longer
+     than the grace, so a chain runs several corners and then ends,
+     which is what makes ending it mean something.
+
+     CHAIN_MIN_SLIP is what counts as drifting for this purpose and it is
+     deliberately NOT the multiplier's test. The multiplier wants slip AND
+     the edge, so a tidy drift down the middle earns nothing from it. That
+     is right for scoring and wrong for praise: the first acknowledgement
+     has to reach a new player in their first twenty seconds, on a modest
+     drift, in the middle of a wide on ramp road. */
+  CHAIN_MIN_SLIP:          0.45,     // LIVE, what counts as drifting for the chain
+  CALLOUT_CHAIN_STEP:      0.50,     // LIVE, seconds of drifting per chain link
+  CALLOUT_CHAIN_GRACE:     2.20,     // LIVE, seconds it may lapse without breaking
+  /* Links at which the praise escalates a tier. Widening on purpose: a
+     chain accrues about one link a second of wall time, so evenly spaced
+     tiers would run off the end of the ladder inside ten seconds. These
+     put the first two within a corner or two of starting and then make
+     each further tier cost more than the last, which is what makes a long
+     chain visibly worth more than a short one. */
+  DRIFT_TIER_LINKS:  [1, 2, 4, 7, 11, 16, 22],
+  DRIFT_TIER_GROWTH:       0.12,     // LIVE, size added per tier, of the base size
+  /* The blip itself. Quiet: it fires about once a second through a good
+     stretch of driving, so it has to sit under the tyres rather than over
+     them, and a short decay keeps it a tick rather than a tone. */
+  CHAIN_GAIN:              0.10,     // LIVE
+  CHAIN_DECAY:             0.13,     // seconds
 
   /* Close calls. Section 4.4's philosophy applied to obstacles rather
      than to the road edge: the risky line is the rewarding one. The
@@ -934,6 +993,77 @@ const FEEL = {
      violent as the loudest one of those alone, and nothing in the game
      can ever shake harder than a crash. */
   SHAKE_MAX_PX:              16,     // LIVE, and equal to CRASH_SHAKE_PX on purpose
+
+  /* ----------------------------------------------------------------
+     HITTING SOMETHING, which is now a different death from leaving the
+     road and looks like one. Going off the edge is a fall: the car slides
+     over the lip and drops into the void, and that stays exactly as it
+     was. Hitting a hazard is an impact: it stops dead, comes apart, and
+     throws debris.
+
+     THE ONE HARD CONSTRAINT IS THAT IT MUST NOT DELAY GETTING BACK IN.
+     Section 5 says restart is instant and this cannot be the thing that
+     breaks it. So the explosion is purely cosmetic: nothing waits on it,
+     the death screen appears under it on the same schedule as before, and
+     a tap or a key at any point during it goes straight through. The only
+     input gate is DEATH_INPUT_LOCK, which is the accidental input guard
+     that was already there and which the hit stop does NOT extend,
+     because the death timer runs on real time while the world is frozen.
+
+     Hit stop is a handful of frames of the world standing still, which is
+     what sells an impact as an impact. Kept short: at a tenth of a second
+     it reads as weight, and past about a fifth it reads as a stutter. */
+  HIT_STOP_TIME:           0.11,     // seconds the world freezes on impact
+  EXPLODE_TIME:            1.10,     // seconds the debris lives
+  EXPLODE_PARTICLES:         26,     // LIVE
+  EXPLODE_SPEED:            620,     // pixels per second, at the fastest
+  EXPLODE_SPREAD:          0.45,     // how much slower the slowest piece is
+  EXPLODE_GRAVITY:          900,     // pixels per second squared
+  EXPLODE_DRAG:            0.55,     // seconds, how fast sideways speed bleeds off
+  EXPLODE_SIZE:            0.026,    // of the smaller screen dimension, the biggest piece
+  EXPLODE_SPIN:             7.0,     // radians per second
+  EXPLODE_FLASH_TIME:      0.22,     // the white flash at the moment of impact
+  EXPLODE_FLASH_ALPHA:     0.38,
+  /* Hard, because this is the hardest thing that happens. It still goes
+     through addShake, so it is clamped with everything else and cannot
+     sum with a gate or a best score break landing on the same frame. */
+  EXPLODE_SHAKE_PX:          16,     // LIVE
+
+  /* ----------------------------------------------------------------
+     CONTINUES, which settle section 14's open question about lives and
+     recoveries: neither, and instead an unlimited resume from the last
+     gate that costs a scoreboard rather than a life.
+
+     The problem it solves is that a player who dies often replays the
+     opening of the track over and over and rarely sees anything new. A
+     continue puts them back at the last gate at that gate's difficulty,
+     so continuing never hands out an easier stretch, and there is no on
+     ramp on a continue because somebody on their fourth continue is not
+     a new player.
+
+     SCORE INTEGRITY IS THE PART THAT IS NOT OPTIONAL. The live best score
+     break is the strongest moment in the game, and if continues carried
+     the score forward it would be reachable by pressing continue enough
+     times and would stop meaning anything. So the records are split:
+     BEST SCORE only moves on a run with zero continues, FURTHEST is a
+     distance record any run may set, and the live break only arms on a
+     clean run. Exploring and scoring get their own scoreboards and both
+     still mean something. */
+  CONTINUE_CLOCK_GRACE:     1.0,     // extra seconds on the clock, so a resume is not instant pressure
+  /* Section 4.3 asks for three and a half seconds of visible road to plan
+     with. A resume that drops the car into a generated phrase after one
+     and a half has taken that away at the exact moment the player is
+     re orienting, so the arrival straight is the planning horizon and not
+     a token. It is not a rest: it is what a fresh run's scripted opening
+     already gives, without the beginner's gentle first curve. */
+  RESUME_STRAIGHT:          160,     // segments, about three and a half seconds
+  /* The prompt and the restart button hang off the BOTTOM edge rather
+     than off a fraction of the height, which is what keeps them clear of
+     the car in both orientations. Above the safe area and above the
+     corner pads, which are 64 across with a 12 margin. */
+  DEATH_BOTTOM:              96,     // pixels above the safe area, the button's centre
+  DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
+  RESUME_FLASH_TIME:       0.45,     // the wash on arriving back at the gate
 
   /* ----------------------------------------------------------------
      Audio. Everything here is synthesised: oscillators and one generated
@@ -1822,11 +1952,10 @@ const TUNABLES = [
   { key: 'CALLOUT_TIME',       label: 'callFor', step: 0.05, min: 0.3,  max: 4.0,   dp: 2, group: 14 },
   { key: 'CALLOUT_GAP',        label: 'callGap', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 14 },
   { key: 'CALLOUT_LOCK',       label: 'callLock',step: 0.1,  min: 0,    max: 4.0,   dp: 1, group: 14 },
-  { key: 'CALLOUT_CHAIN_STEP', label: 'chain',   step: 0.1,  min: 0.4,  max: 10,    dp: 1, group: 14 },
   { key: 'CALLOUT_ENTRY_SLIP', label: 'entry',   step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 14 },
   { key: 'HAZARD_CLOSE_MARGIN',label: 'close',   step: 25,   min: 0,    max: 2000,  dp: 0, group: 15 },
   { key: 'HAZARD_CLOSE_BONUS', label: 'closePts',step: 20,   min: 0,    max: 2000,  dp: 0, group: 15 },
-  { key: 'GATE_SWEEP_SEGMENTS',label: 'sweep',   step: 20,   min: 20,   max: 1400,  dp: 0, group: 15 },
+  { key: 'GATE_SWEEP_SEGMENTS',label: 'gSweep',  step: 20,   min: 20,   max: 1400,  dp: 0, group: 15 },
   { key: 'GATE_FLASH_ALPHA',   label: 'gFlash',  step: 0.02, min: 0,    max: 0.8,   dp: 2, group: 15 },
   { key: 'BEST_FLASH_TIME',    label: 'bFlash',  step: 0.05, min: 0,    max: 3.0,   dp: 2, group: 15 },
   { key: 'SHAKE_MAX_PX',       label: 'shakeCap',step: 1,    min: 0,    max: 40,    dp: 0, group: 15 },
@@ -1849,14 +1978,37 @@ const TUNABLES = [
   { key: 'CALLOUT_OUT',        label: 'callOut', step: 0.02, min: 0,    max: 0.8,   dp: 2, group: 17 },
   { key: 'CALLOUT_SLIDE',      label: 'callFly', step: 0.01, min: 0,    max: 0.30,  dp: 2, group: 17 },
   { key: 'CALLOUT_ENTRY_CLEAR',label: 'entryGap',step: 0.2,  min: 0,    max: 8.0,   dp: 1, group: 17 },
-  { key: 'CALLOUT_CHAIN_GRACE',label: 'chainOk', step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 17 },
   { key: 'BEST_FLASH_ALPHA',   label: 'bWash',   step: 0.02, min: 0,    max: 0.8,   dp: 2, group: 17 },
   { key: 'BEST_GLOW_ALPHA',    label: 'bHalo',   step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 17 },
   { key: 'BEST_GLOW_SPREAD',   label: 'bHaloW',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 17 },
   { key: 'BEST_SHAKE_PX',      label: 'bShake',  step: 1,    min: 0,    max: 30,    dp: 0, group: 17 },
   { key: 'GATE_SWEEP_LENGTH',  label: 'sweepLen',step: 0.02, min: 0.02, max: 0.8,   dp: 2, group: 17 },
   { key: 'GATE_BAR_WIDTH',     label: 'gBars',   step: 0.01, min: 0,    max: 0.35,  dp: 2, group: 17 },
-  { key: 'GATE_SHAKE_PX',      label: 'gShake',  step: 1,    min: 0,    max: 30,    dp: 0, group: 17 }
+  { key: 'GATE_SHAKE_PX',      label: 'gShake',  step: 1,    min: 0,    max: 30,    dp: 0, group: 17 },
+  /* The chain, which is the one thing in this session that can only be
+     judged by driving, so it goes at the front of its own group. */
+  { key: 'CALLOUT_CHAIN_STEP', label: 'chainStep',step: 0.05, min: 0.1, max: 6.0,   dp: 2, group: 18 },
+  { key: 'CALLOUT_CHAIN_GRACE',label: 'chainHold',step: 0.1, min: 0.1,  max: 6.0,   dp: 1, group: 18 },
+  { key: 'CHAIN_MIN_SLIP',     label: 'chainSlip',step: 0.02, min: 0,   max: 1.0,   dp: 2, group: 18 },
+  { key: 'DRIFT_TIER_GROWTH',  label: 'tierUp',  step: 0.02, min: 0,    max: 0.6,   dp: 2, group: 18 },
+  { key: 'CHAIN_GAIN',         label: 'blip',    step: 0.01, min: 0,    max: 0.5,   dp: 2, group: 18 },
+  { key: 'CHAIN_DECAY',        label: 'blipLen', step: 0.02, min: 0.02, max: 1.0,   dp: 2, group: 18 },
+  { key: 'CALLOUT_ROW_DRIFT',  label: 'driftRow',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 18 },
+  { key: 'CALLOUT_ROW_EVENT',  label: 'eventRow',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 18 },
+  { key: 'HIT_STOP_TIME',      label: 'hitStop', step: 0.01, min: 0,    max: 0.5,   dp: 2, group: 19 },
+  { key: 'EXPLODE_PARTICLES',  label: 'bits',    step: 2,    min: 0,    max: 64,    dp: 0, group: 19 },
+  { key: 'EXPLODE_SPEED',      label: 'bitSpeed',step: 40,   min: 40,   max: 2000,  dp: 0, group: 19 },
+  { key: 'EXPLODE_TIME',       label: 'bitLife', step: 0.1,  min: 0.1,  max: 4.0,   dp: 1, group: 19 },
+  { key: 'EXPLODE_SIZE',       label: 'bitSize', step: 0.002,min: 0.004,max: 0.09,  dp: 3, group: 19 },
+  { key: 'EXPLODE_SHAKE_PX',   label: 'hitShake',step: 1,    min: 0,    max: 30,    dp: 0, group: 19 },
+  { key: 'EXPLODE_FLASH_ALPHA',label: 'hitWash', step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 19 },
+  { key: 'EXPLODE_GRAVITY',    label: 'bitDrop', step: 50,   min: 0,    max: 4000,  dp: 0, group: 19 },
+  { key: 'EXPLODE_SPIN',       label: 'bitSpin', step: 0.5,  min: 0,    max: 20,    dp: 1, group: 19 },
+  { key: 'CONTINUE_CLOCK_GRACE',label:'resumeSec',step: 0.5, min: 0,    max: 20,    dp: 1, group: 20 },
+  { key: 'RESUME_STRAIGHT',    label: 'resumeIn',step: 10,   min: 0,    max: 400,   dp: 0, group: 20 },
+  { key: 'RESUME_FLASH_TIME',  label: 'resumeFx',step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 20 },
+  { key: 'DEATH_BOTTOM',       label: 'deadBtm', step: 4,    min: 20,   max: 300,   dp: 0, group: 20 },
+  { key: 'DEATH_PROMPT_GAP',   label: 'deadGap', step: 0.005,min: 0.02, max: 0.30,  dp: 3, group: 20 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -2017,6 +2169,11 @@ window.addEventListener('keydown', function (e) {
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
   else if (k === 'f' || k === 'F') { if (debugAllowed) setDebug(!showDebug); return; }
   else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
+  /* R is the keyboard twin of the RESTART button, for the same reason it
+     exists: the reflex key now continues, so starting over has to be a
+     deliberate second thing. Both cases, so caps lock is not a dead key. */
+  else if ((k === 'r' || k === 'R') && state === DEAD
+           && deadFor >= FEEL.DEATH_INPUT_LOCK) { firstGesture(); startRun(); return; }
   // The tuning keys are the keyboard twin of the on screen buttons, and
   // like F they must not also start a run.
   else if (debugAllowed && k === '[') { selectTuning(-1); return; }
@@ -2067,6 +2224,14 @@ canvas.addEventListener('pointerdown', function (e) {
   e.preventDefault();
   // A tap anywhere on the covered view resumes, and does not also steer.
   if (paused) { setPaused(false); return; }
+  /* The restart button is drawn on the canvas, so it is tested here,
+     before the reflex tap is read. It only exists on the death screen and
+     only when continuing is possible, so this cannot eat a steering tap. */
+  if (hitRestart(e) && deadFor >= FEEL.DEATH_INPUT_LOCK) {
+    firstGesture();
+    startRun();
+    return;
+  }
   touchSides.set(e.pointerId, pointerSide(e));
   applyTouchSides();
   if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
@@ -2437,6 +2602,16 @@ function tunerLine(group) {
     out += 'best ' + bestScore + (bestKnown ? '' : ' (none)')
         + (beatBest ? ' BEATEN' : '') + '  shake ' + shake.toFixed(1);
   }
+  if (group === 18) {
+    // The chain, live, because it is the one thing here that has to be
+    // watched while driving to know whether the numbers are right.
+    out += 'link ' + chainLinks + ' tier ' + chainTier
+        + '  held ' + chainTime.toFixed(1) + 's  lapse ' + chainLapse.toFixed(2) + 's';
+  }
+  if (group === 20) {
+    out += 'cont ' + continues + (cpValid ? '  gate@' + cpSeg + ' t' + cpTime.toFixed(0) + 's' : '  no gate')
+        + '  far ' + furthest + 'm' + (skipOnRamp ? '  NO RAMP' : '');
+  }
   if (group === 8) {
     // What is actually on the road in front of you, live, because spawn
     // rates cannot be tuned against a number that is not visible.
@@ -2503,6 +2678,8 @@ function onRunEnded() {
    what adaptation lengthens; the far end does not move, so this reaches
    1 at ONRAMP_SECONDS for every player regardless of ease. */
 function onRampProgress() {
+  // A continue is past it by definition. See the continues block.
+  if (skipOnRamp) return 1;
   const flat = FEEL.ONRAMP_FLAT + ease * FEEL.ADAPT_FLAT_EXTRA;
   const span = Math.max(1, FEEL.ONRAMP_SECONDS - flat);
   return clamp((runTime - flat) / span, 0, 1);
@@ -2534,7 +2711,7 @@ function updateDifficulty() {
    step, so a new kind of corner arrives as a thing to learn rather than
    as a wall. */
 function maxIntensity() {
-  if (runTime < FEEL.ONRAMP_SECONDS) {
+  if (!skipOnRamp && runTime < FEEL.ONRAMP_SECONDS) {
     // 0 and 1 only for most of the on ramp, then a taste of 2 at the end.
     return onRampProgress() > 0.75 ? FEEL.ONRAMP_INTENSITY + 1 : FEEL.ONRAMP_INTENSITY;
   }
@@ -2545,7 +2722,7 @@ function restChance() {
   // The two halves meet at ONRAMP_REST/2 rather than stepping, or the
   // road audibly changes rhythm on the stroke of sixty seconds.
   const half = FEEL.ONRAMP_REST * 0.5;
-  if (runTime < FEEL.ONRAMP_SECONDS) {
+  if (!skipOnRamp && runTime < FEEL.ONRAMP_SECONDS) {
     return FEEL.ONRAMP_REST - half * onRampProgress();
   }
   return half * (1 - deepProgress());
@@ -3366,6 +3543,13 @@ function startRun() {
   multPop = 0;
   runTime = 0;
   resetSpectacle();
+  // A fresh run has no checkpoint behind it and no continues on it, so
+  // it is a clean run until proven otherwise and it owns the on ramp.
+  continues = 0;
+  skipOnRamp = false;
+  cpValid = false;
+  resumeFlash = 0;
+  clearDebris();
   nextGate = Math.round(FEEL.CHECKPOINT_EVERY * 0.7);
   applyBiome(0);
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
@@ -3375,9 +3559,143 @@ function startRun() {
   state = DRIVING;
 }
 
+/* ==================================================================
+   CONTINUES
+
+   This settles section 14's open question about lives and recoveries:
+   neither. Instead a run may resume from the last gate, free and
+   unlimited, and what it costs is a scoreboard rather than a life.
+
+   The problem is that dying often means replaying the opening of the
+   track over and over and rarely seeing anything new, which is the
+   opposite of section 4.5's whole argument about why run twenty should
+   differ from run two.
+
+   WHAT RESUMES: the position, the elapsed time and therefore the
+   difficulty at that gate, the clock as the gate left it, and the banked
+   score. What does not is the multiplier, because the car crashed.
+
+   THERE IS NO ON RAMP ON A CONTINUE. The first gate lands at about
+   twenty three seconds, inside the thirty second on ramp, so resuming
+   there would otherwise hand a player who has already driven a minute
+   the beginner's wide road. skipOnRamp is what says so, and it is read by
+   every place the on ramp is: the difficulty ramp, the phrase library's
+   intensity and rest rate, and the clock. */
+let continues = 0;        // this run, and the whole of the record split
+let skipOnRamp = false;
+let cpValid = false;
+let cpSeg = 0, cpTime = 0, cpBanked = 0, cpClock = 0, cpBiome = 0, cpGates = 0;
+let resumeFlash = 0;
+
+function saveCheckpoint(seg) {
+  cpValid = true;
+  cpSeg = seg;
+  cpTime = runTime;
+  cpBanked = banked;
+  cpClock = clock;
+  cpBiome = biome;
+  cpGates = gatesPassed;
+}
+
+function canContinue() { return cpValid && state === DEAD; }
+
+/* The road from a checkpoint forward. The stretch behind is long gone,
+   trimmed by topUpRoad hundreds of segments ago, so this builds a fresh
+   one from the gate rather than replaying the generator to get back
+   there. The player has not seen the road past the gate anyway, and a new
+   stretch is the point of continuing rather than a compromise.
+
+   segBase is the CAMERA's segment, not the car's, or the first frame
+   after a resume has no road under the camera at all. */
+function resumeRoad(carSeg) {
+  const base = Math.floor((carSeg * FEEL.SEGMENT_LENGTH - FEEL.CAMERA_DISTANCE)
+                          / FEEL.SEGMENT_LENGTH);
+  segments = [];
+  hazards = [];
+  /* Each kind gets its ordinary spacing before it is due again, NOT the
+     resume point itself. Setting them due immediately guaranteed a hazard
+     within a second of every single resume, which measured as four
+     seconds off the median survival: a continue is not allowed to be
+     easier and it is not allowed to be an ambush either. */
+  hazardDue[HAZ_BLOCKER] = base + Math.round(FEEL.BLOCKER_EVERY * 0.5);
+  hazardDue[HAZ_SPLITTER] = base + Math.round(FEEL.SPLITTER_EVERY * 0.5);
+  hazardDue[HAZ_MOVER] = base + Math.round(FEEL.MOVER_EVERY * 0.5);
+  segBase = base;
+  rngState = nextSeed() >>> 0;
+  roadWidth = 1;
+  restOwed = 0;
+  lastDir = 1;
+  // Long enough to arrive on rather than to be dropped into a corner,
+  // and short enough that a resume is not a rest.
+  addRun(FEEL.RESUME_STRAIGHT, 0, 0, 1, 1, false);
+  return base;
+}
+
+function continueRun() {
+  if (!cpValid) { startRun(); return; }
+  continues++;
+  skipOnRamp = true;
+  runTime = cpTime;
+  updateDifficulty();
+  resumeRoad(cpSeg);
+  position = cpSeg * FEEL.SEGMENT_LENGTH - FEEL.CAMERA_DISTANCE;
+  carX = 0;
+  carFrac = 0;
+  scraping = false;
+  scrapeSide = 0;
+  scrapeMeter = 0;
+  scrapeRisk = 0;
+  shake = 0;
+  deadFor = 0;
+  lastMarkSeg = -1;
+  steering.value = 0;
+  drift.headingV = 0;
+  drift.lateralV = 0;
+  drift.headingAngle = 0;
+  drift.travelAngle = 0;
+  drift.slip = 0;
+  drift.slipDeg = 0;
+  drift.slipNorm = 0;
+  drift.lateralAccel = 0;
+  carCurveX = 0;
+  carY = 0;
+  carFallV = 0;
+  carPitch = 0;
+  coastSpeed = 0;
+  carSegIndex = cpSeg;
+  prevCarIndex = cpSeg;
+  hazardSide = 0;
+  barShow = 0;
+  banked = cpBanked;
+  score = 0;
+  clock = Math.min(FEEL.CLOCK_MAX, cpClock + FEEL.CONTINUE_CLOCK_GRACE);
+  gateFlash = 0;
+  clockPop = 0;
+  gatesPassed = cpGates;
+  multiplier = 1;
+  multPop = 0;
+  nextGate = cpSeg + FEEL.CHECKPOINT_EVERY;
+  applyBiome(cpBiome);
+  for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
+  smokeCount = 0;
+  smokeAcc = 0;
+  clearDebris();
+  const keep = continues;
+  resetSpectacle();
+  continues = keep;               // resetSpectacle must not wipe the count
+  resumeFlash = FEEL.RESUME_FLASH_TIME;
+  calibrateTilt();
+  state = DRIVING;
+}
+
 function startOrRestart() {
   if (state === TITLE) { startRun(); return; }
-  if (state === DEAD && deadFor >= FEEL.DEATH_INPUT_LOCK) { startRun(); }
+  if (state === DEAD && deadFor >= FEEL.DEATH_INPUT_LOCK) {
+    // The reflex tap continues when there is somewhere to continue from,
+    // and restarts when there is not. Either way it is one action with
+    // nothing to hunt for, which is what section 5 requires.
+    if (canContinue()) continueRun(); else startRun();
+  }
 }
 
 function update(dt) {
@@ -3469,7 +3787,7 @@ function update(dt) {
      edge flash, the shake and the bar all come along without a line of
      new feedback code. Only the death test is the hazard's own. */
   const clipped = hazardBand(carIndex, localHalf);
-  if (clipped === 2) { crash(); return; }
+  if (clipped === 2) { crash(HIT_OBJECT); return; }
 
   scraping = offset > FEEL.SCRAPE_START || clipped === 1;
   scrapeSide = clipped === 1 ? hazardSide
@@ -3546,7 +3864,21 @@ function hazardBand(carIndex, localHalf) {
   return worst;
 }
 
-function crash() {
+/* Two ways to die, and they no longer look the same.
+
+   OFF_ROAD is a fall: the car slides over the lip and drops into the
+   void, which is the whole point of a narrow slab at altitude and it is
+   unchanged.
+
+   HIT_OBJECT is an impact: the car stops dead, comes apart and throws
+   debris, and the world holds still for a moment. A hazard was a solid
+   thing that killed you by being touched, and it read as the game simply
+   stopping. */
+const OFF_ROAD = 0, HIT_OBJECT = 1;
+let deathKind = OFF_ROAD;
+
+function crash(kind) {
+  deathKind = kind === HIT_OBJECT ? HIT_OBJECT : OFF_ROAD;
   audioCrash();
   runDistance = Math.round(position / 100);   // world units are centimetres
   bankScore();
@@ -3557,17 +3889,31 @@ function crash() {
   state = DEAD;
   deadFor = 0;
   scraping = false;
-  addShake(FEEL.CRASH_SHAKE_PX);
+  /* Both lanes go quiet. A callout is feedback on driving and there is no
+     driving any more, and leaving one to fade over the result screen is
+     exactly the clutter the two lanes were built to avoid. */
+  calloutLife = 0;
+  driftLife = 0;
+  breakChain();
   carFallV = 0;
   carY = 0;
   carPitch = 0;
   coastSpeed = FEEL.SPEED;
+  if (deathKind === HIT_OBJECT) {
+    explode();
+  } else {
+    addShake(FEEL.CRASH_SHAKE_PX);
+  }
 }
 
 /* The fall. Cheap, because the car is already a box in the world: it just
-   needs a height and a rotation about its own lateral axis. */
+   needs a height and a rotation about its own lateral axis.
+
+   An impact does not fall. It stopped against something solid, so the
+   car stays where it hit and the debris carries the motion instead. */
 function updateFall(dt) {
   deadFor += dt;
+  if (deathKind === HIT_OBJECT) return;
 
   coastSpeed *= Math.exp(-dt / FEEL.CRASH_COAST_TIME);
   position += coastSpeed * dt;
@@ -4918,6 +5264,10 @@ function rimGlow() {
 }
 
 function drawCar(w, h) {
+  /* An impact destroys the car. It is held for the length of the hit
+     stop, which is the frozen moment of contact, and after that there is
+     only debris. Going off the road is untouched: that car falls. */
+  if (state === DEAD && deathKind === HIT_OBJECT && hitStop <= 0) return;
   /* Projected against the camera, positioned at the car. Those were the
      same thing until the camera started leaning into corners, and keeping
      them apart is what slides the car off centre while it does. */
@@ -5197,7 +5547,7 @@ function drawClock(w, h) {
      inside the on ramp had no clock in it at all and a player never saw
      one until they had already survived twice. Not running is a state the
      readout can show; being absent is not. */
-  const running = runTime >= FEEL.ONRAMP_SECONDS;
+  const running = skipOnRamp || runTime >= FEEL.ONRAMP_SECONDS;
   const s = Math.min(w, h);
   const size = Math.round(s * FEEL.CLOCK_SIZE);
   const gateSecs = Math.max(0, nextGate - carSegIndex) * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
@@ -5302,10 +5652,27 @@ function roundRect(x, y, w2, h2, r) {
    because section 5's one more go loop is worth more than any flourish.
    The impatient path is the fast one by construction: nothing here is
    ever waited on. */
+/* The death screen.
+
+   EVERYTHING LIVES IN THE TOP HALF OR HANGS OFF THE BOTTOM EDGE, and the
+   middle band is left empty, because that is where the car is. The stats
+   row used to be laid out at a fraction of the height that happened to be
+   clear of the car in portrait and sat straight on top of it in
+   landscape. Nothing here may drift back into that band.
+
+   TWO RECORDS, because continues exist. BEST SCORE is what a clean run is
+   worth and a continued run can never touch it; FURTHEST is how far the
+   track has been seen and any run may set it. The continue count is shown
+   whenever it is not zero, so it is never ambiguous which kind of run
+   just ended. */
+const restartRect = { x: 0, y: 0, w: 0, h: 0, live: false };
+
 function drawResult(w, h) {
   const s = Math.min(w, h);
   const final = banked;
-  const beat = final > 0 && final >= bestScore;
+  const clean = continues === 0;
+  const beat = clean && final > 0 && final >= bestScore;
+  const far = runDistance > 0 && runDistance >= furthest;
   // Counts up over ROLL seconds and then sits still. Reading it early
   // costs nothing, because the run is over and the number is already
   // decided.
@@ -5313,47 +5680,119 @@ function drawResult(w, h) {
   const eased = 1 - Math.pow(1 - roll, 3);
   const shown = Math.round(final * eased);
 
-  arcadeNumber(String(shown), w / 2, h * 0.36,
-               Math.round(s * 0.155), beat ? COLOUR.SCORE_BEST : COLOUR.SCORE);
-
+  /* THE STACK IS MEASURED IN s, THE SMALLER SCREEN DIMENSION, and only
+     its starting height comes from h. Every size on this screen is a
+     fraction of s, so laying the positions out in fractions of h made a
+     block that fitted in portrait and collided with the car in landscape,
+     where h and s are the same number. The top is pushed down the taller
+     screen and clamped so the block can never reach the middle band,
+     which is where the car is and which stays empty. */
+  const y0 = Math.min(Math.max(s * 0.085, h * 0.125), Math.max(0, h * 0.5 - s * 0.34));
   if (beat) {
     // Unmistakable, because this is the moment somebody plays again for.
-    const t = 0.72 + 0.28 * Math.abs(Math.sin(deadFor * 5));
-    ctx.globalAlpha = t;
-    text('NEW BEST', w / 2, h * 0.27, Math.round(s * 0.055), '900');
+    ctx.globalAlpha = 0.72 + 0.28 * Math.abs(Math.sin(deadFor * 5));
+    text('NEW BEST', w / 2, y0, Math.round(s * 0.055), '900');
+    ctx.globalAlpha = 1;
+  } else if (far) {
+    ctx.globalAlpha = 0.72 + 0.28 * Math.abs(Math.sin(deadFor * 5));
+    text('FURTHEST YET', w / 2, y0, Math.round(s * 0.05), '900', 'center', COLOUR.GATE);
     ctx.globalAlpha = 1;
   } else {
-    text('BEST  ' + bestScore, w / 2, h * 0.27, Math.round(s * 0.042), '700');
+    text(clean ? 'BEST  ' + bestScore : 'CONTINUED RUN',
+         w / 2, y0, Math.round(s * 0.042), '700');
   }
 
-  /* The run, in three figures on one line. Cheap, and it turns a number
-     into a story: how far, how sideways, how many gates. */
-  const rowY = h * 0.47;
+  arcadeNumber(String(shown), w / 2, y0 + s * 0.095, Math.round(s * 0.145),
+               beat ? COLOUR.SCORE_BEST : COLOUR.SCORE);
+
+  /* The run in figures on one line. Cheap, and it turns a number into a
+     story: how far, how sideways, how many gates, and on a continued run
+     how many continues, which goes here rather than on a line of its own
+     so that saying it costs no height at all. */
+  const rowY = y0 + s * 0.205;
   const cols = [
     ['DIST', runDistance + 'm'],
     ['BEST \u00d7', runBestMult.toFixed(1)],
     ['GATES', String(gatesPassed)]
   ];
-  const span = Math.min(w * 0.82, s * 1.05);
+  if (continues > 0) cols.push(['CONT', String(continues)]);
+  const span = Math.min(w * 0.9, s * 1.15);
+  const step = span / cols.length;
   for (let i = 0; i < cols.length; i++) {
-    const cx = w / 2 + (i - 1) * (span / 3);
+    const cx = w / 2 + (i - (cols.length - 1) / 2) * step;
     ctx.globalAlpha = 0.6;
     text(cols[i][0], cx, rowY, Math.round(s * 0.028), '700');
     ctx.globalAlpha = 1;
-    ctx.font = '700 ' + Math.round(s * 0.048) + 'px ' + MONO;
+    ctx.font = '700 ' + Math.round(s * 0.046) + 'px ' + MONO;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = COLOUR.TEXT_SHADOW;
-    ctx.fillText(cols[i][1], cx, rowY + s * 0.048 + 2);
-    ctx.fillStyle = COLOUR.GATE;
-    ctx.fillText(cols[i][1], cx, rowY + s * 0.048);
+    ctx.fillText(cols[i][1], cx, rowY + s * 0.046 + 2);
+    ctx.fillStyle = continues > 0 && i === cols.length - 1 ? COLOUR.SCORE : COLOUR.GATE;
+    ctx.fillText(cols[i][1], cx, rowY + s * 0.046);
   }
 
-  if (deadFor >= FEEL.DEATH_INPUT_LOCK) {
-    ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
-    text('tap or press any key', w / 2, h * 0.62, Math.round(s * 0.042), '600');
-    ctx.globalAlpha = 1;
-  }
+  /* The two records on one line, always both, so the split between them
+     is obvious without a word of explanation. */
+  const rec = 'BEST  ' + bestScore + '     FURTHEST  ' + furthest + 'm';
+  ctx.globalAlpha = 0.72;
+  text(rec, w / 2, y0 + s * 0.30,
+       fittedSize(rec, '700', Math.round(s * 0.032), w * 0.9), '700');
+  ctx.globalAlpha = 1;
+
+  /* The prompt and the restart button, anchored to the bottom edge rather
+     than to a fraction of the height, so they clear the car in both
+     orientations by construction and sit above the corner pads. */
+  restartRect.live = false;
+  if (deadFor < FEEL.DEATH_INPUT_LOCK) return;
+  const resume = canContinue();
+  const btnY = h - safeBottom - FEEL.DEATH_BOTTOM;
+  const promptY = btnY - s * FEEL.DEATH_PROMPT_GAP;
+
+  ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
+  text(resume ? 'tap to continue from the last gate' : 'tap or press any key',
+       w / 2, promptY,
+       fittedSize(resume ? 'tap to continue from the last gate' : 'tap or press any key',
+                  '600', Math.round(s * 0.040), w * 0.88), '600');
+  ctx.globalAlpha = 1;
+
+  /* Restart is a separate, deliberate action, because the reflex tap now
+     continues. It is only here when continuing is possible: with no gate
+     behind you the reflex tap already restarts and a second way to do the
+     same thing would be clutter. */
+  if (!resume) return;
+  const label = 'RESTART';
+  const size = Math.round(s * 0.038);
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const bw = ctx.measureText(label).width + size * 2.4;
+  const bh = size * 2.2;
+  restartRect.x = w / 2 - bw / 2;
+  restartRect.y = btnY - bh / 2;
+  restartRect.w = bw;
+  restartRect.h = bh;
+  restartRect.live = true;
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = COLOUR.BAR_TRACK;
+  roundRect(restartRect.x, restartRect.y, bw, bh, bh * 0.3);
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = COLOUR.SCORE;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  text(label, w / 2, btnY, size, '800', 'center', COLOUR.SCORE);
+}
+
+/* Did that tap land on the restart button? Canvas rather than a DOM
+   button on purpose: #chrome and #pads already carry the pointer-events
+   discipline the Beakdown incident bought, and a fourth overlay is a
+   fourth chance to get it wrong. A rect the drawing code publishes cannot
+   eat a tap it is not under. */
+function hitRestart(e) {
+  if (!restartRect.live || state !== DEAD) return false;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  return x >= restartRect.x && x <= restartRect.x + restartRect.w
+      && y >= restartRect.y && y <= restartRect.y + restartRect.h;
 }
 
 function drawOverlay(w, h) {
@@ -5395,6 +5834,14 @@ let bestScore = (function () {
   const n = raw === null ? 0 : parseInt(raw, 10);
   return isFinite(n) && n > 0 ? n : 0;
 })();
+/* The second record, and the reason continues can exist without hollowing
+   out the first one. Distance is what a continued run is actually good
+   at, so it gets a scoreboard of its own and BEST SCORE is left alone. */
+let furthest = (function () {
+  const raw = storeGet('far');
+  const n = raw === null ? 0 : parseInt(raw, 10);
+  return isFinite(n) && n > 0 ? n : 0;
+})();
 
 /* Section 4.4. Two terms, multiplied, both zero at their easy end.
 
@@ -5433,7 +5880,7 @@ function updateClock(dt) {
   if (clockPop > 0) clockPop -= dt;
   // Nothing to survive during the on ramp. A new player has enough to
   // think about without a number counting down at them.
-  if (runTime < FEEL.ONRAMP_SECONDS) { clock = FEEL.CLOCK_START; return; }
+  if (!skipOnRamp && runTime < FEEL.ONRAMP_SECONDS) { clock = FEEL.CLOCK_START; return; }
   clock += (FEEL.CLOCK_DRIFT_RATE * slipPay() - 1) * dt;
   if (clock > FEEL.CLOCK_MAX) clock = FEEL.CLOCK_MAX;
   if (clock <= 0) { clock = 0; crash(); }
@@ -5442,6 +5889,7 @@ function updateClock(dt) {
 /* Crossing a gate. Everything a gate does happens here, once, on the
    frame the car passes it. */
 function crossGate() {
+  const at = nextGate;
   const took = Math.floor(score);
   banked += took;
   score = 0;
@@ -5459,6 +5907,9 @@ function crossGate() {
   audioSting(STING_GATE);
   sayCallout('BANKED  +' + took, CALL_GATE, COLOUR.GATE);
   applyBiome(biome + 1);
+  // Everything a continue needs, taken after the gate has done its work
+  // so a resume arrives in exactly the state the crossing left.
+  saveCheckpoint(at);
 }
 
 function updateScore(dt) {
@@ -5479,6 +5930,18 @@ function updateScore(dt) {
 }
 
 function bankScore() {
+  /* FURTHEST is open to every run, continued or not, because seeing more
+     of the track is exactly what a continue is for and it deserves to be
+     worth something. */
+  if (runDistance > furthest) {
+    furthest = runDistance;
+    storeSet('far', String(furthest));
+  }
+  /* BEST SCORE IS CLOSED TO A CONTINUED RUN, and this line is the whole
+     of score integrity. Without it the live best score break, which is
+     the strongest moment in the game, becomes reachable by pressing
+     continue enough times and stops meaning anything at all. */
+  if (continues > 0) return;
   // Only what was banked survives. The pending run is what a gate is for.
   const final = banked;
   if (final > bestScore) {
@@ -5531,30 +5994,70 @@ function addShake(px) {
 let worldHeat = 0;
 let heatPulse = 1;        // the travelling pulse, 1 at rest, and exactly 1 at zero heat
 
-/* Callouts. One slot, because one at a time and newest wins. */
-const CALL_DRIFT = 1, CALL_CLOSE = 2, CALL_GATE = 3, CALL_BEST = 4;
+/* TWO LANES.
+
+   The EVENT lane carries the things that happen to a run: a checkpoint, a
+   close call, a best score break. They are rare, so they need no rate
+   limit, and they keep their own precedence, best over gate over close.
+
+   The DRIFT lane carries the thing the player is doing, which is the
+   entire game, so it is not queued behind events and it cannot be
+   outbid by one. It has its own row on the screen, its own slot and its
+   own rate floor. The only thing that may take it away is a best score
+   break, which is the one moment loud enough to deserve the whole screen.
+
+   Each lane holds one callout, newest wins. Neither ever stacks. */
+const CALL_CLOSE = 2, CALL_GATE = 3, CALL_BEST = 4;
 let calloutText = '';
 let calloutColour = '';
 let calloutPri = 0;
 let calloutLife = 0;
 let calloutSide = 1;
-let calloutLock = 0;      // a louder callout holding the channel
-let calloutGap = 0;       // the rate limit on the chatty kind
+let calloutLock = 0;      // a louder event holding the event lane
+
+let driftText = '';
+let driftColour = '';
+let driftSize = 1;        // multiples of the base size, so a tier reads bigger
+let driftLife = 0;
+let driftSide = 1;
+let driftLock = 0;        // only a best score break sets this
+let driftGap = 0;         // the rate floor on this lane
+
+// Away from the car, so a callout can never sit over the car or over the
+// line the player is actually reading.
+function calloutAwaySide() { return carFrac >= 0 ? -1 : 1; }
 
 function sayCallout(str, pri, colour) {
   // Deferred, not queued: a callout that lost its moment has nothing left
   // to say by the time the channel is free.
   if (calloutLock > 0 && pri < calloutPri) return;
-  if (pri <= CALL_DRIFT && calloutGap > 0) return;
   calloutText = str;
   calloutColour = colour;
   calloutPri = pri;
   calloutLife = FEEL.CALLOUT_TIME;
   calloutLock = FEEL.CALLOUT_LOCK;
-  calloutGap = FEEL.CALLOUT_GAP;
-  // Away from the car, so it can never sit over the car or over the line
-  // the player is actually reading.
-  calloutSide = carFrac >= 0 ? -1 : 1;
+  calloutSide = calloutAwaySide();
+  /* The one crossing between the lanes. A best score break is the whole
+     screen's business for a moment, so it clears the drift lane and holds
+     it; nothing else in the event lane touches it at all. */
+  if (pri >= CALL_BEST) { driftLife = 0; driftLock = FEEL.CALLOUT_LOCK; }
+}
+
+/* urgent skips the rate floor. A TIER RISE is urgent by definition: the
+   ladder widens, so tiers are self limiting and cannot become a stream,
+   and holding one back means the player never sees a rung. Measured, the
+   floor was swallowing tier two entirely, which is exactly the rung that
+   says a chain is going somewhere. Tier one and a perfect entry are the
+   repeatable ones and they wait their turn. */
+function sayDrift(str, colour, size, urgent) {
+  if (driftLock > 0) return;
+  if (!urgent && driftGap > 0) return;
+  driftText = str;
+  driftColour = colour;
+  driftSize = size;
+  driftLife = FEEL.CALLOUT_TIME;
+  driftGap = FEEL.CALLOUT_GAP;
+  driftSide = calloutAwaySide();
 }
 
 /* The best score break. bestKnown is the whole of the fresh install and
@@ -5564,12 +6067,21 @@ let bestKnown = bestScore > 0;
 let beatBest = false;
 let beatFlash = 0;
 
-/* The chain: unbroken earning. It survives CALLOUT_CHAIN_GRACE of not
-   earning, so a corner exit does not break it, and every
-   CALLOUT_CHAIN_STEP of it is one link. */
+/* The chain: unbroken DRIFTING, which is slip and not the multiplier's
+   two term test, so a tidy drift down the middle of a wide on ramp road
+   still counts. It survives CALLOUT_CHAIN_GRACE of not drifting, which is
+   long enough to cross the straight between two corners, and every
+   CALLOUT_CHAIN_STEP of drifting is one link.
+
+   The ladder escalates on TIERS, not on links: the pitch in the audio
+   moves on every single link, which is the continuous reward and costs no
+   screen space at all, and the text only changes when a tier is reached,
+   which is what keeps the praise loud without becoming clutter. */
+const DRIFT_TIERS = ['DRIFT', 'NICE', 'GREAT', 'SUPERB', 'BLISTERING', 'UNREAL'];
 let chainTime = 0;
 let chainLapse = 0;
 let chainLinks = 0;
+let chainTier = 0;
 
 let gateFlash2 = 0;       // the crossing wash, separate from the score's own flash
 let wasScraping = false;
@@ -5582,23 +6094,45 @@ function resetSpectacle() {
   calloutLife = 0;
   calloutPri = 0;
   calloutLock = 0;
-  calloutGap = 0;
+  driftText = '';
+  driftLife = 0;
+  driftLock = 0;
+  driftGap = 0;
   beatBest = false;
   beatFlash = 0;
-  chainTime = 0;
-  chainLapse = 0;
-  chainLinks = 0;
+  breakChain();
   gateFlash2 = 0;
   wasScraping = false;
   edgeClear = 0;
 }
 
+function breakChain() {
+  chainTime = 0;
+  chainLapse = 0;
+  chainLinks = 0;
+  chainTier = 0;
+}
+
+/* Which tier a link count has reached, 0 for none. The thresholds widen,
+   so the ladder does not run out inside ten seconds. */
+function chainTierFor(links) {
+  const at = FEEL.DRIFT_TIER_LINKS;
+  let t = 0;
+  for (let i = 0; i < at.length; i++) if (links >= at[i]) t = i + 1;
+  return t;
+}
+
 function updateSpectacle(dt) {
   if (calloutLife > 0) calloutLife -= dt;
   if (calloutLock > 0) calloutLock -= dt;
-  if (calloutGap > 0) calloutGap -= dt;
+  if (driftLife > 0) driftLife -= dt;
+  if (driftLock > 0) driftLock -= dt;
+  if (driftGap > 0) driftGap -= dt;
   if (beatFlash > 0) beatFlash -= dt;
   if (gateFlash2 > 0) gateFlash2 -= dt;
+  if (resumeFlash > 0) resumeFlash -= dt;
+  if (explodeFlash > 0) explodeFlash -= dt;
+  updateDebris(dt);
 
   const driving = state === DRIVING;
   const want = driving
@@ -5613,8 +6147,11 @@ function updateSpectacle(dt) {
 
   if (!driving) { wasScraping = false; edgeClear = 0; return; }
 
-  // The strongest moment available, and one comparison to find it.
-  if (bestKnown && !beatBest && banked + Math.floor(score) > bestScore) {
+  /* The strongest moment available, and one comparison to find it. It
+     only arms on a CLEAN run: a continued run cannot reach the best
+     score, so it must not be told that it has. */
+  if (bestKnown && continues === 0 && !beatBest
+      && banked + Math.floor(score) > bestScore) {
     beatBest = true;
     beatFlash = FEEL.BEST_FLASH_TIME;
     addShake(FEEL.BEST_SHAKE_PX);
@@ -5630,7 +6167,7 @@ function updateSpectacle(dt) {
   if (onEdge) {
     if (!wasScraping && edgeClear >= FEEL.CALLOUT_ENTRY_CLEAR
         && drift.slipNorm >= FEEL.CALLOUT_ENTRY_SLIP) {
-      sayCallout('PERFECT ENTRY', CALL_DRIFT, COLOUR.HAZARD_WARN);
+      sayDrift('PERFECT ENTRY', COLOUR.HAZARD_WARN, 1);
     }
     edgeClear = 0;
   } else {
@@ -5638,21 +6175,149 @@ function updateSpectacle(dt) {
   }
   wasScraping = onEdge;
 
-  // The chain, which is the multiplier's own earning made countable.
-  if (multiplierEarn() > 0) {
+  /* The chain. Every link steps the pitch of the audio blip, which is the
+     continuous reward and costs nothing on screen; the text only speaks
+     when a whole tier is reached. */
+  if (drift.slipNorm >= FEEL.CHAIN_MIN_SLIP) {
     chainLapse = 0;
     chainTime += dt;
-    const links = Math.floor(chainTime / FEEL.CALLOUT_CHAIN_STEP);
+    const links = Math.floor(chainTime / FEEL.CALLOUT_CHAIN_STEP) + 1;
     if (links > chainLinks) {
       chainLinks = links;
-      sayCallout('CHAIN ×' + (links + 1), CALL_DRIFT, COLOUR.SCORE);
+      audioChain(links);
+      const tier = chainTierFor(links);
+      if (tier > chainTier) {
+        chainTier = tier;
+        const top = DRIFT_TIERS.length;
+        // Past the top of the ladder the word stops growing and the count
+        // takes over, so a very long chain still reads as bigger.
+        const label = tier <= top ? DRIFT_TIERS[tier - 1]
+                                  : DRIFT_TIERS[top - 1] + '  ×' + links;
+        sayDrift(label, scoreHeatColour((tier - 1) / Math.max(1, top - 1)),
+                 1 + FEEL.DRIFT_TIER_GROWTH * (tier - 1), tier > 1);
+      }
     }
   } else {
     chainLapse += dt;
-    if (chainLapse > FEEL.CALLOUT_CHAIN_GRACE) { chainTime = 0; chainLinks = 0; }
+    if (chainLapse > FEEL.CALLOUT_CHAIN_GRACE) breakChain();
   }
 
   resolveCloseCalls();
+}
+
+/* ==================================================================
+   THE EXPLOSION
+
+   Hitting a solid object now looks like hitting a solid object. Debris,
+   a flash, a hard shake and a few frames of the world standing still.
+
+   IT MUST NEVER DELAY GETTING BACK IN, which is section 5 and is the one
+   constraint that overrides everything here. So it is purely cosmetic:
+   nothing waits on it, the death screen comes up underneath it on exactly
+   the schedule it always did, and a tap or a key at any point during it
+   goes straight through to continue or restart. The only input gate is
+   DEATH_INPUT_LOCK, the accidental input guard that was already there,
+   and the hit stop does not extend it, because deadFor advances on real
+   time while the world is frozen.
+
+   The pieces are held in SCREEN space rather than world space. They live
+   for about a second over a car that is not moving any more, so there is
+   nothing for world space to buy, and screen space means the whole effect
+   is a handful of numbers and one batched path.
+   ================================================================== */
+const debris = [];
+let debrisCount = 0;
+let hitStop = 0;
+let explodeFlash = 0;
+(function () {
+  for (let i = 0; i < 64; i++) {
+    debris.push({ x: 0, y: 0, vx: 0, vy: 0, r: 0, life: 0, spin: 0, rot: 0, hot: 0 });
+  }
+})();
+
+function clearDebris() {
+  for (let i = 0; i < debris.length; i++) debris[i].life = 0;
+  debrisCount = 0;
+  hitStop = 0;
+  explodeFlash = 0;
+}
+
+function explode() {
+  addShake(FEEL.EXPLODE_SHAKE_PX);
+  hitStop = FEEL.HIT_STOP_TIME;
+  explodeFlash = FEEL.EXPLODE_FLASH_TIME;
+  const s = Math.min(view.w, view.h);
+  // The car's own screen position, which the rear light points already
+  // record every frame, so the debris comes off the car rather than off
+  // the middle of the screen.
+  const cx = (carParts.rlx + carParts.rrx) * 0.5;
+  const cy = (carParts.rly + carParts.rry) * 0.5;
+  const n = Math.min(debris.length, Math.round(FEEL.EXPLODE_PARTICLES));
+  debrisCount = n;
+  for (let i = 0; i < n; i++) {
+    const p = debris[i];
+    const a = rng() * Math.PI * 2;
+    // Biased upward and outward, because that is what an impact throws.
+    const speed = FEEL.EXPLODE_SPEED * (FEEL.EXPLODE_SPREAD
+                  + (1 - FEEL.EXPLODE_SPREAD) * rng());
+    p.x = cx + (rng() * 2 - 1) * s * 0.02;
+    p.y = cy + (rng() * 2 - 1) * s * 0.02;
+    p.vx = Math.cos(a) * speed;
+    p.vy = Math.sin(a) * speed - speed * 0.45;
+    p.r = s * FEEL.EXPLODE_SIZE * (0.35 + 0.65 * rng());
+    p.rot = rng() * Math.PI;
+    p.spin = (rng() * 2 - 1) * FEEL.EXPLODE_SPIN;
+    p.life = FEEL.EXPLODE_TIME * (0.6 + 0.4 * rng());
+    // A third of the pieces are hot: they are the fire and the rest are
+    // the car. Two colours, two batched fills, and it reads as both.
+    p.hot = rng() < 0.38 ? 1 : 0;
+  }
+}
+
+function updateDebris(dt) {
+  if (debrisCount === 0) return;
+  const drag = Math.exp(-dt / FEEL.EXPLODE_DRAG);
+  let live = 0;
+  for (let i = 0; i < debrisCount; i++) {
+    const p = debris[i];
+    if (p.life <= 0) continue;
+    p.life -= dt;
+    p.vx *= drag;
+    p.vy = p.vy * drag + FEEL.EXPLODE_GRAVITY * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.rot += p.spin * dt;
+    if (p.life > 0) live++;
+  }
+  if (live === 0) debrisCount = 0;
+}
+
+function drawDebris() {
+  if (debrisCount === 0) return;
+  // Two passes, one colour each, the same batching discipline the road
+  // and the tyre marks use.
+  for (let pass = 0; pass < 2; pass++) {
+    let any = false;
+    ctx.beginPath();
+    for (let i = 0; i < debrisCount; i++) {
+      const p = debris[i];
+      if (p.life <= 0 || p.hot !== pass) continue;
+      any = true;
+      const t = clamp(p.life / FEEL.EXPLODE_TIME, 0, 1);
+      const r = p.r * (0.35 + 0.65 * t);
+      // Squares rather than circles: flat shading, cut and folded from
+      // paper, and four line segments beat an arc for this many pieces.
+      const c = Math.cos(p.rot) * r, sn = Math.sin(p.rot) * r;
+      ctx.moveTo(p.x - c + sn, p.y - sn - c);
+      ctx.lineTo(p.x + c + sn, p.y + sn - c);
+      ctx.lineTo(p.x + c - sn, p.y + sn + c);
+      ctx.lineTo(p.x - c - sn, p.y - sn + c);
+      ctx.closePath();
+    }
+    if (!any) continue;
+    ctx.fillStyle = pass ? COLOUR.HAZARD_TOP : COLOUR.CAR_SIDE;
+    ctx.fill();
+  }
 }
 
 /* Close calls, section 4.4 applied to obstacles. The gap is recorded by
@@ -5673,13 +6338,23 @@ function resolveCloseCalls() {
   }
 }
 
-/* The callout itself. Flies in a very short way, reads, and dies. The
+/* The callouts. Each flies in a very short way, reads, and dies. The
    slide is deliberately tiny: section 7 warns that motion is the thing
-   most easily overdone here, and the job is legibility not choreography. */
+   most easily overdone here, and the job is legibility not choreography.
+
+   Both lanes go through one drawing routine and differ only in which row
+   of the sky band they sit on and how big they are. */
 function drawCallout(w, h) {
-  if (calloutLife <= 0) return;
+  drawLane(w, h, calloutText, calloutColour, calloutLife, calloutSide,
+           FEEL.CALLOUT_ROW_EVENT, 1);
+  drawLane(w, h, driftText, driftColour, driftLife, driftSide,
+           FEEL.CALLOUT_ROW_DRIFT, driftSize);
+}
+
+function drawLane(w, h, str, colour, life, side, row, scale) {
+  if (life <= 0) return;
   const s = Math.min(w, h);
-  const t = 1 - calloutLife / FEEL.CALLOUT_TIME;      // 0 at birth, 1 at death
+  const t = 1 - life / FEEL.CALLOUT_TIME;             // 0 at birth, 1 at death
   let alpha = 1, slide = 0;
   if (t < FEEL.CALLOUT_IN) {
     const u = t / FEEL.CALLOUT_IN;
@@ -5688,25 +6363,26 @@ function drawCallout(w, h) {
   } else if (t > 1 - FEEL.CALLOUT_OUT) {
     alpha = (1 - t) / FEEL.CALLOUT_OUT;
   }
-  /* In the band of sky between the bottom of the HUD stack and the
-     horizon. Both ends are measured rather than assumed, so it holds in
-     portrait and in landscape and it is never over road: everything above
-     the horizon line is sky by construction. */
-  const y = Math.max(hudBottom + s * FEEL.CALLOUT_GAP_TOP,
-                     horizonY - s * FEEL.CALLOUT_RISE);
+  /* The band of sky between the bottom of the HUD stack and the horizon.
+     Both ends are measured rather than assumed, so it holds in portrait
+     and in landscape, and it is never over road: everything above the
+     horizon line is sky by construction. The two lanes take fixed shares
+     of that band, so they cannot collide however tall it is. */
+  const top = hudBottom + s * FEEL.CALLOUT_GAP_TOP;
+  const bottom = horizonY - s * FEEL.CALLOUT_RISE;
+  const y = bottom > top ? top + (bottom - top) * row : top;
   /* Sized to fit and then clamped on screen. Offset to the side plus a
      long string plus a narrow handset runs the text off the edge, and a
-     callout that cannot be read has cost clutter and bought nothing.
-     CLOSE CALL carries a number and is the long one. */
-  const size = fittedSize(calloutText, '800', Math.round(s * FEEL.CALLOUT_SIZE),
+     callout that cannot be read has cost clutter and bought nothing. */
+  const size = fittedSize(str, '800', Math.round(s * FEEL.CALLOUT_SIZE * scale),
                           w * FEEL.CALLOUT_MAX_WIDTH);
   ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const half = ctx.measureText(calloutText).width / 2;
+  const half = ctx.measureText(str).width / 2;
   const edge = s * FEEL.CALLOUT_GAP_TOP;
-  let x = w / 2 + calloutSide * (w * FEEL.CALLOUT_SIDE + slide);
+  let x = w / 2 + side * (w * FEEL.CALLOUT_SIDE + slide);
   x = clamp(x, half + edge, w - half - edge);
   ctx.globalAlpha = alpha;
-  text(calloutText, x, y, size, '800', 'center', calloutColour);
+  text(str, x, y, size, '800', 'center', colour);
   ctx.globalAlpha = 1;
 }
 
@@ -5731,6 +6407,20 @@ function drawSpectacleFlash(w, h) {
     const u = beatFlash / FEEL.BEST_FLASH_TIME;
     ctx.globalAlpha = FEEL.BEST_FLASH_ALPHA * u * u;
     ctx.fillStyle = COLOUR.SCORE_BEST;
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1;
+  }
+  if (resumeFlash > 0) {
+    const u = resumeFlash / FEEL.RESUME_FLASH_TIME;
+    ctx.globalAlpha = FEEL.GATE_FLASH_ALPHA * u * u;
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1;
+  }
+  if (explodeFlash > 0) {
+    const u = explodeFlash / FEEL.EXPLODE_FLASH_TIME;
+    ctx.globalAlpha = FEEL.EXPLODE_FLASH_ALPHA * u * u;
+    ctx.fillStyle = COLOUR.HAZARD_LIP;
     ctx.fillRect(0, 0, w, h);
     ctx.globalAlpha = 1;
   }
@@ -5787,6 +6477,9 @@ function drawHud(w, h) {
     tunerLine(15),
     tunerLine(16),
     tunerLine(17),
+    tunerLine(18),
+    tunerLine(19),
+    tunerLine(20),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
@@ -5898,6 +6591,7 @@ function render() {
   ctx.fillRect(-40, horizonY - 1, w + 80, h * FEEL.HORIZON_FADE_FRACTION + 2);
   drawSmoke();
   drawCar(w, h);
+  drawDebris();
   ctx.restore();
 
   drawScrapeFlash(w, h);
@@ -6112,10 +6806,21 @@ function buildAudio() {
   const stingGain = gain(0);
   stingOsc.connect(stingGain); stingGain.connect(bus);
 
+  /* --- The chain blip. Its own voice rather than the sting's, because a
+     chain link and a close call can land on the same frame and a shared
+     voice would cut one of them off mid note. On the BUS, not on the
+     music, because music is off by default and this is the reward for
+     playing well. --- */
+  const chainOsc = node('Oscillator');
+  chainOsc.type = 'square';
+  const chainLow = filter('lowpass', 2600, 0.9);
+  const chainGain = gain(0);
+  chainOsc.connect(chainLow); chainLow.connect(chainGain); chainGain.connect(bus);
+
   const t0 = ac.currentTime;
   skidSrc.start(t0); scrapeSrc.start(t0); crashSrc.start(t0); hatSrc.start(t0);
   wobble.start(t0); bassOsc.start(t0);
-  arpOsc.start(t0); octOsc.start(t0); stingOsc.start(t0);
+  arpOsc.start(t0); octOsc.start(t0); stingOsc.start(t0); chainOsc.start(t0);
 
   return {
     ac: ac, master: master, pauseFilter: pauseFilter,
@@ -6128,6 +6833,7 @@ function buildAudio() {
     octOsc: octOsc, octGain: octGain, octLevel: octLevel,
     hatGain: hatGain, hatLevel: hatLevel,
     stingOsc: stingOsc, stingGain: stingGain,
+    chainOsc: chainOsc, chainGain: chainGain,
     step: 0, nextNote: 0, heat: 0, crashUntil: 0
   };
 }
@@ -6489,6 +7195,27 @@ function audioSting(sting) {
   }
 }
 
+/* The chain blip, and it is the continuous reward for drifting.
+
+   One step up the ladder per link, resetting when the chain breaks, which
+   is the oldest and most satisfying combo feedback there is and it costs
+   no screen space at all. The ladder is a major pentatonic over two
+   octaves, so it climbs without ever landing on a note that argues with
+   the music's own key, and past the top it stays there rather than
+   running off into a whistle. */
+const CHAIN_LADDER = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24, 26, 28, 31, 33, 36];
+
+function audioChain(link) {
+  if (!audioOn()) return;
+  const a = audio, t = a.ac.currentTime;
+  const n = CHAIN_LADDER[Math.min(link - 1, CHAIN_LADDER.length - 1)];
+  a.chainOsc.frequency.setValueAtTime(semis(TRACKS[track].root * 8, n), t);
+  const p = a.chainGain.gain;
+  p.cancelScheduledValues(t);
+  p.setValueAtTime(FEEL.CHAIN_GAIN, t);
+  p.exponentialRampToValueAtTime(0.0001, t + FEEL.CHAIN_DECAY);
+}
+
 /* The crash, and then a clean wind down. One envelope and one sweep on
    voices that already exist, so nothing is built at the worst possible
    moment for the frame budget. */
@@ -6511,6 +7238,8 @@ function audioCrash() {
   ramp(a.scrapeGain.gain, 0, 0.05);
   a.stingGain.gain.cancelScheduledValues(t);
   ramp(a.stingGain.gain, 0, 0.05);
+  a.chainGain.gain.cancelScheduledValues(t);
+  ramp(a.chainGain.gain, 0, 0.05);
 }
 
 
@@ -6540,6 +7269,18 @@ function frame(now) {
     // Nothing moves and nothing is read, but the frame still runs so the
     // cover is drawn and the buttons stay live.
     clearHeldInput();
+    render();
+    sampleFps(rawDt);
+    return;
+  }
+  /* Hit stop. The world stands still for a few frames, which is what
+     sells an impact as an impact, and the DEATH TIMER KEEPS RUNNING on
+     real time so this cannot delay getting back in by a single
+     millisecond. Input is handled in listeners, not here, so a tap during
+     the freeze goes straight through. */
+  if (hitStop > 0) {
+    hitStop -= dt;
+    deadFor += dt;
     render();
     sampleFps(rawDt);
     return;
