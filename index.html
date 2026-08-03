@@ -661,15 +661,23 @@ const FEEL = {
   MULT_DECAY_RATE:          1.1,     // per second whenever nothing is being earned
   MULT_MAX:                  12,
   /* The readout. It has to teach the rule inside one corner without a
-     word, so the number is large, it sits where the eyes already are, and
-     it takes its colour from the same ramp the tyre marks run through, so
-     the trail on the road and the number on the screen are visibly the
-     same signal. */
+     word, so the number is large and it sits where the eyes already are.
+     It is the only number left in the run, so it carries the multiplier
+     as well as the total. */
   SCORE_TOP:               0.05,     // of screen height
   SCORE_SIZE:             0.062,     // of the smaller screen dimension
-  MULT_TOP:               0.125,
-  MULT_SIZE:              0.085,
-  MULT_GROWTH:             0.55,     // how much the number swells at full multiplier
+  /* The multiplier has no readout of its own during a run any more, so
+     the score carries its signal instead. One element saying both things
+     rather than two elements or none.
+
+     Restrained on purpose. The score must not start competing with the
+     road edges for attention and section 7 warns specifically about
+     overdoing motion, so the whole reaction is a warm colour shift, an
+     eight percent swell at the very top of the range, and a short kick
+     each time a whole multiplier is crossed. Set SCORE_HEAT_GROWTH to
+     zero and the colour endpoints equal to switch it off entirely. */
+  SCORE_HEAT_GROWTH:       0.08,     // how much the score swells at full multiplier
+  SCORE_HEAT_POP:          0.10,     // the extra kick on crossing a whole number
   MULT_POP_TIME:           0.18,     // seconds of kick each time it crosses a whole number
 
   /* ----------------------------------------------------------------
@@ -726,7 +734,14 @@ const FEEL = {
   CHECKPOINT_HEIGHT:       1500,     // world units, the posts either side
   CHECKPOINT_POST:          260,     // world units, how thick they are
   CHECKPOINT_FLASH:         0.5,     // seconds of the crossing flash
-  CLOCK_TOP:               0.20,     // of screen height, under the multiplier
+  /* The timer hangs off the BOTTOM of the score rather than sitting at
+     its own fraction of the screen height. The two elements are sized
+     from the smaller screen dimension while a fraction of the height is
+     the taller one, so an independent position that looks right in
+     portrait opens a hole or collides in landscape. This is a gap below
+     the score, in the same units the score is drawn in, so the stack
+     holds together in both. */
+  CLOCK_GAP:               0.022,     // of the smaller screen dimension
   CLOCK_SIZE:             0.055,     // of the smaller screen dimension
   CLOCK_GATE_SIZE:        0.036,     // the distance to the next gate, beside it
   CLOCK_PAY_SIZE:         0.030,     // the live payback readout
@@ -4764,13 +4779,42 @@ function drawScore(w, h) {
   if (state !== DRIVING) return;
   const s = Math.min(w, h);
   const flash = gateFlash > 0 ? gateFlash / FEEL.CHECKPOINT_FLASH : 0;
-  const size = Math.round(s * FEEL.SCORE_SIZE * (1 + 0.3 * flash));
-  // One score, not two. It is the whole total, and a gate is what makes
-  // the part of it that was pending safe.
-  arcadeNumber(String(banked + Math.floor(score)), w / 2, safeTop + h * FEEL.SCORE_TOP,
-               size, flash > 0 ? COLOUR.GATE : COLOUR.SCORE);
+  /* The multiplier, carried by the score rather than by a number of its
+     own. Hotter and very slightly larger as it climbs, with a short kick
+     on each whole one crossed, which is the moment worth noticing. */
+  const heat = clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1);
+  const pop = multPop > 0 ? multPop / FEEL.MULT_POP_TIME : 0;
+  const size = Math.round(s * FEEL.SCORE_SIZE
+    * (1 + 0.3 * flash + FEEL.SCORE_HEAT_GROWTH * heat + FEEL.SCORE_HEAT_POP * pop));
+  scoreTop = safeTop + h * FEEL.SCORE_TOP;
+  scoreSize = size;
+  arcadeNumber(String(banked + Math.floor(score)), w / 2, scoreTop,
+               size, flash > 0 ? COLOUR.GATE : scoreHeatColour(heat));
   drawClock(w, h);
-  drawMultiplier(w, h);
+}
+
+/* Precomputed, because it is read every frame and building a colour
+   string per frame to say the same thing is waste. The resting gold at
+   the cold end running to the best score cream at the cap, both taken
+   from the palette rather than written out again here, so a repalette
+   moves the whole ramp with everything else. */
+const SCORE_RAMP = [];
+(function () {
+  const hex = c => [parseInt(c.slice(1, 3), 16),
+                    parseInt(c.slice(3, 5), 16),
+                    parseInt(c.slice(5, 7), 16)];
+  const a = hex(COLOUR.SCORE), b = hex(COLOUR.SCORE_BEST);
+  for (let i = 0; i < 16; i++) {
+    const f = i / 15;
+    SCORE_RAMP.push('rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ','
+      + Math.round(a[1] + (b[1] - a[1]) * f) + ','
+      + Math.round(a[2] + (b[2] - a[2]) * f) + ')');
+  }
+})();
+function scoreHeatColour(t) {
+  let i = Math.round(t * (SCORE_RAMP.length - 1));
+  if (i < 0) i = 0; else if (i >= SCORE_RAMP.length) i = SCORE_RAMP.length - 1;
+  return SCORE_RAMP[i];
 }
 
 /* The pit timer. A plate, tabular digits, and the distance to the next
@@ -4791,7 +4835,6 @@ function drawClock(w, h) {
   const reachable = clock >= gateSecs;
   // Paused during the on ramp: present, legible, and visibly not counting.
   const dim = running ? 1 : 0.45;
-  const y = safeTop + h * FEEL.CLOCK_TOP;
 
   const main = timeLabel(clock);
   const gl = timeLabel(gateSecs);
@@ -4804,6 +4847,11 @@ function drawClock(w, h) {
   const padx = size * 0.42, pady = size * 0.30, gap = size * 0.5;
   const boxW = mw + gap + gw + padx * 2;
   const boxH = size + pady * 2;
+  /* Hung off the score rather than off its own screen fraction, so it sits
+     directly under it in both orientations and follows the score when the
+     score swells with the multiplier or flashes at a gate. scoreTop is a
+     middle baseline, so half the score size clears the digits. */
+  const y = scoreTop + scoreSize * 0.5 + s * FEEL.CLOCK_GAP + boxH * 0.5;
   const bx0 = w / 2 - boxW / 2, by0 = y - boxH / 2;
 
   ctx.globalAlpha = 0.72 * dim;
@@ -4860,34 +4908,6 @@ function drawClock(w, h) {
     ctx.fillText(pl, w / 2, y - boxH * 0.9 - (1 - t) * s * 0.09);
     ctx.globalAlpha = 1;
   }
-}
-
-/* Off to the side, in the trail's own colour, and nothing like either of
-   the other two. */
-function drawMultiplier(w, h) {
-  /* Always drawn, and quiet at rest rather than absent. A player who
-     never gets near the edge early on used to see nothing here at all,
-     so the one number that explains what the game rewards was invisible
-     to exactly the person who needed it. */
-  const s = Math.min(w, h);
-  const t = clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1);
-  const idle = multiplier <= 1.005;
-  const pop = multPop > 0 ? multPop / FEEL.MULT_POP_TIME : 0;
-  const size = Math.round(s * FEEL.MULT_SIZE * (1 + FEEL.MULT_GROWTH * t + 0.2 * pop));
-  ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  const label = '\u00d7' + multiplier.toFixed(1);
-  const x = w - Math.round(s * 0.045);
-  const y = safeTop + h * FEEL.MULT_TOP;
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = Math.max(2.5, size * 0.13);
-  ctx.globalAlpha = idle ? 0.4 : 1;
-  ctx.strokeStyle = COLOUR.SCORE_EDGE;
-  ctx.strokeText(label, x, y);
-  ctx.fillStyle = trailColour(t);
-  ctx.fillText(label, x, y);
-  ctx.globalAlpha = 1;
 }
 
 function roundRect(x, y, w2, h2, r) {
@@ -4991,6 +5011,9 @@ let clock = 0;
 let nextGate = 0;         // segment index of the gate not yet crossed
 let gateFlash = 0;        // seconds left on the crossing response
 let clockPop = 0;         // seconds left on the big time payout
+/* Where the score was drawn this frame, so the timer can hang off it
+   rather than guessing at a fraction of the screen. */
+let scoreTop = 0, scoreSize = 0;
 let runBestMult = 1;      // the best multiplier this run reached
 let gatesPassed = 0;
 let runDistance = 0;      // metres, for the summary
