@@ -885,10 +885,24 @@ const FEEL = {
      the whole city. Ordinary drifting wakes a corner of it, a strong
      chain wakes all of it, and the difference is visible. */
   CITY_SLIP_POWER:          1.0,     // LIVE, how sharply depth counts
-  CITY_SLIP_BASE:          0.55,     // LIVE, the share a chain lights at shallow slip
+  CITY_BASE:               0.40,     // LIVE, the share a deep slide lights with no chain behind it
   CITY_CHAIN_FULL:           12,     // LIVE, links at which the chain term is full
-  CITY_RISE_TIME:          0.30,     // seconds, so it comes up with the drift
-  CITY_FADE_TIME:          2.10,     // LIVE, and much slower, so the city cools rather than switching off
+  /* THE ENVELOPE, and the ratio between these two is the whole feel of
+     it. Attack short enough that the surge lands on the frame the driver
+     commits, release long enough that straightening up is a fade rather
+     than a switch, and short enough that a straight genuinely goes dark.
+     Both LIVE, because this is a ratio that can only be judged by
+     driving. */
+  CITY_ATTACK:             0.10,     // LIVE, seconds
+  CITY_RELEASE:            0.60,     // LIVE, seconds
+  CITY_SILENT:            0.004,     // below this on a zero target it is snapped to nothing
+  /* The throb on top. Restrained by default and section 7 is the reason:
+     the skyline is in peripheral vision for the whole run, which is
+     exactly where overdone motion does its damage. Depth is LIVE and zero
+     switches it off entirely. */
+  CITY_PULSE_DEPTH:        0.16,     // LIVE, how deep the trough goes at full intensity
+  CITY_PULSE_HZ:           0.80,     // LIVE, cycles a second at rest
+  CITY_PULSE_HZ_GAIN:      1.30,     // LIVE, extra cycles a second at full intensity
   CITY_WINDOW_FILL:        0.46,     // of the cell, so windows are small and regular
   CITY_MIN_BUILDING_PX:       9,     // shorter than this and a window is not worth drawing
   HEAT_HORIZON:            0.55,     // LIVE, a second pass of the horizon band at this alpha
@@ -2039,11 +2053,14 @@ const TUNABLES = [
   { key: 'HEAT_HORIZON',       label: 'hSky',    step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
   { key: 'HEAT_SKYLINE_LIFT',  label: 'hCity',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
   { key: 'CITY_ALPHA',         label: 'winLit',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
-  { key: 'CITY_SLIP_BASE',     label: 'winBase', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'CITY_BASE',          label: 'winBase', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
   { key: 'CITY_CHAIN_FULL',    label: 'winFull', step: 2,    min: 2,    max: 120,   dp: 0, group: 21 },
   { key: 'CITY_SLIP_POWER',    label: 'winSlip', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 21 },
-  { key: 'CITY_FADE_TIME',     label: 'winFade', step: 0.1,  min: 0.1,  max: 10,    dp: 1, group: 21 },
-  { key: 'CITY_RISE_TIME',     label: 'winRise', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 21 },
+  { key: 'CITY_ATTACK',        label: 'winAtk',  step: 0.01, min: 0.01, max: 2.0,   dp: 2, group: 21 },
+  { key: 'CITY_RELEASE',       label: 'winRel',  step: 0.05, min: 0.05, max: 6.0,   dp: 2, group: 21 },
+  { key: 'CITY_PULSE_DEPTH',   label: 'winThrob',step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 22 },
+  { key: 'CITY_PULSE_HZ',      label: 'throbHz', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 22 },
+  { key: 'CITY_PULSE_HZ_GAIN', label: 'throbUp', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 22 },
   { key: 'CITY_WINDOW_FILL',   label: 'winSize', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 21 },
   { key: 'CITY_MIN_BUILDING_PX',label:'winMinPx',step: 1,    min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
@@ -2712,6 +2729,9 @@ function tunerLine(group) {
   if (group === 21) {
     out += 'city ' + cityGlow.toFixed(2) + '  slip ' + drift.slipNorm.toFixed(2)
         + '  link ' + chainLinks;
+  }
+  if (group === 22) {
+    out += 'throb ' + cityPulse.toFixed(2);
   }
   if (group === 20) {
     out += 'cont ' + continues + (cpValid ? '  gate@' + cpSeg + ' t' + cpTime.toFixed(0) + 's' : '  no gate')
@@ -4291,7 +4311,7 @@ function drawSkyline(w, h) {
     if (any) {
       // Brighter as well as more numerous, but the alpha is the thing the
       // hard rule bites on and it is capped by CITY_ALPHA.
-      ctx.globalAlpha = FEEL.CITY_ALPHA * (0.45 + 0.55 * cityGlow);
+      ctx.globalAlpha = FEEL.CITY_ALPHA * (0.45 + 0.55 * cityGlow) * cityPulse;
       ctx.fillStyle = COLOUR.SKYLINE_WINDOW;
       ctx.fill();
       ctx.globalAlpha = 1;
@@ -6169,28 +6189,65 @@ let heatPulse = 1;        // the travelling pulse, 1 at rest, and exactly 1 at z
 /* How much of the city is awake, 0 to 1. Its own value rather than a
    second reader of worldHeat, because the two answer different questions:
    worldHeat is the multiplier, which decays and which needs the edge, and
-   this is how well the car is being driven RIGHT NOW. */
-let cityGlow = 0;
+   this is how well the car is being driven RIGHT NOW.
 
+   NOTHING HERE ACCUMULATES. cityGlow is recomputed toward a live target
+   every frame and can fall as freely as it rises, and there is no list of
+   lit windows anywhere: a window is lit when the glow is past the fixed
+   threshold it was born with and dark when it is not, which is why they
+   go out in the same order they came on. */
+let cityGlow = 0;
+let cityPulse = 1;        // the throb, 1 at rest and never above 1
+let cityPhase = 0;
+
+/* AN ENVELOPE, RECOMPUTED EVERY FRAME FROM LIVE DRIFT. Fast attack, slower
+   release, and a target that is genuinely zero on a straight.
+
+   THE BUG THIS REPLACES, because it is worth writing down. The target used
+   to be chainTerm * (base + rest * slipTerm), which reads as "the chain
+   decides how far it goes and slip decides how hard". It latches, and
+   badly: chainLinks only ever grows, the chain survives
+   CALLOUT_CHAIN_GRACE of not drifting, and slip was an ADDITIVE term, so
+   at zero slip the target was still base times chainTerm. Measured on a
+   dead straight with no slip at all: the whole city, all 360 windows,
+   stayed lit for two full seconds, was still half lit at three, and did
+   not reach zero until eight. That is a latch wearing a linger's clothes.
+
+   SLIP IS NOW A GATE, NOT A TERM. It multiplies the whole thing, so
+   however long the chain is, the moment the car stops sliding the target
+   is zero and the release takes it down. The chain still decides how far
+   a slide can go, which is the "longer" half of the brief, but it can no
+   longer hold the lights on by itself.
+
+   The two time constants ARE the feel of this, which is why both are
+   named and both are on the cycler: the ratio between them is what makes
+   it breathe rather than flicker or smear. */
 function updateCity(dt) {
   const driving = state === DRIVING;
-  /* Slip is required for any of it, so drifting is the only thing that
-     lights the city. The chain then decides how far it goes, which is
-     what makes a long drift wake more of the city than a short one of the
-     same depth. */
   const slipTerm = Math.pow(
     clamp((drift.slipNorm - FEEL.CHAIN_MIN_SLIP) / (1 - FEEL.CHAIN_MIN_SLIP), 0, 1),
     FEEL.CITY_SLIP_POWER);
   const chainTerm = clamp(chainLinks / Math.max(1, FEEL.CITY_CHAIN_FULL), 0, 1);
-  const want = driving
-    ? chainTerm * (FEEL.CITY_SLIP_BASE + (1 - FEEL.CITY_SLIP_BASE) * slipTerm)
+  const target = driving
+    ? slipTerm * (FEEL.CITY_BASE + (1 - FEEL.CITY_BASE) * chainTerm)
     : 0;
-  /* Up fast and down slow, which is the whole of "let it linger". A city
-     that snaps off the instant a drift ends is a switch; one that cools
-     over a couple of seconds is an afterglow, and the afterglow is what
-     makes the end of a drift feel like something rather than nothing. */
-  const tau = want > cityGlow ? FEEL.CITY_RISE_TIME : FEEL.CITY_FADE_TIME;
-  cityGlow += (want - cityGlow) * (1 - Math.exp(-dt / tau));
+  const tau = target > cityGlow ? FEEL.CITY_ATTACK : FEEL.CITY_RELEASE;
+  cityGlow += (target - cityGlow) * (1 - Math.exp(-dt / tau));
+  /* An exponential never actually arrives. Without this the city sits at
+     a thousandth of a window for the rest of the run, which is the same
+     class of mistake as the latch it replaces. */
+  if (target <= 0 && cityGlow < FEEL.CITY_SILENT) cityGlow = 0;
+
+  /* The throb. Depth and rate both scale with the envelope, so at rest
+     there is no pulse at all and only a hard sustained slide makes the
+     city breathe. It rides the ALPHA and never the thresholds: modulating
+     which windows are lit would read as flicker rather than as a pulse,
+     and section 7 is specific about overdoing motion on a phone. Default
+     low, and CITY_PULSE_DEPTH takes it to nothing. */
+  cityPhase += dt * (FEEL.CITY_PULSE_HZ + FEEL.CITY_PULSE_HZ_GAIN * cityGlow)
+                  * Math.PI * 2;
+  if (cityPhase > Math.PI * 2) cityPhase -= Math.PI * 2;
+  cityPulse = 1 - FEEL.CITY_PULSE_DEPTH * cityGlow * (0.5 - 0.5 * Math.cos(cityPhase));
 }
 
 /* TWO LANES.
@@ -6311,6 +6368,8 @@ function resetSpectacle() {
   worldHeat = 0;
   heatPulse = 1;
   cityGlow = 0;
+  cityPulse = 1;
+  cityPhase = 0;
   calloutText = '';
   calloutLife = 0;
   calloutPri = 0;
@@ -6731,6 +6790,7 @@ function drawHud(w, h) {
     tunerLine(19),
     tunerLine(20),
     tunerLine(21),
+    tunerLine(22),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
