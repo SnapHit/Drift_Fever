@@ -366,6 +366,26 @@ const FEEL = {
      zero: an average over a stretch ahead, weighted toward the near end
      and clipped to road still on screen, so the lean leads the corner
      rather than being shoved by it. */
+  /* How much of the car's own sideways position the camera copies.
+
+     1.0 is the camera sitting exactly on the car: the car is pinned to
+     the centre of the screen and the road sweeps across it. Because the
+     road fills most of the frame, that reads as the SCREEN moving rather
+     than the road, which a cold player reported as disorienting.
+
+     0 is the camera sitting on the road centreline: the road is pinned
+     and the car visibly moves across it.
+
+     Only the two extremes have ever been tried and both are wrong. This
+     is the middle, and it is not CAMERA_LOOK coming back. CAMERA_LOOK
+     offset the camera by CURVATURE, a derivative, so it lurched whenever
+     the curvature changed and it moved the camera off the car for reasons
+     the player had not caused. This copies a POSITION the player is
+     already driving, so it is continuous by construction and it can only
+     move when the car moves.
+
+     LIVE, on a fine step, and 1.0 so nothing changes until it is tuned. */
+  CAMERA_FOLLOW:            1.0,     // LIVE
   CAMERA_LOOK:                0,     // LIVE, world units per unit of curvature
   CAMERA_LOOK_AHEAD:      11000,     // LIVE, world units up the road it reads from
   CAMERA_LOOK_TIME:        0.70,     // seconds of lag on it
@@ -630,6 +650,46 @@ const FEEL = {
   MULT_SIZE:              0.085,
   MULT_GROWTH:             0.55,     // how much the number swells at full multiplier
   MULT_POP_TIME:           0.18,     // seconds of kick each time it crosses a whole number
+
+  /* ----------------------------------------------------------------
+     Checkpoints and the clock, which together are the progression layer.
+
+     A gate every CHECKPOINT_EVERY segments banks the score, tops the
+     clock up and moves the run to a new place to look at.
+
+     BANKING settles the open question in section 14. The score you keep
+     is the score you had at the last gate; what you have earned since is
+     pending and a crash loses it. Every run ends in a crash, so that is
+     not a punishment bolted on, it is what makes a gate an event: the
+     number rolls over and is yours.
+
+     THE CLOCK is meant to be honest and almost never the thing that
+     kills you. It drains at one second per second and drifting pays it
+     back, scaled by slip exactly as the multiplier is, so anyone taking
+     the corners properly tops it up without thinking about it. The rates
+     below are set so that a driver who never slides at all loses about a
+     fifth of a second per second, which is a couple of minutes of
+     deliberately passive driving before it bites, and a driver who
+     actually drifts gains. It does not run at all during the on ramp. */
+  CLOCK_START:               26,     // seconds in hand at the start of a run
+  CLOCK_MAX:                 40,     // LIVE, the most that can be banked
+  CLOCK_CHECKPOINT:          10,     // LIVE, seconds a gate is worth
+  CLOCK_DRIFT_RATE:         3.2,     // LIVE, seconds paid back per second at full slip
+  /* The clock's own slip threshold, and it is much higher than the
+     multiplier's on purpose. Corners in this game generate slip whether
+     you meant it or not: a driver deliberately holding the middle and not
+     sliding still measures 0.58 mean slip, barely under a driver who is
+     drifting properly. Paying from MULT_MIN_SLIP therefore paid everyone
+     the same and made the clock a decoration. From here, only slip that
+     was actually asked for pays. */
+  CLOCK_MIN_SLIP:          0.55,
+  CLOCK_LOW:                  8,     // seconds under which the readout starts warning
+  CHECKPOINT_EVERY:        1500,     // LIVE, segments between gates, about 33 seconds
+  CHECKPOINT_HEIGHT:       1500,     // world units, the posts either side
+  CHECKPOINT_POST:          260,     // world units, how thick they are
+  CHECKPOINT_FLASH:         0.5,     // seconds of the crossing flash
+  CLOCK_TOP:               0.20,     // of screen height, under the multiplier
+  CLOCK_SIZE:             0.055,     // of the smaller screen dimension
 
   CRASH_GRAVITY:          26000,     // world units per second squared
   CRASH_TUMBLE:             2.4,     // radians per second, nose over
@@ -970,10 +1030,17 @@ const FEEL = {
      and brings the flash and the shake with it. Hitting the core kills.
      Section 4.2's argument against a binary cliff applies to a hazard
      exactly as it applies to the road edge. */
-  HAZARD_HEIGHT:            620,     // world units, tall enough to read at distance
+  /* Taller and striped, because a cold player read these as jumps and
+     aimed at them. Height alone is not the fix: what says "solid" is a
+     dark vertical face carrying diagonal hazard striping, which is the
+     one marking that universally means do not hit. */
+  HAZARD_HEIGHT:            900,     // world units, tall enough to read at distance
+  HAZARD_STRIPE_COUNT:        7,     // diagonal bands across the front face
+  HAZARD_STRIPE_SLANT:      0.9,     // of the face height, how far the bands lean
   HAZARD_CLIP:              140,     // world units of shoulder each side, the middle band
   HAZARD_WARN_SEGMENTS:      45,     // a full second of warning, painted on the road
-  HAZARD_WARN_STRIPES:        5,
+  HAZARD_WARN_STRIPES:        4,     // arrowheads painted in the OPEN lane
+  HAZARD_ARROW_LENGTH:        7,     // segments each arrowhead spans
   /* The curvature a hazard may sit in at its entry, after the scale.
 
      This is a READABILITY bound and nothing else. The road slides off the
@@ -1185,6 +1252,35 @@ const FEEL = {
    warm asphalt is a much weaker read than magenta on blue, so the ramp is
    now blue to cyan to white and carries its intensity in value rather
    than in hue. */
+/* The place the run is in. Only the background moves: the sky, the glow
+   on the horizon, the grid under the road and the skyline on it. The road
+   itself and the car are deliberately untouched, because the readability
+   rules from the neon session are load bearing and a biome that breaks
+   them is a biome that kills people. This is the smallest thing that
+   honestly reads as somewhere new, and it cannot make the game unfair. */
+const BIOMES = [
+  { VOID: '#0b0503', GRID: 'rgba(150,58,22,0.22)', GRID_NEAR: 'rgba(214,88,30,0.32)',
+    HORIZON_GLOW: '#b8431a', HAZE: '58,20,10', HORIZON_FADE: '184,67,26',
+    SKYLINE: '#170906', SKYLINE_TOP: '#66200c' },
+  { VOID: '#0a0410', GRID: 'rgba(120,40,150,0.22)', GRID_NEAR: 'rgba(180,70,215,0.32)',
+    HORIZON_GLOW: '#8a2ec2', HAZE: '40,14,58', HORIZON_FADE: '138,46,194',
+    SKYLINE: '#120620', SKYLINE_TOP: '#4a1470' },
+  { VOID: '#03080b', GRID: 'rgba(24,110,120,0.22)', GRID_NEAR: 'rgba(40,180,190,0.32)',
+    HORIZON_GLOW: '#127f8e', HAZE: '10,42,48', HORIZON_FADE: '18,127,142',
+    SKYLINE: '#04141a', SKYLINE_TOP: '#0d5566' },
+  { VOID: '#0b0703', GRID: 'rgba(150,110,20,0.22)', GRID_NEAR: 'rgba(220,168,36,0.32)',
+    HORIZON_GLOW: '#b8871a', HAZE: '54,38,10', HORIZON_FADE: '184,135,26',
+    SKYLINE: '#170f04', SKYLINE_TOP: '#6a4a0c' }
+];
+let biome = 0;
+function applyBiome(i) {
+  biome = ((i % BIOMES.length) + BIOMES.length) % BIOMES.length;
+  const b = BIOMES[biome];
+  for (const k in b) COLOUR[k] = b[k];
+  // The horizon and haze gradients are cached, so they have to be rebuilt.
+  if (view.h) resize();
+}
+
 const COLOUR = {
   VOID:         '#0b0503',
   GRID:         'rgba(150,58,22,0.22)',
@@ -1240,7 +1336,18 @@ const COLOUR = {
   HAZARD_SIDE:  '#8e1338',
   HAZARD_LIP:   '#ffd6e4',
   HAZARD_GLOW:  '255,61,122',
-  HAZARD_WARN:  '#ff3d7a',
+  HAZARD_DARK:  '#5d0a22',      // the alternating band on the top face
+  /* The gate. Bright, cool and unmistakably not a hazard, because the one
+     thing on the road you are allowed to drive straight through must not
+     wear the colour of the things that kill you. */
+  GATE:         '#8dfbe0',
+  GATE_POST:    '#1d7f70',
+  GATE_GLOW:    '141,251,224',
+  /* The direction cue is deliberately NOT the danger colour. Pink says
+     do not touch; this says go here, and it is the car's own cyan so the
+     two can never be confused at speed. Anything added later that means
+     "aim at this" needs a third treatment again, not this one. */
+  HAZARD_WARN:  '#7ef0ff',
 
   SCRAPE:       '#fff4d2',
   SCRAPE_OUT:   '#ff2b4d',     // the flash shifts to this as the scrape timer runs out
@@ -1324,6 +1431,12 @@ const TUNABLES = [
   { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
   { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
   { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
+  { key: 'CHECKPOINT_EVERY',   label: 'gate',    step: 100,  min: 300,  max: 6000,  dp: 0, group: 12 },
+  { key: 'CLOCK_CHECKPOINT',   label: 'gateSec', step: 1,    min: 0,    max: 60,    dp: 0, group: 12 },
+  { key: 'CLOCK_DRIFT_RATE',   label: 'payRate', step: 0.1,  min: 0,    max: 9,     dp: 1, group: 12 },
+  { key: 'CLOCK_MIN_SLIP',     label: 'paySlip', step: 0.05, min: 0,    max: 0.95,  dp: 2, group: 12 },
+  { key: 'CLOCK_MAX',          label: 'clockMax',step: 2,    min: 10,   max: 200,   dp: 0, group: 12 },
+  { key: 'CAMERA_FOLLOW',      label: 'follow',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 7 },
   { key: 'CAMERA_LOOK',        label: 'look',    step: 10,   min: 0,    max: 500,   dp: 0, group: 7 },
   { key: 'CAMERA_LOOK_AHEAD',  label: 'ahead',   step: 500,  min: 0,    max: 30000, dp: 0, group: 7 },
   /* Two positions only, and it is here because the flip button is gone
@@ -1887,6 +2000,9 @@ function tunerLine(group) {
        driven at all however well it is driven. */
     const peak = maxCurveSeen * curveScale;
     out += 'ceil ' + (peak * FEEL.CENTRIFUGAL).toFixed(2) + ' @' + peak.toFixed(1);
+  }
+  if (group === 12) {
+    out += 'clock ' + clock.toFixed(1) + '  banked ' + banked + '  biome ' + biome;
   }
   if (group === 8) {
     // What is actually on the road in front of you, live, because spawn
@@ -2800,9 +2916,14 @@ function startRun() {
   hazardSide = 0;
   barShow = 0;
   score = 0;
+  banked = 0;
+  clock = FEEL.CLOCK_START;
+  gateFlash = 0;
   multiplier = 1;
   multPop = 0;
   runTime = 0;
+  nextGate = Math.round(FEEL.CHECKPOINT_EVERY * 0.7);
+  applyBiome(0);
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
   smokeCount = 0;
   smokeAcc = 0;
@@ -2826,7 +2947,13 @@ function update(dt) {
   // of a tight corner stays on screen and the lean starts before the car
   // gets there rather than once it is already in the corner.
   lookCurve += (lookAheadCurve() - lookCurve) * (1 - Math.exp(-dt / FEEL.CAMERA_LOOK_TIME));
-  cameraX = carX + lookCurve * FEEL.CAMERA_LOOK;
+  /* Everything that draws reads cameraX and nothing else, so this one
+     line moves the road, the car, the grid and the skyline together.
+     Nothing that decides anything reads it: the bands, the hit tests, the
+     tyre marks and the hazard placement are all in world units or in road
+     fractions, so the camera cannot change what is true, only what is
+     shown. */
+  cameraX = carX * FEEL.CAMERA_FOLLOW + lookCurve * FEEL.CAMERA_LOOK;
 
   if (state === DEAD) { updateFall(dt); return; }
   if (state !== DRIVING) return;
@@ -3390,6 +3517,7 @@ function drawRoad(w, h) {
   lanePass(first, last);
   edgeGlowPass(first, last);
   drawTrail(first, last, baseIndex);
+  drawGate(first, last, baseIndex);
   drawHazardWarnings(first, last, baseIndex);
   drawPylons(first, last, baseIndex, w);
   drawHazards(first, last, baseIndex);
@@ -3403,27 +3531,110 @@ function drawRoad(w, h) {
    seconds and a hazard that resolves at the same moment it has to be
    avoided is the unfairness section 4.3 is about. The stripes are on the
    ground, so they are visible while the object itself is still a speck. */
+/* The checkpoint gate: a post either side of the road and a beam across
+   the top of them. Drawn from the same boundary tables the road is, so it
+   sits in the world rather than on the screen, and it is only ever one
+   object so it costs three fills.
+
+   It is deliberately the widest thing on the road and it has nothing in
+   the driving line, because a gate is the one thing out here that is
+   purely good news. */
+function drawGate(first, last, baseIndex) {
+  const n = nextGate - baseIndex;
+  if (n < first || n > last || !bvis[n]) return;
+  const seg = segAt(nextGate);
+  if (!seg) return;
+  const out = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
+  const post = FEEL.CHECKPOINT_POST / seg.hw;
+  const top = by[n] - bh[n] * FEEL.CHECKPOINT_HEIGHT;
+  const beam = Math.max(2, bh[n] * FEEL.CHECKPOINT_POST * 0.8);
+  const lx = bx[n] + bw[n] * (out + post * 0.5), rx = bx[n] - bw[n] * (out + post * 0.5);
+  const pw = Math.max(2, bw[n] * post);
+
+  // Wide and faint, then solid, the same two pass glow everything lit in
+  // this game uses.
+  for (let pass = 0; pass < 2; pass++) {
+    const spread = pass === 0 ? pw * 1.9 : 0;
+    ctx.globalAlpha = pass === 0 ? 0.3 : 1;
+    ctx.fillStyle = pass === 0 ? GATE_GLOW_FILL : COLOUR.GATE_POST;
+    ctx.beginPath();
+    ctx.rect(lx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
+    ctx.rect(rx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // The beam across, in the bright colour, so the eye reads a doorway.
+  ctx.fillStyle = COLOUR.GATE;
+  ctx.fillRect(Math.min(lx, rx) - pw / 2, top - beam / 2,
+               Math.abs(rx - lx) + pw, beam);
+}
+
+/* The warning, painted on the road a full second before the hazard, and
+   it points at the way THROUGH rather than at the obstruction.
+
+   It used to be a bar across the blocked width, which said "something is
+   coming" when what the player needs is "go this way". A cold player read
+   it as a marker for a jump and drove at it. Now the road carries only
+   the direction cue, arrowheads laid in the lane that is open, and the
+   object carries the danger signal by itself. A splitter gets both of its
+   lanes marked, because either one is a correct answer and choosing is
+   the whole point of it.
+
+   One batched fill for every warning in shot. */
+function laneArrows(h, warn) {
+  // Where the open lanes are, in fractions of the local half width, using
+  // the same rule the placement check used to decide the hazard was fair.
+  const seg = segAt(h.from);
+  if (!seg) return null;
+  const lim = FEEL.SCRAPE_START;
+  const carHalf = (FEEL.CAR_BODY_WIDTH / 2) / seg.hw;
+  const band = (h.half + FEEL.HAZARD_CLIP) / seg.hw;
+  const x = hazardX(h);
+  const lanes = [];
+  if (x - band - carHalf >= -lim) lanes.push((-lim + (x - band - carHalf)) / 2);
+  if (x + band + carHalf <= lim) lanes.push(((x + band + carHalf) + lim) / 2);
+  /* A splitter keeps both, because either side is a correct answer and
+     choosing between them is the entire mechanic. Everything else keeps
+     only the roomier one: two arrows on a blocker is not a direction, it
+     is a shrug, and the point of this marking is to say go THIS way. */
+  if (h.kind !== HAZ_SPLITTER && lanes.length === 2) {
+    const leftRoom = Math.abs((x - band) - (-lim));
+    const rightRoom = Math.abs(lim - (x + band));
+    return [leftRoom >= rightRoom ? lanes[0] : lanes[1]];
+  }
+  return lanes;
+}
+
 function drawHazardWarnings(first, last, baseIndex) {
-  const stripes = FEEL.HAZARD_WARN_STRIPES;
   const warn = FEEL.HAZARD_WARN_SEGMENTS;
-  const gap = Math.max(2, Math.floor(warn / stripes));
+  const count = FEEL.HAZARD_WARN_STRIPES;
+  const alen = FEEL.HAZARD_ARROW_LENGTH;
+  const gap = Math.max(alen + 1, Math.floor(warn / count));
   let any = false;
   ctx.beginPath();
   for (let k = 0; k < hazards.length; k++) {
     const h = hazards[k];
     if (h.from - warn > baseIndex + last || h.from < baseIndex + first) continue;
-    const x = hazardX(h);
-    for (let m = 1; m <= stripes; m++) {
-      const at = h.from - m * gap;
-      const n = at - baseIndex;
-      if (n < first || n > last || !bvis[n]) continue;
-      any = true;
-      const half = (h.half + FEEL.HAZARD_CLIP) / segAt(at).hw;
-      const y1 = by[n], y2 = by[n + 1] - 1;
-      const l1 = bx[n] + bw[n] * (x - half), r1 = bx[n] + bw[n] * (x + half);
-      const l2 = bx[n + 1] + bw[n + 1] * (x - half), r2 = bx[n + 1] + bw[n + 1] * (x + half);
-      ctx.moveTo(l1, y1); ctx.lineTo(r1, y1); ctx.lineTo(r2, y2); ctx.lineTo(l2, y2);
-      ctx.closePath();
+    const lanes = laneArrows(h, warn);
+    if (!lanes || !lanes.length) continue;
+    for (let m = 1; m <= count; m++) {
+      const tail = h.from - m * gap;          // the wide end, nearest the player
+      const head = tail + alen;               // the point, further up the road
+      const nt = tail - baseIndex, nh = head - baseIndex;
+      if (nt < first || nh > last || !bvis[nt] || !bvis[nh]) continue;
+      const st = segAt(tail);
+      if (!st) continue;
+      const wide = (FEEL.CAR_BODY_WIDTH * 0.55) / st.hw;
+      for (let g = 0; g < lanes.length; g++) {
+        any = true;
+        const lx = lanes[g];
+        // An arrowhead pointing the way the car is going: wide across the
+        // near end, coming to a point up the road.
+        ctx.moveTo(bx[nt] + bw[nt] * (lx - wide), by[nt]);
+        ctx.lineTo(bx[nt] + bw[nt] * (lx + wide), by[nt]);
+        ctx.lineTo(bx[nh] + bw[nh] * lx, by[nh]);
+        ctx.closePath();
+      }
     }
   }
   if (!any) return;
@@ -3442,7 +3653,7 @@ function drawHazardWarnings(first, last, baseIndex) {
    Heights use the horizontal scale, the same way the car and the road
    thickness do, so a hazard keeps its proportions rather than being
    stretched by the vertical anisotropy. */
-function hazardQuads(first, last, baseIndex, spread, top) {
+function hazardQuads(first, last, baseIndex, spread, top, parity) {
   let any = false;
   ctx.beginPath();
   for (let k = 0; k < hazards.length; k++) {
@@ -3451,6 +3662,7 @@ function hazardQuads(first, last, baseIndex, spread, top) {
     for (let i = h.from; i <= h.to; i++) {
       const n = i - baseIndex;
       if (n < first || n > last || !bvis[n]) continue;
+      if (parity !== undefined && (i & 1) !== parity) continue;
       const seg = segAt(i);
       if (!seg) continue;
       any = true;
@@ -3473,7 +3685,50 @@ function hazardQuads(first, last, baseIndex, spread, top) {
   return any;
 }
 
+/* The face that actually points at the player, drawn once per hazard
+   with diagonal hazard striping across it. This is the whole "do not hit
+   me" signal: a tall dark wall leaning bands across itself, which is what
+   a crash barrier looks like everywhere in the world.
+
+   Clipped rather than clamped, because a leaning band across a trapezoid
+   has no closed form worth writing, and there are only ever a handful of
+   hazards inside the draw distance. */
+function drawHazardFronts(first, last, baseIndex) {
+  for (let k = 0; k < hazards.length; k++) {
+    const h = hazards[k];
+    const n = h.from - baseIndex;
+    if (n < first || n > last || !bvis[n]) continue;
+    const seg = segAt(h.from);
+    if (!seg) continue;
+    const x = hazardX(h);
+    const half = h.half / seg.hw;
+    const l = bx[n] + bw[n] * (x - half), r = bx[n] + bw[n] * (x + half);
+    const top = by[n] - bh[n] * FEEL.HAZARD_HEIGHT, bot = by[n];
+    const wpx = r - l, hpx = bot - top;
+    if (wpx < 3 || hpx < 3) continue;          // too small to read, skip the work
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(l, top, wpx, hpx);
+    ctx.clip();
+    ctx.fillStyle = COLOUR.HAZARD_SIDE;
+    ctx.fillRect(l, top, wpx, hpx);
+    const slant = hpx * FEEL.HAZARD_STRIPE_SLANT;
+    const step = (wpx + slant) / FEEL.HAZARD_STRIPE_COUNT;
+    ctx.beginPath();
+    for (let i = -1; i < FEEL.HAZARD_STRIPE_COUNT + 1; i += 2) {
+      const b0 = l + i * step;
+      ctx.moveTo(b0, bot); ctx.lineTo(b0 + step, bot);
+      ctx.lineTo(b0 + step + slant, top); ctx.lineTo(b0 + slant, top);
+      ctx.closePath();
+    }
+    ctx.fillStyle = COLOUR.HAZARD_TOP;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
 const HAZARD_GLOW_FILL = 'rgb(' + COLOUR.HAZARD_GLOW + ')';
+const GATE_GLOW_FILL = 'rgb(' + COLOUR.GATE_GLOW + ')';
 function drawHazards(first, last, baseIndex) {
   if (!hazards.length) return;
   // Wide and faint first, the same two pass glow the road edges use, and
@@ -3494,10 +3749,18 @@ function drawHazards(first, last, baseIndex) {
     ctx.fillStyle = COLOUR.HAZARD_SIDE;
     ctx.fill();
   }
-  if (hazardQuads(first, last, baseIndex, 0, false)) {
+  /* The top, in alternating bands along its length. Two fills rather
+     than one, and between them they say "marked object" rather than
+     "coloured surface". */
+  if (hazardQuads(first, last, baseIndex, 0, false, 0)) {
     ctx.fillStyle = COLOUR.HAZARD_TOP;
     ctx.fill();
   }
+  if (hazardQuads(first, last, baseIndex, 0, false, 1)) {
+    ctx.fillStyle = COLOUR.HAZARD_DARK;
+    ctx.fill();
+  }
+  drawHazardFronts(first, last, baseIndex);
   // The lit top edge, so the object resolves as a solid at draw distance
   // rather than as a smear, exactly as the road lip does.
   let any = false;
@@ -4144,8 +4407,24 @@ function fittedSize(str, weight, want, maxWidth) {
 function drawScore(w, h) {
   if (state !== DRIVING) return;
   const s = Math.min(w, h);
-  const shown = Math.floor(score);
-  text(String(shown), w / 2, h * FEEL.SCORE_TOP, Math.round(s * FEEL.SCORE_SIZE), '800');
+  /* The banked total is the number, and what is pending sits beside it in
+     smaller type. Crossing a gate visibly rolls one into the other, which
+     is the whole explanation of banking and needs no words. */
+  const flash = gateFlash > 0 ? gateFlash / FEEL.CHECKPOINT_FLASH : 0;
+  const bankSize = Math.round(s * FEEL.SCORE_SIZE * (1 + 0.35 * flash));
+  text(String(banked), w / 2, h * FEEL.SCORE_TOP, bankSize, '800');
+  const pend = Math.floor(score);
+  if (pend > 0) {
+    ctx.font = '700 ' + Math.round(s * FEEL.SCORE_SIZE * 0.52)
+             + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = COLOUR.TEXT_SHADOW;
+    ctx.fillText('+' + pend, w / 2 + bankSize * 0.9, h * FEEL.SCORE_TOP + 2);
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillText('+' + pend, w / 2 + bankSize * 0.9, h * FEEL.SCORE_TOP);
+  }
+  drawClock(w, h);
 
   // Nothing to say until it is above 1, and then it says it loudly.
   if (multiplier <= 1.005) return;
@@ -4165,6 +4444,30 @@ function drawScore(w, h) {
   ctx.fillText(label, w / 2, y);
 }
 
+/* The clock. Same discipline as the scrape bar: it must be readable at a
+   glance and must never pull the eye off the road, so it is a short bar
+   with the seconds on it, and it only raises its voice when it is
+   genuinely running out. Silent during the on ramp, because it is not
+   running then. */
+function drawClock(w, h) {
+  if (runTime < FEEL.ONRAMP_SECONDS) return;
+  const s = Math.min(w, h);
+  const low = clock < FEEL.CLOCK_LOW;
+  const size = Math.round(s * FEEL.CLOCK_SIZE);
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const y = h * FEEL.CLOCK_TOP;
+  const label = clock.toFixed(1);
+  ctx.fillStyle = COLOUR.TEXT_SHADOW;
+  ctx.fillText(label, w / 2, y + Math.max(1, size * 0.06));
+  // It pulses only once it is actually short of time.
+  ctx.globalAlpha = low ? 0.65 + 0.35 * Math.abs(Math.sin(runTime * 6)) : 1;
+  ctx.fillStyle = low ? COLOUR.BAR_LOW : COLOUR.GATE;
+  ctx.fillText(label, w / 2, y);
+  ctx.globalAlpha = 1;
+}
+
 function drawOverlay(w, h) {
   if (state === TITLE) {
     const s = Math.min(w, h);
@@ -4177,7 +4480,7 @@ function drawOverlay(w, h) {
     const s = Math.min(w, h);
     text('OFF THE ROAD', w / 2, h * 0.38, Math.round(s * 0.095), '800');
     // The two numbers, and a crown on the score when it is the new best.
-    const final = Math.floor(score);
+    const final = banked;
     const beat = final >= bestScore && final > 0;
     text((beat ? '\u2605 ' : '') + final, w / 2, h * 0.48, Math.round(s * 0.11), '800');
     text('best ' + bestScore, w / 2, h * 0.55, Math.round(s * 0.042), '600');
@@ -4195,6 +4498,12 @@ function drawOverlay(w, h) {
 let score = 0;
 let multiplier = 1;
 let multPop = 0;          // seconds left on the kick when it passes a whole number
+/* Banked is what a crash lets you keep. score is what is pending on top
+   of it, which a crash does not. */
+let banked = 0;
+let clock = 0;
+let nextGate = 0;         // segment index of the gate not yet crossed
+let gateFlash = 0;        // seconds left on the crossing response
 let bestScore = (function () {
   const raw = storeGet('best');
   const n = raw === null ? 0 : parseInt(raw, 10);
@@ -4222,9 +4531,42 @@ function multiplierEarn() {
   return slipTerm * edgeTerm;
 }
 
+/* Just the slip half of the multiplier's two terms. The clock is paid by
+   DRIFTING, wherever on the road you are doing it, where the multiplier
+   also wants you near the edge. Courting the edge is what the score is
+   for; keeping the car sideways is what the clock is for. */
+function slipPay() {
+  return Math.pow(
+    clamp((drift.slipNorm - FEEL.CLOCK_MIN_SLIP) / (1 - FEEL.CLOCK_MIN_SLIP), 0, 1),
+    FEEL.MULT_SLIP_POWER);
+}
+
+function updateClock(dt) {
+  if (state !== DRIVING) return;
+  if (gateFlash > 0) gateFlash -= dt;
+  // Nothing to survive during the on ramp. A new player has enough to
+  // think about without a number counting down at them.
+  if (runTime < FEEL.ONRAMP_SECONDS) { clock = FEEL.CLOCK_START; return; }
+  clock += (FEEL.CLOCK_DRIFT_RATE * slipPay() - 1) * dt;
+  if (clock > FEEL.CLOCK_MAX) clock = FEEL.CLOCK_MAX;
+  if (clock <= 0) { clock = 0; crash(); }
+}
+
+/* Crossing a gate. Everything a gate does happens here, once, on the
+   frame the car passes it. */
+function crossGate() {
+  banked += Math.floor(score);
+  score = 0;
+  clock = Math.min(FEEL.CLOCK_MAX, clock + FEEL.CLOCK_CHECKPOINT);
+  gateFlash = FEEL.CHECKPOINT_FLASH;
+  nextGate += FEEL.CHECKPOINT_EVERY;
+  applyBiome(biome + 1);
+}
+
 function updateScore(dt) {
   if (multPop > 0) multPop -= dt;
   if (state !== DRIVING) return;
+  if (carSegIndex >= nextGate) crossGate();
   const earn = multiplierEarn();
   const was = Math.floor(multiplier);
   if (earn > 0) multiplier += FEEL.MULT_CLIMB_RATE * earn * dt;
@@ -4238,7 +4580,8 @@ function updateScore(dt) {
 }
 
 function bankScore() {
-  const final = Math.floor(score);
+  // Only what was banked survives. The pending run is what a gate is for.
+  const final = banked;
   if (final > bestScore) {
     bestScore = final;
     storeSet('best', String(bestScore));
@@ -4290,6 +4633,7 @@ function drawHud(w, h) {
     tunerLine(9),
     tunerLine(10),
     tunerLine(11),
+    tunerLine(12),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
@@ -4859,6 +5203,7 @@ function frame(now) {
   updateSteering(dt);
   update(dt);
   updateScore(dt);
+  updateClock(dt);
   updateBar(dt);
   render();
   sampleFps(rawDt);
