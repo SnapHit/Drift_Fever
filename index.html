@@ -1789,6 +1789,16 @@ const FEEL = {
                                     // it must exceed the flight, which is about 23
 
   /* ----------------------------------------------------------------
+     THE BIOME WHEEL. One palette, turned. BIOME_COUNT is how many equal
+     steps the hue wheel is cut into, so it is exactly how many distinct
+     biomes a run can see before any repeats. BIOME_MIN_STEP is the
+     smallest angle allowed between two consecutive gates, which is what
+     stops the shuffle putting two near identical places back to back.
+     Both LIVE, and changing the count regenerates the wheel. */
+  BIOME_COUNT:               12,     // LIVE
+  BIOME_MIN_STEP:            90,     // LIVE, degrees
+
+  /* ----------------------------------------------------------------
      Progressive difficulty, in two halves that are deliberately not the
      same thing.
 
@@ -1904,29 +1914,263 @@ const FEEL = {
    rules from the neon session are load bearing and a biome that breaks
    them is a biome that kills people. This is the smallest thing that
    honestly reads as somewhere new, and it cannot make the game unfair. */
-const BIOMES = [
-  { VOID: '#0b0503', GRID: 'rgba(150,58,22,0.22)', GRID_NEAR: 'rgba(214,88,30,0.32)',
-    HORIZON_GLOW: '#b8431a', HAZE: '58,20,10', HORIZON_FADE: '184,67,26',
-    SKYLINE: '#170906', SKYLINE_TOP: '#66200c' },
-  { VOID: '#0a0410', GRID: 'rgba(120,40,150,0.22)', GRID_NEAR: 'rgba(180,70,215,0.32)',
-    HORIZON_GLOW: '#8a2ec2', HAZE: '40,14,58', HORIZON_FADE: '138,46,194',
-    SKYLINE: '#120620', SKYLINE_TOP: '#4a1470' },
-  { VOID: '#03080b', GRID: 'rgba(24,110,120,0.22)', GRID_NEAR: 'rgba(40,180,190,0.32)',
-    HORIZON_GLOW: '#127f8e', HAZE: '10,42,48', HORIZON_FADE: '18,127,142',
-    SKYLINE: '#04141a', SKYLINE_TOP: '#0d5566' },
-  { VOID: '#0b0703', GRID: 'rgba(150,110,20,0.22)', GRID_NEAR: 'rgba(220,168,36,0.32)',
-    HORIZON_GLOW: '#b8871a', HAZE: '54,38,10', HORIZON_FADE: '184,135,26',
-    SKYLINE: '#170f04', SKYLINE_TOP: '#6a4a0c' }
-];
+/* ==================================================================
+   THE BIOMES, GENERATED RATHER THAN AUTHORED.
+
+   There used to be four hand written palettes here. Four is not enough:
+   a run that reaches eleven gates cycles the same four three times over
+   and the moment stops being a moment.
+
+   So the palette below is the ONE palette, and a biome is that palette
+   ROTATED AROUND THE HUE WHEEL. Every colour turns by the same angle,
+   which is what makes this safe: hue rotation is a rigid motion on the
+   wheel, so every RELATIVE hue separation in the world survives it
+   exactly. The car sits about a hundred and seventy degrees from the road
+   in the base palette, which is very nearly the maximum, and it still
+   sits a hundred and seventy degrees from it at every rotation. Section 7
+   does not have to be re-argued per biome, because there is nothing
+   per biome to argue about.
+
+   THE LUMINANCE IS HELD, NOT THE LIGHTNESS, and that distinction is the
+   whole of the generator. Rotating hue in HSL and keeping L looks like it
+   should preserve brightness and does not: HSL's L is the midpoint of the
+   largest and smallest channel, and the eye weights green about ten times
+   more than blue. Rotating the road edge from amber toward blue at fixed
+   L drops it far enough to lose the edge, which is hard limit one. So
+   every rotated colour is bisected back onto the sRGB relative luminance
+   the original had. Value relationships are therefore invariant, which is
+   exactly what the five readability rules are written in terms of.
+   ================================================================== */
+
+function srgbLuma(r, g, b) {
+  const lr = r / 255, lg = g / 255, lb = b / 255;
+  const a = lr <= 0.04045 ? lr / 12.92 : Math.pow((lr + 0.055) / 1.055, 2.4);
+  const c = lg <= 0.04045 ? lg / 12.92 : Math.pow((lg + 0.055) / 1.055, 2.4);
+  const d = lb <= 0.04045 ? lb / 12.92 : Math.pow((lb + 0.055) / 1.055, 2.4);
+  return 0.2126 * a + 0.7152 * c + 0.0722 * d;
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  const l = (mx + mn) / 2;
+  if (d === 0) return [0, 0, l];
+  const sat = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+  let h;
+  if (mx === r) h = ((g - b) / d) % 6;
+  else if (mx === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  h *= 60;
+  if (h < 0) h += 360;
+  return [h, sat, l];
+}
+
+function hslToRgb(h, sat, l) {
+  h = ((h % 360) + 360) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * sat;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  let r, g, b;
+  if (h < 60) { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+}
+
+function hex2(v) { return (v < 16 ? '0' : '') + v.toString(16); }
+
+/* Turn one colour, holding its saturation and its measured luminance.
+   The output keeps whatever notation the input used, because the palette
+   mixes hex, bare triples and rgba and every reader of it expects the
+   form it was written in.
+
+   THE TRANSLUCENT LAYERS ARE MEASURED AS COMPOSITES, and that correction
+   is the second thing this generator had to learn. Holding the luminance
+   of a colour that is drawn at alpha 0.22 holds the luminance of a colour
+   nobody ever sees: what reaches the eye is that colour OVER the void,
+   and sRGB alpha blending is not luminance preserving, so two hues at the
+   same layer luminance land at different composite luminances over the
+   same background. Measured, that alone moved the drivable surface
+   against the void from 2.2 units of separation to 1.1 at sixty degrees,
+   which is rule two failing on a palette that passed on paper. So a
+   colour with alpha is matched on its composite over the background it
+   will actually be drawn on, which for the grid is the void.
+
+   `was` and `now` are the background before and after the same rotation.
+   They have the same luminance and different hues, which is precisely why
+   the target has to be measured on one and solved on the other. */
+function rotateHue(colour, deg, was, now) {
+  // The unturned biome is the palette exactly as it was written, not the
+  // palette after a round trip through HSL and back.
+  if (!deg) return colour;
+  const c = rgbOf(colour);
+  const a = c[3];
+  function over(rgb, bg) {
+    if (a >= 1 || !bg) return srgbLuma(rgb[0], rgb[1], rgb[2]);
+    return srgbLuma(rgb[0] * a + bg[0] * (1 - a),
+                    rgb[1] * a + bg[1] * (1 - a),
+                    rgb[2] * a + bg[2] * (1 - a));
+  }
+  const want = over(c, was);
+  const hsl = rgbToHsl(c[0], c[1], c[2]);
+  const h = hsl[0] + deg, sat = hsl[1];
+  /* Luminance rises monotonically with L at fixed hue and saturation, and
+     compositing at fixed alpha is monotonic in it too, so twenty
+     bisections put it within a thousandth. Cheaper solutions were not
+     looked for: this runs once per colour per biome at load. */
+  let lo = 0, hi = 1, out = hslToRgb(h, sat, hsl[2]);
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo + hi) / 2;
+    out = hslToRgb(h, sat, mid);
+    if (over(out, now) < want) lo = mid; else hi = mid;
+  }
+  if (colour.charAt(0) === '#') return '#' + hex2(out[0]) + hex2(out[1]) + hex2(out[2]);
+  if (colour.indexOf('(') >= 0) {
+    return 'rgba(' + out[0] + ',' + out[1] + ',' + out[2] + ',' + c[3] + ')';
+  }
+  return out[0] + ',' + out[1] + ',' + out[2];
+}
+
+/* What does NOT turn with the world. The HUD is a readout, and a readout
+   whose colour changes every gate is a readout that has to be re-learned
+   every gate. The arcade gold and the white text stay put. Everything
+   else in the palette, including the car, the hazards, the gate, the
+   jumps, the tyre marks and the smoke, turns together. */
+const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
+                        SCORE_EDGE: 1, TEXT: 1, TEXT_SHADOW: 1,
+                        BAR_TRACK: 1, BAR_FILL: 1, BAR_LOW: 1 };
+
+let PALETTE_BASE = null;
+let BIOMES = [];
+function buildBiomes() {
+  if (!PALETTE_BASE) {
+    PALETTE_BASE = {};
+    for (const k in COLOUR) PALETTE_BASE[k] = COLOUR[k];
+  }
+  const n = Math.max(1, Math.round(FEEL.BIOME_COUNT));
+  const wasVoid = rgbOf(PALETTE_BASE.VOID);
+  BIOMES = [];
+  for (let i = 0; i < n; i++) {
+    const deg = i * 360 / n;
+    const b = {};
+    // The void first, because the translucent layers are solved against
+    // it and it has to be this biome's void rather than the last one's.
+    b.VOID = rotateHue(PALETTE_BASE.VOID, deg);
+    const nowVoid = rgbOf(b.VOID);
+    for (const k in PALETTE_BASE) {
+      if (k === 'VOID') continue;
+      b[k] = PALETTE_FIXED[k] ? PALETTE_BASE[k]
+                              : rotateHue(PALETTE_BASE[k], deg, wasVoid, nowVoid);
+    }
+    BIOMES.push(b);
+  }
+  biomeBag.length = 0;
+  biomeRecent.length = 0;
+  lastBiomeHue = -999;
+}
+
+function biomeHue(i) { return i * 360 / BIOMES.length; }
+function hueGap(a, b) {
+  const d = Math.abs(((a - b) % 360 + 360) % 360);
+  return d > 180 ? 360 - d : d;
+}
+
+/* THE ORDER, AND IT IS NOT RANDOM. Picking at random puts two neighbours
+   on the wheel back to back about as often as not, and two similar hues
+   in a row wastes the moment entirely. Instead: a bag holding every hue
+   exactly once, drawn greedily from whatever is still far enough from the
+   last one, and refilled when it runs out. Every hue is therefore seen
+   before any repeats, and the tail of a bag falls back to the FARTHEST
+   remaining rather than to nothing, so the rule never simply gives up.
+
+   Math.random on purpose. rng() belongs to the road generator and drawing
+   from it here would move the road, which is the bug that pinned seeds
+   exist to catch. */
+const biomeBag = [];
+const biomeRecent = [];
+let lastBiomeHue = -999;
+
+/* One greedy shuffle: take everything still far enough from the hue
+   before it and from the last few seen at all, pick at random among
+   those, and fall back to the FARTHEST remaining when nothing qualifies
+   rather than giving up on the rule. */
+function biomeOrder() {
+  const n = BIOMES.length;
+  const left = [];
+  for (let i = 0; i < n; i++) left.push(i);
+  const recent = biomeRecent.slice();
+  const order = [];
+  let prev = lastBiomeHue, bad = 0;
+  while (left.length) {
+    const ok = [];
+    for (let i = 0; i < left.length; i++) {
+      if (prev > -180 && hueGap(biomeHue(left[i]), prev) < FEEL.BIOME_MIN_STEP) continue;
+      if (recent.indexOf(left[i]) >= 0) continue;
+      ok.push(i);
+    }
+    let pick;
+    if (ok.length) pick = ok[Math.floor(Math.random() * ok.length)];
+    else {
+      pick = 0;
+      for (let i = 1; i < left.length; i++) {
+        if (hueGap(biomeHue(left[i]), prev) > hueGap(biomeHue(left[pick]), prev)) pick = i;
+      }
+      bad++;
+    }
+    prev = biomeHue(left[pick]);
+    order.push(left[pick]);
+    recent.push(left[pick]);
+    while (recent.length > Math.max(2, Math.floor(n / 3))) recent.shift();
+    left.splice(pick, 1);
+  }
+  return { order: order, bad: bad };
+}
+
+/* The greedy pass can paint itself into a corner at the tail of a bag,
+   where only one hue is left and it happens to sit next to the one just
+   used. Measured, that was about one gate in forty. So the shuffle is
+   built several times and the cleanest is kept, which costs nothing once
+   per twelve gates and takes it to none. */
+function refillBiomeBag() {
+  let best = null;
+  for (let t = 0; t < 24; t++) {
+    const c = biomeOrder();
+    if (!best || c.bad < best.bad) best = c;
+    if (!best.bad) break;
+  }
+  biomeBag.length = 0;
+  for (let i = best.order.length - 1; i >= 0; i--) biomeBag.push(best.order[i]);
+}
+function nextBiome() {
+  if (!biomeBag.length) refillBiomeBag();
+  const i = biomeBag.pop();
+  lastBiomeHue = biomeHue(i);
+  /* Remembered ACROSS bags, so a hue cannot come back one gate after the
+     bag turned over. The bag alone only promises no repeats inside
+     itself, and the seam between two bags is exactly where a repeat
+     would be most noticeable. */
+  biomeRecent.push(i);
+  while (biomeRecent.length > Math.max(2, Math.floor(BIOMES.length / 3))) biomeRecent.shift();
+  return i;
+}
+
 let biome = 0;
 function applyBiome(i) {
+  if (!BIOMES.length) buildBiomes();
   biome = ((i % BIOMES.length) + BIOMES.length) % BIOMES.length;
+  // A continue restores a biome by index rather than drawing one, so the
+  // shuffle has to be told where it landed or the next gate could repeat
+  // the hue the player is already looking at.
+  lastBiomeHue = biomeHue(biome);
   const b = BIOMES[biome];
   for (const k in b) COLOUR[k] = b[k];
-  // The roof lights run toward this biome's own hot hue, so the ramp has
-  // to follow the place.
-  SKYLINE_HOT_RAMP = rampBetween(COLOUR.SKYLINE_TOP, COLOUR.HORIZON_FADE);
-  GRID_HOT_RAMP = rampBetween(COLOUR.GRID, COLOUR.GRID_NEAR);
+  // Everything precomputed from the palette, in one place, because a
+  // ramp or a cached fill that missed a rotation is a colour from the
+  // last biome sitting in the middle of this one.
+  rebuildDerivedColours();
   // The horizon and haze gradients are cached, so they have to be rebuilt.
   if (view.h) resize();
 }
@@ -2070,9 +2314,24 @@ const COLOUR = {
   CAR_SPOILER:  '#eafeff',
   CAR_WING_GAP: '#03141b',
   CAR_RIM:      '#d6feff',
+  CAR_RIM_GLOW: '214,254,255',
   CAR_TYRE:     '#0a0f14',
   CAR_TYRE_TOP: '#182430',
   CAR_SHADOW:   'rgba(0,0,0,0.5)',
+  /* The stops of the three multi stop ramps, which used to be written
+     into the code that built them. They are palette, so they live in the
+     palette: a hue rotation that missed them would pull the world round
+     and leave the tyre marks and the car's own heat behind. */
+  TRAIL_0:      '36,74,235',    // deep blue, gripping
+  TRAIL_1:      '0,158,255',
+  TRAIL_2:      '86,224,255',
+  TRAIL_3:      '190,246,255',
+  TRAIL_4:      '255,255,255',  // hot white, fully sideways
+  CAR_HEAT_0:   '255,176,46',   // the car's own glow and its light pool
+  CAR_HEAT_1:   '255,214,110',
+  CAR_HEAT_2:   '255,246,214',
+  CAR_HEAT_3:   '255,255,255',
+  CAR_SEAM:     'rgba(4,20,28,0.5)',
   TEXT:         '#fff2e2',
   TEXT_SHADOW:  'rgba(24,6,0,0.75)'
 };
@@ -2126,7 +2385,7 @@ const SCORE_RECORD_RAMP = rampBetween(COLOUR.SCORE_BEST, COLOUR.SCORE_RECORD);
 /* The road lip burning hotter: the dim half of the edge running toward
    the light half. This only ever RAISES the edge, which is why it is safe
    against hard limit one. */
-const EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
+let EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
 /* The skyline lights coming up: the roof line running toward the biome's
    own hot hue, so it changes place with the place. Rebuilt by applyBiome,
    which is the only thing that moves either endpoint. */
@@ -2320,7 +2579,9 @@ const TUNABLES = [
   { key: 'JUMP_ARROW_SPACING', label: 'chevGap', step: 1,    min: 3,    max: 40,    dp: 0, group: 24 },
   { key: 'JUMP_ARROW_HEIGHT',  label: 'chevTall',step: 20,   min: 80,   max: 2000,  dp: 0, group: 24 },
   { key: 'JUMP_ARROW_HALF',    label: 'chevWide',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
-  { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 }
+  { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
+  { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 36,    dp: 0, group: 25 },
+  { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 }
 ];
 const TUNABLE_DEFAULTS = {};
 TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key]; });
@@ -2959,6 +3220,10 @@ function tunerLine(group) {
         + (2 * FEEL.JUMP_LAUNCH_V / FEEL.JUMP_GRAVITY).toFixed(2) + 's'
         + (airborne ? '  UP ' + Math.round(carY) : '  down');
   }
+  if (group === 25) {
+    out += 'at ' + biome + '/' + BIOMES.length + '  hue ' + Math.round(biomeHue(biome))
+        + '  bag ' + biomeBag.length;
+  }
   if (group === 24) {
     let next = -1;
     for (let i = 0; i < jumps.length; i++) {
@@ -3162,6 +3427,9 @@ function nudgeTuning(dir) {
   const t = TUNABLES[tuneIndex];
   const next = clamp(FEEL[t.key] + dir * t.step, t.min, t.max);
   FEEL[t.key] = parseFloat(next.toFixed(t.dp + 2));
+  // Cutting the wheel into a different number of steps is a different set
+  // of colours, so it is regenerated rather than left stale.
+  if (t.key === 'BIOME_COUNT') { buildBiomes(); applyBiome(biome); }
   markTuning();
   saveTuning();
 }
@@ -3172,6 +3440,8 @@ function selectTuning(dir) {
 
 function resetTuning() {
   TUNABLES.forEach(function (t) { FEEL[t.key] = TUNABLE_DEFAULTS[t.key]; });
+  buildBiomes();
+  applyBiome(0);
   markTuning();
   saveTuning();
 }
@@ -4062,7 +4332,15 @@ function startRun() {
   resumeFlash = 0;
   clearDebris();
   nextGate = Math.round(FEEL.CHECKPOINT_EVERY * 0.7);
+  /* Every run opens on the unturned palette. That is the game's own
+     colour and it is what the boot flash and the death screen sit in, so
+     it stays the thing a cold player sees first. The variety is at the
+     gates, which is where it was asked for. lastBiomeHue is set so the
+     FIRST gate is already a long way from it. */
   applyBiome(0);
+  lastBiomeHue = 0;
+  biomeBag.length = 0;
+  biomeRecent.length = 0;
   for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
   smokeCount = 0;
   smokeAcc = 0;
@@ -4647,7 +4925,7 @@ function layTyreMarks(carIndex, prevX) {
 /* Smoke is screen space. The car is pinned to one spot on screen, so
    there is nothing to gain from putting the puffs in the world, and a
    ring buffer of fixed objects means no allocation while sliding. */
-const SMOKE_FILL = 'rgb(' + COLOUR.SMOKE + ')';
+let SMOKE_FILL = 'rgb(' + COLOUR.SMOKE + ')';
 const smoke = [];
 let smokeCount = 0;
 let smokeHead = 0;
@@ -4940,9 +5218,9 @@ const blight = new Uint8Array(MAX_BOUNDS);
 const GLOW_CULL_PX = 2.5;
 const WALL_CULL_PX = 1.6;
 
-const EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
-const SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
-const PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
+let EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
+let SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
+let PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
 // The outer lip of the slab, half width plus the shoulder, as a multiple
 // of the half width. The shoulder is the scrape band, so the drawn edge of
 // the road really is the last place the car may be.
@@ -5162,8 +5440,8 @@ function laneArrows(h, warn) {
    cannot have. They are not confusable, and they were never meant to be
    told apart by hue alone.
    ================================================================== */
-const JUMP_GLOW_FILL = 'rgb(' + COLOUR.JUMP_GLOW + ')';
-const JUMP_DECK_RAMP = rampBetween(COLOUR.JUMP_DECK_DARK, COLOUR.JUMP_DECK);
+let JUMP_GLOW_FILL = 'rgb(' + COLOUR.JUMP_GLOW + ')';
+let JUMP_DECK_RAMP = rampBetween(COLOUR.JUMP_DECK_DARK, COLOUR.JUMP_DECK);
 
 function jumpHeightAt(j, i) {
   return FEEL.JUMP_RAMP_HEIGHT
@@ -5417,8 +5695,8 @@ function drawHazardFronts(first, last, baseIndex) {
   }
 }
 
-const HAZARD_GLOW_FILL = 'rgb(' + COLOUR.HAZARD_GLOW + ')';
-const GATE_GLOW_FILL = 'rgb(' + COLOUR.GATE_GLOW + ')';
+let HAZARD_GLOW_FILL = 'rgb(' + COLOUR.HAZARD_GLOW + ')';
+let GATE_GLOW_FILL = 'rgb(' + COLOUR.GATE_GLOW + ')';
 function drawHazards(first, last, baseIndex) {
   if (!hazards.length) return;
   // Wide and faint first, the same two pass glow the road edges use, and
@@ -5783,27 +6061,17 @@ function drawWalls(count) {
    from cool to hot with the slip that laid them. A run driven on the
    limit leaves a brighter line than a tidy one, which is the whole point:
    the prettiest thing on screen is the thing risk buys. */
-const TRAIL_RAMP = [];
-(function () {
-  /* Deep blue, through cyan, to a hot white. Precomputed, because this
-     is read once per marked segment.
+/* Deep blue, through cyan, to a hot white. Precomputed, because this is
+   read once per marked segment.
 
-     It went through magenta while the road was blue, and magenta was the
-     wrong choice the moment the road turned warm: it is close enough in
-     hue to the asphalt that the mark stopped separating from it. Blue to
-     cyan to white is the far side of the wheel from every road colour,
-     and it also puts the intensity in value, which survives a palette
-     change far better than a hue does. */
-  const stops = [[36, 74, 235], [0, 158, 255], [86, 224, 255], [190, 246, 255], [255, 255, 255]];
-  for (let i = 0; i < 24; i++) {
-    const t = i / 23 * (stops.length - 1);
-    const a = stops[Math.floor(t)], b = stops[Math.min(stops.length - 1, Math.floor(t) + 1)];
-    const f = t - Math.floor(t);
-    TRAIL_RAMP.push('rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ','
-      + Math.round(a[1] + (b[1] - a[1]) * f) + ','
-      + Math.round(a[2] + (b[2] - a[2]) * f) + ')');
-  }
-})();
+   It went through magenta while the road was blue, and magenta was the
+   wrong choice the moment the road turned warm: it is close enough in hue
+   to the asphalt that the mark stopped separating from it. Blue to cyan
+   to white is the far side of the wheel from every road colour, and it
+   also puts the intensity in value, which is what survives a hue rotation
+   with the mark still legible against the surface. */
+const TRAIL_RAMP = [];
+const TRAIL_STOPS = ['TRAIL_0', 'TRAIL_1', 'TRAIL_2', 'TRAIL_3', 'TRAIL_4'];
 
 function trailColour(intensity) {
   let i = Math.round(intensity * (TRAIL_RAMP.length - 1));
@@ -6100,8 +6368,8 @@ faceInset.buf = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }]
 const rearFaceQuad = [{ sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }];
 const WING_COLOURS = [COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER,
                       COLOUR.CAR_WING_GAP, COLOUR.CAR_END, COLOUR.CAR_END];
-const CAR_RIM_GLOW_FILL = 'rgb(214,254,255)';
-const CAR_LIGHT_GLOW_FILL = 'rgb(' + COLOUR.CAR_LIGHT_GLOW + ')';
+let CAR_RIM_GLOW_FILL = 'rgb(' + COLOUR.CAR_RIM_GLOW + ')';
+let CAR_LIGHT_GLOW_FILL = 'rgb(' + COLOUR.CAR_LIGHT_GLOW + ')';
 
 /* Copy the rear face of whichever box was drawn last, so an inset can be
    painted on it without projecting anything again. */
@@ -6130,24 +6398,12 @@ const poolPt = { wx: 0, wy: 0, wz: 0, sx: 0, sy: 0 };
    eye finds it instantly, and that discipline is not up for negotiation.
    Slip drives the trail and the car from one variable. */
 const CAR_GLOW_RAMP = [];
+/* The fold lines. Dark rather than lit: on a body this chamfered the
+   seams are already doing their job by separating tones, and a bright
+   outline on every face turns a solid into a wireframe and eats the
+   silhouette section 7 asks for. */
 const CAR_SEAM_RAMP = [];
-(function () {
-  const stops = [[255, 176, 46], [255, 214, 110], [255, 246, 214], [255, 255, 255]];
-  for (let i = 0; i < 16; i++) {
-    const t = i / 15 * (stops.length - 1);
-    const a = stops[Math.floor(t)], b = stops[Math.min(stops.length - 1, Math.floor(t) + 1)];
-    const f = t - Math.floor(t);
-    const r = Math.round(a[0] + (b[0] - a[0]) * f);
-    const g = Math.round(a[1] + (b[1] - a[1]) * f);
-    const bl = Math.round(a[2] + (b[2] - a[2]) * f);
-    CAR_GLOW_RAMP.push('rgb(' + r + ',' + g + ',' + bl + ')');
-    /* The fold lines. Dark rather than lit: on a body this chamfered the
-       seams are already doing their job by separating tones, and a bright
-       outline on every face turns a solid into a wireframe and eats the
-       silhouette section 7 asks for. */
-    CAR_SEAM_RAMP.push('rgba(4,20,28,0.5)');
-  }
-})();
+const CAR_HEAT_STOPS = ['CAR_HEAT_0', 'CAR_HEAT_1', 'CAR_HEAT_2', 'CAR_HEAT_3'];
 function carGlowIndex() {
   let i = Math.round(drift.slipNorm * (CAR_GLOW_RAMP.length - 1));
   if (i < 0) i = 0; else if (i >= CAR_GLOW_RAMP.length) i = CAR_GLOW_RAMP.length - 1;
@@ -6166,22 +6422,89 @@ const SHADOW_COLOURS = [null, null, null, null, COLOUR.CAR_SHADOW, null];
    One radial gradient per ramp step, built once and then filled through a
    scaled transform, so it costs a single fill and no allocation. */
 const CAR_POOL_GRADS = [];
-(function () {
-  const stops = [[255, 176, 46], [255, 214, 110], [255, 246, 214], [255, 255, 255]];
-  for (let i = 0; i < 16; i++) {
-    const t = i / 15 * (stops.length - 1);
+
+/* ==================================================================
+   EVERYTHING PRECOMPUTED FROM THE PALETTE, IN ONE PLACE.
+
+   A hue rotation that reaches COLOUR but not the ramps and cached fills
+   built out of it leaves last biome's colours scattered through the new
+   one, and they show up in exactly the places the eye is already looking:
+   the edge glow, the tyre marks, the car. So every derived value is
+   rebuilt here and nowhere else, and every one of them is a `let` or an
+   array mutated in place rather than a const built at load.
+   ================================================================== */
+const stopBuf = [];
+function stopRampInto(out, keys, n) {
+  out.length = 0;
+  const stops = [];
+  for (let i = 0; i < keys.length; i++) stops.push(rgbOf('rgb(' + COLOUR[keys[i]] + ')'));
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1) * (stops.length - 1);
     const a = stops[Math.floor(t)], b = stops[Math.min(stops.length - 1, Math.floor(t) + 1)];
     const f = t - Math.floor(t);
-    const r = Math.round(a[0] + (b[0] - a[0]) * f);
-    const g = Math.round(a[1] + (b[1] - a[1]) * f);
-    const bl = Math.round(a[2] + (b[2] - a[2]) * f);
+    out.push([Math.round(a[0] + (b[0] - a[0]) * f),
+              Math.round(a[1] + (b[1] - a[1]) * f),
+              Math.round(a[2] + (b[2] - a[2]) * f)]);
+  }
+  return out;
+}
+function setFaces(into, from) { for (let i = 0; i < from.length; i++) into[i] = from[i]; }
+
+function rebuildDerivedColours() {
+  EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
+  // The roof lights run toward this biome's own hot hue, so the ramp has
+  // to follow the place.
+  SKYLINE_HOT_RAMP = rampBetween(COLOUR.SKYLINE_TOP, COLOUR.HORIZON_FADE);
+  GRID_HOT_RAMP = rampBetween(COLOUR.GRID, COLOUR.GRID_NEAR);
+  JUMP_DECK_RAMP = rampBetween(COLOUR.JUMP_DECK_DARK, COLOUR.JUMP_DECK);
+
+  SMOKE_FILL = 'rgb(' + COLOUR.SMOKE + ')';
+  EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
+  SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
+  PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
+  JUMP_GLOW_FILL = 'rgb(' + COLOUR.JUMP_GLOW + ')';
+  HAZARD_GLOW_FILL = 'rgb(' + COLOUR.HAZARD_GLOW + ')';
+  GATE_GLOW_FILL = 'rgb(' + COLOUR.GATE_GLOW + ')';
+  CAR_RIM_GLOW_FILL = 'rgb(' + COLOUR.CAR_RIM_GLOW + ')';
+  CAR_LIGHT_GLOW_FILL = 'rgb(' + COLOUR.CAR_LIGHT_GLOW + ')';
+
+  stopRampInto(stopBuf, TRAIL_STOPS, 24);
+  TRAIL_RAMP.length = 0;
+  for (let i = 0; i < stopBuf.length; i++) {
+    const c = stopBuf[i];
+    TRAIL_RAMP.push('rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')');
+  }
+
+  stopRampInto(stopBuf, CAR_HEAT_STOPS, 16);
+  CAR_GLOW_RAMP.length = 0;
+  CAR_SEAM_RAMP.length = 0;
+  CAR_POOL_GRADS.length = 0;
+  for (let i = 0; i < stopBuf.length; i++) {
+    const c = stopBuf[i], rgb = c[0] + ',' + c[1] + ',' + c[2];
+    CAR_GLOW_RAMP.push('rgb(' + rgb + ')');
+    CAR_SEAM_RAMP.push(COLOUR.CAR_SEAM);
+    /* The light pool, as a falloff rather than as flat steps. Nested flat
+       quads read as nested rectangles, which is worse than no pool at
+       all. One radial gradient per ramp step, filled through a scaled
+       transform, so it costs a single fill and no allocation per frame. */
     const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-    grad.addColorStop(0, 'rgba(' + r + ',' + g + ',' + bl + ',1)');
-    grad.addColorStop(0.45, 'rgba(' + r + ',' + g + ',' + bl + ',0.45)');
-    grad.addColorStop(1, 'rgba(' + r + ',' + g + ',' + bl + ',0)');
+    grad.addColorStop(0, 'rgba(' + rgb + ',1)');
+    grad.addColorStop(0.45, 'rgba(' + rgb + ',0.45)');
+    grad.addColorStop(1, 'rgba(' + rgb + ',0)');
     CAR_POOL_GRADS.push(grad);
   }
-})();
+
+  setFaces(WING_COLOURS, [COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER, COLOUR.CAR_SPOILER,
+                          COLOUR.CAR_WING_GAP, COLOUR.CAR_END, COLOUR.CAR_END]);
+  setFaces(BODY_COLOURS, [COLOUR.CAR_END, COLOUR.CAR_END, COLOUR.CAR_SIDE,
+                          COLOUR.CAR_SIDE, COLOUR.CAR_TOP, null]);
+  setFaces(CABIN_COLOURS, [COLOUR.CAR_GLASS, COLOUR.CAR_GLASS, COLOUR.CAR_SIDE,
+                           COLOUR.CAR_SIDE, COLOUR.CAR_CABIN_TOP, null]);
+  setFaces(WHEEL_COLOURS, [COLOUR.CAR_TYRE, COLOUR.CAR_TYRE, COLOUR.CAR_TYRE,
+                           COLOUR.CAR_TYRE, COLOUR.CAR_TYRE_TOP, null]);
+  setFaces(SHADOW_COLOURS, [null, null, null, null, COLOUR.CAR_SHADOW, null]);
+}
+rebuildDerivedColours();
 
 /* The rim, glowed like everything else lit in this world: wide and faint
    under a solid core. It is a small thing but it is at the corners of the
@@ -6847,7 +7170,11 @@ function crossGate() {
   addShake(FEEL.GATE_SHAKE_PX);
   audioSting(STING_GATE);
   sayCallout('BANKED  +' + took, CALL_GATE, COLOUR.GATE);
-  applyBiome(biome + 1);
+  /* NOT the next one round the wheel. Marching through the hues in order
+     means every gate is a small step and the change stops being an
+     event; the bag guarantees a big step and still shows every hue once
+     before any of them comes back. */
+  applyBiome(nextBiome());
   // Everything a continue needs, taken after the gate has done its work
   // so a resume arrives in exactly the state the crossing left.
   saveCheckpoint(at);
