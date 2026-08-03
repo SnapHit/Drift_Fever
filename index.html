@@ -1335,53 +1335,21 @@ const FEEL = {
      of the wrist to the dead part. The readout prints the deadzone as a
      percentage of full lock for exactly that reason: hold that percentage
      roughly steady while hunting for the lock angle. */
-  /* Which way a tilt steers. The sign that comes off the sensor is not
-     reliable across handsets and browsers, and the reading also degrades
-     as the phone approaches upright, where the spec's own decomposition
-     is at a singularity. So this is the shipped default and the Flip
-     button beside Tilt reverses it permanently, rather than a sign error
-     ever being a blocker again.
+  /* Which way a tilt steers, and it is the ONLY sign in the entire tilt
+     path. THE FULL CONVENTION IS AT THE TOP OF THE TILT SECTION, with
+     the table of correct signs at 0, 90, 180 and 270, and tiltAssert
+     below it checks every claim that block makes.
 
-     THE CONVENTION, written down because this has now been reversed four
-     times and each time it was reasoned about from scratch.
-
-     A positive steering value turns the car RIGHT. That is fixed by the
-     keyboard, where the right key sets the digital target to +1, and it
-     runs through unchanged: intent is steering times the rate, lateralV
-     chases intent, carX adds lateralV, and a positive carX is the right
-     hand side of the road. Nothing between the sensor and the car
-     reverses it.
-
-     In portrait the reading is e.gamma, and gamma is positive when the
-     device's right edge is tipped DOWN. The chain from there is
-     sign preserving throughout: rel is the reading minus the calibrated
-     zero times this constant, the deadzone takes a magnitude and puts
-     Math.sign(rel) straight back on, the smoothing is a lerp toward that
-     target, and updateSteering assigns tilt.value to steering.value
-     unmodified.
-
-     So at +1: drop the right edge, gamma rises, steering goes positive,
-     the car goes right. Drop the left edge and it goes left. That is the
-     direction a driver expects and it is what this must be.
-
-     At -1 it is exactly inverted.
-
-     THE FOURTH REVERSAL WAS NOT A SIGN AT ALL, and this is the important
-     part. The source has read +1 since session fourteen and has never
-     changed since. What changed the running game was localStorage: the
-     cycler wrote a nudged TILT_DIRECTION into it during a handset session
-     and loadTuning applied that on every ordinary load afterwards,
-     silently, overriding this constant. See the tuning persistence block.
-     TILT_DIRECTION is now marked noSave and can never be stored again, so
-     this line is the only place the direction lives. Do not flip it
-     without driving it; the last three times it was flipped, it was not
-     the thing that was wrong. */
-  TILT_DIRECTION:             1,
+     Set by DRIVING it, never by deriving it. The spec's reading of
+     gamma argues for +1; the handset has said backwards at +1 five times
+     running. The handset wins, because it is the thing being played. */
+  TILT_DIRECTION:            -1,
   /* The sign on the sine term of the screen space remap, which is the one
      value that can make the two landscape orientations disagree with
      portrait. It flips 90 and 270 together and cannot touch portrait, so
-     landscape being backwards is now a one value question rather than two
-     independent guesses. See onDeviceOrientation. LIVE. */
+     landscape being backwards is a one value question rather than two
+     independent guesses. TILT_DIRECTION flips all four together, which is
+     why "backwards in both" is one edit and not two. LIVE. */
   TILT_LANDSCAPE_SENSE:       1,
   TILT_SMOOTHING_TIME:     0.08,     // seconds, exponential smoothing
   TILT_DEADZONE_DEG:       1.50,     // LIVE, the neutral state from section 4.1
@@ -2838,7 +2806,95 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
    who never touches it. One permission code path, per section 8.2:
    call requestPermission if it exists, otherwise treat it as granted,
    and handle a denial as a first class outcome.
-   ================================================================== */
+
+   ------------------------------------------------------------------
+   THE CONVENTION. READ THIS BEFORE TOUCHING ANY SIGN BELOW.
+
+   This has been reversed FIVE times. Every previous time it was reasoned
+   about from scratch, and reasoning from scratch is what keeps producing
+   a different answer. So the whole path is written out here once, and
+   tiltAssert below CHECKS it rather than trusting it.
+
+   THE PATH, END TO END. There is exactly ONE sign in it.
+
+     1. THE RAW READING. deviceorientation gives beta and gamma in the
+        DEVICE's frame. Neither is what the game wants on its own,
+        because the screen is rotated inside the device frame.
+
+     2. THE REMAP INTO SCREEN SPACE, in tiltReading. One rotation of the
+        pair by screen.orientation.angle:
+
+            deg = gamma * cos(angle) + beta * sin(angle) * LANDSCAPE_SENSE
+
+        which lands on gamma, beta, -gamma, -beta at 0, 90, 180 and 270.
+        EVERY LANDSCAPE BRANCH IS DERIVED FROM THE PORTRAIT ONE. That is
+        the point: the old code wrote four branches out by hand and one
+        session flipped the landscape pair on its own, which is reversal
+        number two. A hand written branch cannot drift from portrait if
+        there is no hand written branch.
+
+        WHICH PHYSICAL EDGE A POSITIVE deg MEANS IS NOT KNOWN TO THIS
+        FILE, and pretending otherwise is what has cost five sessions.
+        The spec says gamma is positive when the right edge drops; the
+        handset this game is played on behaves as though it is the left.
+        This file cannot see which, so it does not claim to. What it DOES
+        guarantee, and what tiltAssert checks, is that all four
+        orientations respond to the same physical movement identically,
+        because all four come out of the one formula above.
+
+     3. THE ZERO POINT. rel = deg - zeroDeg. Nobody holds a phone flat,
+        so everything is relative to the posture captured at the start of
+        the run. Subtraction only, no sign.
+
+     4. TILT_DIRECTION, and this is the ONLY sign in the whole path.
+        rel is multiplied by it, once, in tiltSteer.
+
+     5. THE DEADZONE AND THE NORMALISE. A magnitude is taken, the
+        deadzone is subtracted, the remainder is divided by the span to
+        full lock, clamped to 0..1, and Math.sign(rel) is put straight
+        back on. Sign preserving by construction.
+
+     6. INTO THE STEERING VALUE. updateTilt smooths toward that target
+        and updateSteering assigns tilt.value to steering.value
+        unmodified. A POSITIVE STEERING VALUE TURNS THE CAR RIGHT: that
+        is fixed by the keyboard, where the right key sets the digital
+        target to +1, and it runs through untouched to carX, where
+        positive is the right hand side of the road.
+
+   THE CORRECT SIGN AT EACH ORIENTATION. Two tables, because there are
+   two different claims and running them together is the mistake.
+
+   FIRST, WHAT THE CODE GUARANTEES. A MORE POSITIVE READING STEERS LEFT,
+   at every orientation, and here is the raw quantity that has to rise
+   for that to happen:
+
+        angle    reading is     so the car goes LEFT when
+          0        gamma          gamma rises
+         90         beta          beta  rises
+        180       -gamma          gamma falls
+        270        -beta          beta  falls
+
+   That is TILT_DIRECTION = -1, and tiltAssert checks all eight of those
+   cells. It is a fact about this file and it is true on every device.
+
+   SECOND, WHAT THE HANDSET DOES, which this file cannot check and which
+   is the whole of the five reversals. TILTING THE PHONE LEFT MUST TURN
+   THE CAR LEFT. On the handset this game is played on, that is what
+   TILT_DIRECTION = -1 delivers, driven and confirmed. It follows that on
+   that handset a more positive gamma is the LEFT edge dropping, which is
+   the opposite of what the W3C spec says gamma means.
+
+   The source said +1 from session fifteen to session twenty seven on the
+   strength of the spec, and the phone said backwards every single time it
+   was driven. Four sessions changed the plumbing around this number
+   instead of changing it, each on a fresh derivation from the spec, and
+   each time the derivation was sound and the premise was wrong.
+
+   SO: THIS CONSTANT IS SET BY DRIVING IT, NEVER BY DERIVING IT. It is
+   one number, it flips all four orientations together, and tiltAssert
+   proves everything around it is consistent, so "backwards" is now a one
+   line change and never an investigation.
+   ------------------------------------------------------------------ */
 const tilt = {
   supported: false,
   active: false,
@@ -2888,41 +2944,40 @@ function orientationAngle() {
 const ORIENT_COS = [1, 0, -1, 0];
 const ORIENT_SIN = [0, 1, 0, -1];
 
+/* ------------------------------------------------------------------
+   THE TWO PURE FUNCTIONS. No side effects, no globals written, nothing
+   read but FEEL. Everything the sensor path does to a number happens in
+   here, so tiltAssert can drive the whole thing without a phone.
+
+   tiltReading  : raw pair plus screen angle  ->  degrees, positive when
+                  the SCREEN's right edge is down
+   tiltSteer    : the same plus the calibrated zero  ->  steering value,
+                  -1 to +1, the number the physics eventually reads
+   ------------------------------------------------------------------ */
+function tiltReading(gamma, beta, angle) {
+  // Snapped to the nearest quarter turn, because a handset mid rotation
+  // can report something in between, and taken off an exact integer table
+  // so nothing here is ever 6e-17 instead of zero.
+  const q = ((Math.round((angle || 0) / 90) % 4) + 4) % 4;
+  return (gamma || 0) * ORIENT_COS[q]
+       + (beta || 0) * ORIENT_SIN[q] * FEEL.TILT_LANDSCAPE_SENSE;
+}
+
+function tiltSteer(gamma, beta, angle, zeroDeg) {
+  /* The direction is applied HERE rather than where the reading is taken,
+     so that flipping it mid run does not also flip the captured posture
+     and force a recalibration. */
+  const rel = (tiltReading(gamma, beta, angle) - (zeroDeg || 0)) * FEEL.TILT_DIRECTION;
+  const magnitude = Math.abs(rel);
+  if (magnitude <= FEEL.TILT_DEADZONE_DEG) return 0;
+  const span = Math.max(1, FEEL.TILT_FULL_LOCK_DEG - FEEL.TILT_DEADZONE_DEG);
+  return clamp((magnitude - FEEL.TILT_DEADZONE_DEG) / span, 0, 1) * Math.sign(rel);
+}
+
 function onDeviceOrientation(e) {
   if (e.gamma === null || e.gamma === undefined) return;   // no real sensor behind the event
   tilt.seenSensor = true;
-
-  /* THE READING, REMAPPED INTO SCREEN SPACE. See the convention block
-     above TILT_DIRECTION for what the number means once it is here.
-
-     gamma and beta are in the DEVICE's frame and the screen is rotated
-     inside that frame by screen.orientation.angle, so getting the screen's
-     own left to right tilt is one rotation of the pair, not four separate
-     cases:
-
-         screenTilt = gamma * cos(angle) + beta * sin(angle)
-
-     which lands on gamma, beta, -gamma, -beta at 0, 90, 180 and 270. That
-     is the same four values the old code listed, and writing it as the
-     rotation is the point: every branch is now DERIVED from the portrait
-     one instead of carrying a sign somebody chose separately, so 90 and
-     270 cannot drift apart from each other or from portrait.
-
-     The cosines and sines are exact integers from a table rather than
-     Math.cos of a converted angle, so nothing here is ever 6e-17 instead
-     of zero, and the angle is snapped to the nearest quarter turn because
-     a handset mid rotation can report something in between.
-
-     TILT_LANDSCAPE_SENSE is the single sign on the sine term. It is the
-     only thing that can make landscape disagree with portrait, and it
-     flips BOTH landscape branches together. The two landscape cases have
-     been modelled twice in this project and driven on a handset never, so
-     if landscape is ever backwards while portrait is right, this is the
-     one value to move and it is on the cycler. */
-  const q = ((Math.round(orientationAngle() / 90) % 4) + 4) % 4;
-  const deg = e.gamma * ORIENT_COS[q]
-            + (e.beta || 0) * ORIENT_SIN[q] * FEEL.TILT_LANDSCAPE_SENSE;
-
+  const deg = tiltReading(e.gamma, e.beta, orientationAngle());
   tilt.rawDeg = deg;
   if (tilt.zeroDeg === null) tilt.zeroDeg = deg;
 }
@@ -2953,6 +3008,131 @@ if (window.screen && window.screen.orientation
   window.screen.orientation.addEventListener('change', onOrientationChanged);
 }
 
+/* ------------------------------------------------------------------
+   THE ASSERTIONS. Debug only, run once at startup, and written to catch
+   every one of the five reversals rather than to be tidy.
+
+   What each one would have caught:
+
+     1. THE PORTRAIT SIGN. Reversals one, three, four and five. Asserts
+        that a right edge drop steers the way the convention block says,
+        so flipping TILT_DIRECTION without also editing the table above
+        fails immediately instead of shipping.
+     2. THE FOUR ORIENTATIONS AGREEING. Reversal two, where a session
+        rewrote the landscape pair by hand and inverted 90 and 270
+        together while portrait stayed right. Asserts that the SAME
+        physical roll produces the SAME steering sign at 0, 90, 180 and
+        270, which no hand written branch can satisfy by accident.
+     3. THE STORED OVERRIDE. The one found in session twenty six, where
+        localStorage carried a nudged direction that beat the source
+        silently. Asserts the live constants still equal their source
+        defaults, so a value arriving from anywhere else is visible.
+     4. THE ZERO POINT. Asserts that the calibrated posture reads as
+        neutral whatever it was, and that the subtraction has not been
+        turned round.
+     5. THE DEADZONE AND THE NORMALISE. Asserts neutral inside the
+        deadzone, full lock at the lock angle, monotonic between, and
+        that the sign survives all of it.
+
+   The failures go to the on screen note as well as the console, because
+   a console message on a phone is a message nobody reads.
+   ------------------------------------------------------------------ */
+function tiltAssert() {
+  const fails = [];
+  function ok(claim, cond) { if (!cond) fails.push(claim); }
+
+  const D = FEEL.TILT_DEADZONE_DEG, L = FEEL.TILT_FULL_LOCK_DEG;
+  const past = (D + L) / 2;                 // comfortably outside the deadzone
+  /* The convention in one number: which way a MORE POSITIVE reading
+     steers. Negative is left. Everything below is checked against this
+     rather than against a physical edge, because which edge a positive
+     reading means is a property of the handset and not of this file. */
+  const SIGN = Math.sign(FEEL.TILT_DIRECTION);
+  const WAY = SIGN < 0 ? 'left' : 'right';
+
+  // 3. The constants are the source's, not something that arrived later.
+  ok('TILT_DIRECTION is not its source default',
+     FEEL.TILT_DIRECTION === TUNABLE_DEFAULTS.TILT_DIRECTION);
+  ok('TILT_LANDSCAPE_SENSE is not its source default',
+     FEEL.TILT_LANDSCAPE_SENSE === TUNABLE_DEFAULTS.TILT_LANDSCAPE_SENSE);
+  ok('TILT_DIRECTION is not plus or minus one', Math.abs(FEEL.TILT_DIRECTION) === 1);
+  ok('the deadzone has eaten the whole range', D < L);
+
+  /* 2. The four orientations, driven from ONE physical description.
+
+     A right edge drop of `past` degrees is expressed in the raw pair the
+     handset would report in each orientation, taken from the remap that
+     tiltReading itself is: at 0 it lands on gamma, at 90 on beta, at 180
+     on minus gamma and at 270 on minus beta. Every one of them must then
+     produce the SAME steering sign, because it is the same physical
+     movement of the same hands. */
+  const S = FEEL.TILT_LANDSCAPE_SENSE;
+  const cases = [
+    [0,   past, 0,        'portrait',              'gamma rises'],
+    [90,  0,    past / S, 'landscape 90',          'beta rises'],
+    [180, -past, 0,       'portrait upside down',  'gamma falls'],
+    [270, 0,    -past / S,'landscape 270',         'beta falls']
+  ];
+  for (let i = 0; i < cases.length; i++) {
+    const angle = cases[i][0], g = cases[i][1], b = cases[i][2];
+    const name = cases[i][3], moves = cases[i][4];
+    ok(name + ': the reading does not rise when ' + moves,
+       tiltReading(g, b, angle) > 0);
+    ok(name + ': ' + moves + ' does not steer ' + WAY,
+       Math.sign(tiltSteer(g, b, angle, 0)) === SIGN);
+    ok(name + ': the opposite movement does not steer the other way',
+       Math.sign(tiltSteer(-g, -b, angle, 0)) === -SIGN);
+    // The same physical movement, so the same steering value, to the
+    // last decimal and not merely the same sign. This is the one that
+    // catches a landscape branch drifting away from portrait.
+    ok(name + ': does not match portrait exactly for the same movement',
+       Math.abs(tiltSteer(g, b, angle, 0) - tiltSteer(past, 0, 0, 0)) < 1e-12);
+    // And an angle reported a few degrees off a quarter turn is the same
+    // orientation, because a handset mid rotation reports exactly that.
+    ok(name + ': an angle a few degrees off a quarter turn changed orientation',
+       tiltReading(g, b, angle + 8) === tiltReading(g, b, angle));
+  }
+
+  // 1. Portrait against the table in the convention block, spelled out
+  //    rather than derived, so the table and the code cannot part company.
+  ok('portrait: a rising reading does not steer left', tiltSteer(past, 0, 0, 0) < 0);
+  ok('portrait: a falling reading does not steer right', tiltSteer(-past, 0, 0, 0) > 0);
+
+  // 4. The zero point. Any posture reads neutral once it is the zero.
+  for (const z of [-40, -12, 0, 7, 33]) {
+    ok('zero ' + z + ' does not read neutral', tiltSteer(z, 0, 0, z) === 0);
+    ok('zero ' + z + ' does not steer ' + WAY + ' past the deadzone',
+       Math.sign(tiltSteer(z + past, 0, 0, z)) === SIGN);
+    // The zero is a subtraction and nothing else: shifting the posture
+    // and the reading together cannot change the answer.
+    ok('zero ' + z + ' is not a pure subtraction',
+       Math.abs(tiltSteer(z + past, 0, 0, z) - tiltSteer(past, 0, 0, 0)) < 1e-12);
+  }
+
+  // 5. The deadzone, the normalise, and the clamp.
+  ok('the deadzone is not neutral', tiltSteer(D * 0.99, 0, 0, 0) === 0);
+  ok('the deadzone edge is not neutral', tiltSteer(D, 0, 0, 0) === 0);
+  ok('just past the deadzone is not moving', Math.abs(tiltSteer(D + 0.5, 0, 0, 0)) > 0);
+  ok('full lock is not full', Math.abs(tiltSteer(L, 0, 0, 0)) > 0.999);
+  ok('past full lock is not clamped', Math.abs(tiltSteer(L * 4, 0, 0, 0)) <= 1.0000001);
+  let last = 0;
+  for (let d = D; d <= L; d += (L - D) / 12) {
+    const v = Math.abs(tiltSteer(d, 0, 0, 0));
+    ok('the ramp to full lock is not monotonic', v >= last - 1e-9);
+    last = v;
+  }
+
+  if (fails.length) {
+    // eslint-disable-next-line no-console
+    if (window.console) console.error('TILT ASSERTIONS FAILED', fails);
+    showNote('TILT BROKEN: ' + fails[0], 12);
+  } else if (window.console && window.console.log) {
+    console.log('tilt assertions pass, direction ' + FEEL.TILT_DIRECTION
+                + ', landscape sense ' + FEEL.TILT_LANDSCAPE_SENSE);
+  }
+  return fails;
+}
+
 function calibrateTilt() {
   // Nobody holds a phone flat. Everything is relative to the posture the
   // player is actually in, recaptured at the start of every run.
@@ -2975,16 +3155,10 @@ function updateTilt(dt) {
   }
   if (tilt.rawDeg === null || tilt.zeroDeg === null) return;
 
-  /* The direction is applied here rather than where the reading is taken,
-     so that flipping mid run does not also flip the captured posture and
-     force a recalibration. */
-  const rel = (tilt.rawDeg - tilt.zeroDeg) * FEEL.TILT_DIRECTION;
-  const magnitude = Math.abs(rel);
-  let target = 0;
-  if (magnitude > FEEL.TILT_DEADZONE_DEG) {
-    const span = Math.max(1, FEEL.TILT_FULL_LOCK_DEG - FEEL.TILT_DEADZONE_DEG);
-    target = clamp((magnitude - FEEL.TILT_DEADZONE_DEG) / span, 0, 1) * Math.sign(rel);
-  }
+  /* rawDeg is already through tiltReading, so this passes it back in at
+     angle 0, where tiltReading is the identity. One function decides the
+     steering value and the assertions drive that same function. */
+  const target = tiltSteer(tilt.rawDeg, 0, 0, tilt.zeroDeg);
   const k = 1 - Math.exp(-dt / FEEL.TILT_SMOOTHING_TIME);
   tilt.value += (target - tilt.value) * k;
 }
@@ -8767,7 +8941,7 @@ function frame(now) {
 if (bootFlash > 0) { try { document.documentElement.classList.add('booting'); } catch (e) {} }
 else bootChromeHidden = false;
 recomputeCamera();
-if (debugAllowed) setDebug(true);
+if (debugAllowed) { setDebug(true); tiltAssert(); }
 // Before the first road is built, or the title screen is generated at
 // deep game difficulty and the first thing anybody sees is a lie.
 updateDifficulty();
