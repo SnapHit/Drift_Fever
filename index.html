@@ -6,6 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="Drift Fever, a browser drift game. One file, no downloads, nothing to install.">
 <meta name="theme-color" content="#e2521c">
+<!-- Add to Home Screen. On an iPhone this is the only thing that reliably
+     removes the browser chrome: the Fullscreen API has been flag gated and
+     unreliable there for years, and Chrome on iOS is WebKit underneath so
+     it inherits the same gap. These two tags are the whole of it. There is
+     deliberately NO manifest: iOS does not read one for this, and it would
+     be a second file and a second request for no benefit. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Drift Fever">
+<!-- The Android equivalent, also manifest free. -->
+<meta name="mobile-web-app-capable" content="yes">
 <!-- An empty data URI, so the browser does not go and ask for a favicon.
      That request would be same origin and harmless, but the rule is zero. -->
 <link rel="icon" href="data:,">
@@ -259,6 +270,7 @@
     <button id="musicBtn" type="button" aria-label="Music"></button>
   </div>
   <div class="padGroup">
+    <button id="fullBtn" type="button" hidden aria-label="Fullscreen"></button>
     <button id="tiltBtn" type="button" hidden aria-label="Tilt steering"></button>
     <button id="pauseBtn" type="button" aria-label="Pause"></button>
   </div>
@@ -671,10 +683,24 @@ const FEEL = {
      fifth of a second per second, which is a couple of minutes of
      deliberately passive driving before it bites, and a driver who
      actually drifts gains. It does not run at all during the on ramp. */
-  CLOCK_START:               26,     // seconds in hand at the start of a run
-  CLOCK_MAX:                 40,     // LIVE, the most that can be banked
-  CLOCK_CHECKPOINT:          10,     // LIVE, seconds a gate is worth
-  CLOCK_DRIFT_RATE:         3.2,     // LIVE, seconds paid back per second at full slip
+  /* A RESOURCE AT ITS CAP COMMUNICATES NOTHING. The first version paid
+     drifting back faster than time was spent, so a competent driver
+     pinned the clock at the ceiling and the number never moved. It was
+     working perfectly and saying nothing, which is the same as not being
+     there.
+
+     So the balance is inverted: between gates even good driving runs a
+     small deficit, and the gate is the income that clears it. That makes
+     the clock swing by most of its range on every cycle, and a number
+     that moves is the entire point. It is not harder: the gates span the
+     road and cannot be missed, so a driver who is drifting still ends
+     each cycle up on where they started. Drifting now buys a shallower
+     drain rather than a surplus, which is still visible in real time and
+     is what the readout shows. */
+  CLOCK_START:               20,     // seconds in hand at the start of a run
+  CLOCK_MAX:                 26,     // LIVE, the most that can be banked
+  CLOCK_CHECKPOINT:          16,     // LIVE, seconds a gate is worth
+  CLOCK_DRIFT_RATE:         1.1,     // LIVE, seconds paid back per second at full slip
   /* The clock's own slip threshold, and it is much higher than the
      multiplier's on purpose. Corners in this game generate slip whether
      you meant it or not: a driver deliberately holding the middle and not
@@ -683,13 +709,19 @@ const FEEL = {
      the same and made the clock a decoration. From here, only slip that
      was actually asked for pays. */
   CLOCK_MIN_SLIP:          0.55,
-  CLOCK_LOW:                  8,     // seconds under which the readout starts warning
+  /* The warning band has to be somewhere the clock actually goes. At 8
+     against a clock that lived at 40 it was thirty two seconds below
+     anywhere the player ever visited and never once fired. */
+  CLOCK_LOW:                 14,     // LIVE, seconds under which the readout warns
   CHECKPOINT_EVERY:        1500,     // LIVE, segments between gates, about 33 seconds
   CHECKPOINT_HEIGHT:       1500,     // world units, the posts either side
   CHECKPOINT_POST:          260,     // world units, how thick they are
   CHECKPOINT_FLASH:         0.5,     // seconds of the crossing flash
   CLOCK_TOP:               0.20,     // of screen height, under the multiplier
   CLOCK_SIZE:             0.055,     // of the smaller screen dimension
+  CLOCK_GATE_SIZE:        0.036,     // the distance to the next gate, beside it
+  CLOCK_PAY_SIZE:         0.030,     // the live payback readout
+  CLOCK_POP_TIME:          1.30,     // seconds the gate payout stays up
 
   CRASH_GRAVITY:          26000,     // world units per second squared
   CRASH_TUMBLE:             2.4,     // radians per second, nose over
@@ -1435,7 +1467,8 @@ const TUNABLES = [
   { key: 'CLOCK_CHECKPOINT',   label: 'gateSec', step: 1,    min: 0,    max: 60,    dp: 0, group: 12 },
   { key: 'CLOCK_DRIFT_RATE',   label: 'payRate', step: 0.1,  min: 0,    max: 9,     dp: 1, group: 12 },
   { key: 'CLOCK_MIN_SLIP',     label: 'paySlip', step: 0.05, min: 0,    max: 0.95,  dp: 2, group: 12 },
-  { key: 'CLOCK_MAX',          label: 'clockMax',step: 2,    min: 10,   max: 200,   dp: 0, group: 12 },
+  { key: 'CLOCK_MAX',          label: 'clockMax',step: 2,    min: 6,    max: 200,   dp: 0, group: 12 },
+  { key: 'CLOCK_LOW',          label: 'clockLow',step: 1,    min: 0,    max: 60,    dp: 0, group: 12 },
   { key: 'CAMERA_FOLLOW',      label: 'follow',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 7 },
   { key: 'CAMERA_LOOK',        label: 'look',    step: 10,   min: 0,    max: 500,   dp: 0, group: 7 },
   { key: 'CAMERA_LOOK_AHEAD',  label: 'ahead',   step: 500,  min: 0,    max: 30000, dp: 0, group: 7 },
@@ -1538,6 +1571,10 @@ function resize() {
   scrapeOutGradientRight.addColorStop(1, 'rgba(' + COLOUR.SCRAPE_OUT_FADE + ',0)');
 
   if (showDebug) measureChrome();
+  // fullReady is a var on purpose: resize runs during start up, well
+  // before the fullscreen block further down has been evaluated, and a
+  // let or a const would be in its temporal dead zone at that point.
+  if (fullReady) syncFullButton();
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
@@ -2919,6 +2956,7 @@ function startRun() {
   banked = 0;
   clock = FEEL.CLOCK_START;
   gateFlash = 0;
+  clockPop = 0;
   multiplier = 1;
   multPop = 0;
   runTime = 0;
@@ -4449,23 +4487,101 @@ function drawScore(w, h) {
    with the seconds on it, and it only raises its voice when it is
    genuinely running out. Silent during the on ramp, because it is not
    running then. */
+/* The clock, and next to it the only question that makes a clock mean
+   anything: can I reach the next gate on what I have.
+
+   A bare countdown is abstract. A countdown beside the time to the gate
+   is a comparison the player can answer at a glance, and the colour makes
+   the answer for them: cool while the clock is bigger than the distance,
+   warm the moment it is not.
+
+   Same discipline as the scrape bar. It sits high and small, it never
+   competes with the road, and it only raises its voice when the answer
+   is actually no. */
 function drawClock(w, h) {
   if (runTime < FEEL.ONRAMP_SECONDS) return;
   const s = Math.min(w, h);
-  const low = clock < FEEL.CLOCK_LOW;
   const size = Math.round(s * FEEL.CLOCK_SIZE);
-  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  const gateSecs = Math.max(0, (nextGate - carSegIndex))
+                 * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
+  /* Two signals, each saying one thing. The number goes warm only when
+     the clock is genuinely short. Whether the next gate is reachable is
+     the gate readout's job, below, because for the first half of every
+     cycle the honest answer is "not on what you are holding, but you will
+     earn more on the way", and a warning colour that is on for half the
+     game is not a warning. */
+  const low = clock < FEEL.CLOCK_LOW;
+  const reachable = clock >= gateSecs;
   const y = h * FEEL.CLOCK_TOP;
+
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
   const label = clock.toFixed(1);
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const half = ctx.measureText(label).width / 2;
   ctx.fillStyle = COLOUR.TEXT_SHADOW;
   ctx.fillText(label, w / 2, y + Math.max(1, size * 0.06));
-  // It pulses only once it is actually short of time.
-  ctx.globalAlpha = low ? 0.65 + 0.35 * Math.abs(Math.sin(runTime * 6)) : 1;
+  ctx.globalAlpha = low ? 0.6 + 0.4 * Math.abs(Math.sin(runTime * 6)) : 1;
   ctx.fillStyle = low ? COLOUR.BAR_LOW : COLOUR.GATE;
   ctx.fillText(label, w / 2, y);
   ctx.globalAlpha = 1;
+
+  // The gate, to the right of it. An arrow and the seconds to reach it.
+  const gsize = Math.round(s * FEEL.CLOCK_GATE_SIZE);
+  ctx.font = '700 ' + gsize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'left';
+  const gl = '\u25b8 ' + gateSecs.toFixed(1);
+  ctx.fillStyle = COLOUR.TEXT_SHADOW;
+  ctx.fillText(gl, w / 2 + half + gsize * 0.5, y + 1 + gsize * 0.06);
+  // Cool once the gate is inside what is in hand, which is the moment
+  // the answer to "can I make it" turns from no to yes.
+  ctx.fillStyle = reachable ? COLOUR.GATE : COLOUR.TEXT;
+  ctx.globalAlpha = reachable ? 0.95 : 0.7;
+  ctx.fillText(gl, w / 2 + half + gsize * 0.5, y + 1);
+  ctx.globalAlpha = 1;
+
+  /* The earning, live, to the left. If scarcity is not allowed to be the
+     pressure then flow has to be, and flow has to be visible: this is the
+     clock answering the driving, second by second. */
+  const pay = FEEL.CLOCK_DRIFT_RATE * slipPay() - 1;
+  if (pay > 0.02) {
+    const psize = Math.round(s * FEEL.CLOCK_PAY_SIZE);
+    ctx.font = '800 ' + psize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'right';
+    const pl = '+' + pay.toFixed(1);
+    ctx.fillStyle = COLOUR.TEXT_SHADOW;
+    ctx.fillText(pl, w / 2 - half - psize * 0.5, y + 1 + psize * 0.06);
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillText(pl, w / 2 - half - psize * 0.5, y + 1);
+  } else if (pay < -0.02 && slipPay() > 0.01) {
+    // Still paying something back, just not all of it. Worth showing,
+    // because it is the difference between drifting and not.
+    const psize = Math.round(s * FEEL.CLOCK_PAY_SIZE);
+    ctx.font = '800 ' + psize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'right';
+    const pl = '+' + (FEEL.CLOCK_DRIFT_RATE * slipPay()).toFixed(1);
+    ctx.globalAlpha = 0.75;
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillText(pl, w / 2 - half - psize * 0.5, y + 1);
+    ctx.globalAlpha = 1;
+  }
+
+  /* The payout, big and loud and rising, and deliberately nothing like
+     the score bonus beside it: one is time and green, the other is points
+     and rolls into a total. Two rewards that look alike teach nothing. */
+  if (clockPop > 0) {
+    const t = clockPop / FEEL.CLOCK_POP_TIME;
+    const psize = Math.round(s * FEEL.CLOCK_SIZE * (1.5 + 0.7 * (1 - t)));
+    ctx.font = '800 ' + psize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = Math.min(1, t * 2.2);
+    const pl = '+' + FEEL.CLOCK_CHECKPOINT + 's';
+    ctx.fillStyle = COLOUR.TEXT_SHADOW;
+    ctx.fillText(pl, w / 2, y - size * 1.25 - (1 - t) * s * 0.09 + 2);
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillText(pl, w / 2, y - size * 1.25 - (1 - t) * s * 0.09);
+    ctx.globalAlpha = 1;
+  }
 }
 
 function drawOverlay(w, h) {
@@ -4504,6 +4620,7 @@ let banked = 0;
 let clock = 0;
 let nextGate = 0;         // segment index of the gate not yet crossed
 let gateFlash = 0;        // seconds left on the crossing response
+let clockPop = 0;         // seconds left on the big time payout
 let bestScore = (function () {
   const raw = storeGet('best');
   const n = raw === null ? 0 : parseInt(raw, 10);
@@ -4544,6 +4661,7 @@ function slipPay() {
 function updateClock(dt) {
   if (state !== DRIVING) return;
   if (gateFlash > 0) gateFlash -= dt;
+  if (clockPop > 0) clockPop -= dt;
   // Nothing to survive during the on ramp. A new player has enough to
   // think about without a number counting down at them.
   if (runTime < FEEL.ONRAMP_SECONDS) { clock = FEEL.CLOCK_START; return; }
@@ -4559,6 +4677,7 @@ function crossGate() {
   score = 0;
   clock = Math.min(FEEL.CLOCK_MAX, clock + FEEL.CLOCK_CHECKPOINT);
   gateFlash = FEEL.CHECKPOINT_FLASH;
+  clockPop = FEEL.CLOCK_POP_TIME;
   nextGate += FEEL.CHECKPOINT_EVERY;
   applyBiome(biome + 1);
 }
@@ -4951,6 +5070,14 @@ const ICON = {
     + '<path d="M10 18V7.2l8-1.8V16"/>'
     + '<circle cx="7.6" cy="18" r="2.6" fill="currentColor"/>'
     + '<circle cx="15.6" cy="16" r="2.6" fill="currentColor"/></svg>',
+  expand:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+  shrink:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"'
+    + ' stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>',
   pause:
     '<svg viewBox="0 0 24 24" fill="currentColor">'
     + '<rect x="6.5" y="5" width="4" height="14" rx="1.2"/>'
@@ -5029,6 +5156,88 @@ function startAudio() {
    they are painted once here, where ICON exists. */
 pauseBtn.innerHTML = ICON.pause;
 tiltBtn.innerHTML = ICON.tilt;
+
+
+/* ----------------------------------------------------------------
+   Fullscreen. Two paths, because neither one covers every handset.
+
+   The API path works on Android Chrome, on desktop and on iPadOS. On an
+   iPhone it simply is not there, which the feature test below picks up,
+   and the meta tags in the head cover that case through Add to Home
+   Screen instead. The button is hidden wherever the API is genuinely
+   unavailable, exactly as the tilt button is, because shipping a control
+   that does nothing is worse than shipping no control.
+
+   The request has to be made synchronously inside the tap, same
+   discipline as the tilt permission: anything asynchronous before it and
+   the browser refuses without saying so. */
+var fullReady = false;
+const fullBtn = document.getElementById('fullBtn');
+const fullRoot = document.documentElement;
+function standalone() {
+  if (window.navigator && window.navigator.standalone === true) return true;
+  try { return window.matchMedia('(display-mode: standalone)').matches; }
+  catch (e) { return false; }
+}
+const canFullscreen = !standalone()
+  && !!(fullRoot.requestFullscreen || fullRoot.webkitRequestFullscreen)
+  && document.fullscreenEnabled !== false;
+
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+function paintFull() {
+  fullBtn.innerHTML = isFullscreen() ? ICON.shrink : ICON.expand;
+  fullBtn.classList.toggle('on', isFullscreen());
+}
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    if (document.exitFullscreen) { document.exitFullscreen().catch(function () {}); }
+    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+    return;
+  }
+  if (fullRoot.requestFullscreen) {
+    const r = fullRoot.requestFullscreen();
+    if (r && r.catch) r.catch(function () {});
+  } else if (fullRoot.webkitRequestFullscreen) {
+    fullRoot.webkitRequestFullscreen();
+  }
+}
+fullBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+fullBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  fullBtn.blur();
+  firstGesture();
+  toggleFullscreen();          // synchronous, inside the gesture
+});
+/* Entering or leaving changes the viewport, and on a phone it also
+   changes the safe area insets, because the insets the browser reports
+   depend on whether its own chrome is there. resize reads both. */
+function onFullscreenChange() {
+  paintFull();
+  resize();
+  // The viewport settles a frame or two after the event on some browsers.
+  window.requestAnimationFrame(resize);
+  setTimeout(resize, 250);
+}
+document.addEventListener('fullscreenchange', onFullscreenChange);
+document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+/* Five buttons do not fit across a narrow phone held upright without
+   dropping them under the size a thumb reliably hits, and the reason this
+   exists at all is landscape, where there is room to spare. So on a
+   narrow portrait screen it stands down. Re evaluated on every resize,
+   so rotating the handset brings it back. */
+function syncFullButton() {
+  /* 420 rather than 380: at 390 the fifth button left only sixteen
+     pixels of canvas between the two groups, and that band has to stay
+     tappable for steering. Landscape always has room. */
+  const roomy = view.w >= 420 || view.w > view.h;
+  fullBtn.hidden = !(canFullscreen && roomy);
+}
+paintFull();
+fullReady = true;
+syncFullButton();
 
 const soundBtn = document.getElementById('soundBtn');
 const musicBtn = document.getElementById('musicBtn');
