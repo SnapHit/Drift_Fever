@@ -1373,7 +1373,7 @@ const FEEL = {
      gamma argues one way and the phone has done the other, and the phone
      is the thing being played. See the convention block for why the older
      reports could not pin this and the latest one can. */
-  TILT_DIRECTION:             1,
+  TILT_DIRECTION:            -1,
   /* The sign on the sine term of the screen space remap, which is the one
      value that can make the two landscape orientations disagree with
      portrait. It flips 90 and 270 together and cannot touch portrait, so
@@ -2844,14 +2844,25 @@ window.addEventListener('keydown', function (e) {
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
   else if (k === 'f' || k === 'F') { if (debugAllowed) setDebug(!showDebug); return; }
-  /* T for today's track, and it is not optional. Section 6 says many
-     sessions are keyboard only, and a canvas button is a tap target that
-     a keyboard cannot reach at all. Title screen only, so it can never
-     take a key away from a run in progress, and both cases so caps lock
-     is not a dead key. It carves T out of "any key starts endless" the
-     same way R and P are already carved out. */
-  else if ((k === 't' || k === 'T') && state === TITLE && bootFlash <= 0) {
+  /* T for today's track and E for endless, and neither is optional.
+     Section 6 says many sessions are keyboard only, and a canvas button
+     is a tap target a keyboard cannot reach at all.
+
+     T ALSO WORKS ON THE DEATH SCREEN after an endless run, because that
+     is the other place the daily is offered and the keyboard has to be
+     able to take it. E is title only: there is no endless offer on a
+     death screen, and a stray E during a run must never change the mode.
+
+     Both cases, so caps lock is not a dead key, and both carve their
+     letter out of "any key starts a run" the same way R and P are. */
+  else if ((k === 't' || k === 'T') && bootFlash <= 0
+           && (state === TITLE
+               || (state === DEAD && mode === ENDLESS
+                   && deadFor >= FEEL.DEATH_INPUT_LOCK))) {
     firstGesture(); startDaily(); return;
+  }
+  else if ((k === 'e' || k === 'E') && state === TITLE && bootFlash <= 0) {
+    firstGesture(); startEndless(); return;
   }
   else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
   /* R is the keyboard twin of the RESTART button, for the same reason it
@@ -2926,10 +2937,16 @@ canvas.addEventListener('pointerdown', function (e) {
     startRun();
     return;
   }
-  /* Same rule as the restart button: it is only on the title screen, so
-     it cannot eat a steering tap, and it is tested before the reflex tap
-     so that the one place a choice exists is the one place it is asked. */
-  if (hitDaily(e) && bootFlash <= 0) {
+  /* The other mode's button, on the title screen, and the daily offer on
+     the death screen after an endless run. Both are places where no run
+     is in progress, so neither can eat a steering tap, and both are
+     tested before the reflex tap so a deliberate choice wins over it. */
+  if (bootFlash <= 0 && hitAlt(e)) {
+    firstGesture();
+    startMode(altRect.to);
+    return;
+  }
+  if (bootFlash <= 0 && hitDaily(e) && deadFor >= FEEL.DEATH_INPUT_LOCK) {
     firstGesture();
     startDaily();
     return;
@@ -3065,9 +3082,20 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
      point the source constant IS the sign in force, and a report of
      backwards finally means something about this line.
 
-     Session twenty eight shipped -1 under those conditions. It was
-     driven and reported backwards. THAT is the observation that pins it,
-     and it is why this reads +1.
+     Session twenty eight shipped -1 and it was reported backwards, so
+     session twenty nine shipped +1. That one was reported backwards too,
+     and the reason is now known: the flip button arrived in the same
+     session, the author had been pressing it, and the stored departure
+     inverted the new default straight back. The stored value was doing
+     to the source exactly what the stored TUNING used to do to it, three
+     sessions after that leak was closed and by a route that had just
+     been opened.
+
+     So THIS reads -1, which is the value the author reported directly
+     and without a stored flip standing between it and the phone, and
+     TILT_FLIP_KEY was bumped in the same edit so no device can carry a
+     departure from the OLD default into the new one. Those two changes
+     belong together and neither is safe alone. See TILT_FLIP_KEY.
 
    AND BECAUSE NO SINGLE DEFAULT CAN BE RIGHT FOR EVERYONE, there is a
    FLIP BUTTON beside the tilt button, stored as the player's departure
@@ -3163,15 +3191,28 @@ function tiltReading(gamma, beta, angle) {
      - Changing the shipped default later cannot silently reverse the
        controls for everybody who already set one.
 
-   THE KEY IS VERSIONED, AND THAT IS NOT A PRECAUTION. A flip button
-   existed between sessions ten and thirteen and wrote 'tiltflip'. It was
-   then removed, so any device that played in that window still carries
-   that value, including the author's. Reusing the name would have had a
-   three year old preference override the shipped default on the one
-   handset this is being fixed for, which is precisely the failure being
-   designed out. Nothing in this file reads the old key.
+   THE KEY IS VERSIONED, AND IT IS BUMPED WHENEVER TILT_DIRECTION MOVES.
+   That rule is the whole of it, and the history is why:
+
+     'tiltflip'   Sessions ten to thirteen. A flip button existed and
+                  wrote this, then the button was removed, so any device
+                  that played in that window still carries the value.
+                  Nothing reads it.
+     'tiltflip2'  Session twenty nine, when the button came back. Bumped
+                  so that the stale 'tiltflip' could not override the
+                  shipped default on the handset being fixed for.
+     'tiltflip3'  Session thirty one, and this one is the rule earning
+                  its keep. The source default moved from +1 to -1, and
+                  the author had been pressing the button to correct the
+                  old default, so 'tiltflip2' on that device says FLIP.
+                  Left alone it would have inverted the new default
+                  straight back and produced a seventh identical report.
+
+   A STORED FLIP IS A DEPARTURE FROM A PARTICULAR DEFAULT, so it means
+   nothing once that default changes. Moving TILT_DIRECTION without
+   moving this key is therefore not a smaller change, it is a broken one.
    ------------------------------------------------------------------ */
-const TILT_FLIP_KEY = 'tiltflip2';
+const TILT_FLIP_KEY = 'tiltflip3';
 let tiltFlipped = (function () {
   const raw = storeGet(TILT_FLIP_KEY);
   // Only an explicit stored choice counts. Anything else, including a
@@ -4016,7 +4057,21 @@ function resetTuning() {
    what a player means by today.
    ================================================================== */
 const ENDLESS = 0, DAILY = 1;
-let mode = ENDLESS;
+/* THE PRIMARY MODE, and it is decided by whether this browser has ever
+   driven. See the entry block: a first ever visit gets endless and no
+   concept to learn, a returning visit gets the thing that is worth
+   coming back for. Set once, here, so every route into a run reads the
+   same variable and there is no second path to keep in step.
+
+   hasPlayedBefore is declared with the rest of the entry code further
+   down the file, so this reads storage directly rather than reordering
+   the file around one line. */
+let mode = (function () {
+  try {
+    return window.localStorage.getItem(STORAGE_PREFIX + 'played') === '1'
+           ? DAILY : ENDLESS;
+  } catch (e) { return ENDLESS; }      // no memory means treat them as new
+})();
 
 /* The day as one integer, yyyymmdd, off the LOCAL clock. */
 function localDayStamp(when) {
@@ -4980,6 +5035,9 @@ const drift = {
 };
 
 function startRun() {
+  // From the second page load on, this browser is a returning player and
+  // the front door changes for it. See the entry block.
+  markPlayed();
   // Midnight can pass with the tab open, and this is the only moment the
   // answer can change anything.
   rollDayIfNeeded();
@@ -8159,46 +8217,58 @@ function drawResult(w, h) {
        fittedSize(rec, '700', Math.round(s * 0.032), w * 0.9), '700');
   ctx.globalAlpha = 1;
 
-  /* The prompt and the restart button, anchored to the bottom edge rather
-     than to a fraction of the height, so they clear the car in both
+  /* The prompt and the buttons, anchored to the bottom edge rather than
+     to a fraction of the height, so they clear the car in both
      orientations by construction and sit above the corner pads. */
   restartRect.live = false;
+  dailyRect.live = false;
   if (deadFor < FEEL.DEATH_INPUT_LOCK) return;
   const resume = canContinue();
   const btnY = h - safeBottom - FEEL.DEATH_BOTTOM;
-  const promptY = btnY - s * FEEL.DEATH_PROMPT_GAP;
-
-  ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
-  text(resume ? 'tap to continue from the last gate' : 'tap or press any key',
-       w / 2, promptY,
-       fittedSize(resume ? 'tap to continue from the last gate' : 'tap or press any key',
-                  '600', Math.round(s * 0.040), w * 0.88), '600');
-  ctx.globalAlpha = 1;
-
-  /* Restart is a separate, deliberate action, because the reflex tap now
-     continues. It is only here when continuing is possible: with no gate
-     behind you the reflex tap already restarts and a second way to do the
-     same thing would be clutter. */
-  if (!resume) return;
-  const label = 'RESTART';
   const size = Math.round(s * 0.038);
-  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const bw = ctx.measureText(label).width + size * 2.4;
-  const bh = size * 2.2;
-  restartRect.x = w / 2 - bw / 2;
-  restartRect.y = btnY - bh / 2;
-  restartRect.w = bw;
-  restartRect.h = bh;
-  restartRect.live = true;
-  ctx.globalAlpha = 0.9;
-  ctx.fillStyle = COLOUR.BAR_TRACK;
-  roundRect(restartRect.x, restartRect.y, bw, bh, bh * 0.3);
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = COLOUR.SCORE;
-  ctx.stroke();
+  const rowH = size * 2.2 * 1.35;
+
+  /* THE DAILY, OFFERED AT THE MOMENT THE PLAYER IS DECIDING WHETHER TO
+     GO AGAIN. That is the honest place to say there is something else,
+     and it is only offered after an ENDLESS run: on a daily death the
+     player is already there and a button saying so would be noise.
+
+     IT DOES NOT TOUCH THE REFLEX TAP. The tap anywhere still continues
+     or restarts the run that just ended, exactly as section 5 requires;
+     this is a separate deliberate target, stacked ABOVE the restart
+     button so the position restart has always occupied does not move. */
+  /* RESTART DOES NOT MOVE. It has been at btnY since it was added and
+     that position is muscle memory, so the daily offer stacks ABOVE it
+     rather than taking its place. When there is no restart button the
+     daily still sits one row up and the bottom row stays empty, because
+     the bottom row is where a reflex tap lands hardest and nothing that
+     changes mode belongs there.
+
+     Restart is a separate, deliberate action because the reflex tap now
+     continues. It is only here when continuing is possible: with no gate
+     behind you the reflex tap already restarts and a second way to do
+     the same thing would be clutter. */
+  if (resume) canvasButton(restartRect, 'RESTART', w / 2, btnY, size, COLOUR.SCORE, w);
+
+  let stack = btnY - rowH;
+  if (mode === ENDLESS) {
+    canvasButton(dailyRect, "TODAY'S TRACK", w / 2, stack, size, COLOUR.GATE, w);
+    ctx.globalAlpha = 0.55;
+    const sub = dailyGateCountFor(todayStamp) + ' gates, one road for everyone'
+              + (ghost.live ? ', your ghost is waiting' : '')
+              + (hasKeyboard ? '     press T' : '');
+    text(sub, w / 2, stack - size * 1.5,
+         fittedSize(sub, '700', Math.round(s * 0.026), w * 0.92), '700');
+    ctx.globalAlpha = 1;
+    stack -= rowH;
+  }
+
+  const promptText = resume ? 'tap to continue from the last gate'
+                            : 'tap or press any key';
+  ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
+  text(promptText, w / 2, stack - s * FEEL.DEATH_PROMPT_GAP,
+       fittedSize(promptText, '600', Math.round(s * 0.040), w * 0.88), '600');
   ctx.globalAlpha = 1;
-  text(label, w / 2, btnY, size, '800', 'center', COLOUR.SCORE);
 }
 
 /* ==================================================================
@@ -8355,26 +8425,113 @@ function dayLabel(stamp) {
   return (stamp % 100) + ' ' + MONTHS[(Math.floor(stamp / 100) % 100) - 1];
 }
 
-/* ENTRY, AND THERE IS NO MENU. Section 12 forbids one and it is right to.
+/* ==================================================================
+   ENTRY, AND THERE IS STILL NO MENU. Section 12 forbids one.
 
-   Tapping anywhere or pressing any key starts ENDLESS, exactly as it
-   always has, so a player arriving cold plays immediately and is never
-   asked to choose anything. The daily is a clearly marked button
-   ALONGSIDE that, for the returning player who is looking for it, and it
-   is drawn on the canvas rather than added to #chrome for the same reason
-   the restart button is: a fourth overlay is a fourth chance to repeat
-   the Beakdown incident, and a rect the drawing code publishes cannot eat
-   a tap it is not under.
+   THE FRONT DOOR DEPENDS ON WHO IS ARRIVING, because the two visitors
+   want opposite things and serving both with one screen is what made the
+   daily undiscoverable.
 
-   And after death there is no choice at all. Restart goes back into
-   whichever mode the run was already in, so the one action restart from
-   section 5 is untouched. */
+     A FIRST EVER VISIT is somebody who followed a search result and has
+     no idea what any of this is. Tap anywhere, drive, no concept to
+     learn. Unchanged, and it is not up for negotiation.
+
+     A RETURNING VISIT is somebody who already knows how to drive and is
+     here for a reason. TODAY'S TRACK is that reason: a road everyone
+     shares for the day, a finish line, a ghost of their own best. So for
+     them it is the PRIMARY, and endless is the clearly marked button
+     beside it.
+
+   THE PRIMARY IS `mode` ITSELF, not a visual emphasis. Tapping anywhere,
+   pressing any key and every other route into a run all read `mode`, so
+   setting it once at load makes the whole front door consistent by
+   construction. There is no second code path to keep in step.
+
+   WHY THIS AND NOT "REMEMBER THE LAST MODE". Remembering would send a
+   returning endless player straight back to endless, which is exactly
+   the loop that had to be broken: the author chose the daily, the page
+   reloaded, and endless quietly became the default again. The whole
+   point is that coming back means being offered the thing that is worth
+   coming back FOR.
+
+   And after death there is still no choice: the reflex tap restarts the
+   run you were in, one action, nothing to hunt for. Section 5 holds.
+   ================================================================== */
 const dailyRect = { x: 0, y: 0, w: 0, h: 0, live: false };
+const altRect = { x: 0, y: 0, w: 0, h: 0, live: false, to: 0 };
+
+/* Has this browser ever driven? Written on the first run start, so it is
+   true from the second page load onward. With storage unavailable it is
+   false forever, which is the correct degradation: a player the game
+   cannot remember is a player it should treat as new. */
+let hasPlayedBefore = storeGet('played') === '1';
+function markPlayed() {
+  if (hasPlayedBefore) return;
+  hasPlayedBefore = true;
+  storeSet('played', '1');
+}
 /* Fine pointer means a trackpad or a mouse, which on this audience's
    hardware means a Chromebook, which means a keyboard. The same media
    query the tilt button already uses, read the other way round. */
 const hasKeyboard = !(window.matchMedia
                       && window.matchMedia('(any-pointer: coarse)').matches);
+
+/* One canvas button, drawn and published for the hit test. Canvas rather
+   than a DOM node for the same reason the restart button is: #chrome and
+   #pads already carry the pointer-events discipline the Beakdown incident
+   bought, and a fourth overlay is a fourth chance to get it wrong. */
+function canvasButton(rect, label, cx, cy, size, colour, w) {
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const bw = Math.min(w * 0.92, ctx.measureText(label).width + size * 2.4);
+  const bh = size * 2.2;
+  rect.x = cx - bw / 2;
+  rect.y = cy - bh / 2;
+  rect.w = bw;
+  rect.h = bh;
+  rect.live = true;
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = COLOUR.BAR_TRACK;
+  roundRect(rect.x, rect.y, bw, bh, bh * 0.3);
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = colour;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  text(label, cx, cy, size, '800', 'center', colour);
+  return bh;
+}
+
+function hitRect(rect, e) {
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  return x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
+}
+
+/* WHAT TODAY'S TRACK ACTUALLY GIVES YOU, which is the half that was
+   missing. A button labelled TODAY'S TRACK names a thing; these lines
+   are the reason to press it. Everything here is a fact about today
+   rather than a description of a feature. */
+function dailyPitchLines() {
+  /* ALWAYS EXACTLY THREE. A variable stack was tried and the four line
+     case ran into the car in landscape, where h and s are the same
+     number and there is no spare height at all. Three lines is what the
+     shortest screen this game is played on can hold, so the third one
+     carries whichever fact is worth the most right now. */
+  let third;
+  if (dailyTime > 0) {
+    third = 'YOUR TIME  ' + timeLabel(dailyTime)
+          + (ghost.live ? '     GHOST WAITING' : '');
+  } else if (ghost.live) {
+    third = 'YOUR GHOST IS WAITING';
+  } else if (dailyBest > 0) {
+    third = 'BEST TODAY  ' + dailyBest + '     NOT FINISHED YET';
+  } else {
+    third = 'FINISH CLEAN TO RECORD A GHOST';
+  }
+  return [dailyGateCountFor(todayStamp) + ' GATES TO THE FINISH',
+          'THE SAME ROAD FOR EVERYONE TODAY',
+          third];
+}
 
 function drawOverlay(w, h) {
   if (state === TITLE) {
@@ -8386,71 +8543,93 @@ function drawOverlay(w, h) {
        the top is pushed down the taller screen and clamped so the stack
        can never reach the middle band, which is where the car is. */
     const s = Math.min(w, h);
-    const y0 = Math.min(Math.max(s * 0.10, h * 0.16), Math.max(0, h * 0.5 - s * 0.30));
+    const daily = mode === DAILY;
+    const y0 = Math.min(Math.max(s * 0.09, h * 0.14), Math.max(0, h * 0.5 - s * 0.38));
     const title = 'DRIFT FEVER';
     text(title, w / 2, y0,
-         fittedSize(title, '800', Math.round(s * 0.13), w * 0.88), '800');
-    text('hold left or right to steer', w / 2, y0 + s * 0.135,
-         Math.round(s * 0.045), '600');
-    text('tap or press any key to start', w / 2, y0 + s * 0.20,
-         Math.round(s * 0.045), '600');
+         fittedSize(title, '800', Math.round(s * 0.125), w * 0.88), '800');
+    text('hold left or right to steer', w / 2, y0 + s * 0.125,
+         Math.round(s * 0.042), '600');
 
-    /* The daily button sits EXACTLY where RESTART sits on the death
-       screen: anchored to the bottom edge rather than to a fraction of
-       the height, so it clears the car in both orientations by
-       construction and above the corner pads. Two canvas buttons, one
-       place, and a player who has seen one already knows the other. */
-    const label = "TODAY'S TRACK";
-    const size = Math.round(s * 0.040);
-    ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-    const bw = ctx.measureText(label).width + size * 2.4;
-    const bh = size * 2.2;
+    /* The prompt names the mode the tap will actually start. It used to
+       say "to start", which was true and useless: the whole failure this
+       is fixing is a player who did not know which mode a tap gave
+       them. */
+    const go = daily ? "tap or press any key for TODAY'S TRACK"
+                     : 'tap or press any key to start';
+    text(go, w / 2, y0 + s * 0.182,
+         fittedSize(go, '600', Math.round(s * 0.042), w * 0.92), '600',
+         'center', daily ? COLOUR.GATE : COLOUR.TEXT);
+
+    /* THE PITCH, and only for the returning player, because a first
+       timer has nothing to compare it to and four lines of copy in front
+       of somebody who has never driven is a tutorial. */
+    if (daily) {
+      const lines = dailyPitchLines();
+      ctx.globalAlpha = 0.72;
+      for (let i = 0; i < lines.length; i++) {
+        text(lines[i], w / 2, y0 + s * (0.238 + i * 0.036),
+             fittedSize(lines[i], '700', Math.round(s * 0.030), w * 0.9), '700',
+             'center', i === 0 ? COLOUR.GATE : COLOUR.TEXT);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    /* The other mode, anchored to the bottom edge where RESTART sits on
+       the death screen and the mode switch sits on the pause overlay, so
+       it clears the car in both orientations by construction and stays
+       above the corner pads. */
     const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
-    dailyRect.x = w / 2 - bw / 2;
-    dailyRect.y = by0 - bh / 2;
-    dailyRect.w = bw;
-    dailyRect.h = bh;
-    dailyRect.live = true;
+    const label = daily ? 'ENDLESS' : "TODAY'S TRACK";
+    altRect.to = daily ? ENDLESS : DAILY;
+    const bh = canvasButton(altRect, label, w / 2, by0, Math.round(s * 0.040),
+                            daily ? COLOUR.TEXT : COLOUR.GATE, w);
+    dailyRect.live = false;
 
-    ctx.globalAlpha = 0.62;
-    const sub = dayLabel(todayStamp)
-              + (hasKeyboard ? '     press T' : '')
-              + (dailyBest > 0 ? '     BEST TODAY  ' + dailyBest : '')
-              + (ghost.live ? '     GHOST READY' : '');
+    ctx.globalAlpha = 0.6;
+    const sub = daily
+      ? 'the infinite road, no finish, no ghost' + (hasKeyboard ? '     press E' : '')
+      : dayLabel(todayStamp) + '     ' + dailyGateCountFor(todayStamp) + ' gates, one road for everyone'
+        + (hasKeyboard ? '     press T' : '');
     text(sub, w / 2, by0 - bh * 0.95,
-         fittedSize(sub, '700', Math.round(s * 0.030), w * 0.9), '700');
+         fittedSize(sub, '700', Math.round(s * 0.029), w * 0.92), '700');
     ctx.globalAlpha = 1;
-
-    ctx.globalAlpha = 0.9;
-    ctx.fillStyle = COLOUR.BAR_TRACK;
-    roundRect(dailyRect.x, dailyRect.y, bw, bh, bh * 0.3);
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = COLOUR.GATE;
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-    text(label, w / 2, by0, size, '800', 'center', COLOUR.GATE);
   } else if (state === DEAD) {
     dailyRect.live = false;
+    altRect.live = false;
     drawResult(w, h);
   } else if (state === FINISHED) {
     dailyRect.live = false;
+    altRect.live = false;
     drawFinish(w, h);
   } else {
     dailyRect.live = false;
+    altRect.live = false;
   }
 }
 
 function hitDaily(e) {
-  if (!dailyRect.live || state !== TITLE) return false;
-  const r = canvas.getBoundingClientRect();
-  const x = e.clientX - r.left, y = e.clientY - r.top;
-  return x >= dailyRect.x && x <= dailyRect.x + dailyRect.w
-      && y >= dailyRect.y && y <= dailyRect.y + dailyRect.h;
+  if (dailyRect.live && state === DEAD && hitRect(dailyRect, e)) return true;
+  return false;
+}
+
+function hitAlt(e) {
+  if (!altRect.live || state !== TITLE) return false;
+  return hitRect(altRect, e);
 }
 
 function startDaily() {
   mode = DAILY;
+  startRun();
+}
+
+function startEndless() {
+  mode = ENDLESS;
+  startRun();
+}
+
+function startMode(m) {
+  mode = m;
   startRun();
 }
 
@@ -9370,9 +9549,13 @@ function drawModeMark(w, h) {
 
   // The pips carry the mode on the daily, so the word is not needed
   // there. Endless has no pips, so it says so.
+  /* ENDLESS NAMES ITSELF AND SAYS WHAT IT COSTS. The bare word was
+     doing its job and was not enough: it told the player which mode they
+     were in without telling them what they were missing, so somebody
+     hunting for the ghost read it and carried on hunting. */
   let line, colour;
   if (mode !== DAILY) {
-    line = 'ENDLESS';
+    line = 'ENDLESS   NO FINISH, NO GHOST';
     colour = COLOUR.TEXT;
   } else {
     colour = COLOUR.GATE;
