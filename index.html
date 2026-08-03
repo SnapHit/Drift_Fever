@@ -1795,6 +1795,44 @@ const FEEL = {
      Both LIVE, and changing the count regenerates the wheel. */
   BIOME_COUNT:               12,     // LIVE
   BIOME_MIN_STEP:            90,     // LIVE, degrees
+
+  /* ----------------------------------------------------------------
+     THE DAILY IS A FIXED LENGTH TRACK WITH A FINISH LINE.
+
+     Endless has no end and none of this touches it. The daily needs one,
+     because a deterministic road with no end is only endless with extra
+     steps: it makes finishing impossible, so there is nothing to
+     compare, and the ghost is a pace car rather than a rival.
+
+     THE COUNT COMES OFF THE SEED, so it is the same for everyone on the
+     same local date and the shape of the day is part of the day. Six to
+     eight gates is three to four minutes at the current spacing, which
+     is long enough that finishing is an achievement and short enough
+     that a retry is not a commitment.
+
+     THE LAST GATE IS THE FINISH. There is no extra structure after a
+     count of checkpoints: gate N ends the run, which is why the pips and
+     the countdown and the line are all the same number. */
+  DAILY_GATES_MIN:            6,     // LIVE
+  DAILY_GATES_MAX:            8,     // LIVE
+  /* Nothing is placed inside this of the line. The closing stretch is
+     meant to be the hardest part of the day, not a lottery on the last
+     corner, and a blocker straddling the finish would decide the run
+     rather than test it. */
+  FINISH_CLEAR_SEGMENTS:     40,
+  /* The finish, drawn in the world. Taller and wider than a gate on
+     purpose: it has to resolve out of the draw distance as a thing
+     arriving rather than appear as a thing that was suddenly there. */
+  FINISH_HEIGHT:           3800,     // LIVE, world units to the banner
+  FINISH_POST:              320,     // world units, post thickness
+  FINISH_BANNER:           0.20,     // banner depth, as a share of the height
+  FINISH_BARS:                7,     // light bars down each post
+  /* The pips: one per gate, filling as they are passed. Daily only, so
+     their presence is also what says which mode this is. */
+  PIP_SIZE:               0.020,     // LIVE, of the smaller screen dimension
+  PIP_GAP:                0.009,     // LIVE
+  PIP_ALPHA_DONE:          0.85,     // LIVE
+  PIP_ALPHA_TODO:          0.22,     // LIVE
   /* How long the one sentence under the mode marker stays up. Long
      enough to read on the way into the first corner, short enough that
      it is gone before it becomes furniture. */
@@ -2632,6 +2670,13 @@ const TUNABLES = [
   { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 36,    dp: 0, group: 25 },
   { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 },
   { key: 'MODE_NOTE_SECONDS',  label: 'modeSay', step: 1,    min: 0,    max: 30,    dp: 0, group: 26 },
+  { key: 'DAILY_GATES_MIN',    label: 'gatesLo', step: 1,    min: 2,    max: 30,    dp: 0, group: 27 },
+  { key: 'DAILY_GATES_MAX',    label: 'gatesHi', step: 1,    min: 2,    max: 30,    dp: 0, group: 27 },
+  { key: 'FINISH_HEIGHT',      label: 'finTall', step: 100,  min: 400,  max: 8000,  dp: 0, group: 27 },
+  { key: 'PIP_SIZE',           label: 'pip',     step: 0.001,min: 0.005,max: 0.06,  dp: 3, group: 27 },
+  { key: 'PIP_GAP',            label: 'pipGap',  step: 0.001,min: 0,    max: 0.04,  dp: 3, group: 27 },
+  { key: 'PIP_ALPHA_DONE',     label: 'pipOn',   step: 0.05, min: 0.1,  max: 1.0,   dp: 2, group: 27 },
+  { key: 'PIP_ALPHA_TODO',     label: 'pipOff',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 27 },
   { key: 'GHOST_ALPHA',        label: 'ghostA',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 26 },
   { key: 'GHOST_HEIGHT',       label: 'ghostTop',step: 20,   min: 40,   max: 900,   dp: 0, group: 26 },
   { key: 'GHOST_CABIN_WIDE',   label: 'ghostCw', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 26 },
@@ -3649,6 +3694,13 @@ function tunerLine(group) {
     out += 'at ' + biome + '/' + BIOMES.length + '  hue ' + Math.round(biomeHue(biome))
         + '  bag ' + biomeBag.length;
   }
+  if (group === 27) {
+    out += (mode === DAILY
+      ? 'gates ' + gatesPassed + '/' + dailyGates
+        + '  finish @' + finishSeg + ' (' + Math.round(finishClock()) + 's)'
+        + '  to go ' + Math.max(0, finishSeg - carSegIndex)
+      : 'endless, no finish');
+  }
   if (group === 26) {
     // The ghost, live, because a replay that is somewhere else cannot be
     // tuned against a number that is not on screen.
@@ -3793,10 +3845,22 @@ function onRampProgress(t) {
 }
 
 /* And how far into the deep game after it, 0 to 1. No adaptation term
-   anywhere in here, on purpose. */
+   anywhere in here, on purpose.
+
+   ON THE DAILY THE SPAN IS THE TRACK. In endless the ramp reaches its
+   peak at RAMP_SECONDS and everything after that is the same difficulty
+   for as long as the player lasts, which is right for a road with no
+   end. A finite track wants the opposite shape: it should still be
+   climbing at the line, so the closing stretch is the hardest part of
+   the day and the run builds to something. Measured, a seven gate track
+   runs 223 seconds and the endless ramp would have finished at 130,
+   leaving the last two fifths flat. */
 function deepProgress(t) {
-  return clamp(((t === undefined ? runTime : t) - FEEL.ONRAMP_SECONDS)
-               / FEEL.RAMP_SECONDS, 0, 1);
+  const now = (t === undefined ? runTime : t);
+  const span = mode === DAILY
+    ? Math.max(1, finishClock() - FEEL.ONRAMP_SECONDS)
+    : FEEL.RAMP_SECONDS;
+  return clamp((now - FEEL.ONRAMP_SECONDS) / span, 0, 1);
 }
 
 /* The curve scale actually in force. FEEL.CURVE_SCALE stays the
@@ -3974,6 +4038,48 @@ function dailySeedFor(stamp) {
 let todayStamp = localDayStamp();
 function dailySeed() { return dailySeedFor(todayStamp); }
 
+/* ------------------------------------------------------------------
+   HOW LONG TODAY'S TRACK IS.
+
+   Off the seed, hashed a second time with a different constant, so the
+   length is not correlated with the road the same seed produces and two
+   consecutive days do not tend toward the same length. Not from rng(),
+   which belongs to the road generator, and not from the biome stream,
+   which belongs to the palette: a third consumer of either would move
+   what they produce.
+
+   Held in a variable for the length of a run rather than recomputed,
+   because the cycler can move the bounds mid session and a track that
+   changed length under the car would be worse than either bound.
+   ------------------------------------------------------------------ */
+function dailyGateCountFor(stamp) {
+  const lo = Math.max(1, Math.round(FEEL.DAILY_GATES_MIN));
+  const hi = Math.max(lo, Math.round(FEEL.DAILY_GATES_MAX));
+  let h = dailySeedFor(stamp) ^ 0x2545f491;
+  h = Math.imul(h ^ (h >>> 13), 0x27d4eb2d);
+  h = Math.imul(h ^ (h >>> 15), 0x165667b1);
+  h = (h ^ (h >>> 16)) >>> 0;
+  return lo + (h % (hi - lo + 1));
+}
+
+/* Gate k, one indexed, in segments. The first sits at seven tenths of a
+   spacing so the opening is not a full gate long, which is where it has
+   always been; everything after is one spacing apart. */
+function gateSegment(k) {
+  return Math.round(FEEL.CHECKPOINT_EVERY * 0.7) + (k - 1) * FEEL.CHECKPOINT_EVERY;
+}
+
+let dailyGates = 6;
+let finishSeg = 0;
+function refreshTrackLength() {
+  dailyGates = dailyGateCountFor(todayStamp);
+  finishSeg = gateSegment(dailyGates);
+}
+refreshTrackLength();
+/* The finish expressed on the road's own distance clock, which is what
+   the difficulty ramp is measured against. */
+function finishClock() { return finishSeg * FEEL.SEGMENT_LENGTH / FEEL.SPEED; }
+
 /* Midnight can pass with the tab open. Checked at the start of every run
    rather than on a timer, because that is the only moment the answer can
    change anything, and it is where the records have to be rolled over. */
@@ -3981,11 +4087,10 @@ function rollDayIfNeeded() {
   const now = localDayStamp();
   if (now === todayStamp) return false;
   todayStamp = now;
-  dailyBest = 0;
   ghostClear();
-  storeSet('daily.day', String(todayStamp));
-  storeSet('daily.best', '0');
-  storeSet('daily.ghost', '');
+  clearDailyRecords();
+  // A new day is a new track, and its length comes off the new seed.
+  refreshTrackLength();
   return true;
 }
 
@@ -4495,6 +4600,7 @@ function worstCrossing(lo, hi, carHalf, slack) {
    because the crossing it demands is monotonic in x on each side. */
 function hazardFits(from, to, xFrac, halfWorld, swingFrac) {
   const warn = FEEL.HAZARD_WARN_SEGMENTS;
+  if (pastFinish(to)) return false;              // nothing crosses the line
   /* No two hazards may share a stretch of road, including each other's
      warning runs. Each kind is placed on its own schedule, so without
      this a blocker and a splitter can land on the same segments: both
@@ -4693,6 +4799,7 @@ function jumpLead() { return FEEL.JUMP_ARROW_COUNT * FEEL.JUMP_ARROW_SPACING + 4
 function jumpFits(from, to) {
   const lead = jumpLead();
   const a = from - lead, b = to + FEEL.JUMP_RUNOUT;
+  if (pastFinish(b)) return false;               // nothing crosses the line
   for (let i = 0; i < hazards.length; i++) {
     const h = hazards[i];
     if (h.to + FEEL.HAZARD_WARN_SEGMENTS + 2 >= a
@@ -4731,9 +4838,33 @@ function buildJumpPhrase() {
   return true;
 }
 
+/* Nothing may be placed at the line or past it. The closing stretch is
+   meant to be the hardest part of the day; a blocker straddling the
+   finish would decide the run instead of testing it, and a ramp that
+   launched the car over the line would be worse again. */
+function pastFinish(seg) {
+  return mode === DAILY && seg >= finishSeg - FEEL.FINISH_CLEAR_SEGMENTS;
+}
+
 function topUpRoad(baseIndex) {
   const needed = baseIndex + FEEL.DRAW_DISTANCE_SEGMENTS + 4;
-  while (segBase + segments.length < needed) addPhrase();
+  /* THE DAILY STOPS GENERATING. It used to build ahead of the camera for
+     as long as the tab was open, which is what made it a deterministic
+     endless road rather than a track.
+
+     Road is still laid past the line, because the finish has to be
+     approached and crossed with something under the car and something
+     behind it, and it has to resolve out of the draw distance rather
+     than appear. That run out is dead straight at full width: it is not
+     part of the track and nothing about it is a test. */
+  while (segBase + segments.length < needed) {
+    if (pastFinish(segBase + segments.length)) {
+      addRun(Math.min(64, needed - (segBase + segments.length)),
+             0, 0, roadWidth, 1, true);
+      continue;
+    }
+    addPhrase();
+  }
   // Trim what is behind the camera, in one splice rather than one shift
   // per frame, so the array does not grow for the length of a run.
   const behind = baseIndex - segBase;
@@ -4754,7 +4885,11 @@ function topUpRoad(baseIndex) {
    touch or a sensor. That is the section 8.1 rule and it is the one
    thing here that is expensive to reverse.
    ================================================================== */
-const TITLE = 0, DRIVING = 1, DEAD = 2;
+/* FINISHED is not a kind of DEAD and nothing treats it as one. A run
+   that reached the line is the only outcome in this game that is a win,
+   and every test in the file that reads "not driving" was checked
+   against it rather than assumed. */
+const TITLE = 0, DRIVING = 1, DEAD = 2, FINISHED = 3;
 let state = TITLE;
 
 /* Pause. Section 12 says no pause and the author has overruled it: this
@@ -4848,6 +4983,14 @@ function startRun() {
   // Midnight can pass with the tab open, and this is the only moment the
   // answer can change anything.
   rollDayIfNeeded();
+  /* And the only moment the track length may change. The cycler can move
+     the bounds mid session and a track that changed length under the car
+     would be worse than either bound. */
+  refreshTrackLength();
+  finishTime = 0;
+  finishMargin = null;
+  finishClean = false;
+  finishRecord = false;
   runTime = 0;
   /* Before updateDifficulty, not after. On the daily the difficulty is a
      function of the car's segment, so leaving last run's index in place
@@ -5095,6 +5238,10 @@ function continueRun() {
 
 function startOrRestart() {
   if (state === TITLE) { startRun(); return; }
+  /* A finished run restarts and never continues. There is nothing to
+     continue from: the track is over, and the one action stays one
+     action. */
+  if (state === FINISHED && deadFor >= FEEL.DEATH_INPUT_LOCK) { startRun(); return; }
   if (state === DEAD && deadFor >= FEEL.DEATH_INPUT_LOCK) {
     // The reflex tap continues when there is somewhere to continue from,
     // and restarts when there is not. Either way it is one action with
@@ -5123,6 +5270,12 @@ function update(dt) {
   cameraX = carX * FEEL.CAMERA_FOLLOW + lookCurve * FEEL.CAMERA_LOOK;
 
   if (state === DEAD) { updateFall(dt); return; }
+  /* A finished run holds still. Nothing falls, nothing explodes and the
+     car keeps its shape sitting under the line, which is the picture the
+     completion screen is drawn over. Only the clock on the screen itself
+     runs, and it runs on real time so the input lock and the score roll
+     behave exactly as they do on the death screen. */
+  if (state === FINISHED) { deadFor += dt; return; }
   if (state !== DRIVING) return;
 
   runTime += dt;
@@ -5474,7 +5627,8 @@ function updateFall(dt) {
    that turns without being asked reads as the game steering for you. See
    CAR_CURVE_YAW. Nothing here may rotate the car off the driver's own
    input while that constant is zero. */
-function dead() { return state === DEAD; }
+// Used by the drawing to ask "is the run over", so a finish counts.
+function dead() { return state === DEAD || state === FINISHED; }
 
 function carYaw() {
   return drift.headingAngle * FEEL.CAR_YAW_GAIN + carCurve * FEEL.CAR_CURVE_YAW;
@@ -5953,7 +6107,117 @@ function drawRoad(w, h) {
    It is deliberately the widest thing on the road and it has nothing in
    the driving line, because a gate is the one thing out here that is
    purely good news. */
+/* Is the gate being approached the LINE? Gate N is the finish, so this
+   is true for the whole of the closing stretch, which is what makes the
+   structure resolve out of the draw distance instead of appearing. */
+function atFinishGate() {
+  return mode === DAILY && gatesPassed >= dailyGates - 1;
+}
+
+/* ==================================================================
+   THE FINISH, DRAWN IN THE WORLD.
+
+   The payoff of a finite track is not a message on a HUD. It is a thing
+   on the road that comes up out of the distance and gets bigger, so the
+   last thirty seconds are driven at something rather than toward a
+   number counting down.
+
+   Built as a gate that has grown up: the same two posts and beam, the
+   same two pass glow, in the same palette, so it reads as the same
+   family and not as a foreign object. What makes it the LAST one is
+   scale and a banner. It is more than four times the height of a
+   checkpoint, which is what lets it clear the horizon and be visible
+   from the far end of the draw distance while a gate is still a smudge.
+   ================================================================== */
+function drawFinishGate(first, last, baseIndex) {
+  const n = nextGate - baseIndex;
+  if (n < first || n > last || !bvis[n]) return;
+  const seg = segAt(nextGate);
+  if (!seg) return;
+  const out = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
+  const post = FEEL.FINISH_POST / seg.hw;
+  const top = by[n] - bh[n] * FEEL.FINISH_HEIGHT;
+  const lx = bx[n] + bw[n] * (out + post * 0.5), rx = bx[n] - bw[n] * (out + post * 0.5);
+  const pw = Math.max(2, bw[n] * post);
+  const banner = (by[n] - top) * FEEL.FINISH_BANNER;
+
+  for (let pass = 0; pass < 2; pass++) {
+    const spread = pass === 0 ? pw * 2.2 : 0;
+    ctx.globalAlpha = pass === 0 ? 0.26 : 1;
+    ctx.fillStyle = pass === 0 ? GATE_GLOW_FILL : COLOUR.GATE_POST;
+    ctx.beginPath();
+    ctx.rect(lx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
+    ctx.rect(rx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  /* The banner across the top, in the score's own gold rather than the
+     gate's cyan. Every checkpoint all day has been cyan; the one that
+     ends the run is the colour of the number it is ending. */
+  const bl = Math.min(lx, rx) - pw / 2, bwid = Math.abs(rx - lx) + pw;
+  ctx.globalAlpha = 0.28;
+  ctx.fillStyle = 'rgb(' + COLOUR.SCORE_GLOW + ')';
+  ctx.fillRect(bl - pw, top - banner * 0.35, bwid + pw * 2, banner * 1.7);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = COLOUR.SCORE;
+  ctx.fillRect(bl, top, bwid, banner);
+  // A dark band through the middle of it, so the banner reads as a sign
+  // with something on it rather than as a solid bar.
+  ctx.fillStyle = COLOUR.SCORE_EDGE;
+  ctx.fillRect(bl, top + banner * 0.36, bwid, banner * 0.28);
+
+  /* Light bars running down both posts, evenly spaced, so the height is
+     legible at distance. A single tall rectangle at this scale reads as
+     a wall; a ladder reads as a structure. */
+  const postH = by[n] - top;
+  ctx.fillStyle = COLOUR.GATE;
+  ctx.globalAlpha = 0.75;
+  const bars = Math.max(1, Math.round(FEEL.FINISH_BARS));
+  for (let i = 1; i <= bars; i++) {
+    const y = top + postH * (i / (bars + 1));
+    const bh2 = Math.max(1.5, postH * 0.016);
+    ctx.fillRect(lx - pw * 0.9, y, pw * 1.8, bh2);
+    ctx.fillRect(rx - pw * 0.9, y, pw * 1.8, bh2);
+  }
+  ctx.globalAlpha = 1;
+
+  /* The road under it, painted across the full width. This is the only
+     marking in the game that spans the driving line, and it is allowed
+     to because there is nothing to avoid on it and nothing after it. */
+  const nn = Math.min(last, n + 6);
+  if (nn > n && bvis[n]) {
+    const bars2 = 8;
+    ctx.beginPath();
+    for (let k = 0; k < bars2; k += 2) {
+      const f0 = -1 + 2 * k / bars2, f1 = -1 + 2 * (k + 1) / bars2;
+      ctx.moveTo(bx[n] + bw[n] * f0 * out, by[n]);
+      ctx.lineTo(bx[n] + bw[n] * f1 * out, by[n]);
+      ctx.lineTo(bx[nn] + bw[nn] * f1 * out, by[nn]);
+      ctx.lineTo(bx[nn] + bw[nn] * f0 * out, by[nn]);
+      ctx.closePath();
+    }
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = COLOUR.SCORE;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // The same approach sweep a gate has, so the last one still counts the
+  // car in the way every gate before it did.
+  const away = nextGate - carSegIndex;
+  if (away > 0 && away < FEEL.GATE_SWEEP_SEGMENTS && state === DRIVING) {
+    const u = 1 - away / FEEL.GATE_SWEEP_SEGMENTS;
+    const band = Math.max(2, postH * FEEL.GATE_SWEEP_LENGTH);
+    const y = top + (postH - band) * u;
+    ctx.fillStyle = COLOUR.SCORE_BEST;
+    ctx.fillRect(lx - pw * 1.1, y, pw * 2.2, band);
+    ctx.fillRect(rx - pw * 1.1, y, pw * 2.2, band);
+  }
+}
+
 function drawGate(first, last, baseIndex) {
+  if (atFinishGate()) { drawFinishGate(first, last, baseIndex); return; }
   const n = nextGate - baseIndex;
   if (n < first || n > last || !bvis[n]) return;
   const seg = segAt(nextGate);
@@ -7937,6 +8201,140 @@ function drawResult(w, h) {
   text(label, w / 2, btnY, size, '800', 'center', COLOUR.SCORE);
 }
 
+/* ==================================================================
+   THE COMPLETION SCREEN.
+
+   Not the death screen with a different word on it. A crash screen leads
+   with what you scored before it ended; this leads with the fact that
+   you got to the end, because that is the achievement and everything
+   else is detail about how.
+
+   CLEAN IS THE HEADLINE. It is the binary most worth knowing, it is the
+   only thing that separates a run that counts from a run that was
+   ground out on continues, and it is therefore the largest thing on the
+   screen. The score is next, because this game is about drifting. The
+   time is third and is what the ghost is raced against.
+   ================================================================== */
+function timeLabel(t) {
+  const m = Math.floor(t / 60), sec = t - m * 60;
+  return m + ':' + (sec < 10 ? '0' : '') + sec.toFixed(1);
+}
+
+function drawFinish(w, h) {
+  const s = Math.min(w, h);
+  const roll = clamp(deadFor / FEEL.RESULT_ROLL_TIME, 0, 1);
+  const eased = 1 - Math.pow(1 - roll, 3);
+  const shown = Math.round(banked * eased);
+
+  // The same measured-in-s stack the death screen uses, for the same
+  // reason: laid out in fractions of h it collides with the car in
+  // landscape, where h and s are the same number.
+  /* The gaps are set from the TYPE SIZES rather than picked, because the
+     first pass was picked and the headline, the number and the credit
+     all ran into each other: a 0.085 headline centred 0.09 above a 0.125
+     number overlaps by construction whatever it looks like at one
+     screen size. Every step below is at least half the sum of the two
+     heights it separates. */
+  const y0 = Math.min(Math.max(s * 0.06, h * 0.10), Math.max(0, h * 0.5 - s * 0.44));
+
+  ctx.globalAlpha = 0.8;
+  text('TRACK COMPLETE', w / 2, y0, Math.round(s * 0.034), '700', 'center', COLOUR.GATE);
+  ctx.globalAlpha = 1;
+
+  /* The binary, and it is the loudest thing here. A clean run pulses in
+     the score's own gold; a continued one says so plainly and does not,
+     because it is not the same achievement and the screen must not
+     pretend otherwise. */
+  if (finishClean) {
+    ctx.globalAlpha = 0.74 + 0.26 * Math.abs(Math.sin(deadFor * 4.5));
+    const label = 'CLEAN RUN';
+    text(label, w / 2, y0 + s * 0.066,
+         fittedSize(label, '900', Math.round(s * 0.072), w * 0.9), '900',
+         'center', COLOUR.SCORE_BEST);
+    ctx.globalAlpha = 1;
+  } else {
+    const label = continues === 1 ? 'ONE CONTINUE' : continues + ' CONTINUES';
+    ctx.globalAlpha = 0.85;
+    text(label, w / 2, y0 + s * 0.066,
+         fittedSize(label, '800', Math.round(s * 0.056), w * 0.9), '800',
+         'center', COLOUR.SCORE);
+    ctx.globalAlpha = 1;
+  }
+
+  arcadeNumber(String(shown), w / 2, y0 + s * 0.168, Math.round(s * 0.108),
+               finishRecord ? COLOUR.SCORE_BEST : COLOUR.SCORE);
+
+  ctx.globalAlpha = FEEL.BRAND_DEATH_ALPHA;
+  text('SNAPHIT', w / 2, y0 + s * 0.238, Math.round(s * FEEL.BRAND_DEATH_SIZE), '700');
+  ctx.globalAlpha = 1;
+
+  /* The run in figures. TIME is what the ghost is raced against, so the
+     margin against it sits directly under the time rather than in a
+     line of its own. */
+  const rowY = y0 + s * 0.272;
+  const cols = [['TIME', timeLabel(finishTime)],
+                ['SCORE', String(banked)],
+                ['GATES', String(dailyGates)]];
+  const span = Math.min(w * 0.9, s * 1.15);
+  const step = span / cols.length;
+  for (let i = 0; i < cols.length; i++) {
+    const cx = w / 2 + (i - (cols.length - 1) / 2) * step;
+    ctx.globalAlpha = 0.6;
+    text(cols[i][0], cx, rowY, Math.round(s * 0.028), '700');
+    ctx.globalAlpha = 1;
+    ctx.font = '700 ' + Math.round(s * 0.044) + 'px ' + MONO;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = COLOUR.TEXT_SHADOW;
+    ctx.fillText(cols[i][1], cx, rowY + s * 0.044 + 2);
+    ctx.fillStyle = COLOUR.GATE;
+    ctx.fillText(cols[i][1], cx, rowY + s * 0.044);
+  }
+
+  /* THE MARGIN, which is what having a ghost is for. Faster than the
+     line you were racing is the whole point of racing it, so it gets the
+     record colour and a sign that reads at a glance. */
+  let line, colour = COLOUR.TEXT;
+  if (finishMargin !== null) {
+    const faster = finishMargin < 0;
+    line = (faster ? 'BEAT YOUR GHOST BY  ' : 'BEHIND YOUR GHOST BY  ')
+         + Math.abs(finishMargin).toFixed(1) + 's';
+    colour = faster ? COLOUR.SCORE_BEST : COLOUR.TEXT;
+  } else if (finishClean && !dailyDone) {
+    line = 'FIRST CLEAN FINISH TODAY';
+    colour = COLOUR.SCORE_BEST;
+  } else if (!finishClean) {
+    line = 'A CLEAN RUN IS THE ONE THAT COUNTS';
+  } else {
+    line = 'GHOST RECORDED';
+    colour = COLOUR.GATE;
+  }
+  ctx.globalAlpha = 0.82;
+  text(line, w / 2, y0 + s * 0.360,
+       fittedSize(line, '700', Math.round(s * 0.031), w * 0.9), '700', 'center', colour);
+  ctx.globalAlpha = 1;
+
+  const rec = "TODAY " + dayLabel(todayStamp) + '  ' + dailyBest
+            + (dailyTime > 0 ? '  ' + timeLabel(dailyTime) : '');
+  ctx.globalAlpha = 0.66;
+  text(rec, w / 2, y0 + s * 0.405,
+       fittedSize(rec, '700', Math.round(s * 0.028), w * 0.9), '700');
+  ctx.globalAlpha = 1;
+
+  /* One action, and there is nothing to continue from: the track is
+     over. No restart button either, because with no continue on offer
+     the reflex tap already restarts and a second way to do the same
+     thing is clutter. That is the death screen's own rule. */
+  restartRect.live = false;
+  if (deadFor < FEEL.DEATH_INPUT_LOCK) return;
+  const btnY = h - safeBottom - FEEL.DEATH_BOTTOM;
+  ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
+  const prompt = 'tap or press any key to run it again';
+  text(prompt, w / 2, btnY,
+       fittedSize(prompt, '600', Math.round(s * 0.040), w * 0.88), '600');
+  ctx.globalAlpha = 1;
+}
+
 /* Did that tap land on the restart button? Canvas rather than a DOM
    button on purpose: #chrome and #pads already carry the pointer-events
    discipline the Beakdown incident bought, and a fourth overlay is a
@@ -8035,6 +8433,9 @@ function drawOverlay(w, h) {
   } else if (state === DEAD) {
     dailyRect.live = false;
     drawResult(w, h);
+  } else if (state === FINISHED) {
+    dailyRect.live = false;
+    drawFinish(w, h);
   } else {
     dailyRect.live = false;
   }
@@ -8138,11 +8539,19 @@ function crossGate() {
   const took = Math.floor(score);
   banked += took;
   score = 0;
+  gatesPassed++;
+
+  /* THE LAST GATE IS THE LINE. On the daily, crossing gate N ends the
+     run and there is no lap two. A player with clock left will feel cut
+     short and that is the correct feeling: the moment survival past the
+     line contributes to a score, two runs stop being comparable and the
+     daily is endless with extra steps. Finishing is the achievement. */
+  if (mode === DAILY && gatesPassed >= dailyGates) { finishRun(); return; }
+
   clock = Math.min(FEEL.CLOCK_MAX, clock + FEEL.CLOCK_CHECKPOINT);
   gateFlash = FEEL.CHECKPOINT_FLASH;
   clockPop = FEEL.CLOCK_POP_TIME;
   nextGate += FEEL.CHECKPOINT_EVERY;
-  gatesPassed++;
   /* The peak of the stage, and it lands as a moment rather than as a
      fade: the wash and the shake fire on this frame and the new biome
      arrives underneath them, so the turnover is something that happened
@@ -8150,7 +8559,19 @@ function crossGate() {
   gateFlash2 = FEEL.CHECKPOINT_FLASH;
   addShake(FEEL.GATE_SHAKE_PX);
   audioSting(STING_GATE);
-  sayCallout('BANKED  +' + took, CALL_GATE, COLOUR.GATE);
+  /* THE GATE COUNTS DOWN, and it is delivered here rather than as a
+     standing readout because this is the exact moment it means
+     something and it costs nothing on screen for the rest of the run.
+     The second to last says what the next one is, so the closing stretch
+     is driven in the knowledge that it IS the closing stretch, which is
+     where the tension of a finite track lives. */
+  let said = 'BANKED  +' + took;
+  if (mode === DAILY) {
+    const left = dailyGates - gatesPassed;
+    said += left === 1 ? '   FINAL STRETCH'
+          : '   ' + left + ' TO GO';
+  }
+  sayCallout(said, CALL_GATE, COLOUR.GATE);
   /* NOT the next one round the wheel. Marching through the hues in order
      means every gate is a small step and the change stops being an
      event; the bag guarantees a big step and still shows every hue once
@@ -8159,6 +8580,54 @@ function crossGate() {
   // Everything a continue needs, taken after the gate has done its work
   // so a resume arrives in exactly the state the crossing left.
   saveCheckpoint(at);
+}
+
+/* ==================================================================
+   THE FINISH.
+
+   Deliberately not a crash with a different word on it. Nothing
+   explodes, nothing falls, the car keeps its shape and the screen says
+   the run was completed. It is the one outcome in this game that is a
+   win and it has to read as one.
+
+   THREE THINGS ARE RECORDED, in the order they matter:
+
+     SCORE, which is primary, because this game is about drifting and a
+       finish that was crawled round is not the same achievement as a
+       finish that was thrown round.
+     TIME, which is what the ghost is raced against.
+     CLEAN, meaning zero continues, which is the binary most worth
+       knowing and is therefore the loudest thing on the screen.
+   ================================================================== */
+let finishTime = 0;         // this run's time to the line
+let finishMargin = null;    // against the ghost's, seconds, null if none
+let finishClean = false;
+let finishRecord = false;   // did this run set today's record
+
+function finishRun() {
+  finishTime = runTime;
+  finishClean = continues === 0;
+  runDistance = Math.round(position / 100);
+  banked += Math.floor(score);
+  score = 0;
+  /* The margin against the line the ghost was recorded on, which is only
+     meaningful if that run reached the line too. */
+  finishMargin = (finishClean && dailyTime > 0) ? finishTime - dailyTime : null;
+  finishRecord = bankScore(true);
+  stopTiltHint(true);
+  onRunEnded();
+  state = FINISHED;
+  deadFor = 0;
+  scraping = false;
+  calloutLife = 0;
+  driftLife = 0;
+  breakChain();
+  gateFlash = FEEL.CHECKPOINT_FLASH;
+  gateFlash2 = FEEL.CHECKPOINT_FLASH;
+  clockPop = 0;
+  addShake(FEEL.GATE_SHAKE_PX);
+  audioSting(STING_BEST);
+  coastSpeed = FEEL.SPEED;
 }
 
 function updateScore(dt) {
@@ -8202,43 +8671,75 @@ function updateScore(dt) {
    is still fully playable and remembers nothing, which is the required
    behaviour rather than a degradation.
    ================================================================== */
-let dailyBest = 0;
+let dailyBest = 0;         // best score on a clean run
+let dailyTime = 0;         // and its time to the line, zero if it never got there
+let dailyDone = false;     // has today's track been finished clean at all
 let dailyGhostBytes = 0;
+
+function clearDailyRecords() {
+  dailyBest = 0;
+  dailyTime = 0;
+  dailyDone = false;
+  dailyGhostBytes = 0;
+  storeSet('daily.day', String(todayStamp));
+  storeSet('daily.best', '0');
+  storeSet('daily.time', '0');
+  storeSet('daily.ghost', '');
+}
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
   if (day !== todayStamp) {
     // A different day, or nothing stored. Either way there is nothing
     // here that belongs to today's road.
-    storeSet('daily.day', String(todayStamp));
-    storeSet('daily.best', '0');
-    storeSet('daily.ghost', '');
+    clearDailyRecords();
     return;
   }
   const b = parseInt(storeGet('daily.best'), 10);
   if (isFinite(b) && b > 0) dailyBest = b;
+  const t = parseFloat(storeGet('daily.time'));
+  if (isFinite(t) && t > 0) { dailyTime = t; dailyDone = true; }
   const g = storeGet('daily.ghost');
   if (g) { dailyGhostBytes = g.length; ghostDecode(g); }
 })();
 
-/* Called at the end of a run, before anything is reset. */
-function bankDaily() {
-  if (mode !== DAILY) return;
-  if (continues > 0) return;              // not a lap
-  if (banked <= dailyBest) return;
+/* Which of two clean runs is the better one.
+
+   A FINISH BEATS AN UNFINISHED RUN WHATEVER THE SCORES. Score stays
+   primary between two runs of the same kind, and that is the right way
+   round: this game is about drifting, so the higher score wins. But a
+   run that reached the line and one that died at gate four are not
+   comparable at all, and letting a big score on a dead run hold the
+   record would keep a ghost that runs out halfway and a time that does
+   not exist. */
+function dailyBeatsRecord(finished, score) {
+  if (finished !== dailyDone) return finished;   // a finish always wins
+  return score > dailyBest;
+}
+
+/* Called at the end of a run, before anything is reset. Returns whether
+   this run took the record, which is what the completion screen says. */
+function bankDaily(finished) {
+  if (mode !== DAILY) return false;
+  if (continues > 0) return false;              // not a lap
+  if (!dailyBeatsRecord(!!finished, banked)) return false;
   dailyBest = banked;
+  dailyDone = !!finished;
+  dailyTime = finished ? finishTime : 0;
   storeSet('daily.day', String(todayStamp));
   storeSet('daily.best', String(dailyBest));
-  /* The line goes with the score, so the ghost is always the run that
-     set the record rather than merely the last clean one. */
+  storeSet('daily.time', dailyTime ? dailyTime.toFixed(2) : '0');
+  /* The line goes with the record, so the ghost is always the run that
+     set it rather than merely the last clean one. */
   const blob = ghostEncode();
   dailyGhostBytes = blob.length;
   storeSet('daily.ghost', blob);
   ghostDecode(blob);                      // live for the next attempt at once
+  return true;
 }
 
-function bankScore() {
-  bankDaily();
+function bankScore(finished) {
+  const tookDaily = bankDaily(finished);
   /* FURTHEST is open to every run, continued or not, because seeing more
      of the track is exactly what a continue is for and it deserves to be
      worth something. */
@@ -8250,7 +8751,7 @@ function bankScore() {
      of score integrity. Without it the live best score break, which is
      the strongest moment in the game, becomes reachable by pressing
      continue enough times and stops meaning anything at all. */
-  if (continues > 0) return;
+  if (continues > 0) return tookDaily;
   // Only what was banked survives. The pending run is what a gate is for.
   const final = banked;
   if (final > bestScore) {
@@ -8260,6 +8761,7 @@ function bankScore() {
     bestKnown = true;
     storeSet('best', String(bestScore));
   }
+  return tookDaily;
 }
 
 
@@ -8806,6 +9308,58 @@ function modeSecondLine() {
   return 'CHASING YOUR BEST CLEAN RUN';
 }
 
+/* ------------------------------------------------------------------
+   THE PIPS. One mark per gate, filling as they are passed.
+
+   A COUNTER WOULD BE WORSE AND THAT IS THE WHOLE ARGUMENT. "GATE 3"
+   tells the player nothing about whether there are five more or fifty,
+   which is exactly the question a finite track has to answer. A row
+   shows the SHAPE of the day in one look with nothing to parse, and it
+   is the same glance that says how much is left.
+
+   THE LAST PIP IS THE LINE and it is drawn wider and in the score's own
+   gold, so the end of the row reads as an end rather than as one more
+   of the same.
+
+   PIPS ONLY EXIST ON THE DAILY, because endless has no end to draw. That
+   makes their presence the mode indicator as well, which is the cheapest
+   possible answer to the question the last session had to spend a line
+   of text on.
+   ------------------------------------------------------------------ */
+function drawPips(w, h, y) {
+  const s = Math.min(w, h);
+  const n = dailyGates;
+  const pip = s * FEEL.PIP_SIZE;
+  const gap = s * FEEL.PIP_GAP;
+  // The finish pip is wider, so the row itself has a shape.
+  const lastW = pip * 1.9;
+  const total = (n - 1) * (pip + gap) + lastW;
+  let x = w / 2 - total / 2;
+  // Measured at 0.5: three pixels tall on a 320 wide handset, which is a
+  // row you can see and not a row you can count.
+  const hgt = Math.max(2.5, pip * 0.60);
+  for (let i = 0; i < n; i++) {
+    const last = i === n - 1;
+    const wdt = last ? lastW : pip;
+    const done = i < gatesPassed;
+    ctx.globalAlpha = done ? FEEL.PIP_ALPHA_DONE : FEEL.PIP_ALPHA_TODO;
+    ctx.fillStyle = last ? COLOUR.SCORE : COLOUR.GATE;
+    roundRect(x, y - hgt / 2, wdt, hgt, hgt * 0.5);
+    ctx.fill();
+    /* The one being driven toward, breathing. It is the only pip that
+       moves and it is always the next thing to happen, so the row reads
+       as a position and not only as a total. */
+    if (!done && i === gatesPassed && state === DRIVING) {
+      ctx.globalAlpha = 0.30 + 0.35 * Math.abs(Math.sin(runTime * 3));
+      roundRect(x, y - hgt / 2, wdt, hgt, hgt * 0.5);
+      ctx.fill();
+    }
+    x += wdt + gap;
+  }
+  ctx.globalAlpha = 1;
+  return hgt;
+}
+
 function drawModeMark(w, h) {
   /* WHILE DRIVING ONLY. The death screen says all of this in its own
      records line, and drawing both put two lines of teal on top of each
@@ -8814,6 +9368,8 @@ function drawModeMark(w, h) {
   const s = Math.min(w, h);
   const y = hudBottom + s * 0.026;
 
+  // The pips carry the mode on the daily, so the word is not needed
+  // there. Endless has no pips, so it says so.
   let line, colour;
   if (mode !== DAILY) {
     line = 'ENDLESS';
@@ -8825,8 +9381,13 @@ function drawModeMark(w, h) {
     if (continues > 0) line += '   CONTINUED';
     else if (ghost.live) line += '   ' + ghostGapLabel();
   }
+  let below = y;
+  if (mode === DAILY) {
+    drawPips(w, h, y);
+    below = y + s * 0.028;
+  }
   ctx.globalAlpha = 0.42;
-  text(line, w / 2, y, fittedSize(line, '700', Math.round(s * 0.026), w * 0.85),
+  text(line, w / 2, below, fittedSize(line, '700', Math.round(s * 0.026), w * 0.85),
        '700', 'center', colour);
 
   /* Once, at the start of the run, then gone. It is the one thing here
@@ -8836,7 +9397,7 @@ function drawModeMark(w, h) {
   if (second && runTime < FEEL.MODE_NOTE_SECONDS) {
     const fade = clamp((FEEL.MODE_NOTE_SECONDS - runTime) / 0.8, 0, 1);
     ctx.globalAlpha = 0.42 * fade;
-    text(second, w / 2, y + s * 0.032,
+    text(second, w / 2, below + s * 0.032,
          fittedSize(second, '700', Math.round(s * 0.023), w * 0.9), '700',
          'center', continues > 0 ? COLOUR.SCORE : colour);
   }
@@ -9001,6 +9562,7 @@ function drawHud(w, h) {
     tunerLine(24),
     tunerLine(25),
     tunerLine(26),
+    tunerLine(27),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
