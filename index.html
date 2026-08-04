@@ -1895,8 +1895,34 @@ const FEEL = {
      precisely this audience, so first visit detection quietly becomes
      every visit for some players. A pulse that gives up after a few
      seconds regardless is fine. One that greets a returning player for
-     ever is not. Frame time, so it does not run down in a hidden tab. */
+     ever is not. Frame time, so it does not run down in a hidden tab.
+
+     AND IT ONLY RUNS WHILE THE CAR IS. Measured: the clock used to start
+     at page load, so a player who read the title screen for six seconds
+     arrived at the road with four seconds of hint left. The ring keeps
+     breathing on the title screen for as long as it takes, and the ten
+     seconds is ten seconds of DRIVING, which is what "the opening
+     stretch" means. It also survives a crash in the first few seconds:
+     the countdown carries over into the restart rather than resetting or
+     being lost. */
   TILT_HINT_SECONDS:         10,
+  /* THE WORDS. A ring says "something is here". It does not say "you can
+     steer by tilting the phone", and nobody guesses that. So the same
+     timer now also draws a short line above the tilt button with a
+     pointer down at it: the words explain, the ring locates.
+
+     LOW AND TO THE RIGHT, in the band the pads already own, so it is
+     never over the road ahead. Section 7's whole argument about the edge
+     being the difference between living and dying applies to anything
+     laid over the driving surface, and this is not an exception. */
+  TILT_HINT_SIZE:          0.043,    // LIVE, of the smaller dimension
+  TILT_HINT_IN:             0.45,    // seconds to fade up
+  TILT_HINT_FADE:           1.60,    // LIVE, seconds of fade at the end
+  TILT_HINT_GAP:            0.30,    // of the pad's height, words above it
+  TILT_HINT_ALPHA:          0.94,    // LIVE
+  TILT_HINT_ARROW:          0.62,    // LIVE, of the type size, the pointer's reach
+  TILT_HINT_BOB:            0.22,    // of the pointer's reach, how far it bobs
+  TILT_HINT_BOB_HZ:         1.15,    // LIVE
 
   /* The car, in world units, the same units as the road. It is a real box
      in the world now, so these are its actual dimensions and they set the
@@ -3321,6 +3347,19 @@ const TUNABLES = [
   { key: 'TILT_CAL_MIN_DEG',   label: 'calMin',  step: 0.5,  min: 0.5,  max: 20,    dp: 1, group: 1 },
   { key: 'TILT_CAL_SECONDS',   label: 'calWait', step: 0.5,  min: 1,    max: 20,    dp: 1, group: 1 },
   { key: 'TILT_CAL_HOLD',      label: 'calHold', step: 0.05, min: 0.2,  max: 2.0,   dp: 2, group: 1 },
+  /* The discovery hint, which is the one thing on this screen aimed at
+     somebody who has never seen the game. How long three words need to
+     sit there before they are read, by somebody who is also driving, is
+     the definition of a number to find out by handing a phone over. */
+  { key: 'TILT_HINT_SECONDS',  label: 'hintSecs',step: 1,    min: 0,    max: 40,    dp: 0, group: 1 },
+  { key: 'TILT_HINT_SIZE',     label: 'hintSize',step: 0.002,min: 0.02, max: 0.10,  dp: 3, group: 1 },
+  { key: 'TILT_HINT_IN',       label: 'hintIn',  step: 0.05, min: 0.01, max: 2.0,   dp: 2, group: 1 },
+  { key: 'TILT_HINT_FADE',     label: 'hintOut', step: 0.10, min: 0.01, max: 5.0,   dp: 2, group: 1 },
+  { key: 'TILT_HINT_GAP',      label: 'hintGap', step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 1 },
+  { key: 'TILT_HINT_ALPHA',    label: 'hintA',   step: 0.02, min: 0,    max: 1,     dp: 2, group: 1 },
+  { key: 'TILT_HINT_ARROW',    label: 'hintArw', step: 0.04, min: 0,    max: 2.0,   dp: 2, group: 1 },
+  { key: 'TILT_HINT_BOB',      label: 'hintBob', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 1 },
+  { key: 'TILT_HINT_BOB_HZ',   label: 'hintHz',  step: 0.05, min: 0,    max: 5.0,   dp: 2, group: 1 },
   /* The spectacle, and the world reaction especially, because that is the
      one thing in it that can only be judged by driving with it on. Group
      13 is the intensity of the world reaction, 14 is the callouts and 15
@@ -3625,6 +3664,7 @@ function resize() {
      every button that respects this clean off the top of the screen.
      endBootChrome calls resize again the moment the row exists. */
   padsTop = (padBox && padBox.height > 0) ? padBox.top : (h - safeBottom);
+  measureTiltPad();
 
   // The distant road fades into the horizon glow rather than staying sharp
   // all the way to the vanishing point.
@@ -4682,6 +4722,9 @@ function syncFlipBtn() {
   flipBtn.classList.toggle('on', tiltFlipped);
   // Six across does not fit at the ordinary size. See the stylesheet.
   padsEl.classList.toggle('six', show);
+  // The row just changed size and contents, so the pointer has to be
+  // told where the button went.
+  measureTiltPad();
 }
 
 /* `quiet` is the calibration writing its result: the flash on the canvas
@@ -4762,8 +4805,47 @@ function stopTiltHint(remember) {
 }
 function updateTiltHint(dt) {
   if (tiltHintLeft <= 0) return;
+  /* ONLY WHILE THE CAR IS MOVING. The ring keeps breathing on the title
+     screen and between runs for as long as it takes, and the budget is
+     spent on the road, where the words belong and where somebody is
+     actually looking at the bottom of the screen. */
+  if (state !== DRIVING || paused) return;
   tiltHintLeft -= dt;
   if (tiltHintLeft <= 0) stopTiltHint(false);
+}
+
+/* How much of the message is on screen, 0 to 1: up over TILT_HINT_IN and
+   away over TILT_HINT_FADE, so it arrives and leaves rather than
+   appearing and cutting. Zero everywhere it must not show, and the whole
+   of that rule is here rather than spread through the drawing. */
+function tiltHintAlpha() {
+  if (tiltHintLeft <= 0 || !tilt.supported || tilt.active) return 0;
+  if (state !== DRIVING || paused || tiltCalOnScreen() || tiltPad.w <= 0) return 0;
+  const shown = FEEL.TILT_HINT_SECONDS - tiltHintLeft;
+  const up = clamp(shown / Math.max(0.01, FEEL.TILT_HINT_IN), 0, 1);
+  const out = clamp(tiltHintLeft / Math.max(0.01, FEEL.TILT_HINT_FADE), 0, 1);
+  return Math.min(up, out) * FEEL.TILT_HINT_ALPHA;
+}
+
+/* WHERE THE TILT BUTTON IS, in CSS pixels, measured rather than derived.
+   The pad row is sized in the stylesheet with media queries on it and the
+   flip button appears beside it later, which shifts everything, so there
+   is no expression on the canvas side that could work this out. Read on
+   a resize and again whenever the row's contents change, so the draw loop
+   never touches layout. */
+const tiltPad = { cx: 0, top: 0, w: 0, h: 0 };
+function measureTiltPad() {
+  const box = (typeof tiltBtn !== 'undefined' && tiltBtn && !tiltBtn.hidden)
+    ? tiltBtn.getBoundingClientRect() : null;
+  if (box && box.width > 0) {
+    tiltPad.cx = box.left + box.width / 2;
+    tiltPad.top = box.top;
+    tiltPad.w = box.width;
+    tiltPad.h = box.height;
+  } else {
+    tiltPad.w = 0;
+    tiltPad.h = 0;
+  }
 }
 
 /* The preference persists, the grant does not: most iOS versions want a
@@ -4782,6 +4864,7 @@ function firstGesture() {
 
 tilt.supported = detectTiltSupport();
 tiltBtn.hidden = !tilt.supported;
+measureTiltPad();
 
 // Only where there is a sensor to find, and only until it has been found.
 if (tilt.supported && storeGet('tilthint') !== '1') {
@@ -7034,9 +7117,13 @@ function crash(kind) {
      still the most recent thing that happened on this road, and the
      ghost is the last run. See the ghost block header. */
   ghostBank();
-  // A run has been played, so the tilt button has had its chance to be
-  // noticed and does not get to keep asking.
-  stopTiltHint(true);
+  /* THE HINT SURVIVES A CRASH, and it did not used to. When it was a
+     ring alone, one run was a fair chance to notice a button. Now that it
+     carries the words that say what the button is FOR, dying is not the
+     same as having read them: a first run can be over in four seconds
+     and this is exactly the player the message exists for. The budget is
+     ten seconds of DRIVING, spent across as many attempts as it takes,
+     and using tilt is what ends it. See TILT_HINT_SECONDS. */
   onRunEnded();
   state = DEAD;
   deadFor = 0;
@@ -12543,6 +12630,9 @@ function render() {
      nobody answers. Under the boot credit, which owns the first second
      of the page outright. */
   drawTiltCal(w, h);
+  // After the calibration, which is the thing this hint exists to get
+  // somebody to, and which owns the screen once it is running.
+  drawTiltHint(w, h);
   /* Both lockups are DOM, so the frame ends by making the document agree
      with what was just drawn rather than by drawing them. Neither writes
      anything unless something actually changed. */
@@ -12605,6 +12695,70 @@ function drawTiltCal(w, h) {
   const sub = 'hold the phone how you want to play     tap to skip';
   text(sub, w / 2, y + s * 0.072,
        fittedSize(sub, '600', Math.round(s * 0.028), w * 0.9), '600');
+  ctx.globalAlpha = 1;
+}
+
+/* ------------------------------------------------------------------
+   TILT TO STEER, AND IT IS THE SAME HINT THE RING ALREADY WAS.
+
+   Nobody guesses that a phone steers by tilting, or that one of four
+   identical circles turns it on. The ring says something is here; it
+   cannot say what. So the timer TILT_HINT_SECONDS already runs now also
+   draws three words and a pointer, and the two halves do different jobs:
+   THE WORDS EXPLAIN, THE RING LOCATES. Neither is a second mechanism and
+   neither can outlive the other, because there is one clock.
+
+   IT IS NOT A TUTORIAL AND SECTION 5 STILL STANDS. Nothing is modal,
+   nothing is dismissed, nothing waits for it, and the game is fully
+   playable on touch and keys for the whole ten seconds. It exists
+   because tilt is a DISCOVERY problem rather than a comprehension one:
+   an invisible option behind an unlabelled button. Dying still teaches
+   the edges and the numbers still teach the scoring.
+
+   WHERE IT SITS. In the band the pads already own, right of centre, hard
+   against the tilt button and pointing down at it. Never over the road
+   ahead, which is the rule everything else in this game obeys.
+   ------------------------------------------------------------------ */
+function drawTiltHint(w, h) {
+  const a = tiltHintAlpha();
+  if (a <= 0) return;
+  const s = Math.min(w, h);
+  const size = Math.round(s * FEEL.TILT_HINT_SIZE);
+  const reach = size * FEEL.TILT_HINT_ARROW;
+
+  /* The pointer bobs toward the button. A static arrow is a diagram; one
+     that moves is a gesture, and it is the same trick the calibration's
+     own arrow uses one screen later. */
+  const bob = Math.sin(runTime * FEEL.TILT_HINT_BOB_HZ * Math.PI * 2)
+            * reach * FEEL.TILT_HINT_BOB;
+  const tipY = tiltPad.top - size * FEEL.TILT_HINT_GAP + bob;
+  const line = 'TILT TO STEER';
+
+  /* Right aligned to the button's own right edge and pushed back inside
+     the screen if the phone is too narrow to hold it there. Aligning to
+     the BUTTON rather than to the screen is what keeps the words and the
+     pointer reading as one object. */
+  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const wide = ctx.measureText(line).width;
+  const pad = size * 0.4;
+  let right = tiltPad.cx + tiltPad.w / 2;
+  if (right - wide < pad) right = Math.min(w - pad, wide + pad);
+
+  ctx.globalAlpha = a;
+  text(line, right, tipY - reach - size * 0.62, size, '800', 'right', COLOUR.GATE);
+
+  // And the pointer, from under the words down at the button itself.
+  ctx.strokeStyle = COLOUR.GATE;
+  ctx.lineWidth = Math.max(3, size * 0.13);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(tiltPad.cx, tipY - reach);
+  ctx.lineTo(tiltPad.cx, tipY);
+  ctx.moveTo(tiltPad.cx - reach * 0.52, tipY - reach * 0.5);
+  ctx.lineTo(tiltPad.cx, tipY);
+  ctx.lineTo(tiltPad.cx + reach * 0.52, tipY - reach * 0.5);
+  ctx.stroke();
   ctx.globalAlpha = 1;
 }
 
