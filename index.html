@@ -70,12 +70,33 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    /* THIS GAME IS HOLD TO STEER, SO EVERY CORNER IS A LONG PRESS.
+
+       On iOS Safari a long press raises the callout: a dark rounded
+       panel next to the finger offering copy, look up and share. It is
+       the shape a player on iPhone reported seeing mid screen on the
+       side he was holding to steer, and it is the only thing in this
+       stack that produces that shape.
+
+       touch-callout is the property that suppresses it and it was
+       missing from this file entirely. Set here AND on the canvas AND
+       on every button rather than left to inheritance, because
+       inheritance through a shadow root, a replaced element or a UA
+       stylesheet default is exactly the sort of thing that differs
+       between engines, and this is the one platform nobody on this
+       project can test. */
+    -webkit-touch-callout: none;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   #game {
     display: block;
     width: 100%;
     height: 100%;
+    /* The steering surface, and therefore the element every long press
+       actually lands on. See the note on body. */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
   /* Chrome sits above the canvas so a tap on a button is never read as
      steering. It spans the full width, so it MUST NOT swallow pointers
@@ -131,6 +152,7 @@
     padding: 9px 11px;
     cursor: pointer;
     touch-action: manipulation;
+    -webkit-touch-callout: none;
   }
   #chrome button[hidden] {
     display: none;
@@ -211,8 +233,23 @@
                 0 3px 10px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     touch-action: manipulation;
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
+    -webkit-touch-callout: none;
+    /* NO backdrop-filter. It was here at blur(3px) and it has been
+       removed, because it was measured and it bought nothing.
+
+       Same frame shot twice, once with the rule and once without, and
+       the pixels inside all four discs compared: mean difference 0.28
+       of 255, and the single worst pixel on the whole row moved by 18.
+       Three of the four buttons were pixel identical. That is not a
+       tuning result, it is structural: section 7's art direction is
+       flat shading with large areas of constant colour, and blurring a
+       constant colour returns the same colour. A three pixel blur can
+       only do anything within three pixels of an edge, and there is
+       almost no edge detail at that scale behind these buttons.
+
+       Against nothing, it forces a compositing layer, and
+       backdrop-filter is a well known source of stray rectangles on
+       iOS Safari, which is the one platform nobody here can test. */
     transition: transform 90ms ease-out, background 140ms ease-out;
   }
   #pads button[hidden] {
@@ -1531,24 +1568,96 @@ const FEEL = {
      FINALE_ over cap constants below go PAST the ceilings those systems
      have, and they are the ones worth tuning first.
 
-     AND THE OVER CAP WAITS FOR THE CAR TO STOP. While the car is still
-     rolling the road has to stay readable, which is hard limit one and
-     is not suspended because the moment is nice. Once it has stopped
-     there is nothing left to read and spectacle takes over completely.
-     FINALE_FREE_TIME is that handover. */
+     AND THE ROAD STAYS READABLE WHILE THERE IS A CAR ON IT. That is hard
+     limit one and it is not suspended because the moment is nice, so the
+     over cap is split in two by WHERE IT LANDS rather than by how loud it
+     is. Everything on or beside the road waits for the car to stop
+     (finaleFree). Everything ABOVE THE HORIZON is sky and only sky, so it
+     is free from the first volley (finaleSky) and can strobe with them.
+
+     THE SHAPE MATTERS MORE THAN THE VOLUME. Every duration below is a
+     BEAT, and the beats are laid end to end rather than pinned to
+     absolute times, so moving one moves everything after it and the
+     sequence cannot develop a hole in the middle. In order:
+
+       a APPROACH   FINALE_APPROACH, while still driving
+       b CROSSING   FINALE_CROSS
+       c HUSH       FINALE_HUSH, and the world DROPS for it. A
+                    celebration that peaks on the first frame has
+                    nowhere to go, and the near silence is what makes
+                    the first volley land.
+       d f WAVES    FINALE_WAVES volleys, FINALE_WAVE_GAP apart, each
+                    FINALE_WAVE_GROWTH bigger than the last
+       e DRIFT      the victory donut, which starts with wave one and
+                    runs FINALE_DRIFT_TAIL past the last volley
+       g SETTLE     FINALE_SETTLE
+       h AFTERGLOW  FINALE_AFTERGLOW, then down over FINALE_COOL
+
+     About five seconds for a scrape home and about seven for a perfect
+     run, because the wave count is what the achievement buys. */
   FINALE_APPROACH:         0.62,     // LIVE, how hot the closing stretch gets
   FINALE_SLAM:             0.09,     // seconds to reach full at the line
-  FINALE_HOLD:             3.40,     // LIVE, seconds the world stays at maximum
-  FINALE_COOL:             3.00,     // seconds to come back down afterwards
+  FINALE_CROSS:            0.34,     // LIVE, beat b, the crossing itself
+  FINALE_HUSH:             0.46,     // LIVE, beat c, the near silence
+  FINALE_HUSH_LEVEL:       0.30,     // LIVE, how far the world drops for it
+  FINALE_COOL:             3.00,     // seconds to come back down at the very end
   FINALE_HIT_STOP:         0.17,     // seconds the world stands still on the line
   FINALE_SHAKE_PX:           14,     // LIVE, under SHAKE_MAX_PX, and it never sums
   FINALE_FLASH_TIME:       0.60,
   FINALE_FLASH_ALPHA:      0.46,     // LIVE
-  FINALE_COAST_TIME:       0.55,     // LIVE, seconds of roll before the car stops
-  FINALE_STOP_AT:          0.07,     // share of full speed that counts as stopped
-  FINALE_FREE_TIME:        0.60,     // seconds for the over cap to arrive once stopped
+  FINALE_FREE_TIME:        0.60,     // seconds for the road's over cap to arrive
+  /* ----------------------------------------------------------------
+     THE WAVES. Discrete volleys rather than a trickle, because three
+     things arriving is a celebration and a steady stream is weather. */
+  FINALE_WAVES:               3,     // LIVE, volleys at level zero
+  FINALE_WAVE_PER_LEVEL:   0.50,     // more for a better result, rounded
+  FINALE_WAVE_GAP:         0.95,     // LIVE, seconds between volleys
+  FINALE_WAVE_SHELLS:         5,     // LIVE, shells in the first volley
+  FINALE_WAVE_GROWTH:      0.45,     // share more in each one after it
+  FINALE_WAVE_SHAKE_PX:       7,     // per volley, capped, and it never sums
+  /* MEASURED AND SPLIT. The strobe was folded into the sky gate, which
+     was already pinned at one during the waves, so the clamp ate it
+     whole and the volleys did not flash the city at all. Each strobe
+     term is its own now, and the STEADY terms were cut to leave it room
+     to move: a flash needs somewhere to flash TO. */
+  FINALE_STROBE_TIME:      0.34,     // LIVE, seconds a volley lights the city for
+  FINALE_STROBE_CITY:      0.30,     // LIVE, the window alpha on a volley
+  FINALE_STROBE_THICK:     1.60,     // LIVE, extra roof line pixels on a volley
+  FINALE_STROBE_HORIZON:   0.16,     // LIVE, extra horizon glow on a volley
+  /* THE RAINBOW VICTORY LAP. The hue wheel already exists and a whole
+     palette rotation measured a tenth of a millisecond, so cycling every
+     biome hue during the waves really is nearly free. Nothing in normal
+     play ever does this: a gate changes the hue once and then leaves it
+     alone for a minute. */
+  FINALE_HUE_STEP:         0.22,     // LIVE, seconds per hue during the waves
+  /* ----------------------------------------------------------------
+     THE VICTORY DONUT, AND IT IS THE CENTREPIECE. Fireworks over a
+     stationary car could be any game. A car celebrating by drifting,
+     throwing smoke and leaving its own marks across the finish line,
+     could only be this one, and it is made of the vocabulary the whole
+     run was written in.
+
+     The marks go through layTyreMarks and the smoke through the same
+     emitter a corner uses, so this is the game's own drift feedback
+     driven by something other than the player. */
+  FINALE_DRIFT_TAIL:       0.90,     // LIVE, seconds the donut runs past the last volley
+  FINALE_DRIFT_IN:         0.30,     // seconds the spin takes to wind up
+  FINALE_DRIFT_SPEED:      0.30,     // LIVE, share of full speed it travels at
+  FINALE_DRIFT_SPIN:       3.40,     // LIVE, radians per second at full
+  FINALE_DRIFT_SWING:      0.52,     // LIVE, share of the road half width it sweeps
+  FINALE_DRIFT_RATE:       1.30,     // LIVE, sweeps per second
+  FINALE_DRIFT_SLIP:       0.92,     // the slip it reports, which is what smokes
+  FINALE_STOP_AT:          0.05,     // share of full speed that counts as still
+  /* MEASURED AND CUT, from 0.55. At that value the donut's marks came
+     out a solid white ribbon brighter than the road edge, and section 7
+     is explicit that the lip is the brightest thing on screen and must
+     stay that way. The marks are meant to be the loudest thing ON THE
+     ROAD, not on the screen. */
+  FINALE_MARK_GLOW:        0.20,     // LIVE, extra alpha on the marks it lays
+  FINALE_SETTLE:           0.55,     // LIVE, beat g, donut over to car still
+  FINALE_AFTERGLOW:        1.60,     // LIVE, beat h, the world stays lit under the result
   /* The two beats of the message. The banner lands first, alone and
-     large; the result arrives under it a beat later. */
+     large; the result arrives under it once the car has settled. */
   FINALE_BANNER_AT:        0.20,     // seconds before TRACK COMPLETE lands
   FINALE_BANNER_IN:        0.26,     // seconds it takes to land
   FINALE_BANNER_SIZE:     0.108,     // of the smaller dimension, at its largest
@@ -1557,45 +1666,42 @@ const FEEL = {
      was still coming down the screen while the records line was fading
      up into it. The banner is home before the result exists. */
   FINALE_BANNER_MOVE:      0.38,     // seconds it takes to settle into the headline
-  FINALE_REVEAL_AT:        1.70,     // seconds before the result starts arriving
+  FINALE_REVEAL_AFTER:     0.25,     // LIVE, seconds after the car settles
   FINALE_REVEAL_TIME:      0.55,
   /* THE OVER CAP. Each of these is ADDED to a term that was already at
      its own ceiling, so the world does something here it cannot do at a
-     multiplier of twelve with the city fully awake. */
+     multiplier of twelve with the city fully awake. The first four are
+     ON the road and wait for the car; the last four are SKY and do not. */
   FINALE_EDGE_GLOW:        0.30,     // LIVE, on top of HEAT_EDGE_GLOW
   FINALE_EDGE_SPREAD:      1.60,     // LIVE
   FINALE_PYLON_GLOW:       0.34,     // LIVE
   FINALE_PYLON_SPREAD:     1.40,
   FINALE_SKY_LIFT:         0.60,     // LIVE, on top of HEAT_SKYLINE_LIFT
-  FINALE_SKY_THICK:        1.80,
-  FINALE_HORIZON:          0.24,     // LIVE
-  FINALE_CITY_ALPHA:       0.60,     // LIVE, on top of CITY_ALPHA
+  FINALE_SKY_THICK:        1.20,
+  FINALE_HORIZON:          0.14,     // LIVE
+  FINALE_CITY_ALPHA:       0.16,     // LIVE, on top of CITY_ALPHA
   /* ----------------------------------------------------------------
      THE FIREWORKS, on the particle pool the explosion already uses
      rather than a second system. Shells rise from along the road and
      from where the finish structure went past, then burst.
 
      GENEROUS SCALES WITH WHAT WAS ACHIEVED. finaleLevel counts the
-     things worth celebrating, and both the rate and the burst size read
-     it, so a clean run that took the record does not look like a
-     scrappy one that squeaked over. */
-  /* MEASURED AND CUT. At 0.26 with a second shell above level three
-     this was launching sixteen shells a second, which at forty two
-     sparks and a 1.2 second life is eight hundred live particles in a
-     four hundred and sixty slot pool: every burst was stealing from
-     the one before it and none of them was drawn whole. The rate and
-     the burst size both still climb with the level, and the top level
-     now settles at about four hundred live, which the pool holds. */
-  FIREWORK_EVERY:          0.34,     // LIVE, seconds between launches at level zero
-  FIREWORK_RATE_GAIN:      0.05,     // taken off that per level achieved
+     things worth celebrating, and the wave count, the volley size and
+     the burst size all read it, so a clean run that took the record
+     cannot look like a scrappy one that squeaked over. */
   /* MEASURED, TWICE. At 0.72 the shells burst at head height and read
      as sparks off the road; at 1.30 they burst level with the car. The
      sky above the skyline is where a firework belongs, and on an 844
      tall screen that is 450 pixels of climb from the launch line. */
   FIREWORK_RISE:           0.80,     // seconds a shell climbs before it bursts
-  FIREWORK_SPEED:          1.85,     // LIVE, of the smaller dimension per second
-  FIREWORK_SPARKS:           24,     // LIVE, per burst at level zero
-  FIREWORK_SPARK_GAIN:        6,     // more per level
+  FIREWORK_SPEED:          0.98,     // LIVE, of the SCREEN HEIGHT per second
+  /* MEASURED AND CUT, from 24 and 6. Volleys overlap by design, and at
+     the top level wave five alone wanted six hundred sparks with wave
+     four's still in the air. THE SHELL COUNT IS WHAT READS AS GENEROUS,
+     not the spark count inside each burst: sixteen flowers of eighteen
+     look bigger than six of forty two, and they fit in the pool. */
+  FIREWORK_SPARKS:           18,     // LIVE, per burst at level zero
+  FIREWORK_SPARK_GAIN:        4,     // more per level
   FIREWORK_SPARK_SPEED:    0.38,     // of the smaller dimension per second
   FIREWORK_LIFE:           1.20,     // seconds a spark lives
   FIREWORK_DRAG:           0.60,     // seconds, the velocity time constant
@@ -3307,8 +3413,10 @@ const TUNABLES = [
   /* THE FINALE, group 28, which is new. The author asked for every one of
      these on the cycler and especially the intensity, so the over cap
      constants are all here and all steppable while the thing is on
-     screen. FINALE_HOLD and FINALE_COOL are long enough that there is
-     time to nudge a value and watch it change. */
+     screen. The beats are named after the letters in the comment beside
+     the FINALE block, so bCross, cHush, dGap and so on line up with the
+     shape rather than with the variable names, and the afterglow is long
+     enough that there is time to nudge a value and watch it change. */
   { key: 'BRAND_TEXT_STROKE',  label: 'bTxtStk', step: 0.005,min: 0,    max: 0.4,   dp: 3, group: 28 },
   { key: 'BRAND_TEXT_SHADOW_X',label: 'bTxtSX',  step: 0.004,min: -0.2, max: 0.2,   dp: 3, group: 28 },
   { key: 'BRAND_TEXT_SHADOW_Y',label: 'bTxtSY',  step: 0.004,min: -0.2, max: 0.2,   dp: 3, group: 28 },
@@ -3317,20 +3425,41 @@ const TUNABLES = [
   { key: 'FANFARE_TAIL',       label: 'fanTail', step: 0.10, min: 0.1,  max: 5.0,   dp: 2, group: 28 },
   { key: 'FINALE_APPROACH',    label: 'finRamp', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
   { key: 'FINALE_SLAM',        label: 'finSlam', step: 0.01, min: 0,    max: 1.0,   dp: 2, group: 28 },
-  { key: 'FINALE_HOLD',        label: 'finHold', step: 0.10, min: 0,    max: 8.0,   dp: 2, group: 28 },
-  { key: 'FINALE_COOL',        label: 'finCool', step: 0.10, min: 0.1,  max: 10.0,  dp: 2, group: 28 },
+  { key: 'FINALE_CROSS',       label: 'bCross',  step: 0.02, min: 0.02, max: 2.0,   dp: 2, group: 28 },
+  { key: 'FINALE_HUSH',        label: 'cHush',   step: 0.02, min: 0.02, max: 2.0,   dp: 2, group: 28 },
+  { key: 'FINALE_HUSH_LEVEL',  label: 'cHushLv', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_WAVES',       label: 'dWaves',  step: 1,    min: 1,    max: 8,     dp: 0, group: 28 },
+  { key: 'FINALE_WAVE_PER_LEVEL',label:'dWaveLv',step: 0.25, min: 0,    max: 2,     dp: 2, group: 28 },
+  { key: 'FINALE_WAVE_GAP',    label: 'dGap',    step: 0.05, min: 0.10, max: 3.0,   dp: 2, group: 28 },
+  { key: 'FINALE_WAVE_SHELLS', label: 'dShells', step: 1,    min: 1,    max: 24,    dp: 0, group: 28 },
+  { key: 'FINALE_WAVE_GROWTH', label: 'dGrow',   step: 0.05, min: 0,    max: 2,     dp: 2, group: 28 },
+  { key: 'FINALE_WAVE_SHAKE_PX',label:'dShake',  step: 1,    min: 0,    max: 20,    dp: 0, group: 28 },
+  { key: 'FINALE_STROBE_TIME', label: 'dFlash' , step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 28 },
+  { key: 'FINALE_STROBE_CITY', label: 'dStrobC', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_STROBE_THICK',label: 'dStrobT', step: 0.10, min: 0,    max: 6,     dp: 2, group: 28 },
+  { key: 'FINALE_STROBE_HORIZON',label:'dStrobH',step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_HUE_STEP',    label: 'fHue',    step: 0.02, min: 0.03, max: 1.5,   dp: 2, group: 28 },
+  { key: 'FINALE_DRIFT_TAIL',  label: 'eTail',   step: 0.05, min: 0,    max: 4.0,   dp: 2, group: 28 },
+  { key: 'FINALE_DRIFT_IN',    label: 'eIn',     step: 0.02, min: 0.02, max: 2.0,   dp: 2, group: 28 },
+  { key: 'FINALE_DRIFT_SPEED', label: 'eSpeed',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_DRIFT_SPIN',  label: 'eSpin',   step: 0.10, min: 0,    max: 12,    dp: 2, group: 28 },
+  { key: 'FINALE_DRIFT_SWING', label: 'eSwing',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 28 },
+  { key: 'FINALE_DRIFT_RATE',  label: 'eRate',   step: 0.05, min: 0.05, max: 4.0,   dp: 2, group: 28 },
+  { key: 'FINALE_DRIFT_SLIP',  label: 'eSlip',   step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_MARK_GLOW',   label: 'eMark',   step: 0.05, min: 0,    max: 3,     dp: 2, group: 28 },
+  { key: 'FINALE_SETTLE',      label: 'gSettle', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 28 },
+  { key: 'FINALE_AFTERGLOW',   label: 'hAfter',  step: 0.10, min: 0,    max: 8.0,   dp: 2, group: 28 },
+  { key: 'FINALE_COOL',        label: 'hCool',   step: 0.10, min: 0.1,  max: 10.0,  dp: 2, group: 28 },
   { key: 'FINALE_HIT_STOP',    label: 'finStop', step: 0.01, min: 0,    max: 0.6,   dp: 2, group: 28 },
   { key: 'FINALE_SHAKE_PX',    label: 'finShake',step: 1,    min: 0,    max: 30,    dp: 0, group: 28 },
   { key: 'FINALE_FLASH_TIME',  label: 'finFlsT', step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 28 },
   { key: 'FINALE_FLASH_ALPHA', label: 'finFlsA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
-  { key: 'FINALE_COAST_TIME',  label: 'finRoll', step: 0.05, min: 0.05, max: 4.0,   dp: 2, group: 28 },
-  { key: 'FINALE_STOP_AT',     label: 'finStil', step: 0.01, min: 0.01, max: 0.5,   dp: 2, group: 28 },
   { key: 'FINALE_FREE_TIME',   label: 'finFree', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 28 },
   { key: 'FINALE_BANNER_AT',   label: 'finBanA', step: 0.05, min: 0,    max: 3.0,   dp: 2, group: 28 },
   { key: 'FINALE_BANNER_IN',   label: 'finBanI', step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 28 },
   { key: 'FINALE_BANNER_SIZE', label: 'finBanS', step: 0.004,min: 0.03, max: 0.30,  dp: 3, group: 28 },
   { key: 'FINALE_BANNER_MOVE', label: 'finBanM', step: 0.02, min: 0.02, max: 2.0,   dp: 2, group: 28 },
-  { key: 'FINALE_REVEAL_AT',   label: 'finRevA', step: 0.10, min: 0,    max: 8.0,   dp: 2, group: 28 },
+  { key: 'FINALE_REVEAL_AFTER',label: 'finRevA', step: 0.05, min: 0,    max: 4.0,   dp: 2, group: 28 },
   { key: 'FINALE_REVEAL_TIME', label: 'finRevT', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 28 },
   { key: 'FINALE_EDGE_GLOW',   label: 'finEdgA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
   { key: 'FINALE_EDGE_SPREAD', label: 'finEdgS', step: 0.10, min: 0,    max: 6,     dp: 2, group: 28 },
@@ -3340,8 +3469,6 @@ const TUNABLES = [
   { key: 'FINALE_SKY_THICK',   label: 'finSkyT', step: 0.10, min: 0,    max: 6,     dp: 2, group: 28 },
   { key: 'FINALE_HORIZON',     label: 'finHorz', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
   { key: 'FINALE_CITY_ALPHA',  label: 'finCity', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
-  { key: 'FIREWORK_EVERY',     label: 'fwEvery', step: 0.02, min: 0.02, max: 2.0,   dp: 2, group: 28 },
-  { key: 'FIREWORK_RATE_GAIN', label: 'fwGain',  step: 0.005,min: 0,    max: 0.10,  dp: 3, group: 28 },
   { key: 'FIREWORK_RISE',      label: 'fwRise',  step: 0.02, min: 0.05, max: 2.0,   dp: 2, group: 28 },
   { key: 'FIREWORK_SPEED',     label: 'fwUp',    step: 0.02, min: 0.05, max: 2.0,   dp: 2, group: 28 },
   { key: 'FIREWORK_SPARKS',    label: 'fwSpark', step: 2,    min: 2,    max: 90,    dp: 0, group: 28 },
@@ -4693,6 +4820,128 @@ const debugAllowed = (function () {
 })();
 let showDebug = false;
 let fpsFrames = 0, fpsElapsed = 0, fpsWorst = 0, fpsShown = 0, fpsWorstShown = 0;
+
+/* ==================================================================
+   ?probe=1, AND IT EXISTS BECAUSE OF A BUG NOBODY HERE CAN REPRODUCE.
+
+   A player on iPhone Safari reported a dark rounded rectangle appearing
+   mid screen, right of centre, while playing. Neither the author nor
+   this session can reproduce it: there is no iPhone on this project and
+   the shape does not appear on any engine available here.
+
+   So rather than guess, this makes the page describe itself. It outlines
+   EVERY element that is over the canvas or can take a pointer, labels
+   each one, and prints a readout of what the browser thinks each one is
+   doing: computed display, visibility, opacity, its rectangle, and
+   whether it is genuinely the topmost thing at its own centre. One
+   screenshot from the affected phone then identifies the culprit by
+   name, or shows that the culprit is not in this list at all, which is
+   itself the answer: if nothing is outlined where the rectangle is, the
+   rectangle is not ours and it is the platform's own callout.
+
+   IT IS OFF UNLESS ASKED FOR, it never takes a pointer, and it is the
+   same shape as ?debug=1 so there is nothing new to learn. */
+const probeAllowed = (function () {
+  try { return /[?&]probe=1(&|$)/.test(window.location.search); }
+  catch (e) { return false; }
+})();
+
+/* Everything that is not the canvas and could conceivably paint. The
+   selector is deliberately broad: an element that SHOULD never show is
+   exactly the one worth outlining, so hidden ones are listed too and
+   marked. */
+const PROBE_WHAT = '#chrome, #buttons, #tuner, #tuner button, #note, #pads,'
+                 + ' .padGroup, #pads button, #boot, #boot svg, #credit,'
+                 + ' #credit svg, #safe, canvas';
+
+let probeBox = null;
+function probeStart() {
+  if (!probeAllowed || probeBox) return;
+  probeBox = document.createElement('div');
+  probeBox.id = 'probe';
+  probeBox.style.cssText =
+    'position:fixed;left:0;top:0;right:0;bottom:0;z-index:9;pointer-events:none;'
+    + 'font:600 10px/1.25 system-ui,-apple-system,sans-serif';
+  document.body.appendChild(probeBox);
+  probeTick();
+  /* On a timer rather than in the frame loop, so it cannot cost the game
+     a frame and cannot be the thing being diagnosed. */
+  setInterval(probeTick, 500);
+}
+
+function probeVisible(el, cs, r) {
+  return cs.display !== 'none' && cs.visibility !== 'hidden'
+      && parseFloat(cs.opacity) > 0.01 && r.width > 0 && r.height > 0;
+}
+
+function probeTick() {
+  if (!probeBox) return;
+  const els = document.querySelectorAll(PROBE_WHAT);
+  const lines = [];
+  let html = '';
+  let n = 0;
+  els.forEach(function (el) {
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    const shown = probeVisible(el, cs, r);
+    const name = el.id ? '#' + el.id
+               : (el.className && typeof el.className === 'string'
+                  ? '.' + el.className.split(' ')[0] : el.tagName.toLowerCase());
+    /* Is it actually the thing under its own middle? A yes on an element
+       that should be invisible is the Beakdown failure: a transparent
+       overlay eating taps. */
+    let top = '';
+    if (shown && r.width > 0) {
+      const hit = document.elementFromPoint(
+        Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)),
+        Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2)));
+      top = hit === el ? 'HIT' : (hit ? 'under ' + (hit.id || hit.tagName.toLowerCase()) : '-');
+    }
+    lines.push(name + (el.hidden ? '[hidden]' : '') + ' '
+      + (shown ? 'SHOWN' : 'gone') + ' '
+      + Math.round(r.left) + ',' + Math.round(r.top) + ' '
+      + Math.round(r.width) + 'x' + Math.round(r.height)
+      + ' op' + (+cs.opacity).toFixed(2) + ' pe:' + cs.pointerEvents
+      + (cs.backdropFilter && cs.backdropFilter !== 'none' ? ' BACKDROP' : '')
+      + (top ? ' ' + top : ''));
+    if (!shown || r.width <= 0) return;
+    n++;
+    const hue = (n * 61) % 360;
+    html += '<div style="position:fixed;left:' + r.left + 'px;top:' + r.top
+         + 'px;width:' + Math.max(0, r.width - 2) + 'px;height:' + Math.max(0, r.height - 2)
+         + 'px;border:1px solid hsl(' + hue + ',100%,60%);box-sizing:border-box"></div>'
+         + '<div style="position:fixed;left:' + r.left + 'px;top:' + Math.max(0, r.top - 11)
+         + 'px;color:hsl(' + hue + ',100%,70%);background:#000;padding:0 2px">'
+         + name + '</div>';
+  });
+  let ua = '';
+  try { ua = navigator.userAgent; } catch (e) { ua = 'unknown'; }
+  /* THE ONE THING THIS HAS TO PROVE IS THAT THE FIX IS LIVE ON HIS
+     PHONE. A screenshot that says callout:none is a screenshot that
+     rules the callout out; one that says anything else says the CSS
+     never reached him. */
+  const csBody = getComputedStyle(document.body);
+  const callout = csBody.webkitTouchCallout || csBody.getPropertyValue('-webkit-touch-callout')
+                || 'not supported';
+  /* Anchored to the BOTTOM and above the pads, so the middle of the
+     screen stays clear. That is where the rectangle was reported and
+     covering it with the readout would defeat the whole exercise. */
+  html += '<div style="position:fixed;left:4px;bottom:92px;right:4px;color:#fff;'
+       + 'background:rgba(0,0,0,0.72);padding:4px;'
+       + 'white-space:pre-wrap;word-break:break-all">'
+       + escapeProbe(innerWidth + 'x' + innerHeight + ' dpr' + (window.devicePixelRatio || 1)
+           + '  callout:' + callout + '\n' + ua + '\n' + lines.join('\n'))
+       + '</div>';
+  probeBox.innerHTML = html;
+}
+
+function escapeProbe(str) {
+  return String(str).replace(/[&<>]/g, function (c) {
+    return c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;';
+  });
+}
+
+probeStart();
 
 /* The readout sits under the button row, which wraps to two lines on a
    narrow phone, so its height is measured rather than assumed. */
@@ -6814,42 +7063,6 @@ function crash(kind) {
 
    An impact does not fall. It stopped against something solid, so the
    car stays where it hit and the debris carries the motion instead. */
-/* The run out. The sibling of updateFall, and deliberately shaped like
-   it: one decaying speed, the same lateral carry, and no collision of any
-   kind. The camera is NOT touched. Section 7 warns about overdoing
-   motion and the camera has caused more complaints on this project than
-   anything else, so it holds still while everything else erupts. */
-function updateFinishRoll(dt) {
-  deadFor += dt;
-  coastSpeed *= Math.exp(-dt / FEEL.FINALE_COAST_TIME);
-  position += coastSpeed * dt;
-
-  // The road has to keep arriving under a car that is still moving.
-  topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
-  carSegIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
-
-  /* The slide bleeds off on its own time constant, so the tail of the
-     run out is the car straightening rather than snapping straight. */
-  const k = Math.exp(-dt / FEEL.FINALE_COAST_TIME);
-  drift.lateralV *= k;
-  drift.headingV *= k;
-  carX += drift.lateralV * dt;
-  const seg = segAt(carSegIndex);
-  carFrac = carX / (seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE);
-  drift.headingAngle = Math.atan(drift.headingV / Math.max(1, FEEL.SPEED));
-  drift.travelAngle = Math.atan(drift.lateralV / Math.max(1, FEEL.SPEED));
-  drift.slip = drift.headingAngle - drift.travelAngle;
-  drift.slipDeg = drift.slip * 180 / Math.PI;
-  drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
-
-  /* AND THIS IS THE HANDOVER. While there is a car moving on it the road
-     has to stay readable; the moment there is not, the over cap is free
-     to take the screen. One comparison, one flag, and drawing reads it. */
-  if (finaleRolling && coastSpeed <= FEEL.SPEED * FEEL.FINALE_STOP_AT) {
-    finaleRolling = false;
-  }
-}
-
 function updateFall(dt) {
   deadFor += dt;
   if (deathKind === HIT_OBJECT) return;
@@ -6893,8 +7106,14 @@ function updateFall(dt) {
 // Used by the drawing to ask "is the run over", so a finish counts.
 function dead() { return state === DEAD || state === FINISHED; }
 
+/* finaleSpin is the victory donut and it is zero on every frame of every
+   run, so this is the same expression it always was while anybody is
+   driving. It is added HERE rather than drawn separately so the body,
+   the wheel contact points and therefore the marks all come off one
+   angle: a car cannot spin without its marks spinning with it. */
 function carYaw() {
-  return drift.headingAngle * FEEL.CAR_YAW_GAIN + carCurve * FEEL.CAR_CURVE_YAW;
+  return drift.headingAngle * FEEL.CAR_YAW_GAIN + carCurve * FEEL.CAR_CURVE_YAW
+       + finaleSpin;
 }
 
 /* Where the two rear wheels touch the road, in world units, given a centre
@@ -6956,6 +7175,13 @@ let smokeHead = 0;
 let smokeAcc = 0;
 for (let i = 0; i < FEEL.SMOKE_MAX; i++) {
   smoke.push({ x: 0, y: 0, vx: 0, vy: 0, r: 0, life: 0 });
+}
+
+// Used by the finale skip, which has to leave nothing on the screen.
+function clearSmoke() {
+  for (let i = 0; i < FEEL.SMOKE_MAX; i++) smoke[i].life = 0;
+  smokeCount = 0;
+  smokeAcc = 0;
 }
 
 function spawnSmoke(side) {
@@ -7133,12 +7359,17 @@ function drawSkyline(w, h) {
       // hard rule bites on and it is capped by CITY_ALPHA.
       /* THE ONE THING THE CITY CANNOT DO IN PLAY. cityGlow reaches one
          on a good run, which lights every window, but the ALPHA is
-         capped at CITY_ALPHA and nothing in the game may pass it. The
-         finale passes it, once the car has stopped and there is no road
-         left to read. */
+         capped at CITY_ALPHA and nothing in the game may pass it, so a
+         fully lit city is still a dim one. The finale passes it.
+
+         IT DOES NOT WAIT FOR THE CAR, because the city is above the
+         horizon and cannot cost the road a thing however bright it
+         gets. That is what lets it FLASH IN TIME WITH THE VOLLEYS while
+         the donut is still going, which is the whole point of it. */
       ctx.globalAlpha = Math.min(1,
         FEEL.CITY_ALPHA * (0.45 + 0.55 * cityGlow) * cityPulse
-        + FEEL.FINALE_CITY_ALPHA * finaleFree);
+        + FEEL.FINALE_CITY_ALPHA * finaleSky
+        + FEEL.FINALE_STROBE_CITY * strobe2());
       ctx.fillStyle = COLOUR.SKYLINE_WINDOW;
       ctx.fill();
       ctx.globalAlpha = 1;
@@ -7152,7 +7383,8 @@ function drawSkyline(w, h) {
      they are the silhouette the far road is read against and lifting them
      would cost contrast rather than buy anything. */
   const lit = 1.5 + FEEL.HEAT_SKYLINE_THICK * worldHeat * heatPulse
-            + FEEL.FINALE_SKY_THICK * finaleFree;
+            + FEEL.FINALE_SKY_THICK * finaleSky
+            + FEEL.FINALE_STROBE_THICK * strobe2();
   ctx.beginPath();
   for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
     for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
@@ -7165,7 +7397,7 @@ function drawSkyline(w, h) {
   // The ramp clamps its own index, so the finale term simply drives it
   // to the hot end and holds it there rather than running off it.
   ctx.fillStyle = rampAt(SKYLINE_HOT_RAMP, worldHeat * FEEL.HEAT_SKYLINE_LIFT
-                                           + FEEL.FINALE_SKY_LIFT * finaleFree);
+                                           + FEEL.FINALE_SKY_LIFT * finaleSky);
   ctx.fill();
 }
 
@@ -8646,10 +8878,17 @@ function drawTrail(first, last, baseIndex) {
     const y1 = by[n], y2 = by[n + 1] - 1;
     const w1 = bw[n], w2 = bw[n + 1];
 
+    /* The donut's signature burns. The marks the celebration lays are
+       the same marks a corner lays, drawn by the same two passes, and
+       the finale simply lifts both: what the car wrote across the finish
+       line is meant to be the loudest thing left on the road when the
+       result arrives over it. */
+    const lift = 1 + FEEL.FINALE_MARK_GLOW * finaleGlow;
     ctx.fillStyle = colour;
-    ctx.globalAlpha = s.ma * FEEL.TYRE_MARK_MAX_ALPHA * FEEL.TRAIL_GLOW_ALPHA * fade;
+    ctx.globalAlpha = Math.min(1,
+      s.ma * FEEL.TYRE_MARK_MAX_ALPHA * FEEL.TRAIL_GLOW_ALPHA * fade * lift);
     trailQuads(s, mw * FEEL.TRAIL_GLOW_SPREAD, bx[n], bx[n + 1], w1, w2, y1, y2);
-    ctx.globalAlpha = s.ma * FEEL.TYRE_MARK_MAX_ALPHA * fade;
+    ctx.globalAlpha = Math.min(1, s.ma * FEEL.TYRE_MARK_MAX_ALPHA * fade * lift);
     trailQuads(s, mw, bx[n], bx[n + 1], w1, w2, y1, y2);
   }
   ctx.globalAlpha = 1;
@@ -9826,7 +10065,7 @@ function drawFinish(w, h) {
      finished layout with no animation at all rather than a fast one.
      ---------------------------------------------------------------- */
   const bIn = finaleBanner();
-  const set = finaleSettle();
+  const set = finaleSettleT();
   const rev = finaleReveal();
   let bannerCy = y0;
   if (bIn > 0) {
@@ -10531,9 +10770,13 @@ let finishTime = 0;         // this run's time to the line
 let finishMargin = null;    // against the ghost's, seconds, null if none
 let finishClean = false;
 let finishRecord = false;   // did this run set today's record
+// Where on the road the car crossed. The donut is centred on it, so the
+// celebration happens where the run ended rather than in the middle.
+let finishX = 0;
 
 function finishRun() {
   finishTime = runTime;
+  finishX = carX;
   finishClean = continues === 0;
   runDistance = Math.round(position / 100);
   banked += Math.floor(score);
@@ -10561,11 +10804,11 @@ function finishRun() {
   gateFlash2 = FEEL.CHECKPOINT_FLASH;
   clockPop = 0;
   coastSpeed = FEEL.SPEED;
-  /* Everything at once, on the line. The shake goes through addShake like
-     every other source, so it is capped and it does not sum with the
-     gate's own. */
+  /* The crossing, and only the crossing. The volleys, the donut and the
+     rest of the fanfare are beats of their own and they arrive on the
+     finale's clock, not here. The shake goes through addShake like every
+     other source, so it is capped and does not sum with the gate's own. */
   startFinale();
-  audioFanfare(finaleLevel);
 }
 
 function updateScore(dt) {
@@ -10928,9 +11171,16 @@ function resetSpectacle() {
   finaleLevel = 0;
   finaleGlow = 0;
   finaleFree = 0;
+  finaleSky = 0;
+  finaleStrobe = 0;
   finaleFlash = 0;
-  finaleRolling = false;
-  fireworkDue = 0;
+  finaleWavesFired = 0;
+  finaleShellsFired = 0;
+  finaleHueDue = 0;
+  finaleHueN = 0;
+  finaleSpin = 0;
+  finaleSwing = 0;
+  finaleDriving = false;
   worldHeat = 0;
   heatPulse = 1;
   cityGlow = 0;
@@ -11139,7 +11389,12 @@ function updateSpectacle(dt) {
    slots cost one walk each in the draw, which measured under a tenth of
    a millisecond, and buy the guarantee that no burst is ever drawn part
    eaten. */
-const PARTICLE_POOL = 520;
+/* RESIZED AGAIN FOR THE VOLLEYS. A trickle of shells never had more than
+   about four hundred pieces alive; five discrete volleys a second apart,
+   each bigger than the last and each still in the air when the next one
+   goes up, peak far higher, because two waves are always overlapping by
+   design. Measured at the top level, saturated a 520 slot pool outright. */
+const PARTICLE_POOL = 900;
 const PART_CAR = 0, PART_FIRE = 1;          // the explosion's own two
 const PART_FW = 2;                          // and four firework colours from here
 const PART_COLOURS = 6;
@@ -11292,35 +11547,66 @@ function particleColour(i) {
    is simply there. Nothing waits on an animation, because nothing here
    is on the path to anything.
 
-   THE SHAPE OF IT:
+   THE SHAPE OF IT, AND THE SHAPE MATTERS MORE THAN THE VOLUME. A
+   celebration that fires everything on the first frame has nowhere left
+   to go and reads as one event rather than as a celebration, so this is
+   built as distinct beats laid end to end. Every duration is a named
+   constant on the cycler and every boundary below is DERIVED from them,
+   so moving one beat moves the ones after it and the sequence can never
+   develop a hole in the middle.
 
-     THE APPROACH, from the final gate to the line, ramping the world's
-     own intensity continuously so the crossing is a peak rather than a
-     surprise.
-     THE LINE: hit stop, flash, shake, fanfare, the first shells away and
-     the world slammed to full.
-     THE ROLL: the car carries its speed past the line and drifts to a
-     stop. The road stays readable for the whole of this.
-     THE HANDOVER: once it has stopped there is nothing left to read, so
-     the over cap comes in and the world goes past anything the
-     multiplier can buy.
-     THE MESSAGE: the banner lands, and the result arrives under it.
+     a APPROACH   the closing stretch escalating continuously from the
+                  final gate, so the crossing is a peak and not a
+                  surprise.
+     b CROSSING   hit stop, full screen flash, shake, the world slammed
+                  to maximum.
+     c HUSH       and the world DROPS for it. This is the beat that makes
+                  the first volley land.
+     d WAVE ONE   the first volley, the city flashing with it.
+     e THE DONUT  the victory drift, which starts on wave one and is the
+                  centrepiece of the whole thing.
+     f WAVES      each volley bigger than the last, the palette walking
+                  the hue wheel, the city strobing in time.
+     g SETTLE     the car comes to rest.
+     h AFTERGLOW  the world stays lit under the result and comes down
+                  slowly rather than snapping back.
+
+   THE TWO OVER CAPS ARE SPLIT BY WHERE THEY LAND, not by how loud they
+   are. finaleFree is everything ON the road and it waits for the car to
+   stop, which is hard limit one holding by construction. finaleSky is
+   everything ABOVE THE HORIZON, which is sky and only sky and cannot
+   cost the road a thing, so it is free from the first volley and is what
+   strobes with them.
    ================================================================== */
 let finaleT = -1;         // seconds since the line, negative when there is no finale
 let finaleLevel = 0;      // 0 to 4, how much this run actually achieved
-let finaleGlow = 0;       // 0 to 1, the world's intensity, ramp then hold then cool
-let finaleFree = 0;       // 0 to 1, the over cap, and only once the car has stopped
+let finaleGlow = 0;       // 0 to 1, the world's intensity through the beats
+let finaleFree = 0;       // 0 to 1, the ROAD over cap, once the car has stopped
+let finaleSky = 0;        // 0 to 1, the SKY over cap, free from the first volley
+let finaleStrobe = 0;     // 1 on a volley, decaying, and it is what flashes
 let finaleFlash = 0;
-let finaleRolling = false;
-let fireworkDue = 0;
+let finaleWavesFired = 0;
+let finaleShellsFired = 0;
+let finaleHueDue = 0;
+let finaleHueN = 0;
 let finaleFirstToday = false;   // captured before the record is banked
+
+/* THE DONUT. Its own three numbers, because the drift model belongs to
+   the player and this is not the player driving. */
+let finaleSpin = 0;       // radians, added into carYaw, zero outside a finale
+let finaleSwing = 0;      // the phase of the lateral sweep
+let finaleDriving = false;
 
 function finaleActive() { return finaleT >= 0; }
 
-/* How much there is to celebrate, and it is read by the firework rate,
-   the burst size and the banner. Four things can be true and each one
-   makes the finale visibly louder, so a clean run that took the record
-   cannot look like a scrappy one that squeaked over. */
+/* The volley flash, squared so it falls away rather than fading. One
+   function, read by the three sky draw sites, so a volley cannot flash
+   the windows and the roof line on different curves. */
+function strobe2() { return finaleStrobe * finaleStrobe; }
+
+/* How much there is to celebrate. Four things can be true and each one
+   buys another volley, a bigger burst and a longer sequence, so a clean
+   run that took the record cannot look like one that squeaked over. */
 function finaleLevelFor() {
   let n = 0;
   if (finishClean) n++;
@@ -11340,37 +11626,70 @@ function finaleBadge() {
   return null;
 }
 
+/* ------------------------------------------------------------------
+   THE BEAT BOUNDARIES. All derived, all in seconds since the line, and
+   this is the only place any of them is worked out.
+   ------------------------------------------------------------------ */
+function finaleWaveCount() {
+  return Math.max(1, Math.round(FEEL.FINALE_WAVES
+                                + FEEL.FINALE_WAVE_PER_LEVEL * finaleLevel));
+}
+function finaleHushEnd() { return FEEL.FINALE_CROSS + FEEL.FINALE_HUSH; }
+function finaleWaveAt(n) { return finaleHushEnd() + n * FEEL.FINALE_WAVE_GAP; }
+function finaleLastWave() { return finaleWaveAt(finaleWaveCount() - 1); }
+function finaleDriftEnd() { return finaleLastWave() + FEEL.FINALE_DRIFT_TAIL; }
+function finaleSettleEnd() { return finaleDriftEnd() + FEEL.FINALE_SETTLE; }
+function finaleRevealAt() { return finaleSettleEnd() + FEEL.FINALE_REVEAL_AFTER; }
+function finaleLitEnd() { return finaleSettleEnd() + FEEL.FINALE_AFTERGLOW; }
+
+/* THE END, and it is the end of the MESSAGE rather than of the light.
+   The afterglow is deliberately allowed to outlive it: the result screen
+   sits over a world that is still warm and coming down, which is what
+   "do not snap back to normal" means. */
+function finaleEnd() { return finaleRevealAt() + FEEL.FINALE_REVEAL_TIME; }
+
 function startFinale() {
   finaleT = 0;
   finaleLevel = finaleLevelFor();
   finaleGlow = 1;
   finaleFree = 0;
-  finaleRolling = true;
+  finaleSky = 1;
+  finaleStrobe = 1;
   finaleFlash = FEEL.FINALE_FLASH_TIME;
-  fireworkDue = 0;
+  finaleWavesFired = 0;
+  finaleShellsFired = 0;
+  finaleHueDue = 0;
+  finaleHueN = 0;
+  finaleSpin = 0;
+  finaleSwing = 0;
+  finaleDriving = true;
+  finaleBiome0 = biome;
   hitStop = FEEL.FINALE_HIT_STOP;
   addShake(FEEL.FINALE_SHAKE_PX);          // capped and never summed, see addShake
-  // A handful away on the line itself, so the burst is already in the air
-  // as the flash clears rather than starting after it.
-  for (let i = 0; i < 3 + finaleLevel; i++) fireworkLaunch(1);
+  audioFinishHit();
 }
 
-/* THE WHOLE THING, IN ONE CALL. Winds the clock past every phase, stops
-   the car dead and clears what is in the air. The result screen is then
-   simply drawn, because everything that gates it reads this clock. */
+/* THE WHOLE THING, IN ONE CALL. Winds the clock past every beat, stops
+   the car, puts the palette back and clears what is in the air. The
+   result screen is then simply drawn, because everything that gates it
+   reads this clock. Nothing here waits on anything: the impatient path
+   is one tap to the result and a second to run it again, which is
+   exactly what it was before any of this existed. */
 function skipFinale() {
   finaleT = finaleEnd();
-  finaleRolling = false;
   finaleGlow = 0;
   finaleFree = 0;
+  finaleSky = 0;
+  finaleStrobe = 0;
   finaleFlash = 0;
+  finaleDriving = false;
+  finaleSpin = 0;
   hitStop = 0;
   coastSpeed = 0;
+  drift.slipNorm = 0;
+  finaleRestoreHue();
   clearDebris();
-}
-
-function finaleEnd() {
-  return FEEL.FINALE_REVEAL_AT + FEEL.FINALE_REVEAL_TIME;
+  clearSmoke();
 }
 
 // Is the sequence still running, and therefore still worth skipping?
@@ -11382,12 +11701,12 @@ function finaleRunning() {
    screen fades in on this one number. */
 function finaleReveal() {
   if (finaleT < 0) return 1;
-  return clamp((finaleT - FEEL.FINALE_REVEAL_AT)
+  return clamp((finaleT - finaleRevealAt())
                / Math.max(0.01, FEEL.FINALE_REVEAL_TIME), 0, 1);
 }
 
-/* And how much of the banner. It lands first and alone, which is the
-   first of the two beats. */
+/* And how much of the banner. It lands on the crossing, alone and large,
+   which is the first of the two beats the message has. */
 function finaleBanner() {
   if (finaleT < 0) return 1;
   return clamp((finaleT - FEEL.FINALE_BANNER_AT)
@@ -11397,10 +11716,10 @@ function finaleBanner() {
 /* And how far it has TRAVELLED from the middle of the screen to the top
    of the result stack. Finishes exactly as the reveal begins, so the two
    never occupy the screen at once. */
-function finaleSettle() {
+function finaleSettleT() {
   if (finaleT < 0) return 1;
   const move = Math.max(0.01, FEEL.FINALE_BANNER_MOVE);
-  return clamp((finaleT - (FEEL.FINALE_REVEAL_AT - move)) / move, 0, 1);
+  return clamp((finaleT - (finaleRevealAt() - move)) / move, 0, 1);
 }
 
 /* THE APPROACH RAMP. Continuous from the final gate to the line, so the
@@ -11414,6 +11733,66 @@ function finaleApproach() {
   return clamp((carSegIndex - from) / span, 0, 1) * FEEL.FINALE_APPROACH;
 }
 
+/* THE ENVELOPE, and the hush is the whole reason it is a function rather
+   than a hold. Up on the line, DOWN for the near silence, up again and
+   held through every volley and the afterglow, then down slowly. */
+function finaleEnvelope(t) {
+  const cross = Math.max(0.01, FEEL.FINALE_CROSS);
+  if (t <= cross) return 1;
+  const hush = Math.max(0.01, FEEL.FINALE_HUSH);
+  const low = clamp(FEEL.FINALE_HUSH_LEVEL, 0, 1);
+  const hushEnd = finaleHushEnd();
+  if (t <= hushEnd) {
+    /* Down over the first half of the hush and back up over the second,
+       so the quiet is a dip with a shape rather than a hole with edges. */
+    const u = (t - cross) / hush;
+    return u < 0.55 ? 1 + (low - 1) * (u / 0.55)
+                    : low + (1 - low) * ((u - 0.55) / 0.45);
+  }
+  if (t <= finaleLitEnd()) return 1;
+  return clamp(1 - (t - finaleLitEnd()) / Math.max(0.01, FEEL.FINALE_COOL), 0, 1);
+}
+
+/* ------------------------------------------------------------------
+   THE RAINBOW VICTORY LAP.
+
+   applyBiome is a whole palette rotation and it measured a tenth of a
+   millisecond, which is why this is affordable at five hues a second.
+
+   IT MUST NOT MOVE THE BIOME ORDER. The shuffle remembers the last hue
+   it handed out so it never puts two neighbours back to back, and on the
+   daily that bag is seeded from the day so two devices see the same
+   twelve places. Walking the wheel here would rewrite that memory, so
+   the marker is saved and put straight back. The run's own biome is
+   restored when the finale ends, for the same reason.
+   ------------------------------------------------------------------ */
+let finaleBiome0 = 0;
+function finaleHue(i) {
+  const keep = lastBiomeHue;
+  applyBiome(i);
+  lastBiomeHue = keep;
+}
+function finaleRestoreHue() {
+  if (biome !== finaleBiome0) finaleHue(finaleBiome0);
+}
+
+/* ------------------------------------------------------------------
+   A VOLLEY. Everything that fires together fires here, in one place, so
+   the fireworks, the city flash, the shake and the note cannot drift out
+   of time with each other.
+   ------------------------------------------------------------------ */
+function finaleShells(n) {
+  const shells = Math.max(1, Math.round(FEEL.FINALE_WAVE_SHELLS
+                                        * (1 + FEEL.FINALE_WAVE_GROWTH * n)));
+  for (let i = 0; i < shells; i++) fireworkLaunch(1);
+}
+
+function finaleWave(n) {
+  finaleStrobe = 1;
+  addShake(FEEL.FINALE_WAVE_SHAKE_PX);     // capped and never summed
+  audioFanfareWave(n, finaleWaveCount(), finaleLevel);
+}
+
 function updateFinale(dt) {
   // The approach owns the value while the car is still driving.
   if (state === DRIVING) {
@@ -11421,44 +11800,175 @@ function updateFinale(dt) {
     finaleGlow += (want - finaleGlow)
                 * (1 - Math.exp(-dt / Math.max(0.01, FEEL.FINALE_SLAM)));
     finaleFree = 0;
+    finaleSky = finaleGlow;
     return;
   }
   if (finaleFlash > 0) finaleFlash -= dt;
+  if (finaleStrobe > 0) {
+    finaleStrobe = Math.max(0, finaleStrobe - dt / Math.max(0.01, FEEL.FINALE_STROBE_TIME));
+  }
   if (!finaleActive()) {
     // Not a finale, so nothing here may hold the world hot.
     if (finaleGlow > 0) finaleGlow = Math.max(0, finaleGlow - dt / FEEL.FINALE_COOL);
     finaleFree = 0;
+    finaleSky = 0;
     return;
   }
   finaleT += dt;
+  finaleGlow = finaleEnvelope(finaleT);
 
-  // Full through the hold, then down over the cool. Never a step.
-  if (finaleT <= FEEL.FINALE_HOLD) finaleGlow = 1;
-  else {
-    finaleGlow = clamp(1 - (finaleT - FEEL.FINALE_HOLD)
-                           / Math.max(0.01, FEEL.FINALE_COOL), 0, 1);
+  /* THE VOLLEYS, ON TWO SCHEDULES, AND THAT IS THE WHOLE TRICK. A shell
+     spends FIREWORK_RISE climbing before it bursts, so launching it on
+     the beat puts the burst a second LATE and the volley arrives as two
+     separate events: a flash and a note, then some fireworks. Measured
+     at wave one there was nothing in the sky at all when the note
+     played.
+
+     So the shells go up EARLY, by exactly the rise, and everything that
+     happens instantly happens on the beat. The burst, the city flash,
+     the shake and the note then land together, which is what makes a
+     volley read as one thing.
+
+     A while rather than an if on both, so a long frame fires every wave
+     it stepped over instead of swallowing one. */
+  while (finaleShellsFired < finaleWaveCount()
+         && finaleT >= finaleWaveAt(finaleShellsFired) - FEEL.FIREWORK_RISE) {
+    finaleShells(finaleShellsFired);
+    finaleShellsFired++;
+  }
+  while (finaleWavesFired < finaleWaveCount()
+         && finaleT >= finaleWaveAt(finaleWavesFired)) {
+    finaleWave(finaleWavesFired);
+    finaleWavesFired++;
   }
 
-  /* THE OVER CAP WAITS FOR THE CAR. Hard limit one says the road stays
-     readable, and it stays readable while there is a car on it to read
-     it for. The moment there is not, it comes in. */
-  const freeWant = finaleRolling ? 0 : 1;
+  /* THE HUE WHEEL, walked for the length of the waves and no longer.
+     Every biome hue is seen, which is the point of it, and nothing in
+     normal play ever changes the palette more than once a gate. */
+  if (finaleT >= finaleHushEnd() && finaleT < finaleDriftEnd()
+      && finaleHueN < BIOMES.length) {
+    finaleHueDue -= dt;
+    if (finaleHueDue <= 0) {
+      finaleHueDue = Math.max(0.03, FEEL.FINALE_HUE_STEP);
+      finaleHueN++;
+      finaleHue(finaleBiome0 + finaleHueN);
+    }
+  } else if (finaleT >= finaleDriftEnd() && finaleHueN > 0) {
+    // Home again as the car settles, so the result is read on the road's
+    // own colour rather than on whichever hue the walk stopped on.
+    finaleHueN = 0;
+    finaleRestoreHue();
+  }
+
+  /* THE ROAD'S OVER CAP WAITS FOR THE CAR. Hard limit one says the road
+     stays readable, and it stays readable while there is a car on it to
+     read it for. The moment there is not, it comes in.
+
+     MEASURED, AND IT WAS WRONG THE FIRST TIME. Gating this on the DONUT
+     BEAT being over let the over cap reach 0.95 while the car was still
+     rolling at a third of full speed through the settle, which is the
+     one thing this rule exists to stop. It is gated on the car's ACTUAL
+     SPEED as well now, so no amount of retiming the beats can put it
+     back. */
+  const stillMoving = finaleDriving
+                   || coastSpeed > FEEL.SPEED * FEEL.FINALE_STOP_AT;
+  const freeWant = stillMoving ? 0 : 1;
   finaleFree += (freeWant - finaleFree)
               * (1 - Math.exp(-dt / Math.max(0.01, FEEL.FINALE_FREE_TIME)));
   finaleFree *= finaleGlow;                 // and it leaves with the rest
 
-  // Shells, for as long as the world is hot, faster the more there was
-  // to celebrate.
-  if (finaleGlow > 0.25) {
-    fireworkDue -= dt;
-    if (fireworkDue <= 0) {
-      fireworkDue = Math.max(0.05, FEEL.FIREWORK_EVERY
-                                   - FEEL.FIREWORK_RATE_GAIN * finaleLevel);
-      fireworkLaunch(1);
-    }
-  }
+  /* THE SKY'S DOES NOT. Nothing above the horizon can cost the road a
+     thing, so the city is free to go past its ceiling from the first
+     volley. This is the STEADY term only: finaleStrobe is added on top
+     of it at each draw site, because folding the two together here put
+     the flash inside a clamp that was already satisfied. */
+  finaleSky = finaleGlow;
 }
 
+/* ==================================================================
+   THE VICTORY DONUT.
+
+   The car crosses the line and celebrates by drifting, which is the one
+   thing in this finale that could not be any other game. It is driven
+   through the SAME drift feedback a corner is: layTyreMarks reads the
+   yaw and the slip, the smoke emitter reads the slip, so the marks and
+   the smoke are the game's own, laid by something other than the player.
+
+   THE MARKS PERSIST because they live on the road segments and the road
+   has stopped moving, so what the car wrote across the finish line is
+   still there under the result screen. That is the signature of the run.
+
+   THE CAMERA IS NOT TOUCHED. Section 7 warns about overdoing motion and
+   the camera has caused more complaints on this project than anything
+   else, so it holds perfectly still while the car spins in front of it.
+   ================================================================== */
+function updateFinishRoll(dt) {
+  deadFor += dt;
+  const overDrift = finaleT >= finaleDriftEnd();
+  if (finaleDriving && overDrift) finaleDriving = false;
+
+  /* Winding in and out. The spin ramps up over FINALE_DRIFT_IN and back
+     down over the settle, so the donut starts and ends as a movement
+     rather than as a switch. */
+  let env;
+  if (!finaleActive()) env = 0;
+  else if (finaleT < finaleHushEnd()) {
+    env = clamp((finaleT - FEEL.FINALE_CROSS)
+                / Math.max(0.01, FEEL.FINALE_DRIFT_IN), 0, 1);
+  } else if (!overDrift) env = 1;
+  else {
+    env = clamp(1 - (finaleT - finaleDriftEnd())
+                    / Math.max(0.01, FEEL.FINALE_SETTLE), 0, 1);
+  }
+
+  /* Forward speed. It does not stop dead: it settles to a slow travel
+     for the length of the donut and only then comes to rest, which is
+     what lays the marks ALONG the line rather than in one spot. */
+  const want = FEEL.SPEED * FEEL.FINALE_DRIFT_SPEED * env;
+  coastSpeed += (want - coastSpeed) * (1 - Math.exp(-dt / FEEL.FINALE_SETTLE));
+  /* AND THE SETTLE ACTUALLY ARRIVES. A lerp toward zero approaches it
+     and never reaches it, which left the car creeping at a tenth of full
+     speed for the whole result screen and held the road's over cap off
+     the whole time. env falls to exactly zero at the end of beat g, so
+     capping the speed with it stops the car at a definite moment without
+     putting a step in the deceleration. */
+  if (overDrift) coastSpeed = Math.min(coastSpeed, want);
+  position += coastSpeed * dt;
+
+  // The road has to keep arriving under a car that is still moving.
+  topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
+  const prevX = carX;
+  carSegIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+
+  // The spin, which is the whole of the celebration in one number.
+  finaleSpin += FEEL.FINALE_DRIFT_SPIN * env * dt;
+  finaleSwing += FEEL.FINALE_DRIFT_RATE * env * dt;
+
+  /* And the sweep across the road that turns a spin into a donut. It is
+     centred on wherever the car crossed and clamped well inside the
+     edges, because a celebration that drives off the road would be a
+     poor one. */
+  const seg = segAt(carSegIndex);
+  const half = seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE;
+  const swing = Math.sin(finaleSwing * Math.PI * 2) * half * FEEL.FINALE_DRIFT_SWING * env;
+  carX = clamp(finishX + swing, -half * FEEL.OFF_ROAD, half * FEEL.OFF_ROAD);
+  carFrac = carX / half;
+
+  /* THE SLIP IS REPORTED, NOT DERIVED. Everything downstream of a drift
+     reads slipNorm, so writing it here is what makes the smoke pour and
+     the marks go dark without a single special case in either. */
+  drift.lateralV = (carX - prevX) / Math.max(dt, 0.0001);
+  drift.headingV = 0;
+  drift.headingAngle = 0;
+  drift.travelAngle = 0;
+  drift.slip = 0;
+  drift.slipDeg = FEEL.SLIP_MAX_DEG * FEEL.FINALE_DRIFT_SLIP * env;
+  drift.slipNorm = clamp(FEEL.FINALE_DRIFT_SLIP * env, 0, 1);
+
+  // The game's own drift feedback, driven by the celebration.
+  layTyreMarks(carSegIndex, prevX);
+  updateSmoke(dt);
+}
 /* ==================================================================
    THE FIREWORKS, ON THE EXPLOSION'S OWN POOL.
 
@@ -11476,6 +11986,15 @@ function updateFinale(dt) {
    ================================================================== */
 function fireworkLaunch(spread) {
   const s = Math.min(view.w, view.h);
+  /* THE CLIMB IS MEASURED IN SCREEN HEIGHTS, NOT IN THE SMALLER
+     DIMENSION. Everything else in this file scales off min(w, h) because
+     it has to look the same size in both orientations, and that is right
+     for a burst. It is wrong for the RISE: in landscape the smaller
+     dimension IS the height, so a shell told to climb 1.85 of it left
+     the screen entirely and every volley burst above the top edge. In
+     portrait nothing looked wrong, which is why it survived a session.
+     Measured in landscape, the shells cleared the top by 190 pixels. */
+  const up = view.h;
   const p = takeParticle();
   /* Biased to the middle by squaring a signed random, so most go up over
      the road and the rest fan out along it. */
@@ -11483,15 +12002,15 @@ function fireworkLaunch(spread) {
   p.x = view.w * (0.5 + t * Math.abs(t) * 0.5 * spread);
   p.y = view.h * (0.86 + Math.random() * 0.10);
   const lean = (p.x - view.w * 0.5) / Math.max(1, view.w) * 0.55;
-  p.vx = -lean * s * FEEL.FIREWORK_SPEED * 0.5;
-  p.vy = -s * FEEL.FIREWORK_SPEED * (0.82 + 0.36 * Math.random());
+  p.vx = -lean * up * FEEL.FIREWORK_SPEED * 0.5;
+  p.vy = -up * FEEL.FIREWORK_SPEED * (0.82 + 0.36 * Math.random());
   p.r = s * FEEL.FIREWORK_SIZE * FEEL.FIREWORK_SHELL_SIZE;
   p.rot = Math.PI * 0.25;
   p.spin = 0;
   // A shell holds its speed far better than a spark does, or it never
   // gets out of the road and bursts at head height.
   p.drag = FEEL.FIREWORK_DRAG * 3;
-  p.grav = s * FEEL.FIREWORK_GRAVITY * 0.40;
+  p.grav = up * FEEL.FIREWORK_GRAVITY * 0.40;
   p.fuse = FEEL.FIREWORK_RISE * (0.78 + 0.44 * Math.random());
   p.life = p.fuse + 0.02;                     // it never outlives its fuse
   p.fade = p.life;
@@ -11991,9 +12510,10 @@ function render() {
      horizon section 4.3 is about, fell from a difference of 0.4 to one of
      4.8 the wrong way. Above the line is sky and only sky, so the glow
      can swell as much as it likes there and the road cannot lose by it. */
-  if (worldHeat > 0.01 || finaleFree > 0.01) {
+  if (worldHeat > 0.01 || finaleSky > 0.01) {
     ctx.globalAlpha = Math.min(1, FEEL.HEAT_HORIZON * worldHeat
-                                  + FEEL.FINALE_HORIZON * finaleFree);
+                                  + FEEL.FINALE_HORIZON * finaleSky
+                                  + FEEL.FINALE_STROBE_HORIZON * strobe2());
     ctx.fillRect(-40, horizonY - glow, w + 80, glow);
     ctx.globalAlpha = 1;
   }
@@ -12786,27 +13306,52 @@ function audioSting(sting) {
    because a sting over a wreck is wrong. The tail is allowed to ring
    under the result screen.
 
-   LONGER FOR MORE. The ladder is a major arpeggio over two octaves and
-   the level decides how far up it goes, so a clean run that took the
-   record finishes higher and later than one that squeaked over. */
-const FANFARE_LADDER = [0, 7, 12, 16, 19, 24, 28, 31, 36];
+   IT HAS THE SAME WAVE STRUCTURE AS THE PICTURE. One stab on the line,
+   then near silence, then one rising figure per volley, each starting
+   higher than the last off the same ladder, and the final one given the
+   long tail. Shape before volume, in the ear as well as the eye: a
+   continuous fanfare under three discrete volleys would fight them. */
+const FANFARE_LADDER = [0, 7, 12, 16, 19, 24, 28, 31, 36, 40, 43, 48];
 
-function audioFanfare(level) {
+/* Beat b. Two notes, low, short, and then it gets out of the way so the
+   hush is actually a hush. */
+function audioFinishHit() {
   if (!audioOn()) return;
   const a = audio, root = TRACKS[track].root;
   const p = a.stingGain.gain;
   const t = a.ac.currentTime;
-  const n = Math.min(FANFARE_LADDER.length, 5 + Math.max(0, level));
   p.cancelScheduledValues(t);
   p.setValueAtTime(p.value, t);
-  for (let i = 0; i < n; i++) {
-    const at = t + i * FEEL.FANFARE_STEP;
-    a.stingOsc.frequency.setValueAtTime(semis(root * 8, FANFARE_LADDER[i]), at);
+  for (let i = 0; i < 2; i++) {
+    const at = t + i * FEEL.FANFARE_STEP * 1.4;
+    a.stingOsc.frequency.setValueAtTime(semis(root * 4, i === 0 ? 0 : 7), at);
     p.setValueAtTime(FEEL.FANFARE_GAIN, at);
-    // Every note but the last is clipped by the next; the last one is
-    // given the long decay, which is the part that rings out.
+    p.exponentialRampToValueAtTime(0.0001, at + FEEL.FANFARE_STEP * 2.2);
+  }
+}
+
+/* Beats d and f. One figure per volley, climbing the ladder further each
+   time, so wave three is audibly bigger than wave one in the same way it
+   is visibly bigger. The last one rings out rather than cutting, which
+   is what carries the afterglow. */
+function audioFanfareWave(n, total, level) {
+  if (!audioOn()) return;
+  const a = audio, root = TRACKS[track].root;
+  const p = a.stingGain.gain;
+  const t = a.ac.currentTime;
+  const last = n >= total - 1;
+  const notes = Math.min(6, 3 + n + Math.max(0, level >> 1));
+  const from = Math.min(FANFARE_LADDER.length - notes, n * 2);
+  p.cancelScheduledValues(t);
+  p.setValueAtTime(p.value, t);
+  for (let i = 0; i < notes; i++) {
+    const at = t + i * FEEL.FANFARE_STEP;
+    a.stingOsc.frequency.setValueAtTime(semis(root * 8, FANFARE_LADDER[from + i]), at);
+    p.setValueAtTime(FEEL.FANFARE_GAIN, at);
+    // Every note but the last is clipped by the next; the last note of
+    // the last wave is the one given the long decay.
     p.exponentialRampToValueAtTime(0.0001,
-      at + (i === n - 1 ? FEEL.FANFARE_TAIL : FEEL.FANFARE_STEP * 1.6));
+      at + (i === notes - 1 && last ? FEEL.FANFARE_TAIL : FEEL.FANFARE_STEP * 1.6));
   }
 }
 
