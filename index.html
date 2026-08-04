@@ -641,8 +641,31 @@ const FEEL = {
      already driving, so it is continuous by construction and it can only
      move when the car moves.
 
-     LIVE, on a fine step, and 1.0 so nothing changes until it is tuned. */
-  CAMERA_FOLLOW:            1.0,     // LIVE
+     TUNED, AND THIS IS THE MEASUREMENT. The screen wobbling on a soft
+     bend was reported three times by two people, and it is entirely this
+     constant: everything world space is drawn at
+       screen x = w/2 + scale * (worldX - cameraX) * w/2
+     so the ONLY thing the camera contributes is cameraX, and cameraX is
+     carX times this. A driver's corrections therefore translate the whole
+     picture by exactly this share of their own lateral movement.
+
+     Measured, driving the line the SCORING asks for, out near the edge
+     chasing the multiplier: at 1.0 the entire picture moves 392 pixels
+     inside the worst second on a 390 pixel wide screen. A whole screen
+     width a second. That is the wobble, and nothing else was moving:
+     a fixed piece of road tracked from 120 segments out to the car jerked
+     0.29 pixels at p95 with the camera taken out, the visible segment
+     count never moved off 192, and a tracked pylon never once slid
+     backwards in 360 frames.
+
+     0.55 halves it. The bend's own movement of the road then leads the
+     driver's shove by better than two to one, which is what "the road is
+     turning" rather than "the screen is being shoved" means, and the car
+     sits up to 12% of the screen width off centre at the road edge, which
+     is visible movement across a road that is holding still. Lower reads
+     better still on the road and starts throwing the car far enough
+     across the frame to be its own problem. */
+  CAMERA_FOLLOW:           0.55,     // LIVE
   CAMERA_LOOK:                0,     // LIVE, world units per unit of curvature
   CAMERA_LOOK_AHEAD:      11000,     // LIVE, world units up the road it reads from
   CAMERA_LOOK_TIME:        0.70,     // seconds of lag on it
@@ -2143,6 +2166,10 @@ const FEEL = {
   HAZARD_CLIP:              140,     // world units of shoulder each side, the middle band
   HAZARD_WARN_SEGMENTS:      45,     // a full second of warning, painted on the road
   HAZARD_WARN_STRIPES:        4,     // arrowheads painted in the OPEN lane
+  HAZARD_WARN_ALPHA:       0.50,     // LIVE, those arrowheads
+  HAZARD_WARN_BARS:           5,     // LIVE, barrier bars across the BLOCKED width
+  HAZARD_WARN_BAR_THICK:   0.55,     // LIVE, of the segment's own drawn depth
+  HAZARD_WARN_BAR_ALPHA:   0.72,     // LIVE
   HAZARD_ARROW_LENGTH:        7,     // segments each arrowhead spans
   /* The curvature a hazard may sit in at its entry, after the scale.
 
@@ -2273,15 +2300,62 @@ const FEEL = {
   /* Enough to correct a bad launch, not enough to make the launch free.
      A share of the ground steering rate. */
   JUMP_AIR_STEER:          0.34,     // LIVE
+  /* THE LANDING, AND IT USED TO COST YOU. A player asked whether he was
+     meant to hit these or avoid them, and reading the old constants the
+     honest answer was AVOID: a clean landing multiplied speed by 0.82 and
+     fewer than half of them carried any time at all.
+
+     A reward that arrives less than half the time cannot be learned. It
+     is worse than no reward, because the player cannot form a rule and so
+     forms the wrong one. So: EVERY jump pays, and a landing that is on
+     the road is not slowed at all. The only speed penalty left is for
+     landing in the scrape band, which is a bad landing and should cost. */
   JUMP_LAND_SLOW_TIME:     0.45,     // seconds the landing costs speed for
-  JUMP_LAND_SLOW:          0.82,     // speed multiplier on a clean landing
+  JUMP_LAND_SLOW:          1.00,     // LIVE, a landing ON the road is free
   JUMP_LAND_SLOW_BAD:      0.58,     // and on a landing in the scrape band
-  JUMP_LAND_SHAKE:            5,     // pixels, clean
+  JUMP_LAND_SHAKE:            5,     // pixels, routine
   JUMP_LAND_SHAKE_BAD:       11,     // pixels, bad, and still capped with everything else
-  /* Some jumps carry time and some do not. No rings, no collectibles and
-     no new economy: hitting the ramp is the whole of the earning. */
-  JUMP_BOOST_CHANCE:       0.45,     // LIVE
-  JUMP_BOOST_SECONDS:       2.5,     // LIVE
+  JUMP_LAND_SHAKE_BIG:        9,     // LIVE, a great landing, and still capped
+  /* WHAT THE LANDING IS WORTH, and REWARD THE LANDING RATHER THAN THE
+     JUMP. This is a drifting game, so the thing worth paying for is
+     coming down still sideways. Anybody can drive up a ramp; landing on
+     opposite lock is a skill expression, and it is measured with the slip
+     angle the whole rest of the game already runs on.
+
+     quality = SLIP_WEIGHT * (slip at touchdown / SLIP_REF)
+             + AIR_WEIGHT  * (air time / AIR_REF)
+     clamped to 0..1, and the two weights sum to one so quality really is
+     a share. Air contributes because a fuller commitment off the lip
+     should pay, but slip is worth more because slip is the game. */
+  JUMP_BOOST_SECONDS:      0.90,     // LIVE, seconds every landing pays
+  JUMP_BOOST_BEST:         1.80,     // LIVE, seconds more at quality one
+  JUMP_LAND_SLIP_REF:      0.62,     // slipNorm that counts as fully sideways
+  JUMP_LAND_SLIP_WEIGHT:   0.68,     // LIVE, slip's share of the quality
+  JUMP_LIP_LOSS:           0.34,     // LIVE, share of the launch lost at the ramp's edge
+  JUMP_LAND_AIR_REF:       0.98,     // seconds of air that counts as full commitment
+  JUMP_LAND_AIR_WEIGHT:    0.32,     // and air's share, the two summing to one
+  JUMP_LAND_BAD_KEEP:      0.25,     // LIVE, share of the pay a bad landing keeps
+  /* THE TWO RUNGS, and the gap between them is the whole point. Jumps are
+     frequent, so a full celebration on every one goes stale inside a run
+     and becomes exactly the clutter this game has spent sessions keeping
+     off the road. A routine landing gets a number and a thump. Only a
+     landing over TIER_BIG earns the burst, the flare and the sting. */
+  JUMP_TIER_GOOD:          0.40,     // LIVE, quality for the middle rung
+  JUMP_TIER_BIG:           0.72,     // LIVE, quality for the full treatment
+  /* The touchdown itself. Particles off the wheels, a mark burnt into the
+     road, and a short spike in the world reaction that is nowhere near
+     what the finale does and clearly more than driving does. */
+  JUMP_LAND_BITS:            10,     // LIVE, particles at quality zero
+  JUMP_LAND_BITS_GAIN:       26,     // LIVE, more at quality one
+  JUMP_LAND_PUFFS:            6,     // LIVE, smoke puffs off each rear wheel
+  JUMP_LAND_MARK:          0.85,     // LIVE, the mark burnt in on touchdown
+  JUMP_LAND_FLARE:         0.55,     // LIVE, the world reaction spike at quality one
+  JUMP_LAND_FLARE_TIME:    0.70,     // LIVE, seconds it takes to fall away
+  /* The thump, on the crash voice at a fraction of its gain, because that
+     is already the one voice in the graph that can make a body sound. */
+  JUMP_LAND_THUMP:         0.30,     // LIVE, peak gain at a great landing
+  JUMP_LAND_THUMP_TIME:    0.22,     // LIVE, seconds it takes to die
+  JUMP_LAND_THUMP_FREQ:     110,     // Hz it knocks from
   /* The camera follows the car up, damped, so the jump reads as height
      without the car leaving the frame. A share of the car's height, with
      a lag on it. */
@@ -2624,11 +2698,38 @@ function rotateHue(colour, deg, was, now) {
    every gate. The arcade gold and the white text stay put. Everything
    else in the palette, including the car, the hazards, the gate, the
    jumps, the tyre marks and the smoke, turns together. */
+/* THE COLOURS THE HUE WHEEL MAY NOT TOUCH.
+
+   THE HAZARD AND JUMP FAMILIES ARE HERE BECAUSE OF A BUG, and it is the
+   reason two different players confused the two IN OPPOSITE DIRECTIONS.
+   Every colour in this file rotated with the biome, including these, so
+   MEASURED across the twelve biomes:
+
+     biome 0   hazard #ff3d7a hot pink      jump #4dff7a green
+     biome 4   hazard #32a000 GREEN         jump #e4dcff pale lavender
+     biome 5   hazard #00a21e GREEN         jump #f5d6ff pale pink
+     biome 10  hazard #c955ff purple        jump #b6f300 lime
+               and the hazard's own warning arrows #4dff62 BRIGHT GREEN
+
+   So a player who learns "green means jump" on the first road is shown
+   green hazards four biomes later, and the warning arrows painted in
+   front of a hazard come out the exact green the ramp used. The visual
+   language does not merely fade, it INVERTS. No amount of restyling
+   survives that, so danger is danger in every biome and go is go in
+   every biome, pinned exactly the way the score colours already are and
+   for exactly the same reason: they mean something. */
 const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         SCORE_EDGE: 1, TEXT: 1, TEXT_SHADOW: 1,
                         BAR_TRACK: 1, BAR_FILL: 1, BAR_LOW: 1,
                         // The title screen's own family. See COLOUR.
-                        TITLE_DIM: 1, TITLE_SCRIM: 1 };
+                        TITLE_DIM: 1, TITLE_SCRIM: 1,
+                        // Danger. Never green, never anywhere near the jump.
+                        HAZARD_TOP: 1, HAZARD_SIDE: 1, HAZARD_LIP: 1,
+                        HAZARD_GLOW: 1, HAZARD_DARK: 1, HAZARD_WARN: 1,
+                        HAZARD_WARN_BAR: 1,
+                        // Go. Never red, never anywhere near the hazard.
+                        JUMP_DECK: 1, JUMP_DECK_DARK: 1, JUMP_SIDE: 1,
+                        JUMP_LIP: 1, JUMP_GLOW: 1, JUMP_ARROW: 1 };
 
 let PALETTE_BASE = null;
 let BIOMES = [];
@@ -2836,12 +2937,20 @@ const COLOUR = {
   PAUSE_COVER:  '#0a0402',      // opaque, so the corner ahead cannot be studied
 
   /* The hazards. A third colour family, because the road is warm and the
-     car is cool and a hazard must not be mistaken for either. */
+     car is cool and a hazard must not be mistaken for either. PINNED
+     against the hue wheel, see PALETTE_FIXED, so it is this in every
+     biome and can never come out green. */
   HAZARD_TOP:   '#ff3d7a',
   HAZARD_SIDE:  '#8e1338',
   HAZARD_LIP:   '#ffd6e4',
   HAZARD_GLOW:  '255,61,122',
   HAZARD_DARK:  '#5d0a22',      // the alternating band on the top face
+  /* The barrier bar painted across the blocked width. Near white on the
+     hazard's own red is the striping every road works site on earth uses
+     for "do not drive here", and it is a HORIZONTAL form where the jump's
+     is a rising one, so the two are told apart by shape as well as by
+     colour and neither reading depends on the other. */
+  HAZARD_WARN_BAR: '#ffe4ec',
   /* The gate. Bright, cool and unmistakably not a hazard, because the one
      thing on the road you are allowed to drive straight through must not
      wear the colour of the things that kill you. */
@@ -2864,7 +2973,15 @@ const COLOUR = {
      do not touch; this says go here, and it is the car's own cyan so the
      two can never be confused at speed. Anything added later that means
      "aim at this" needs a third treatment again, not this one. */
-  HAZARD_WARN:  '#7ef0ff',
+  /* THE WARNING ON THE ROAD, AND IT USED TO BE CYAN. #7ef0ff is a hair
+     off COLOUR.GATE, which is the checkpoint: the one thing on the road
+     you are meant to drive straight through. Painting the approach to a
+     hazard in very nearly the colour of the thing you aim for is the
+     worst available choice, and rotated round the wheel it came out
+     bright green in front of a purple hazard. It wears the hazard's own
+     red now, so the warning and the thing it warns about are obviously
+     the same object. */
+  HAZARD_WARN:  '#ff5c8f',
 
   /* THE JUMP, and it is a fourth family on purpose.
 
@@ -3553,8 +3670,32 @@ const TUNABLES = [
   { key: 'JUMP_LAND_SHAKE_BAD',label: 'landBmp', step: 1,    min: 0,    max: 40,    dp: 0, group: 23 },
   { key: 'JUMP_TIME',          label: 'jumpAt',  step: 5,    min: 0,    max: 300,   dp: 0, group: 24 },
   { key: 'JUMP_EVERY',         label: 'jumpGap', step: 50,   min: 200,  max: 8000,  dp: 0, group: 24 },
-  { key: 'JUMP_BOOST_CHANCE',  label: 'jumpPay', step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 24 },
-  { key: 'JUMP_BOOST_SECONDS', label: 'jumpSec', step: 0.5,  min: 0,    max: 15,    dp: 1, group: 24 },
+  /* THE LANDING REWARD. Every one of these decides whether a jump is
+     worth taking and how loud saying so is, which is exactly the sort of
+     thing that has to be found by driving into one. */
+  { key: 'JUMP_BOOST_SECONDS', label: 'jumpSec', step: 0.1,  min: 0,    max: 15,    dp: 2, group: 24 },
+  { key: 'JUMP_BOOST_BEST',    label: 'jumpTop', step: 0.1,  min: 0,    max: 15,    dp: 2, group: 24 },
+  { key: 'JUMP_LAND_SLIP_REF', label: 'landRef', step: 0.02, min: 0.05, max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_SLIP_WEIGHT',label:'landSlp',step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LIP_LOSS',      label: 'lipLoss', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_AIR_REF',  label: 'landAir', step: 0.02, min: 0.05, max: 3.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_AIR_WEIGHT',label: 'landAiW',step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_BAD_KEEP', label: 'landKeep',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_TIER_GOOD',     label: 'tierOne', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_TIER_BIG',      label: 'tierTwo', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_SHAKE_BIG',label: 'landBig', step: 1,    min: 0,    max: 30,    dp: 0, group: 24 },
+  { key: 'JUMP_LAND_BITS',     label: 'landBits',step: 2,    min: 0,    max: 80,    dp: 0, group: 24 },
+  { key: 'JUMP_LAND_BITS_GAIN',label: 'landMore',step: 2,    min: 0,    max: 120,   dp: 0, group: 24 },
+  { key: 'JUMP_LAND_PUFFS',    label: 'landPuff',step: 1,    min: 0,    max: 30,    dp: 0, group: 24 },
+  { key: 'JUMP_LAND_MARK',     label: 'landMark',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_FLARE',    label: 'landFlar',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_FLARE_TIME',label:'landFlrT',step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_THUMP',    label: 'landDrum',step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_LAND_THUMP_TIME',label:'landDrmT',step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 24 },
+  { key: 'HAZARD_WARN_ALPHA',  label: 'warnA',   step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'HAZARD_WARN_BARS',   label: 'warnBars',step: 1,    min: 0,    max: 12,    dp: 0, group: 24 },
+  { key: 'HAZARD_WARN_BAR_THICK',label:'warnThk',step: 0.05, min: 0.05, max: 2.0,   dp: 2, group: 24 },
+  { key: 'HAZARD_WARN_BAR_ALPHA',label:'warnBrA',step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 24 },
   { key: 'JUMP_RAMP_SEGMENTS', label: 'rampLen', step: 1,    min: 2,    max: 30,    dp: 0, group: 24 },
   { key: 'JUMP_RAMP_HEIGHT',   label: 'rampTop', step: 20,   min: 60,   max: 2000,  dp: 0, group: 24 },
   { key: 'JUMP_RAMP_HALF',     label: 'rampWide',step: 0.02, min: 0.1,  max: 1.0,   dp: 2, group: 24 },
@@ -6352,8 +6493,12 @@ function buildJumpPhrase() {
           + Math.round(FEEL.JUMP_EVERY * (0.7 + rng() * 0.6));
   addRun(lead + 2, 0, 0, roadWidth, 1, true);
   addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
-  jumps.push({ from: at, to: to, riding: false,
-               boost: rng() < FEEL.JUMP_BOOST_CHANCE, done: false });
+  /* NO COIN FLIP. Every jump pays now, so there is nothing left to draw
+     for and the draw is gone rather than left in to preserve a hash.
+     It DOES move the generator's stream by one value from here on, which
+     shifts the road built after the first jump: that is what removing a
+     generator input means and the road is rebuilt from the date daily. */
+  jumps.push({ from: at, to: to, riding: false, done: false });
   return true;
 }
 
@@ -6464,7 +6609,6 @@ let carVY = 0;
 let airTime = 0;
 let landSlow = 0;         // seconds of the landing speed penalty left
 let landSlowTo = 1;       // and how much it costs
-let landedBoost = false;  // this ramp carries a time extension
 // The two velocities the car left the lip with. Air steering moves both
 // of these together, which is what freezes the slip angle in flight.
 let airHeadingV = 0;
@@ -6563,7 +6707,6 @@ function startRun() {
   airTime = 0;
   landSlow = 0;
   landSlowTo = 1;
-  landedBoost = false;
   airHeadingV = 0;
   airLateralV = 0;
   camLift = 0;
@@ -6735,7 +6878,6 @@ function continueRun() {
   airTime = 0;
   landSlow = 0;
   landSlowTo = 1;
-  landedBoost = false;
   airHeadingV = 0;
   airLateralV = 0;
   camLift = 0;
@@ -7002,9 +7144,22 @@ function rampRide(carIndex, carFracZ, localHalf) {
     airTime = 0;
     airHeadingV = drift.headingV;
     airLateralV = drift.lateralV;
-    carVY = FEEL.JUMP_LAUNCH_V;
+    /* HOW MUCH OF THE LIP YOU ACTUALLY USED, and this is the whole of
+       what makes AIR TIME a variable.
+
+       MEASURED, IT WAS NOT ONE. carVY was a constant and gravity is a
+       constant, so every flight in this game lasted exactly 0.98
+       seconds, for everybody, always. Rewarding "a fuller commitment"
+       off the lip is impossible when the lip gives the same launch to a
+       car that clipped its outside edge as to one that hit the middle.
+
+       So it does not. Leaving squarely off the middle of the deck is the
+       full launch; scraping over the corner of it costs height, and the
+       cost is a share rather than a cliff so there is no line to learn,
+       just a thing that gets better the better you aim. */
+    const off = clamp(Math.abs(carX / localHalf) / FEEL.JUMP_RAMP_HALF, 0, 1);
+    carVY = FEEL.JUMP_LAUNCH_V * (1 - FEEL.JUMP_LIP_LOSS * off * off);
     carY = FEEL.JUMP_RAMP_HEIGHT;
-    landedBoost = j.boost;
     audioSting(STING_JUMP);
     return;
   }
@@ -7014,23 +7169,139 @@ function rampRide(carIndex, carFracZ, localHalf) {
 /* Back on the ground. FORGIVING BY DESIGN: only landing off the road
    kills. The scrape band is a bad landing rather than a fatal one, and it
    costs speed and a shake, which is a cost the player can drive out of. */
+/* HOW WELL IT WENT, 0 to 1, and it is the LANDING that is being scored.
+   Slip at touchdown is most of it because slip is what this game is
+   about; air time is the rest because a fuller commitment off the lip
+   should pay. Read once, at the moment of contact, and everything
+   downstream reads this one number: the time, the callout, the
+   particles, the shake, the flare and the note. */
+function landQuality(air) {
+  const slipQ = clamp(drift.slipNorm / Math.max(0.01, FEEL.JUMP_LAND_SLIP_REF), 0, 1);
+  const airQ = clamp(air / Math.max(0.01, FEEL.JUMP_LAND_AIR_REF), 0, 1);
+  return clamp(FEEL.JUMP_LAND_SLIP_WEIGHT * slipQ
+             + FEEL.JUMP_LAND_AIR_WEIGHT * airQ, 0, 1);
+}
+
 function land(localHalf) {
   airborne = false;
   carVY = 0;
+  // Read BEFORE it is cleared, because the flight is half the score.
+  const air = airTime;
   airTime = 0;
   const offset = Math.abs(carX / localHalf);
   if (offset > FEEL.OFF_ROAD) { crash(); return; }
   const bad = offset > FEEL.SCRAPE_START;
+  const q = bad ? 0 : landQuality(air);
+  /* THE RUNGS. Jumps are frequent, so the gap between a nod and the full
+     treatment is the whole of what keeps the full one worth having. */
+  const tier = bad ? -1
+             : q >= FEEL.JUMP_TIER_BIG ? 2
+             : q >= FEEL.JUMP_TIER_GOOD ? 1 : 0;
+
   landSlow = FEEL.JUMP_LAND_SLOW_TIME;
   landSlowTo = bad ? FEEL.JUMP_LAND_SLOW_BAD : FEEL.JUMP_LAND_SLOW;
-  addShake(bad ? FEEL.JUMP_LAND_SHAKE_BAD : FEEL.JUMP_LAND_SHAKE);
-  audioSting(bad ? STING_CLOSE : STING_LAND);
-  if (landedBoost) {
-    // Hitting the ramp is the whole of the earning. No ring, no pickup.
-    clock = Math.min(FEEL.CLOCK_MAX, clock + FEEL.JUMP_BOOST_SECONDS);
-    clockPop = FEEL.CLOCK_POP_TIME;
-    landedBoost = false;
+  // One source, capped, and it never sums. See addShake.
+  addShake(bad ? FEEL.JUMP_LAND_SHAKE_BAD
+                : tier === 2 ? FEEL.JUMP_LAND_SHAKE_BIG : FEEL.JUMP_LAND_SHAKE);
+
+  /* EVERY JUMP PAYS. One rule, learnable in one jump, which is the whole
+     reason the old coin flip had to go: a reward that turns up less than
+     half the time teaches nothing except that the ramp is unreliable. */
+  const pay = (FEEL.JUMP_BOOST_SECONDS + FEEL.JUMP_BOOST_BEST * q)
+            * (bad ? FEEL.JUMP_LAND_BAD_KEEP : 1);
+  clock = Math.min(FEEL.CLOCK_MAX, clock + pay);
+  clockPop = FEEL.CLOCK_POP_TIME;
+
+  landImpact(q, tier, bad, localHalf);
+  sayLanding(tier, pay);
+  audioLanding(tier, q, bad);
+}
+
+/* ------------------------------------------------------------------
+   THE TOUCHDOWN, and it is made of parts that already exist: the
+   explosion's particle pool, the drift smoke emitter, the tyre marks the
+   road already carries, and the world reaction the multiplier already
+   drives. Nothing here is a second system.
+
+   IT SCALES WITH THE LANDING. A routine one throws a handful of grit and
+   a puff; a great one throws the lot and briefly lifts the world. That
+   difference is the reward, and making it visible is what teaches the
+   rule without a word of copy, per section 5.
+   ------------------------------------------------------------------ */
+function landImpact(q, tier, bad, localHalf) {
+  /* GRIT OFF THE WHEELS. carParts holds where the rear wheels were drawn
+     last frame, which is where the contact actually looks like it
+     happened, and it is screen space exactly like the explosion. */
+  const n = Math.round(FEEL.JUMP_LAND_BITS + FEEL.JUMP_LAND_BITS_GAIN * q);
+  const sMin = Math.min(view.w, view.h);
+  for (let i = 0; i < n; i++) {
+    const p = takeParticle();
+    const side = (i & 1) ? 1 : -1;
+    p.x = side < 0 ? carParts.rlx : carParts.rrx;
+    p.y = side < 0 ? carParts.rly : carParts.rry;
+    /* Thrown OUTWARD and low, because that is what a wheel slapping down
+       does. Math.random, never rng(): rng belongs to the road generator
+       and drawing from it here would move the road. */
+    const a = -Math.PI * (0.15 + Math.random() * 0.35) * (side > 0 ? 1 : -1) - Math.PI / 2;
+    const v = sMin * (0.25 + 0.55 * Math.random()) * (0.6 + 0.7 * q);
+    p.vx = Math.cos(a) * v * side;
+    p.vy = Math.sin(a) * v;
+    p.r = carParts.scale * (0.055 + 0.085 * Math.random());
+    p.rot = Math.random() * Math.PI;
+    p.spin = (Math.random() * 2 - 1) * 6;
+    p.drag = FEEL.EXPLODE_DRAG;
+    p.grav = sMin * 1.4;
+    p.life = 0.22 + 0.34 * Math.random();
+    p.fade = p.life;
+    p.fuse = 0;
+    // Hot bits on a big one, the same two colours the explosion uses.
+    p.col = (tier === 2 && Math.random() < 0.4) ? PART_FIRE : PART_CAR;
   }
+
+  // And the smoke, straight through the emitter a corner uses.
+  const puffs = Math.round(FEEL.JUMP_LAND_PUFFS * (0.6 + q));
+  for (let i = 0; i < puffs; i++) spawnSmoke((i & 1) ? 1 : -1);
+
+  /* THE MARK BURNT IN. The tyre marks live on the road segments, so a
+     landing writes straight into the same store a corner does and the
+     stripe it leaves is the same stripe, laid hard. */
+  if (!bad) {
+    const axleZ = position + FEEL.CAMERA_DISTANCE - FEEL.CAR_WHEELBASE / 2;
+    const idx = Math.floor(axleZ / FEEL.SEGMENT_LENGTH);
+    const now = rearWheelOffsets(carX);
+    const l = now.left, r = now.right;
+    for (let i = idx - 1; i <= idx + 1; i++) {
+      const seg = segAt(i);
+      if (!seg) continue;
+      if (seg.ma === 0) { seg.ml0 = l / seg.hw; seg.mr0 = r / seg.hw; }
+      seg.ml1 = l / seg.hw;
+      seg.mr1 = r / seg.hw;
+      const a = FEEL.JUMP_LAND_MARK * (0.55 + 0.45 * q);
+      if (a > seg.ma) seg.ma = a;
+    }
+    lastMarkSeg = idx;
+  }
+
+  /* AND THE WORLD NOTICES. A spike on the same worldHeat and cityGlow the
+     multiplier drives, so the pylons and the skyline flare for a moment.
+     Well short of the finale, which owns the top of both, and only worth
+     having at all on a landing that earned it. */
+  if (tier === 2) landFlare = FEEL.JUMP_LAND_FLARE * q;
+}
+
+/* THE WORD, in the DRIFT lane so it never fights the checkpoint or the
+   best score channels, and with the seconds ON IT so the benefit is read
+   at the moment it is earned rather than inferred from the clock.
+
+   The routine rung is deliberately just the number. Something happened,
+   it paid, and the screen does not make a fuss about it, which is what
+   leaves room for the one that does. */
+function sayLanding(tier, pay) {
+  const secs = '+' + pay.toFixed(1) + 's';
+  if (tier < 0) { sayDrift('ROUGH LANDING  ' + secs, COLOUR.HAZARD_WARN, 1); return; }
+  if (tier === 0) { sayDrift(secs, COLOUR.GATE, 1); return; }
+  if (tier === 1) { sayDrift('CLEAN LANDING  ' + secs, COLOUR.SCORE, 1.15, true); return; }
+  sayDrift('SIDEWAYS LANDING  ' + secs, COLOUR.SCORE_BEST, 1.4, true);
 }
 
 /* The curvature the camera leans on. An average of the road ahead of the
@@ -8464,9 +8735,64 @@ function drawHazardWarnings(first, last, baseIndex) {
       }
     }
   }
+  if (any) {
+    ctx.globalAlpha = FEEL.HAZARD_WARN_ALPHA;
+    ctx.fillStyle = COLOUR.HAZARD_WARN;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  hazardBarriers(first, last, baseIndex);
+}
+
+/* THE BARRIER BARS, and they are the half of this that says STOP.
+
+   The arrows say where the gap is, which is useful and stays. What was
+   missing is anything that says do not go HERE, and without it a run of
+   marks on the road in front of a hazard has the same grammar as a run of
+   marks on the road in front of a ramp: pointed, forward facing, leading
+   you on. Two players read the two the wrong way round.
+
+   These are TRANSVERSE. Short bars laid straight across the blocked
+   width, near white on the hazard's own red, which is the striping every
+   road works on earth uses. A horizontal form cannot be confused with a
+   rising chevron at any speed or any distance, and it does not depend on
+   telling two colours apart. */
+function hazardBarriers(first, last, baseIndex) {
+  const warn = FEEL.HAZARD_WARN_SEGMENTS;
+  const count = FEEL.HAZARD_WARN_BARS;
+  const gap = Math.max(2, Math.floor(warn / Math.max(1, count)));
+  let any = false;
+  ctx.beginPath();
+  for (let k = 0; k < hazards.length; k++) {
+    const h = hazards[k];
+    if (h.from - warn > baseIndex + last || h.from < baseIndex + first) continue;
+    const seg = segAt(h.from);
+    if (!seg) continue;
+    const x = hazardX(h);
+    for (let m = 1; m <= count; m++) {
+      const at = h.from - m * gap;
+      const n = at - baseIndex;
+      if (n < first || n + 1 > last || !bvis[n] || !bvis[n + 1]) continue;
+      const st = segAt(at);
+      if (!st) continue;
+      /* The blocked width, plus the clip shoulder, because the shoulder
+         is where a scrape starts and the bar is the promise that the
+         whole of it is bad news. Fades toward the player so the run reads
+         as approaching rather than as a fence. */
+      const half = (h.half + FEEL.HAZARD_CLIP) / st.hw;
+      const thick = (by[n] - by[n + 1]) * FEEL.HAZARD_WARN_BAR_THICK;
+      any = true;
+      const l = bx[n] + bw[n] * (x - half), r = bx[n] + bw[n] * (x + half);
+      ctx.moveTo(l, by[n]);
+      ctx.lineTo(r, by[n]);
+      ctx.lineTo(r, by[n] - Math.max(1, thick));
+      ctx.lineTo(l, by[n] - Math.max(1, thick));
+      ctx.closePath();
+    }
+  }
   if (!any) return;
-  ctx.globalAlpha = 0.5;
-  ctx.fillStyle = COLOUR.HAZARD_WARN;
+  ctx.globalAlpha = FEEL.HAZARD_WARN_BAR_ALPHA;
+  ctx.fillStyle = COLOUR.HAZARD_WARN_BAR;
   ctx.fill();
   ctx.globalAlpha = 1;
 }
@@ -11126,6 +11452,8 @@ function updateCity(dt) {
   // The city too. Every window is lit at one, which a good run does
   // reach; the finale is what holds it there with nobody driving.
   if (finaleGlow > cityGlow) cityGlow = finaleGlow;
+  // The skyline too, so a great landing lifts the whole picture briefly.
+  if (landFlare > cityGlow) cityGlow = landFlare;
 
   /* The throb. Depth and rate both scale with the envelope, so at rest
      there is no pulse at all and only a hard sustained slide makes the
@@ -11252,6 +11580,12 @@ function driftWord(tier) {
 let gateFlash2 = 0;       // the crossing wash, separate from the score's own flash
 let wasScraping = false;
 let edgeClear = 0;        // seconds since the car was last in the scrape band
+/* THE LANDING FLARE. A short spike on the world reaction, set by a great
+   landing and decaying on its own, and it is a FLOOR on worldHeat and
+   cityGlow rather than an addition: it cannot take anything away from a
+   player who is already running hot, and it cannot push either past the
+   ceiling the finale owns. */
+let landFlare = 0;
 
 function resetSpectacle() {
   finaleT = -1;
@@ -11268,6 +11602,7 @@ function resetSpectacle() {
   finaleSpin = 0;
   finaleSwing = 0;
   finaleDriving = false;
+  landFlare = 0;
   worldHeat = 0;
   heatPulse = 1;
   cityGlow = 0;
@@ -11341,6 +11676,14 @@ function updateSpectacle(dt) {
      PAST the ceiling is done at the draw sites, because a worldHeat
      above one would run off the end of every ramp table that reads it. */
   if (finaleGlow > worldHeat) worldHeat = finaleGlow;
+  /* AND THE LANDING FLARE, on the same terms: a FLOOR rather than an
+     addition, so it can only ever lift a world that was cooler than the
+     landing deserved and can never push past the ceiling. Decays on its
+     own clock so the spike falls away without anything else driving it. */
+  if (landFlare > 0) {
+    landFlare = Math.max(0, landFlare - dt / Math.max(0.01, FEEL.JUMP_LAND_FLARE_TIME));
+    if (landFlare > worldHeat) worldHeat = landFlare;
+  }
   /* Phase off distance travelled rather than off a clock, so it is the
      world going past. Depth is multiplied by heat, so at a multiplier of
      one this is exactly 1 and there is no pulse at all. */
@@ -13432,6 +13775,10 @@ const STING_CHAIN = { notes: [19, 24, 28],     step: 0.065, gain: 0.12, decay: 0
 // landing falls, so the pair reads as one arc without a word of copy.
 const STING_JUMP  = { notes: [7, 14, 21, 26],  step: 0.045, gain: 0.13, decay: 0.20 };
 const STING_LAND  = { notes: [26, 19, 12],     step: 0.050, gain: 0.12, decay: 0.26 };
+/* And the top rung, which RISES where the ordinary landing falls. Same
+   ladder, opposite direction, which is the whole of the difference the
+   ear needs and it costs one line. */
+const STING_LAND_BIG = { notes: [12, 19, 24, 31], step: 0.048, gain: 0.15, decay: 0.30 };
 
 function audioSting(sting) {
   if (!audioOn()) return;
@@ -13446,6 +13793,40 @@ function audioSting(sting) {
     p.setValueAtTime(sting.gain, at);
     p.exponentialRampToValueAtTime(0.0001, at + sting.decay);
   }
+}
+
+/* THE LANDING, and it is two voices doing two jobs.
+
+   THE THUMP is the crash voice at a fraction of its gain: a short low
+   knock with the same fall in it, which is what a car dropping onto its
+   suspension sounds like and is already the one voice in this graph that
+   can make a body sound. It scales with the landing, so a routine one is
+   a tap and a great one lands.
+
+   THE STING only turns up on the top rung, rising rather than falling,
+   because a note that goes up is the arcade's own way of saying that was
+   good and it is the same figure the drift chain climbs. A routine
+   landing does NOT get one: jumps are frequent, and a fanfare on every
+   one of them is the clutter this whole section is written against. */
+function audioLanding(tier, q, bad) {
+  if (!audioOn()) return;
+  const a = audio;
+  const t = a.ac.currentTime;
+  const g = a.crashGain.gain;
+  const hit = FEEL.JUMP_LAND_THUMP * (bad ? 1.15 : 0.45 + 0.75 * q);
+  g.cancelScheduledValues(t);
+  g.setValueAtTime(0.0001, t);
+  g.linearRampToValueAtTime(hit, t + 0.008);
+  g.exponentialRampToValueAtTime(0.0001, t + FEEL.JUMP_LAND_THUMP_TIME);
+  const f = a.crashLow.frequency;
+  const from = FEEL.JUMP_LAND_THUMP_FREQ * (bad ? 0.8 : 1);
+  f.cancelScheduledValues(t);
+  f.setValueAtTime(from, t);
+  f.exponentialRampToValueAtTime(Math.max(20, from * 0.35),
+                                 t + FEEL.JUMP_LAND_THUMP_TIME);
+  if (bad) { audioSting(STING_CLOSE); return; }
+  if (tier >= 2) audioSting(STING_LAND_BIG);
+  else if (tier >= 1) audioSting(STING_LAND);
 }
 
 /* THE FANFARE, and it is on the EFFECTS bus.
