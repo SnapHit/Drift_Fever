@@ -1477,6 +1477,11 @@ const FEEL = {
      once the three lines under it, the air above the bottom button and
      the bottom button itself have taken theirs, which is what makes
      landscape work without a second layout. */
+  /* The wordmark's treatment on a line of type. Shares of the type size,
+     so the stroke and the shadow scale with it. See brandText. */
+  BRAND_TEXT_STROKE:      0.115,     // LIVE
+  BRAND_TEXT_SHADOW_X:    0.028,
+  BRAND_TEXT_SHADOW_Y:    0.038,
   TITLE_SCRIM_ALPHA:       0.84,     // LIVE, the wash over the running game
   TITLE_TOP:              0.055,     // of h, the margin above the wordmark
   TITLE_WM_WIDTH:          0.88,     // of w, the wordmark's ink width
@@ -1505,6 +1510,99 @@ const FEEL = {
   TITLE_CLOCK_ALPHA:       0.52,
   TITLE_SUB_ALPHA:         0.55,
 
+  /* ----------------------------------------------------------------
+     THE FINALE, WHICH IS THE ONE PLACE IN THIS GAME WHERE RESTRAINT IS
+     WRONG. Reaching the line is the hardest thing here and it used to be
+     a full stop: the car froze, the screen changed, nothing happened.
+
+     TWO PRINCIPLES SHAPE EVERY NUMBER BELOW.
+
+     THE CELEBRATION STARTS BEFORE THE LINE. FINALE_APPROACH is how hot
+     the world gets on the closing stretch, ramped continuously from the
+     final gate, so by the time the line arrives it already feels like
+     something is about to happen. If it all fired on the line it would
+     read as a stop rather than an arrival.
+
+     THE BEST FIREWORK IS THE GAME ITSELF. The world already intensifies
+     with the multiplier, and MEASURED over five minutes of hard driving
+     a good player reaches worldHeat 1.00 and cityGlow 1.00 and sits over
+     0.9 about a fifth of the time. So merely pinning those to one is not
+     "past anything reachable in normal play", it is Tuesday. The
+     FINALE_ over cap constants below go PAST the ceilings those systems
+     have, and they are the ones worth tuning first.
+
+     AND THE OVER CAP WAITS FOR THE CAR TO STOP. While the car is still
+     rolling the road has to stay readable, which is hard limit one and
+     is not suspended because the moment is nice. Once it has stopped
+     there is nothing left to read and spectacle takes over completely.
+     FINALE_FREE_TIME is that handover. */
+  FINALE_APPROACH:         0.62,     // LIVE, how hot the closing stretch gets
+  FINALE_SLAM:             0.09,     // seconds to reach full at the line
+  FINALE_HOLD:             3.40,     // LIVE, seconds the world stays at maximum
+  FINALE_COOL:             3.00,     // seconds to come back down afterwards
+  FINALE_HIT_STOP:         0.17,     // seconds the world stands still on the line
+  FINALE_SHAKE_PX:           14,     // LIVE, under SHAKE_MAX_PX, and it never sums
+  FINALE_FLASH_TIME:       0.60,
+  FINALE_FLASH_ALPHA:      0.46,     // LIVE
+  FINALE_COAST_TIME:       0.55,     // LIVE, seconds of roll before the car stops
+  FINALE_STOP_AT:          0.07,     // share of full speed that counts as stopped
+  FINALE_FREE_TIME:        0.60,     // seconds for the over cap to arrive once stopped
+  /* The two beats of the message. The banner lands first, alone and
+     large; the result arrives under it a beat later. */
+  FINALE_BANNER_AT:        0.20,     // seconds before TRACK COMPLETE lands
+  FINALE_BANNER_IN:        0.26,     // seconds it takes to land
+  FINALE_BANNER_SIZE:     0.108,     // of the smaller dimension, at its largest
+  /* THE BANNER TRAVELS BEFORE THE RESULT ARRIVES, not during it. Both
+     were hung off the same reveal at first and they crossed: the banner
+     was still coming down the screen while the records line was fading
+     up into it. The banner is home before the result exists. */
+  FINALE_BANNER_MOVE:      0.38,     // seconds it takes to settle into the headline
+  FINALE_REVEAL_AT:        1.70,     // seconds before the result starts arriving
+  FINALE_REVEAL_TIME:      0.55,
+  /* THE OVER CAP. Each of these is ADDED to a term that was already at
+     its own ceiling, so the world does something here it cannot do at a
+     multiplier of twelve with the city fully awake. */
+  FINALE_EDGE_GLOW:        0.30,     // LIVE, on top of HEAT_EDGE_GLOW
+  FINALE_EDGE_SPREAD:      1.60,     // LIVE
+  FINALE_PYLON_GLOW:       0.34,     // LIVE
+  FINALE_PYLON_SPREAD:     1.40,
+  FINALE_SKY_LIFT:         0.60,     // LIVE, on top of HEAT_SKYLINE_LIFT
+  FINALE_SKY_THICK:        1.80,
+  FINALE_HORIZON:          0.24,     // LIVE
+  FINALE_CITY_ALPHA:       0.60,     // LIVE, on top of CITY_ALPHA
+  /* ----------------------------------------------------------------
+     THE FIREWORKS, on the particle pool the explosion already uses
+     rather than a second system. Shells rise from along the road and
+     from where the finish structure went past, then burst.
+
+     GENEROUS SCALES WITH WHAT WAS ACHIEVED. finaleLevel counts the
+     things worth celebrating, and both the rate and the burst size read
+     it, so a clean run that took the record does not look like a
+     scrappy one that squeaked over. */
+  /* MEASURED AND CUT. At 0.26 with a second shell above level three
+     this was launching sixteen shells a second, which at forty two
+     sparks and a 1.2 second life is eight hundred live particles in a
+     four hundred and sixty slot pool: every burst was stealing from
+     the one before it and none of them was drawn whole. The rate and
+     the burst size both still climb with the level, and the top level
+     now settles at about four hundred live, which the pool holds. */
+  FIREWORK_EVERY:          0.34,     // LIVE, seconds between launches at level zero
+  FIREWORK_RATE_GAIN:      0.05,     // taken off that per level achieved
+  /* MEASURED, TWICE. At 0.72 the shells burst at head height and read
+     as sparks off the road; at 1.30 they burst level with the car. The
+     sky above the skyline is where a firework belongs, and on an 844
+     tall screen that is 450 pixels of climb from the launch line. */
+  FIREWORK_RISE:           0.80,     // seconds a shell climbs before it bursts
+  FIREWORK_SPEED:          1.85,     // LIVE, of the smaller dimension per second
+  FIREWORK_SPARKS:           24,     // LIVE, per burst at level zero
+  FIREWORK_SPARK_GAIN:        6,     // more per level
+  FIREWORK_SPARK_SPEED:    0.38,     // of the smaller dimension per second
+  FIREWORK_LIFE:           1.20,     // seconds a spark lives
+  FIREWORK_DRAG:           0.60,     // seconds, the velocity time constant
+  FIREWORK_GRAVITY:        0.34,     // of the smaller dimension per second squared
+  FIREWORK_SIZE:          0.0065,    // of the smaller dimension
+  FIREWORK_SHELL_SIZE:     0.60,     // of a spark, so the rising shell is smaller
+
   DEATH_BOTTOM:              96,     // pixels above the safe area, the button's centre
   DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
   RESUME_FLASH_TIME:       0.45,     // the wash on arriving back at the gate
@@ -1520,6 +1618,11 @@ const FEEL = {
      so the chosen station is deliberately NOT persisted: these are shared
      classroom machines and the next person to open the page gets silence.
      ---------------------------------------------------------------- */
+  /* The finish fanfare. On the effects bus, because music is off by
+     default and this has to land for somebody with it disabled. */
+  FANFARE_STEP:           0.085,     // LIVE, seconds between notes
+  FANFARE_GAIN:            0.19,     // LIVE, above a sting and below the master
+  FANFARE_TAIL:            1.60,     // LIVE, seconds the last note rings out
   AUDIO_MASTER:            0.55,     // the whole graph, never near 1
   AUDIO_FADE_TIME:         0.08,     // seconds, the follow on every live level
   AUDIO_START_TIME:        0.35,     // seconds to fade the graph in on a station change
@@ -2907,6 +3010,44 @@ function brandBitmap(art, boxW, boxH, dpr) {
   return c;
 }
 
+/* ------------------------------------------------------------------
+   THE WORDMARK'S TREATMENT, APPLIED TO TYPE.
+
+   The same three draws in the same order off the same three colours:
+   the shadow, offset and both filled and stroked, then the outline, then
+   the face. So a line of text set this way belongs to the brand without
+   anybody having to draw it as artwork.
+
+   THE OFFSET AND THE STROKE SCALE WITH THE TYPE, expressed as shares of
+   the size rather than as pixels, for exactly the reason the wordmark's
+   own do: a fixed stroke swallows the counters when it is small and
+   disappears when it is large.
+
+   Used by the finale banner and by nothing else so far. It is here
+   rather than beside drawBrand because it is a text helper.
+   ------------------------------------------------------------------ */
+function brandText(str, cx, cy, size, alpha) {
+  ctx.save();
+  if (alpha !== undefined) ctx.globalAlpha = alpha;
+  ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.lineWidth = size * FEEL.BRAND_TEXT_STROKE;
+  const dx = size * FEEL.BRAND_TEXT_SHADOW_X;
+  const dy = size * FEEL.BRAND_TEXT_SHADOW_Y;
+  ctx.fillStyle = BRAND.SHADOW;
+  ctx.strokeStyle = BRAND.SHADOW;
+  ctx.strokeText(str, cx + dx, cy + dy);
+  ctx.fillText(str, cx + dx, cy + dy);
+  ctx.strokeStyle = BRAND.OUTLINE;
+  ctx.strokeText(str, cx, cy);
+  ctx.fillStyle = BRAND.FILL;
+  ctx.fillText(str, cx, cy);
+  ctx.restore();
+}
+
 /* Centres the INK on cx, cy at the given ink width, and returns the ink
    height so callers can stack under it. */
 function drawBrandInk(art, cx, cy, inkWidth, alpha) {
@@ -3163,6 +3304,54 @@ const TUNABLES = [
   /* The boot splash. Changing these mid splash cannot restart it, which
      is correct: it is a cold load event and nothing may re trigger it.
      Reload to see a change, which is what the author does anyway. */
+  /* THE FINALE, group 28, which is new. The author asked for every one of
+     these on the cycler and especially the intensity, so the over cap
+     constants are all here and all steppable while the thing is on
+     screen. FINALE_HOLD and FINALE_COOL are long enough that there is
+     time to nudge a value and watch it change. */
+  { key: 'BRAND_TEXT_STROKE',  label: 'bTxtStk', step: 0.005,min: 0,    max: 0.4,   dp: 3, group: 28 },
+  { key: 'BRAND_TEXT_SHADOW_X',label: 'bTxtSX',  step: 0.004,min: -0.2, max: 0.2,   dp: 3, group: 28 },
+  { key: 'BRAND_TEXT_SHADOW_Y',label: 'bTxtSY',  step: 0.004,min: -0.2, max: 0.2,   dp: 3, group: 28 },
+  { key: 'FANFARE_STEP',       label: 'fanStep', step: 0.005,min: 0.01, max: 0.4,   dp: 3, group: 28 },
+  { key: 'FANFARE_GAIN',       label: 'fanGain', step: 0.01, min: 0,    max: 0.5,   dp: 2, group: 28 },
+  { key: 'FANFARE_TAIL',       label: 'fanTail', step: 0.10, min: 0.1,  max: 5.0,   dp: 2, group: 28 },
+  { key: 'FINALE_APPROACH',    label: 'finRamp', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_SLAM',        label: 'finSlam', step: 0.01, min: 0,    max: 1.0,   dp: 2, group: 28 },
+  { key: 'FINALE_HOLD',        label: 'finHold', step: 0.10, min: 0,    max: 8.0,   dp: 2, group: 28 },
+  { key: 'FINALE_COOL',        label: 'finCool', step: 0.10, min: 0.1,  max: 10.0,  dp: 2, group: 28 },
+  { key: 'FINALE_HIT_STOP',    label: 'finStop', step: 0.01, min: 0,    max: 0.6,   dp: 2, group: 28 },
+  { key: 'FINALE_SHAKE_PX',    label: 'finShake',step: 1,    min: 0,    max: 30,    dp: 0, group: 28 },
+  { key: 'FINALE_FLASH_TIME',  label: 'finFlsT', step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 28 },
+  { key: 'FINALE_FLASH_ALPHA', label: 'finFlsA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_COAST_TIME',  label: 'finRoll', step: 0.05, min: 0.05, max: 4.0,   dp: 2, group: 28 },
+  { key: 'FINALE_STOP_AT',     label: 'finStil', step: 0.01, min: 0.01, max: 0.5,   dp: 2, group: 28 },
+  { key: 'FINALE_FREE_TIME',   label: 'finFree', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 28 },
+  { key: 'FINALE_BANNER_AT',   label: 'finBanA', step: 0.05, min: 0,    max: 3.0,   dp: 2, group: 28 },
+  { key: 'FINALE_BANNER_IN',   label: 'finBanI', step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 28 },
+  { key: 'FINALE_BANNER_SIZE', label: 'finBanS', step: 0.004,min: 0.03, max: 0.30,  dp: 3, group: 28 },
+  { key: 'FINALE_BANNER_MOVE', label: 'finBanM', step: 0.02, min: 0.02, max: 2.0,   dp: 2, group: 28 },
+  { key: 'FINALE_REVEAL_AT',   label: 'finRevA', step: 0.10, min: 0,    max: 8.0,   dp: 2, group: 28 },
+  { key: 'FINALE_REVEAL_TIME', label: 'finRevT', step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 28 },
+  { key: 'FINALE_EDGE_GLOW',   label: 'finEdgA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_EDGE_SPREAD', label: 'finEdgS', step: 0.10, min: 0,    max: 6,     dp: 2, group: 28 },
+  { key: 'FINALE_PYLON_GLOW',  label: 'finPylA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_PYLON_SPREAD',label: 'finPylS', step: 0.10, min: 0,    max: 6,     dp: 2, group: 28 },
+  { key: 'FINALE_SKY_LIFT',    label: 'finSkyL', step: 0.05, min: 0,    max: 2,     dp: 2, group: 28 },
+  { key: 'FINALE_SKY_THICK',   label: 'finSkyT', step: 0.10, min: 0,    max: 6,     dp: 2, group: 28 },
+  { key: 'FINALE_HORIZON',     label: 'finHorz', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FINALE_CITY_ALPHA',  label: 'finCity', step: 0.02, min: 0,    max: 1,     dp: 2, group: 28 },
+  { key: 'FIREWORK_EVERY',     label: 'fwEvery', step: 0.02, min: 0.02, max: 2.0,   dp: 2, group: 28 },
+  { key: 'FIREWORK_RATE_GAIN', label: 'fwGain',  step: 0.005,min: 0,    max: 0.10,  dp: 3, group: 28 },
+  { key: 'FIREWORK_RISE',      label: 'fwRise',  step: 0.02, min: 0.05, max: 2.0,   dp: 2, group: 28 },
+  { key: 'FIREWORK_SPEED',     label: 'fwUp',    step: 0.02, min: 0.05, max: 2.0,   dp: 2, group: 28 },
+  { key: 'FIREWORK_SPARKS',    label: 'fwSpark', step: 2,    min: 2,    max: 90,    dp: 0, group: 28 },
+  { key: 'FIREWORK_SPARK_GAIN',label: 'fwSprkG', step: 1,    min: 0,    max: 30,    dp: 0, group: 28 },
+  { key: 'FIREWORK_SPARK_SPEED',label:'fwBurst', step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 28 },
+  { key: 'FIREWORK_LIFE',      label: 'fwLife',  step: 0.05, min: 0.1,  max: 4.0,   dp: 2, group: 28 },
+  { key: 'FIREWORK_DRAG',      label: 'fwDrag',  step: 0.05, min: 0.05, max: 3.0,   dp: 2, group: 28 },
+  { key: 'FIREWORK_GRAVITY',   label: 'fwGrav',  step: 0.02, min: 0,    max: 2.0,   dp: 2, group: 28 },
+  { key: 'FIREWORK_SIZE',      label: 'fwSize',  step: 0.001,min: 0.001,max: 0.04,  dp: 4, group: 28 },
+  { key: 'FIREWORK_SHELL_SIZE',label: 'fwShell', step: 0.05, min: 0.1,  max: 2.0,   dp: 2, group: 28 },
   { key: 'BOOT_FADE_IN',       label: 'bootIn',  step: 0.02, min: 0,    max: 2.0,   dp: 2, group: 20 },
   { key: 'BOOT_HOLD',          label: 'bootHold',step: 0.10, min: 0,    max: 6.0,   dp: 2, group: 20 },
   { key: 'BOOT_FADE_OUT',      label: 'bootOut', step: 0.02, min: 0,    max: 2.0,   dp: 2, group: 20 },
@@ -6254,6 +6443,13 @@ function startOrRestart() {
   /* A finished run restarts and never continues. There is nothing to
      continue from: the track is over, and the one action stays one
      action. */
+  /* THE FINALE IS SKIPPED BY THE SAME ONE ACTION THAT RESTARTS, and it
+     is tested FIRST and without the input lock, so it can be cut on its
+     very first frame. Section 5 is not suspended because the moment is
+     nice: the impatient path is one tap to the result and a second to
+     run it again, which is exactly what it was before any of this
+     existed. */
+  if (state === FINISHED && finaleRunning()) { skipFinale(); return; }
   if (state === FINISHED && deadFor >= FEEL.DEATH_INPUT_LOCK) { startRun(); return; }
   if (state === DEAD && deadFor >= FEEL.DEATH_INPUT_LOCK) {
     // The reflex tap continues when there is somewhere to continue from,
@@ -6288,7 +6484,16 @@ function update(dt) {
      completion screen is drawn over. Only the clock on the screen itself
      runs, and it runs on real time so the input lock and the score roll
      behave exactly as they do on the death screen. */
-  if (state === FINISHED) { deadFor += dt; return; }
+  /* THE CAR CARRIES ON PAST THE LINE. It used to stop dead on the
+     instant it crossed, which is what made the finish read as a full
+     stop: the most that has ever been achieved in this game, and the
+     car behaved as though the tab had been closed.
+
+     It keeps its speed, bleeds it off, and keeps whatever sideways
+     motion it had, so it drifts to a halt rather than braking. Nothing
+     can kill it here: the edge test is not run, because the run is over
+     and falling off the road after finishing would be absurd. */
+  if (state === FINISHED) { updateFinishRoll(dt); return; }
   /* THE TITLE SCREEN NEEDS A CLOCK OF ITS OWN. Nothing else advances
      there: runTime belongs to a run and deadFor to a run that ended, so
      a blink hung off either would sit frozen. This is the only thing
@@ -6609,6 +6814,42 @@ function crash(kind) {
 
    An impact does not fall. It stopped against something solid, so the
    car stays where it hit and the debris carries the motion instead. */
+/* The run out. The sibling of updateFall, and deliberately shaped like
+   it: one decaying speed, the same lateral carry, and no collision of any
+   kind. The camera is NOT touched. Section 7 warns about overdoing
+   motion and the camera has caused more complaints on this project than
+   anything else, so it holds still while everything else erupts. */
+function updateFinishRoll(dt) {
+  deadFor += dt;
+  coastSpeed *= Math.exp(-dt / FEEL.FINALE_COAST_TIME);
+  position += coastSpeed * dt;
+
+  // The road has to keep arriving under a car that is still moving.
+  topUpRoad(Math.floor(position / FEEL.SEGMENT_LENGTH));
+  carSegIndex = Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+
+  /* The slide bleeds off on its own time constant, so the tail of the
+     run out is the car straightening rather than snapping straight. */
+  const k = Math.exp(-dt / FEEL.FINALE_COAST_TIME);
+  drift.lateralV *= k;
+  drift.headingV *= k;
+  carX += drift.lateralV * dt;
+  const seg = segAt(carSegIndex);
+  carFrac = carX / (seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE);
+  drift.headingAngle = Math.atan(drift.headingV / Math.max(1, FEEL.SPEED));
+  drift.travelAngle = Math.atan(drift.lateralV / Math.max(1, FEEL.SPEED));
+  drift.slip = drift.headingAngle - drift.travelAngle;
+  drift.slipDeg = drift.slip * 180 / Math.PI;
+  drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
+
+  /* AND THIS IS THE HANDOVER. While there is a car moving on it the road
+     has to stay readable; the moment there is not, the over cap is free
+     to take the screen. One comparison, one flag, and drawing reads it. */
+  if (finaleRolling && coastSpeed <= FEEL.SPEED * FEEL.FINALE_STOP_AT) {
+    finaleRolling = false;
+  }
+}
+
 function updateFall(dt) {
   deadFor += dt;
   if (deathKind === HIT_OBJECT) return;
@@ -6890,7 +7131,14 @@ function drawSkyline(w, h) {
     if (any) {
       // Brighter as well as more numerous, but the alpha is the thing the
       // hard rule bites on and it is capped by CITY_ALPHA.
-      ctx.globalAlpha = FEEL.CITY_ALPHA * (0.45 + 0.55 * cityGlow) * cityPulse;
+      /* THE ONE THING THE CITY CANNOT DO IN PLAY. cityGlow reaches one
+         on a good run, which lights every window, but the ALPHA is
+         capped at CITY_ALPHA and nothing in the game may pass it. The
+         finale passes it, once the car has stopped and there is no road
+         left to read. */
+      ctx.globalAlpha = Math.min(1,
+        FEEL.CITY_ALPHA * (0.45 + 0.55 * cityGlow) * cityPulse
+        + FEEL.FINALE_CITY_ALPHA * finaleFree);
       ctx.fillStyle = COLOUR.SKYLINE_WINDOW;
       ctx.fill();
       ctx.globalAlpha = 1;
@@ -6903,7 +7151,8 @@ function drawSkyline(w, h) {
      own hot hue. The building bodies are deliberately left alone, because
      they are the silhouette the far road is read against and lifting them
      would cost contrast rather than buy anything. */
-  const lit = 1.5 + FEEL.HEAT_SKYLINE_THICK * worldHeat * heatPulse;
+  const lit = 1.5 + FEEL.HEAT_SKYLINE_THICK * worldHeat * heatPulse
+            + FEEL.FINALE_SKY_THICK * finaleFree;
   ctx.beginPath();
   for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
     for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
@@ -6913,7 +7162,10 @@ function drawSkyline(w, h) {
       ctx.rect(x, baseY - th, step * 0.86, lit);
     }
   }
-  ctx.fillStyle = rampAt(SKYLINE_HOT_RAMP, worldHeat * FEEL.HEAT_SKYLINE_LIFT);
+  // The ramp clamps its own index, so the finale term simply drives it
+  // to the hot end and holds it there rather than running off it.
+  ctx.fillStyle = rampAt(SKYLINE_HOT_RAMP, worldHeat * FEEL.HEAT_SKYLINE_LIFT
+                                           + FEEL.FINALE_SKY_LIFT * finaleFree);
   ctx.fill();
 }
 
@@ -8126,11 +8378,19 @@ function edgeGlowPass(first, last) {
   if (worldHeat <= 0.01) return;
 
   const lip = FEEL.EDGE_LIP_FRACTION;
-  const spread = FEEL.EDGE_GLOW_SPREAD * (1 + FEEL.HEAT_EDGE_SPREAD * worldHeat);
+  /* PAST THE CEILING, and only once the car has stopped. worldHeat is
+     already one at this point, so these two terms are the whole of what
+     the finale adds: an edge burning wider and brighter than a
+     multiplier of twelve can buy. finaleFree is zero for every frame the
+     car is still rolling, which is hard limit one holding. */
+  const spread = FEEL.EDGE_GLOW_SPREAD
+               * (1 + FEEL.HEAT_EDGE_SPREAD * worldHeat
+                    + FEEL.FINALE_EDGE_SPREAD * finaleFree);
   ctx.beginPath();
   glowBandPath(first, last, EDGE_OUT - lip - spread, EDGE_OUT - lip, true);
   glowBandPath(first, last, EDGE_OUT, EDGE_OUT + spread, true);
-  ctx.globalAlpha = FEEL.HEAT_EDGE_GLOW * worldHeat;
+  ctx.globalAlpha = Math.min(1, FEEL.HEAT_EDGE_GLOW * worldHeat
+                                + FEEL.FINALE_EDGE_GLOW * finaleFree);
   ctx.fillStyle = EDGE_GLOW_FILL;
   ctx.fill();
   ctx.globalAlpha = 1;
@@ -8266,10 +8526,12 @@ function drawPylons(first, last, baseIndex, w) {
      edge outboard of which they stand is untouched. heatPulse is exactly
      1 at a multiplier of one, so at rest this is the old drawing to the
      pixel and there is no pulse to notice. */
-  const glow = FEEL.PYLON_GLOW_SPREAD * (1 + FEEL.HEAT_PYLON_SPREAD * worldHeat);
+  const glow = FEEL.PYLON_GLOW_SPREAD * (1 + FEEL.HEAT_PYLON_SPREAD * worldHeat
+                                            + FEEL.FINALE_PYLON_SPREAD * finaleFree);
   pylonPath(first, last, baseIndex, spacing, glow, scaleH, 2);
   ctx.globalAlpha = Math.min(1,
-    (FEEL.PYLON_GLOW_ALPHA + FEEL.HEAT_PYLON_GLOW * worldHeat) * heatPulse);
+    (FEEL.PYLON_GLOW_ALPHA + FEEL.HEAT_PYLON_GLOW * worldHeat) * heatPulse
+    + FEEL.FINALE_PYLON_GLOW * finaleFree);
   ctx.fillStyle = PYLON_GLOW_FILL;
   ctx.fill();
   ctx.globalAlpha = 1;
@@ -9030,13 +9292,19 @@ let creditWant = false;      // did this frame ask for it
    session's brief forbids. */
 let creditShown = false;     // and is it actually in the document
 
-function placeCredit(cx, cy, width, height) {
+/* fade is the completion screen's reveal, so the lockup arrives with the
+   rest of the result rather than snapping in at full strength under it.
+   It is in the key, rounded, because the key is what stops this writing
+   to the DOM on a frame where nothing moved. */
+function placeCredit(cx, cy, width, height, fade) {
   creditWant = true;
-  const key = Math.round(cx) + ':' + Math.round(cy) + ':' + Math.round(width);
+  const a = FEEL.CREDIT_ALPHA * (fade === undefined ? 1 : fade);
+  const key = Math.round(cx) + ':' + Math.round(cy) + ':' + Math.round(width)
+            + ':' + Math.round(a * 50);
   if (key === creditKey) return;
   creditKey = key;
   creditEl.style.width = width + 'px';
-  creditEl.style.opacity = FEEL.CREDIT_ALPHA;
+  creditEl.style.opacity = a;
   // transform rather than left and top, so this never triggers a layout.
   creditEl.style.transform = 'translate(' + (cx - width / 2) + 'px,'
                                           + (cy - height / 2) + 'px)';
@@ -9080,7 +9348,7 @@ function syncCredit() {
 let creditPlate = null;
 let creditPlateKey = '';
 
-function drawCredit(w, s, cy) {
+function drawCredit(w, s, cy, fade) {
   const width = s * FEEL.CREDIT_WIDTH;
   const height = width / LOCKUP_ASPECT;
   const rx = width * FEEL.CREDIT_PLATE_WIDE;
@@ -9113,7 +9381,7 @@ function drawCredit(w, s, cy) {
 
   // And the lockup itself, which is DOM. Nothing is written unless the
   // geometry actually moved.
-  placeCredit(w / 2, cy, width, height);
+  placeCredit(w / 2, cy, width, height, fade);
 }
 
 /* The size that makes a string fill a share of the width and no more,
@@ -9546,35 +9814,101 @@ function drawFinish(w, h) {
      heights it separates. */
   const y0 = Math.min(Math.max(s * 0.06, h * 0.10), Math.max(0, h * 0.5 - s * 0.44));
 
-  ctx.globalAlpha = 0.8;
-  text('TRACK COMPLETE', w / 2, y0, Math.round(s * 0.034), '700', 'center', COLOUR.GATE);
-  ctx.globalAlpha = 1;
+  /* ----------------------------------------------------------------
+     TWO BEATS. The banner lands first, large and alone in the middle of
+     the screen, and the result arrives under it a moment later, at which
+     point the banner has travelled up to the top of the stack and shrunk
+     into being its headline. One element, two positions, one lerp: it
+     reads as the banner settling into place rather than as one thing
+     being replaced by another.
 
-  /* The binary, and it is the loudest thing here. A clean run pulses in
-     the score's own gold; a continued one says so plainly and does not,
-     because it is not the same achievement and the screen must not
-     pretend otherwise. */
-  if (finishClean) {
-    ctx.globalAlpha = 0.74 + 0.26 * Math.abs(Math.sin(deadFor * 4.5));
-    const label = 'CLEAN RUN';
-    text(label, w / 2, y0 + s * 0.066,
-         fittedSize(label, '900', Math.round(s * 0.072), w * 0.9), '900',
+     Skipping winds both to the end, so an impatient tap gets the
+     finished layout with no animation at all rather than a fast one.
+     ---------------------------------------------------------------- */
+  const bIn = finaleBanner();
+  const set = finaleSettle();
+  const rev = finaleReveal();
+  let bannerCy = y0;
+  if (bIn > 0) {
+    // Overshoot slightly on the way in, so it lands rather than fades.
+    const pop = bIn < 1 ? 1 + 0.16 * Math.sin(bIn * Math.PI) : 1;
+    /* FITTED, like every other headline in this file. The wordmark's
+       treatment adds a stroke either side of the glyphs, so the ink is
+       wider than the type is and a size that fits as text runs off the
+       edge as brand text. The stroke is a share of the size, so backing
+       the target width off by that share is exact rather than a guess. */
+    const big = s * FEEL.FINALE_BANNER_SIZE, small = s * 0.042;
+    const room = w * 0.92 * (1 - FEEL.BRAND_TEXT_STROKE)
+               - s * FEEL.BRAND_TEXT_SHADOW_X * 2;
+    const want = Math.round((big + (small - big) * set) * pop);
+    const size = fittedSize('TRACK COMPLETE', '900', want, room);
+    bannerCy = (h * 0.42) + (y0 - h * 0.42) * set;
+    brandText('TRACK COMPLETE', w / 2, bannerCy, Math.max(8, size),
+              Math.min(1, bIn * 1.4));
+  }
+
+  /* THE BADGE, and it is the reason the finale was loud. Only present
+     when there is something to say, only while the banner is still the
+     hero, and it fades out as the result takes over because the result
+     says all of this again in its own words. */
+  const badge = finaleBadge();
+  if (badge && bIn > 0 && set < 1) {
+    // Hung off the banner's own position, so the pair travels together
+    // rather than the badge sitting where the banner used to be.
+    ctx.globalAlpha = Math.min(1, bIn * 1.4) * (1 - set)
+                    * (0.75 + 0.25 * Math.abs(Math.sin(deadFor * 6)));
+    text(badge, w / 2, bannerCy + s * FEEL.FINALE_BANNER_SIZE * 0.9,
+         fittedSize(badge, '800', Math.round(s * 0.046), w * 0.9), '800',
          'center', COLOUR.SCORE_BEST);
-    ctx.globalAlpha = 1;
-  } else {
-    const label = continues === 1 ? 'ONE CONTINUE' : continues + ' CONTINUES';
-    ctx.globalAlpha = 0.85;
-    text(label, w / 2, y0 + s * 0.066,
-         fittedSize(label, '800', Math.round(s * 0.056), w * 0.9), '800',
-         'center', COLOUR.SCORE);
     ctx.globalAlpha = 1;
   }
 
-  arcadeNumber(String(shown), w / 2, y0 + s * 0.168, Math.round(s * 0.108),
+  /* AND EVERYTHING BELOW IS THE RESULT, which does not exist until the
+     reveal has started. Nothing here is on the path to anything: the
+     restart is live the moment the input lock is up, whatever this is
+     doing. */
+  if (rev <= 0) { restartRect.live = false; shareRect.live = false; return; }
+  ctx.save();
+  /* EVERY alpha below this line is multiplied through the reveal, because
+     a canvas globalAlpha REPLACES rather than compounds: setting the save
+     to rev and then setting 0.6 for a label throws the fade away for that
+     label, and the result arrives as half of it fading up and half of it
+     popping. */
+  ctx.globalAlpha = rev;
+
+  /* The binary, and it is the loudest thing here. A clean run is the
+     hardest thing in the game, so on a clean run it is the hero and the
+     score steps down to make room: same outlined treatment as the number,
+     larger than it, pulsing in the record gold. A continued run says so
+     plainly and does not, because it is not the same achievement and the
+     screen must not pretend otherwise, and there the score is the hero
+     again.
+
+     The two stacks swap sizes rather than adding any, so the run of gaps
+     below is unchanged and nothing new can collide with the credit. */
+  let numY = y0 + s * 0.168, numSize = Math.round(s * 0.108);
+  if (finishClean) {
+    const label = 'CLEAN RUN';
+    numY = y0 + s * 0.172; numSize = Math.round(s * 0.082);
+    ctx.globalAlpha = (0.74 + 0.26 * Math.abs(Math.sin(deadFor * 4.5))) * rev;
+    arcadeNumber(label, w / 2, y0 + s * 0.078,
+                 fittedSize(label, '900', Math.round(s * 0.100), w * 0.9),
+                 COLOUR.SCORE_BEST);
+    ctx.globalAlpha = rev;
+  } else {
+    const label = continues === 1 ? 'ONE CONTINUE' : continues + ' CONTINUES';
+    ctx.globalAlpha = 0.85 * rev;
+    text(label, w / 2, y0 + s * 0.066,
+         fittedSize(label, '800', Math.round(s * 0.056), w * 0.9), '800',
+         'center', COLOUR.SCORE);
+    ctx.globalAlpha = rev;
+  }
+
+  arcadeNumber(String(shown), w / 2, numY, numSize,
                finishRecord ? COLOUR.SCORE_BEST : COLOUR.SCORE);
 
   // The same scan on the completion screen. See drawResult.
-  drawCredit(w, s, y0 + s * 0.2349);
+  drawCredit(w, s, y0 + s * 0.2349, rev);
 
   /* The run in figures. TIME is what the ghost is raced against, so the
      margin against it sits directly under the time rather than in a
@@ -9587,9 +9921,9 @@ function drawFinish(w, h) {
   const step = span / cols.length;
   for (let i = 0; i < cols.length; i++) {
     const cx = w / 2 + (i - (cols.length - 1) / 2) * step;
-    ctx.globalAlpha = 0.6;
+    ctx.globalAlpha = 0.6 * rev;
     text(cols[i][0], cx, rowY, Math.round(s * 0.028), '700');
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = rev;
     ctx.font = '700 ' + Math.round(s * 0.044) + 'px ' + MONO;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -9617,24 +9951,27 @@ function drawFinish(w, h) {
     line = 'THIS RUN IS YOUR NEW GHOST';
     colour = COLOUR.GATE;
   }
-  ctx.globalAlpha = 0.82;
+  ctx.globalAlpha = 0.82 * rev;
   text(line, w / 2, y0 + s * 0.360,
        fittedSize(line, '700', Math.round(s * 0.031), w * 0.9), '700', 'center', colour);
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = rev;
 
   const rec = 'TRACK #' + trackNumber(todayStamp) + '     TODAY  ' + dailyBest
             + (dailyTime > 0 ? '     ' + timeLabel(dailyTime) : '');
-  ctx.globalAlpha = 0.66;
+  ctx.globalAlpha = 0.66 * rev;
   text(rec, w / 2, y0 + s * 0.405,
        fittedSize(rec, '700', Math.round(s * 0.028), w * 0.9), '700');
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = rev;
 
   /* One action, and there is nothing to continue from: the track is
      over. No restart button either, because with no continue on offer
      the reflex tap already restarts and a second way to do the same
      thing is clutter. That is the death screen's own rule. */
+  ctx.restore();
+
   restartRect.live = false;
   shareRect.live = false;
+  if (rev < 1) return;
   if (deadFor < FEEL.DEATH_INPUT_LOCK) return;
   if (tiltCalOnScreen()) return;
   const btnY = h - safeBottom - FEEL.DEATH_BOTTOM;
@@ -10204,6 +10541,10 @@ function finishRun() {
   /* The margin against the line the ghost was recorded on, which is only
      meaningful if that run reached the line too. */
   finishMargin = (finishClean && dailyTime > 0) ? finishTime - dailyTime : null;
+  /* BEFORE the bank, because banking is what sets dailyDone, and the
+     finale wants to know whether this was the first clean finish of the
+     day rather than whether it is one now. */
+  finaleFirstToday = !dailyDone;
   finishRecord = bankScore(true);
   // The margin above is read off the record's time, so the line is kept
   // after it, not before, or a run would be measured against itself.
@@ -10219,9 +10560,12 @@ function finishRun() {
   gateFlash = FEEL.CHECKPOINT_FLASH;
   gateFlash2 = FEEL.CHECKPOINT_FLASH;
   clockPop = 0;
-  addShake(FEEL.GATE_SHAKE_PX);
-  audioSting(STING_BEST);
   coastSpeed = FEEL.SPEED;
+  /* Everything at once, on the line. The shake goes through addShake like
+     every other source, so it is capped and it does not sum with the
+     gate's own. */
+  startFinale();
+  audioFanfare(finaleLevel);
 }
 
 function updateScore(dt) {
@@ -10449,6 +10793,9 @@ function updateCity(dt) {
      a thousandth of a window for the rest of the run, which is the same
      class of mistake as the latch it replaces. */
   if (target <= 0 && cityGlow < FEEL.CITY_SILENT) cityGlow = 0;
+  // The city too. Every window is lit at one, which a good run does
+  // reach; the finale is what holds it there with nobody driving.
+  if (finaleGlow > cityGlow) cityGlow = finaleGlow;
 
   /* The throb. Depth and rate both scale with the envelope, so at rest
      there is no pulse at all and only a hard sustained slide makes the
@@ -10577,6 +10924,13 @@ let wasScraping = false;
 let edgeClear = 0;        // seconds since the car was last in the scrape band
 
 function resetSpectacle() {
+  finaleT = -1;
+  finaleLevel = 0;
+  finaleGlow = 0;
+  finaleFree = 0;
+  finaleFlash = 0;
+  finaleRolling = false;
+  fireworkDue = 0;
   worldHeat = 0;
   heatPulse = 1;
   cityGlow = 0;
@@ -10633,6 +10987,9 @@ function updateSpectacle(dt) {
   if (gateFlash2 > 0) gateFlash2 -= dt;
   if (resumeFlash > 0) resumeFlash -= dt;
   if (explodeFlash > 0) explodeFlash -= dt;
+  /* Before the debris, because a shell that bursts this frame should
+     have its sparks moved this frame rather than next. */
+  updateFinale(dt);
   updateDebris(dt);
 
   const driving = state === DRIVING;
@@ -10640,6 +10997,13 @@ function updateSpectacle(dt) {
     ? Math.pow(clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1), FEEL.HEAT_CURVE)
     : 0;
   worldHeat += (want - worldHeat) * (1 - Math.exp(-dt / FEEL.HEAT_TIME));
+  /* THE FINALE OWNS THE FLOOR OF BOTH SYSTEMS. It cannot lower them, so
+     a player who arrives at the line already at full heat loses nothing,
+     and it holds them at their ceiling for the whole of the finale,
+     which no amount of driving can do once the car has stopped. Going
+     PAST the ceiling is done at the draw sites, because a worldHeat
+     above one would run off the end of every ramp table that reads it. */
+  if (finaleGlow > worldHeat) worldHeat = finaleGlow;
   /* Phase off distance travelled rather than off a clock, so it is the
      world going past. Depth is multiplied by heat, so at a multiplier of
      one this is exactly 1 and there is no pulse at all. */
@@ -10752,21 +11116,73 @@ function updateSpectacle(dt) {
    nothing for world space to buy, and screen space means the whole effect
    is a handful of numbers and one batched path.
    ================================================================== */
+/* ONE POOL, TWO CUSTOMERS, and the fireworks are the second one. The
+   finale wanted particles and this system already had all of them:
+   screen space, pooled, no allocation, batched by colour. Writing a
+   second one would have been two update loops and two draw loops for the
+   same handful of numbers.
+
+   `col` is the batch a piece belongs to and it is the only thing that
+   differs between a lump of car and a firework spark. `fuse` is the one
+   addition: a piece with a fuse is a SHELL, which climbs, is not drawn
+   like a spark, and BURSTS into sparks when the fuse runs out.
+
+   THE POOL IS SIZED FOR THE FINALE and the explosion barely touches it.
+   A crash uses a few dozen; a burst at the top level uses fifty and
+   several can be in the air at once. Allocation is at load and never
+   again, so the cost of the bigger pool is one array of small objects.
+
+   SIZED OFF A MEASUREMENT, WITH HEADROOM. A top level finale peaks at
+   between 380 and 443 live pieces depending on how the launches happen
+   to land, so 460 was right up against it and a slightly unlucky pass
+   would have started stealing from bursts still on screen. The extra
+   slots cost one walk each in the draw, which measured under a tenth of
+   a millisecond, and buy the guarantee that no burst is ever drawn part
+   eaten. */
+const PARTICLE_POOL = 520;
+const PART_CAR = 0, PART_FIRE = 1;          // the explosion's own two
+const PART_FW = 2;                          // and four firework colours from here
+const PART_COLOURS = 6;
+
 const debris = [];
 let debrisCount = 0;
 let hitStop = 0;
 let explodeFlash = 0;
 (function () {
-  for (let i = 0; i < 64; i++) {
-    debris.push({ x: 0, y: 0, vx: 0, vy: 0, r: 0, life: 0, spin: 0, rot: 0, hot: 0 });
+  for (let i = 0; i < PARTICLE_POOL; i++) {
+    debris.push({ x: 0, y: 0, vx: 0, vy: 0, r: 0, life: 0, spin: 0, rot: 0,
+                  col: 0, fuse: 0, drag: 0, grav: 0, fade: 0 });
   }
 })();
 
 function clearDebris() {
-  for (let i = 0; i < debris.length; i++) debris[i].life = 0;
+  for (let i = 0; i < debris.length; i++) { debris[i].life = 0; debris[i].fuse = 0; }
   debrisCount = 0;
   hitStop = 0;
   explodeFlash = 0;
+}
+
+/* The first free slot, or the shortest lived one if the pool is full.
+   Stealing the shortest lived rather than refusing means a burst at full
+   pool thins the oldest smoke rather than coming out half drawn, which
+   is the failure that would be noticed. */
+let particleCursor = 0;
+function takeParticle() {
+  /* Round robin from where the last one was found. A burst asks for
+     forty slots in a row and they are almost always adjacent, so this is
+     one step per particle instead of a walk of the whole pool from zero
+     every time. */
+  for (let n = 0; n < debris.length; n++) {
+    const i = particleCursor;
+    particleCursor = (particleCursor + 1) % debris.length;
+    if (debris[i].life <= 0) {
+      if (i >= debrisCount) debrisCount = i + 1;
+      return debris[i];
+    }
+  }
+  let worst = 0;
+  for (let i = 1; i < debris.length; i++) if (debris[i].life < debris[worst].life) worst = i;
+  return debris[worst];
 }
 
 function explode() {
@@ -10780,7 +11196,7 @@ function explode() {
   const cx = (carParts.rlx + carParts.rrx) * 0.5;
   const cy = (carParts.rly + carParts.rry) * 0.5;
   const n = Math.min(debris.length, Math.round(FEEL.EXPLODE_PARTICLES));
-  debrisCount = n;
+  if (n > debrisCount) debrisCount = n;
   /* Math.random, NOT rng(). This drew nine values a particle off the ROAD
      GENERATOR'S stream for four sessions, so every crash permanently
      shifted every corner generated after it: a pinned seed stopped
@@ -10805,40 +11221,328 @@ function explode() {
     p.life = FEEL.EXPLODE_TIME * (0.6 + 0.4 * Math.random());
     // A third of the pieces are hot: they are the fire and the rest are
     // the car. Two colours, two batched fills, and it reads as both.
-    p.hot = Math.random() < 0.38 ? 1 : 0;
+    p.col = Math.random() < 0.38 ? PART_FIRE : PART_CAR;
+    p.fuse = 0;
+    p.drag = FEEL.EXPLODE_DRAG;
+    p.grav = FEEL.EXPLODE_GRAVITY;
+    p.fade = FEEL.EXPLODE_TIME;
   }
 }
 
 function updateDebris(dt) {
   if (debrisCount === 0) return;
-  const drag = Math.exp(-dt / FEEL.EXPLODE_DRAG);
-  let live = 0;
+  let live = 0, burst = 0;
   for (let i = 0; i < debrisCount; i++) {
     const p = debris[i];
     if (p.life <= 0) continue;
     p.life -= dt;
+    /* A SHELL BURSTS RATHER THAN DYING. Its fuse is the climb; when it
+       runs out it hands its position and a share of its momentum to a
+       ring of sparks and stops existing. Collected and fired AFTER this
+       loop, because a burst writes into the same pool this is walking. */
+    if (p.fuse > 0) {
+      p.fuse -= dt;
+      if (p.fuse <= 0) { burstAt[burst] = i; burst++; p.life = 0; }
+    }
+    const drag = Math.exp(-dt / Math.max(0.01, p.drag));
     p.vx *= drag;
-    p.vy = p.vy * drag + FEEL.EXPLODE_GRAVITY * dt;
+    p.vy = p.vy * drag + p.grav * dt;
     p.x += p.vx * dt;
     p.y += p.vy * dt;
     p.rot += p.spin * dt;
     if (p.life > 0) live++;
   }
-  if (live === 0) debrisCount = 0;
+  for (let i = 0; i < burst; i++) fireworkBurst(debris[burstAt[i]]);
+  if (live === 0 && burst === 0) debrisCount = 0;
+}
+// Which slots burst this frame. Fixed length, because a frame cannot
+// burst more shells than there are shells and allocating here would be
+// an allocation in the update loop.
+const burstAt = new Int32Array(64);
+
+/* One colour per batch, in the order they are drawn. The first two are
+   the explosion's and the rest are the fireworks', which are the score's
+   own gold, its record pale gold, the gate colour so the burst belongs
+   to the world it is over, and a near white for the hottest sparks. */
+function particleColour(i) {
+  if (i === PART_CAR) return COLOUR.CAR_SIDE;
+  if (i === PART_FIRE) return COLOUR.HAZARD_TOP;
+  if (i === PART_FW) return COLOUR.SCORE;
+  if (i === PART_FW + 1) return COLOUR.SCORE_BEST;
+  if (i === PART_FW + 2) return COLOUR.GATE;
+  return COLOUR.CAR_LIGHT_HOT;
+}
+
+/* ==================================================================
+   THE FINALE.
+
+   Reaching the line is the hardest thing in this game and it used to be
+   a full stop: the car froze on the spot and the result screen replaced
+   the world. This is the arrival.
+
+   IT IS NOT A STATE. state goes straight to FINISHED on the line exactly
+   as it always did, so every input path, the pause guard, the credit
+   overlay and the restart lock all keep working untouched. The finale is
+   a CLOCK laid over that state, and the only thing it gates is how much
+   of the result screen has arrived yet.
+
+   THAT IS ALSO WHAT MAKES IT SKIPPABLE FOR FREE. Section 5 is not
+   suspended because the moment is nice: a tap or a key at any point,
+   including the first frame, winds the clock to the end and the result
+   is simply there. Nothing waits on an animation, because nothing here
+   is on the path to anything.
+
+   THE SHAPE OF IT:
+
+     THE APPROACH, from the final gate to the line, ramping the world's
+     own intensity continuously so the crossing is a peak rather than a
+     surprise.
+     THE LINE: hit stop, flash, shake, fanfare, the first shells away and
+     the world slammed to full.
+     THE ROLL: the car carries its speed past the line and drifts to a
+     stop. The road stays readable for the whole of this.
+     THE HANDOVER: once it has stopped there is nothing left to read, so
+     the over cap comes in and the world goes past anything the
+     multiplier can buy.
+     THE MESSAGE: the banner lands, and the result arrives under it.
+   ================================================================== */
+let finaleT = -1;         // seconds since the line, negative when there is no finale
+let finaleLevel = 0;      // 0 to 4, how much this run actually achieved
+let finaleGlow = 0;       // 0 to 1, the world's intensity, ramp then hold then cool
+let finaleFree = 0;       // 0 to 1, the over cap, and only once the car has stopped
+let finaleFlash = 0;
+let finaleRolling = false;
+let fireworkDue = 0;
+let finaleFirstToday = false;   // captured before the record is banked
+
+function finaleActive() { return finaleT >= 0; }
+
+/* How much there is to celebrate, and it is read by the firework rate,
+   the burst size and the banner. Four things can be true and each one
+   makes the finale visibly louder, so a clean run that took the record
+   cannot look like a scrappy one that squeaked over. */
+function finaleLevelFor() {
+  let n = 0;
+  if (finishClean) n++;
+  if (finishRecord) n++;
+  if (finishMargin !== null && finishMargin < 0) n++;   // faster than the ghost
+  if (finishClean && finaleFirstToday) n++;
+  return n;
+}
+
+/* The word that says WHY it is loud, or nothing when the answer is just
+   "you finished". One line, and the loudest thing available is chosen. */
+function finaleBadge() {
+  if (finishRecord && finishClean) return "TODAY'S BEST";
+  if (finishMargin !== null && finishMargin < 0) return 'NEW FASTEST';
+  if (finishClean && finaleFirstToday) return 'FIRST CLEAN FINISH';
+  if (finishRecord) return 'NEW RECORD';
+  return null;
+}
+
+function startFinale() {
+  finaleT = 0;
+  finaleLevel = finaleLevelFor();
+  finaleGlow = 1;
+  finaleFree = 0;
+  finaleRolling = true;
+  finaleFlash = FEEL.FINALE_FLASH_TIME;
+  fireworkDue = 0;
+  hitStop = FEEL.FINALE_HIT_STOP;
+  addShake(FEEL.FINALE_SHAKE_PX);          // capped and never summed, see addShake
+  // A handful away on the line itself, so the burst is already in the air
+  // as the flash clears rather than starting after it.
+  for (let i = 0; i < 3 + finaleLevel; i++) fireworkLaunch(1);
+}
+
+/* THE WHOLE THING, IN ONE CALL. Winds the clock past every phase, stops
+   the car dead and clears what is in the air. The result screen is then
+   simply drawn, because everything that gates it reads this clock. */
+function skipFinale() {
+  finaleT = finaleEnd();
+  finaleRolling = false;
+  finaleGlow = 0;
+  finaleFree = 0;
+  finaleFlash = 0;
+  hitStop = 0;
+  coastSpeed = 0;
+  clearDebris();
+}
+
+function finaleEnd() {
+  return FEEL.FINALE_REVEAL_AT + FEEL.FINALE_REVEAL_TIME;
+}
+
+// Is the sequence still running, and therefore still worth skipping?
+function finaleRunning() {
+  return state === FINISHED && finaleT >= 0 && finaleT < finaleEnd();
+}
+
+/* How much of the result screen has arrived, 0 to 1. Everything on that
+   screen fades in on this one number. */
+function finaleReveal() {
+  if (finaleT < 0) return 1;
+  return clamp((finaleT - FEEL.FINALE_REVEAL_AT)
+               / Math.max(0.01, FEEL.FINALE_REVEAL_TIME), 0, 1);
+}
+
+/* And how much of the banner. It lands first and alone, which is the
+   first of the two beats. */
+function finaleBanner() {
+  if (finaleT < 0) return 1;
+  return clamp((finaleT - FEEL.FINALE_BANNER_AT)
+               / Math.max(0.01, FEEL.FINALE_BANNER_IN), 0, 1);
+}
+
+/* And how far it has TRAVELLED from the middle of the screen to the top
+   of the result stack. Finishes exactly as the reveal begins, so the two
+   never occupy the screen at once. */
+function finaleSettle() {
+  if (finaleT < 0) return 1;
+  const move = Math.max(0.01, FEEL.FINALE_BANNER_MOVE);
+  return clamp((finaleT - (FEEL.FINALE_REVEAL_AT - move)) / move, 0, 1);
+}
+
+/* THE APPROACH RAMP. Continuous from the final gate to the line, so the
+   closing stretch escalates rather than the line firing on its own. It
+   is the same number the crossing then slams to one, so there is no seam
+   between the build and the peak. */
+function finaleApproach() {
+  if (state !== DRIVING || !atFinishGate() || finishSeg <= 0) return 0;
+  const from = gateSegment(Math.max(1, dailyGates - 1));
+  const span = Math.max(1, finishSeg - from);
+  return clamp((carSegIndex - from) / span, 0, 1) * FEEL.FINALE_APPROACH;
+}
+
+function updateFinale(dt) {
+  // The approach owns the value while the car is still driving.
+  if (state === DRIVING) {
+    const want = finaleApproach();
+    finaleGlow += (want - finaleGlow)
+                * (1 - Math.exp(-dt / Math.max(0.01, FEEL.FINALE_SLAM)));
+    finaleFree = 0;
+    return;
+  }
+  if (finaleFlash > 0) finaleFlash -= dt;
+  if (!finaleActive()) {
+    // Not a finale, so nothing here may hold the world hot.
+    if (finaleGlow > 0) finaleGlow = Math.max(0, finaleGlow - dt / FEEL.FINALE_COOL);
+    finaleFree = 0;
+    return;
+  }
+  finaleT += dt;
+
+  // Full through the hold, then down over the cool. Never a step.
+  if (finaleT <= FEEL.FINALE_HOLD) finaleGlow = 1;
+  else {
+    finaleGlow = clamp(1 - (finaleT - FEEL.FINALE_HOLD)
+                           / Math.max(0.01, FEEL.FINALE_COOL), 0, 1);
+  }
+
+  /* THE OVER CAP WAITS FOR THE CAR. Hard limit one says the road stays
+     readable, and it stays readable while there is a car on it to read
+     it for. The moment there is not, it comes in. */
+  const freeWant = finaleRolling ? 0 : 1;
+  finaleFree += (freeWant - finaleFree)
+              * (1 - Math.exp(-dt / Math.max(0.01, FEEL.FINALE_FREE_TIME)));
+  finaleFree *= finaleGlow;                 // and it leaves with the rest
+
+  // Shells, for as long as the world is hot, faster the more there was
+  // to celebrate.
+  if (finaleGlow > 0.25) {
+    fireworkDue -= dt;
+    if (fireworkDue <= 0) {
+      fireworkDue = Math.max(0.05, FEEL.FIREWORK_EVERY
+                                   - FEEL.FIREWORK_RATE_GAIN * finaleLevel);
+      fireworkLaunch(1);
+    }
+  }
+}
+
+/* ==================================================================
+   THE FIREWORKS, ON THE EXPLOSION'S OWN POOL.
+
+   A SHELL RISES AND BURSTS, which is two stages and is why fireworks
+   read as fireworks rather than as confetti appearing. The rise is what
+   the eye follows and the burst is what it was following for; a burst
+   with no climb in front of it is just a flash.
+
+   SCREEN SPACE, like the debris, and for a stronger reason here: these
+   are meant to be over the world rather than in it, and a firework that
+   converged on the vanishing point with the road would look like the
+   road throwing sparks. Launch positions are spread across the width and
+   biased toward the middle, so they read as coming from where the finish
+   structure went past and from along the road either side of it.
+   ================================================================== */
+function fireworkLaunch(spread) {
+  const s = Math.min(view.w, view.h);
+  const p = takeParticle();
+  /* Biased to the middle by squaring a signed random, so most go up over
+     the road and the rest fan out along it. */
+  const t = Math.random() * 2 - 1;
+  p.x = view.w * (0.5 + t * Math.abs(t) * 0.5 * spread);
+  p.y = view.h * (0.86 + Math.random() * 0.10);
+  const lean = (p.x - view.w * 0.5) / Math.max(1, view.w) * 0.55;
+  p.vx = -lean * s * FEEL.FIREWORK_SPEED * 0.5;
+  p.vy = -s * FEEL.FIREWORK_SPEED * (0.82 + 0.36 * Math.random());
+  p.r = s * FEEL.FIREWORK_SIZE * FEEL.FIREWORK_SHELL_SIZE;
+  p.rot = Math.PI * 0.25;
+  p.spin = 0;
+  // A shell holds its speed far better than a spark does, or it never
+  // gets out of the road and bursts at head height.
+  p.drag = FEEL.FIREWORK_DRAG * 3;
+  p.grav = s * FEEL.FIREWORK_GRAVITY * 0.40;
+  p.fuse = FEEL.FIREWORK_RISE * (0.78 + 0.44 * Math.random());
+  p.life = p.fuse + 0.02;                     // it never outlives its fuse
+  p.fade = p.life;
+  p.col = PART_FW + (Math.random() * 4 | 0);
+}
+
+/* The burst inherits the shell's colour, so a spark can be traced back to
+   the streak it came from, and a share of its momentum, so the whole
+   flower drifts the way the shell was going. */
+function fireworkBurst(shell) {
+  const s = Math.min(view.w, view.h);
+  const n = Math.round(FEEL.FIREWORK_SPARKS
+                       + FEEL.FIREWORK_SPARK_GAIN * finaleLevel);
+  const speed = s * FEEL.FIREWORK_SPARK_SPEED;
+  /* A ring rather than a scatter: evenly spaced angles with a little
+     jitter is what makes a burst look like one burst instead of a cloud,
+     and the radius wobble is what stops it looking like a wheel. */
+  const off = Math.random() * Math.PI * 2;
+  for (let i = 0; i < n; i++) {
+    const p = takeParticle();
+    const a = off + (i / n) * Math.PI * 2 + (Math.random() - 0.5) * 0.22;
+    const v = speed * (0.55 + 0.45 * Math.random());
+    p.x = shell.x;
+    p.y = shell.y;
+    p.vx = Math.cos(a) * v + shell.vx * 0.30;
+    p.vy = Math.sin(a) * v + shell.vy * 0.30;
+    p.r = s * FEEL.FIREWORK_SIZE * (0.5 + 0.7 * Math.random());
+    p.rot = Math.random() * Math.PI;
+    p.spin = (Math.random() * 2 - 1) * 2.2;
+    p.drag = FEEL.FIREWORK_DRAG;
+    p.grav = s * FEEL.FIREWORK_GRAVITY;
+    p.life = FEEL.FIREWORK_LIFE * (0.55 + 0.45 * Math.random());
+    p.fade = FEEL.FIREWORK_LIFE;
+    p.fuse = 0;
+    // Mostly the shell's colour, with a few white hot ones through it.
+    p.col = Math.random() < 0.18 ? PART_FW + 3 : shell.col;
+  }
 }
 
 function drawDebris() {
   if (debrisCount === 0) return;
-  // Two passes, one colour each, the same batching discipline the road
-  // and the tyre marks use.
-  for (let pass = 0; pass < 2; pass++) {
+  // One batched fill per colour, the same discipline the road and the
+  // tyre marks use. A pass with nothing in it costs a walk and no fill.
+  for (let pass = 0; pass < PART_COLOURS; pass++) {
     let any = false;
     ctx.beginPath();
     for (let i = 0; i < debrisCount; i++) {
       const p = debris[i];
-      if (p.life <= 0 || p.hot !== pass) continue;
+      if (p.life <= 0 || p.col !== pass) continue;
       any = true;
-      const t = clamp(p.life / FEEL.EXPLODE_TIME, 0, 1);
+      const t = clamp(p.life / Math.max(0.01, p.fade), 0, 1);
       const r = p.r * (0.35 + 0.65 * t);
       // Squares rather than circles: flat shading, cut and folded from
       // paper, and four line segments beat an arc for this many pieces.
@@ -10850,7 +11554,7 @@ function drawDebris() {
       ctx.closePath();
     }
     if (!any) continue;
-    ctx.fillStyle = pass ? COLOUR.HAZARD_TOP : COLOUR.CAR_SIDE;
+    ctx.fillStyle = particleColour(pass);
     ctx.fill();
   }
 }
@@ -11094,6 +11798,17 @@ function drawSpectacleFlash(w, h) {
     ctx.fillRect(0, 0, w, h);
     ctx.globalAlpha = 1;
   }
+  /* THE LINE. The score's own gold rather than the crash's red, because
+     this is the opposite outcome and the colour is the fastest thing
+     about it to read. Squared, like the others, so it is a flash that
+     falls away rather than a fade. */
+  if (finaleFlash > 0) {
+    const u = finaleFlash / Math.max(0.01, FEEL.FINALE_FLASH_TIME);
+    ctx.globalAlpha = FEEL.FINALE_FLASH_ALPHA * u * u;
+    ctx.fillStyle = COLOUR.SCORE_BEST;
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1;
+  }
 }
 
 let barShow = 0;
@@ -11161,6 +11876,7 @@ function drawHud(w, h) {
     tunerLine(25),
     tunerLine(26),
     tunerLine(27),
+    tunerLine(28),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
@@ -11275,8 +11991,9 @@ function render() {
      horizon section 4.3 is about, fell from a difference of 0.4 to one of
      4.8 the wrong way. Above the line is sky and only sky, so the glow
      can swell as much as it likes there and the road cannot lose by it. */
-  if (worldHeat > 0.01) {
-    ctx.globalAlpha = FEEL.HEAT_HORIZON * worldHeat;
+  if (worldHeat > 0.01 || finaleFree > 0.01) {
+    ctx.globalAlpha = Math.min(1, FEEL.HEAT_HORIZON * worldHeat
+                                  + FEEL.FINALE_HORIZON * finaleFree);
     ctx.fillRect(-40, horizonY - glow, w + 80, glow);
     ctx.globalAlpha = 1;
   }
@@ -11687,14 +12404,26 @@ function ramp(param, value, tau) {
    and text at this size reads as a debug control. Nothing is fetched,
    these are paths in the file. */
 const ICON = {
-  /* The flip. Two arrows curving into each other, which says reverse
-     without a word, and it is the only pad icon that is about a direction
-     rather than about a thing being on or off. */
+  /* THE FLIP. Two opposed arrows, and this is a REDRAW.
+
+     It used to be a U turn: a bar with a hook on the end and two
+     arrowheads at different scales, drawn at stroke-width 2 where the
+     rest of the row is 2.2. Next to five solid centred glyphs it read as
+     a rendering error rather than a control, and it was: the shape was
+     not symmetric about either axis, so it could not sit on the same
+     optical centre as its neighbours whatever it was nudged to.
+
+     This one is EXACTLY ROTATIONALLY SYMMETRIC about the middle of the
+     box. Rotate it half a turn and every point lands on another point of
+     itself, so it is centred by construction rather than by eye, and the
+     two heads are the same head. Same stroke weight, caps and joins as
+     the fullscreen icon, which is the other purely stroked glyph in the
+     row, and the same 4 to 20 span so the optical size matches. */
   flip:
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"'
     + ' stroke-linecap="round" stroke-linejoin="round">'
-    + '<path d="M4 9h11a4 4 0 010 8h-3"/><path d="M7.5 5.5L4 9l3.5 3.5"/>'
-    + '<path d="M16.5 20.5L20 17l-3.5-3.5"/></svg>',
+    + '<path d="M20 9H5"/><path d="M9 5.2 5 9l4 3.8"/>'
+    + '<path d="M4 15h15"/><path d="M15 11.2 19 15l-4 3.8"/></svg>',
   speakerOff:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
     + ' stroke-linecap="round" stroke-linejoin="round">'
@@ -12042,6 +12771,42 @@ function audioSting(sting) {
     a.stingOsc.frequency.setValueAtTime(semis(root * 8, sting.notes[i]), at);
     p.setValueAtTime(sting.gain, at);
     p.exponentialRampToValueAtTime(0.0001, at + sting.decay);
+  }
+}
+
+/* THE FANFARE, and it is on the EFFECTS bus.
+
+   Music is off by default for this audience, so a finish that celebrated
+   in the arrangement would land silently for almost everybody. This goes
+   through the sting voice, which is the effects side, so it plays for
+   anybody who has turned sound on at all.
+
+   IT PLAYS OUT RATHER THAN CUTTING. Nothing in the finish path touches
+   the sting bus afterwards, unlike a crash, which cancels it deliberately
+   because a sting over a wreck is wrong. The tail is allowed to ring
+   under the result screen.
+
+   LONGER FOR MORE. The ladder is a major arpeggio over two octaves and
+   the level decides how far up it goes, so a clean run that took the
+   record finishes higher and later than one that squeaked over. */
+const FANFARE_LADDER = [0, 7, 12, 16, 19, 24, 28, 31, 36];
+
+function audioFanfare(level) {
+  if (!audioOn()) return;
+  const a = audio, root = TRACKS[track].root;
+  const p = a.stingGain.gain;
+  const t = a.ac.currentTime;
+  const n = Math.min(FANFARE_LADDER.length, 5 + Math.max(0, level));
+  p.cancelScheduledValues(t);
+  p.setValueAtTime(p.value, t);
+  for (let i = 0; i < n; i++) {
+    const at = t + i * FEEL.FANFARE_STEP;
+    a.stingOsc.frequency.setValueAtTime(semis(root * 8, FANFARE_LADDER[i]), at);
+    p.setValueAtTime(FEEL.FANFARE_GAIN, at);
+    // Every note but the last is clipped by the next; the last one is
+    // given the long decay, which is the part that rings out.
+    p.exponentialRampToValueAtTime(0.0001,
+      at + (i === n - 1 ? FEEL.FANFARE_TAIL : FEEL.FANFARE_STEP * 1.6));
   }
 }
 
