@@ -1032,6 +1032,36 @@ const FEEL = {
   CLOCK_GATE_SIZE:        0.036,     // the distance to the next gate, beside it
   CLOCK_PAY_SIZE:         0.030,     // the live payback readout
   CLOCK_POP_TIME:          1.30,     // seconds the gate payout stays up
+  /* ------------------------------------------------------------------
+     THE LANDSCAPE BAR. A SECOND ARRANGEMENT, NOT A SCALED FIRST ONE.
+
+     The stack above is a PORTRAIT layout: score, then clock, then pips,
+     then the track line, four rows deep down the middle. That is the
+     right shape when height is what there is plenty of. Turn the handset
+     and it is exactly backwards: vertical space becomes the scarce thing
+     and the whole width sits empty either side of a narrow column.
+     Measured on an 844 by 390 screen the stack reached 106 pixels, 27
+     per cent of the height, and stopped 13 pixels short of the horizon.
+
+     So in landscape it transposes into one thin strip across the top:
+     score at the left, the two times together in the middle, the track
+     and the ghost at the right, and the pips folded in as a line under
+     the whole thing rather than a row of their own.
+
+     THE TREATMENTS DO NOT CHANGE, only the places. The score is still
+     the arcade number in its heat colour, the times are still mono
+     digits on their plate, the track line is still small and dim, so
+     nothing here can make a score read as a time.
+     ------------------------------------------------------------------ */
+  HUD_BAR_RATIO:           1.35,     // wider than this much of the height, use the bar
+  HUD_BAR_TOP:            0.075,     // LIVE, of h, the strip's centre line
+  HUD_BAR_PAD:            0.055,     // LIVE, of w, the inset at each end
+  HUD_BAR_SCORE:          0.062,     // LIVE, of s
+  HUD_BAR_CLOCK:          0.050,     // LIVE, of s
+  HUD_BAR_INFO:           0.028,     // LIVE, of s, the track and ghost line
+  HUD_BAR_INFO_ALPHA:      0.55,     // LIVE
+  HUD_BAR_PIP_GAP:        0.014,     // LIVE, of s, under the score down to the pip line
+  HUD_BAR_PIP_HEIGHT:      3.00,     // LIVE, pixels, the thin line's thickness
   /* Purely cosmetic. Nothing waits on it and a tap during it restarts,
      so it can be as long as it likes without costing anything. */
   RESULT_ROLL_TIME:        0.85,     // seconds the result counts up over
@@ -3826,6 +3856,19 @@ const TUNABLES = [
   { key: 'PIP_GAP',            label: 'pipGap',  step: 0.001,min: 0,    max: 0.04,  dp: 3, group: 27 },
   { key: 'PIP_ALPHA_DONE',     label: 'pipOn',   step: 0.05, min: 0.1,  max: 1.0,   dp: 2, group: 27 },
   { key: 'PIP_ALPHA_TODO',     label: 'pipOff',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 27 },
+  /* The landscape strip, beside the pips it folds them into. The ratio
+     is here as well as the sizes so the two arrangements can be swapped
+     between on one screen without rotating anything, which is the only
+     way to compare them fairly. */
+  { key: 'HUD_BAR_RATIO',      label: 'barAt',   step: 0.05, min: 0.5,  max: 4.0,   dp: 2, group: 27 },
+  { key: 'HUD_BAR_TOP',        label: 'barY',    step: 0.005,min: 0,    max: 0.30,  dp: 3, group: 27 },
+  { key: 'HUD_BAR_PAD',        label: 'barPad',  step: 0.005,min: 0,    max: 0.25,  dp: 3, group: 27 },
+  { key: 'HUD_BAR_SCORE',      label: 'barScr',  step: 0.002,min: 0.02, max: 0.14,  dp: 3, group: 27 },
+  { key: 'HUD_BAR_CLOCK',      label: 'barClk',  step: 0.002,min: 0.02, max: 0.12,  dp: 3, group: 27 },
+  { key: 'HUD_BAR_INFO',       label: 'barInf',  step: 0.001,min: 0.01, max: 0.06,  dp: 3, group: 27 },
+  { key: 'HUD_BAR_INFO_ALPHA', label: 'barInfA', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 27 },
+  { key: 'HUD_BAR_PIP_GAP',    label: 'barPipY', step: 0.002,min: 0,    max: 0.12,  dp: 3, group: 27 },
+  { key: 'HUD_BAR_PIP_HEIGHT', label: 'barPipH', step: 0.5,  min: 1,    max: 12,    dp: 1, group: 27 },
   { key: 'GHOST_ALPHA',        label: 'ghostA',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 26 },
   { key: 'GHOST_HEIGHT',       label: 'ghostTop',step: 20,   min: 40,   max: 900,   dp: 0, group: 26 },
   { key: 'GHOST_CABIN_WIDE',   label: 'ghostCw', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 26 },
@@ -10223,8 +10266,17 @@ function arcadeNumber(str, x, y, size, fill) {
   ctx.fillText(str, x, y);
 }
 
+/* WHICH OF THE TWO ARRANGEMENTS THIS SCREEN GETS. A ratio and not a
+   simple w > h, because a nearly square window has no horizontal room to
+   spare either and the strip would be four cramped columns instead of
+   four roomy rows. Portrait is untouched by every part of this. */
+function hudIsBar(w, h) {
+  return w >= h * FEEL.HUD_BAR_RATIO;
+}
+
 function drawScore(w, h) {
   if (state !== DRIVING) return;
+  if (hudIsBar(w, h)) { drawHudBar(w, h); return; }
   const s = Math.min(w, h);
   const flash = gateFlash > 0 ? gateFlash / FEEL.CHECKPOINT_FLASH : 0;
   /* The multiplier, carried by the score rather than by a number of its
@@ -10258,6 +10310,118 @@ function drawScore(w, h) {
   drawClock(w, h);
 }
 
+/* ------------------------------------------------------------------
+   THE LANDSCAPE STRIP. One row, laid out left to right.
+
+   The centre is placed FIRST and everything else is fitted around what
+   it turns out to need, because the clock is the one element whose width
+   is not a choice: it is however wide two mono time labels are, and on a
+   640 wide handset that is a real fraction of the strip. Laying the ends
+   out first and hoping would put the score under the plate at the exact
+   moment the score is longest, which is the moment it matters.
+
+   NOTHING HERE PAINTS A BACKGROUND BEHIND THE WHOLE STRIP. The clock
+   keeps its own plate because that plate is part of what makes a time
+   look like a time, but a bar wide band of dark across the sky would be
+   a new large shape competing with the road edges for attention, which
+   section 7 spends a paragraph warning about.
+   ------------------------------------------------------------------ */
+function drawHudBar(w, h) {
+  const s = Math.min(w, h);
+  const flash = gateFlash > 0 ? gateFlash / FEEL.CHECKPOINT_FLASH : 0;
+  const heat = clamp((multiplier - 1) / (FEEL.MULT_MAX - 1), 0, 1);
+  const pop = multPop > 0 ? multPop / FEEL.MULT_POP_TIME : 0;
+  const size = Math.round(s * FEEL.HUD_BAR_SCORE
+    * (1 + 0.3 * flash + FEEL.SCORE_HEAT_GROWTH * heat + FEEL.SCORE_HEAT_POP * pop));
+  const cy = safeTop + h * FEEL.HUD_BAR_TOP;
+  const padx = w * FEEL.HUD_BAR_PAD;
+  const x0 = padx, x1 = w - padx;
+  scoreTop = cy;
+  scoreSize = size;
+
+  // THE CENTRE: both times, in their own instrument, which reports back
+  // how much of the strip it took.
+  const boxW = drawClock(w, h, w / 2, cy, Math.round(s * FEEL.HUD_BAR_CLOCK));
+  /* What is left at each end once the plate has taken the middle, which
+     is what the score and the track line are both fitted into. The floor
+     is a guard and not a design: fittedSize divides by its maximum
+     width, so a room that came out zero or negative would give nonsense.
+     It cannot be reached above HUD_BAR_RATIO, where the narrowest case
+     measured leaves 138 pixels. */
+  const room = Math.max(8, w / 2 - boxW / 2 - s * 0.03 - x0);
+
+  // THE LEFT: the score, in exactly the treatment it has in portrait.
+  const label = String(banked + Math.floor(score));
+  const ssize = fittedSize(label, '900', size, room);
+  ctx.font = '900 ' + ssize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const sw = ctx.measureText(label).width;
+  const scx = x0 + sw / 2;
+  if (beatBest) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(4, ssize * FEEL.BEST_GLOW_SPREAD);
+    ctx.globalAlpha = FEEL.BEST_GLOW_ALPHA;
+    ctx.strokeStyle = 'rgb(' + COLOUR.SCORE_GLOW + ')';
+    ctx.strokeText(label, scx, cy);
+    ctx.globalAlpha = 1;
+  }
+  arcadeNumber(label, scx, cy, ssize,
+               flash > 0 ? COLOUR.GATE : scoreHeatColour(heat));
+
+  // THE RIGHT: which track this is and where the ghost is, dim, in the
+  // same small treatment the stack gives it, right aligned to the end.
+  const info = modeLine();
+  const isize = fittedSize(info.line, '700', Math.round(s * FEEL.HUD_BAR_INFO), room);
+  ctx.globalAlpha = FEEL.HUD_BAR_INFO_ALPHA;
+  text(info.line, x1, cy, isize, '700', 'right', info.colour);
+  ctx.globalAlpha = 1;
+
+  /* THE PIPS, FOLDED IN. Not a row of their own: one line the width of
+     the strip, divided into a segment per gate, which is the same
+     information as the portrait row and costs a couple of pixels of
+     height instead of a whole row. It doubles as the strip's underline,
+     so the four elements read as one instrument.
+
+     CLEARED OFF THE SCORE AT ITS BIGGEST, not off the score as drawn.
+     The score swells with the multiplier, kicks on every whole one
+     crossed and again at a gate, up to 1.48 times its resting size, so
+     hanging the line off the live size makes it twitch on every kick,
+     and hanging it off the resting size lets the digits sit on top of
+     it. 0.74 is half of that worst case: the line is FIXED, and the
+     fattest the score can ever get still clears it. */
+  const clear = Math.round(s * FEEL.HUD_BAR_SCORE) * 0.74;
+  const pipY = cy + clear + s * FEEL.HUD_BAR_PIP_GAP;
+  let below = cy + clear;
+  if (mode === DAILY) { drawPipStrip(x0, x1, pipY); below = pipY; }
+  hudBottom = below + FEEL.HUD_BAR_PIP_HEIGHT;
+}
+
+/* One line per gate, laid end to end across a span. The last one is the
+   finish and keeps the score's gold, the way the portrait row does, so
+   the end of the strip still reads as an end. */
+function drawPipStrip(x0, x1, y) {
+  const n = dailyGates;
+  const hgt = FEEL.HUD_BAR_PIP_HEIGHT;
+  const gap = Math.max(2, (x1 - x0) * 0.006);
+  const each = ((x1 - x0) - gap * (n - 1)) / n;
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * (each + gap);
+    const last = i === n - 1;
+    const done = i < gatesPassed;
+    ctx.globalAlpha = done ? FEEL.PIP_ALPHA_DONE : FEEL.PIP_ALPHA_TODO;
+    ctx.fillStyle = last ? COLOUR.SCORE : COLOUR.GATE;
+    roundRect(x, y - hgt / 2, each, hgt, hgt * 0.5);
+    ctx.fill();
+    if (!done && i === gatesPassed && state === DRIVING) {
+      ctx.globalAlpha = 0.30 + 0.35 * Math.abs(Math.sin(runTime * 3));
+      roundRect(x, y - hgt / 2, each, hgt, hgt * 0.5);
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
 /* The resting gold running to the best score cream, and once the stored
    best has been passed, that cream running on to white. Both tables are
    built up with the rest of the ramps, beside the palette they come out
@@ -10269,8 +10433,16 @@ function scoreHeatColour(t) {
 /* The pit timer. A plate, tabular digits, and the distance to the next
    gate as a second, quieter figure on the same plate, because that is
    also time and it belongs in the time element rather than being a fifth
-   number somewhere else. */
-function drawClock(w, h) {
+   number somewhere else.
+
+   THE PLACEMENT IS AN ARGUMENT AND THE TREATMENT IS NOT. Portrait hangs
+   it under the score and passes nothing; the landscape bar puts it in
+   the middle of the strip and passes a centre and a size. One routine
+   either way, so the plate, the tabular digits, the divider, the low
+   time blink, the earning arrow and the gate payout are the same
+   instrument in both orientations rather than two that have to be kept
+   in step. */
+function drawClock(w, h, atX, atY, atSize) {
   /* Drawn from the first frame, not from the end of the on ramp. It used
      to return early for the whole thirty seconds, so a run that ended
      inside the on ramp had no clock in it at all and a player never saw
@@ -10278,7 +10450,8 @@ function drawClock(w, h) {
      readout can show; being absent is not. */
   const running = skipOnRamp || runTime >= FEEL.ONRAMP_SECONDS;
   const s = Math.min(w, h);
-  const size = Math.round(s * FEEL.CLOCK_SIZE);
+  const placed = atSize !== undefined;
+  const size = placed ? atSize : Math.round(s * FEEL.CLOCK_SIZE);
   const gateSecs = Math.max(0, nextGate - carSegIndex) * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
   const low = running && clock < FEEL.CLOCK_LOW;
   const reachable = clock >= gateSecs;
@@ -10300,11 +10473,14 @@ function drawClock(w, h) {
      directly under it in both orientations and follows the score when the
      score swells with the multiplier or flashes at a gate. scoreTop is a
      middle baseline, so half the score size clears the digits. */
-  const y = scoreTop + scoreSize * 0.5 + s * FEEL.CLOCK_GAP + boxH * 0.5;
-  // The bottom of the whole HUD stack, so anything placed under it can
-  // measure rather than assume. The callouts are the only reader.
-  hudBottom = y + boxH * 0.5;
-  const bx0 = w / 2 - boxW / 2, by0 = y - boxH / 2;
+  const y = placed ? atY
+                   : scoreTop + scoreSize * 0.5 + s * FEEL.CLOCK_GAP + boxH * 0.5;
+  /* The bottom of the whole HUD stack, so anything placed under it can
+     measure rather than assume. The callouts are the only reader. The
+     bar sets it for itself, once, after the pip line, because there the
+     clock is not the last thing down the screen. */
+  if (!placed) hudBottom = y + boxH * 0.5;
+  const bx0 = (placed ? atX : w / 2) - boxW / 2, by0 = y - boxH / 2;
 
   ctx.globalAlpha = 0.72 * dim;
   ctx.fillStyle = COLOUR.BAR_TRACK;
@@ -10354,12 +10530,24 @@ function drawClock(w, h) {
     ctx.textAlign = 'center';
     ctx.globalAlpha = Math.min(1, t * 2.2);
     const pl = '+' + FEEL.CLOCK_CHECKPOINT;
+    /* IT DRIFTS AWAY FROM THE PLATE, WHICHEVER WAY THERE IS ROOM. The
+       portrait stack has the score above it and a run of sky below, so
+       it rises the way a payout should. The bar sits at the very top of
+       the screen, where rising by a ninth of the screen puts it off the
+       edge entirely: measured at minus thirty four pixels, which is a
+       reward the player never sees. So there it falls instead. */
+    const px = placed ? atX : w / 2;
+    const away = placed ? 1 : -1;
+    const py = y + away * (boxH * 0.9 + (1 - t) * s * 0.09);
     ctx.fillStyle = COLOUR.TEXT_SHADOW;
-    ctx.fillText(pl, w / 2, y - boxH * 0.9 - (1 - t) * s * 0.09 + 2);
+    ctx.fillText(pl, px, py + 2);
     ctx.fillStyle = COLOUR.GATE;
-    ctx.fillText(pl, w / 2, y - boxH * 0.9 - (1 - t) * s * 0.09);
+    ctx.fillText(pl, px, py);
     ctx.globalAlpha = 1;
   }
+  // How much room the instrument took, so the bar can lay out around it
+  // rather than guess at it. Portrait has no use for it and ignores it.
+  return boxW;
 }
 
 function roundRect(x, y, w2, h2, r) {
@@ -12773,32 +12961,57 @@ function drawPips(w, h, y) {
   return hgt;
 }
 
+/* WHICH TRACK THIS IS AND WHAT THE GHOST IS DOING, as a string, because
+   both arrangements want the same sentence in different places: the
+   portrait stack puts it under the pips, the landscape strip puts it at
+   the right hand end.
+
+   The pips carry the mode on the daily, so the word is not needed there.
+   Endless has no pips, so it says so.
+
+   ENDLESS NAMES ITSELF AND SAYS WHAT IT COSTS. The bare word was doing
+   its job and was not enough: it told the player which mode they were in
+   without telling them what they were missing, so somebody hunting for
+   the ghost read it and carried on hunting. */
+function modeLine() {
+  if (mode !== DAILY) {
+    return { line: 'RANDOM TRACK   NO FINISH, NO GHOST', colour: COLOUR.TEXT };
+  }
+  let line = 'TRACK #' + trackNumber(todayStamp)
+           + (dailyBest > 0 ? '   BEST ' + dailyBest : '');
+  if (continues > 0) line += '   CONTINUED';
+  else if (ghost.live) line += '   ' + ghostGapLabel();
+  return { line: line, colour: COLOUR.GATE };
+}
+
 function drawModeMark(w, h) {
   /* WHILE DRIVING ONLY. The death screen says all of this in its own
      records line, and drawing both put two lines of teal on top of each
      other at the top of that screen. */
   if (state !== DRIVING) return;
   const s = Math.min(w, h);
+  const bar = hudIsBar(w, h);
   const y = hudBottom + s * 0.026;
-
-  // The pips carry the mode on the daily, so the word is not needed
-  // there. Endless has no pips, so it says so.
-  /* ENDLESS NAMES ITSELF AND SAYS WHAT IT COSTS. The bare word was
-     doing its job and was not enough: it told the player which mode they
-     were in without telling them what they were missing, so somebody
-     hunting for the ghost read it and carried on hunting. */
-  let line, colour;
-  if (mode !== DAILY) {
-    line = 'RANDOM TRACK   NO FINISH, NO GHOST';
-    colour = COLOUR.TEXT;
-  } else {
-    colour = COLOUR.GATE;
-    line = 'TRACK #' + trackNumber(todayStamp)
-         + (dailyBest > 0 ? '   BEST ' + dailyBest : '');
-    if (continues > 0) line += '   CONTINUED';
-    else if (ghost.live) line += '   ' + ghostGapLabel();
-  }
+  const info = modeLine();
+  const line = info.line, colour = info.colour;
   let below = y;
+
+  /* IN LANDSCAPE THE PIPS AND THE TRACK LINE ARE ALREADY IN THE STRIP,
+     so all that is left here is the opening note, which is a sentence
+     rather than a readout and is gone after a few seconds. It sits under
+     the strip for those seconds and the steady state is still one row. */
+  if (bar) {
+    const second = modeSecondLine();
+    if (second && runTime < FEEL.MODE_NOTE_SECONDS) {
+      const fade = clamp((FEEL.MODE_NOTE_SECONDS - runTime) / 0.8, 0, 1);
+      ctx.globalAlpha = 0.42 * fade;
+      text(second, w / 2, y,
+           fittedSize(second, '700', Math.round(s * 0.023), w * 0.9), '700',
+           'center', continues > 0 ? COLOUR.SCORE : colour);
+      ctx.globalAlpha = 1;
+    }
+    return;
+  }
   if (mode === DAILY) {
     drawPips(w, h, y);
     below = y + s * 0.028;
@@ -13504,7 +13717,6 @@ const tune = {
   retryIn: 0,             // seconds until the next retry is allowed
   nameLife: 0,            // seconds left on the on screen title
   nameText: '',
-  stall: 0,               // seconds of no progress, for giving up
   lastTime: -1
 };
 
@@ -13628,13 +13840,42 @@ function tuneRevive() {
   return true;
 }
 
+/* EVERY TRACK NUMBER IN THIS FILE GOES THROUGH HERE FIRST.
+
+   MEASURED, AND THIS KILLED THE MUSIC AFTER TRACK FOUR. The wrap used to
+   live inside tuneLoad alone, so the FILE it picked was always right
+   while tune.index and tune.loaded carried the raw counter: 4, 5, 6. Two
+   things then went wrong at once. The comparisons that choose a side are
+   made against those numbers, so they were being made in a different
+   space from the files they name. And TUNES[4] is undefined, so the very
+   next line, the one that puts the title on screen, threw before play()
+   was ever asked for and before the fade envelope was set. Traced: at
+   12.94 seconds the live side swapped to the track one element, its
+   currentTime stayed at zero, the gain stayed at zero, and the master
+   went silent for the remaining eleven seconds of the test.
+
+   So the wrap belongs at the source. Nothing downstream ever sees a
+   number outside 0 to TUNES.length - 1, and every comparison is made in
+   the same space as every other. */
+function tuneWrap(index) {
+  return ((index % TUNES.length) + TUNES.length) % TUNES.length;
+}
+
 // Give one side a track and let it start buffering. Never more than the
 // one being played and the one after it, which is what this enforces.
 function tuneLoad(side, index) {
   const el = tune.el[side];
   if (!el || tune.failed) return;
-  const t = TUNES[((index % TUNES.length) + TUNES.length) % TUNES.length];
-  if (el.dataset && el.dataset.tune === t.file) return;
+  index = tuneWrap(index);
+  const t = TUNES[index];
+  /* THE EARLY RETURN STILL RECORDS WHAT IS THERE, and it used to not.
+     "This side already holds that file" is the same fact as "this side
+     is loaded with that index", and dropping the second one left
+     tune.loaded naming a track that had moved on, which is precisely the
+     disagreement that picks the wrong side. It matters most at the wrap,
+     where the next file to load is track one and the idle side may still
+     be holding track one from earlier in the session. */
+  if (el.dataset && el.dataset.tune === t.file) { tune.loaded = index; return; }
   if (el.dataset) el.dataset.tune = t.file;
   el.src = t.file;
   try { el.load(); } catch (e) { tuneFailed(); }
@@ -13685,6 +13926,9 @@ function tuneStart() {
 }
 
 function tunePlay(index, fade) {
+  // Wrapped FIRST, so the comparison below and TUNES[index] both mean the
+  // same thing on the fifth track as they do on the first.
+  index = tuneWrap(index);
   const side = tune.loaded === index ? 1 - tune.live : tune.live;
   tuneLoad(side, index);
   const el = tune.el[side];
@@ -13728,7 +13972,7 @@ function tunePlay(index, fade) {
 
      The load is deferred until the outgoing level has actually reached
      nothing. There is a whole track's length to do it in. */
-  tune.pending = index + 1;
+  tune.pending = tuneWrap(index + 1);
 }
 
 function tuneStop() {
