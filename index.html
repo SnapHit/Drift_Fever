@@ -1569,6 +1569,13 @@ const FEEL = {
   TITLE_FACT_ALPHA:        0.80,
   TITLE_CLOCK_ALPHA:       0.52,
   TITLE_SUB_ALPHA:         0.55,
+  /* The music warning. Its own three numbers rather than the facts
+     line's, because it is the one line on that screen a player might
+     need to act on and it is allowed to be a little louder than the
+     scenery. */
+  TITLE_GAP_MUSIC:        0.052,     // LIVE, of the smaller dimension, under the clock
+  TITLE_MUSIC_SIZE:       0.030,     // LIVE
+  TITLE_MUSIC_ALPHA:       0.80,     // LIVE
 
   /* ----------------------------------------------------------------
      THE FINALE, WHICH IS THE ONE PLACE IN THIS GAME WHERE RESTRAINT IS
@@ -1847,6 +1854,47 @@ const FEEL = {
   MUSIC_HAT_DECAY:        0.045,
   MUSIC_ATTACK:           0.006,     // seconds. Short, but not zero, or it clicks.
   MUSIC_DUCK:              0.35,     // how far the music drops under a crash
+  /* ----------------------------------------------------------------
+     THE FOUR RECORDED TRACKS, AND WHY THEY ARE ALLOWED TO EXIST.
+
+     Sections 5 and 6 say audio defaults off and that nothing is ever
+     fetched. The author is reversing both, deliberately, and the
+     mitigations are what make it safe rather than a change of mind:
+
+       NOTHING IS FETCHED BEFORE THE TITLE SCREEN. A first ever visitor
+       who loads the page and looks at it downloads the HTML and nothing
+       else, which is the whole of section 6's actual concern.
+       THE TITLE SCREEN SAYS SO before a note plays, and the mute is
+       already on screen and one tap away when it does.
+       NOTHING EVER WAITS ON AUDIO. Not the title screen, not a run, not
+       a restart, not a continue. A track that has not arrived is a run
+       that starts quiet.
+       A FAILED FETCH FALLS BACK TO THE PROCEDURAL TRACK, which is still
+       here and still costs nothing.
+
+     STREAMED, NOT DECODED. decodeAudioData on a three minute track is
+     tens of megabytes of PCM and the target is a five year old Celeron
+     Chromebook. An HTMLAudioElement streams it, and
+     createMediaElementSource puts it back inside the Web Audio graph so
+     the existing ducking and the filter still apply. */
+  TUNE_GAIN:               0.62,     // LIVE, the recorded track's own level
+  TUNE_FADE_IN:            2.00,     // LIVE, seconds. Time to react to being caught.
+  TUNE_CROSSFADE:          2.40,     // LIVE, seconds between one track and the next
+  TUNE_TAIL:               6.00,     // seconds before the end that the next one starts
+  /* THE LAYER THAT ARRIVES UNDER PRESSURE. A finished mix cannot grow a
+     layer the way MUSIC_OCTAVE_GAIN does, so the track is played through
+     a lowpass and the cutoff opens as the multiplier climbs, exactly the
+     way MUSIC_ARP_CUTOFF_LOW and HIGH already do for the arp. Subtle on
+     purpose: it should read as the music brightening when you drive
+     well, not as an effect being switched on. */
+  TUNE_CUTOFF_LOW:         2600,     // LIVE, Hz at rest, slightly veiled
+  TUNE_CUTOFF_HIGH:       16000,     // LIVE, Hz on the edge, open
+  TUNE_CUTOFF_Q:           0.70,     // LIVE, gentle, or it rings
+  TUNE_NAME_TIME:          3.60,     // LIVE, seconds the track's name is shown
+  TUNE_NAME_FADE:          0.80,     // LIVE, seconds it takes to leave
+  TUNE_NAME_SIZE:         0.030,     // LIVE, of the smaller dimension
+  TUNE_NAME_ALPHA:         0.72,     // LIVE
+  TUNE_STALL_GIVE_UP:      12.0,     // seconds of no progress before the fallback
 
   /* Tilt. TILT_SMOOTHING_TIME matters most on cheap Android handsets that
      derive orientation from the accelerometer.
@@ -1928,7 +1976,7 @@ const FEEL = {
      stretch" means. It also survives a crash in the first few seconds:
      the countdown carries over into the restart rather than resetting or
      being lost. */
-  TILT_HINT_SECONDS:         10,
+  TILT_HINT_SECONDS:         18,
   /* THE WORDS. A ring says "something is here". It does not say "you can
      steer by tilting the phone", and nobody guesses that. So the same
      timer now also draws a short line above the tilt button with a
@@ -1938,7 +1986,14 @@ const FEEL = {
      never over the road ahead. Section 7's whole argument about the edge
      being the difference between living and dying applies to anything
      laid over the driving surface, and this is not an exception. */
-  TILT_HINT_SIZE:          0.043,    // LIVE, of the smaller dimension
+  /* MEASURED BY TESTERS FAILING TO FIND IT. At 0.043 of the smaller
+     dimension this was 17 pixels on a 390 wide phone, which is smaller
+     than the score's own subtitle, for the one message in the game aimed
+     at somebody who has never played it. It is the sanctioned exception
+     to section 5 and it was too timid to do the job. */
+  TILT_HINT_SIZE:          0.068,    // LIVE, of the smaller dimension
+  TILT_HINT_SUB:           0.54,     // LIVE, the sentence under it, of that size
+  TILT_HINT_SUB_ALPHA:     0.90,     // LIVE
   TILT_HINT_IN:             0.45,    // seconds to fade up
   TILT_HINT_FADE:           1.60,    // LIVE, seconds of fade at the end
   TILT_HINT_GAP:            0.30,    // of the pad's height, words above it
@@ -3469,7 +3524,9 @@ const TUNABLES = [
      sit there before they are read, by somebody who is also driving, is
      the definition of a number to find out by handing a phone over. */
   { key: 'TILT_HINT_SECONDS',  label: 'hintSecs',step: 1,    min: 0,    max: 40,    dp: 0, group: 1 },
-  { key: 'TILT_HINT_SIZE',     label: 'hintSize',step: 0.002,min: 0.02, max: 0.10,  dp: 3, group: 1 },
+  { key: 'TILT_HINT_SIZE',     label: 'hintSize',step: 0.002,min: 0.02, max: 0.16,  dp: 3, group: 1 },
+  { key: 'TILT_HINT_SUB',      label: 'hintSub', step: 0.02, min: 0.2,  max: 1.2,   dp: 2, group: 1 },
+  { key: 'TILT_HINT_SUB_ALPHA',label: 'hintSubA',step: 0.02, min: 0,    max: 1,     dp: 2, group: 1 },
   { key: 'TILT_HINT_IN',       label: 'hintIn',  step: 0.05, min: 0.01, max: 2.0,   dp: 2, group: 1 },
   { key: 'TILT_HINT_FADE',     label: 'hintOut', step: 0.10, min: 0.01, max: 5.0,   dp: 2, group: 1 },
   { key: 'TILT_HINT_GAP',      label: 'hintGap', step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 1 },
@@ -3647,6 +3704,21 @@ const TUNABLES = [
   { key: 'TITLE_GAP_FACTS',    label: 'ttlGap2', step: 0.005,min: 0,    max: 0.30,  dp: 3, group: 20 },
   { key: 'TITLE_FACT_SIZE',    label: 'ttlFact', step: 0.002,min: 0.01, max: 0.08,  dp: 3, group: 20 },
   { key: 'TITLE_GAP_CLOCK',    label: 'ttlGap3', step: 0.004,min: 0,    max: 0.20,  dp: 3, group: 20 },
+  { key: 'TITLE_GAP_MUSIC',    label: 'ttlGap4', step: 0.004,min: 0,    max: 0.20,  dp: 3, group: 20 },
+  { key: 'TITLE_MUSIC_SIZE',   label: 'ttlMusS', step: 0.002,min: 0.01, max: 0.08,  dp: 3, group: 20 },
+  { key: 'TITLE_MUSIC_ALPHA',  label: 'ttlMusA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
+  /* The recorded music. Its level against the effects, how long it takes
+     to arrive, and how far the filter opens under pressure, all of which
+     can only be judged with a phone in your hand. */
+  { key: 'TUNE_GAIN',          label: 'tuneVol', step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 20 },
+  { key: 'TUNE_FADE_IN',       label: 'tuneIn',  step: 0.10, min: 0,    max: 8.0,   dp: 2, group: 20 },
+  { key: 'TUNE_CROSSFADE',     label: 'tuneXf',  step: 0.10, min: 0.1,  max: 10.0,  dp: 2, group: 20 },
+  { key: 'TUNE_CUTOFF_LOW',    label: 'tuneLo',  step: 100,  min: 200,  max: 20000, dp: 0, group: 20 },
+  { key: 'TUNE_CUTOFF_HIGH',   label: 'tuneHi',  step: 200,  min: 200,  max: 22000, dp: 0, group: 20 },
+  { key: 'TUNE_CUTOFF_Q',      label: 'tuneQ',   step: 0.05, min: 0.1,  max: 8.0,   dp: 2, group: 20 },
+  { key: 'TUNE_NAME_TIME',     label: 'tuneNmT', step: 0.2,  min: 0,    max: 12,    dp: 2, group: 20 },
+  { key: 'TUNE_NAME_SIZE',     label: 'tuneNmS', step: 0.002,min: 0.01, max: 0.08,  dp: 3, group: 20 },
+  { key: 'TUNE_NAME_ALPHA',    label: 'tuneNmA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
   { key: 'TITLE_CLOCK_SIZE',   label: 'ttlClk',  step: 0.002,min: 0.01, max: 0.08,  dp: 3, group: 20 },
   { key: 'TITLE_AIR',          label: 'ttlAir',  step: 0.01, min: 0,    max: 0.50,  dp: 2, group: 20 },
   { key: 'TITLE_BLINK_PERIOD', label: 'blinkT',  step: 0.05, min: 0.2,  max: 4.0,   dp: 2, group: 20 },
@@ -6642,6 +6714,9 @@ const drift = {
   lateralAccel: 0    // road half widths per second squared, what the body leans on
 };
 
+/* MUSIC STARTS WITH THE RUN, and this is the only place it starts. Not
+   the boot splash, not the title screen: the first note lands with the
+   first corner. */
 function startRun() {
   /* Driving ends the calibration, whichever route into a run was taken.
      startTiltCal refuses to begin one while the car is moving; this is
@@ -6649,6 +6724,10 @@ function startRun() {
      with one already up. A run is a clear enough answer to "are you
      doing this now" and nothing is written, so it is a skip. */
   endTiltCal(false);
+  /* The music, and NOTHING WAITS ON IT. tuneStart asks the element to
+     play and ignores what it says: a track that has not buffered yet
+     means a quiet first few seconds, never a delayed run. */
+  tuneStart();
   // Midnight can pass with the tab open, and this is the only moment the
   // answer can change anything.
   rollDayIfNeeded();
@@ -6972,7 +7051,16 @@ function update(dt) {
      there: runTime belongs to a run and deadFor to a run that ended, so
      a blink hung off either would sit frozen. This is the only thing
      that moves on that screen and it moves nothing in the world. */
-  if (state === TITLE) { titleTime += dt; return; }
+  if (state === TITLE) {
+    titleTime += dt;
+    /* AND THIS IS THE ONE LINE THAT EVER FETCHES ANYTHING. Not the boot
+       splash, which owns the first second of the page outright and must
+       not be sharing the connection with nine megabytes of music, and
+       not a moment before. A first ever visitor who loads the page and
+       looks at the splash has downloaded the HTML and nothing else. */
+    if (!bootShown && bootFlash <= 0) tuneWake();
+    return;
+  }
   if (state !== DRIVING) return;
 
   runTime += dt;
@@ -10969,6 +11057,32 @@ function drawOverlay(w, h) {
          'center', COLOUR.TITLE_DIM);
     ctx.globalAlpha = 1;
 
+    /* THE WARNING, AND IT IS WHAT MAKES MUSIC ON BY DEFAULT DEFENSIBLE.
+
+       This screen is silent. The music starts with the run. So a player
+       is told what is about to happen, and shown where the off switch
+       is, at a moment when nothing is playing and there is no hurry. It
+       is the difference between a warning and an apology.
+
+       Brighter than the two dim lines above it on purpose: it is the one
+       thing on this screen somebody might need to act on. It is dropped
+       once the player has muted, because at that point it is telling
+       them about something that will not happen.
+
+       NOT dropped when the FETCH fails, which it was at first. A failed
+       fetch falls back to the procedural track, so music still plays and
+       the warning is still true; hiding it there would be warning people
+       only when the music is the good kind. */
+    if (musicOn) {
+      y += s * FEEL.TITLE_GAP_MUSIC;
+      ctx.globalAlpha = FEEL.TITLE_MUSIC_ALPHA;
+      const mus = 'music on. the note button, bottom left, mutes it';
+      text(mus, w / 2, y,
+           fittedSize(mus, '700', Math.round(s * FEEL.TITLE_MUSIC_SIZE), w * 0.94),
+           '700', 'center', COLOUR.TEXT);
+      ctx.globalAlpha = 1;
+    }
+
     /* AND THEN NOTHING, ALL THE WAY DOWN TO THE BOTTOM BUTTON. That
        emptiness is the design and not an oversight. */
     dailyRect.live = false;
@@ -12976,6 +13090,7 @@ function render() {
   // After the calibration, which is the thing this hint exists to get
   // somebody to, and which owns the screen once it is running.
   drawTiltHint(w, h);
+  drawTuneName(w, h);
   /* Both lockups are DOM, so the frame ends by making the document agree
      with what was just drawn rather than by drawing them. Neither writes
      anything unless something actually changed. */
@@ -13042,6 +13157,28 @@ function drawTiltCal(w, h) {
 }
 
 /* ------------------------------------------------------------------
+   THE TRACK'S NAME, briefly, when one starts.
+
+   These are original tracks and saying so is the point of having them.
+   Small, quiet, in the same dim treatment the other secondary lines on
+   this screen use, low on the LEFT so it is nowhere near the drift lane,
+   the checkpoint lane or the road ahead. It fades rather than cutting.
+   ------------------------------------------------------------------ */
+function drawTuneName(w, h) {
+  if (tune.nameLife <= 0 || !tune.nameText) return;
+  if (state !== DRIVING || paused) return;
+  const s = Math.min(w, h);
+  const a = Math.min(1, tune.nameLife / Math.max(0.05, FEEL.TUNE_NAME_FADE))
+          * FEEL.TUNE_NAME_ALPHA;
+  const size = Math.round(s * FEEL.TUNE_NAME_SIZE);
+  const line = '\u266a  ' + tune.nameText;
+  const x = Math.max(w * 0.04, s * 0.04);
+  ctx.globalAlpha = a;
+  text(line, x, padsTop - size * 1.9, size, '700', 'left', COLOUR.TITLE_DIM);
+  ctx.globalAlpha = 1;
+}
+
+/* ------------------------------------------------------------------
    TILT TO STEER, AND IT IS THE SAME HINT THE RING ALREADY WAS.
 
    Nobody guesses that a phone steers by tilting, or that one of four
@@ -13076,19 +13213,38 @@ function drawTiltHint(w, h) {
             * reach * FEEL.TILT_HINT_BOB;
   const tipY = tiltPad.top - size * FEEL.TILT_HINT_GAP + bob;
   const line = 'TILT TO STEER';
+  const sub = 'tap here to turn it on';
+  const subSize = Math.round(size * FEEL.TILT_HINT_SUB);
 
   /* Right aligned to the button's own right edge and pushed back inside
      the screen if the phone is too narrow to hold it there. Aligning to
      the BUTTON rather than to the screen is what keeps the words and the
-     pointer reading as one object. */
-  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const wide = ctx.measureText(line).width;
+     pointer reading as one object.
+
+     BOTH LINES FIT, and the WIDER of the two is what the fit is measured
+     against, or the headline shrinks to fit and the sentence under it
+     runs off the side. */
+  ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  let wide = ctx.measureText(line).width;
+  ctx.font = '700 ' + subSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  wide = Math.max(wide, ctx.measureText(sub).width);
   const pad = size * 0.4;
   let right = tiltPad.cx + tiltPad.w / 2;
   if (right - wide < pad) right = Math.min(w - pad, wide + pad);
 
   ctx.globalAlpha = a;
-  text(line, right, tipY - reach - size * 0.62, size, '800', 'right', COLOUR.GATE);
+  const headY = tipY - reach - subSize - size * 0.62;
+  text(line, right, headY, size, '900', 'right', COLOUR.GATE);
+
+  /* AND THE SENTENCE UNDER IT, because testers kept failing to find the
+     button and a pointer alone was not saying enough. "TILT TO STEER" is
+     a claim about the phone; this is the instruction that follows from
+     it, and between them they say the two things somebody who has never
+     seen this needs: that tilting works, and what to press. */
+  ctx.globalAlpha = a * FEEL.TILT_HINT_SUB_ALPHA;
+  text(sub, right, tipY - reach - subSize * 0.45, subSize, '700', 'right',
+       COLOUR.TEXT);
+  ctx.globalAlpha = a;
 
   // And the pointer, from under the words down at the button itself.
   ctx.strokeStyle = COLOUR.GATE;
@@ -13241,6 +13397,251 @@ const TRACKS = [
     wave: 'sawtooth', root: 55, tempo: 1,
     arp: [0, 3, 7, 10, 12, 10, 7, 3], bass: [0, 0, 7, 0, 10, 0, 7, 5] }
 ];
+
+/* ==================================================================
+   THE RECORDED MUSIC.
+
+   Four original tracks, played in order, looping back to the first. The
+   titles are HERE, in one place, so putting the real ones in is a data
+   change: they are shown on screen when a track starts and that is the
+   whole point of having them.
+
+   THE PATH IS RELATIVE, so this works from a filesystem, from a static
+   host and from a phone, which is what section 1 asks for. It is the
+   same origin as the HTML: the same kind of request that fetched the
+   page, which is why it is not the class of thing section 6 forbids. */
+const TUNES = [
+  { file: 'music/track-1.m4a', name: 'TRACK ONE' },
+  { file: 'music/track-2.m4a', name: 'TRACK TWO' },
+  { file: 'music/track-3.m4a', name: 'TRACK THREE' },
+  { file: 'music/track-4.m4a', name: 'TRACK FOUR' }
+];
+
+/* TWO ELEMENTS, NOT ONE, because a crossfade needs both tracks audible
+   at once and an element can only be in one place at a time. They swap
+   roles every change: whichever is playing is `live`, the other is the
+   one being faded out or the one being got ready.
+
+   A MediaElementAudioSourceNode may be created ONCE per element, ever,
+   so the pair is built at the same moment as the rest of the graph and
+   nothing is ever rebuilt. */
+const tune = {
+  el: [null, null],       // the two HTMLAudioElements
+  src: [null, null],      // their MediaElementAudioSourceNodes
+  low: [null, null],      // and each one's own lowpass
+  g: [null, null],        // and each one's own gain
+  live: 0,                // which side is the one playing
+  /* THE FADE LIVES HERE, not in the gain node. updateMusic writes the
+     live side's gain every frame with a short follow, so a slow ramp set
+     once at play() was overwritten inside a frame and the two second
+     fade in measured a quarter of a second. These are the envelope;
+     updateMusic multiplies by them and cannot fight them. */
+  lvl: [0, 0],            // where each side actually is, 0 to 1
+  want: [0, 0],           // where it is heading
+  rate: [1, 1],           // and how fast, in units a second
+  index: -1,              // which TUNES entry is on the live side
+  loaded: -1,             // which TUNES entry the idle side has been given
+  pending: -1,            // and one waiting for the outgoing track to finish
+  wired: false,           // are the elements inside the audio graph yet
+  playing: false,
+  failed: false,          // a fetch died, so the procedural track takes over
+  nameLife: 0,            // seconds left on the on screen title
+  nameText: '',
+  stall: 0,               // seconds of no progress, for giving up
+  lastTime: -1
+};
+
+/* THE ELEMENTS ARE MADE AT THE TITLE SCREEN AND NOT ONE MOMENT EARLIER.
+   Creating them is what starts the download, so this is the line that
+   section 6's exception actually turns on, and it is called from exactly
+   one place. */
+function tuneWake() {
+  /* AND NOT AT ALL FOR SOMEBODY WHO HAS MUTED. Being remembered has to
+     mean the download does not happen either, or a muted player on a
+     school connection still pays for music they will never hear. */
+  if (!musicOn) return;
+  if (tune.el[0] || tune.failed) return;
+  for (let i = 0; i < 2; i++) {
+    let el;
+    try { el = new Audio(); } catch (e) { tune.failed = true; return; }
+    el.preload = 'auto';
+    /* NO crossOrigin. It was set to 'anonymous' at first and it broke
+       running from a filesystem outright: the attribute forces a CORS
+       check, and file:// cannot satisfy one, so every track failed with
+       "Cross origin requests are only supported for protocol schemes"
+       and the game fell back to the procedural music for anybody opening
+       the HTML directly. Section 1 says this runs from a filesystem, a
+       static host or a phone, and it does.
+
+       Nothing is lost. The attribute exists so that a CROSS origin
+       media element can still be read by Web Audio, and these are same
+       origin by construction: a relative path, alongside the HTML. */
+    el.loop = false;
+    /* Muted at the ELEMENT is wrong: it would mute the graph tap as
+       well. The gain nodes are the volume and these stay at one. */
+    el.volume = 1;
+    el.addEventListener('error', tuneFailed);
+    tune.el[i] = el;
+  }
+  tuneLoad(1 - tune.live, 0);        // track one, onto the idle side
+}
+
+function tuneFailed() {
+  /* A LOCKED DOWN SCHOOL NETWORK WILL BLOCK THINGS and the game must not
+     break or go quiet when it does. The procedural track is still in the
+     graph and it takes over from here. */
+  if (tune.failed) return;
+  tune.failed = true;
+  tune.playing = false;
+  for (let i = 0; i < 2; i++) {
+    const el = tune.el[i];
+    if (el) { try { el.pause(); } catch (e) {} }
+  }
+}
+
+// Give one side a track and let it start buffering. Never more than the
+// one being played and the one after it, which is what this enforces.
+function tuneLoad(side, index) {
+  const el = tune.el[side];
+  if (!el || tune.failed) return;
+  const t = TUNES[((index % TUNES.length) + TUNES.length) % TUNES.length];
+  if (el.dataset && el.dataset.tune === t.file) return;
+  if (el.dataset) el.dataset.tune = t.file;
+  el.src = t.file;
+  try { el.load(); } catch (e) { tuneFailed(); }
+  tune.loaded = index;
+}
+
+/* Into the graph, once there is a graph. Called from buildAudio, which
+   only ever runs after a gesture, so the elements may already have been
+   buffering for a while by then and nothing has waited on them. */
+function tuneWire(a) {
+  if (tune.wired || tune.failed || !tune.el[0]) return;
+  for (let i = 0; i < 2; i++) {
+    let src;
+    try { src = a.ac.createMediaElementSource(tune.el[i]); }
+    catch (e) { tuneFailed(); return; }
+    const low = a.ac.createBiquadFilter();
+    low.type = 'lowpass';
+    low.frequency.value = FEEL.TUNE_CUTOFF_LOW;
+    low.Q.value = FEEL.TUNE_CUTOFF_Q;
+    const g = a.ac.createGain();
+    g.gain.value = 0;
+    src.connect(low); low.connect(g); g.connect(a.bus);
+    tune.src[i] = src; tune.low[i] = low; tune.g[i] = g;
+  }
+  tune.wired = true;
+}
+
+/* THE RUN IS WHAT STARTS THE MUSIC, so the first note lands with the
+   first corner rather than over a title screen somebody is reading.
+
+   NOTHING WAITS. play() is asked for and whatever it returns is
+   ignored: if the track has not buffered, the run is already under way
+   and the audio joins when it can. */
+function tuneStart() {
+  if (!musicOn || tune.failed || !tune.wired) return;
+  if (tune.playing) return;
+  const next = tune.index < 0 ? 0 : tune.index;
+  tunePlay(next, FEEL.TUNE_FADE_IN);
+}
+
+function tunePlay(index, fade) {
+  const side = tune.loaded === index ? 1 - tune.live : tune.live;
+  tuneLoad(side, index);
+  const el = tune.el[side];
+  if (!el || !tune.g[side]) return;
+  try {
+    const p = el.play();
+    // A rejected play is a browser saying not yet. It is not an error
+    // and it must not take the music away for the rest of the session.
+    if (p && p.catch) p.catch(function () {});
+  } catch (e) { return; }
+  tune.live = side;
+  tune.index = index;
+  tune.playing = true;
+  tune.stall = 0;
+  tune.lastTime = -1;
+  tune.nameText = TUNES[index].name;
+  tune.nameLife = FEEL.TUNE_NAME_TIME;
+  const per = 1 / Math.max(0.05, fade);
+  tune.want[side] = 1;     tune.rate[side] = per;
+  tune.want[1 - side] = 0; tune.rate[1 - side] = per;
+  /* AND THE NEXT ONE WAITS FOR THE OLD ONE TO FINISH LEAVING.
+
+     MEASURED, AND THIS WAS BROKEN. Loading the next track onto the other
+     side immediately sets that element's src, which PAUSES IT AND RESETS
+     IT TO ZERO, and that element is the track still fading out. So the
+     crossfade was a fade up from silence with the outgoing track cut
+     dead at the first frame of it, which is the one thing a crossfade is
+     for. Traced: side one went from 8.0 seconds playing to paused at
+     zero on the frame the swap happened.
+
+     The load is deferred until the outgoing level has actually reached
+     nothing. There is a whole track's length to do it in. */
+  tune.pending = index + 1;
+}
+
+function tuneStop() {
+  tune.playing = false;
+  for (let i = 0; i < 2; i++) {
+    tune.want[i] = 0; tune.lvl[i] = 0;
+    if (tune.g[i]) ramp(tune.g[i].gain, 0, FEEL.AUDIO_FADE_TIME);
+    const el = tune.el[i];
+    if (el) { try { el.pause(); } catch (e) {} }
+  }
+}
+
+// Is a recorded track actually making sound right now? The procedural
+// music runs only when the answer is no AND the fetch has failed.
+function tuneAudible() {
+  if (!tune.playing || tune.failed || !tune.wired) return false;
+  const el = tune.el[tune.live];
+  return !!(el && !el.paused && el.currentTime > 0);
+}
+
+function tuneUpdate(dt) {
+  if (tune.nameLife > 0) tune.nameLife -= dt;
+  /* THE ENVELOPE, ON FRAME TIME. Linear and rate limited rather than a
+     follow, because a fade in is a promise about how long somebody has
+     to react and an exponential tail does not keep it. */
+  for (let i = 0; i < 2; i++) {
+    const d = tune.want[i] - tune.lvl[i];
+    const step = tune.rate[i] * dt;
+    tune.lvl[i] = Math.abs(d) <= step ? tune.want[i] : tune.lvl[i] + Math.sign(d) * step;
+  }
+  /* The deferred load, now that the side it would land on is silent. */
+  if (tune.pending >= 0 && tune.lvl[1 - tune.live] <= 0) {
+    const idle = 1 - tune.live;
+    const el = tune.el[idle];
+    if (el) { try { el.pause(); } catch (e) {} }
+    tuneLoad(idle, tune.pending);
+    tune.pending = -1;
+  }
+  if (!tune.wired || tune.failed) return;
+  if (!tune.playing) return;
+  const el = tune.el[tune.live];
+  if (!el) return;
+
+  /* GIVING UP, and only after a long wait. A track that has made no
+     progress for TUNE_STALL_GIVE_UP seconds is not coming, so the
+     procedural track takes over rather than the run staying silent for
+     the whole of somebody's go. */
+  if (el.currentTime === tune.lastTime) tune.stall += dt;
+  else { tune.stall = 0; tune.lastTime = el.currentTime; }
+  if (tune.stall > FEEL.TUNE_STALL_GIVE_UP) { tuneFailed(); return; }
+
+  /* THE CROSSFADE. Started TUNE_TAIL before the end so the two overlap
+     rather than one stopping and the next beginning, and the next track
+     has been buffering on the other side since this one started. */
+  const dur = el.duration;
+  if (dur && isFinite(dur) && el.currentTime > 0
+      && dur - el.currentTime <= FEEL.TUNE_TAIL) {
+    tunePlay(tune.index + 1, FEEL.TUNE_CROSSFADE);
+  } else if (el.ended) {
+    tunePlay(tune.index + 1, FEEL.TUNE_CROSSFADE);
+  }
+}
 let track = 0;            // only one for now, and the list is here so that
                           // adding a second is a data change and not a
                           // rewrite. Nothing selects between them yet.
@@ -13251,15 +13652,24 @@ let track = 0;            // only one for now, and the list is here so that
    SOUND is the tyres, the scrape and the crash, and it is on. The skid is
    quiet, textural and is most of what makes the drift read at all.
 
-   MUSIC is off, and that is section 6 taken seriously rather than a taste
-   judgement: the skid could be a video playing in the next tab, but an
-   arpeggio at 148bpm is unmistakably a game from across a classroom and
-   it is what gets somebody caught. Anyone who wants it is one tap away
-   and the choice is remembered.
+   MUSIC IS NOW ON, and it used to be off. The old comment here argued
+   that an arpeggio at 148bpm is what gets somebody caught in a
+   classroom, and that argument was right about the arpeggio. It is the
+   author's call to reverse it for four original tracks, and what makes
+   it defensible is not the music being better: it is that THE TITLE
+   SCREEN SAYS SO BEFORE A NOTE PLAYS, the mute is already on screen and
+   one tap away when it does, the title screen itself is silent, and a
+   mute is remembered forever.
 
-   A stored value always wins over the default, in both directions. */
+   A STORED VALUE ALWAYS WINS OVER THE DEFAULT, IN BOTH DIRECTIONS, and
+   that is the half of this that matters most now the default is on:
+   somebody who muted once is never surprised again. With storage
+   blocked the mute still holds for the whole session, which is the same
+   fallback the tilt hint has and the same limit: there is no way to
+   remember a person across loads on a device that refuses to remember
+   anything. */
 let sfxOn = storeGet('sfx') !== '0';
-let musicOn = storeGet('music') === '1';
+let musicOn = storeGet('music') !== '0';
 function anySound() { return sfxOn || musicOn; }
 
 let audio = null;         // the graph, once there is one, and never before one
@@ -13391,8 +13801,8 @@ function buildAudio() {
   wobble.start(t0); bassOsc.start(t0);
   arpOsc.start(t0); octOsc.start(t0); stingOsc.start(t0); chainOsc.start(t0);
 
-  return {
-    ac: ac, master: master, pauseFilter: pauseFilter,
+  const built = {
+    ac: ac, master: master, pauseFilter: pauseFilter, bus: bus,
     skidBand: skidBand, skidGain: skidGain,
     scrapeA: scrapeA, scrapeGain: scrapeGain,
     crashLow: crashLow, crashGain: crashGain,
@@ -13405,6 +13815,10 @@ function buildAudio() {
     chainOsc: chainOsc, chainGain: chainGain,
     step: 0, nextNote: 0, heat: 0, crashUntil: 0
   };
+  // The recorded tracks join the same bus, so the master, the pause
+  // sweep and the crash duck all apply to them without a second path.
+  tuneWire(built);
+  return built;
 }
 
 /* Every live level goes through this rather than through a bare
@@ -13647,7 +14061,14 @@ function padSwitch(btn, set) {
   });
 }
 padSwitch(soundBtn, function () { sfxOn = !sfxOn; });
-padSwitch(musicBtn, function () { musicOn = !musicOn; });
+padSwitch(musicBtn, function () {
+  musicOn = !musicOn;
+  /* Unmuting mid run has to be able to start the download, because the
+     title screen tick is the only other place that ever does and this
+     player is nowhere near it. Muting is handled by updateMusic, which
+     sees musicOn go false on the next frame and stops the element. */
+  if (musicOn) { tuneWake(); tuneStart(); }
+});
 paintSound();
 
 /* Resumed from every gesture path there is, not just from the dial. A
@@ -13677,9 +14098,43 @@ function pluck(g, peak, decay, when) {
 function updateMusic() {
   const s = TRACKS[track];
   const a = audio;
-  if (!musicOn) { ramp(a.musicGain.gain, 0, FEEL.AUDIO_FADE_TIME); return; }
+  if (!musicOn) {
+    ramp(a.musicGain.gain, 0, FEEL.AUDIO_FADE_TIME);
+    if (tune.playing) tuneStop();
+    return;
+  }
 
   const duck = a.ac.currentTime < a.crashUntil ? FEEL.MUSIC_DUCK : 1;
+
+  /* THE RECORDED TRACK, AND THE FILTER THAT MAKES IT REACT.
+
+     A finished mix cannot grow a layer the way MUSIC_OCTAVE_GAIN does,
+     so the brightness is the lever instead: the cutoff opens as the
+     multiplier climbs, which is exactly what MUSIC_ARP_CUTOFF_LOW and
+     HIGH already do to the arp. Same idea, same heat, applied to a
+     stereo file rather than to an oscillator. */
+  const cut = FEEL.TUNE_CUTOFF_LOW
+            + (FEEL.TUNE_CUTOFF_HIGH - FEEL.TUNE_CUTOFF_LOW) * a.heat;
+  for (let i = 0; i < 2; i++) {
+    if (!tune.low[i]) continue;
+    ramp(tune.low[i].frequency, cut, FEEL.AUDIO_FADE_TIME);
+    tune.low[i].Q.value = FEEL.TUNE_CUTOFF_Q;
+  }
+  if (tune.playing) {
+    for (let i = 0; i < 2; i++) {
+      if (!tune.g[i]) continue;
+      ramp(tune.g[i].gain, FEEL.TUNE_GAIN * duck * tune.lvl[i], FEEL.AUDIO_FADE_TIME);
+    }
+  }
+
+  /* AND THE PROCEDURAL TRACK IS THE FALLBACK, not a companion. It runs
+     when the fetch has FAILED, and it stays quiet while a recorded track
+     is on its way: a run that starts before the download lands is a
+     quiet run, per the brief, not one with two pieces of music in it. */
+  if (!tune.failed) {
+    ramp(a.musicGain.gain, 0, FEEL.AUDIO_FADE_TIME);
+    return;
+  }
   ramp(a.musicGain.gain, FEEL.MUSIC_GAIN * duck, FEEL.AUDIO_FADE_TIME);
   // The layers that arrive under pressure. Levels, not switches.
   ramp(a.octLevel.gain, FEEL.MUSIC_OCTAVE_GAIN * a.heat, FEEL.AUDIO_FADE_TIME);
@@ -13718,6 +14173,10 @@ function updateMusic() {
 /* Called once a frame from the main loop, whatever the state, so the
    pause sweep and the wind down still run when nothing else does. */
 function updateAudio(dt) {
+  /* THE TRACK CLOCK RUNS WHETHER OR NOT THERE IS A GRAPH, because the
+     on screen title and the crossfade are the element's business and the
+     element exists from the title screen onward. */
+  tuneUpdate(dt);
   if (!audio) return;
   const a = audio;
   if (a.ac.state === 'suspended') return;
