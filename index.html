@@ -14174,7 +14174,10 @@ function updateDebris(dt) {
        loop, because a burst writes into the same pool this is walking. */
     if (p.fuse > 0) {
       p.fuse -= dt;
-      if (p.fuse <= 0) { burstAt[burst] = i; burst++; p.life = 0; }
+      if (p.fuse <= 0) {
+        if (burst < burstAt.length) { burstAt[burst] = i; burst++; }
+        p.life = 0;
+      }
     }
     const drag = Math.exp(-dt / Math.max(0.01, p.drag));
     p.vx *= drag;
@@ -14187,10 +14190,28 @@ function updateDebris(dt) {
   for (let i = 0; i < burst; i++) fireworkBurst(debris[burstAt[i]]);
   if (live === 0 && burst === 0) debrisCount = 0;
 }
-// Which slots burst this frame. Fixed length, because a frame cannot
-// burst more shells than there are shells and allocating here would be
-// an allocation in the update loop.
-const burstAt = new Int32Array(64);
+/* Which slots burst this frame. Fixed length, because allocating here
+   would be an allocation in the update loop.
+
+   SIZED FROM THE POOL IT INDEXES, AND IT USED TO BE SIXTY FOUR. The old
+   comment said a frame cannot burst more shells than there are shells,
+   which is true, and then sized the array at 64 while the pool holds 900.
+   At sixty frames a second no more than a handful of fuses expire in the
+   same frame and it never showed. At a big enough step they expire
+   together: updateDebris wrote burstAt[burst++] with no bound, read past
+   the end, and handed fireworkBurst debris[undefined], which throws on
+   .x and kills the frame loop.
+
+   That is the finale, on a five year old Chromebook, the first time
+   somebody finishes the last level. It reproduced at 10fps and on all
+   three stuttering profiles.
+
+   The size is now derived from the thing it indexes rather than guessed
+   at, so the sentence in the old comment is actually true of the array.
+   The bound in the loop is kept anyway: this array being one number
+   smaller than the pool is a crash, and a crash in the reward moment is
+   worth two lines of belt and braces. */
+const burstAt = new Int32Array(PARTICLE_POOL);
 
 /* One colour per batch, in the order they are drawn. The first two are
    the explosion's and the rest are the fireworks', which are the score's
