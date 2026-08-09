@@ -823,6 +823,58 @@ const FEEL = {
   PYLON_MIN_PX:             1.4,     // culled once shorter than this on screen
   PYLON_GLOW_SPREAD:        1.9,     // multiple of the pylon width
   PYLON_GLOW_ALPHA:        0.22,
+  /* ----------------------------------------------------------------
+     STREET LAMPS AND LIGHT POOLS. Item 9.
+
+     The game has no light SOURCES at road level. Everything lit down
+     there is lit because it is painted bright, and that is the flat
+     decal reading the whole visual pass exists to break. A lamp is one
+     post that already exists, one lit head on top of it, and a pool of
+     that light on the ground beneath it, which is the first thing in
+     this game that says the road is being lit rather than glowing.
+
+     ON THE MARKER POSTS, AND ALTERNATING SIDES. Marker posts already run
+     at PYLON_MAJOR_EVERY, so the lamps inherit a rhythm the eye has
+     already learnt. The investigation asks for every FOURTH marker post
+     and expects three to five lamps in shot, and those two do not agree
+     against this source: marker posts fall every fifty six segments
+     against a draw distance of two hundred, so there are THREE of them
+     in shot and every fourth of three is less than one. Measured, it put
+     no lamp on screen at all for most of a run. So the thinning is one
+     and the count comes out at the three to five the document wanted.
+
+     ONE SIDE AT A TIME, alternating, which is how a real street is lit
+     and not a concession. Lamps down both verges would double the pools
+     to six, and the pool is the only per pixel cost in this item.
+
+     THE TWO THINGS THIS MAY NOT DO. The head is a new lit element and
+     it is the likeliest thing in the whole pass to overtake the road
+     edge, so its colour sits deliberately under the marker post's own,
+     which already sits within a point or two of the lip. And the pool
+     is BY DEFINITION on the drivable road, so its width is clamped
+     against the projected half width rather than set in world units:
+     it may never reach the centre line, at any distance, on any screen. */
+  LAMP_EVERY:                 1,     // LIVE, every nth marker post carries a lamp
+  LAMP_HEAD_WIDTH:          230,     // world units, wider than the post under it
+  LAMP_HEAD_HEIGHT:         110,     // world units
+  LAMP_HEAD_GLOW:           2.6,     // LIVE, multiple of the head, for the faint pass
+  LAMP_HEAD_GLOW_ALPHA:    0.24,     // LIVE
+  LAMP_HEAD_MIN_PX:         1.2,     // never thinner than this, at any dpr
+  /* THE POOL SITS INBOARD OF THE POST THAT THROWS IT, and that is not a
+     liberty. The posts stand at EDGE_OUT + PYLON_OUT, which is outboard
+     of the whole slab: a pool centred under one would be half in the
+     void, glowing on nothing. Real street lamps reach over the
+     carriageway on an arm, so the light lands on the road and the pole
+     does not, which is exactly the offset this is. */
+  LAMP_POOL_OUT:           0.66,     // LIVE, of the half width, where the pool lands
+  LAMP_POOL_SIZE:          0.50,     // LIVE, of the projected half width
+  LAMP_POOL_SQUASH:        0.34,     // LIVE, flattened the way the camera flattens the road
+  LAMP_POOL_ALPHA:         0.30,     // LIVE
+  LAMP_POOL_GAP:           0.12,     // LIVE, of the half width, held off the centre line
+  LAMP_POOL_MIN_PX:         2.0,     // below this it is not worth a gradient fill
+  /* A RADIAL GRADIENT COSTS PER PIXEL, so the cost of this feature is
+     the AREA of the nearest pool and not the number of them. Capped. */
+  LAMP_POOL_MAX_PX:         200,     // LIVE, screen pixels, the near cap
 
   /* The horizon. Section 7.3 calls it the emotional anchor and it was a
      colour ramp. Distant towers seen across the void, well below the road,
@@ -1380,6 +1432,59 @@ const FEEL = {
   CITY_COOL_FROM:          0.46,     // LIVE, thresholds in this band light cool
   CITY_COOL_TO:            0.52,     // LIVE
   CITY_COOL_ALPHA:         0.72,     // LIVE, share of the amber alpha, so it stays quieter
+  /* ----------------------------------------------------------------
+     NEON SIGNAGE. Item 8.
+
+     A city at night and a city STREET at night are different pictures,
+     and the thing that separates them is signage. A handful of bars of
+     light on the building faces, mostly vertical, and the background
+     stops being scenery and starts being a place.
+
+     NO TEXT, NO GLYPHS, NO FONT. At this size a bar of light reads as a
+     sign perfectly well, and anything actually legible up there would
+     be a second thing to read while driving.
+
+     THE COLOUR IS THE WHOLE PROBLEM AND IT IS SOLVED BY ROTATION. The
+     palette already spends four saturated families: the warm road, the
+     cool car, pinned pink for danger and pinned green for go. A fifth
+     that rides the wheel independently will eventually land on top of
+     one of them, and the one it must never land on is the car. So the
+     sign colour is not a colour, it is an OFFSET: this biome's own
+     amber turned by a fixed number of degrees, which puts it a known
+     distance from everything else on the wheel in all twelve biomes
+     rather than in eleven of them.
+
+     ABOVE THE HORIZON ONLY. Clipped at the horizon line, so a sign can
+     never appear alongside the far road however tall the city gets. */
+  SIGN_SHARE:              0.38,     // LIVE, share of buildings carrying one
+  SIGN_VERTICAL_SHARE:     0.72,     // LIVE, of those, how many run down the face
+  SIGN_LEN_MIN:            0.30,     // LIVE, of the face, the shortest sign
+  SIGN_LEN_SPAN:           0.34,     // LIVE, and the span above it
+  SIGN_THICK:              0.16,     // LIVE, of the face, across the sign
+  SIGN_INSET:              0.12,     // LIVE, of the face, kept clear of both edges
+  SIGN_MIN_PX:              1.4,     // never thinner than this, at any dpr
+  SIGN_MIN_BUILDING_PX:      16,     // shorter than this and a sign is a smudge
+  SIGN_GLOW_INFLATE:        2.2,     // LIVE, pixels the faint pass grows by
+  SIGN_GLOW_ALPHA:         0.30,     // LIVE, share of the solid alpha
+  SIGN_ALPHA:              0.80,     // LIVE
+  SIGN_HUE_SHIFT:           210,     // degrees off this biome's own amber
+  /* AND A FLOOR AGAINST THE TWO PINNED FAMILIES, because the rotation on
+     its own does NOT solve them and the investigation's reasoning misses
+     it. A fixed offset from the biome holds a fixed distance from
+     everything that TURNS with the biome, and the car is one of those:
+     measured, the sign sits 52 degrees off the car in all twelve, which
+     is the result the document wanted. But danger and go do not turn.
+     They are pinned, deliberately, because rotating them once inverted
+     the visual language and two players confused the two in opposite
+     directions. So a sign that turns sweeps past them, and measured it
+     did: 1 degree off the jump green in biome five and 12 off the hazard
+     pink in biome three. Green bars in the sky in the biome where green
+     means go is the same failure in a quieter place.
+
+     So the offset is a wish and this is the rule: if the turn lands the
+     sign inside this many degrees of either pinned hue, it is pushed to
+     the near edge of that zone and no further. */
+  SIGN_KEEP_CLEAR:           34,     // degrees, from danger and from go
   /* ----------------------------------------------------------------
      THE CITY LIGHTS THE SKY. Item 6. One more fill of the horizon band
      that is already cached, keyed to the city glow rather than to the
@@ -3294,6 +3399,19 @@ const COLOUR = {
   PYLON:        '#d85a22',
   PYLON_MAJOR:  '#ffc266',
   PYLON_GLOW:   '224,104,40',
+  /* The lamp head, item 9, and it is deliberately DIMMER than the marker
+     post it stands on. Measured across the twelve biomes, the marker
+     posts peak within a point or two of the dimmest road edge, so a lit
+     head at the top of one is the single easiest way in this whole pass
+     to hand brightest-on-screen to something that is not the edge. This
+     sits about twenty five under the post. */
+  LAMP:         '#e8a95c',
+  /* And the pool it throws, which is WARM NEUTRAL rather than a new hue.
+     It is the one thing in this pass that is unavoidably ON the drivable
+     road, so it may add light there but it may not add colour: near
+     enough to unsaturated that the hue wheel barely moves it, which is
+     the point. Held as a triple because the gradient is built from it. */
+  LAMP_POOL:    '244,222,196',
   SKYLINE:      '#170906',
   /* The far city. Clearly above the void and clearly below the near
      silhouette, which is the whole requirement: too close to either and
@@ -3324,6 +3442,14 @@ const COLOUR = {
      argument about the road edge's fire spreading to the city survives
      having an exception in it. */
   SKYLINE_WINDOW_COOL: '#9fd8ff',
+  /* The neon signage, item 8, and this entry is a STARTING POINT rather
+     than the colour that gets drawn. It rides the wheel with the rest of
+     the palette and is then turned a further SIGN_HUE_SHIFT degrees in
+     rebuildDerivedColours, so what reaches the screen is always the same
+     fixed distance from this biome's road, car, hazard and jump families
+     instead of wandering across them one biome in twelve. Its luminance
+     is what is set here, because the rotation preserves it. */
+  SIGN:         '#ff9a3c',
 
   /* Deliberately duller than the edge lip. This is the secondary channel
      and it must never pull the eye down off the road. It carries its
@@ -3848,6 +3974,15 @@ const TUNABLES = [
   { key: 'WET_SHEEN_ALPHA',    label: 'sheenA',  step: 0.01, min: 0,    max: 0.8,   dp: 2, group: 4 },
   { key: 'WET_SHEEN_FADE',     label: 'sheenH',  step: 0.02, min: 0.02, max: 1.0,   dp: 2, group: 4 },
   { key: 'PYLON_HEIGHT',       label: 'post',    step: 30,   min: 60,   max: 2400,  dp: 0, group: 4 },
+  { key: 'LAMP_EVERY',         label: 'lampN',   step: 1,    min: 1,    max: 12,    dp: 0, group: 4 },
+  { key: 'LAMP_HEAD_GLOW',     label: 'lampGW',  step: 0.2,  min: 1,    max: 8,     dp: 1, group: 4 },
+  { key: 'LAMP_HEAD_GLOW_ALPHA',label:'lampGA',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'LAMP_POOL_OUT',      label: 'poolAt',  step: 0.02, min: 0,    max: 1.4,   dp: 2, group: 4 },
+  { key: 'LAMP_POOL_SIZE',     label: 'poolW',   step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 4 },
+  { key: 'LAMP_POOL_SQUASH',   label: 'poolSq',  step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 4 },
+  { key: 'LAMP_POOL_ALPHA',    label: 'poolA',   step: 0.01, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'LAMP_POOL_GAP',      label: 'poolGap', step: 0.02, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'LAMP_POOL_MAX_PX',   label: 'poolCap', step: 10,   min: 10,   max: 600,   dp: 0, group: 4 },
   { key: 'EDGE_GLOW_ALPHA',    label: 'glow',    step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 4 },
   { key: 'EDGE_BLEED_ALPHA',   label: 'bleed',   step: 0.01, min: 0,    max: 0.4,   dp: 2, group: 4 },
   { key: 'EDGE_BLEED_PX',      label: 'bleedLen',step: 0.002,min: 0,    max: 0.12,  dp: 3, group: 4 },
@@ -3954,6 +4089,15 @@ const TUNABLES = [
   { key: 'CITY_HALO_ALPHA',    label: 'cityHalo',step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'CITY_WINDOW_FILL',   label: 'winSize', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 21 },
   { key: 'CITY_MIN_BUILDING_PX',label:'winMinPx',step: 1,    min: 0,    max: 60,    dp: 0, group: 21 },
+  { key: 'SIGN_SHARE',         label: 'signN',   step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SIGN_VERTICAL_SHARE',label: 'signUp',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SIGN_LEN_MIN',       label: 'signLo',  step: 0.02, min: 0.02, max: 1,     dp: 2, group: 21 },
+  { key: 'SIGN_LEN_SPAN',      label: 'signHi',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SIGN_THICK',         label: 'signW',   step: 0.02, min: 0.02, max: 0.8,   dp: 2, group: 21 },
+  { key: 'SIGN_INSET',         label: 'signIn',  step: 0.02, min: 0,    max: 0.45,  dp: 2, group: 21 },
+  { key: 'SIGN_GLOW_INFLATE',  label: 'signGW',  step: 0.2,  min: 0,    max: 8,     dp: 1, group: 21 },
+  { key: 'SIGN_GLOW_ALPHA',    label: 'signGA',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SIGN_ALPHA',         label: 'signA',   step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
   { key: 'CHECKPOINT_FLASH',   label: 'gateFx',  step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 14 },
   { key: 'CALLOUT_TIME',       label: 'callFor', step: 0.05, min: 0.3,  max: 4.0,   dp: 2, group: 14 },
@@ -8405,6 +8549,22 @@ const SKY_PLAIN = 0, SKY_SETBACK = 1, SKY_CROWN = 2, SKY_MAST = 3;
 const cityShape = [];
 // And the far layer's own heights, which are not the near layer's.
 const skylineFarH = [];
+/* THE SIGNAGE, ITEM 8, generated once at load like everything else up
+   here. Five raw numbers a building and not one decision: which face
+   carries a sign, which way it runs, where it sits, how long it is and
+   how far across the face. RAW, in nought to one, with every FEEL
+   constant applied at DRAW time, so the tuner can move any of them on
+   the phone without regenerating the city. */
+const signRnd = [];
+const signVert = [];
+const signAlong = [];
+const signLen = [];
+const signAcross = [];
+/* THE SIGN BUFFER, sized for the worst case the repeat walk can produce
+   and written in place, for the same reason the window buffer exists:
+   nothing in the draw path may allocate. */
+const MAX_SIGNS = 256;
+const signXY = new Float32Array(MAX_SIGNS * 4);
 (function () {
   let seed = 1337;
   function next() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 1000) / 1000; }
@@ -8429,6 +8589,19 @@ const skylineFarH = [];
     for (let k = 0; k < rows * cols; k++) {
       cityThr.push(clamp(base + (next() - 0.5) * 0.22, 0, 1));
     }
+  }
+  /* A SECOND LOOP RATHER THAN FIVE MORE DRAWS INSIDE THE FIRST ONE, and
+     that is not tidiness. Every value above comes off this one stream in
+     a fixed order, so inserting a draw anywhere in that loop shifts every
+     height, every shape and every window threshold after it and rebuilds
+     a city that has already been played and signed off. Appended, the
+     city is byte for byte the one that shipped and the signs are new. */
+  for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
+    signRnd.push(next());
+    signVert.push(next());
+    signAlong.push(next());
+    signLen.push(next());
+    signAcross.push(next());
   }
 })();
 
@@ -8480,6 +8653,93 @@ function drawSkylineFar(w, h) {
   }
   ctx.fillStyle = COLOUR.SKYLINE_FAR;
   ctx.fill();
+}
+
+/* THE SIGNAGE, ITEM 8. The same repeat walk and the same cull the
+   bodies and the windows use, into the same kind of preallocated
+   buffer, and then two fills for every sign in shot: the bar wide and
+   faint, then the bar solid. That is the two pass glow convention this
+   file uses everywhere instead of shadowBlur.
+
+   ON ALWAYS, unlike the windows. The windows come up with the chain
+   because they are the reward for driving well; a neon sign is simply
+   switched on, and having the street furniture wait for a good run is
+   what would make the opening look unfinished rather than dark.
+
+   ITS OWN FUNCTION RATHER THAN A BLOCK INSIDE drawSkyline, so it can
+   be suppressed on its own when the twelve biome ranking is taken.
+   An element that cannot be measured separately cannot be argued
+   about separately, and every hard limit in this file is a claim
+   about one element against another. */
+function drawSigns(w, period, step, shift, baseY, minH, spanH) {
+  let signN = 0;
+  for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
+    for (let i = 0; i < FEEL.SKYLINE_COUNT && signN < MAX_SIGNS; i++) {
+      if (signRnd[i] >= FEEL.SIGN_SHARE) continue;
+      const x = shift + rep * period + i * step;
+      if (x > w + step || x < -step * 2) continue;
+      const th = minH + skylineH[i] * spanH;
+      // Too short to carry a bar that would read as one rather than as
+      // a smudge, which is the same judgement the windows already make.
+      if (th < FEEL.SIGN_MIN_BUILDING_PX) continue;
+      const bwid = step * 0.86;
+      const top = baseY - th;
+      const inset = FEEL.SIGN_INSET;
+      const lenF = FEEL.SIGN_LEN_MIN + signLen[i] * FEEL.SIGN_LEN_SPAN;
+      let sx, sy, sw, sh;
+      if (signVert[i] < FEEL.SIGN_VERTICAL_SHARE) {
+        sh = th * lenF;
+        sw = Math.max(FEEL.SIGN_MIN_PX, bwid * FEEL.SIGN_THICK);
+        sx = x + bwid * inset
+           + signAcross[i] * Math.max(0, bwid * (1 - inset * 2) - sw);
+        sy = top + signAlong[i] * Math.max(0, th - sh);
+      } else {
+        sw = bwid * lenF;
+        sh = Math.max(FEEL.SIGN_MIN_PX, th * FEEL.SIGN_THICK);
+        sx = x + signAlong[i] * Math.max(0, bwid - sw);
+        sy = top + th * inset
+           + signAcross[i] * Math.max(0, th * (1 - inset * 2) - sh);
+      }
+      /* ABOVE THE HORIZON, AND TRIMMED RATHER THAN DROPPED. The
+         building bases sit a little BELOW the horizon line, by
+         SKYLINE_DROP, so a sign low on a short block can reach past it
+         and end up alongside the far road, which is the one place in
+         this game nothing new is allowed to appear. Cutting the bottom
+         off keeps the sign and loses only the part that was never
+         allowed to be there. */
+      if (sy >= horizonY) continue;
+      if (sy + sh > horizonY) sh = horizonY - sy;
+      if (sh < 1 || sw < 1) continue;
+      const at = signN * 4;
+      signXY[at] = sx; signXY[at + 1] = sy;
+      signXY[at + 2] = sw; signXY[at + 3] = sh;
+      signN++;
+    }
+  }
+  if (signN) {
+    const g = FEEL.SIGN_GLOW_INFLATE;
+    ctx.beginPath();
+    for (let k = 0; k < signN; k++) {
+      const at = k * 4;
+      // The faint pass is held to the horizon as well, or the glow
+      // alone would put light beside the far road.
+      const gy = signXY[at + 1] - g;
+      const gh = Math.min(signXY[at + 3] + g * 2, horizonY - gy);
+      if (gh <= 0) continue;
+      ctx.rect(signXY[at] - g, gy, signXY[at + 2] + g * 2, gh);
+    }
+    ctx.globalAlpha = FEEL.SIGN_ALPHA * FEEL.SIGN_GLOW_ALPHA;
+    ctx.fillStyle = SIGN_FILL;
+    ctx.fill();
+    ctx.beginPath();
+    for (let k = 0; k < signN; k++) {
+      const at = k * 4;
+      ctx.rect(signXY[at], signXY[at + 1], signXY[at + 2], signXY[at + 3]);
+    }
+    ctx.globalAlpha = FEEL.SIGN_ALPHA;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
 }
 
 function drawSkyline(w, h) {
@@ -8600,6 +8860,7 @@ function drawSkyline(w, h) {
     }
   }
 
+  drawSigns(w, period, step, shift, baseY, minH, spanH);
   /* A dim lit line on the roofs, so they read as built rather than as a
      ragged hole in the background. This is where the city lights come up
      with the multiplier: the line thickens and runs toward this biome's
@@ -8712,6 +8973,14 @@ const WALL_CULL_PX = 1.6;
 let EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
 let SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
 let PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
+/* The signage, item 8, and the road pool under a lamp, item 9. Both are
+   built in rebuildDerivedColours rather than here, for the reason the
+   whole of that function exists: a cached fill or a gradient that misses
+   a rotation puts the last biome's colour in the middle of this one. The
+   pool is a single gradient rather than a ramp of them, unlike the car's,
+   because a lamp is one fixed warm neutral and nothing indexes it. */
+let SIGN_FILL = 'rgb(255,154,60)';
+let LAMP_POOL_GRAD = null;
 // The outer lip of the slab, half width plus the shoulder, as a multiple
 // of the half width. The shoulder is the scrape band, so the drawn edge of
 // the road really is the last place the car may be.
@@ -8815,6 +9084,10 @@ function drawRoad(w, h) {
      is outboard of both. */
   wetSheenPass(first, last);
   reflectPass(first, last, baseIndex, FEEL.PYLON_SPACING);
+  // And the light the lamps throw on the road, item 9, which belongs in
+  // the same place and for the same reason: it is ON the surface, so it
+  // goes after the surface and before everything the player steers by.
+  lampPoolPass(first, last, baseIndex, FEEL.PYLON_SPACING);
   lanePass(first, last);
   edgeGlowPass(first, last);
   drawTrail(first, last, baseIndex);
@@ -10062,6 +10335,121 @@ function drawPylons(first, last, baseIndex, w) {
   pylonPath(first, last, baseIndex, spacing, 1, scaleH, 1);
   ctx.fillStyle = COLOUR.PYLON_MAJOR;
   ctx.fill();
+
+  // The lit heads, item 9. Two more batched fills for every lamp in
+  // shot, wide and faint then solid, on top of the posts they stand on.
+  drawLampHeads(first, last, baseIndex, spacing, scaleH);
+}
+
+/* THE HEADS, AS A PAINTER OF THEIR OWN AND NOT TWO FILLS INSIDE
+   drawPylons. Suppressing a painter is how everything in this file is
+   measured, and stubbing lampHeadPath alone would have left the marker
+   posts' path still open with two fills about to land on it: the posts
+   would have been redrawn in the lamp colour and the measurement would
+   have reported the heads at the brightness of the posts. Only whole
+   painters may be stubbed, which this project has paid for before. */
+function drawLampHeads(first, last, baseIndex, spacing, scaleH) {
+  lampHeadPath(first, last, baseIndex, spacing, FEEL.LAMP_HEAD_GLOW, scaleH);
+  ctx.globalAlpha = FEEL.LAMP_HEAD_GLOW_ALPHA;
+  ctx.fillStyle = COLOUR.LAMP;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  lampHeadPath(first, last, baseIndex, spacing, 1, scaleH);
+  ctx.fill();
+}
+
+/* THE LAMP HEADS, ITEM 9. Walked with the same test pylonPath uses, so a
+   head exists exactly where a marker post exists and the two can never
+   disagree about spacing, and thinned again by LAMP_EVERY so only every
+   nth marker post carries one.
+
+   IT DOES NOT MOVE WITH THE MULTIPLIER. The pylon glow pulses with the
+   heat and the finale opens it right up; a street lamp does neither,
+   because a lamp that brightens when you drift is a scoring readout
+   rather than a light source, and the whole point of item 9 is that the
+   road is being LIT by something that exists in the world. */
+function lampHeadPath(first, last, baseIndex, spacing, widen, scaleH) {
+  const every = Math.max(1, Math.round(FEEL.PYLON_MAJOR_EVERY
+                                       * Math.max(1, Math.round(FEEL.LAMP_EVERY))));
+  ctx.beginPath();
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const idx = baseIndex + n;
+    if (idx % spacing !== 0) continue;
+    if (((idx / spacing) % every) !== 0) continue;
+
+    const rise = bw[n] * FEEL.PYLON_MAJOR_HEIGHT * scaleH;
+    if (rise < FEEL.PYLON_MIN_PX) continue;
+    const hh = bw[n] * FEEL.LAMP_HEAD_HEIGHT * scaleH * 0.5;
+    const hx = Math.max(FEEL.LAMP_HEAD_MIN_PX,
+                        bw[n] * FEEL.LAMP_HEAD_WIDTH * scaleH * 0.5) * widen;
+    const hy = Math.max(FEEL.LAMP_HEAD_MIN_PX, hh) * widen;
+    const side = lampSide(idx, spacing);
+    const out = side * bw[n] * (EDGE_OUT + FEEL.PYLON_OUT);
+    // Centred on the top of the post, so the head caps it rather than
+    // floating above it.
+    const cy = by[n] - rise + hh;
+    ctx.rect(bx[n] + out - hx, cy - hy, hx * 2, hy * 2);
+  }
+}
+
+/* WHICH VERGE THIS LAMP STANDS ON. Alternating, off the lamp's own index
+   rather than off anything that moves, so a given post is lit from the
+   same side every frame of every run and the row reads as a street
+   rather than as a flicker. */
+function lampSide(idx, spacing) {
+  const p = Math.round(idx / spacing / Math.max(1, Math.round(FEEL.PYLON_MAJOR_EVERY))
+                       / Math.max(1, Math.round(FEEL.LAMP_EVERY)));
+  return (p % 2) ? 1 : -1;
+}
+
+/* THE LIGHT ON THE GROUND. Item 9, and the one thing in this whole pass
+   that is unavoidably ON the drivable road.
+
+   ONE RADIAL GRADIENT, BUILT ONCE PER PALETTE REBUILD and filled through
+   a translate and a scale, so a pool costs a single fill and allocates
+   nothing. That is the pattern the car's own pool already uses.
+
+   THE WIDTH IS CLAMPED IN FRACTIONS OF THE HALF WIDTH, NOT IN WORLD
+   UNITS, because the rule it has to keep is a rule about the picture and
+   not about the road: it may never reach the centre line, at any
+   distance, on any screen. A world sized pool keeps that promise near
+   the camera and breaks it at the planning horizon, where the half width
+   is a few pixels and everything is on top of everything else.
+
+   AND CAPPED IN PIXELS AT THE NEAR END, because a radial gradient costs
+   per pixel: the cost of this feature is the area of the closest pool
+   and has almost nothing to do with how many of them are in shot. */
+function lampPoolPass(first, last, baseIndex, spacing) {
+  if (!LAMP_POOL_GRAD || FEEL.LAMP_POOL_ALPHA <= 0) return;
+  const every = Math.max(1, Math.round(FEEL.PYLON_MAJOR_EVERY
+                                       * Math.max(1, Math.round(FEEL.LAMP_EVERY))));
+  const outF = FEEL.LAMP_POOL_OUT;
+  const room = outF - FEEL.LANE_DASH_FRACTION - FEEL.LAMP_POOL_GAP;
+  if (room <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = FEEL.LAMP_POOL_ALPHA;
+  ctx.fillStyle = LAMP_POOL_GRAD;
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const idx = baseIndex + n;
+    if (idx % spacing !== 0) continue;
+    if (((idx / spacing) % every) !== 0) continue;
+    const rx = Math.min(bw[n] * FEEL.LAMP_POOL_SIZE, bw[n] * room,
+                        FEEL.LAMP_POOL_MAX_PX);
+    if (rx < FEEL.LAMP_POOL_MIN_PX) continue;
+    // The same side the head is on, or the light would be coming from
+    // the wrong place, which is the one mistake a lighting pass cannot
+    // survive.
+    ctx.save();
+    ctx.translate(bx[n] + lampSide(idx, spacing) * bw[n] * outF, by[n]);
+    ctx.scale(rx, rx * FEEL.LAMP_POOL_SQUASH);
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
 }
 
 /* THE WET SHEEN, ITEM 7. surfacePass's shape, the far segments only,
@@ -10623,6 +11011,41 @@ function stopRampInto(out, keys, n) {
 }
 function setFaces(into, from) { for (let i = 0; i < from.length; i++) into[i] = from[i]; }
 
+/* HOW FAR TO TURN THE SIGN, ITEM 8. The wish is SIGN_HUE_SHIFT degrees
+   off this biome's amber, which holds the sign a constant distance from
+   everything that turns with the biome. The rule is that it may not come
+   within SIGN_KEEP_CLEAR of either pinned family, because those do not
+   turn and the wish would sweep straight through them.
+
+   TWICE, because pushing clear of one zone can push into the other. Two
+   passes settle it at these widths and the result is checked rather than
+   assumed: signhue reports the closest approach across all twelve. */
+/* THE TWO HUES THAT MEAN SOMETHING, and they are the LOUD members of
+   each family rather than the first key in it. JUMP_DECK is the ramp's
+   brown deck, not the go colour: aiming the avoidance at it steered the
+   sign clear of a brown nobody reads and left it one degree off the
+   green that means go. The lip is the thing the eye takes the meaning
+   from, in both families. */
+const SIGN_AVOID = ['HAZARD_TOP', 'JUMP_LIP'];
+function signHueShift() {
+  const c = rgbOf(COLOUR.SIGN);
+  const h0 = rgbToHsl(c[0], c[1], c[2])[0];
+  let h = h0 + FEEL.SIGN_HUE_SHIFT;
+  const keep = FEEL.SIGN_KEEP_CLEAR;
+  for (let pass = 0; pass < 2; pass++) {
+    for (let i = 0; i < SIGN_AVOID.length; i++) {
+      const p = rgbOf(COLOUR[SIGN_AVOID[i]]);
+      const ph = rgbToHsl(p[0], p[1], p[2])[0];
+      const d = ((h - ph) % 360 + 360) % 360;
+      // Pushed to whichever edge of the zone it is already nearer, so
+      // the correction is the smallest one that clears it.
+      if (d < keep) h += keep - d;
+      else if (d > 360 - keep) h -= keep - (360 - d);
+    }
+  }
+  return h - h0;
+}
+
 function rebuildDerivedColours() {
   EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
   // The roof lights run toward this biome's own hot hue, so the ramp has
@@ -10640,6 +11063,22 @@ function rebuildDerivedColours() {
   GATE_GLOW_FILL = 'rgb(' + COLOUR.GATE_GLOW + ')';
   CAR_RIM_GLOW_FILL = 'rgb(' + COLOUR.CAR_RIM_GLOW + ')';
   CAR_LIGHT_GLOW_FILL = 'rgb(' + COLOUR.CAR_LIGHT_GLOW + ')';
+
+  /* THE SIGN COLOUR, AS AN OFFSET RATHER THAN A COLOUR. Item 8. The base
+     entry has already been turned by this biome's own rotation, so
+     turning it a further fixed amount here lands it the same distance
+     from the road, the car, the hazards and the jumps in every biome.
+     rotateHue holds luminance while it turns, which is exactly what is
+     wanted: the sign's brightness is decided once, in COLOUR.SIGN, and
+     the wheel cannot walk it up toward the road edge. */
+  SIGN_FILL = rotateHue(COLOUR.SIGN, signHueShift());
+  /* The lamp's pool on the road, same pattern as the car's: one radial
+     gradient, filled through a scaled transform, so a pool is a single
+     fill and allocates nothing per frame. */
+  LAMP_POOL_GRAD = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+  LAMP_POOL_GRAD.addColorStop(0, 'rgba(' + COLOUR.LAMP_POOL + ',1)');
+  LAMP_POOL_GRAD.addColorStop(0.42, 'rgba(' + COLOUR.LAMP_POOL + ',0.40)');
+  LAMP_POOL_GRAD.addColorStop(1, 'rgba(' + COLOUR.LAMP_POOL + ',0)');
 
   stopRampInto(stopBuf, TRAIL_STOPS, 24);
   TRAIL_RAMP.length = 0;
