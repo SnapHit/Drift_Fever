@@ -2869,6 +2869,11 @@ const FEEL = {
      being a wall without level one gaining anything or level three
      losing anything. One is the old straight line. */
   LEVEL_RAMP_POWER:         1.6,     // LIVE
+  /* The run out past the finish, laid in fixed size pieces so the
+     slicing is a pure function of the segment index rather than of how
+     far the camera had got. See topUpRoad. NOT live: changing it changes
+     the road, which is the one thing the daily may not do per device. */
+  FINISH_RUNOUT_CHUNK:       64,     // segments
   /* Nothing is placed inside this of the line. The closing stretch is
      meant to be the hardest part of the day, not a lottery on the last
      corner, and a blocker straddling the finish would decide the run
@@ -6776,11 +6781,31 @@ function buildWidthScale() {
 }
 
 function addRun(count, c0, c1, w0, w1, easeIn) {
-  // The difficulty's own squeeze, on top of whatever the phrase asked
-  // for. Applied here, at build time, so the road narrows over the run
-  // rather than under the car.
-  const base = FEEL.ROAD_HALF_WIDTH_BASE * buildWidthScale();
+  /* The difficulty's own squeeze, on top of whatever the phrase asked
+     for. Applied here, at build time, so the road narrows over the run
+     rather than under the car.
+
+     PER SEGMENT, NOT PER RUN, AND THAT WAS A DETERMINISM BUG. It used to
+     be computed once, before the loop, from the index of the run's FIRST
+     segment, so every segment in a run carried the width scale of
+     whichever index the run happened to start at. That is fine while the
+     runs themselves are a pure function of the seed, and the phrases
+     are. The run out past the finish is not: topUpRoad used to size it
+     from how far the CAMERA had got, which is a frame rate quantity, so
+     two devices sliced the same stretch of road into different length
+     runs and each slice took its width scale from a different index.
+
+     Measured, level three at 9000 segments: the half widths came out
+     2025.035 at 60fps, 2025.073 at 30 and 2025.112 at 22. Same road,
+     three different widths, and the daily's whole premise is that there
+     is one road today.
+
+     Evaluated here, a segment's width depends on that segment's own
+     index and on nothing else, so it cannot matter how the stretch
+     containing it was sliced. buildClock reads segBase + segments.length
+     which inside this loop IS the index about to be laid. */
   for (let i = 0; i < count; i++) {
+    const base = FEEL.ROAD_HALF_WIDTH_BASE * buildWidthScale();
     const p = count > 1 ? i / (count - 1) : 1;
     const t = easeIn ? (1 - Math.cos(p * Math.PI)) / 2 : p;
     addSegment(c0 + (c1 - c0) * t, base * (w0 + (w1 - w0) * t));
@@ -7412,8 +7437,19 @@ function topUpRoad(baseIndex) {
      part of the track and nothing about it is a test. */
   while (segBase + segments.length < needed) {
     if (pastFinish(segBase + segments.length)) {
-      addRun(Math.min(64, needed - (segBase + segments.length)),
-             0, 0, roadWidth, 1, true);
+      /* A FIXED CHUNK, AND IT USED TO BE Math.min(64, needed - built).
+         `needed` is derived from baseIndex, which is the CAMERA's
+         segment, which is a frame rate quantity: a device a few frames
+         behind asks for a different number of segments and gets a
+         differently sized run. addRun interpolates across its own count,
+         so a stretch sliced 64 + 64 + 12 is not the stretch sliced
+         64 + 40 + 36 even though both cover the same indices.
+
+         Fixed, the slicing falls on a grid anchored to the finish line,
+         which is itself a pure function of the seed and the level. It
+         may overshoot the requested end by up to a chunk, which costs a
+         few dozen segments of array and nothing else. */
+      addRun(FEEL.FINISH_RUNOUT_CHUNK, 0, 0, roadWidth, 1, true);
       continue;
     }
     addPhrase();
@@ -13347,6 +13383,7 @@ function clearDailyRecords() {
   dailyBest = 0; dailyTime = 0; dailyDone = false; dailyClean = false;
   dailyGhostBytes = 0;
   storeSet('daily.day', String(todayStamp));
+  storeSet('daily.gen', String(ROAD_GEN));
   /* Every level's keys wiped, and a couple past the current count, so
      turning LEVEL_COUNT down and back up cannot resurrect yesterday's
      level three under today's date. */
@@ -13358,11 +13395,29 @@ function clearDailyRecords() {
   }
 }
 
+/* WHICH GENERATION OF THE ROAD A STORED RECORD BELONGS TO.
+
+   The day stamp answers "is this today's road", and until now that was
+   the whole question, because the road for a given day was fixed for
+   ever. It is not: fixing the frame rate leak CHANGED the road every
+   seed produces, slightly, so a score or a ghost banked this morning was
+   set on a road that no longer exists. Worse, it may have been set on a
+   road that never existed for anybody else, because that is precisely
+   what the bug was.
+
+   So a record has to match the day AND the generation, and a stored
+   record that predates this marker is discarded exactly the way a
+   yesterday's record is. Bump this whenever a change alters the geometry
+   a seed produces. It costs the day's records once and it is the only
+   honest thing to do with a time set on a different track. */
+const ROAD_GEN = 2;
+
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
-  if (day !== todayStamp) {
-    // A different day, or nothing stored. Either way there is nothing
-    // here that belongs to today's roads.
+  const gen = parseInt(storeGet('daily.gen'), 10);
+  if (day !== todayStamp || gen !== ROAD_GEN) {
+    // A different day, an older road, or nothing stored. Either way
+    // there is nothing here that belongs to today's roads.
     clearDailyRecords();
     return;
   }
@@ -13500,6 +13555,7 @@ function bankDaily(finished) {
       }
     }
     storeSet('daily.day', String(todayStamp));
+  storeSet('daily.gen', String(ROAD_GEN));
     storeSet('daily.done.' + clampLevel(level), r.clean ? '2' : '1');
     dailyDone = r.done;
     dailyClean = r.clean;
@@ -13511,6 +13567,7 @@ function bankDaily(finished) {
   dailyBest = r.best;
   dailyTime = r.time;
   storeSet('daily.day', String(todayStamp));
+  storeSet('daily.gen', String(ROAD_GEN));
   storeSet('daily.best.' + clampLevel(level), String(r.best));
   storeSet('daily.time.' + clampLevel(level), r.time ? r.time.toFixed(2) : '0');
   /* THE LINE NO LONGER GOES WITH THE RECORD. It used to be written here,
