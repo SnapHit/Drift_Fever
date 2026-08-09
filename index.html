@@ -772,7 +772,26 @@ const FEEL = {
   SKYLINE_COUNT:             40,
   SKYLINE_PERIOD:          1100,     // pixels the pattern repeats over
   SKYLINE_MIN_HEIGHT:     0.008,     // of screen height
-  SKYLINE_MAX_HEIGHT:      0.05,
+  /* WAS 0.05, WHICH IS A KERB AND NOT A CITY. Five per cent of the
+     screen height is 42 pixels on a phone held upright, so the tallest
+     tower on the horizon was shorter than the score above it and the
+     whole skyline read as texture at the join rather than as a place the
+     road is going. Section 7.3 calls the horizon the emotional anchor
+     and asks for something ON it; this is the difference between a line
+     and a silhouette.
+
+     IT COSTS ALMOST NOTHING TO RAISE. The bodies are one batched fill
+     however tall they are. What does grow is the WINDOWS: taller
+     buildings clear CITY_MIN_BUILDING_PX, so blocks that were skipped
+     entirely now light. Measured either side of the change: see the
+     report. It also puts buildings behind the score and the clock for
+     the first time, which the text shadow already handles and which is
+     checked rather than assumed.
+
+     LIVE, because how tall a city should be is a question for a phone.
+     Its own seeded stream is untouched: nothing here draws from rng(),
+     so a pinned road is the same road before and after. */
+  SKYLINE_MAX_HEIGHT:      0.18,     // LIVE
   SKYLINE_DROP:           0.008,     // how far below the horizon its base sits
   SKYLINE_PARALLAX:       0.018,     // against the car's sideways position
   SKYLINE_DRIFT:         0.0016,     // against distance travelled
@@ -3747,6 +3766,7 @@ const TUNABLES = [
   { key: 'CITY_PULSE_DEPTH',   label: 'winThrob',step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 22 },
   { key: 'CITY_PULSE_HZ',      label: 'throbHz', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 22 },
   { key: 'CITY_PULSE_HZ_GAIN', label: 'throbUp', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 22 },
+  { key: 'SKYLINE_MAX_HEIGHT', label: 'cityTall',step: 0.01, min: 0.01, max: 0.45,  dp: 3, group: 21 },
   { key: 'CITY_WINDOW_FILL',   label: 'winSize', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 21 },
   { key: 'CITY_MIN_BUILDING_PX',label:'winMinPx',step: 1,    min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
