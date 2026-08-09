@@ -2020,7 +2020,7 @@ const FEEL = {
   FINALE_AFTERGLOW:        1.60,     // LIVE, beat h, the world stays lit under the result
   /* The two beats of the message. The banner lands first, alone and
      large; the result arrives under it once the car has settled. */
-  FINALE_BANNER_AT:        0.20,     // seconds before TRACK COMPLETE lands
+  FINALE_BANNER_AT:        0.20,     // seconds before LEVEL COMPLETE lands
   FINALE_BANNER_IN:        0.26,     // seconds it takes to land
   FINALE_BANNER_SIZE:     0.108,     // of the smaller dimension, at its largest
   /* THE BANNER TRAVELS BEFORE THE RESULT ARRIVES, not during it. Both
@@ -12049,13 +12049,19 @@ function rollsForward() {
      level after this one. */
   return mode === DAILY && level < levelCount() && recFor(level).done;
 }
+/* HOW THE INPUT IS GIVEN, on the device it is being read on.
+
+   The title screen has branched on hasKeyboard since it was written and
+   these two screens never did, so a phone with no keyboard anywhere near
+   it was being told to press any key. Same query, same answer, and it is
+   SHORTER on the device with less room, which is the one that matters. */
+function tapOrKey() { return hasKeyboard ? 'tap or press any key' : 'tap'; }
 function finishPrompt() {
   /* MORE TO COME. It rolls forward, so it says where to, by number,
      because "the next level" is vaguer than the game already is: the HUD
      has been saying LEVEL 2/3 for the whole run. */
   if (rollsForward()) {
-    return 'tap or press any key for level '
-         + (level + 1) + ' of ' + levelCount();
+    return tapOrKey() + ' for level ' + (level + 1) + ' of ' + levelCount();
   }
   /* THE LAST LEVEL, WITH THE DAY BEHIND IT. It does not roll anywhere:
      startNextLevel's guard fails and startRun puts the player back on
@@ -12069,7 +12075,7 @@ function finishPrompt() {
      Endless lands here too. It has no finish line at all, so this is
      unreachable from play, but the input path has a defensive
      `else startRun()` and the sentence matches it. */
-  return 'tap or press any key to run it again';
+  return tapOrKey() + ' to run it again';
 }
 function deathPrompt(resume) {
   // Unchanged, and it was already right: the reflex tap continues.
@@ -12079,7 +12085,7 @@ function deathPrompt(resume) {
      which is the same fault as the completion screen's in a quieter
      form. It restarts, so it now says so, in the words the completion
      screen was borrowing. */
-  return 'tap or press any key to run it again';
+  return tapOrKey() + ' to run it again';
 }
 
 function drawFinish(w, h) {
@@ -12126,9 +12132,15 @@ function drawFinish(w, h) {
     const room = w * 0.92 * (1 - FEEL.BRAND_TEXT_STROKE)
                - s * FEEL.BRAND_TEXT_SHADOW_X * 2;
     const want = Math.round((big + (small - big) * set) * pop);
-    const size = fittedSize('TRACK COMPLETE', '900', want, room);
+    /* LEVEL COMPLETE, NOT TRACK COMPLETE. TRACK is the day's road, the
+       one with a number on it that two players can quote at each other,
+       and LEVEL is one of the three inside it. The banner was firing on
+       finishing one of three while the HUD directly above it read
+       TRACK #8   LEVEL 3/3, so the same word meant the whole road in one
+       place and a third of it in another. One word each, everywhere. */
+    const size = fittedSize('LEVEL COMPLETE', '900', want, room);
     bannerCy = (h * 0.42) + (y0 - h * 0.42) * set;
-    brandText('TRACK COMPLETE', w / 2, bannerCy, Math.max(8, size),
+    brandText('LEVEL COMPLETE', w / 2, bannerCy, Math.max(8, size),
               Math.min(1, bIn * 1.4));
   }
 
