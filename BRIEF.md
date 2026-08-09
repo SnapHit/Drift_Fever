@@ -113,9 +113,19 @@ This is the pillar that makes it a different game rather than a better clone, an
 
 Distance scoring tells the player one thing: stay away from the edge. So the optimal play is the timid play, and the scoring system argues against the thing that makes drifting fun.
 
-Invert it. Score proximity to the edge, drift angle and chain length. A multiplier that climbs while drifting, climbs faster the closer to the edge, peaks inside the scrape band from 4.2, and resets on straightening or crashing. Bank it at checkpoints or lose it on death.
+Invert it. Score drift angle and chain length. A multiplier that climbs while drifting, climbs faster the deeper the slide, and resets on straightening or crashing. Bank it at checkpoints or lose it on death.
 
-Emotionally, the edge stops being the thing you avoid and becomes the thing you court. Nothing in this browser niche does this. Drift Hunters has drift scoring but is a heavy WebGL free-roam simulator; Drift Boss is a reflex test with a distance counter. The space between them is empty.
+**Proximity to the edge was part of this and has been removed. Do not reintroduce it.** This paragraph originally read "score proximity to the edge, drift angle and chain length", with the multiplier peaking inside the scrape band. It shipped, it was played for many sessions, and it was dropped in session C for three reasons.
+
+*It did not register.* Hundreds of runs by the author and lateral position was never once a thing being thought about: the game is hard enough that surviving is the whole job. A tester who had played repeatedly asked whether the game scores you for holding the centre line, which is the exact opposite of what it did.
+
+*The scrape band was doing two contradictory jobs at once.* The same lateral position drained the clock from 4.2 and peaked the multiplier from 4.4, so it was punished and rewarded simultaneously. That is a reliable way to make scoring unreadable. The band is now purely the mercy gradient 4.2 always described: it keeps its clock drain, its sparks, its shake, its speed penalty and its meter, and it pays nothing.
+
+*And slip is visible where position is not.* The car is sideways and the trail runs hot; the player can see the whole of it. Nobody can judge their distance from an edge they are steering away from, with the camera behind the car. Scoring what the player can see is the difference between a mechanic and noise.
+
+This still scores the risk in the sense that matters, because a deep slide is riskier than a shallow one. It stops scoring a dimension nobody perceives. Everything else in this section stands.
+
+Emotionally, the edge stops being the thing you avoid and becomes the thing you court — the scrape band is survivable, so committing to a corner rather than backing out of it is the whole skill. Nothing in this browser niche does this. Drift Hunters has drift scoring but is a heavy WebGL free-roam simulator; Drift Boss is a reflex test with a distance counter. The space between them is empty.
 
 This also answers the observed market gap: every site competing for the sequel terms advertises progression, shops and power-ups, because the originals have none. A live multiplier is progression inside the run and is far cheaper than a shop.
 

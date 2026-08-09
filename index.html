@@ -1072,23 +1072,27 @@ const FEEL = {
   /* ----------------------------------------------------------------
      Scoring, which is section 4.4: score the risk, not the distance.
 
-     The failure this is built against is a permanent shallow drift. If
-     time spent sideways is what pays, the whole game collapses into one
-     move held for ever, so time alone must pay almost nothing and the
-     multiplier has to be bought with depth and with proximity to the
-     edge, both at once.
-
-     That is why the two factors MULTIPLY rather than add, and why both
-     go to zero at their easy end. Sitting sideways in the middle of the
-     road earns a climb of exactly zero, not a small one, and a
-     multiplier that is not climbing is decaying. Sitting on the edge
-     without slip earns zero the same way. Only both together pay, and
-     the scrape timer from 4.2 is what stops the paying state being
-     somewhere you can live.
+     PROXIMITY TO THE EDGE IS NO LONGER ONE OF THE TERMS. It was, and
+     the argument for dropping it is in multiplierEarn and in BRIEF.md
+     4.4. What is left is slip depth, integrated over time, which is
+     chain length: holding a slide climbs the number and letting it go
+     lets it decay.
 
      MULT_SLIP_POWER above 1 bends the slip term against shallow angles
      specifically, so easing into a lazy slide barely registers while
-     committing to one pays quickly. */
+     committing to one pays quickly.
+
+     WHAT THE FLOOR IS ACTUALLY FOR, MEASURED. slipNorm is close to
+     saturated in ordinary play: across four driving styles from
+     aggressive sawing to a gentle 0.35 gain, every one of them spent
+     between 50 and 63 per cent of level three above a slipNorm of 0.9.
+     This car is sideways almost all the time and no floor can separate
+     one style from another, so MULT_MIN_SLIP is not a difficulty dial.
+     Its job is that the number MOVES BOTH WAYS: at 0.25 a driver is
+     under it for roughly a fifth of a run, on the straights and through
+     the gentle bends, and that fifth is where the multiplier decays.
+     Raise it and the climb simply stops for longer; it does not become
+     more selective. */
   /* Two rates, not one, and the split is the whole point.
 
      SCORE_SURVIVE_RATE is what mere time is worth, and it is deliberately
@@ -1112,9 +1116,17 @@ const FEEL = {
   SCORE_RISK_RATE:          110,     // points per second per multiplier above one
   MULT_MIN_SLIP:           0.25,     // slipNorm under this is not drifting at all
   MULT_SLIP_POWER:          1.6,     // above 1 punishes shallow angles
-  MULT_EDGE_START:         0.45,     // road half widths, where the edge term leaves zero
-  MULT_EDGE_PEAK:          1.15,     // and where it reaches full, inside the scrape band
-  MULT_CLIMB_RATE:          3.2,     // multiplier per second, at full slip on the edge
+  /* RETUNED FOR ONE TERM INSTEAD OF TWO. The edge factor sat between
+     nought and one and was nought most of the time, so removing it did
+     not slow the climb down, it took the brakes off: at the old 3.2 the
+     ceiling arrived in eight to thirteen seconds for every driving style
+     tested, which makes the cap a formality rather than an achievement.
+     At 0.9 a committed driver reaches it in 22 to 28 seconds, a passive
+     one in 31 to 38, and on level three a passive one did not reach it
+     inside a minute at all. That is close to what the old best case
+     managed, which was 20.8 seconds on level one and never on two or
+     three. MULT_EDGE_START and MULT_EDGE_PEAK are gone with the term. */
+  MULT_CLIMB_RATE:          0.9,     // multiplier per second, at full slip
   MULT_DECAY_RATE:          1.1,     // per second whenever nothing is being earned
   MULT_MAX:                  12,
   /* The readout. It has to teach the rule inside one corner without a
@@ -12764,31 +12776,51 @@ let furthest = (function () {
   return isFinite(n) && n > 0 ? n : 0;
 })();
 
-/* Section 4.4. Two terms, multiplied, both zero at their easy end.
+/* Section 4.4, AND PROXIMITY TO THE EDGE IS NO LONGER PART OF IT.
 
-   slipTerm  is how far past MULT_MIN_SLIP the car is sideways, bent by
-             MULT_SLIP_POWER so a shallow slide is worth far less than
-             half of a deep one.
-   edgeTerm  is how close to the edge it is, zero in the middle of the
-             road and full inside the scrape band.
+   ONE TERM NOW. slipTerm is how far past MULT_MIN_SLIP the car is
+   sideways, bent by MULT_SLIP_POWER so a shallow slide is worth far less
+   than half of a deep one. Chain length is the other half and it always
+   was: updateScore integrates this over time, so holding a slide is what
+   climbs the number and breaking it is what loses it.
 
-   Multiplied, so neither alone pays. Sideways in the middle earns
-   nothing. Parked on the edge pointing straight earns nothing. */
+   WHY THE EDGE TERM IS GONE, and this reverses a founding pillar so the
+   reasoning belongs here as well as in the brief.
+
+   IT DID NOT REGISTER. Hundreds of runs by the author and lateral
+   position was never once a thing being thought about: the game is hard
+   enough that surviving is the whole job. A tester who had played
+   repeatedly asked whether the game scores you for holding the CENTRE
+   line, which is the exact opposite of what it did.
+
+   THE SCRAPE BAND WAS DOING TWO CONTRADICTORY JOBS AT ONCE. The same
+   lateral position drained the clock and peaked the multiplier, so it
+   was punished and rewarded simultaneously. That is a reliable way to
+   make scoring unreadable, and it made the band impossible to describe
+   in one sentence.
+
+   AND SLIP IS VISIBLE WHERE POSITION IS NOT. The car is sideways and the
+   trail runs hot; you can see the whole of it. You cannot judge your
+   distance from an edge you are steering away from, and the camera is
+   behind the car. Scoring what the player can see is the difference
+   between a mechanic and noise.
+
+   This still scores the risk in the sense that matters, because a deep
+   slide is riskier than a shallow one. It stops scoring a dimension
+   nobody perceives. The scrape band keeps its clock drain, its sparks,
+   its shake, its speed penalty and its meter, and becomes purely the
+   mercy gradient section 4.2 always described it as. */
 function multiplierEarn() {
   const slipTerm = Math.pow(
     clamp((drift.slipNorm - FEEL.MULT_MIN_SLIP) / (1 - FEEL.MULT_MIN_SLIP), 0, 1),
     FEEL.MULT_SLIP_POWER);
-  if (slipTerm <= 0) return 0;
-  const edgeTerm = clamp(
-    (Math.abs(carFrac) - FEEL.MULT_EDGE_START)
-    / Math.max(0.01, FEEL.MULT_EDGE_PEAK - FEEL.MULT_EDGE_START), 0, 1);
-  return slipTerm * edgeTerm;
+  return slipTerm;
 }
 
-/* Just the slip half of the multiplier's two terms. The clock is paid by
-   DRIFTING, wherever on the road you are doing it, where the multiplier
-   also wants you near the edge. Courting the edge is what the score is
-   for; keeping the car sideways is what the clock is for. */
+/* The clock's own slip term, which was ALREADY just the slip half and is
+   unchanged. It has its own floor, CLOCK_MIN_SLIP, because the two are
+   answering different questions and always have been. What has changed
+   is that the multiplier no longer asks a second question on top. */
 function slipPay() {
   return Math.pow(
     clamp((drift.slipNorm - FEEL.CLOCK_MIN_SLIP) / (1 - FEEL.CLOCK_MIN_SLIP), 0, 1),
