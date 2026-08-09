@@ -2429,6 +2429,13 @@ const FEEL = {
   CAR_SPOILER_THICK:         26,     // world units
   CAR_SPOILER_POST:         0.5,     // of half width, how far out the posts sit
   CAR_SPOILER_SHADOW:      0.55,     // alpha of the gap band under the blade
+  /* THE UNLOCKABLE WING SHAPES, as multiples of the stock one, so the
+     stock car is untouched by construction and a variant cannot drift
+     away from it when the stock numbers are tuned. */
+  CAR_WING_DUCK_HALF:      0.66,     // LIVE, the ducktail's span
+  CAR_WING_DUCK_Y:         0.98,     // LIVE, of body height, sitting on the boot
+  CAR_WING_WIDE_HALF:      1.14,     // LIVE, the wide blade's span
+  CAR_WING_WIDE_THICK:     0.55,     // LIVE, and it is thinner for it
   /* The glow may spread upward and backward as much as it likes, because
      that reads as light on air. It may NOT spread sideways past the car's
      own tail, because that reads as bodywork: at a spread of 2.3 on a
@@ -3617,6 +3624,27 @@ const COLOUR = {
   CAR_TYRE:     '#0a0f14',
   CAR_TYRE_TOP: '#182430',
   CAR_SHADOW:   'rgba(0,0,0,0.5)',
+  /* THE UNLOCKABLE COSMETICS. Every one of these is an ALTERNATE for a
+     part that is not doing the finding: the rims, the light bar, the
+     panel seams and the cool end of the tyre marks. The BODY is not on
+     this list and never will be, because the body colour is derived from
+     the biome at maximum hue separation and that is the whole reason the
+     car stays findable against all twelve. A player may not override it.
+
+     In COLOUR, not PALETTE_FIXED, so they turn with the world like every
+     other part of the car. A rim that ignored the wheel would be the one
+     object on screen that belongs to no biome.
+
+     ALL HELD UNDER THE ROAD EDGE. CAR_RIM was already brought down once
+     for being level with it, so its alternates start from that lesson
+     rather than repeating it. */
+  CAR_RIM_DARK: '#3d6572',      // gunmetal, the quiet one
+  CAR_RIM_GOLD: '#e8c877',
+  CAR_LIGHT_AMBER: '#ff9a2a',
+  CAR_LIGHT_COOL:  '#8fe8ff',
+  CAR_SEAM_GOLD: 'rgba(232,200,119,0.5)',
+  CAR_SEAM_LIGHT: 'rgba(180,240,255,0.45)',
+  TRAIL_ALT:    '120,52,220',   // a violet cool end for the marks
   /* The stops of the three multi stop ramps, which used to be written
      into the code that built them. They are palette, so they live in the
      palette: a hue rotation that missed them would pull the world round
@@ -4704,6 +4732,16 @@ canvas.addEventListener('pointerdown', function (e) {
      the death screen after an endless run. Both are places where no run
      is in progress, so neither can eat a steering tap, and both are
      tested before the reflex tap so a deliberate choice wins over it. */
+  /* THE CAR CYCLE, FIRST, because it is the smallest target on the
+     title screen and the tap that starts a run is the largest. It does
+     NOT start a run and it does not cost the one tap to play anything:
+     it is a deliberate press on a named button, exactly like RANDOM
+     TRACK beside it. */
+  if (bootFlash <= 0 && hitCar(e)) {
+    firstGesture();
+    pickCar(nextCar());
+    return;
+  }
   if (bootFlash <= 0 && hitAlt(e)) {
     firstGesture();
     startMode(altRect.to);
@@ -7507,6 +7545,9 @@ function startRun() {
      with one already up. A run is a clear enough answer to "are you
      doing this now" and nothing is written, so it is a skip. */
   endTiltCal(false);
+  // The unlock badge belongs to the screen that announced it, not to the
+  // run after it.
+  carJustUnlocked = '';
   /* The music, and NOTHING WAITS ON IT. tuneStart asks the element to
      play and ignores what it says: a track that has not buffered yet
      means a quiet first few seconds, never a delayed run. */
@@ -9038,6 +9079,12 @@ let PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
    pool is a single gradient rather than a ramp of them, unlike the car's,
    because a lamp is one fixed warm neutral and nothing indexes it. */
 let SIGN_FILL = 'rgb(255,154,60)';
+/* The two car parts drawCar used to read straight off COLOUR. They are
+   cached here instead because the active car may substitute a different
+   palette entry for either, and a substitution that missed a biome
+   change is the exact failure rebuildDerivedColours exists to prevent. */
+let CAR_RIM_FILL = '#c4f2fa';
+let CAR_LIGHT_FILL = '#ff3a4f';
 let LAMP_POOL_GRAD = null;
 // The outer lip of the slab, half width plus the shoulder, as a multiple
 // of the half width. The shoulder is the scrape band, so the drawn edge of
@@ -10687,6 +10734,115 @@ function drawWalls(count) {
 const TRAIL_RAMP = [];
 const TRAIL_STOPS = ['TRAIL_0', 'TRAIL_1', 'TRAIL_2', 'TRAIL_3', 'TRAIL_4'];
 
+/* ==================================================================
+   THE CARS, AND THERE IS NO GARAGE.
+
+   Handoff section 9 forbids new screens and BRIEF.md section 12 forbids
+   menus, so this is not one: it is a ladder of cosmetic variants, earned
+   by playing, cycled by one small control on the title screen that
+   nobody has to touch. One tap to play still stands, because the tap
+   anywhere is still the tap that plays.
+
+   COSMETIC ONLY, AND THIS IS THE PART THAT IS NOT NEGOTIABLE. Nothing
+   here touches handling, speed, grip, scoring or the clock. Handoff
+   section 4 kills anything that makes the daily non comparable between
+   two players, because that breaks the ghost and the share at once, and
+   a car that gripped better would do exactly that.
+
+   WHAT MAY VARY AND WHAT MAY NOT. The body colour is derived from the
+   biome at maximum hue separation and that is what keeps the car
+   findable against all twelve. It is not on this list. What varies is
+   everything not doing the finding: the spoiler's shape, the rims, the
+   light bar, the panel seams and the cool end of the tyre marks.
+
+   TWO CURRENCIES, BOTH ALREADY COUNTED. finishedEver is cumulative
+   levels finished, which session B already stored and nothing read.
+   cleanDaysEver is days completed with every level clean, which is the
+   hardest thing in this game and earned nothing at all until now. The
+   rare cars are on that one.
+
+   SIX, WELL SPACED, because few that look different beats many that look
+   the same. wing: 0 none, 1 the stock blade, 2 a low ducktail, 3 a wide
+   thin blade.
+   ================================================================== */
+const CARS = [
+  { name: 'STOCK',      need: 0,  days: 0, wing: 1,
+    rim: 'CAR_RIM',      light: 'CAR_LIGHT',       seam: 'CAR_SEAM',
+    trail: 'TRAIL_0' },
+  { name: 'DUCKTAIL',   need: 3,  days: 0, wing: 2,
+    rim: 'CAR_RIM_DARK', light: 'CAR_LIGHT',       seam: 'CAR_SEAM',
+    trail: 'TRAIL_0' },
+  { name: 'WIDEBODY',   need: 10, days: 0, wing: 3,
+    rim: 'CAR_RIM',      light: 'CAR_LIGHT_AMBER', seam: 'CAR_SEAM_LIGHT',
+    trail: 'TRAIL_0' },
+  { name: 'SLICKTOP',   need: 25, days: 0, wing: 0,
+    rim: 'CAR_RIM_DARK', light: 'CAR_LIGHT_COOL',  seam: 'CAR_SEAM_LIGHT',
+    trail: 'TRAIL_ALT' },
+  { name: 'NIGHT SHIFT', need: 0, days: 1, wing: 2,
+    rim: 'CAR_RIM_DARK', light: 'CAR_LIGHT_COOL',  seam: 'CAR_SEAM',
+    trail: 'TRAIL_ALT' },
+  { name: 'GOLD CHAIN', need: 0,  days: 5, wing: 3,
+    rim: 'CAR_RIM_GOLD', light: 'CAR_LIGHT_AMBER', seam: 'CAR_SEAM_GOLD',
+    trail: 'TRAIL_0' }
+];
+
+/* HOW MANY LEVELS HAVE EVER BEEN FINISHED, and how many whole days have
+   been finished clean. Both wrapped, both surviving storage being
+   refused: with no memory the player simply drives the stock car for
+   ever, which is the required behaviour and not a degradation. */
+let cleanDaysEver = (function () {
+  const raw = storeGet('cleandays');
+  const n = raw === null ? 0 : parseInt(raw, 10);
+  return isFinite(n) && n > 0 ? n : 0;
+})();
+let carPick = (function () {
+  const raw = storeGet('car');
+  const n = raw === null ? 0 : parseInt(raw, 10);
+  return isFinite(n) && n > 0 ? n : 0;
+})();
+/* Named on the completion screen when it happens, cleared when the next
+   run starts, because the moment IS the reward and a badge that lingers
+   into the following run stops being a moment. */
+let carJustUnlocked = '';
+
+function carUnlocked(i) {
+  const c = CARS[i];
+  if (!c) return false;
+  return finishedEver >= c.need && cleanDaysEver >= c.days;
+}
+function carsUnlocked() {
+  let n = 0;
+  for (let i = 0; i < CARS.length; i++) if (carUnlocked(i)) n++;
+  return n;
+}
+/* THE ACTIVE CAR IS ALWAYS ONE THAT IS ACTUALLY UNLOCKED. carPick comes
+   out of storage, which a previous version of the ladder may have
+   written, so it is checked rather than trusted: an index naming a car
+   this player has not earned falls back to stock rather than handing out
+   a reward for editing localStorage. */
+function activeCar() {
+  const i = Math.round(carPick);
+  return (i >= 0 && i < CARS.length && carUnlocked(i)) ? CARS[i] : CARS[0];
+}
+/* The next unlocked car after this one, wrapping. This is the whole of
+   the cycle control's behaviour. */
+function nextCar() {
+  const from = Math.max(0, Math.min(CARS.length - 1, Math.round(carPick)));
+  for (let k = 1; k <= CARS.length; k++) {
+    const i = (from + k) % CARS.length;
+    if (carUnlocked(i)) return i;
+  }
+  return 0;
+}
+function pickCar(i) {
+  carPick = i;
+  storeSet('car', String(i));
+  // The cosmetics are cached fills and ramps, so they are rebuilt here
+  // for exactly the reason everything else in that function is.
+  rebuildDerivedColours();
+}
+
+
 function trailColour(intensity) {
   let i = Math.round(intensity * (TRAIL_RAMP.length - 1));
   if (i < 0) i = 0; else if (i >= TRAIL_RAMP.length) i = TRAIL_RAMP.length - 1;
@@ -11140,6 +11296,15 @@ function rebuildDerivedColours() {
   LAMP_POOL_GRAD.addColorStop(0.42, 'rgba(' + COLOUR.LAMP_POOL + ',0.40)');
   LAMP_POOL_GRAD.addColorStop(1, 'rgba(' + COLOUR.LAMP_POOL + ',0)');
 
+  /* THE ACTIVE CAR'S COSMETICS, applied here and nowhere else, so a
+     biome change and a car change go through the same one door. */
+  const car = activeCar();
+  CAR_RIM_FILL = COLOUR[car.rim] || COLOUR.CAR_RIM;
+  CAR_LIGHT_FILL = COLOUR[car.light] || COLOUR.CAR_LIGHT;
+  CAR_LIGHT_GLOW_FILL = 'rgb(' + rgbOf(CAR_LIGHT_FILL).slice(0, 3).join(',') + ')';
+
+  // The cool end of the tyre marks is the car's, so the variant owns it.
+  TRAIL_STOPS[0] = car.trail;
   stopRampInto(stopBuf, TRAIL_STOPS, 24);
   TRAIL_RAMP.length = 0;
   for (let i = 0; i < stopBuf.length; i++) {
@@ -11154,7 +11319,7 @@ function rebuildDerivedColours() {
   for (let i = 0; i < stopBuf.length; i++) {
     const c = stopBuf[i], rgb = c[0] + ',' + c[1] + ',' + c[2];
     CAR_GLOW_RAMP.push('rgb(' + rgb + ')');
-    CAR_SEAM_RAMP.push(COLOUR.CAR_SEAM);
+    CAR_SEAM_RAMP.push(COLOUR[car.seam] || COLOUR.CAR_SEAM);
     /* The light pool, as a falloff rather than as flat steps. Nested flat
        quads read as nested rectangles, which is worse than no pool at
        all. One radial gradient per ramp step, filled through a scaled
@@ -11187,7 +11352,7 @@ function rimGlow() {
   ctx.fillStyle = CAR_RIM_GLOW_FILL;
   lightStrip(0.5, 0.30 * FEEL.CAR_RIM_GLOW_SPREAD, 0.5, 0.09 * FEEL.CAR_RIM_GLOW_SPREAD);
   ctx.globalAlpha = 1;
-  ctx.fillStyle = COLOUR.CAR_RIM;
+  ctx.fillStyle = CAR_RIM_FILL;
   lightStrip(0.5, 0.30, 0.5, 0.09);
 }
 
@@ -11284,7 +11449,7 @@ function drawCar(w, h) {
     const z = pass === 0 ? lightZ - FEEL.CAR_LIGHT_GLOW_BACK : lightZ;
     ctx.globalAlpha = pass === 0 ? FEEL.CAR_LIGHT_GLOW_ALPHA * (1 + hot * 0.8) : 1;
     ctx.fillStyle = pass === 0 ? CAR_LIGHT_GLOW_FILL
-                  : (hot ? COLOUR.CAR_LIGHT_HOT : COLOUR.CAR_LIGHT);
+                  : (hot ? COLOUR.CAR_LIGHT_HOT : CAR_LIGHT_FILL);
     quadInCar(-wide, lightY - tall, z, wide, lightY + tall, z, camX, w, h);
   }
   ctx.globalAlpha = 1;
@@ -11293,12 +11458,31 @@ function drawCar(w, h) {
      performance instantly and it gives the silhouette something along its
      top edge, which is the line the player actually sees against the
      sky. */
-  const spY = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_SPOILER_Y * FEEL.CAR_BODY_HEIGHT;
+  /* AND ITS SHAPE IS THE ONE THING THE UNLOCKS CHANGE ABOUT THE
+     SILHOUETTE. Four of them, off the active car: none, the stock blade
+     on posts, a low ducktail sitting straight on the boot, and a wide
+     thin blade. The top edge against the sky is the line the player
+     actually sees, so it is the right thing to vary and it costs no
+     extra geometry: the same two boxes with different numbers. */
+  const wing = activeCar().wing;
+  const wingHalf = wing === 2 ? FEEL.CAR_SPOILER_HALF * FEEL.CAR_WING_DUCK_HALF
+                 : wing === 3 ? FEEL.CAR_SPOILER_HALF * FEEL.CAR_WING_WIDE_HALF
+                 : FEEL.CAR_SPOILER_HALF;
+  const wingThick = wing === 3 ? FEEL.CAR_SPOILER_THICK * FEEL.CAR_WING_WIDE_THICK
+                  : FEEL.CAR_SPOILER_THICK;
+  const spY = FEEL.CAR_RIDE_HEIGHT
+            + (wing === 2 ? FEEL.CAR_WING_DUCK_Y : FEEL.CAR_SPOILER_Y)
+              * FEEL.CAR_BODY_HEIGHT;
   const spZ = FEEL.CAR_SPOILER_Z * halfL;
   const postX = halfW * FEEL.CAR_SPOILER_POST;
   const postH = (spY - (FEEL.CAR_RIDE_HEIGHT + 0.9 * FEEL.CAR_BODY_HEIGHT)) / 2;
-  drawBox(-postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
-  drawBox(postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
+  // A ducktail sits ON the boot, so it has no posts to draw, and with no
+  // wing at all there is nothing here at any.
+  if (wing === 1 || wing === 3) {
+    drawBox(-postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
+    drawBox(postX, spY - postH, spZ + 10, 12, postH, 26, 0, false, WING_COLOURS, false, camX, w, h);
+  }
+  if (wing !== 0) {
   /* The shadow the wing casts on the boot. Seen from above, a spoiler is
      a horizontal plane floating over another horizontal plane and the two
      merge into one surface: the ONLY thing that separates them is the gap
@@ -11307,15 +11491,16 @@ function drawCar(w, h) {
      in a top down framing. */
   ctx.globalAlpha = FEEL.CAR_SPOILER_SHADOW;
   ctx.fillStyle = COLOUR.CAR_WING_GAP;
-  quadInCar(-halfW * FEEL.CAR_SPOILER_HALF * 1.06,
-            spY - FEEL.CAR_SPOILER_THICK * 1.5,
+  quadInCar(-halfW * wingHalf * 1.06,
+            spY - wingThick * 1.5,
             spZ + halfL * FEEL.CAR_SPOILER_CHORD * 1.5,
-            halfW * FEEL.CAR_SPOILER_HALF * 1.06,
-            spY - FEEL.CAR_SPOILER_THICK * 1.5,
+            halfW * wingHalf * 1.06,
+            spY - wingThick * 1.5,
             spZ - halfL * FEEL.CAR_SPOILER_CHORD * 1.5, camX, w, h);
   ctx.globalAlpha = 1;
-  drawBox(0, spY, spZ, halfW * FEEL.CAR_SPOILER_HALF, FEEL.CAR_SPOILER_THICK / 2,
+  drawBox(0, spY, spZ, halfW * wingHalf, wingThick / 2,
           halfL * FEEL.CAR_SPOILER_CHORD, 0, false, WING_COLOURS, true, camX, w, h);
+  }
 
   drawBox.drewRear = false;
   drawBox(-trackHalf, wheelR, -baseHalf, FEEL.CAR_WHEEL_WIDTH / 2, wheelR, wheelR * 1.02, 0, false, WHEEL_COLOURS, false, camX, w, h);
@@ -12334,6 +12519,17 @@ function drawFinish(w, h) {
      put its own prompt and for the same reason: the row is for targets
      and the line above it is for words. */
   ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
+  /* WHAT THIS RUN EARNED, if anything, and it sits directly above the
+     prompt because that is the last thing read before tapping on. The
+     callout said it at the line; this is the receipt. */
+  if (carJustUnlocked) {
+    ctx.globalAlpha = 0.9;
+    const won = 'NEW CAR UNLOCKED     ' + carJustUnlocked;
+    text(won, w / 2, btnY - s * FEEL.DEATH_PROMPT_GAP - s * 0.052,
+         fittedSize(won, '800', Math.round(s * 0.034), w * 0.88), '800',
+         'center', COLOUR.SCORE_BEST);
+    ctx.globalAlpha = 1;
+  }
   const prompt = finishPrompt();
   text(prompt, w / 2, btnY - s * FEEL.DEATH_PROMPT_GAP,
        fittedSize(prompt, '600', Math.round(s * 0.040), w * 0.88), '600');
@@ -12391,6 +12587,12 @@ function hitRestart(e) {
    ================================================================== */
 const dailyRect = { x: 0, y: 0, w: 0, h: 0, live: false };
 const altRect = { x: 0, y: 0, w: 0, h: 0, live: false, to: 0 };
+/* THE CAR CYCLE, and it is one small control rather than a screen.
+   Handoff 9 forbids new screens and BRIEF.md 12 forbids menus; a button
+   that changes the paint on the car you are about to drive is neither.
+   It is only drawn once there is more than one car to cycle, so a player
+   who has not earned anything never sees a control for nothing. */
+const carRect = { x: 0, y: 0, w: 0, h: 0, live: false };
 
 /* Fine pointer means a trackpad or a mouse, which on this audience's
    hardware means a Chromebook, which means a keyboard. The same media
@@ -12745,18 +12947,44 @@ function drawOverlay(w, h) {
          fittedSize(sub, '700', Math.round(s * 0.027), w * 0.92), '700',
          'center', COLOUR.TITLE_DIM);
     ctx.globalAlpha = 1;
+    /* THE CAR, ABOVE THE SECOND CHOICE and well clear of the centre of
+       the bottom row, which is where a reflex tap lands hardest and
+       where nothing that changes anything belongs. Named rather than
+       shown as a swatch, because the name is what the unlock announced
+       and the car itself is on screen behind this the moment you tap. */
+    if (carsUnlocked() > 1) {
+      canvasButton(carRect, 'CAR  ' + activeCar().name, w / 2,
+                   by0 - s * 0.050 - s * 0.098, Math.round(s * 0.032),
+                   COLOUR.SCORE_BEST, w);
+    } else {
+      carRect.live = false;
+    }
   } else if (state === DEAD) {
     dailyRect.live = false;
     altRect.live = false;
+    carRect.live = false;
     drawResult(w, h);
   } else if (state === FINISHED) {
     dailyRect.live = false;
     altRect.live = false;
+    carRect.live = false;
     drawFinish(w, h);
   } else {
     dailyRect.live = false;
     altRect.live = false;
+    carRect.live = false;
   }
+}
+
+/* Did that tap land on the car cycle? Same shape as every other canvas
+   button in this file, and tested BEFORE the tap anywhere so it cannot
+   be swallowed by the thing that starts a run. */
+function hitCar(e) {
+  if (!carRect.live || state !== TITLE) return false;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  return x >= carRect.x && x <= carRect.x + carRect.w
+      && y >= carRect.y && y <= carRect.y + carRect.h;
 }
 
 function hitDaily(e) {
@@ -13225,12 +13453,52 @@ function bankDaily(finished) {
        so a replay for a better score does not inflate it. Nothing reads
        it yet on purpose: storing it now means the number is real when
        the display arrives rather than starting from zero. */
+    const wasUnlocked = carsUnlocked();
     if (!r.done) {
       finishedEver++;
       storeSet('finished', String(finishedEver));
     }
     r.done = true;
     if (continues === 0) r.clean = true;
+    /* AND A WHOLE DAY CLEAN, WHICH EARNED NOTHING UNTIL NOW. It is the
+       hardest thing available in this game: every level of the day
+       finished with no continues at all. Counted once per day, AFTER
+       this level's clean bit is set, because this run may be the one
+       that completes it.
+
+       ONCE PER DAY IS ENFORCED BY A STAMP, not by a flag that a replay
+       could set again: the day it was last credited is stored, so
+       replaying the last level of an already clean day cannot pay
+       twice. */
+    if (dayClean() && storeGet('cleanday') !== String(todayStamp)) {
+      cleanDaysEver++;
+      storeSet('cleandays', String(cleanDaysEver));
+      storeSet('cleanday', String(todayStamp));
+    }
+    /* THE ANNOUNCEMENT, in the language the game already uses for
+       everything else worth saying. Said once, here, at the moment it
+       is earned, and held for the completion screen to show as well,
+       because that screen is where the player is actually looking. */
+    if (carsUnlocked() > wasUnlocked) {
+      for (let i = CARS.length - 1; i >= 0; i--) {
+        if (!carUnlocked(i)) continue;
+        carJustUnlocked = CARS[i].name;
+        break;
+      }
+      if (carJustUnlocked) {
+        /* URGENT, AND IT HAS TO BE. Measured without it: the line was
+           set and then immediately overwritten by CLEAN, which is said
+           a moment later on the same finish, so the announcement never
+           reached the screen at all. Unlocking a car happens a handful
+           of times in a player's whole history; CLEAN happens most
+           runs. This one wins. */
+        sayDrift('NEW CAR  ' + carJustUnlocked, COLOUR.SCORE_BEST, 1, true);
+        driftLock = FEEL.CALLOUT_LOCK;
+        // Earned it, so drive it: nothing to find and nothing to choose.
+        pickCar(CARS.map(function (c, i) { return i; })
+                    .filter(function (i) { return CARS[i].name === carJustUnlocked; })[0]);
+      }
+    }
     storeSet('daily.day', String(todayStamp));
     storeSet('daily.done.' + clampLevel(level), r.clean ? '2' : '1');
     dailyDone = r.done;
