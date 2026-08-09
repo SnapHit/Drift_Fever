@@ -11988,8 +11988,7 @@ function drawResult(w, h) {
     stack -= rowH;
   }
 
-  const promptText = resume ? 'tap to continue from the last gate'
-                            : 'tap or press any key';
+  const promptText = deathPrompt(resume);
   ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
   text(promptText, w / 2, stack - s * FEEL.DEATH_PROMPT_GAP,
        fittedSize(promptText, '600', Math.round(s * 0.040), w * 0.88), '600');
@@ -12013,6 +12012,62 @@ function drawResult(w, h) {
 function timeLabel(t) {
   const m = Math.floor(t / 60), sec = t - m * 60;
   return m + ':' + (sec < 10 ? '0' : '') + sec.toFixed(1);
+}
+
+/* ------------------------------------------------------------------
+   WHAT THE ONE INPUT ACTUALLY DOES, IN WORDS.
+
+   Both prompts are worked out here and nowhere else, and both are
+   derived from the SAME EXPRESSION the input path branches on rather
+   than from a parallel guess at it. That is the whole reason this is a
+   function: the completion screen said "run it again" for a year of
+   sessions because the copy was written for the death screen and levels
+   arrived afterwards, and nothing connected the sentence to the code
+   that decides where the tap goes.
+
+   THE INPUT COUNT IS NOT TOUCHED BY ANY OF THIS. One tap continues,
+   restarts or rolls forward exactly as it did; only the sentence above
+   it changed.
+   ------------------------------------------------------------------ */
+function rollsForward() {
+  /* startNextLevel's own test, and it has to stay startNextLevel's own
+     test. `done` is true by the time this screen draws, because banking
+     runs at the line, so the ONLY thing that decides between rolling
+     forward and running the last level again is whether there is a
+     level after this one. */
+  return mode === DAILY && level < levelCount() && recFor(level).done;
+}
+function finishPrompt() {
+  /* MORE TO COME. It rolls forward, so it says where to, by number,
+     because "the next level" is vaguer than the game already is: the HUD
+     has been saying LEVEL 2/3 for the whole run. */
+  if (rollsForward()) {
+    return 'tap or press any key for level '
+         + (level + 1) + ' of ' + levelCount();
+  }
+  /* THE LAST LEVEL, WITH THE DAY BEHIND IT. It does not roll anywhere:
+     startNextLevel's guard fails and startRun puts the player back on
+     the level they just finished. So the old sentence was accidentally
+     right about exactly this one case and it is kept. The day being
+     over is announced by the badge a beat earlier, which reads DAY
+     COMPLETE or DAY COMPLETE, CLEAN, and it has faded by the time this
+     line is being read: this sentence is about the INPUT, and stating
+     the outcome again underneath it would be two headlines.
+
+     Endless lands here too. It has no finish line at all, so this is
+     unreachable from play, but the input path has a defensive
+     `else startRun()` and the sentence matches it. */
+  return 'tap or press any key to run it again';
+}
+function deathPrompt(resume) {
+  // Unchanged, and it was already right: the reflex tap continues.
+  if (resume) return 'tap to continue from the last gate';
+  /* AND THIS ONE NAMED NO ACTION AT ALL. "tap or press any key" says
+     how to give the input and not one word about what it does with it,
+     which is the same fault as the completion screen's in a quieter
+     form. It restarts, so it now says so, in the words the completion
+     screen was borrowing. */
+  return 'tap or press any key to run it again';
 }
 
 function drawFinish(w, h) {
@@ -12207,7 +12262,7 @@ function drawFinish(w, h) {
      put its own prompt and for the same reason: the row is for targets
      and the line above it is for words. */
   ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(deadFor * 3));
-  const prompt = 'tap or press any key to run it again';
+  const prompt = finishPrompt();
   text(prompt, w / 2, btnY - s * FEEL.DEATH_PROMPT_GAP,
        fittedSize(prompt, '600', Math.round(s * 0.040), w * 0.88), '600');
   ctx.globalAlpha = 1;
