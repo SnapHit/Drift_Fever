@@ -761,6 +761,65 @@ const FEEL = {
   PYLON_WIDTH:               85,
   PYLON_MAJOR_WIDTH:        110,
   PYLON_OUT:               0.06,     // of the half width, how far outboard they stand
+  /* ----------------------------------------------------------------
+     REFLECTION STREAKS. Item 2, and the single best ratio in the
+     investigation: every lit thing on a wet surface throws a long soft
+     smear toward the viewer, there are already lit posts down both
+     edges at fixed intervals, and the projection produces the smear
+     shape for free. It invents no new object.
+
+     One tapering quad per visible post, from the post's base at the
+     post's width down to a segment nearer the camera at several times
+     that width, pulled inboard so it lands on the road and not on the
+     void. One flat fill in the pylon glow colour at low alpha.
+
+     WHERE IT MAY NOT GO. A streak is ON the road, and a long bright one
+     starts reading as a lane marking or, worse, as an edge. So it is
+     clamped INBOARD of the lip and OUTBOARD of the lane dashes, which
+     leaves it in the band between them, and it is drawn after the
+     surface so it never paints over the lip that was laid down before
+     it. Its luminance is checked against the pylons themselves, which
+     the ranking already showed sitting only a point or so under the
+     road edge. */
+  REFLECT_SEGMENTS:           9,     // LIVE, how far toward the camera it runs
+  REFLECT_WIDEN:            3.2,     // LIVE, how much wider at the near end
+  REFLECT_INBOARD:         0.34,     // LIVE, of the half width, pulled toward the middle
+  REFLECT_ALPHA:           0.16,     // LIVE
+  REFLECT_MIN_PX:           1.2,     // never thinner than this, at any dpr
+  /* ----------------------------------------------------------------
+     THE WET SHEEN ON THE FAR ROAD. Item 7.
+
+     Wet asphalt is a mirror at a grazing angle and matte underfoot.
+     That is Fresnel, and it is the most convenient possible fact for
+     this renderer: the sheen belongs on the far road, and the far road
+     is where the segments are smallest and cheapest.
+
+     ONE PASS SHAPED LIKE surfacePass, filled with a vertical gradient
+     cached at resize. Canvas takes a gradient as the fill style of an
+     arbitrary path, so this is one extra batched fill and no clipping.
+
+     CULLED BY PROJECTED HALF WIDTH, which is the OPPOSITE of the edge
+     glow's cull: segments stop being added once the road is wider than
+     the threshold, so the pass never reaches the expensive near
+     geometry at all.
+
+     WHAT IT THREATENS. It lifts the road surface in exactly the region
+     where the lip is thinnest and hardest to read, which is the worst
+     place to reduce the contrast step. The acceptance test is the lip
+     against the surface at two and three seconds out, before and after,
+     and if the gap narrows the alpha comes down. See the report. */
+  WET_SHEEN_FROM:            46,     // LIVE, projected half width above which it stops
+  /* MEASURED AND BROUGHT DOWN, which is what the acceptance test asks
+     for. Any visible sheen narrows the lip against surface step by
+     construction, so the question is how much, and the curve was swept
+     rather than a number picked and defended. At 0.15 the gap at three
+     seconds out went from 49.1 to 40.5, an 18 per cent cut in the
+     contrast step the player reads the far road by. At 0.06 it goes to
+     45.7: the step keeps 93 per cent of its size and the sheen is still
+     plainly there. The lip itself never moves, because the pass is
+     culled to the surface path and never touches it. */
+  WET_SHEEN_ALPHA:         0.06,     // LIVE, ceiling on the gradient
+  WET_SHEEN_FADE:          0.34,     // LIVE, share of the way to the camera it fades over
   PYLON_MIN_PX:             1.4,     // culled once shorter than this on screen
   PYLON_GLOW_SPREAD:        1.9,     // multiple of the pylon width
   PYLON_GLOW_ALPHA:        0.22,
@@ -3206,6 +3265,10 @@ const COLOUR = {
   HAZE:         '58,20,10',
   HORIZON_FADE: '184,67,26',
 
+  /* The wet sheen, item 7. A pale tint, not a new hue: what it is
+     saying is that the surface is reflective, not that it is a
+     different colour. It rides the wheel with the rest of the road. */
+  WET_SHEEN:    '203,229,255',
   ROAD_LIGHT:   '#33191a',     // the surface, plainly above the void
   ROAD_DARK:    '#2b1416',
   /* The side of the slab. It has to sit below the road surface in value,
@@ -3777,6 +3840,13 @@ const TUNABLES = [
   { key: 'ROAD_THICKNESS',     label: 'thick',   step: 20,   min: 0,    max: 1200,  dp: 0, group: 3 },
   { key: 'ROAD_FLARE',         label: 'flare',   step: 20,   min: 0,    max: 1400,  dp: 0, group: 3 },
   { key: 'PYLON_SPACING',      label: 'pylons',  step: 1,    min: 2,    max: 40,    dp: 0, group: 4 },
+  { key: 'REFLECT_SEGMENTS',   label: 'reflLen', step: 1,    min: 0,    max: 40,    dp: 0, group: 4 },
+  { key: 'REFLECT_WIDEN',      label: 'reflW',   step: 0.1,  min: 1,    max: 10,    dp: 1, group: 4 },
+  { key: 'REFLECT_INBOARD',    label: 'reflIn',  step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 4 },
+  { key: 'REFLECT_ALPHA',      label: 'reflA',   step: 0.01, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'WET_SHEEN_FROM',     label: 'sheenTo', step: 2,    min: 0,    max: 300,   dp: 0, group: 4 },
+  { key: 'WET_SHEEN_ALPHA',    label: 'sheenA',  step: 0.01, min: 0,    max: 0.8,   dp: 2, group: 4 },
+  { key: 'WET_SHEEN_FADE',     label: 'sheenH',  step: 0.02, min: 0.02, max: 1.0,   dp: 2, group: 4 },
   { key: 'PYLON_HEIGHT',       label: 'post',    step: 30,   min: 60,   max: 2400,  dp: 0, group: 4 },
   { key: 'EDGE_GLOW_ALPHA',    label: 'glow',    step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 4 },
   { key: 'EDGE_BLEED_ALPHA',   label: 'bleed',   step: 0.01, min: 0,    max: 0.4,   dp: 2, group: 4 },
@@ -4171,6 +4241,7 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const view = { w: 0, h: 0, dpr: 1 };
 let hazeGradient = null;
 let horizonGradient = null;
+let wetSheenGradient = null;
 let safeTop = 0;         // notch or camera cutout, measured from CSS
 let safeBottom = 0;      // home indicator and gesture bar, measured from CSS
 let padsTop = 1e9;       // top of the corner pad row, measured from the DOM
@@ -4237,6 +4308,16 @@ function resize() {
   horizonGradient.addColorStop(0, 'rgba(' + COLOUR.HORIZON_FADE + ',0)');
   horizonGradient.addColorStop(0.5, COLOUR.HORIZON_GLOW);
   horizonGradient.addColorStop(1, 'rgba(' + COLOUR.HORIZON_FADE + ',0)');
+
+  /* The wet sheen's gradient, item 7. Built HERE and not at load, for
+     the reason the wiring notes give: resize is what a biome change
+     calls, so a gradient built once at load is the wrong colour from
+     the first biome change and the wrong size from the first rotation. */
+  const sheen = h * FEEL.WET_SHEEN_FADE;
+  wetSheenGradient = ctx.createLinearGradient(0, horizonY, 0, horizonY + sheen);
+  wetSheenGradient.addColorStop(0, 'rgba(' + COLOUR.WET_SHEEN + ','
+                                  + FEEL.WET_SHEEN_ALPHA.toFixed(3) + ')');
+  wetSheenGradient.addColorStop(1, 'rgba(' + COLOUR.WET_SHEEN + ',0)');
 
   // Cached, because the scrape flash is drawn on the frames where the
   // player is under the most pressure and can least afford a hitch.
@@ -8727,6 +8808,13 @@ function drawRoad(w, h) {
            rampAt(EDGE_HOT_RAMP, worldHeat * FEEL.HEAT_EDGE_LIFT));
   surfacePass(first, last, 1, COLOUR.ROAD_LIGHT);
   surfacePass(first, last, 0, COLOUR.ROAD_DARK);
+  /* ON THE SURFACE, UNDER EVERYTHING THAT MATTERS. Both of these paint
+     the road itself, so they go here: after the surface that carries
+     them and before the lane dashes, the edge glow and everything else
+     the player steers by. The lip was laid down before the surface and
+     is outboard of both. */
+  wetSheenPass(first, last);
+  reflectPass(first, last, baseIndex, FEEL.PYLON_SPACING);
   lanePass(first, last);
   edgeGlowPass(first, last);
   drawTrail(first, last, baseIndex);
@@ -9974,6 +10062,101 @@ function drawPylons(first, last, baseIndex, w) {
   pylonPath(first, last, baseIndex, spacing, 1, scaleH, 1);
   ctx.fillStyle = COLOUR.PYLON_MAJOR;
   ctx.fill();
+}
+
+/* THE WET SHEEN, ITEM 7. surfacePass's shape, the far segments only,
+   filled with the cached vertical gradient.
+
+   THE CULL IS BACKWARDS FROM THE GLOW'S ON PURPOSE. edgeGlowPass stops
+   when segments get too SMALL; this stops when they get too BIG, because
+   the whole point is to stay on the cheap far geometry and off the near
+   quads that cost the frame. The loop breaks rather than continues: the
+   road only gets wider toward the camera, so once one segment is over
+   the threshold every segment after it is too. */
+function wetSheenPass(first, last) {
+  if (!wetSheenGradient || FEEL.WET_SHEEN_ALPHA <= 0) return;
+  ctx.beginPath();
+  let any = false;
+  for (let n = last; n >= first; n--) {
+    if (!bvis[n]) continue;
+    if (bw[n] > FEEL.WET_SHEEN_FROM) break;
+    any = true;
+    const y1 = by[n], y2 = by[n + 1] - 1;
+    ctx.moveTo(bx[n] - bw[n], y1); ctx.lineTo(bx[n] + bw[n], y1);
+    ctx.lineTo(bx[n + 1] + bw[n + 1], y2); ctx.lineTo(bx[n + 1] - bw[n + 1], y2);
+    ctx.closePath();
+  }
+  if (!any) return;
+  ctx.fillStyle = wetSheenGradient;
+  ctx.fill();
+}
+
+/* THE STREAKS THE POSTS THROW ON A WET ROAD. Item 2.
+
+   Walked with the same test pylonPath uses, so a streak exists exactly
+   where a post exists and the two can never disagree about spacing.
+
+   CLAMPED INBOARD OF THE LIP AND OUTBOARD OF THE LANE DASHES. The post
+   stands outboard of the road at EDGE_OUT + PYLON_OUT; its reflection
+   has to be ON the road, so the near end is pulled toward the middle,
+   and both ends are then clamped into the band between the lane dash
+   fraction and the inner edge of the lip. That is the one part of the
+   surface where a bright smear cannot be read as either of the two
+   things the player steers by. */
+function reflectPass(first, last, baseIndex, spacing) {
+  const lip = FEEL.EDGE_LIP_FRACTION;
+  const inner = FEEL.LANE_DASH_FRACTION;
+  const outer = EDGE_OUT - lip;
+  ctx.beginPath();
+  let any = false;
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const idx = baseIndex + n;
+    if (idx % spacing !== 0) continue;
+    const m = n - FEEL.REFLECT_SEGMENTS;
+    if (m < first || !bvis[m]) continue;
+
+    const major = ((idx / spacing) % FEEL.PYLON_MAJOR_EVERY) === 0;
+    const wWorld = major ? FEEL.PYLON_MAJOR_WIDTH : FEEL.PYLON_WIDTH;
+    const scaleH = 1 / FEEL.ROAD_HALF_WIDTH_BASE;
+    // The post's own half width at each end, the near one widened.
+    const h0 = Math.max(FEEL.REFLECT_MIN_PX, bw[n] * wWorld * scaleH * 0.5);
+    const h1 = Math.max(FEEL.REFLECT_MIN_PX,
+                        bw[m] * wWorld * scaleH * 0.5 * FEEL.REFLECT_WIDEN);
+    for (let side = -1; side <= 1; side += 2) {
+      /* Both ends as a FRACTION of the local half width, so the clamp is
+         in the same units the lip and the lane are quoted in and cannot
+         drift with the projection.
+
+         THE QUAD'S OWN WIDTH IS PART OF THE CLAMP, AND LEAVING IT OUT
+         WAS A REAL FAILURE. Clamping the CENTRE line to the inner edge
+         of the lip put half the quad inside the lip, and because the lip
+         is laid down before the surface in this file, a pass drawn after
+         the surface paints straight over it. Measured: the streaks came
+         out at 206.3 against a road edge that never draws below 199.7,
+         so the reflection was brighter than the thing it may not
+         outrank, on a handful of pixels right where the eye is looking.
+         The half width is converted into the same fractional units and
+         subtracted before the clamp. */
+      const g0 = h0 / Math.max(1e-6, bw[n]);
+      const g1 = h1 / Math.max(1e-6, bw[m]);
+      let f0 = clamp(EDGE_OUT + FEEL.PYLON_OUT, inner + g0, outer - g0);
+      let f1 = clamp(EDGE_OUT + FEEL.PYLON_OUT - FEEL.REFLECT_INBOARD,
+                     inner + g1, outer - g1);
+      if (outer - g0 <= inner + g0 || outer - g1 <= inner + g1) continue;
+      any = true;
+      const x0 = bx[n] + side * bw[n] * f0, y0 = by[n];
+      const x1 = bx[m] + side * bw[m] * f1, y1 = by[m];
+      ctx.moveTo(x0 - h0, y0); ctx.lineTo(x0 + h0, y0);
+      ctx.lineTo(x1 + h1, y1); ctx.lineTo(x1 - h1, y1);
+      ctx.closePath();
+    }
+  }
+  if (!any) return;
+  ctx.globalAlpha = FEEL.REFLECT_ALPHA;
+  ctx.fillStyle = PYLON_GLOW_FILL;
+  ctx.fill();
+  ctx.globalAlpha = 1;
 }
 
 /* which: 0 ordinary posts, 1 marker posts, 2 both. */
