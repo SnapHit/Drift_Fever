@@ -795,6 +795,47 @@ const FEEL = {
   SKYLINE_DROP:           0.008,     // how far below the horizon its base sits
   SKYLINE_PARALLAX:       0.018,     // against the car's sideways position
   SKYLINE_DRIFT:         0.0016,     // against distance travelled
+  /* ----------------------------------------------------------------
+     THE SECOND CITY, FURTHER AND SLOWER. Item 3.
+
+     One city at one parallax rate is a backdrop; two at two rates is
+     depth, and it is the oldest trick in the genre because it works at
+     any resolution and costs one more fill of fifteen small rectangles.
+
+     It is the SAME loop with a second set of numbers: a longer period so
+     the far towers are further apart, a lower parallax and drift so they
+     slide more slowly, a lower height range so they sit shorter, and a
+     base a shade higher up the screen. Drawn FIRST, so the near city
+     occludes it.
+
+     NO WINDOWS, NO ROOF LINE, NO SIGNS on it, because distance is mostly
+     the absence of detail. The one thing to watch is value: it has to
+     sit clearly above the void and clearly below the near silhouette or
+     the two merge into one noisy band, which is the audit finding in
+     miniature. See COLOUR.SKYLINE_FAR. */
+  SKYLINE_FAR_PERIOD:      1700,     // LIVE, pixels the far pattern repeats over
+  SKYLINE_FAR_MIN_HEIGHT: 0.006,     // LIVE, of screen height
+  SKYLINE_FAR_MAX_HEIGHT:  0.11,     // LIVE, shorter than the near city
+  SKYLINE_FAR_DROP:       0.001,     // LIVE, its base sits higher up the screen
+  SKYLINE_FAR_PARALLAX:   0.007,     // LIVE, slides more slowly
+  SKYLINE_FAR_DRIFT:     0.0006,     // LIVE
+  /* ----------------------------------------------------------------
+     BUILDING SHAPE. Item 4. Every building was one rectangle, and the
+     difference between a skyline and a bar chart lives entirely in the
+     top tenth of the silhouette. Each building gets a shape class from
+     the skyline's OWN seeded generator, and the draw loop pushes two or
+     three rectangles into the path that was already being built.
+
+     THE MAST HAS A FLOOR IN PIXELS. A one pixel spike vanishes at device
+     pixel ratio one and shimmers at two, which is the same trap the
+     window fill already guards against. */
+  SKYLINE_SETBACK_W:       0.62,     // LIVE, width of a setback, of the body
+  SKYLINE_SETBACK_H:       0.34,     // LIVE, its height, of the body
+  SKYLINE_CROWN_W:         0.30,     // LIVE
+  SKYLINE_CROWN_H:         0.16,     // LIVE
+  SKYLINE_MAST_W:          0.07,     // LIVE, of the body width
+  SKYLINE_MAST_H:          0.30,     // LIVE
+  SKYLINE_MAST_MIN_PX:      1.0,     // never thinner than this, at any dpr
   /* The floor sits a long way down, which is the point: the distinctive
      thing here is a narrow slab at altitude, not the neon on it. Deep
      enough that the near rows fall off the bottom of the screen and only
@@ -1255,6 +1296,44 @@ const FEEL = {
   CITY_PULSE_HZ_GAIN:      1.30,     // LIVE, extra cycles a second at full intensity
   CITY_WINDOW_FILL:        0.46,     // of the cell, so windows are small and regular
   CITY_MIN_BUILDING_PX:       9,     // shorter than this and a window is not worth drawing
+  /* ----------------------------------------------------------------
+     WINDOWS THAT READ AS LIGHT. Item 5.
+
+     The same two pass treatment every other lit thing in this game gets:
+     the shape wide and faint under the shape solid. No shadowBlur, per
+     the file's standing rule; this is the convention that replaces it.
+
+     AND A COOL MINORITY, because every night city photograph has two
+     colour temperatures in it and having one is what makes a render look
+     like a lighting diagram. It costs no new state: every window already
+     carries a threshold, so the ones whose threshold falls in a chosen
+     band go into a third path in the cool colour.
+
+     THE MINORITY STAYS A MINORITY. The existing comment justifies the
+     amber as the road edge's fire spreading to the city, and a cool
+     minority weakens that a little, so it is kept near one window in
+     eight and drawn dimmer than the amber. */
+  CITY_GLOW_INFLATE:        1.6,     // LIVE, pixels each window grows for the faint pass
+  CITY_GLOW_ALPHA:         0.34,     // LIVE, share of the solid alpha
+  /* MEASURED AND NARROWED. The band 0.42 to 0.55 caught 92 of the 360
+     windows, which is 25.6 per cent and not a minority: the city read as
+     two colours rather than as one colour with exceptions in it. */
+  CITY_COOL_FROM:          0.46,     // LIVE, thresholds in this band light cool
+  CITY_COOL_TO:            0.52,     // LIVE
+  CITY_COOL_ALPHA:         0.72,     // LIVE, share of the amber alpha, so it stays quieter
+  /* ----------------------------------------------------------------
+     THE CITY LIGHTS THE SKY. Item 6. One more fill of the horizon band
+     that is already cached, keyed to the city glow rather than to the
+     multiplier, so the sky over the city has a source.
+
+     THE UPPER HALF ONLY, AND THAT IS NOT DECORATION. The road converges
+     to the horizon from BELOW, so the lower half of that band sits
+     directly behind the far road. The file records deepening it there
+     once: it lit the void without lighting the road, and the surface
+     against void contrast at the planning horizon went from a difference
+     of 0.4 to one of 4.8 the wrong way. Above the line is sky and only
+     sky. */
+  CITY_HALO_ALPHA:         0.30,     // LIVE, at full city glow
   HEAT_HORIZON:            0.55,     // LIVE, a second pass of the horizon band at this alpha
   HEAT_MUSIC:              0.85,     // LIVE, how much of the music's heat the multiplier may drive
 
@@ -3153,6 +3232,21 @@ const COLOUR = {
   PYLON_MAJOR:  '#ffc266',
   PYLON_GLOW:   '224,104,40',
   SKYLINE:      '#170906',
+  /* The far city. Clearly above the void and clearly below the near
+     silhouette, which is the whole requirement: too close to either and
+     the two layers merge into one noisy band. Rides the hue wheel with
+     everything else up there. */
+  /* MEASURED AS PAINTED, AND THE PALETTE VALUES LIE ABOUT THIS. Read
+     off COLOUR alone the far city looks like it has to sit between the
+     void at 6 and the near city at 12, and lifting it toward the middle
+     looks obviously right. Rendered, it is the opposite: the sky it
+     actually stands against is not the void, it is the void plus the
+     horizon band plus the new city halo, and that measures 17 to 19.
+     So the far layer is a DARK silhouette against a lit sky, the way
+     distant buildings really are, and every step lighter costs
+     separation instead of buying it. Lifting it to #120705 narrowed the
+     gap; this is the darker value, which widens it. */
+  SKYLINE_FAR:  '#0c0503',
   SKYLINE_TOP:  '#66200c',
   /* The lit windows, and this one deliberately does NOT change with the
      biome the way SKYLINE and SKYLINE_TOP do. It is the ROAD EDGE's own
@@ -3162,6 +3256,11 @@ const COLOUR = {
      very dark, and it ties the far background to the track instead of
      giving it a fifth colour family of its own. */
   SKYLINE_WINDOW: '#ffb03a',
+  /* The cool minority, item 5. Deliberately DIMMER than the amber as
+     well as cooler, so the warm reading still dominates and the existing
+     argument about the road edge's fire spreading to the city survives
+     having an exception in it. */
+  SKYLINE_WINDOW_COOL: '#9fd8ff',
 
   /* Deliberately duller than the edge lip. This is the secondary channel
      and it must never pull the eye down off the road. It carries its
@@ -3767,6 +3866,22 @@ const TUNABLES = [
   { key: 'CITY_PULSE_HZ',      label: 'throbHz', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 22 },
   { key: 'CITY_PULSE_HZ_GAIN', label: 'throbUp', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 22 },
   { key: 'SKYLINE_MAX_HEIGHT', label: 'cityTall',step: 0.01, min: 0.01, max: 0.45,  dp: 3, group: 21 },
+  { key: 'SKYLINE_FAR_MAX_HEIGHT',label:'farTall',step: 0.01, min: 0,    max: 0.40,  dp: 3, group: 21 },
+  { key: 'SKYLINE_FAR_PERIOD', label: 'farStep', step: 50,   min: 300,  max: 4000,  dp: 0, group: 21 },
+  { key: 'SKYLINE_FAR_PARALLAX',label:'farPar',  step: 0.001,min: 0,    max: 0.05,  dp: 3, group: 21 },
+  { key: 'SKYLINE_FAR_DROP',   label: 'farDrop', step: 0.001,min:-0.05, max: 0.05,  dp: 3, group: 21 },
+  { key: 'SKYLINE_SETBACK_W',  label: 'setW',    step: 0.02, min: 0.1,  max: 1.0,   dp: 2, group: 21 },
+  { key: 'SKYLINE_SETBACK_H',  label: 'setH',    step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'SKYLINE_CROWN_W',    label: 'crownW',  step: 0.02, min: 0.05, max: 1.0,   dp: 2, group: 21 },
+  { key: 'SKYLINE_CROWN_H',    label: 'crownH',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'SKYLINE_MAST_W',     label: 'mastW',   step: 0.01, min: 0.01, max: 0.5,   dp: 2, group: 21 },
+  { key: 'SKYLINE_MAST_H',     label: 'mastH',   step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 21 },
+  { key: 'CITY_GLOW_INFLATE',  label: 'winGlowW',step: 0.2,  min: 0,    max: 8,     dp: 1, group: 21 },
+  { key: 'CITY_GLOW_ALPHA',    label: 'winGlowA',step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'CITY_COOL_FROM',     label: 'coolLo',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'CITY_COOL_TO',       label: 'coolHi',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'CITY_COOL_ALPHA',    label: 'coolA',   step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'CITY_HALO_ALPHA',    label: 'cityHalo',step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'CITY_WINDOW_FILL',   label: 'winSize', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 21 },
   { key: 'CITY_MIN_BUILDING_PX',label:'winMinPx',step: 1,    min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
@@ -8194,11 +8309,34 @@ const cityRows = [];
 const cityCols = [];
 const cityStart = [];
 const cityThr = [];
+/* THE WINDOW BUFFER, sized once for the worst case the walk can produce:
+   every building repeated across the widest screen, with the largest
+   grid any of them carries. Allocated at load, written every frame,
+   never grown. */
+const MAX_WINDOWS = 4096;
+const winXY = new Float32Array(MAX_WINDOWS * 4);
+const winCool = new Uint8Array(MAX_WINDOWS);
+
+/* WHAT SHAPE EACH BUILDING IS. Item 4, and it is one number a building,
+   drawn from the same separate stream everything else up here comes
+   from. 0 plain, 1 setback, 2 crowned, 3 masted. */
+const SKY_PLAIN = 0, SKY_SETBACK = 1, SKY_CROWN = 2, SKY_MAST = 3;
+const cityShape = [];
+// And the far layer's own heights, which are not the near layer's.
+const skylineFarH = [];
 (function () {
   let seed = 1337;
   function next() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 1000) / 1000; }
   for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
     skylineH.push(next());
+    skylineFarH.push(next());
+    /* THE SHAPE, weighted. Plain is still the common case, because a
+       skyline where every building has a hat is as uniform as one where
+       none does; the variety is in the minority. */
+    const r = next();
+    cityShape.push(r < 0.46 ? SKY_PLAIN
+                 : r < 0.72 ? SKY_SETBACK
+                 : r < 0.89 ? SKY_CROWN : SKY_MAST);
     const rows = 2 + (i % 4);
     const cols = 2 + (i % 2);
     cityRows.push(rows);
@@ -8213,7 +8351,58 @@ const cityThr = [];
   }
 })();
 
+/* ONE BUILDING INTO A PATH THAT IS ALREADY OPEN. Item 4. Two or three
+   rectangles instead of one, so the whole city is still a single fill.
+   The body is returned so the window grid and the roof line can use the
+   same top the silhouette used. */
+function skylineBody(x, wid, baseY, th, shape) {
+  ctx.rect(x, baseY - th, wid, th);
+  if (shape === SKY_PLAIN) return;
+  const cx = x + wid * 0.5;
+  if (shape === SKY_SETBACK) {
+    const w2 = wid * FEEL.SKYLINE_SETBACK_W, h2 = th * FEEL.SKYLINE_SETBACK_H;
+    ctx.rect(cx - w2 * 0.5, baseY - th - h2, w2, h2);
+    return;
+  }
+  if (shape === SKY_CROWN) {
+    const w2 = wid * FEEL.SKYLINE_CROWN_W, h2 = th * FEEL.SKYLINE_CROWN_H;
+    ctx.rect(cx - w2 * 0.5, baseY - th - h2, w2, h2);
+    return;
+  }
+  // Masted: a spike, with a floor in PIXELS so it cannot vanish at dpr 1
+  // or shimmer at dpr 2. Same guard the window fill already uses.
+  const w2 = Math.max(FEEL.SKYLINE_MAST_MIN_PX, wid * FEEL.SKYLINE_MAST_W);
+  const h2 = th * FEEL.SKYLINE_MAST_H;
+  ctx.rect(cx - w2 * 0.5, baseY - th - h2, w2, h2);
+}
+
+/* THE FAR CITY, ITEM 3. The same walk as the near one with a second set
+   of numbers, no detail of any kind on it, and drawn first so the near
+   city stands in front of it. Its own heights, so the two layers are not
+   the same skyline at two sizes. */
+function drawSkylineFar(w, h) {
+  const period = FEEL.SKYLINE_FAR_PERIOD;
+  const step = period / FEEL.SKYLINE_COUNT;
+  const baseY = horizonY + h * FEEL.SKYLINE_FAR_DROP;
+  const minH = h * FEEL.SKYLINE_FAR_MIN_HEIGHT;
+  const spanH = h * Math.max(0, FEEL.SKYLINE_FAR_MAX_HEIGHT - FEEL.SKYLINE_FAR_MIN_HEIGHT);
+  let shift = -carX * FEEL.SKYLINE_FAR_PARALLAX - position * FEEL.SKYLINE_FAR_DRIFT;
+  shift = shift - Math.floor(shift / period) * period;
+  ctx.beginPath();
+  for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
+    for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
+      const x = shift + rep * period + i * step;
+      if (x > w + step || x < -step * 2) continue;
+      ctx.rect(x, baseY - (minH + skylineFarH[i] * spanH),
+               step * 0.86, minH + skylineFarH[i] * spanH);
+    }
+  }
+  ctx.fillStyle = COLOUR.SKYLINE_FAR;
+  ctx.fill();
+}
+
 function drawSkyline(w, h) {
+  drawSkylineFar(w, h);
   const period = FEEL.SKYLINE_PERIOD;
   const step = period / FEEL.SKYLINE_COUNT;
   const baseY = horizonY + h * FEEL.SKYLINE_DROP;
@@ -8228,7 +8417,7 @@ function drawSkyline(w, h) {
       const x = shift + rep * period + i * step;
       if (x > w + step || x < -step * 2) continue;
       const th = minH + skylineH[i] * spanH;
-      ctx.rect(x, baseY - th, step * 0.86, th);
+      skylineBody(x, step * 0.86, baseY, th, cityShape[i]);
     }
   }
   ctx.fillStyle = COLOUR.SKYLINE;
@@ -8238,7 +8427,19 @@ function drawSkyline(w, h) {
      stay on top of them. One batched fill for every lit window in shot,
      using the same repeat loop and the same culling the bodies use. */
   if (cityGlow > 0.01) {
-    ctx.beginPath();
+    /* THREE PATHS, ITEM 5, AND STILL THREE FILLS FOR THE WHOLE CITY.
+       The wide faint one under the solid one is the same two pass glow
+       convention everything else lit in this game uses, and the cool
+       path is the minority. Walked ONCE; which path a window lands in is
+       decided from the threshold it already carries.
+
+       INTO A PREALLOCATED BUFFER, not into three arrays built per frame.
+       Nothing in the draw path may allocate, and three arrays of a few
+       hundred entries sixty times a second is exactly the garbage this
+       file's Float64Array boundary tables exist to avoid. Path2D would
+       be the tidy answer and is not available: the file supports an
+       environment without it, and brandrules tests that. */
+    let winN = 0;
     let any = false;
     for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
       for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
@@ -8255,10 +8456,19 @@ function drawSkyline(w, h) {
         const top = baseY - th;
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
-            if (cityThr[at + r * cols + c] > cityGlow) continue;
+            const thr = cityThr[at + r * cols + c];
+            if (thr > cityGlow) continue;
             any = true;
-            ctx.rect(x + (c + 0.5) * cellW - ww / 2,
-                     top + (r + 0.5) * cellH - wh / 2, ww, wh);
+            const wx = x + (c + 0.5) * cellW - ww / 2;
+            const wy = top + (r + 0.5) * cellH - wh / 2;
+            if (winN < MAX_WINDOWS) {
+              const at2 = winN * 4;
+              winXY[at2] = wx; winXY[at2 + 1] = wy;
+              winXY[at2 + 2] = ww; winXY[at2 + 3] = wh;
+              winCool[winN] = (thr >= FEEL.CITY_COOL_FROM
+                            && thr <= FEEL.CITY_COOL_TO) ? 1 : 0;
+              winN++;
+            }
           }
         }
       }
@@ -8275,12 +8485,36 @@ function drawSkyline(w, h) {
          horizon and cannot cost the road a thing however bright it
          gets. That is what lets it FLASH IN TIME WITH THE VOLLEYS while
          the donut is still going, which is the whole point of it. */
-      ctx.globalAlpha = Math.min(1,
+      const solid = Math.min(1,
         FEEL.CITY_ALPHA * (0.45 + 0.55 * cityGlow) * cityPulse
         + FEEL.FINALE_CITY_ALPHA * finaleSky
         + FEEL.FINALE_STROBE_CITY * strobe2());
+      // The wide faint pass, every window grown a pixel or two.
+      const g = FEEL.CITY_GLOW_INFLATE;
+      ctx.beginPath();
+      for (let k = 0; k < winN; k++) {
+        const at2 = k * 4;
+        ctx.rect(winXY[at2] - g, winXY[at2+1] - g,
+                 winXY[at2+2] + g * 2, winXY[at2+3] + g * 2);
+      }
+      ctx.globalAlpha = solid * FEEL.CITY_GLOW_ALPHA;
       ctx.fillStyle = COLOUR.SKYLINE_WINDOW;
       ctx.fill();
+      // Then the solid ones, warm and then the cool minority.
+      for (let want = 0; want <= 1; want++) {
+        ctx.beginPath();
+        let some = false;
+        for (let k = 0; k < winN; k++) {
+          if (winCool[k] !== want) continue;
+          some = true;
+          const at2 = k * 4;
+          ctx.rect(winXY[at2], winXY[at2+1], winXY[at2+2], winXY[at2+3]);
+        }
+        if (!some) continue;
+        ctx.globalAlpha = want ? solid * FEEL.CITY_COOL_ALPHA : solid;
+        ctx.fillStyle = want ? COLOUR.SKYLINE_WINDOW_COOL : COLOUR.SKYLINE_WINDOW;
+        ctx.fill();
+      }
       ctx.globalAlpha = 1;
     }
   }
@@ -13926,6 +14160,20 @@ function render() {
     ctx.globalAlpha = Math.min(1, FEEL.HEAT_HORIZON * worldHeat
                                   + FEEL.FINALE_HORIZON * finaleSky
                                   + FEEL.FINALE_STROBE_HORIZON * strobe2());
+    ctx.fillRect(-40, horizonY - glow, w + 80, glow);
+    ctx.globalAlpha = 1;
+  }
+  /* AND THE CITY LIGHTS THE SKY, item 6. A third fill of the same cached
+     band, keyed to cityGlow rather than to the multiplier, so the sky
+     over the city has a source rather than being a glow that happens to
+     be there. One fillRect, no new gradient, no new state.
+
+     THE UPPER HALF ONLY, exactly as the pass above it. See
+     CITY_HALO_ALPHA: the lower half of this band is the void directly
+     behind the far road, and the file has already measured what
+     deepening it costs the planning horizon. */
+  if (cityGlow > 0.01) {
+    ctx.globalAlpha = Math.min(1, FEEL.CITY_HALO_ALPHA * cityGlow);
     ctx.fillRect(-40, horizonY - glow, w + 80, glow);
     ctx.globalAlpha = 1;
   }
