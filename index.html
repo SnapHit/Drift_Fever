@@ -1940,15 +1940,12 @@ const FEEL = {
   TUNE_FADE_IN:            2.00,     // LIVE, seconds. Time to react to being caught.
   TUNE_CROSSFADE:          2.40,     // LIVE, seconds between one track and the next
   TUNE_TAIL:               6.00,     // seconds before the end that the next one starts
-  /* THE LAYER THAT ARRIVES UNDER PRESSURE. A finished mix cannot grow a
-     layer the way MUSIC_OCTAVE_GAIN does, so the track is played through
-     a lowpass and the cutoff opens as the multiplier climbs, exactly the
-     way MUSIC_ARP_CUTOFF_LOW and HIGH already do for the arp. Subtle on
-     purpose: it should read as the music brightening when you drive
-     well, not as an effect being switched on. */
-  TUNE_CUTOFF_LOW:         2600,     // LIVE, Hz at rest, slightly veiled
-  TUNE_CUTOFF_HIGH:       16000,     // LIVE, Hz on the edge, open
-  TUNE_CUTOFF_Q:           0.70,     // LIVE, gentle, or it rings
+  /* THERE IS NO LAYER THAT ARRIVES UNDER PRESSURE ANY MORE. Three
+     constants used to live here driving a lowpass whose cutoff opened
+     with the multiplier. Played, it did not read as the music
+     responding; it read as the tracks being broken, so it is gone
+     rather than retuned. The recorded music is a plain playlist and the
+     only things that touch it are the crossfade and the crash duck. */
   TUNE_NAME_TIME:          3.60,     // LIVE, seconds the track's name is shown
   TUNE_NAME_FADE:          0.80,     // LIVE, seconds it takes to leave
   TUNE_NAME_SIZE:         0.030,     // LIVE, of the smaller dimension
@@ -2632,16 +2629,62 @@ const FEEL = {
   CURVE_SCALE_DEEP:         2.5,     // where the curve scale ends up
   ROAD_SQUEEZE:            0.88,     // road width multiplier at full difficulty
   DEEP_INTENSITY:             3,
-  /* How much the on ramp may soften for somebody who keeps dying in it.
-     Nothing is announced and there is no menu, per section 7.7. */
-  ADAPT_DEATH_WINDOW:        30,     // dying inside this many seconds counts as struggling
-  ADAPT_STEP:              0.34,     // how fast the softening comes and goes
-  /* Kept under ONRAMP_SECONDS with room, or the eased flat runs past the
-     end of the window and difficulty stops being identical for everybody
-     after it, which is the one thing the on ramp must not break. */
-  ADAPT_FLAT_EXTRA:          12,     // extra seconds of the easiest setting, at full ease
-  ADAPT_CURVE_EASE:         0.3,     // curve scale taken off the start, at full ease
-  ADAPT_WIDTH_EASE:        0.14,     // road width added at the start, at full ease
+  /* ------------------------------------------------------------------
+     THE UNFAILABLE OPENING. Not easy. Unfailable.
+
+     The first OPENING_SECONDS of every run cannot end it. No hazards, no
+     jumps, and the road edge does not kill: a car that runs out of road
+     is held at the lip, scraping, until the opening is over.
+
+     WHY IT IS A HELD EDGE AND NOT A GENTLE CURVE, which is what was
+     asked for. "Curvature low enough that the car cannot leave the road
+     even with the steering held hard over" cannot be built, and not
+     because of tuning. Curvature is the centrifugal push the ROAD makes;
+     the steering is the driver's own input and it is independent of it.
+     At full lock the car crosses the road and leaves it on any curvature
+     there is, including none at all, and no width survives twenty
+     seconds of it. So the thing that has to give is the death, and the
+     acceptance test that was asked for, hold one direction from the
+     first frame and be alive at twenty seconds, is exactly the test of
+     that. Driven, both directions, several seeds: see the report.
+
+     It is also the right shape for section 5, which refuses a tutorial
+     and says the first seconds of the real game are the tutorial. A new
+     player who holds the wrong thing meets the edge, hears it, sees the
+     sparks, and drives on. That teaches the edge. Dying teaches nothing
+     in the first twenty seconds because there was nothing to have known.
+     ------------------------------------------------------------------ */
+  OPENING_SECONDS:           20,     // LIVE, the part of a run that cannot end it
+  /* WHERE THE OPENING HOLDS THE CAR, in the same half widths as the
+     bands above. INSIDE the scrape band and not at the lip, and the
+     difference is the whole handover.
+
+     MEASURED. Held at OFF_ROAD, every one of thirty two driven cases
+     died on the LAST FRAME of the window: the car sat exactly on the
+     lip for twenty seconds and the instant the protection lifted it was
+     already off the road. That is a cliff at 20.000 seconds, which is a
+     worse thing to hand a new player than the death it was meant to
+     prevent. Held here, the car is on the road when the protection
+     lifts, loudly scraping, with the whole of SCRAPE_TIME_LIMIT to do
+     something about it. Nothing is teleported and nothing changes on
+     the stroke of twenty; the rules simply start counting. */
+  OPENING_EDGE:            1.18,     // LIVE, between SCRAPE_START and OFF_ROAD
+  /* THERE IS NO ADAPTIVE DIFFICULTY ANY MORE and the ADAPT_ terms that
+     were here are gone. It softened the on ramp for a player who kept
+     dying in it, was kept off the daily so the shared road stayed
+     shared, and it is still the wrong shape: two players comparing a
+     score have to have driven the same thing, and a road that quietly
+     differs by who has been struggling makes both the ghost and the
+     share meaningless the moment it ever reaches the daily.
+
+     What replaces it is deterministic and has no memory of how anybody
+     drove: the first FIRST_RUNS runs this browser has ever seen ramp
+     more gently AFTER the opening, and then never again. A count, not a
+     judgement. */
+  FIRST_RUNS:                 3,     // how many runs get the gentler ramp
+  FIRST_RUN_FLAT_EXTRA:      12,     // extra seconds of the easiest setting
+  FIRST_RUN_CURVE_EASE:     0.3,     // curve scale taken off the start
+  FIRST_RUN_WIDTH_EASE:    0.14,     // road width added at the start
 
   /* Frame. Clamped so a stutter cannot teleport the player off the road. */
   MAX_FRAME_DELTA:      1 / 20
@@ -3145,7 +3188,12 @@ const COLOUR = {
   CAR_TOP:      '#7ef0ff',
   CAR_END:      '#38bcd6',
   CAR_SIDE:     '#1c7f9a',
-  CAR_CABIN_TOP:'#ccfaff',
+  /* 241 drawn, against a road edge that draws at 230 at full heat, so
+     the car was the brightest thing on screen in all twelve biomes and
+     rule one above says it may not be. Trimmed to sit just under it: it
+     is still comfortably the brightest thing on the car, which is what
+     rule two actually asks for. */
+  CAR_CABIN_TOP:'#b6ecf5',
   CAR_GLASS:    '#08222c',
   /* Red, finally. The car is the one cool object in a warm world and the
      lights are the one warm thing on it, which is exactly why they read:
@@ -3160,9 +3208,12 @@ const COLOUR = {
   /* Distinct from BOTH the roof and the body, or from overhead it is
      just more of the same surface. Nearly white against the roof's mid
      cyan, over a near black gap. */
-  CAR_SPOILER:  '#eafeff',
+  /* 250 luminance, over the edge's 246, and the brightest pixel in the
+     whole frame in four biomes. Rule two says the car is second to the
+     edge and it was first. Same treatment as the trail: down, not off. */
+  CAR_SPOILER:  '#d8f4fa',
   CAR_WING_GAP: '#03141b',
-  CAR_RIM:      '#d6feff',
+  CAR_RIM:      '#c4f2fa',      // was 246, level with the edge
   CAR_RIM_GLOW: '214,254,255',
   CAR_TYRE:     '#0a0f14',
   CAR_TYRE_TOP: '#182430',
@@ -3173,9 +3224,28 @@ const COLOUR = {
      and leave the tyre marks and the car's own heat behind. */
   TRAIL_0:      '36,74,235',    // deep blue, gripping
   TRAIL_1:      '0,158,255',
-  TRAIL_2:      '86,224,255',
-  TRAIL_3:      '190,246,255',
-  TRAIL_4:      '255,255,255',  // hot white, fully sideways
+  TRAIL_2:      '58,166,246',
+  /* MEASURED, AND THESE TWO WERE BREAKING RULE ONE. TRAIL_4 was pure
+     white, luminance 255, against EDGE_LIGHT's 246. At maximum
+     multiplier, which is exactly when the marks are drawn at this end of
+     the ramp, the tyre marks were the brightest thing on screen in eight
+     biomes out of twelve, and they cover 41 per cent of the edge's own
+     pixels because they are laid right where the car has been driving.
+     The block above says the edge is first and the marks are third, and
+     the marks were first.
+
+     TURNED DOWN, NOT REMOVED. Handoff 2.3 is that Extreme tests as badly
+     as None on every measure, so stripping the glow would be the other
+     wrong answer. The ramp still runs cool to hot and still reads as the
+     line getting hotter the harder you drift; the top of it now sits
+     under the edge instead of over it, with room to spare. */
+  TRAIL_3:      '96,188,244',    // 172 luminance
+  /* 194, and the road edge draws anywhere from 208 to 231 depending on
+     the biome and on how near the nearest lit segment is. The margin is
+     deliberately wider than the difference being corrected, because the
+     edge's own drawn brightness moves by about twenty between frames and
+     a value tuned to the last unit would be tuned to noise. */
+  TRAIL_4:      '134,206,246',
   CAR_HEAT_0:   '255,176,46',   // the car's own glow and its light pool
   CAR_HEAT_1:   '255,214,110',
   CAR_HEAT_2:   '255,246,214',
@@ -3554,7 +3624,10 @@ const TUNABLES = [
   { key: 'SPLITTER_TIME',      label: 'sAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
   { key: 'MOVER_TIME',         label: 'mAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
   { key: 'MOVER_PERIOD',       label: 'sweep',   step: 0.5,  min: 1.5,  max: 20,    dp: 1, group: 9 },
+  { key: 'OPENING_SECONDS',    label: 'safeFor', step: 1,    min: 0,    max: 60,    dp: 0, group: 10 },
+  { key: 'OPENING_EDGE',       label: 'safeAt',  step: 0.02, min: 0.5,  max: 1.5,   dp: 2, group: 10 },
   { key: 'ONRAMP_SECONDS',     label: 'ramp',    step: 5,    min: 5,    max: 180,   dp: 0, group: 10 },
+  { key: 'FIRST_RUNS',         label: 'easyN',   step: 1,    min: 0,    max: 20,    dp: 0, group: 10 },
   { key: 'RAMP_SECONDS',       label: 'deepAt',  step: 10,   min: 20,   max: 600,   dp: 0, group: 10 },
   { key: 'ONRAMP_CURVE',       label: 'rCurve',  step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 10 },
   { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
@@ -3784,9 +3857,6 @@ const TUNABLES = [
   { key: 'SKID_GAIN_MAX',      label: 'skidVol', step: 0.05, min: 0,    max: 4.0,   dp: 2, group: 20 },
   { key: 'TUNE_FADE_IN',       label: 'tuneIn',  step: 0.10, min: 0,    max: 8.0,   dp: 2, group: 20 },
   { key: 'TUNE_CROSSFADE',     label: 'tuneXf',  step: 0.10, min: 0.1,  max: 10.0,  dp: 2, group: 20 },
-  { key: 'TUNE_CUTOFF_LOW',    label: 'tuneLo',  step: 100,  min: 200,  max: 20000, dp: 0, group: 20 },
-  { key: 'TUNE_CUTOFF_HIGH',   label: 'tuneHi',  step: 200,  min: 200,  max: 22000, dp: 0, group: 20 },
-  { key: 'TUNE_CUTOFF_Q',      label: 'tuneQ',   step: 0.05, min: 0.1,  max: 8.0,   dp: 2, group: 20 },
   { key: 'TUNE_NAME_TIME',     label: 'tuneNmT', step: 0.2,  min: 0,    max: 12,    dp: 2, group: 20 },
   { key: 'TUNE_NAME_SIZE',     label: 'tuneNmS', step: 0.002,min: 0.01, max: 0.08,  dp: 3, group: 20 },
   { key: 'TUNE_NAME_ALPHA',    label: 'tuneNmA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
@@ -5514,34 +5584,86 @@ function worstOvershoot() {
    ------------------------------------------------------------------ */
 let runTime = 0;          // seconds of the current run, DRIVING only
 let titleTime = 0;        // seconds on the title screen, for the blink
-/* Zero to one. Rises when a run ends inside ADAPT_DEATH_WINDOW, falls
-   when one gets through the on ramp. Held in memory rather than stored:
-   it is a read of how the last few minutes went, and a stored one would
-   follow a player who has since got better. */
-let ease = 0;
+/* HOW MANY RUNS THIS BROWSER HAS EVER STARTED, and the whole of what
+   is left of difficulty easing.
 
-/* THE ADAPTATION IS OFF ON THE DAILY, and it is the only system in the
-   game that has to be. Everything else about the road is a pure function
-   of the seed and the elapsed time, so it is already the same for
-   everyone; the adaptation is a pure function of how the PLAYER has been
-   doing, which is exactly the thing that would make two people's daily
-   roads differ and break the shared premise.
+   WHAT WENT, AND WHY. There used to be an adaptive `ease` here that rose
+   when a run ended quickly and fell when one got through the on ramp. It
+   was already held off the daily so the shared road stayed shared, and
+   it was still the wrong shape: the moment a road differs by how the
+   player has been doing, two people's scores stop being comparable and
+   the ghost and the share are both measuring nothing. It also could not
+   be reasoned about, because no two players and no two sessions had the
+   same road.
 
-   THE FIXED ON RAMP STAYS. ONRAMP_SECONDS, ONRAMP_CURVE, ONRAMP_WIDTH
-   and the rest are the same for everyone and are the tutorial section 5
-   refuses to allow, so removing them from the daily would hand a cold
-   player the deep game. Only the ADAPT_ terms go.
+   WHAT REPLACES IT reads nothing about how anybody drove. The first
+   FIRST_RUNS runs get a gentler ramp AFTER the opening, and run four
+   onwards is the same game for everybody, for ever. A count, not a
+   judgement.
 
-   Read through this everywhere instead of reading `ease` directly. */
-function adaptEase() { return mode === DAILY ? 0 : ease; }
+   STORED, so it survives a reload, which is the whole point of "the
+   first three runs this browser has ever seen". When storage is
+   unavailable the read fails and every run is a first run, which is the
+   correct direction to fail in: a locked down profile gets the gentler
+   ramp rather than the deep game. */
+let runsEver = 0;
 
-function onRunEnded() {
-  // A daily run neither reads the adaptation nor feeds it. Struggling on
-  // a road nobody chose should not quietly soften the endless one.
-  if (mode === DAILY) return;
-  if (runTime < FEEL.ADAPT_DEATH_WINDOW) ease = Math.min(1, ease + FEEL.ADAPT_STEP);
-  else if (runTime > FEEL.ONRAMP_SECONDS) ease = Math.max(0, ease - FEEL.ADAPT_STEP);
+function loadRunsEver() {
+  const v = parseInt(storeGet('runs'), 10);
+  runsEver = isFinite(v) && v > 0 ? v : 0;
 }
+
+function countRun() {
+  runsEver++;
+  storeSet('runs', String(runsEver));
+}
+
+/* 1 while this is one of the first runs, 0 after. Read through this
+   everywhere rather than comparing the count in place.
+
+   IT APPLIES ON THE DAILY TOO, and the adaptation it replaced could not.
+   That is the point of it being a fixed count: everybody's first three
+   runs are eased by exactly the same amount, so the road a beginner
+   drives on their fourth run is the road everybody else is driving, and
+   the first three were the same first three for all of them. */
+function firstRunEase() { return runsEver <= FEEL.FIRST_RUNS ? 1 : 0; }
+
+/* THE UNFAILABLE OPENING, in one place, so nothing has to remember the
+   rule. A continue is past it by definition: skipOnRamp says the player
+   has already driven the road once and is resuming, not starting. */
+function inOpening() {
+  return !skipOnRamp && runTime < FEEL.OPENING_SECONDS;
+}
+
+/* THE HANDOVER, and it is the whole difficulty of this feature.
+
+   MEASURED, TWICE. The protection lifting must not itself be lethal, and
+   the first two attempts both were. Held at the lip, the car was already
+   off the road the instant the rules resumed and thirty two driven cases
+   out of thirty three died on the last frame of the window. Held inside
+   the band instead, the position was fine and they ALL STILL DIED on the
+   same frame, because the scrape meter had been pinned at its limit for
+   twenty seconds and one more frame of dt took it over.
+
+   So the meter is handed over empty. The player who arrives at twenty
+   seconds leaning on the edge gets the whole of SCRAPE_TIME_LIMIT to
+   come off it, which is the same thing any other player gets for
+   entering the band. Nothing is teleported, nothing changes on screen;
+   the rules simply start counting from zero. */
+let wasInOpening = false;
+function openingHandover() {
+  const now = inOpening();
+  if (wasInOpening && !now) scrapeMeter = 0;
+  wasInOpening = now;
+}
+
+/* Nothing may be PLACED before the opening is over either, and this is
+   the floor under every unlock time rather than a set of edited
+   constants. Tuning BLOCKER_TIME back under the opening on a phone would
+   otherwise quietly put a blocker inside it. */
+function unlockAt(seconds) { return Math.max(FEEL.OPENING_SECONDS, seconds); }
+
+function onRunEnded() { /* nothing to feed any more, see runsEver */ }
 
 /* ------------------------------------------------------------------
    THE CLOCK THE ROAD IS BUILT AGAINST, AND WHY THE DAILY NEEDS ITS OWN.
@@ -5575,11 +5697,11 @@ function liveClock() { return roadClock(carSegIndex); }
 
 /* How far through the on ramp, 0 to 1. The flat part at the front is
    what adaptation lengthens; the far end does not move, so this reaches
-   1 at ONRAMP_SECONDS for every player regardless of ease. */
+   1 at ONRAMP_SECONDS for everyone regardless of the first run ease. */
 function onRampProgress(t) {
   // A continue is past it by definition. See the continues block.
   if (skipOnRamp) return 1;
-  const flat = FEEL.ONRAMP_FLAT + adaptEase() * FEEL.ADAPT_FLAT_EXTRA;
+  const flat = FEEL.ONRAMP_FLAT + firstRunEase() * FEEL.FIRST_RUN_FLAT_EXTRA;
   const span = Math.max(1, FEEL.ONRAMP_SECONDS - flat);
   return clamp(((t === undefined ? runTime : t) - flat) / span, 0, 1);
 }
@@ -5612,11 +5734,11 @@ let widthScale = 1;
 function updateDifficulty() {
   const t = liveClock();
   const p = onRampProgress(t), d = deepProgress(t);
-  const e = adaptEase();
-  const start = Math.max(0.2, FEEL.ONRAMP_CURVE - e * FEEL.ADAPT_CURVE_EASE);
+  const e = firstRunEase();
+  const start = Math.max(0.2, FEEL.ONRAMP_CURVE - e * FEEL.FIRST_RUN_CURVE_EASE);
   const base = start + (FEEL.CURVE_SCALE - start) * p;
   curveScale = base + (FEEL.CURVE_SCALE_DEEP - FEEL.CURVE_SCALE) * d;
-  const wide = FEEL.ONRAMP_WIDTH + e * FEEL.ADAPT_WIDTH_EASE;
+  const wide = FEEL.ONRAMP_WIDTH + e * FEEL.FIRST_RUN_WIDTH_EASE;
   widthScale = (wide + (1 - wide) * p) + (FEEL.ROAD_SQUEEZE - 1) * d;
 }
 
@@ -6053,7 +6175,7 @@ let roadWidth = 1;      // current half width, as a multiple of the base
 function buildWidthScale() {
   if (mode !== DAILY) return widthScale;
   const t = buildClock();
-  const wide = FEEL.ONRAMP_WIDTH;                 // adaptEase is zero here
+  const wide = FEEL.ONRAMP_WIDTH + firstRunEase() * FEEL.FIRST_RUN_WIDTH_EASE;
   return (wide + (1 - wide) * onRampProgress(t))
        + (FEEL.ROAD_SQUEEZE - 1) * deepProgress(t);
 }
@@ -6515,9 +6637,9 @@ function hazardX(h) {
 function dueHazardKind() {
   const at = segBase + segments.length;
   const order = [
-    { k: HAZ_SPLITTER, time: FEEL.SPLITTER_TIME },
-    { k: HAZ_MOVER,    time: FEEL.MOVER_TIME },
-    { k: HAZ_BLOCKER,  time: FEEL.BLOCKER_TIME }
+    { k: HAZ_SPLITTER, time: unlockAt(FEEL.SPLITTER_TIME) },
+    { k: HAZ_MOVER,    time: unlockAt(FEEL.MOVER_TIME) },
+    { k: HAZ_BLOCKER,  time: unlockAt(FEEL.BLOCKER_TIME) }
   ];
   const t = buildClock();
   for (let i = 0; i < order.length; i++) {
@@ -6596,7 +6718,7 @@ function buildHazardPhrase(kind) {
 let jumps = [];
 let jumpDue = 0;
 
-function jumpUnlocked() { return buildClock() >= FEEL.JUMP_TIME; }
+function jumpUnlocked() { return buildClock() >= unlockAt(FEEL.JUMP_TIME); }
 
 function jumpLead() { return FEEL.JUMP_ARROW_COUNT * FEEL.JUMP_ARROW_SPACING + 4; }
 
@@ -6749,6 +6871,10 @@ let scrapeRisk = 0;      // that meter as 0 to 1, for feedback
 let shake = 0;
 let shakeX = 0, shakeY = 0;
 let deadFor = 0;
+/* A reflex input that arrived inside DEATH_INPUT_LOCK, kept rather than
+   thrown away. See startOrRestart: the lock's job is that nothing
+   restarts too early, not that the player has to press twice. */
+let restartWanted = false;
 let lastMarkSeg = -1;
 let carSegIndex = 0;     // the segment the car is on, read by the trail fade
 let prevCarIndex = 0;    // so a long frame cannot tunnel through a hazard
@@ -6828,6 +6954,10 @@ function startRun() {
   carSegIndex = 0;
   prevCarIndex = 0;
   position = 0;
+  /* COUNTED BEFORE THE ROAD IS BUILT, or the first run gets the road of
+     a player who has not started yet. A continue does not come through
+     here and does not count: it is the same run resumed. */
+  countRun();
   updateDifficulty();
   /* The biome order is a generator input like any other, so on the daily
      it comes off the day and not off Math.random. Its own stream: rng()
@@ -6848,6 +6978,8 @@ function startRun() {
   scrapeRisk = 0;
   shake = 0;
   deadFor = 0;
+  restartWanted = false;
+  wasInOpening = false;
   lastMarkSeg = -1;
   steering.value = 0;
   drift.headingV = 0;
@@ -7019,6 +7151,8 @@ function continueRun() {
   scrapeRisk = 0;
   shake = 0;
   deadFor = 0;
+  restartWanted = false;
+  wasInOpening = false;
   lastMarkSeg = -1;
   steering.value = 0;
   drift.headingV = 0;
@@ -7085,13 +7219,38 @@ function startOrRestart() {
      run it again, which is exactly what it was before any of this
      existed. */
   if (state === FINISHED && finaleRunning()) { skipFinale(); return; }
-  if (state === FINISHED && deadFor >= FEEL.DEATH_INPUT_LOCK) { startRun(); return; }
-  if (state === DEAD && deadFor >= FEEL.DEATH_INPUT_LOCK) {
-    // The reflex tap continues when there is somewhere to continue from,
-    // and restarts when there is not. Either way it is one action with
-    // nothing to hunt for, which is what section 5 requires.
-    if (canContinue()) continueRun(); else startRun();
-  }
+  /* THE LOCK NO LONGER THROWS THE INPUT AWAY, IT REMEMBERS IT.
+
+     MEASURED. One tap, delivered at a range of delays after the car
+     died: at 0.02s, 0.10s and 0.22s nothing happened at all, and from
+     0.28s on a single tap was enough. So the game was one input only for
+     a player patient enough to wait out DEATH_INPUT_LOCK, and the reflex
+     tap after a crash is nowhere near that patient. Every path measured
+     cost TWO inputs: one thrown away, one that worked.
+
+     The lock's actual job is that nothing restarts before the crash has
+     registered, and buffering keeps that completely: the restart still
+     happens no earlier than DEATH_INPUT_LOCK. What changes is that the
+     input the player already made is the one that does it, instead of
+     being discarded and asked for again. */
+  if (state !== DEAD && state !== FINISHED) return;
+  if (deadFor < FEEL.DEATH_INPUT_LOCK) { restartWanted = true; return; }
+  restartWanted = false;
+  if (state === FINISHED) { startRun(); return; }
+  // The reflex tap continues when there is somewhere to continue from,
+  // and restarts when there is not. Either way it is one action with
+  // nothing to hunt for, which is what section 5 requires.
+  if (canContinue()) continueRun(); else startRun();
+}
+
+/* The buffered reflex input, spent the first frame it is allowed to be.
+   Called from the frame loop rather than from update, because update
+   does not run in every state this can be waiting in. */
+function spendRestartWanted() {
+  if (!restartWanted) return;
+  if (state !== DEAD && state !== FINISHED) { restartWanted = false; return; }
+  if (deadFor < FEEL.DEATH_INPUT_LOCK) return;
+  startOrRestart();
 }
 
 function update(dt) {
@@ -7252,8 +7411,25 @@ function update(dt) {
   layTyreMarks(carIndex, prevX);
   updateSmoke(dt);
 
-  const offset = Math.abs(carFrac);
-  if (offset > FEEL.OFF_ROAD) { crash(); return; }
+  /* THE EDGE DOES NOT KILL DURING THE OPENING. The car is held inside
+     the scrape band instead, so it keeps every piece of feedback the
+     edge has, sparks, shake, the speed penalty and the meter, and loses
+     only the ending. Held rather than merely spared: letting it carry
+     on out into the void with the death suppressed would put the car
+     somewhere the road is not drawn. See OPENING_EDGE for why it is
+     held there and not at the lip. */
+  openingHandover();
+  let offset = Math.abs(carFrac);
+  const wall = inOpening() ? FEEL.OPENING_EDGE : FEEL.OFF_ROAD;
+  if (offset > wall) {
+    if (!inOpening()) { crash(); return; }
+    carX = Math.sign(carX) * wall * localHalf;
+    carFrac = carX / localHalf;
+    offset = wall;
+    // And the sideways speed is spent, or it fights the wall every frame
+    // and the car sits against it juddering.
+    if (drift.lateralV * carX > 0) drift.lateralV = 0;
+  }
 
   /* Three bands on a hazard, the same three the road edge has. Section
      4.2's argument is that a binary cliff reads as unfair and a gradient
@@ -7264,8 +7440,12 @@ function update(dt) {
      flag the shoulder sets, so the speed penalty, the budget drain, the
      edge flash, the shake and the bar all come along without a line of
      new feedback code. Only the death test is the hazard's own. */
+  /* AND A HAZARD CANNOT END IT EITHER. Nothing is placed inside the
+     opening, so this is unreachable on a generated road, but "unfailable"
+     should be true by construction rather than by an argument about
+     placement that a tuned OPENING_SECONDS could outlive. */
   const clipped = hazardBand(carIndex, localHalf);
-  if (clipped === 2) { crash(HIT_OBJECT); return; }
+  if (clipped === 2 && !inOpening()) { crash(HIT_OBJECT); return; }
 
   scraping = offset > FEEL.SCRAPE_START || clipped === 1;
   scrapeSide = clipped === 1 ? hazardSide
@@ -7273,7 +7453,13 @@ function update(dt) {
   if (scraping) {
     scrapeMeter += dt;
     addShake(FEEL.SCRAPE_SHAKE_PX);
-    if (scrapeMeter > FEEL.SCRAPE_TIME_LIMIT) { crash(); return; }
+    // The other way the edge kills, and the opening spares this one too.
+    // The meter still fills, so the bar is honest about the risk being
+    // taken; it simply holds at the top instead of ending the run.
+    if (scrapeMeter > FEEL.SCRAPE_TIME_LIMIT) {
+      if (!inOpening()) { crash(); return; }
+      scrapeMeter = FEEL.SCRAPE_TIME_LIMIT;
+    }
   } else {
     scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
   }
@@ -7358,8 +7544,10 @@ function land(localHalf) {
   // Read BEFORE it is cleared, because the flight is half the score.
   const air = airTime;
   airTime = 0;
+  /* Nor a landing. Jumps are barred from the opening too, so this is
+     also unreachable in play, and it is guarded for the same reason. */
   const offset = Math.abs(carX / localHalf);
-  if (offset > FEEL.OFF_ROAD) { crash(); return; }
+  if (offset > FEEL.OFF_ROAD && !inOpening()) { crash(); return; }
   const bad = offset > FEEL.SCRAPE_START;
   const q = bad ? 0 : landQuality(air);
   /* THE RUNGS. Jumps are frequent, so the gap between a nod and the full
@@ -7568,6 +7756,7 @@ function crash(kind) {
   onRunEnded();
   state = DEAD;
   deadFor = 0;
+  restartWanted = false;
   scraping = false;
   /* Both lanes go quiet. A callout is feedback on driving and there is no
      driving any more, and leaving one to fade over the result screen is
@@ -10352,7 +10541,15 @@ function drawHudBar(w, h) {
 
   // THE LEFT: the score, in exactly the treatment it has in portrait.
   const label = String(banked + Math.floor(score));
-  const ssize = fittedSize(label, '900', size, room);
+  /* THE OUTLINE COUNTS TOWARD THE WIDTH. fittedSize measures the glyphs
+     and arcadeNumber strokes them, so half a line width hangs off each
+     end of what was measured. At 480 by 350 with a nine figure score
+     that was a one pixel overlap with the clock plate: small, real, and
+     the kind of thing that is a three pixel overlap on the next screen
+     size nobody tested. Reserved against the REQUESTED size, which is
+     the largest it can be, so the reservation is never short. */
+  const ssize = fittedSize(label, '900', size,
+                           room - Math.max(3, size * 0.14));
   ctx.font = '900 ' + ssize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   const sw = ctx.measureText(label).width;
   const scx = x0 + sw / 2;
@@ -11563,6 +11760,7 @@ function finishRun() {
   onRunEnded();
   state = FINISHED;
   deadFor = 0;
+  restartWanted = false;
   scraping = false;
   calloutLife = 0;
   driftLife = 0;
@@ -13209,7 +13407,7 @@ function drawHud(w, h) {
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
       + '  width ' + widthScale.toFixed(2) + '  int ' + maxIntensity()
-      + '  ease ' + ease.toFixed(2) + ' used ' + adaptEase().toFixed(2),
+      + '  runs ' + runsEver + (firstRunEase() ? ' EASED' : ''),
     (mode === DAILY ? 'DAILY ' + todayStamp + ' seed ' + dailySeed() : 'endless')
       + '  today ' + dailyBest
       + '  ghost ' + (ghost.live ? ghost.n + ' pts ' + dailyGhostBytes + 'B' : 'none')
@@ -13693,7 +13891,6 @@ const TUNES = [
 const tune = {
   el: [null, null],       // the two HTMLAudioElements
   src: [null, null],      // their MediaElementAudioSourceNodes
-  low: [null, null],      // and each one's own lowpass
   g: [null, null],        // and each one's own gain
   live: 0,                // which side is the one playing
   /* THE FADE LIVES HERE, not in the gain node. updateMusic writes the
@@ -13887,25 +14084,33 @@ function tuneLoad(side, index) {
    buffering for a while by then and nothing has waited on them. */
 function tuneWire(a) {
   /* NOT GATED ON tune.failed, AND IT USED TO BE. Wiring is plumbing: two
-     source nodes, two filters, two gains, silent until something plays.
-     Refusing to build it because the FIRST fetch had failed meant that a
-     player whose first request was blocked never got the elements into
-     the graph at all, so no later retry could ever produce a sound. The
+     source nodes, two gains, silent until something plays. Refusing to
+     build it because the FIRST fetch had failed meant that a player
+     whose first request was blocked never got the elements into the
+     graph at all, so no later retry could ever produce a sound. The
      revive path looked like it worked and was silent, which is the worst
      kind of broken. */
+  /* THERE WAS A LOWPASS HERE AND IT IS GONE. Its cutoff opened with the
+     drift multiplier, the same lever the procedural arp uses, on the
+     reasoning that a finished mix cannot grow a layer so brightness had
+     to be the response instead. Played, it did not read as the music
+     responding to the driving. It read as the tracks being broken, which
+     is the worst possible reading of an effect: it costs the player
+     confidence in the whole thing rather than merely adding nothing.
+
+     So the recorded tracks are now a plain playlist. Source into gain
+     into the bus, and the only two things that ever touch that gain are
+     the crossfade envelope and the crash duck, neither of which is a
+     response to how anybody is driving. */
   if (tune.wired || !tune.el[0]) return;
   for (let i = 0; i < 2; i++) {
     let src;
     try { src = a.ac.createMediaElementSource(tune.el[i]); }
     catch (e) { tuneFailed(); return; }
-    const low = a.ac.createBiquadFilter();
-    low.type = 'lowpass';
-    low.frequency.value = FEEL.TUNE_CUTOFF_LOW;
-    low.Q.value = FEEL.TUNE_CUTOFF_Q;
     const g = a.ac.createGain();
     g.gain.value = 0;
-    src.connect(low); low.connect(g); g.connect(a.bus);
-    tune.src[i] = src; tune.low[i] = low; tune.g[i] = g;
+    src.connect(g); g.connect(a.bus);
+    tune.src[i] = src; tune.g[i] = g;
   }
   tune.wired = true;
 }
@@ -14536,20 +14741,13 @@ function updateMusic() {
 
   const duck = a.ac.currentTime < a.crashUntil ? FEEL.MUSIC_DUCK : 1;
 
-  /* THE RECORDED TRACK, AND THE FILTER THAT MAKES IT REACT.
+  /* THE RECORDED TRACKS, AND NOTHING IN HERE READS THE DRIVING.
 
-     A finished mix cannot grow a layer the way MUSIC_OCTAVE_GAIN does,
-     so the brightness is the lever instead: the cutoff opens as the
-     multiplier climbs, which is exactly what MUSIC_ARP_CUTOFF_LOW and
-     HIGH already do to the arp. Same idea, same heat, applied to a
-     stereo file rather than to an oscillator. */
-  const cut = FEEL.TUNE_CUTOFF_LOW
-            + (FEEL.TUNE_CUTOFF_HIGH - FEEL.TUNE_CUTOFF_LOW) * a.heat;
-  for (let i = 0; i < 2; i++) {
-    if (!tune.low[i]) continue;
-    ramp(tune.low[i].frequency, cut, FEEL.AUDIO_FADE_TIME);
-    tune.low[i].Q.value = FEEL.TUNE_CUTOFF_Q;
-  }
+     `duck` is a crash, which is a discrete event and not a style of
+     driving, and it is here so the music stops fighting the crash sound.
+     `tune.lvl` is the crossfade envelope between one track and the next.
+     That is the whole list. a.heat is deliberately not consulted: see
+     tuneWire for why the filter that used to read it was taken out. */
   if (tune.playing) {
     for (let i = 0; i < 2; i++) {
       if (!tune.g[i]) continue;
@@ -14943,6 +15141,11 @@ function frame(now) {
     sampleFps(rawDt);
     return;
   }
+  /* The reflex input that came in during the input lock, spent the
+     first frame it is allowed to be. Ahead of everything else in the
+     frame, so a run that starts here runs its whole first frame rather
+     than half of one. */
+  spendRestartWanted();
   /* Hit stop. The world stands still for a few frames, which is what
      sells an impact as an impact, and the DEATH TIMER KEEPS RUNNING on
      real time so this cannot delay getting back in by a single
@@ -14974,6 +15177,9 @@ function frame(now) {
 
 if (bootFlash > 0) { try { document.documentElement.classList.add('booting'); } catch (e) {} }
 else bootChromeHidden = false;
+// Before the first road is built, for the same reason updateDifficulty is:
+// the eased ramp is one of the inputs to it.
+loadRunsEver();
 recomputeCamera();
 if (debugAllowed) { setDebug(true); tiltAssert(); }
 // Before the first road is built, or the title screen is generated at
