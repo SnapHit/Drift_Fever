@@ -1019,7 +1019,22 @@ const FEEL = {
   CHECKPOINT_EVERY:        1500,     // LIVE, segments between gates, about 33 seconds
   CHECKPOINT_HEIGHT:       1500,     // world units, the posts either side
   CHECKPOINT_POST:          260,     // world units, how thick they are
-  CHECKPOINT_FLASH:         0.5,     // seconds of the crossing flash
+  /* HALF A SECOND, AND IT WAS NEARLY CUT ON A MEASUREMENT THAT WAS
+     WRONG. A previous session reported the gate response lit on 46 per
+     cent of gentle bend frames and called it ambient lighting rather
+     than a flash. It was neither: gateFlash decays inside updateClock,
+     the harness that produced the figure never called updateClock, and
+     the flash it measured had been set once and never decayed at all.
+
+     Re measured with a whole frame: 1 to 2 per cent of gentle bend
+     frames on every level. That is an event. So this stays where it was
+     and the squared falloff that went with the cut came out again,
+     because handoff 2.3 is explicit that None tests as badly as Extreme
+     and there is no finding here to act on.
+
+     It is LIVE now, which is the part of that session worth keeping:
+     whether half a second feels right is a question for a phone. */
+  CHECKPOINT_FLASH:         0.5,     // LIVE, seconds of the crossing flash
   /* The timer hangs off the BOTTOM of the score rather than sitting at
      its own fraction of the screen height. The two elements are sized
      from the smaller screen dimension while a fraction of the height is
@@ -1668,6 +1683,20 @@ const FEEL = {
   /* ----------------------------------------------------------------
      THE WAVES. Discrete volleys rather than a trickle, because three
      things arriving is a celebration and a steady stream is weather. */
+  /* ----------------------------------------------------------------
+     HOW BIG THE FINALE IS FOR THE LEVEL THAT WAS JUST FINISHED.
+
+     Completing the last level has to feel bigger than completing the
+     first, or the escalation is hollow. One scalar does it: it multiplies
+     the volley count and the length of every beat after the crossing, so
+     an early level is both LIGHTER and SHORTER. Short matters as much as
+     light here, because the next level is one input away and a finale
+     that delays it is a toll on the thing the day is made of.
+
+     The floor is what stops the first level's arrival being nothing.
+     Interpolated across the level band like everything else, so it
+     follows LEVEL_COUNT rather than assuming three. */
+  FINALE_LEVEL_FLOOR:      0.38,     // LIVE, the scale at the first level
   FINALE_WAVES:               3,     // LIVE, volleys at level zero
   FINALE_WAVE_PER_LEVEL:   0.50,     // more for a better result, rounded
   FINALE_WAVE_GAP:         0.95,     // LIVE, seconds between volleys
@@ -2518,17 +2547,41 @@ const FEEL = {
      steps: it makes finishing impossible, so there is nothing to
      compare, and the ghost is a pace car rather than a rival.
 
-     THE COUNT COMES OFF THE SEED, so it is the same for everyone on the
-     same local date and the shape of the day is part of the day. Six to
-     eight gates is three to four minutes at the current spacing, which
-     is long enough that finishing is an achievement and short enough
-     that a retry is not a commitment.
+     THE DAY IS THREE TRACKS, NOT ONE, and they are played in order.
+
+     THE TOTAL IS THE DESIGN CONSTRAINT, not the level count. Handoff 2.5:
+     a daily works as an appointment at three to five minutes and becomes
+     homework at ten. At the current spacing of 33.3 seconds a gate, the
+     count below is 2, 4 and 5 gates, which is 57 + 123 + 157 = 337
+     seconds clean, five minutes thirty seven. If a length ever drifts
+     upward the fix is to shorten it, not to accept the total.
+
+     THREE, BECAUSE THREE CONFIGURATIONS ALREADY EXIST. The on ramp
+     values, the mid values and the deep values. Level one is the on ramp
+     band held for the whole level, level two completes the on ramp and
+     never goes deep, level three is the game as it was. Nothing here is
+     an invented difficulty setting; see levelBand.
+
+     THE COUNT IS NOT HARDCODED ANYWHERE. Everything downstream, the
+     progression, the records, the ghosts, the finale and every layout,
+     reads LEVEL_COUNT, and the gate counts and difficulty bands are
+     INTERPOLATED across whatever it is set to. Two levels gives 2 and 5
+     gates at the on ramp and deep bands; four gives 2, 3, 4, 5. The
+     right count is exactly the sort of question watching people play
+     will answer, so it has to be one number to change.
+
+     THE LENGTHS NO LONGER VARY BY DAY. They used to come off the seed,
+     six to eight gates, and that was right when the day was one track.
+     Three tracks with three independent lengths puts the TOTAL, which is
+     the thing that actually has to hold, on a random walk. The road
+     still changes completely every day; only its length is fixed.
 
      THE LAST GATE IS THE FINISH. There is no extra structure after a
      count of checkpoints: gate N ends the run, which is why the pips and
      the countdown and the line are all the same number. */
-  DAILY_GATES_MIN:            6,     // LIVE
-  DAILY_GATES_MAX:            8,     // LIVE
+  LEVEL_COUNT:                3,     // LIVE, and read by everything
+  LEVEL_GATES_FIRST:          2,     // LIVE, gates on level one
+  LEVEL_GATES_LAST:           5,     // LIVE, gates on the last level
   /* Nothing is placed inside this of the line. The closing stretch is
      meant to be the hardest part of the day, not a lottery on the last
      corner, and a blocker straddling the finish would decide the run
@@ -3697,6 +3750,7 @@ const TUNABLES = [
   { key: 'CITY_WINDOW_FILL',   label: 'winSize', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 21 },
   { key: 'CITY_MIN_BUILDING_PX',label:'winMinPx',step: 1,    min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
+  { key: 'CHECKPOINT_FLASH',   label: 'gateFx',  step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 14 },
   { key: 'CALLOUT_TIME',       label: 'callFor', step: 0.05, min: 0.3,  max: 4.0,   dp: 2, group: 14 },
   { key: 'CALLOUT_GAP',        label: 'callGap', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 14 },
   { key: 'CALLOUT_LOCK',       label: 'callLock',step: 0.1,  min: 0,    max: 4.0,   dp: 1, group: 14 },
@@ -3919,8 +3973,9 @@ const TUNABLES = [
   { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 36,    dp: 0, group: 25 },
   { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 },
   { key: 'MODE_NOTE_SECONDS',  label: 'modeSay', step: 1,    min: 0,    max: 30,    dp: 0, group: 26 },
-  { key: 'DAILY_GATES_MIN',    label: 'gatesLo', step: 1,    min: 2,    max: 30,    dp: 0, group: 27 },
-  { key: 'DAILY_GATES_MAX',    label: 'gatesHi', step: 1,    min: 2,    max: 30,    dp: 0, group: 27 },
+  { key: 'LEVEL_COUNT',        label: 'levels',  step: 1,    min: 1,    max: 8,     dp: 0, group: 27 },
+  { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
+  { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'FINISH_HEIGHT',      label: 'finTall', step: 100,  min: 400,  max: 8000,  dp: 0, group: 27 },
   { key: 'PIP_SIZE',           label: 'pip',     step: 0.001,min: 0.005,max: 0.06,  dp: 3, group: 27 },
   { key: 'PIP_GAP',            label: 'pipGap',  step: 0.001,min: 0,    max: 0.04,  dp: 3, group: 27 },
@@ -5608,6 +5663,14 @@ let titleTime = 0;        // seconds on the title screen, for the blink
    ramp rather than the deep game. */
 let runsEver = 0;
 
+/* Tracks finished, ever, across every day. Monotonic by construction.
+   See bankDaily: written now, displayed in a later session. */
+let finishedEver = 0;
+function loadFinishedEver() {
+  const v = parseInt(storeGet('finished'), 10);
+  finishedEver = isFinite(v) && v > 0 ? v : 0;
+}
+
 function loadRunsEver() {
   const v = parseInt(storeGet('runs'), 10);
   runsEver = isFinite(v) && v > 0 ? v : 0;
@@ -5733,7 +5796,14 @@ let widthScale = 1;
 
 function updateDifficulty() {
   const t = liveClock();
-  const p = onRampProgress(t), d = deepProgress(t);
+  /* CAPPED BY THE LEVEL. See levelHardP and levelHardD: a level says how
+     far along the existing ramp it is allowed to get, so level one holds
+     the on ramp values for its whole length and the last level is the
+     game exactly as it was. In ENDLESS both are 1, because endless is
+     not a level and has never had a ceiling. */
+  const cap = mode === DAILY;
+  const p = onRampProgress(t) * (cap ? levelHardP() : 1);
+  const d = deepProgress(t) * (cap ? levelHardD() : 1);
   const e = firstRunEase();
   const start = Math.max(0.2, FEEL.ONRAMP_CURVE - e * FEEL.FIRST_RUN_CURVE_EASE);
   const base = start + (FEEL.CURVE_SCALE - start) * p;
@@ -5750,11 +5820,20 @@ function maxIntensity() {
   // The BUILD clock: this decides what goes on the road ahead, not what
   // is under the car.
   const t = buildClock();
+  let n;
   if (!skipOnRamp && t < FEEL.ONRAMP_SECONDS) {
     // 0 and 1 only for most of the on ramp, then a taste of 2 at the end.
-    return onRampProgress(t) > 0.75 ? FEEL.ONRAMP_INTENSITY + 1 : FEEL.ONRAMP_INTENSITY;
+    n = onRampProgress(t) > 0.75 ? FEEL.ONRAMP_INTENSITY + 1 : FEEL.ONRAMP_INTENSITY;
+  } else {
+    n = FEEL.DEEP_INTENSITY;
   }
-  return FEEL.DEEP_INTENSITY;
+  /* AND A CEILING PER LEVEL, interpolated across the band the same way
+     everything else about a level is. Level one never sees a phrase
+     above the on ramp's own hardest; the last level sees everything. */
+  if (mode !== DAILY) return n;
+  const cap = FEEL.ONRAMP_INTENSITY
+            + (FEEL.DEEP_INTENSITY - FEEL.ONRAMP_INTENSITY) * levelBand(level);
+  return Math.min(n, Math.round(cap));
 }
 
 function restChance() {
@@ -5988,15 +6067,71 @@ function countdownLabel() {
    because the cycler can move the bounds mid session and a track that
    changed length under the car would be worse than either bound.
    ------------------------------------------------------------------ */
-function dailyGateCountFor(stamp) {
-  const lo = Math.max(1, Math.round(FEEL.DAILY_GATES_MIN));
-  const hi = Math.max(lo, Math.round(FEEL.DAILY_GATES_MAX));
-  let h = dailySeedFor(stamp) ^ 0x2545f491;
-  h = Math.imul(h ^ (h >>> 13), 0x27d4eb2d);
-  h = Math.imul(h ^ (h >>> 15), 0x165667b1);
-  h = (h ^ (h >>> 16)) >>> 0;
-  return lo + (h % (hi - lo + 1));
+/* ==================================================================
+   THE LEVELS.
+
+   Three tracks a day, played in order, escalating. Everything about them
+   is DERIVED from FEEL.LEVEL_COUNT so that changing it to two or four
+   changes the game and not the code. Nothing below writes 3.
+
+   Levels are ONE INDEXED throughout, because that is what is shown on
+   screen and a level zero that means level one is the kind of thing that
+   is right until somebody reads it.
+   ================================================================== */
+function levelCount() { return Math.max(1, Math.round(FEEL.LEVEL_COUNT)); }
+function clampLevel(n) { return clamp(Math.round(n), 1, levelCount()); }
+
+/* WHERE A LEVEL SITS BETWEEN EASY AND HARD, 0 to 1. The first level is
+   0, the last is 1, and everything in between is spaced evenly. With one
+   level only there is nothing to interpolate and it is the whole game,
+   so it is 1. */
+function levelBand(lvl) {
+  const n = levelCount();
+  if (n <= 1) return 1;
+  return (clampLevel(lvl) - 1) / (n - 1);
 }
+
+/* GATES PER LEVEL, interpolated across the band, so the lengths ramp
+   whatever the count is. Rounded, and never fewer than one. */
+function levelGatesFor(lvl) {
+  const a = Math.max(1, Math.round(FEEL.LEVEL_GATES_FIRST));
+  const b = Math.max(1, Math.round(FEEL.LEVEL_GATES_LAST));
+  return Math.max(1, Math.round(a + (b - a) * levelBand(lvl)));
+}
+
+/* A LEVEL'S OWN SEED. The day's seed hashed with the level, so the three
+   roads have nothing to do with each other and all three are a pure
+   function of the local date. Two devices on the same date generate the
+   same three roads, which is the guarantee the ghost and the share both
+   rest on, extended to all of them rather than weakened. */
+function levelSeedFor(stamp, lvl) {
+  let h = (dailySeedFor(stamp) ^ Math.imul(clampLevel(lvl), 0x85ebca6b)) >>> 0;
+  h = Math.imul(h ^ (h >>> 16), 0xc2b2ae35);
+  h = Math.imul(h ^ (h >>> 13), 0x27d4eb2f);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
+/* WHICH LEVEL IS BEING DRIVEN. Only ever set by the routes that start a
+   run, and read by the road generator, the records, the ghost, the
+   finale and the readouts. */
+let level = 1;
+
+/* THE TWO HALVES OF THE DIFFICULTY BAND, and this is what makes three
+   levels three EXISTING configurations rather than three new ones.
+
+   The run's own ramp already runs the road from the on ramp values up to
+   the normal values, and then on from there to the deep values. A level
+   simply says how far along that existing path it is allowed to get:
+
+     hardP  how much of the ON RAMP the level may complete
+     hardD  how much of the DEEP GAME it may reach
+
+   The first half of the level range opens the on ramp and the second
+   half opens the deep game, so at three levels they come out as (0,0),
+   (1,0) and (1,1): the on ramp band held for a whole level, the mid
+   values, and the game exactly as it was. */
+function levelHardP() { return clamp(levelBand(level) * 2, 0, 1); }
+function levelHardD() { return clamp(levelBand(level) * 2 - 1, 0, 1); }
 
 /* Gate k, one indexed, in segments. The first sits at seven tenths of a
    spacing so the opening is not a full gate long, which is where it has
@@ -6008,7 +6143,7 @@ function gateSegment(k) {
 let dailyGates = 6;
 let finishSeg = 0;
 function refreshTrackLength() {
-  dailyGates = dailyGateCountFor(todayStamp);
+  dailyGates = levelGatesFor(level);
   finishSeg = gateSegment(dailyGates);
 }
 refreshTrackLength();
@@ -6044,7 +6179,10 @@ let lastSeed = PINNED_SEED;
    not be the opening road again. */
 function nextSeed(salt) {
   if (mode === DAILY) {
-    lastSeed = salt ? (dailySeed() ^ Math.imul(salt | 0, 0x9E3779B1)) >>> 0 : dailySeed();
+    // The LEVEL's seed, not the day's. Three roads a day, each of them a
+    // pure function of the local date and the level number.
+    const base = levelSeedFor(todayStamp, level);
+    lastSeed = salt ? (base ^ Math.imul(salt | 0, 0x9E3779B1)) >>> 0 : base;
     return lastSeed;
   }
   lastSeed = seedPinned ? PINNED_SEED : ((Math.random() * 0xFFFFFFFF) >>> 0);
@@ -6176,8 +6314,9 @@ function buildWidthScale() {
   if (mode !== DAILY) return widthScale;
   const t = buildClock();
   const wide = FEEL.ONRAMP_WIDTH + firstRunEase() * FEEL.FIRST_RUN_WIDTH_EASE;
-  return (wide + (1 - wide) * onRampProgress(t))
-       + (FEEL.ROAD_SQUEEZE - 1) * deepProgress(t);
+  // The same two caps updateDifficulty applies, on the same two terms.
+  return (wide + (1 - wide) * onRampProgress(t) * levelHardP())
+       + (FEEL.ROAD_SQUEEZE - 1) * deepProgress(t) * levelHardD();
 }
 
 function addRun(count, c0, c1, w0, w1, easeIn) {
@@ -6635,6 +6774,12 @@ function hazardX(h) {
 /* Which kind is due, rarest and longest first so that whoever gets the
    ground is the one that needs most of it. Zero if none is. */
 function dueHazardKind() {
+  /* NOTHING AT ALL ON THE EASIEST LEVEL. Its one job is to be finished
+     by somebody who has never played the game, and a hazard is the only
+     thing on the road that can end a run without the player having made
+     a driving mistake they could have seen coming. Expressed against the
+     band rather than against the number one, so it follows LEVEL_COUNT. */
+  if (mode === DAILY && levelBand(level) <= 0) return 0;
   const at = segBase + segments.length;
   const order = [
     { k: HAZ_SPLITTER, time: unlockAt(FEEL.SPLITTER_TIME) },
@@ -6718,7 +6863,19 @@ function buildHazardPhrase(kind) {
 let jumps = [];
 let jumpDue = 0;
 
-function jumpUnlocked() { return buildClock() >= unlockAt(FEEL.JUMP_TIME); }
+/* AND NO JUMPS ON THE EASIEST LEVEL EITHER.
+
+   The brief asked for jumps here "only if they cannot cause a death",
+   and the only way to guarantee that is for there not to be one. A jump
+   can end a run on the landing, and special casing the landing death for
+   one level is more machinery than the level is worth: level one's whole
+   job is to be completed by somebody who has never played, and a jump is
+   a mechanic to learn rather than a thing to survive. At 57 seconds
+   against a JUMP_TIME of 30 there would have been at most one of them. */
+function jumpUnlocked() {
+  if (mode === DAILY && levelBand(level) <= 0) return false;
+  return buildClock() >= unlockAt(FEEL.JUMP_TIME);
+}
 
 function jumpLead() { return FEEL.JUMP_ARROW_COUNT * FEEL.JUMP_ARROW_SPACING + 4; }
 
@@ -6939,6 +7096,12 @@ function startRun() {
   // Midnight can pass with the tab open, and this is the only moment the
   // answer can change anything.
   rollDayIfNeeded();
+  /* THE LEVEL IS SETTLED BEFORE ANYTHING READS IT, because the seed, the
+     length, the difficulty band, the records and the ghost are all
+     functions of it. clampLevel is what keeps it honest when LEVEL_COUNT
+     moves on the cycler mid session. */
+  level = clampLevel(level);
+  syncLevelRecord();
   /* And the only moment the track length may change. The cycler can move
      the bounds mid session and a track that changed length under the car
      would be worse than either bound. */
@@ -6962,7 +7125,8 @@ function startRun() {
   /* The biome order is a generator input like any other, so on the daily
      it comes off the day and not off Math.random. Its own stream: rng()
      belongs to the road and drawing from it here would move the road. */
-  biomeSeed(mode === DAILY ? (dailySeed() ^ 0x5bf03635) : ((Math.random() * 0xFFFFFFFF) >>> 0));
+  biomeSeed(mode === DAILY ? (levelSeedFor(todayStamp, level) ^ 0x5bf03635)
+                           : ((Math.random() * 0xFFFFFFFF) >>> 0));
   resetRoad(nextSeed());
   ghost.i = 0;
   ghost.said = 0;
@@ -7236,7 +7400,15 @@ function startOrRestart() {
   if (state !== DEAD && state !== FINISHED) return;
   if (deadFor < FEEL.DEATH_INPUT_LOCK) { restartWanted = true; return; }
   restartWanted = false;
-  if (state === FINISHED) { startRun(); return; }
+  /* A FINISH ROLLS FORWARD. The same reflex input that restarts after a
+     death takes the player into the next level after a completion, so
+     the whole day is one input at a time from the title screen to the
+     end of the last level. On endless there is no next level and
+     startNextLevel is not the route: it restarts. */
+  if (state === FINISHED) {
+    if (mode === DAILY) startNextLevel(); else startRun();
+    return;
+  }
   // The reflex tap continues when there is somewhere to continue from,
   // and restarts when there is not. Either way it is one action with
   // nothing to hunt for, which is what section 5 requires.
@@ -8886,7 +9058,10 @@ function ghostBank() {
   if (ghostRec.n < 2) return false;          // too short to be a line
   const blob = ghostEncode();
   dailyGhostBytes = blob.length;
-  storeSet('daily.ghost', blob);
+  // The LEVEL's own line. Three ghosts is three stored blobs; the
+  // renderer still only ever has the one loaded.
+  recFor(level).ghost = blob;
+  storeSet('daily.ghost.' + clampLevel(level), blob);
   ghostDecode(blob);
   return true;
 }
@@ -10645,7 +10820,10 @@ function drawClock(w, h, atX, atY, atSize) {
      inside the on ramp had no clock in it at all and a player never saw
      one until they had already survived twice. Not running is a state the
      readout can show; being absent is not. */
-  const running = skipOnRamp || runTime >= FEEL.ONRAMP_SECONDS;
+  // The same test updateClock uses, so the readout cannot say counting
+  // while the rule says paused.
+  const running = !(mode === DAILY && levelBand(level) <= 0)
+               && (skipOnRamp || runTime >= FEEL.ONRAMP_SECONDS);
   const s = Math.min(w, h);
   const placed = atSize !== undefined;
   const size = placed ? atSize : Math.round(s * FEEL.CLOCK_SIZE);
@@ -10925,7 +11103,7 @@ function drawResult(w, h) {
     canvasButton(dailyRect, "TODAY'S TRACK", w / 2, stack, size, COLOUR.GATE, w);
     ctx.globalAlpha = 0.55;
     const sub = 'track #' + trackNumber(todayStamp) + ', '
-              + dailyGateCountFor(todayStamp) + ' gates, one road for everyone'
+              + levelCount() + ' levels, one road for everyone'
               + (ghost.live ? ', your ghost is waiting' : '')
               + (hasKeyboard ? '     press T' : '');
     text(sub, w / 2, stack - size * 1.5,
@@ -11106,8 +11284,11 @@ function drawFinish(w, h) {
     line = (faster ? 'BEAT YOUR GHOST BY  ' : 'BEHIND YOUR GHOST BY  ')
          + Math.abs(finishMargin).toFixed(1) + 's';
     colour = faster ? COLOUR.SCORE_BEST : COLOUR.TEXT;
-  } else if (finishClean && !dailyDone) {
-    line = 'FIRST CLEAN FINISH TODAY';
+  } else if (finishClean && finaleFirstToday) {
+    /* THE VALUE CAPTURED BEFORE THE BANK, not the live one. By the time
+       this screen draws, banking has already set the clean bit, so
+       reading it here meant the line could never appear. */
+    line = 'FIRST CLEAN FINISH ON THIS LEVEL';
     colour = COLOUR.SCORE_BEST;
   } else if (!finishClean) {
     line = 'A CLEAN RUN IS THE ONE THAT COUNTS';
@@ -11265,8 +11446,15 @@ function hitRect(rect, e) {
    ================================================================== */
 function shareRun() {
   const daily = mode === DAILY;
+  /* THE LEVEL IS PART OF WHICH TRACK IT WAS. A score off track 47 is a
+     claim two people can settle only if they drove the same corners, and
+     the day is three roads now, so naming the track without the level
+     names a third of it. The glyph lands next session and will do this
+     properly; this keeps the plain text honest until it does. */
+  const lv = daily ? levelLabel(level) : '';
   const head = 'DRIFT FEVER   '
-             + (daily ? 'TRACK #' + trackNumber(todayStamp) : 'RANDOM TRACK');
+             + (daily ? 'TRACK #' + trackNumber(todayStamp) + (lv ? '   ' + lv : '')
+                      : 'RANDOM TRACK');
   let body;
   if (state === FINISHED) {
     body = banked + ' points, finished in ' + timeLabel(finishTime)
@@ -11352,8 +11540,17 @@ function drawShareButton(w, h, s, btnY, size) {
    say without the sentence. */
 function titleFactLine() {
   const bits = ['TRACK #' + trackNumber(todayStamp)];
+  /* THE LEVEL THE TAP WILL START, not the one last played, because this
+     line sits directly above a prompt that says TAP TO START and it has
+     to be true about what that tap does. Once the day is complete it
+     says so instead, which is the trophy and the only place it appears. */
+  if (levelCount() > 1) {
+    bits.push(dayDone() ? (dayClean() ? 'DAY COMPLETE, CLEAN' : 'DAY COMPLETE')
+                        : levelLabel(nextLevel()));
+  }
   if (bestScore > 0) bits.push('BEST ' + bestScore);
-  if (dailyBest > 0) bits.push('TODAY ' + dailyBest);
+  const r = recFor(nextLevel());
+  if (r.best > 0) bits.push('TODAY ' + r.best);
   bits.push('NEW IN ' + countdownLabel());
   return bits.join('  \u00b7  ');
 }
@@ -11570,8 +11767,24 @@ function hitAlt(e) {
   return hitRect(altRect, e);
 }
 
+/* THE FRONT DOOR, AND IT NEVER ASKS. The furthest level not yet
+   finished today, which is level one on a first visit and the last level
+   once the day is done, so a finished day is replayable for a better
+   score without ever offering a choice. */
 function startDaily() {
   mode = DAILY;
+  rollDayIfNeeded();
+  level = nextLevel();
+  startRun();
+}
+
+/* Rolling forward off the completion screen. The SAME one input that
+   restarts everywhere else, so finishing a level and dying on one cost
+   the player exactly the same thing. The last level rolls to itself:
+   the day is over and another go at it is what is left. */
+function startNextLevel() {
+  mode = DAILY;
+  if (level < levelCount() && recFor(level).done) level = level + 1;
   startRun();
 }
 
@@ -11655,9 +11868,27 @@ function updateClock(dt) {
   if (state !== DRIVING) return;
   if (gateFlash > 0) gateFlash -= dt;
   if (clockPop > 0) clockPop -= dt;
-  // Nothing to survive during the on ramp. A new player has enough to
-  // think about without a number counting down at them.
-  if (!skipOnRamp && runTime < FEEL.ONRAMP_SECONDS) { clock = FEEL.CLOCK_START; return; }
+  /* Nothing to survive during the on ramp. A new player has enough to
+     think about without a number counting down at them.
+
+     A FLOOR, NOT AN ASSIGNMENT, AND THAT WAS A REAL BUG. Writing
+     CLOCK_START every frame threw away any gate bonus banked inside the
+     window. It never showed while the daily was six to eight gates,
+     because gate one was one of many; on a two gate level it is half of
+     them, and the discarded sixteen seconds is the difference between
+     reaching the line and not.
+
+     AND THE EASIEST LEVEL IS PINNED FOR ITS WHOLE LENGTH, for exactly
+     the reason the sentence above gives. Measured: driven perfectly
+     straight, with no drifting to pay the clock, level one ran out of
+     time at 50 seconds with the line at 56.7. A first time player who
+     drives it well and is then told they were too slow has met a failure
+     they could not see coming, which is the one thing level one exists
+     to not do. The test is the level band, so it follows LEVEL_COUNT and
+     a single level configuration still has a clock. */
+  const noClock = (mode === DAILY && levelBand(level) <= 0)
+               || (!skipOnRamp && runTime < FEEL.ONRAMP_SECONDS);
+  if (noClock) { if (clock < FEEL.CLOCK_START) clock = FEEL.CLOCK_START; return; }
   clock += (FEEL.CLOCK_DRIFT_RATE * slipPay() - 1) * dt;
   if (clock > FEEL.CLOCK_MAX) clock = FEEL.CLOCK_MAX;
   if (clock <= 0) { clock = 0; crash(); }
@@ -11751,7 +11982,7 @@ function finishRun() {
   /* BEFORE the bank, because banking is what sets dailyDone, and the
      finale wants to know whether this was the first clean finish of the
      day rather than whether it is one now. */
-  finaleFirstToday = !dailyDone;
+  finaleFirstToday = !dailyClean;
   finishRecord = bankScore(true);
   // The margin above is read off the record's time, so the line is kept
   // after it, not before, or a run would be measured against itself.
@@ -11817,37 +12048,119 @@ function updateScore(dt) {
    is still fully playable and remembers nothing, which is the required
    behaviour rather than a degradation.
    ================================================================== */
-let dailyBest = 0;         // best score on a clean run
-let dailyTime = 0;         // and its time to the line, zero if it never got there
-let dailyDone = false;     // has today's track been finished clean at all
+/* ONE ENTRY PER LEVEL, AND THE ARRAYS ARE SIZED FROM LEVEL_COUNT.
+
+   Three ghosts is three arrays, not three systems: the ghost that is
+   LOADED is still the single one the existing renderer draws, and these
+   are the stored blobs it is loaded from when a level starts.
+
+   THE KEYS CARRY THE LEVEL NUMBER, so a stored day survives LEVEL_COUNT
+   changing under it: entries for levels that no longer exist are simply
+   never read, and levels that did not exist before read as empty.
+
+   levelRec is indexed 1..levelCount(). Index 0 is left unused rather
+   than shifting every read by one, because every other level number in
+   the file is one indexed and a single off by one here would be silent. */
+const levelRec = [];
 let dailyGhostBytes = 0;
 
+function recFor(lvl) {
+  const i = clampLevel(lvl);
+  while (levelRec.length <= i) levelRec.push(null);
+  if (!levelRec[i]) levelRec[i] = { best: 0, time: 0, done: false, clean: false, ghost: '' };
+  return levelRec[i];
+}
+
+/* The current level's record, which is what every existing reader wants.
+   These four were plain variables and are now views onto the array; they
+   are refreshed by syncLevelRecord whenever the level changes. */
+let dailyBest = 0;         // best score on a clean run, THIS level
+let dailyTime = 0;         // and its time to the line, zero if it never got there
+let dailyDone = false;     // has this level been finished at all
+let dailyClean = false;    // and was it ever finished with no continues
+
+function syncLevelRecord() {
+  const r = recFor(level);
+  dailyBest = r.best;
+  dailyTime = r.time;
+  dailyDone = r.done;
+  dailyClean = r.clean;
+  dailyGhostBytes = r.ghost.length;
+  ghostClear();
+  if (r.ghost) ghostDecode(r.ghost);
+}
+
 function clearDailyRecords() {
-  dailyBest = 0;
-  dailyTime = 0;
-  dailyDone = false;
+  levelRec.length = 0;
+  ghostClear();
+  dailyBest = 0; dailyTime = 0; dailyDone = false; dailyClean = false;
   dailyGhostBytes = 0;
   storeSet('daily.day', String(todayStamp));
-  storeSet('daily.best', '0');
-  storeSet('daily.time', '0');
-  storeSet('daily.ghost', '');
+  /* Every level's keys wiped, and a couple past the current count, so
+     turning LEVEL_COUNT down and back up cannot resurrect yesterday's
+     level three under today's date. */
+  for (let i = 1; i <= levelCount() + 2; i++) {
+    storeSet('daily.best.' + i, '0');
+    storeSet('daily.time.' + i, '0');
+    storeSet('daily.done.' + i, '0');
+    storeSet('daily.ghost.' + i, '');
+  }
 }
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
   if (day !== todayStamp) {
     // A different day, or nothing stored. Either way there is nothing
-    // here that belongs to today's road.
+    // here that belongs to today's roads.
     clearDailyRecords();
     return;
   }
-  const b = parseInt(storeGet('daily.best'), 10);
-  if (isFinite(b) && b > 0) dailyBest = b;
-  const t = parseFloat(storeGet('daily.time'));
-  if (isFinite(t) && t > 0) { dailyTime = t; dailyDone = true; }
-  const g = storeGet('daily.ghost');
-  if (g) { dailyGhostBytes = g.length; ghostDecode(g); }
+  for (let i = 1; i <= levelCount(); i++) {
+    const r = recFor(i);
+    const b = parseInt(storeGet('daily.best.' + i), 10);
+    if (isFinite(b) && b > 0) r.best = b;
+    const t = parseFloat(storeGet('daily.time.' + i));
+    if (isFinite(t) && t > 0) r.time = t;
+    /* DONE AND CLEAN IN ONE FIELD, because they are two bits of the same
+       fact and a level cannot be clean without being done. 0 unfinished,
+       1 finished, 2 finished with no continues. */
+    const d = parseInt(storeGet('daily.done.' + i), 10);
+    if (isFinite(d) && d > 0) { r.done = true; r.clean = d >= 2; }
+    r.ghost = storeGet('daily.ghost.' + i) || '';
+  }
+  syncLevelRecord();
 })();
+
+/* ------------------------------------------------------------------
+   PROGRESSION, AND THERE IS NEVER A CHOICE.
+
+   Handoff section 9 forbids new screens and BRIEF.md section 12 forbids
+   menus, so there is no level select and there never will be. The front
+   door picks for you: the furthest level not yet finished today, which
+   on a first visit is level one and after a completed day is the last
+   level, replayable for a better score.
+   ------------------------------------------------------------------ */
+function nextLevel() {
+  for (let i = 1; i <= levelCount(); i++) if (!recFor(i).done) return i;
+  return levelCount();
+}
+
+/* Has the whole day been finished, and was every level of it clean. The
+   clean version is the hardest thing available in the game and it is the
+   loudest thing recorded. */
+function dayDone() {
+  for (let i = 1; i <= levelCount(); i++) if (!recFor(i).done) return false;
+  return true;
+}
+function dayClean() {
+  for (let i = 1; i <= levelCount(); i++) if (!recFor(i).clean) return false;
+  return true;
+}
+function levelsDone() {
+  let n = 0;
+  for (let i = 1; i <= levelCount(); i++) if (recFor(i).done) n++;
+  return n;
+}
 
 /* Which of two clean runs is the better one.
 
@@ -11859,7 +12172,10 @@ function clearDailyRecords() {
    record would keep a ghost that runs out halfway and a time that does
    not exist. */
 function dailyBeatsRecord(finished, score) {
-  if (finished !== dailyDone) return finished;   // a finish always wins
+  /* Against the CLEAN record, not against the done bit. done can now be
+     set by a continued run, which takes no record, so comparing against
+     it would let a continued finish lock out every later clean one. */
+  if (finished !== dailyClean) return finished;   // a finish always wins
   return score > dailyBest;
 }
 
@@ -11867,14 +12183,45 @@ function dailyBeatsRecord(finished, score) {
    this run took the record, which is what the completion screen says. */
 function bankDaily(finished) {
   if (mode !== DAILY) return false;
+  const r = recFor(level);
+  /* COMPLETION IS BANKED EVEN ON A CONTINUED RUN, and this is the one
+     place the two ideas have to come apart. Finishing a level is what
+     unlocks the next one, and refusing to record it because the player
+     used their continue would strand them on a level they have already
+     driven to the end. The RECORD, meaning the score, the time and the
+     word clean, is still closed to a continued run exactly as before.
+
+     So: done is progression, clean is achievement, and only clean is a
+     record. A DAY COMPLETED CLEAN needs every level's clean bit. */
+  if (finished) {
+    /* THE CUMULATIVE COUNT, WRITTEN BUT NOT SHOWN. Session D puts a
+       tracks finished total on the title screen; handoff section 4 is
+       explicit that it replaces any notion of a streak, so it only ever
+       goes up and there is no consecutive day logic anywhere near it.
+       Counted here, on the first completion of a level on a given day,
+       so a replay for a better score does not inflate it. Nothing reads
+       it yet on purpose: storing it now means the number is real when
+       the display arrives rather than starting from zero. */
+    if (!r.done) {
+      finishedEver++;
+      storeSet('finished', String(finishedEver));
+    }
+    r.done = true;
+    if (continues === 0) r.clean = true;
+    storeSet('daily.day', String(todayStamp));
+    storeSet('daily.done.' + clampLevel(level), r.clean ? '2' : '1');
+    dailyDone = r.done;
+    dailyClean = r.clean;
+  }
   if (continues > 0) return false;              // not a lap
   if (!dailyBeatsRecord(!!finished, banked)) return false;
-  dailyBest = banked;
-  dailyDone = !!finished;
-  dailyTime = finished ? finishTime : 0;
+  r.best = banked;
+  r.time = finished ? finishTime : 0;
+  dailyBest = r.best;
+  dailyTime = r.time;
   storeSet('daily.day', String(todayStamp));
-  storeSet('daily.best', String(dailyBest));
-  storeSet('daily.time', dailyTime ? dailyTime.toFixed(2) : '0');
+  storeSet('daily.best.' + clampLevel(level), String(r.best));
+  storeSet('daily.time.' + clampLevel(level), r.time ? r.time.toFixed(2) : '0');
   /* THE LINE NO LONGER GOES WITH THE RECORD. It used to be written here,
      which tied the ghost to the best clean run; it is written by
      ghostBank at the end of every run instead. The record and the ghost
@@ -12595,12 +12942,19 @@ function finaleLevelFor() {
   if (finishRecord) n++;
   if (finishMargin !== null && finishMargin < 0) n++;   // faster than the ghost
   if (finishClean && finaleFirstToday) n++;
+  /* AND THE WHOLE DAY, CLEAN, WHICH IS THE HARDEST THING AVAILABLE. It
+     is worth two because it is not one more good thing about this run,
+     it is the only fact in the game that is about all of them. */
+  if (dayClean()) n += 2;
   return n;
 }
 
 /* The word that says WHY it is loud, or nothing when the answer is just
    "you finished". One line, and the loudest thing available is chosen. */
 function finaleBadge() {
+  // Loudest first, and nothing is louder than the whole day clean.
+  if (dayClean()) return 'DAY COMPLETE, CLEAN';
+  if (dayDone()) return 'DAY COMPLETE';
   if (finishRecord && finishClean) return "TODAY'S BEST";
   if (finishMargin !== null && finishMargin < 0) return 'NEW FASTEST';
   if (finishClean && finaleFirstToday) return 'FIRST CLEAN FINISH';
@@ -12612,17 +12966,33 @@ function finaleBadge() {
    THE BEAT BOUNDARIES. All derived, all in seconds since the line, and
    this is the only place any of them is worked out.
    ------------------------------------------------------------------ */
-function finaleWaveCount() {
-  return Math.max(1, Math.round(FEEL.FINALE_WAVES
-                                + FEEL.FINALE_WAVE_PER_LEVEL * finaleLevel));
+/* CAPTURED AT THE LINE, not read live, because the level rolls forward
+   the moment the player taps and every beat boundary below would then
+   move under a sequence already running. */
+let finaleScale = 1;
+function finaleScaleFor() {
+  if (mode !== DAILY) return 1;
+  const f = clamp(FEEL.FINALE_LEVEL_FLOOR, 0, 1);
+  return f + (1 - f) * levelBand(level);
 }
+
+function finaleWaveCount() {
+  return Math.max(1, Math.round((FEEL.FINALE_WAVES
+                                 + FEEL.FINALE_WAVE_PER_LEVEL * finaleLevel)
+                                * finaleScale));
+}
+/* THE CROSSING AND THE HUSH ARE NOT SCALED. They are the moment of
+   arrival itself and they are already under a second; shrinking them
+   turns the line into a thing that happened rather than a thing that
+   was noticed. Everything after them is the celebration, and that is
+   what an early level gets less of. */
 function finaleHushEnd() { return FEEL.FINALE_CROSS + FEEL.FINALE_HUSH; }
-function finaleWaveAt(n) { return finaleHushEnd() + n * FEEL.FINALE_WAVE_GAP; }
+function finaleWaveAt(n) { return finaleHushEnd() + n * FEEL.FINALE_WAVE_GAP * finaleScale; }
 function finaleLastWave() { return finaleWaveAt(finaleWaveCount() - 1); }
-function finaleDriftEnd() { return finaleLastWave() + FEEL.FINALE_DRIFT_TAIL; }
-function finaleSettleEnd() { return finaleDriftEnd() + FEEL.FINALE_SETTLE; }
+function finaleDriftEnd() { return finaleLastWave() + FEEL.FINALE_DRIFT_TAIL * finaleScale; }
+function finaleSettleEnd() { return finaleDriftEnd() + FEEL.FINALE_SETTLE * finaleScale; }
 function finaleRevealAt() { return finaleSettleEnd() + FEEL.FINALE_REVEAL_AFTER; }
-function finaleLitEnd() { return finaleSettleEnd() + FEEL.FINALE_AFTERGLOW; }
+function finaleLitEnd() { return finaleSettleEnd() + FEEL.FINALE_AFTERGLOW * finaleScale; }
 
 /* THE END, and it is the end of the MESSAGE rather than of the light.
    The afterglow is deliberately allowed to outlive it: the result screen
@@ -12632,6 +13002,7 @@ function finaleEnd() { return finaleRevealAt() + FEEL.FINALE_REVEAL_TIME; }
 
 function startFinale() {
   finaleT = 0;
+  finaleScale = finaleScaleFor();
   finaleLevel = finaleLevelFor();
   finaleGlow = 1;
   finaleFree = 0;
@@ -13171,12 +13542,26 @@ function drawPips(w, h, y) {
    its job and was not enough: it told the player which mode they were in
    without telling them what they were missing, so somebody hunting for
    the ghost read it and carried on hunting. */
+/* WHICH LEVEL, in the same words in both places it is shown, and the
+   same treatment as the track number it sits beside. It is a readout and
+   not a new screen: handoff section 9 and BRIEF.md section 12 both hold.
+
+   Suppressed entirely at a count of one, because "LEVEL 1 OF 1" is a
+   sentence about a system the player does not have. */
+function levelLabel(lvl) {
+  if (levelCount() <= 1) return '';
+  return 'LEVEL ' + clampLevel(lvl) + '/' + levelCount();
+}
+
 function modeLine() {
   if (mode !== DAILY) {
     return { line: 'RANDOM TRACK   NO FINISH, NO GHOST', colour: COLOUR.TEXT };
   }
-  let line = 'TRACK #' + trackNumber(todayStamp)
-           + (dailyBest > 0 ? '   BEST ' + dailyBest : '');
+  const bits = ['TRACK #' + trackNumber(todayStamp)];
+  const lv = levelLabel(level);
+  if (lv) bits.push(lv);
+  if (dailyBest > 0) bits.push('BEST ' + dailyBest);
+  let line = bits.join('   ');
   if (continues > 0) line += '   CONTINUED';
   else if (ghost.live) line += '   ' + ghostGapLabel();
   return { line: line, colour: COLOUR.GATE };
@@ -15180,6 +15565,7 @@ else bootChromeHidden = false;
 // Before the first road is built, for the same reason updateDifficulty is:
 // the eased ramp is one of the inputs to it.
 loadRunsEver();
+loadFinishedEver();
 recomputeCamera();
 if (debugAllowed) { setDebug(true); tiltAssert(); }
 // Before the first road is built, or the title screen is generated at
