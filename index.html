@@ -2855,7 +2855,13 @@ const FEEL = {
      the countdown and the line are all the same number. */
   LEVEL_COUNT:                3,     // LIVE, and read by everything
   LEVEL_GATES_FIRST:          2,     // LIVE, gates on level one
-  LEVEL_GATES_LAST:           5,     // LIVE, gates on the last level
+  LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
+  /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
+     levelBand. Above one compresses the middle levels toward the easy
+     end and leaves both ends untouched, which is how level two stops
+     being a wall without level one gaining anything or level three
+     losing anything. One is the old straight line. */
+  LEVEL_RAMP_POWER:         1.6,     // LIVE
   /* Nothing is placed inside this of the line. The closing stretch is
      meant to be the hardest part of the day, not a lottery on the last
      corner, and a blocker straddling the finish would decide the run
@@ -3218,7 +3224,7 @@ const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         // Danger. Never green, never anywhere near the jump.
                         HAZARD_TOP: 1, HAZARD_SIDE: 1, HAZARD_LIP: 1,
                         HAZARD_GLOW: 1, HAZARD_DARK: 1, HAZARD_WARN: 1,
-                        HAZARD_WARN_BAR: 1,
+                        HAZARD_WARN_BAR: 1, HAZARD_WARN_ARROW: 1,
                         // Go. Never red, never anywhere near the hazard.
                         JUMP_DECK: 1, JUMP_DECK_DARK: 1, JUMP_SIDE: 1,
                         JUMP_LIP: 1, JUMP_GLOW: 1, JUMP_ARROW: 1 };
@@ -3519,6 +3525,27 @@ const COLOUR = {
      red now, so the warning and the thing it warns about are obviously
      the same object. */
   HAZARD_WARN:  '#ff5c8f',
+  /* AND THE LANE ARROW IS NOT THAT COLOUR ANY MORE, which reverses the
+     comment directly above it. That comment is about the WARNING as a
+     whole and it still holds: the striping, the bars and the body wear
+     the hazard's red so the warning and the thing it warns about are
+     obviously the same object.
+
+     The arrow is different, because the arrow is not the warning. It
+     points at the SAFE GAP. Carl put it plainly: the arrow points where
+     to go and it is red, and red means danger everywhere else in this
+     game, so the one mark on the road that means "here" is wearing the
+     colour of "not here".
+
+     So it is the go colour, the same value JUMP_ARROW carries, because
+     it carries the same meaning: this is the way through. Pinned, for
+     the same reason every other member of these two families is pinned,
+     and kept identical to JUMP_ARROW deliberately rather than by
+     accident. What still separates a hazard from a ramp is FORM, which
+     is what the barrier bars were added for and is a far stronger cue
+     than hue: transverse bars across the blocked width appear in front
+     of a hazard and never in front of a jump. */
+  HAZARD_WARN_ARROW: '#4dff7a',
 
   /* THE JUMP, and it is a fourth family on purpose.
 
@@ -3535,7 +3562,7 @@ const COLOUR = {
   JUMP_SIDE:    '#2a1210',      // the wedge's own flanks, just off the wall value
   JUMP_LIP:     '#4dff7a',      // the edge you leave from
   JUMP_GLOW:    '77,255,122',
-  JUMP_ARROW:   '#4dff7a',
+  JUMP_ARROW:   '#4dff7a',      // and HAZARD_WARN_ARROW is this on purpose
 
   /* The ghost. The car's own family, because it IS the car, and held far
      enough down in value that it can never take the road edge's place at
@@ -4337,6 +4364,7 @@ const TUNABLES = [
   { key: 'LEVEL_COUNT',        label: 'levels',  step: 1,    min: 1,    max: 8,     dp: 0, group: 27 },
   { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
+  { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
   { key: 'FINISH_HEIGHT',      label: 'finTall', step: 100,  min: 400,  max: 8000,  dp: 0, group: 27 },
   { key: 'PIP_SIZE',           label: 'pip',     step: 0.001,min: 0.005,max: 0.06,  dp: 3, group: 27 },
   { key: 'PIP_GAP',            label: 'pipGap',  step: 0.001,min: 0,    max: 0.04,  dp: 3, group: 27 },
@@ -6457,10 +6485,28 @@ function clampLevel(n) { return clamp(Math.round(n), 1, levelCount()); }
    0, the last is 1, and everything in between is spaced evenly. With one
    level only there is nothing to interpolate and it is the whole game,
    so it is 1. */
+/* HOW HARD AND HOW LONG A LEVEL IS, as one number from nought at the
+   first to one at the last. Everything that ramps across the day reads
+   this: the gate count, the hazard density, the intensity, the finale's
+   scale, and the guards that switch the clock and the hazards off
+   entirely on level one.
+
+   AND IT IS BENT, NOT LINEAR. Linear put level two exactly halfway,
+   which measured as 57 seconds then 123: more than double the length AND
+   the middle of the difficulty range, both arriving at once, for a
+   player who had just cleared a level designed to be unfailable. Carl
+   hit that wall and the times say why.
+
+   A POWER ABOVE ONE COMPRESSES THE MIDDLE TOWARD THE START and leaves
+   BOTH ENDS EXACTLY WHERE THEY WERE, which is the property that matters:
+   band(first) is still 0 to the bit, so level one keeps its no clock and
+   no hazards guards, and band(last) is still 1, so the last level keeps
+   the full difficulty. Only the middle moves. */
 function levelBand(lvl) {
   const n = levelCount();
   if (n <= 1) return 1;
-  return (clampLevel(lvl) - 1) / (n - 1);
+  const t = (clampLevel(lvl) - 1) / (n - 1);
+  return Math.pow(t, Math.max(0.1, FEEL.LEVEL_RAMP_POWER));
 }
 
 /* GATES PER LEVEL, interpolated across the band, so the lengths ramp
@@ -9898,7 +9944,9 @@ function drawHazardWarnings(first, last, baseIndex) {
   }
   if (any) {
     ctx.globalAlpha = FEEL.HAZARD_WARN_ALPHA;
-    ctx.fillStyle = COLOUR.HAZARD_WARN;
+    // The go colour. The arrow only ever says which way through; danger
+    // is carried by the bars, the striping and the hazard's own body.
+    ctx.fillStyle = COLOUR.HAZARD_WARN_ARROW;
     ctx.fill();
     ctx.globalAlpha = 1;
   }
