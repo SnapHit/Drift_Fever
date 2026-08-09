@@ -15237,6 +15237,27 @@ function tuneWake() {
     tune.el[i] = el;
   }
   tuneLoad(1 - tune.live, 0);        // track one, onto the idle side
+  /* AND INTO THE GRAPH, IF THE GRAPH GOT HERE FIRST. This is the line
+     that was missing and it cost every player who taps.
+
+     There are exactly two things that have to meet: the elements, made
+     here, and the audio graph, made by the first gesture. Either can
+     happen first. buildAudio already calls tuneWire, which covers the
+     elements arriving first. Nothing covered the graph arriving first,
+     because tuneWire begins `if (tune.wired || !tune.el[0]) return` and
+     that is a silent no.
+
+     AND THE GRAPH ARRIVES FIRST FOR ANYBODY WHO TAPS. The boot splash
+     owns the first seconds of the page and tuneWake is only reached
+     once it has finished; a tap SKIPS the splash, and that same tap is
+     the gesture that builds the graph. So the tap that gets a player to
+     the title screen quickly is the tap that guarantees them silence:
+     wired stayed false for the whole session, tuneStart returned on it
+     every run, and nothing failed, so tuneRevive, which carries the only
+     other wiring line in the file, never ran either. Measured: tap
+     within the splash and the music never starts; let the splash end on
+     its own and it plays. That is the whole bug. */
+  if (!tune.wired && audio) tuneWire(audio);
 }
 
 /* ------------------------------------------------------------------
@@ -15397,6 +15418,14 @@ function tuneWire(a) {
    ignored: if the track has not buffered, the run is already under way
    and the audio joins when it can. */
 function tuneStart() {
+  /* THE ELEMENTS, IF THE TITLE SCREEN NEVER MADE THEM. tuneWake is
+     reached from exactly one place, a title screen tick after the boot
+     splash has finished, and a player who taps twice quickly can be in a
+     run before that tick ever happened. tuneWake returns immediately
+     once the elements exist, so this costs nothing on every run after
+     the first, and a run cannot begin during the splash, so it does not
+     put the download back where section 6 says it may not go. */
+  tuneWake();
   // A new run is the moment to try again after a hiccup.
   if (tune.failed) tuneRevive();
   if (!musicOn || tune.failed || !tune.wired) return;
