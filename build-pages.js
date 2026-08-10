@@ -1,8 +1,13 @@
-/* THE SEVEN CONTENT PAGES, BUILT FROM content/.
+/* THE SEVEN CONTENT PAGES, BUILT FROM _content/.
 
    Run: node build-pages.js
 
-   content/ is the source of record. The writer's markdown is not
+   THE UNDERSCORE IS LOAD BEARING. _content/ holds the full text of all
+   seven pages, and served at a second URL that is the same words twice.
+   Jekyll does not copy _-prefixed directories into the built site, and
+   _config.yml names it again in exclude. Renaming it back publishes it.
+
+   _content/ is the source of record. The writer's markdown is not
    rewritten, reworded or moved, and this exists so a built page can be
    diffed against what was written by rebuilding it rather than by
    reading two files side by side.
@@ -216,7 +221,7 @@ function page(meta, body) {
 
 /* ------------------------------------------------------------------ */
 function build() {
-  var dir = path.join(ROOT, 'content');
+  var dir = path.join(ROOT, '_content');
   var files = fs.readdirSync(dir).filter(function (f) {
     return /^[1-7]-.*\.md$/.test(f);
   }).sort();

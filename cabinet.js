@@ -1,13 +1,14 @@
 /* THE ARCADE CABINET, PORTED FROM snap-hit.online.
 
    The markup, the zoom, the observer and the attract rebuild below are
-   the author's own, taken from reference/snaphit-index.html where they
+   the author's own, taken from _reference/snaphit-index.html where they
    are inline in the page. An earlier version of this file was written
    from a description because the site could not be reached from the
    build environment; that version is gone and this is the real one.
 
-   reference/ is source material. Nothing here loads it, links to it or
-   depends on it at runtime.
+   _reference/ is source material, and the underscore is what keeps it
+   off the web: Jekyll will not publish it. Nothing here loads it, links
+   to it or depends on it at runtime.
 
    TWO SITE SPECIFIC CHANGES, and only two.
 
