@@ -1,0 +1,310 @@
+/* THE ARCADE CABINET, and the site around it.
+
+   Shared by all seven content pages and linked, not copied. Seven copies
+   would be seven places to fix a bug.
+
+   Two same origin requests per content page, this and cabinet.js. That
+   is not the zero request rule being bent: that rule governs the GAME
+   FILE, index.html, which still fetches nothing but itself. These are
+   pages about the game, not the game.
+
+   No font service, no framework, no third party anything. Section 6's
+   filter surface reasoning applies here exactly as it does to the game:
+   a clean single purpose site stays uncategorised longer than a portal,
+   and every extra host is another thing for a filter to recognise. */
+
+:root {
+  --ink: #f6efe6;
+  --dim: #b3a494;
+  --bg: #120a06;
+  --panel: #1d110a;
+  --line: #3a2416;
+  --hot: #ff9a3c;
+  --gold: #ffc266;
+  --cool: #4fd6e6;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  /* The system stack. A font service is a third party request, a render
+     delay and a tracking surface, and it buys nothing a reader on a
+     school Chromebook will ever notice. */
+  font: 400 17px/1.65 system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Generous measure and line height. These are read on phones, at arm's
+   length, by children, often in bad light. */
+main {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2.2rem 1.15rem 4rem;
+}
+
+h1 {
+  font-size: clamp(1.75rem, 5.4vw, 2.4rem);
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  margin: 0 0 1rem;
+}
+h2 {
+  font-size: clamp(1.3rem, 3.8vw, 1.6rem);
+  line-height: 1.25;
+  margin: 2.4rem 0 0.7rem;
+  color: var(--gold);
+}
+h3 {
+  font-size: clamp(1.08rem, 3.1vw, 1.22rem);
+  margin: 1.7rem 0 0.5rem;
+  color: var(--ink);
+}
+p { margin: 0 0 1.05rem; }
+strong { color: #fff; font-weight: 600; }
+
+a { color: var(--cool); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover, a:focus { color: #fff; }
+
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.6rem 0; }
+
+/* Tables scroll inside themselves rather than pushing the page sideways.
+   Every one of these has four or five columns and the screen is 360px. */
+.tw { overflow-x: auto; margin: 0 0 1.3rem; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 0.94rem; }
+th, td {
+  text-align: left;
+  padding: 0.5rem 0.7rem 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th { color: var(--gold); font-weight: 600; white-space: nowrap; }
+
+.checked { color: var(--dim); font-size: 0.9rem; }
+
+/* ------------------------------------------------------------------
+   THE CABINET
+   ------------------------------------------------------------------ */
+.cab {
+  display: block;
+  margin: 1.8rem auto 2.2rem;
+  max-width: 21rem;
+  background: linear-gradient(180deg, #241408 0%, #170d07 60%, #120a06 100%);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 0.85rem 0.85rem 1rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* The marquee, lit from behind the way a real one is. */
+.cab-marquee {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  font-size: 0.82rem;
+  color: #2a1608;
+  background: linear-gradient(180deg, var(--gold), var(--hot));
+  border-radius: 9px;
+  padding: 0.42rem 0.5rem;
+  margin-bottom: 0.8rem;
+  box-shadow: 0 0 22px rgba(255, 154, 60, 0.28);
+}
+
+/* The aperture is the hole in the cabinet the phone sits in. */
+.cab-aperture {
+  background: #0a0603;
+  border: 1px solid #2c1a0e;
+  border-radius: 14px;
+  padding: 0.7rem 0.55rem;
+}
+
+.cab-phone {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 15.5rem;
+  background: #05070a;
+  border: 2px solid #2a2f36;
+  border-radius: 22px;
+  padding: 0.55rem 0.4rem;
+}
+
+/* The volume and power keys. Decoration, and the thing that makes the
+   aperture read as holding a phone rather than a rectangle. */
+.cab-vol, .cab-pwr {
+  position: absolute;
+  width: 3px;
+  background: #39404a;
+  border-radius: 2px;
+}
+.cab-vol { left: -5px; top: 22%; height: 13%; }
+.cab-vol.two { top: 38%; }
+.cab-pwr { right: -5px; top: 26%; height: 18%; }
+
+.cab-screen {
+  position: relative;
+  width: 100%;
+  /* A phone's shape, so the game inside is laid out the way it will be
+     on the reader's own phone. */
+  aspect-ratio: 9 / 19;
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+}
+/* aspect-ratio is well supported but not universal on the five year old
+   end of this audience's hardware, so there is a padding fallback. */
+@supports not (aspect-ratio: 9 / 19) {
+  .cab-screen { height: 0; padding-bottom: 211%; }
+}
+
+.cab-screen iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* THE ATTRACT PANEL. What the screen shows before anything is loaded,
+   and what it goes back to when the cabinet is unloaded. */
+.cab-attract {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  text-align: center;
+  background:
+    radial-gradient(120% 60% at 50% 8%, rgba(255, 154, 60, 0.16), transparent 70%),
+    linear-gradient(180deg, #150c07, #05070a 70%);
+}
+.cab-name {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  font-size: 1.05rem;
+  color: var(--gold);
+  text-shadow: 0 0 18px rgba(255, 194, 102, 0.35);
+}
+.cab-sub { margin: 0; font-size: 0.8rem; color: var(--dim); }
+
+.cab-play {
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 0.9rem;
+  color: #2a1608;
+  background: linear-gradient(180deg, var(--gold), var(--hot));
+  border: 0;
+  border-radius: 999px;
+  padding: 0.62rem 1.3rem;
+  cursor: pointer;
+  animation: cabpulse 1.8s ease-in-out infinite;
+}
+@keyframes cabpulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.055); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cab-play { animation: none; }
+}
+
+/* THE GROW BUTTON, and it is deliberately not a small corner icon.
+
+   On snap-hit it is one cabinet among several and a corner glyph is
+   enough. Here it is the whole reason somebody can play properly
+   without leaving the page they arrived on, so it is a labelled control
+   in the frame of the phone, the width of the screen, and it says what
+   it does. It only appears once something is actually running: there is
+   nothing to grow before that. */
+.cab-grow {
+  display: none;
+  width: 100%;
+  margin: 0.5rem 0 0.1rem;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  background: #14100c;
+  border: 1px solid #4a3016;
+  border-radius: 9px;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+.cab.live .cab-grow { display: block; }
+.cab-grow:hover, .cab-grow:focus { color: #fff; border-color: var(--gold); }
+
+/* GROWN. The phone fills the viewport. Fixed rather than fullscreen API,
+   because the API needs a gesture chain that survives an iframe and this
+   does not, and because leaving is one tap either way. */
+.cab.grown .cab-phone {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  max-width: none;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: #000;
+}
+.cab.grown .cab-screen {
+  aspect-ratio: auto;
+  height: 100dvh;
+  border-radius: 0;
+}
+@supports not (aspect-ratio: 9 / 19) {
+  .cab.grown .cab-screen { padding-bottom: 0; }
+}
+.cab.grown .cab-vol, .cab.grown .cab-pwr { display: none; }
+.cab.grown .cab-grow {
+  position: fixed;
+  z-index: 10000;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: max(0.6rem, env(safe-area-inset-bottom));
+  width: auto;
+  margin: 0;
+  padding: 0.45rem 1.1rem;
+  background: rgba(10, 8, 6, 0.82);
+}
+/* Nothing behind a grown cabinet may scroll. */
+body.cab-grown { overflow: hidden; }
+
+/* The control deck. Inline SVG, so it costs no request and scales. */
+.cab-deck { display: block; width: 100%; height: auto; margin: 0.7rem 0 0.2rem; }
+
+.cab-coin {
+  margin: 0.15rem auto 0;
+  width: 3.4rem;
+  height: 0.42rem;
+  border-radius: 3px;
+  background: #0a0603;
+  border: 1px solid #4a3016;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.cab-under {
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-size: 0.86rem;
+  color: var(--dim);
+}
+
+/* No JavaScript at all: the attract panel's button does nothing, so the
+   plain link underneath is the whole route to the game. It is always
+   there for that reason, and it is why the full size link was kept
+   rather than dropped in favour of the grow button. */
+.cab-noscript { color: var(--gold); }
