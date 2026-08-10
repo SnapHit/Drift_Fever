@@ -1,0 +1,7 @@
+# Drift Fever. One game and seven pages about it.
+# Nothing here is kept out of an index: there is no admin, no account
+# area and no duplicate of anything.
+User-agent: *
+Allow: /
+
+Sitemap: https://driftfever.com/sitemap.xml

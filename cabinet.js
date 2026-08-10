@@ -1,180 +1,253 @@
-/* THE ARCADE CABINET.
+/* THE ARCADE CABINET, PORTED FROM snap-hit.online.
 
-   One shared file for all seven content pages. Not copied into each
-   page: seven copies is seven places to fix a bug.
+   The markup, the zoom, the observer and the attract rebuild below are
+   the author's own, taken from reference/snaphit-index.html where they
+   are inline in the page. An earlier version of this file was written
+   from a description because the site could not be reached from the
+   build environment; that version is gone and this is the real one.
 
-   FOUR BEHAVIOURS, and they are the reasons the thing works.
+   reference/ is source material. Nothing here loads it, links to it or
+   depends on it at runtime.
 
-   1. NOTHING LOADS UNTIL ASKED. The screen shows an attract panel and
-      the iframe does not exist until somebody taps it. Four live
-      canvases on one page would cook a phone, and these pages carry one
-      each on a Chromebook.
+   TWO SITE SPECIFIC CHANGES, and only two.
 
-   2. AN INTERSECTION OBSERVER unloads a cabinet that has scrolled away
-      and keeps watching it, so it can come back when the reader
-      scrolls back to it. Unloading is what keeps a long page cheap;
-      still watching is what stops the reader having to ask twice.
+   1. THE FRAME IS "/", the game at the repo root serving double duty,
+      rather than a play/ path. No copy in a play/ folder: one file, one
+      source of truth, and every future game update reaches all seven
+      pages with no action here.
 
-   3. THE GROW BUTTON fills the viewport with the phone. On these pages
-      that matters more than it does on snap-hit, because this is how
-      somebody plays properly without leaving the page they landed on,
-      so it is a labelled control across the width of the phone rather
-      than a glyph in a corner.
+   2. PLAY IT FULL SIZE OPENS "/" IN A NEW TAB rather than another site.
+      On snap-hit it points at the game's own domain; here that would be
+      this page's own domain. It is kept rather than dropped because it
+      is the only route to the game without JavaScript: the attract
+      panel is a button that this script turns into an iframe, and with
+      scripts off it does nothing at all. A managed school Chromebook is
+      exactly the machine likely to have scripting restricted.
 
-   4. ONE AT A TIME. Starting a cabinet unloads any other that is
-      running. Two live canvases on one page is the thing behaviour one
-      exists to prevent, and a reader who taps two of them would get it
-      anyway without this.
+   ONE ADDITION, and it is the one behaviour the original does not need.
+   snap-hit's cabinets are far apart on a tall shelf and the observer
+   unloads whatever scrolls away, so two live frames is not a state that
+   page can reach. Here a reader could tap a cabinet, and on a page that
+   grew a second one, tap that too. loadInto() unloads any other first.
 
-   The frame is same origin, "/", which is the game at the repo root
-   serving double duty. index.html is not copied into a play/ folder:
-   one file, one source of truth, and every future game update reaches
-   all seven pages with no action here. */
+   Everything else is as it stands. */
 
 (function () {
   'use strict';
 
   var SRC = '/';
-  /* accelerometer and gyroscope are not strictly needed same origin,
-     where the default self allowlist already covers them, and fullscreen
-     is not used because grow is a fixed position layout rather than the
-     fullscreen API. Declared anyway: it costs nothing, it says what the
-     frame is allowed to do, and it keeps working if the frame is ever
-     served from somewhere else. */
-  var ALLOW = 'accelerometer; gyroscope; fullscreen';
+  var NAME = 'Drift Fever';
 
-  var cabs = [];
+  /* The wordmark, carried in the marquee directly rather than through a
+     use href pointing at a page level defs block. Same drawing; it means
+     the cabinet is self contained and a page needs nothing but an empty
+     article to mount it. */
+  var WM = '<path d="M182 502H0Q2 571 38.5 620Q75 669 136 694Q197 719 274 719Q353 719 411 690Q469 661 499.5 612Q530 563 530 503Q530 440 499 400Q468 360 425.5 339Q383 318 315 295Q247 273 215 254Q183 235 183 201Q183 170 202 153.5Q221 137 252 137Q288 137 311 156.5Q334 176 336 210H521Q516 111 445 55.5Q374 0 258 0Q144 0 73 55.5Q2 111 2 209Q2 275 33 316Q64 357 107 378Q150 399 218 420Q265 434 290.5 445Q316 456 333.5 473Q351 490 351 516Q351 547 329 564.5Q307 582 269 582Q232 582 209 561.5Q186 541 182 502ZM1177 712H1348V10H1177V445L891 10H720V712H891V279L1177 712ZM1732 588H1994L2036 712H2217L1963 10H1765L1511 712H1690L1732 588ZM1863 199 1950 456H1777L1863 199ZM2550 460H2656Q2742 460 2800 429Q2858 398 2886 347.5Q2914 297 2914 236Q2914 170 2885 119Q2856 68 2798 39Q2740 10 2656 10H2379V712H2550V460ZM2716 171Q2740 194 2740 236Q2740 278 2716 301Q2692 324 2643 324H2550V148H2643Q2692 148 2716 171ZM3696 712V10H3525V285H3259V10H3088V712H3259V423H3525V712H3696ZM3904 10V712H4075V10ZM4789 147V10H4246V147H4432V712H4603V147H4789Z" fill="#ffffff" stroke="currentColor"          stroke-linejoin="round" stroke-linecap="round"/>';
+
+  /* The control panel. Verbatim: a printed overlay with real parts
+     standing on it, the joystick, three buttons and the studio mark. */
+  var PANEL = "<svg class=\"panel\" viewBox=\"0 0 200 74\" aria-hidden=\"true\"><defs><linearGradient id=\"gwall\" x1=\"0\" x2=\"1\"><stop offset=\"0\" stop-color=\"#0a1420\"/><stop offset=\".35\" stop-color=\"#223a52\"/><stop offset=\".62\" stop-color=\"#16283b\"/><stop offset=\"1\" stop-color=\"#070e18\"/></linearGradient><radialGradient id=\"gface\" cx=\"40%\" cy=\"26%\" r=\"82%\"><stop offset=\"0\" stop-color=\"#1d3a55\"/><stop offset=\".62\" stop-color=\"#0e2135\"/><stop offset=\"1\" stop-color=\"#060e18\"/></radialGradient><linearGradient id=\"gstem\" x1=\"0\" x2=\"1\"><stop offset=\"0\" stop-color=\"#6b4a12\"/><stop offset=\".26\" stop-color=\"#ffe0a0\"/><stop offset=\".52\" stop-color=\"#c9922e\"/><stop offset=\"1\" stop-color=\"#4d3208\"/></linearGradient><radialGradient id=\"gorb\" cx=\"34%\" cy=\"26%\" r=\"80%\"><stop offset=\"0\" stop-color=\"#16233a\"/><stop offset=\".7\" stop-color=\"#080f1b\"/><stop offset=\"1\" stop-color=\"#03060c\"/></radialGradient><radialGradient id=\"gb1\" cx=\"32%\" cy=\"24%\" r=\"82%\"><stop offset=\"0\" stop-color=\"#fff\"/><stop offset=\".28\" stop-color=\"#93ecff\"/><stop offset=\".7\" stop-color=\"#1fbde8\"/><stop offset=\"1\" stop-color=\"#06566f\"/></radialGradient><radialGradient id=\"gb2\" cx=\"32%\" cy=\"24%\" r=\"82%\"><stop offset=\"0\" stop-color=\"#fff7e6\"/><stop offset=\".28\" stop-color=\"#ffc478\"/><stop offset=\".7\" stop-color=\"#ff8c1c\"/><stop offset=\"1\" stop-color=\"#853a03\"/></radialGradient><radialGradient id=\"gb3\" cx=\"32%\" cy=\"24%\" r=\"82%\"><stop offset=\"0\" stop-color=\"#fff\"/><stop offset=\".28\" stop-color=\"#ffe4b0\"/><stop offset=\".7\" stop-color=\"#ffb43f\"/><stop offset=\"1\" stop-color=\"#855105\"/></radialGradient><clipPath id=\"deck\"><rect x=\"5\" y=\"4\" width=\"190\" height=\"66\" rx=\"9\"/></clipPath></defs><rect x=\"5\" y=\"4\" width=\"190\" height=\"66\" rx=\"9\" fill=\"#050b14\"/><g clip-path=\"url(#deck)\" opacity=\".55\"><line x1=\"14\" y1=\"4\" x2=\"14\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"27\" y1=\"4\" x2=\"27\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"40\" y1=\"4\" x2=\"40\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"53\" y1=\"4\" x2=\"53\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"66\" y1=\"4\" x2=\"66\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"79\" y1=\"4\" x2=\"79\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"92\" y1=\"4\" x2=\"92\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"105\" y1=\"4\" x2=\"105\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"118\" y1=\"4\" x2=\"118\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"131\" y1=\"4\" x2=\"131\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"144\" y1=\"4\" x2=\"144\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"157\" y1=\"4\" x2=\"157\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"170\" y1=\"4\" x2=\"170\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"183\" y1=\"4\" x2=\"183\" y2=\"70\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"5\" y1=\"11\" x2=\"195\" y2=\"11\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"5\" y1=\"22\" x2=\"195\" y2=\"22\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"5\" y1=\"33\" x2=\"195\" y2=\"33\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"5\" y1=\"44\" x2=\"195\" y2=\"44\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"5\" y1=\"55\" x2=\"195\" y2=\"55\" stroke=\"#2ba6d8\" stroke-width=\".4\"/><line x1=\"5\" y1=\"66\" x2=\"195\" y2=\"66\" stroke=\"#2ba6d8\" stroke-width=\".4\"/></g><rect x=\"5\" y=\"4\" width=\"190\" height=\"66\" rx=\"9\" fill=\"none\" stroke=\"#ff9424\" stroke-width=\"3.4\" opacity=\".18\"/><rect x=\"5\" y=\"4\" width=\"190\" height=\"66\" rx=\"9\" fill=\"none\" stroke=\"#ff9424\" stroke-width=\"1.8\" opacity=\".55\"/><rect x=\"5\" y=\"4\" width=\"190\" height=\"66\" rx=\"9\" fill=\"none\" stroke=\"#ffd9a2\" stroke-width=\".8\"/><ellipse cx=\"46\" cy=\"49\" rx=\"22.5\" ry=\"7.4\" fill=\"#02060c\" opacity=\".6\"/><path d=\"M25.00 43.00 A21.00 6.90 0 0 0 67.00 43.00 L67.00 47.20 A21.00 6.90 0 0 1 25.00 47.20 Z\" fill=\"url(#gwall)\"/><path d=\"M25.00 44.26 A21.00 6.90 0 0 0 67.00 44.26\" fill=\"none\" stroke=\"#ff9a24\" stroke-width=\".34\" opacity=\"0.68\"/><path d=\"M25.00 45.60 A21.00 6.90 0 0 0 67.00 45.60\" fill=\"none\" stroke=\"#ff9a24\" stroke-width=\".34\" opacity=\"0.59\"/><path d=\"M25.00 46.86 A21.00 6.90 0 0 0 67.00 46.86\" fill=\"none\" stroke=\"#ff9a24\" stroke-width=\".34\" opacity=\"0.52\"/><ellipse cx=\"46\" cy=\"43\" rx=\"21\" ry=\"6.9\" fill=\"url(#gface)\"/><ellipse cx=\"46\" cy=\"43\" rx=\"21\" ry=\"6.9\" fill=\"none\" stroke=\"#ff9424\" stroke-width=\"1.5\" opacity=\".5\"/><ellipse cx=\"46\" cy=\"43\" rx=\"21\" ry=\"6.9\" fill=\"none\" stroke=\"#ffd9a2\" stroke-width=\".6\"/><rect x=\"55.62\" y=\"43.12\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#ffb04a\" opacity=\".85\"/><rect x=\"58.14\" y=\"44.41\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"59.20\" y=\"46.13\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"53.10\" y=\"45.73\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"51.95\" y=\"47.37\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#ffb04a\" opacity=\".85\"/><rect x=\"46.86\" y=\"45.95\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"44.69\" y=\"47.26\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"39.99\" y=\"48.28\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"38.57\" y=\"46.10\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#ffb04a\" opacity=\".85\"/><rect x=\"34.06\" y=\"46.41\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"36.13\" y=\"44.42\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"31.21\" y=\"44.07\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"27.25\" y=\"43.06\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#ffb04a\" opacity=\".85\"/><rect x=\"32.77\" y=\"41.93\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"29.87\" y=\"40.50\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"36.85\" y=\"40.51\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"35.96\" y=\"38.94\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#ffb04a\" opacity=\".85\"/><rect x=\"36.99\" y=\"37.22\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"42.76\" y=\"38.59\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"45.63\" y=\"37.27\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"47.66\" y=\"39.26\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#ffb04a\" opacity=\".85\"/><rect x=\"52.38\" y=\"38.51\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"57.50\" y=\"38.29\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"55.21\" y=\"40.40\" width=\"2.50\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><rect x=\"60.58\" y=\"40.89\" width=\"1.50\" height=\"0.85\" rx=\".25\" fill=\"#ffb04a\" opacity=\".85\"/><rect x=\"55.47\" y=\"42.29\" width=\"2.00\" height=\"0.85\" rx=\".25\" fill=\"#4fd8ff\" opacity=\".85\"/><line x1=\"54.43\" y1=\"43.86\" x2=\"63.25\" y2=\"44.75\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"53.03\" y1=\"44.75\" x2=\"60.39\" y2=\"46.59\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"50.78\" y1=\"45.44\" x2=\"55.79\" y2=\"47.99\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"47.96\" y1=\"45.83\" x2=\"50.00\" y2=\"48.79\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"44.90\" y1=\"45.88\" x2=\"43.74\" y2=\"48.89\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"41.97\" y1=\"45.58\" x2=\"37.75\" y2=\"48.28\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"39.53\" y1=\"44.97\" x2=\"32.75\" y2=\"47.03\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"37.87\" y1=\"44.12\" x2=\"29.35\" y2=\"45.30\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"37.19\" y1=\"43.14\" x2=\"27.96\" y2=\"43.29\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"37.57\" y1=\"42.14\" x2=\"28.75\" y2=\"41.25\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"38.97\" y1=\"41.25\" x2=\"31.61\" y2=\"39.41\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"41.22\" y1=\"40.56\" x2=\"36.21\" y2=\"38.01\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"44.04\" y1=\"40.17\" x2=\"42.00\" y2=\"37.21\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"47.10\" y1=\"40.12\" x2=\"48.26\" y2=\"37.11\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"50.03\" y1=\"40.42\" x2=\"54.25\" y2=\"37.72\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"52.47\" y1=\"41.03\" x2=\"59.25\" y2=\"38.97\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"54.13\" y1=\"41.88\" x2=\"62.65\" y2=\"40.70\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><line x1=\"54.81\" y1=\"42.86\" x2=\"64.04\" y2=\"42.71\" stroke=\"#ff9a24\" stroke-width=\".38\" opacity=\".72\"/><ellipse cx=\"46\" cy=\"43\" rx=\"15.5\" ry=\"5.1\" fill=\"none\" stroke=\"#2ba6d8\" stroke-width=\".4\" opacity=\".7\"/><ellipse cx=\"46\" cy=\"43\" rx=\"10.5\" ry=\"3.5\" fill=\"none\" stroke=\"#ff9a24\" stroke-width=\".5\" opacity=\".8\"/><ellipse cx=\"46\" cy=\"42.4\" rx=\"7.6\" ry=\"2.5\" fill=\"#0d1c2c\" stroke=\"#ffb04a\" stroke-width=\".45\"/><ellipse cx=\"46\" cy=\"41.6\" rx=\"5.2\" ry=\"1.75\" fill=\"#152a40\" stroke=\"#ffd9a2\" stroke-width=\".4\"/><ellipse cx=\"46\" cy=\"40.9\" rx=\"3.1\" ry=\"1.05\" fill=\"#070f1a\" stroke=\"#ffb04a\" stroke-width=\".35\"/><path d=\"M43.6 41 L44.3 24.6 L47.7 24.6 L48.4 41 Z\" fill=\"url(#gstem)\"/><ellipse cx=\"46\" cy=\"24.8\" rx=\"2.6\" ry=\".9\" fill=\"#ffe0a0\" opacity=\".85\"/><circle cx=\"46\" cy=\"16.5\" r=\"10.2\" fill=\"url(#gorb)\"/><path d=\"M46.84 7.26 L46.00 7.75 L45.16 7.26 L45.16 6.30 L46.00 5.81 L46.84 6.30 Z\" fill=\"rgb(30,31,33)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M42.84 9.82 L41.79 10.42 L40.74 9.82 L40.74 8.60 L41.79 8.00 L42.84 8.60 Z\" fill=\"rgb(139,111,70)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M45.74 9.87 L44.60 10.53 L43.45 9.87 L43.45 8.55 L44.60 7.89 L45.74 8.55 Z\" fill=\"rgb(108,88,60)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M48.55 9.87 L47.40 10.53 L46.26 9.87 L46.26 8.55 L47.40 7.89 L48.55 8.55 Z\" fill=\"rgb(44,41,38)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M51.26 9.82 L50.21 10.42 L49.16 9.82 L49.16 8.60 L50.21 8.00 L51.26 8.60 Z\" fill=\"rgb(10,16,26)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M38.42 12.12 L37.58 12.61 L36.75 12.12 L36.75 11.16 L37.58 10.67 L38.42 11.16 Z\" fill=\"rgb(95,78,55)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M41.54 12.30 L40.39 12.96 L39.24 12.30 L39.24 10.98 L40.39 10.32 L41.54 10.98 Z\" fill=\"rgb(174,136,82)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M44.46 12.37 L43.19 13.11 L41.93 12.37 L41.93 10.91 L43.19 10.17 L44.46 10.91 Z\" fill=\"rgb(186,143,84)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M47.30 12.39 L46.00 13.15 L44.70 12.39 L44.70 10.89 L46.00 10.13 L47.30 10.89 Z\" fill=\"rgb(122,91,56)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M50.07 12.37 L48.81 13.11 L47.54 12.37 L47.54 10.91 L48.81 10.17 L50.07 10.91 Z\" fill=\"rgb(42,32,28)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M52.76 12.30 L51.61 12.96 L50.46 12.30 L50.46 10.98 L51.61 10.32 L52.76 10.98 Z\" fill=\"rgb(10,16,26)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M55.25 12.12 L54.42 12.61 L53.58 12.12 L53.58 11.16 L54.42 10.67 L55.25 11.16 Z\" fill=\"rgb(10,16,26)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M40.13 14.73 L38.99 15.39 L37.84 14.73 L37.84 13.41 L38.99 12.75 L40.13 13.41 Z\" fill=\"rgb(117,94,63)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M43.10 14.82 L41.79 15.58 L40.49 14.82 L40.49 13.32 L41.79 12.56 L43.10 13.32 Z\" fill=\"rgb(179,133,76)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M45.97 14.86 L44.60 15.65 L43.23 14.86 L43.23 13.28 L44.60 12.49 L45.97 13.28 Z\" fill=\"rgb(170,116,60)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M48.77 14.86 L47.40 15.65 L46.03 14.86 L46.03 13.28 L47.40 12.49 L48.77 13.28 Z\" fill=\"rgb(127,74,34)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M51.51 14.82 L50.21 15.58 L48.90 14.82 L48.90 13.32 L50.21 12.56 L51.51 13.32 Z\" fill=\"rgb(66,37,21)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M54.16 14.73 L53.01 15.39 L51.87 14.73 L51.87 13.41 L53.01 12.75 L54.16 13.41 Z\" fill=\"rgb(13,17,26)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M38.63 17.11 L37.58 17.71 L36.53 17.11 L36.53 15.89 L37.58 15.29 L38.63 15.89 Z\" fill=\"rgb(41,39,37)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M41.66 17.23 L40.39 17.97 L39.12 17.23 L39.12 15.77 L40.39 15.03 L41.66 15.77 Z\" fill=\"rgb(122,84,48)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M44.57 17.29 L43.19 18.08 L41.82 17.29 L41.82 15.71 L43.19 14.92 L44.57 15.71 Z\" fill=\"rgb(167,101,45)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M47.40 17.31 L46.00 18.12 L44.60 17.31 L44.60 15.69 L46.00 14.88 L47.40 15.69 Z\" fill=\"rgb(179,91,27)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M50.18 17.29 L48.81 18.08 L47.43 17.29 L47.43 15.71 L48.81 14.92 L50.18 15.71 Z\" fill=\"rgb(136,62,15)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M52.88 17.23 L51.61 17.97 L50.34 17.23 L50.34 15.77 L51.61 15.03 L52.88 15.77 Z\" fill=\"rgb(74,39,20)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M55.47 17.11 L54.42 17.71 L53.37 17.11 L53.37 15.89 L54.42 15.29 L55.47 15.89 Z\" fill=\"rgb(10,16,26)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M40.13 19.59 L38.99 20.25 L37.84 19.59 L37.84 18.27 L38.99 17.61 L40.13 18.27 Z\" fill=\"rgb(39,27,23)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M43.10 19.68 L41.79 20.44 L40.49 19.68 L40.49 18.18 L41.79 17.42 L43.10 18.18 Z\" fill=\"rgb(118,60,22)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M45.97 19.72 L44.60 20.51 L43.23 19.72 L43.23 18.14 L44.60 17.35 L45.97 18.14 Z\" fill=\"rgb(183,79,11)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M48.77 19.72 L47.40 20.51 L46.03 19.72 L46.03 18.14 L47.40 17.35 L48.77 18.14 Z\" fill=\"rgb(193,83,10)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M51.51 19.68 L50.21 20.44 L48.90 19.68 L48.90 18.18 L50.21 17.42 L51.51 18.18 Z\" fill=\"rgb(121,57,16)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M54.16 19.59 L53.01 20.25 L51.87 19.59 L51.87 18.27 L53.01 17.61 L54.16 18.27 Z\" fill=\"rgb(50,30,23)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M38.42 21.84 L37.58 22.33 L36.75 21.84 L36.75 20.88 L37.58 20.39 L38.42 20.88 Z\" fill=\"rgb(10,16,26)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M41.54 22.02 L40.39 22.68 L39.24 22.02 L39.24 20.70 L40.39 20.04 L41.54 20.70 Z\" fill=\"rgb(61,35,22)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M44.46 22.09 L43.19 22.83 L41.93 22.09 L41.93 20.63 L43.19 19.89 L44.46 20.63 Z\" fill=\"rgb(122,57,16)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M47.30 22.11 L46.00 22.87 L44.70 22.11 L44.70 20.61 L46.00 19.85 L47.30 20.61 Z\" fill=\"rgb(157,70,13)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M50.07 22.09 L48.81 22.83 L47.54 22.09 L47.54 20.63 L48.81 19.89 L50.07 20.63 Z\" fill=\"rgb(130,60,16)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M52.76 22.02 L51.61 22.68 L50.46 22.02 L50.46 20.70 L51.61 20.04 L52.76 20.70 Z\" fill=\"rgb(70,38,21)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M55.25 21.84 L54.42 22.33 L53.58 21.84 L53.58 20.88 L54.42 20.39 L55.25 20.88 Z\" fill=\"rgb(10,16,26)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M42.84 24.40 L41.79 25.00 L40.74 24.40 L40.74 23.18 L41.79 22.58 L42.84 23.18 Z\" fill=\"rgb(52,32,22)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M45.74 24.45 L44.60 25.11 L43.45 24.45 L43.45 23.13 L44.60 22.47 L45.74 23.13 Z\" fill=\"rgb(88,45,19)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M48.55 24.45 L47.40 25.11 L46.26 24.45 L46.26 23.13 L47.40 22.47 L48.55 23.13 Z\" fill=\"rgb(91,46,19)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M51.26 24.40 L50.21 25.00 L49.16 24.40 L49.16 23.18 L50.21 22.58 L51.26 23.18 Z\" fill=\"rgb(59,34,22)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><path d=\"M46.84 26.70 L46.00 27.19 L45.16 26.70 L45.16 25.74 L46.00 25.25 L46.84 25.74 Z\" fill=\"rgb(33,24,24)\" stroke=\"rgba(120,200,240,.20)\" stroke-width=\".18\"/><ellipse cx=\"41.9\" cy=\"11.6\" rx=\"3.3\" ry=\"2.1\" fill=\"#eaf6ff\" opacity=\".5\"/><path d=\"M38.4 23.6 a10.2 10.2 0 0 0 15 -1.4\" fill=\"none\" stroke=\"#ffb04a\" stroke-width=\".9\" opacity=\".5\"/><circle cx=\"46\" cy=\"16.5\" r=\"10.2\" fill=\"none\" stroke=\"#7fc9e8\" stroke-width=\".4\" opacity=\".45\"/><ellipse cx=\"120\" cy=\"48.0\" rx=\"8.9\" ry=\"6\" fill=\"#02070e\" opacity=\".5\"/><ellipse cx=\"120\" cy=\"46.0\" rx=\"8.5\" ry=\"6.2\" fill=\"#070e18\"/><ellipse cx=\"120\" cy=\"46.0\" rx=\"8.5\" ry=\"6.2\" fill=\"none\" stroke=\"#8299af\" stroke-width=\".7\" opacity=\".55\"/><ellipse cx=\"120\" cy=\"45.4\" rx=\"6.7\" ry=\"4.9\" fill=\"url(#gb1)\"/><path d=\"M115.7 42.8 a6.7 4.9 0 0 1 5.4 -2.3\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.2\" stroke-linecap=\"round\" opacity=\".68\"/><ellipse cx=\"144\" cy=\"43.0\" rx=\"8.9\" ry=\"6\" fill=\"#02070e\" opacity=\".5\"/><ellipse cx=\"144\" cy=\"41.0\" rx=\"8.5\" ry=\"6.2\" fill=\"#070e18\"/><ellipse cx=\"144\" cy=\"41.0\" rx=\"8.5\" ry=\"6.2\" fill=\"none\" stroke=\"#8299af\" stroke-width=\".7\" opacity=\".55\"/><ellipse cx=\"144\" cy=\"40.4\" rx=\"6.7\" ry=\"4.9\" fill=\"url(#gb2)\"/><path d=\"M139.7 37.8 a6.7 4.9 0 0 1 5.4 -2.3\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.2\" stroke-linecap=\"round\" opacity=\".68\"/><ellipse cx=\"168\" cy=\"44.0\" rx=\"8.9\" ry=\"6\" fill=\"#02070e\" opacity=\".5\"/><ellipse cx=\"168\" cy=\"42.0\" rx=\"8.5\" ry=\"6.2\" fill=\"#070e18\"/><ellipse cx=\"168\" cy=\"42.0\" rx=\"8.5\" ry=\"6.2\" fill=\"none\" stroke=\"#8299af\" stroke-width=\".7\" opacity=\".55\"/><ellipse cx=\"168\" cy=\"41.4\" rx=\"6.7\" ry=\"4.9\" fill=\"url(#gb3)\"/><path d=\"M163.7 38.8 a6.7 4.9 0 0 1 5.4 -2.3\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.2\" stroke-linecap=\"round\" opacity=\".68\"/><rect x=\"115\" y=\"10\" width=\"15\" height=\"5\" rx=\"2.5\" fill=\"#0a1420\" stroke=\"#37d0f5\" stroke-width=\".7\" opacity=\".8\"/><rect x=\"135\" y=\"10\" width=\"15\" height=\"5\" rx=\"2.5\" fill=\"#0a1420\" stroke=\"#ff9424\" stroke-width=\".7\" opacity=\".8\"/><text x=\"144\" y=\"62.5\" text-anchor=\"middle\" font-family=\"Arial Black,Impact,sans-serif\" font-size=\"6.6\" font-weight=\"900\" fill=\"#ffd9a2\" opacity=\".95\">SnapHit</text><text x=\"144\" y=\"67.6\" text-anchor=\"middle\" font-family=\"system-ui,sans-serif\" font-size=\"3.5\" font-weight=\"800\" letter-spacing=\"1.1\" fill=\"#ff9424\" opacity=\".9\">STUDIOS</text></svg>";
+
+  var CAB =
+    '<div class="cab-body">' +
+      '<div class="marquee"><svg class="wm wm-marq" viewBox="0 0 4789 719" role="img" aria-label="SnapHit">' + WM + '</svg></div>' +
+      '<div class="aperture">' +
+        '<div class="phone">' +
+          '<span class="key vol v1"></span><span class="key vol v2"></span>' +
+          '<span class="key pwr"></span>' +
+          '<button class="grow" type="button" aria-label="Expand to full screen">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6M15 3h6v6M9 21H3v-6M15 21h6v-6"/></svg>' +
+          '</button>' +
+          '<div class="screen">' +
+            '<button class="attract" type="button">' +
+              '<span class="title"></span>' +
+              '<span class="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3 L21 12 L6 21 Z"/></svg></span>' +
+              '<span class="hint">TAP TO PLAY</span>' +
+            '</button>' +
+            '<div class="island"><span class="lens"></span></div>' +
+            '<div class="glass"></div><div class="bar"></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="deck">' + PANEL + '</div>' +
+      '<div class="coin">' +
+        '<span class="slot"></span><span class="ret"></span><span class="slot"></span>' +
+      '</div>' +
+    '</div>' +
+    '<a class="visit" href="/" target="_blank" rel="noopener">PLAY IT FULL SIZE</a>';
+
+  var frames = [];
   var live = null;
 
-  function screenOf(cab) { return cab.querySelector('.cab-screen'); }
+  /* ---------------- full screen, without the Fullscreen API ----------------
+     Tap to expand styles the phone in place rather than moving it, so the
+     iframe is never reloaded and the run survives. The Fullscreen API is
+     skipped deliberately: iOS Safari will not honour it on an iframe. */
+  var shrinkBtn = null;
+  var zoomed = null;
 
-  /* Build the frame. This is the only place one is ever created, and it
-     is only ever called from a tap or from a revive. */
-  function load(cab) {
-    if (cab.__frame) return;
-    // One at a time.
-    if (live && live !== cab) unload(live);
-    var f = document.createElement('iframe');
-    f.src = SRC;
-    f.title = 'Drift Fever';
-    f.setAttribute('allow', ALLOW);
-    /* The game reads the tilt sensor and writes localStorage, both of
-       which need same origin, so there is deliberately no sandbox
-       attribute: adding one would drop the frame into an opaque origin
-       and silently break the daily, the ghost and tilt steering. It is
-       our own file on our own domain. */
-    f.setAttribute('scrolling', 'no');
-    screenOf(cab).appendChild(f);
-    cab.__frame = f;
-    cab.classList.add('live');
-    var attract = cab.querySelector('.cab-attract');
-    if (attract) attract.hidden = true;
-    live = cab;
+  function makeShrink() {
+    if (shrinkBtn) return shrinkBtn;
+    shrinkBtn = document.createElement('button');
+    shrinkBtn.className = 'shrink';
+    shrinkBtn.id = 'shrink';
+    shrinkBtn.type = 'button';
+    shrinkBtn.setAttribute('aria-label', 'Leave full screen');
+    shrinkBtn.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v6H3M15 3v6h6M9 21v-6H3M15 21v-6h6"/></svg>';
+    shrinkBtn.addEventListener('click', unzoom);
+    document.body.appendChild(shrinkBtn);
+    return shrinkBtn;
+  }
+  function zoom(phone) {
+    zoomed = phone;
+    phone.classList.add('big');
+    document.body.classList.add('zoomed');
+    makeShrink().focus();
+  }
+  function unzoom() {
+    if (!zoomed) return;
+    zoomed.classList.remove('big');
+    document.body.classList.remove('zoomed');
+    var g = zoomed.querySelector('.grow');
+    zoomed = null;
+    if (g) g.focus();
+  }
+  addEventListener('keydown', function (e) { if (e.key === 'Escape') unzoom(); });
+
+  /* ---------------- unloading whatever scrolled away ---------------- */
+  function watch(el) {
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (en) {
+      for (var i = 0; i < en.length; i++) {
+        var e = en[i];
+        if (document.body.classList.contains('zoomed')) continue;
+        if (!e.isIntersecting && e.target.src) {
+          e.target.removeAttribute('src');            // stop the loop dead
+          var rec = null;
+          for (var k = 0; k < frames.length; k++) if (frames[k].el === e.target) rec = frames[k];
+          if (rec) {
+            var again = document.createElement('button');
+            again.className = 'attract';
+            again.type = 'button';
+            again.setAttribute('aria-label', 'Play ' + rec.name);
+            again.innerHTML =
+              '<span class="title">' + rec.name + '</span>' +
+              '<span class="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3 L21 12 L6 21 Z"/></svg></span>' +
+              '<span class="hint">TAP TO PLAY</span>';
+            again.addEventListener('click', function () {
+              rec.el.src = rec.src; again.remove(); rec.phone.classList.add('live');
+              live = rec;
+            });
+            rec.phone.classList.remove('live');
+            rec.screen.appendChild(again);
+            if (live === rec) live = null;
+            /* PARKED BY THE OBSERVER, and that distinction matters. The
+               revive below wakes anything on screen without a src, and
+               loadInto also strips a src when a second cabinet is
+               started. Without this flag the two fight: start the second
+               cabinet on a tall screen where both are visible, loadInto
+               unloads the first, the observer sees a visible frame with
+               no src and immediately brings it back, and both end up
+               live, which is the state one at a time exists to prevent.
+               Only what scrolling away parked may scrolling back wake. */
+            rec.parked = true;
+            /* KEPT UNDER OBSERVATION rather than unobserved. The original
+               calls io.unobserve here, which is right for a shelf of
+               cabinets where the reader has moved on to the next machine.
+               On an article the reader scrolls back up to the thing they
+               were playing, and asking them to tap it again because the
+               page moved is a worse answer than reviving it. The attract
+               panel is still put back and still works, so both routes in
+               are live. */
+            rec.revive = again;
+          }
+        } else if (e.isIntersecting && !e.target.src) {
+          var back = null;
+          for (var j = 0; j < frames.length; j++) if (frames[j].el === e.target) back = frames[j];
+          if (back && back.revive && back.parked) {
+            back.revive.remove();
+            back.revive = null;
+            back.parked = false;
+            back.el.src = back.src;
+            back.phone.classList.add('live');
+            loadInto(back);
+          }
+        }
+      }
+    }, { rootMargin: '120px' });
+    io.observe(el);
   }
 
-  /* Tear the frame out. The attract panel comes back, so the cabinet
-     reads as a cabinet again rather than as a black hole, and the
-     observer keeps watching so this is reversible. */
-  function unload(cab) {
-    if (!cab.__frame) return;
-    cab.__frame.remove();
-    cab.__frame = null;
-    cab.classList.remove('live');
-    if (cab.classList.contains('grown')) shrink(cab);
-    var attract = cab.querySelector('.cab-attract');
-    if (attract) attract.hidden = false;
-    if (live === cab) live = null;
-  }
-
-  function grow(cab) {
-    cab.classList.add('grown');
-    document.body.classList.add('cab-grown');
-    var b = cab.querySelector('.cab-grow');
-    if (b) { b.textContent = 'CLOSE'; b.setAttribute('aria-pressed', 'true'); }
-  }
-  function shrink(cab) {
-    cab.classList.remove('grown');
-    document.body.classList.remove('cab-grown');
-    var b = cab.querySelector('.cab-grow');
-    if (b) { b.textContent = 'PLAY BIGGER'; b.setAttribute('aria-pressed', 'false'); }
-  }
-
-  function wire(cab) {
-    cabs.push(cab);
-    cab.__frame = null;
-    /* WANTED is what makes reviving different from loading. A cabinet
-       that has never been asked for stays dark for ever; one that was
-       asked for and then scrolled away comes back on its own, because
-       the reader already answered that question once. */
-    cab.__wanted = false;
-
-    var play = cab.querySelector('.cab-play');
-    if (play) {
-      play.addEventListener('click', function () {
-        cab.__wanted = true;
-        load(cab);
-      });
+  /* One at a time. See the note at the top: this is the addition. */
+  function loadInto(rec) {
+    for (var i = 0; i < frames.length; i++) {
+      var f = frames[i];
+      if (f === rec || !f.el.src) continue;
+      f.el.removeAttribute('src');
+      f.phone.classList.remove('live');
+      if (!f.revive) {
+        var again = document.createElement('button');
+        again.className = 'attract';
+        again.type = 'button';
+        again.setAttribute('aria-label', 'Play ' + f.name);
+        again.innerHTML =
+          '<span class="title">' + f.name + '</span>' +
+          '<span class="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3 L21 12 L6 21 Z"/></svg></span>' +
+          '<span class="hint">TAP TO PLAY</span>';
+        (function (rr, btn) {
+          btn.addEventListener('click', function () {
+            rr.el.src = rr.src; btn.remove(); rr.phone.classList.add('live');
+            rr.revive = null; loadInto(rr);
+          });
+        })(f, again);
+        f.screen.appendChild(again);
+        f.revive = again;
+      }
     }
-    /* The whole attract panel is the target, not just the button. A
-       thumb aimed at a phone shaped screen lands anywhere on it, and
-       "TAP TO PLAY" is an instruction about the screen. */
-    var attract = cab.querySelector('.cab-attract');
-    if (attract) {
-      attract.addEventListener('click', function (e) {
-        if (e.target === play) return;      // already handled
-        cab.__wanted = true;
-        load(cab);
-      });
-    }
-
-    var g = cab.querySelector('.cab-grow');
-    if (g) {
-      g.addEventListener('click', function () {
-        if (cab.classList.contains('grown')) shrink(cab); else grow(cab);
-      });
-    }
+    live = rec;
   }
 
-  /* Escape leaves a grown cabinet, because a keyboard player who has
-     grown one has no other obvious way out and the browser's own
-     fullscreen habit is what their hand will reach for. */
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Escape') return;
-    for (var i = 0; i < cabs.length; i++) {
-      if (cabs[i].classList.contains('grown')) shrink(cabs[i]);
-    }
-  });
+  function build(cab) {
+    cab.innerHTML = CAB;
+    cab.querySelector('.attract .title').textContent = NAME;
+    var visit = cab.querySelector('.visit');
+    visit.setAttribute('aria-label', 'Open ' + NAME + ' in its own tab');
+
+    var screen = cab.querySelector('.screen');
+    var phone = cab.querySelector('.phone');
+    var grow = cab.querySelector('.grow');
+    var attract = cab.querySelector('.attract');
+    grow.addEventListener('click', function () { zoom(phone); });
+    attract.setAttribute('aria-label', 'Play ' + NAME);
+
+    // Nothing loads until it is asked for. Four live canvases on one page
+    // would cook a phone.
+    attract.addEventListener('click', function () {
+      if (screen.querySelector('iframe')) return;
+      var f = document.createElement('iframe');
+      f.src = SRC;
+      f.title = NAME;
+      f.setAttribute('scrolling', 'no');
+      f.setAttribute('allow', 'accelerometer; gyroscope; fullscreen');
+      /* No sandbox, deliberately. The game reads the tilt sensor and
+         writes localStorage, and a sandbox would drop the frame into an
+         opaque origin and break the daily, the ghost and tilt at once.
+         It is our own file on our own domain. */
+      screen.appendChild(f);
+      attract.remove();
+      phone.classList.add('live');
+      var rec = { el: f, src: SRC, screen: screen, phone: phone,
+                  name: NAME, revive: null, parked: false };
+      frames.push(rec);
+      loadInto(rec);
+      watch(f);
+    });
+  }
 
   function start() {
     var list = document.querySelectorAll('.cab');
-    for (var i = 0; i < list.length; i++) wire(list[i]);
-    if (!list.length) return;
-
-    if (!('IntersectionObserver' in window)) return;   // no observer, no unload
-
-    var io = new IntersectionObserver(function (entries) {
-      for (var i = 0; i < entries.length; i++) {
-        var cab = entries[i].target;
-        /* A GROWN CABINET IS NEVER UNLOADED. It is fixed to the
-           viewport, so the article behind it can scroll out from under
-           it, and unloading the thing somebody is playing because the
-           page moved behind it would be absurd. */
-        if (cab.classList.contains('grown')) continue;
-        if (entries[i].isIntersecting) {
-          if (cab.__wanted && !cab.__frame) load(cab);
-        } else {
-          unload(cab);
-        }
-      }
-    }, {
-      /* A generous margin, so a cabinet is not torn down the instant its
-         last pixel leaves and rebuilt the instant it returns. Scrolling
-         past one and back is the common case on these pages and it
-         should cost nothing. */
-      rootMargin: '200px 0px 200px 0px',
-      threshold: 0
-    });
-    for (var j = 0; j < list.length; j++) io.observe(list[j]);
+    for (var i = 0; i < list.length; i++) build(list[i]);
   }
 
   if (document.readyState === 'loading') {

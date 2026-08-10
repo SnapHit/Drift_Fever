@@ -1,4 +1,13 @@
-/* THE ARCADE CABINET, and the site around it.
+/* THE ARCADE CABINET, PORTED FROM snap-hit.online.
+
+   The cabinet rules below are the author's own, lifted verbatim from
+   reference/snaphit-index.html where they are inline in the head, and
+   not reinterpreted. An earlier version of this file was written to a
+   written description because the site could not be reached from the
+   build environment; that version is gone and this is the real one.
+
+   reference/ is source material. Nothing here loads from it, links to
+   it or depends on it at runtime.
 
    Shared by all seven content pages and linked, not copied. Seven copies
    would be seven places to fix a bug.
@@ -8,30 +17,29 @@
    FILE, index.html, which still fetches nothing but itself. These are
    pages about the game, not the game.
 
-   No font service, no framework, no third party anything. Section 6's
-   filter surface reasoning applies here exactly as it does to the game:
-   a clean single purpose site stays uncategorised longer than a portal,
-   and every extra host is another thing for a filter to recognise. */
+   ==================================================================
+   PART ONE: THE PAGE. These rules are this site's, not snap-hit's, and
+   they are what the seven pages of prose are set in. snap-hit is a
+   shelf of cabinets with almost no text; these are articles that happen
+   to carry one, so the typography is the site's own.
+   ================================================================== */
 
 :root {
-  --ink: #f6efe6;
+  --ink-body: #f6efe6;
   --dim: #b3a494;
   --bg: #120a06;
-  --panel: #1d110a;
   --line: #3a2416;
-  --hot: #ff9a3c;
   --gold: #ffc266;
   --cool: #4fd6e6;
 }
 
 * { box-sizing: border-box; }
-
 html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--ink);
+  color: var(--ink-body);
   /* The system stack. A font service is a third party request, a render
      delay and a tracking surface, and it buys nothing a reader on a
      school Chromebook will ever notice. */
@@ -63,13 +71,13 @@ h2 {
 h3 {
   font-size: clamp(1.08rem, 3.1vw, 1.22rem);
   margin: 1.7rem 0 0.5rem;
-  color: var(--ink);
+  color: var(--ink-body);
 }
 p { margin: 0 0 1.05rem; }
 strong { color: #fff; font-weight: 600; }
 
-a { color: var(--cool); text-decoration-thickness: 1px; text-underline-offset: 2px; }
-a:hover, a:focus { color: #fff; }
+main a { color: var(--cool); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+main a:hover, main a:focus { color: #fff; }
 
 hr { border: 0; border-top: 1px solid var(--line); margin: 2.6rem 0; }
 
@@ -85,226 +93,271 @@ th, td {
 }
 th { color: var(--gold); font-weight: 600; white-space: nowrap; }
 
-.checked { color: var(--dim); font-size: 0.9rem; }
+/* ==================================================================
+   PART TWO: THE CABINET, snap-hit.online's own rules.
 
-/* ------------------------------------------------------------------
-   THE CABINET
-   ------------------------------------------------------------------ */
-.cab {
-  display: block;
-  margin: 1.8rem auto 2.2rem;
-  max-width: 21rem;
-  background: linear-gradient(180deg, #241408 0%, #170d07 60%, #120a06 100%);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 0.85rem 0.85rem 1rem;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+   The variables come first because every measurement below is derived
+   from the phone's width: the phone drives everything, and the cabinet
+   is the frame around it rather than the other way round.
+   ================================================================== */
+
+:root {
+  --void: #04070e;
+  --cyan: #37d0f5;
+  --amber: #ff9424; --amber-lit: #ffd9a2;
+  --ink: #cfe2f5; --ink-dim: #7e93ab;
+  --cabx: 1.44;                        /* cabinet width, in phone widths */
+  --apx: 1.18;                         /* aperture width, likewise */
+  --pw: min(calc((100vw - 26px) / 1.44), 300px);
+  --ph: calc(var(--pw) / 0.4615);
+}
+@media (min-width:720px){
+  :root{ --cabx:1.62; --apx:1.30; --pw:min(26.5vh, 330px); }
+}
+@media (min-width:720px) and (min-height:1000px){
+  :root{ --pw:min(26vh, 380px); }
 }
 
-/* The marquee, lit from behind the way a real one is. */
-.cab-marquee {
-  text-align: center;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  font-size: 0.82rem;
-  color: #2a1608;
-  background: linear-gradient(180deg, var(--gold), var(--hot));
-  border-radius: 9px;
-  padding: 0.42rem 0.5rem;
-  margin-bottom: 0.8rem;
-  box-shadow: 0 0 22px rgba(255, 154, 60, 0.28);
-}
+/* The wordmark in the marquee. */
+.wm{display:block;height:auto;color:var(--amber);overflow:visible}
+.wm-marq{width:54%;margin:0 auto;color:var(--amber);
+  filter:drop-shadow(0 0 4px rgba(255,148,36,.85)) drop-shadow(0 0 15px rgba(255,148,36,.42))}
 
-/* The aperture is the hole in the cabinet the phone sits in. */
-.cab-aperture {
-  background: #0a0603;
-  border: 1px solid #2c1a0e;
-  border-radius: 14px;
-  padding: 0.7rem 0.55rem;
-}
+/* THE CABINET IS CENTRED IN THE ARTICLE. On snap-hit it sits in a flex
+   column rack that does the centring; here it is one object dropped into
+   a column of prose, so it centres itself. This is the only addition to
+   the ported rules and it replaces the rack rather than changing the
+   cabinet. */
+.cab{margin:2rem auto 2.4rem}
 
-.cab-phone {
-  position: relative;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 15.5rem;
-  background: #05070a;
-  border: 2px solid #2a2f36;
-  border-radius: 22px;
-  padding: 0.55rem 0.4rem;
+/* ---------- cabinet ---------- */
+.cab{width:calc(var(--pw) * var(--cabx));max-width:100%}
+.cab-body{
+  position:relative;padding:0 0 calc(var(--ph) * .04);
+  border-radius:calc(var(--pw) * .1) calc(var(--pw) * .1) calc(var(--pw) * .03) calc(var(--pw) * .03);
+  background:linear-gradient(180deg,#2a5b8c 0%,#1d4370 38%,#122c4d 74%,#0b1e38 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(55,208,245,.55),
+    inset 0 1px 0 rgba(180,232,255,.35),
+    0 0 0 2px rgba(255,148,36,.85),
+    0 0 34px -4px rgba(255,148,36,.45),
+    0 0 78px -18px rgba(55,208,245,.6),
+    0 40px 80px -30px rgba(0,0,0,.95);
+  overflow:hidden;
 }
-
-/* The volume and power keys. Decoration, and the thing that makes the
-   aperture read as holding a phone rather than a rectangle. */
-.cab-vol, .cab-pwr {
-  position: absolute;
-  width: 3px;
-  background: #39404a;
-  border-radius: 2px;
-}
-.cab-vol { left: -5px; top: 22%; height: 13%; }
-.cab-vol.two { top: 38%; }
-.cab-pwr { right: -5px; top: 26%; height: 18%; }
-
-.cab-screen {
-  position: relative;
-  width: 100%;
-  /* A phone's shape, so the game inside is laid out the way it will be
-     on the reader's own phone. */
-  aspect-ratio: 9 / 19;
-  background: #000;
-  border-radius: 14px;
-  overflow: hidden;
-}
-/* aspect-ratio is well supported but not universal on the five year old
-   end of this audience's hardware, so there is a padding fallback. */
-@supports not (aspect-ratio: 9 / 19) {
-  .cab-screen { height: 0; padding-bottom: 211%; }
-}
-
-.cab-screen iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  display: block;
-}
-
-/* THE ATTRACT PANEL. What the screen shows before anything is loaded,
-   and what it goes back to when the cabinet is unloaded. */
-.cab-attract {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.9rem;
-  padding: 1rem;
-  text-align: center;
+/* side art: cabinet stripes, the way a real machine is decalled */
+.cab-body::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
   background:
-    radial-gradient(120% 60% at 50% 8%, rgba(255, 154, 60, 0.16), transparent 70%),
-    linear-gradient(180deg, #150c07, #05070a 70%);
+    linear-gradient(90deg,
+      transparent 0 3.5%, rgba(255,148,36,.85) 3.5% 5.4%,
+      transparent 5.4% 7%, rgba(55,208,245,.7) 7% 8.4%,
+      transparent 8.4% 91.6%, rgba(55,208,245,.7) 91.6% 93%,
+      transparent 93% 94.6%, rgba(255,148,36,.85) 94.6% 96.5%,
+      transparent 96.5% 100%);
 }
-.cab-name {
-  margin: 0;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  font-size: 1.05rem;
-  color: var(--gold);
-  text-shadow: 0 0 18px rgba(255, 194, 102, 0.35);
+/* Both front edges catch the light, and a broad gloss rakes across the
+   left face. This is what stops it reading as a flat rectangle. */
+.cab-body::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,.34) 0 .8%,
+      rgba(214,240,255,.13) .8% 2.4%,
+      rgba(255,255,255,0) 2.4% 96.8%,
+      rgba(214,240,255,.10) 96.8% 99.1%,
+      rgba(255,255,255,.26) 99.1% 100%),
+    linear-gradient(104deg,
+      rgba(198,238,255,.19) 0 6%,
+      rgba(198,238,255,.07) 13%,
+      rgba(198,238,255,0) 30%,
+      rgba(198,238,255,0) 84%,
+      rgba(198,238,255,.05) 100%),
+    linear-gradient(180deg, rgba(255,255,255,.10) 0 1.5%, transparent 6%);
 }
-.cab-sub { margin: 0; font-size: 0.8rem; color: var(--dim); }
-
-.cab-play {
-  font: inherit;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  font-size: 0.9rem;
-  color: #2a1608;
-  background: linear-gradient(180deg, var(--gold), var(--hot));
-  border: 0;
-  border-radius: 999px;
-  padding: 0.62rem 1.3rem;
-  cursor: pointer;
-  animation: cabpulse 1.8s ease-in-out infinite;
+.marquee{
+  position:relative;margin:calc(var(--pw) * .07) calc(var(--pw) * .07) 0;
+  padding:calc(var(--pw) * .048) 0;border-radius:calc(var(--pw) * .045);
+  text-align:center;
+  background:linear-gradient(180deg,#1b1006 0%,#2a1708 55%,#150c04 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,148,36,.5),0 0 26px -6px rgba(255,148,36,.55);
+  padding-left:calc(var(--pw) * .04);padding-right:calc(var(--pw) * .04);
 }
-@keyframes cabpulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.055); }
+.marquee::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(120% 180% at 50% 50%,rgba(255,190,110,.55),rgba(255,148,36,.12) 70%,transparent);
+  mix-blend-mode:screen;will-change:opacity;
+  animation:mq 4.4s ease-in-out infinite;
 }
-@media (prefers-reduced-motion: reduce) {
-  .cab-play { animation: none; }
+@keyframes mq{
+  0%{opacity:.10} 38%{opacity:.62} 44%{opacity:0} 47%{opacity:.85}
+  51%{opacity:.06} 55%{opacity:.7} 72%{opacity:.34} 100%{opacity:.10}
 }
-
-/* THE GROW BUTTON, and it is deliberately not a small corner icon.
-
-   On snap-hit it is one cabinet among several and a corner glyph is
-   enough. Here it is the whole reason somebody can play properly
-   without leaving the page they arrived on, so it is a labelled control
-   in the frame of the phone, the width of the screen, and it says what
-   it does. It only appears once something is actually running: there is
-   nothing to grow before that. */
-.cab-grow {
-  display: none;
-  width: 100%;
-  margin: 0.5rem 0 0.1rem;
-  font: inherit;
-  font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
-  color: var(--gold);
-  background: #14100c;
-  border: 1px solid #4a3016;
-  border-radius: 9px;
-  padding: 0.5rem;
-  cursor: pointer;
+.aperture{
+  position:relative;margin:calc(var(--pw) * .07) auto 0;width:calc(var(--pw) * var(--apx));
+  max-width:calc(100% - var(--pw) * .14);
+  padding:calc(var(--pw) * .09) 0;border-radius:calc(var(--pw) * .05);
+  background:#01040a;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.95),
+    inset 0 12px 34px rgba(0,0,0,.9),
+    0 0 0 1.5px rgba(255,148,36,.7),
+    0 0 20px -4px rgba(255,148,36,.4);
+  display:flex;justify-content:center;
 }
-.cab.live .cab-grow { display: block; }
-.cab-grow:hover, .cab-grow:focus { color: #fff; border-color: var(--gold); }
-
-/* GROWN. The phone fills the viewport. Fixed rather than fullscreen API,
-   because the API needs a gesture chain that survives an iframe and this
-   does not, and because leaving is one tap either way. */
-.cab.grown .cab-phone {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  max-width: none;
-  width: 100vw;
-  height: 100dvh;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: #000;
+/* A brushed metal rail, a glass front, an island, side keys. The point of
+   the whole page rests on this reading as a phone at a glance. */
+.phone{
+  position:relative;width:var(--pw);height:var(--ph);
+  border-radius:calc(var(--pw) * .135);
+  padding:calc(var(--pw) * .022);
+  background:linear-gradient(148deg,#8ea2b8 0%,#46525f 16%,#222a34 40%,
+                             #1a212a 62%,#3d4854 84%,#7d8fa3 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.22),
+    0 0 0 1px rgba(4,8,14,.9),
+    0 0 40px -8px rgba(55,208,245,.5),
+    0 14px 30px -12px rgba(0,0,0,.9);
 }
-.cab.grown .cab-screen {
-  aspect-ratio: auto;
-  height: 100dvh;
-  border-radius: 0;
+/* side keys, standing slightly proud of the rail */
+.key{
+  position:absolute;z-index:2;border-radius:calc(var(--pw) * .012);
+  background:linear-gradient(90deg,#7f92a6,#39424e 55%,#232a33);
+  box-shadow:0 0 0 .5px rgba(0,0,0,.55);
 }
-@supports not (aspect-ratio: 9 / 19) {
-  .cab.grown .cab-screen { padding-bottom: 0; }
+.key.vol{left:calc(var(--pw) * -.014);width:calc(var(--pw) * .017)}
+.key.v1{top:22%;height:7.5%}
+.key.v2{top:31.5%;height:7.5%}
+.key.pwr{right:calc(var(--pw) * -.014);width:calc(var(--pw) * .017);top:26%;height:11%;
+  background:linear-gradient(270deg,#7f92a6,#39424e 55%,#232a33)}
+.screen{
+  position:relative;width:100%;height:100%;overflow:hidden;
+  border-radius:calc(var(--pw) * .118);background:#000;
 }
-.cab.grown .cab-vol, .cab.grown .cab-pwr { display: none; }
-.cab.grown .cab-grow {
-  position: fixed;
-  z-index: 10000;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: max(0.6rem, env(safe-area-inset-bottom));
-  width: auto;
-  margin: 0;
-  padding: 0.45rem 1.1rem;
-  background: rgba(10, 8, 6, 0.82);
+.screen iframe{display:block;width:100%;height:100%;border:0}
+/* the island sits over the display, the way it does on the real thing */
+.island{
+  position:absolute;z-index:4;top:calc(var(--pw) * .028);left:50%;
+  transform:translateX(-50%);
+  width:calc(var(--pw) * .30);height:calc(var(--pw) * .082);
+  border-radius:999px;background:#000;
+  box-shadow:0 0 0 .5px rgba(120,140,165,.35);
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:calc(var(--pw) * .022);pointer-events:none;
 }
-/* Nothing behind a grown cabinet may scroll. */
-body.cab-grown { overflow: hidden; }
-
-/* The control deck. Inline SVG, so it costs no request and scales. */
-.cab-deck { display: block; width: 100%; height: auto; margin: 0.7rem 0 0.2rem; }
-
-.cab-coin {
-  margin: 0.15rem auto 0;
-  width: 3.4rem;
-  height: 0.42rem;
-  border-radius: 3px;
-  background: #0a0603;
-  border: 1px solid #4a3016;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9);
+.lens{
+  width:calc(var(--pw) * .036);height:calc(var(--pw) * .036);border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,#3c5f7d 0%,#12202e 46%,#05090e 100%);
+  box-shadow:0 0 0 .5px rgba(150,180,210,.35),inset 0 0 2px rgba(120,200,255,.6);
 }
-
-.cab-under {
-  margin: 0.75rem 0 0;
-  text-align: center;
-  font-size: 0.86rem;
-  color: var(--dim);
+/* glass: a light rake across the front, and the home indicator */
+.glass{
+  position:absolute;inset:0;z-index:3;pointer-events:none;
+  border-radius:calc(var(--pw) * .118);
+  background:linear-gradient(118deg,
+    rgba(255,255,255,.11) 0%, rgba(255,255,255,.045) 13%,
+    rgba(255,255,255,0) 30%, rgba(255,255,255,0) 78%,
+    rgba(180,220,255,.05) 96%, rgba(180,220,255,.09) 100%);
+}
+.bar{
+  position:absolute;z-index:4;left:50%;transform:translateX(-50%);
+  bottom:calc(var(--pw) * .030);width:34%;height:calc(var(--pw) * .016);
+  border-radius:999px;background:rgba(255,255,255,.42);pointer-events:none;
 }
 
-/* No JavaScript at all: the attract panel's button does nothing, so the
-   plain link underneath is the whole route to the game. It is always
-   there for that reason, and it is why the full size link was kept
-   rather than dropped in favour of the grow button. */
-.cab-noscript { color: var(--gold); }
+.attract{
+  position:absolute;inset:0;width:100%;height:100%;border:0;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:calc(var(--pw) * .05);padding:8%;
+  background:
+    radial-gradient(85% 55% at 50% 74%, rgba(255,148,36,.20), transparent 70%),
+    linear-gradient(180deg,#05070f 0%,#0a1020 55%,#07050f 100%);
+  color:var(--ink);font:inherit;text-align:center;
+}
+.attract .title{
+  font:900 calc(var(--pw) * .155)/1 "Arial Black",Impact,system-ui,sans-serif;
+  letter-spacing:.02em;color:#fff;text-shadow:0 0 18px rgba(255,148,36,.75);
+}
+.attract .play{
+  width:calc(var(--pw) * .28);height:calc(var(--pw) * .28);border-radius:50%;
+  display:grid;place-items:center;
+  background:rgba(255,148,36,.14);box-shadow:0 0 0 1px rgba(255,148,36,.65),0 0 28px -6px rgba(255,148,36,.8);
+  transition:transform .18s ease, background .18s ease;
+}
+.attract .play svg{width:38%;height:38%;fill:var(--amber-lit);margin-left:8%}
+.attract:hover .play,.attract:focus-visible .play{transform:scale(1.09);background:rgba(255,148,36,.24)}
+.attract .hint{font:800 calc(var(--pw) * .045)/1.5 system-ui,sans-serif;letter-spacing:.2em;color:var(--ink-dim)}
+
+/* Ten sliders at 157px wide is not a game, it is a diagram. Tap to expand
+   styles the phone in place rather than moving it, so the iframe is never
+   reloaded and the run survives. The Fullscreen API is skipped deliberately:
+   iOS Safari will not honour it on an iframe. */
+.grow{
+  position:absolute;top:calc(var(--pw) * .075);right:calc(var(--pw) * .075);
+  z-index:4;width:calc(var(--pw) * .17);height:calc(var(--pw) * .17);
+  display:none;place-items:center;border:0;border-radius:calc(var(--pw) * .05);
+  background:rgba(6,13,24,.82);
+  box-shadow:inset 0 0 0 1px rgba(255,148,36,.55);cursor:pointer;
+}
+.phone.live .grow{display:grid}
+.grow svg{width:52%;height:52%;fill:none;stroke:var(--amber-lit);stroke-width:2.4;
+  stroke-linecap:round;stroke-linejoin:round}
+.grow:hover,.grow:focus-visible{background:rgba(255,148,36,.22)}
+
+body.zoomed{overflow:hidden}
+body.zoomed .phone.big{
+  position:fixed;inset:0;z-index:200;width:100%;height:100%;
+  padding:0;border-radius:0;box-shadow:none;background:#000;
+}
+body.zoomed .phone.big .island,
+body.zoomed .phone.big .key,
+body.zoomed .phone.big .glass,
+body.zoomed .phone.big .bar,
+body.zoomed .phone.big .grow{display:none}
+body.zoomed .phone.big .screen{border-radius:0}
+.shrink{
+  display:none;position:fixed;z-index:201;
+  top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
+  width:40px;height:40px;place-items:center;border:0;border-radius:12px;cursor:pointer;
+  background:rgba(6,13,24,.86);
+  box-shadow:inset 0 0 0 1px rgba(255,148,36,.55);
+}
+body.zoomed .shrink{display:grid}
+.shrink svg{width:18px;height:18px;fill:none;stroke:var(--amber-lit);stroke-width:2.6;
+  stroke-linecap:round}
+
+/* The control panel: a printed overlay with real parts standing on it. */
+.deck{
+  position:relative;margin:calc(var(--pw) * .075) calc(var(--pw) * .035) 0;
+  padding:calc(var(--pw) * .022) calc(var(--pw) * .028);
+  border-radius:calc(var(--pw) * .05);
+  background:linear-gradient(180deg,#101f31 0%,#0a1725 60%,#060e18 100%);
+  box-shadow:inset 0 3px 9px rgba(0,0,0,.7),0 2px 0 rgba(0,0,0,.5);
+}
+.panel{display:block;width:100%;height:auto}
+
+/* coin door, because nothing says arcade faster */
+.coin{
+  position:relative;margin:calc(var(--pw) * .05) calc(var(--pw) * .17) 0;
+  height:calc(var(--pw) * .115);border-radius:calc(var(--pw) * .02);
+  background:linear-gradient(180deg,#0a1524 0%,#060e19 100%);
+  box-shadow:inset 0 0 0 1px rgba(140,170,200,.35),inset 0 3px 7px rgba(0,0,0,.8);
+  display:flex;align-items:center;justify-content:center;gap:calc(var(--pw) * .05);
+}
+.slot{
+  width:calc(var(--pw) * .012);height:calc(var(--pw) * .058);border-radius:2px;
+  background:#000;box-shadow:0 0 0 1px rgba(190,215,240,.5),0 0 6px -1px rgba(55,208,245,.5);
+}
+.ret{
+  width:calc(var(--pw) * .1);height:calc(var(--pw) * .046);
+  border-radius:calc(var(--pw) * .01);background:linear-gradient(180deg,#1b2b3d,#0b1420);
+  box-shadow:inset 0 0 0 1px rgba(150,180,210,.4);
+}
+
+.cab .visit{
+  display:block;margin:18px auto 0;width:max-content;
+  font:800 11px/1 system-ui,sans-serif;letter-spacing:.18em;
+  color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,148,36,.45);
+  padding-bottom:5px;
+}
+.cab .visit:hover{color:var(--amber-lit);border-bottom-color:var(--amber-lit)}

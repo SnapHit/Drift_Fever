@@ -33,53 +33,28 @@ var EMBED = /\[\[\s*GAME EMBED GOES HERE.*?\]\]/;
    The cabinet's markup, in one place, so all seven pages carry the same
    thing and there is one place to change it.
    ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------
+   WHERE THE CABINET GOES.
+
+   The page carries an empty article and a plain link, and cabinet.js
+   builds the machine into it. That is how snap-hit does it: its rack
+   builder writes the whole cabinet from script, so the markup lives in
+   one file rather than in seven.
+
+   THE LINK IS IN THE PAGE, NOT IN THE SCRIPT, and that is the one thing
+   that cannot move. With scripts off the article stays empty, so this
+   anchor is the only route from a content page to the game, and a
+   managed school Chromebook is exactly the machine likely to have
+   scripting restricted. cabinet.js replaces the article's contents
+   wholesale, its own copy of the link included, so with scripts on
+   there is still exactly one.
+   ------------------------------------------------------------------ */
 function cabinet() {
   return [
     '<article class="cab">',
-    '  <div class="cab-marquee">SNAPHIT</div>',
-    '  <div class="cab-aperture">',
-    '    <div class="cab-phone">',
-    '      <span class="cab-vol"></span><span class="cab-vol two"></span>',
-    '      <span class="cab-pwr"></span>',
-    '      <div class="cab-screen">',
-    '        <div class="cab-attract">',
-    '          <p class="cab-name">DRIFT FEVER</p>',
-    '          <button type="button" class="cab-play">TAP TO PLAY</button>',
-    '          <p class="cab-sub">free, no sign up, nothing to install</p>',
-    '        </div>',
-    '      </div>',
-    '      <button type="button" class="cab-grow" aria-pressed="false">PLAY BIGGER</button>',
-    '    </div>',
-    '  </div>',
-    /* The control deck. Inline SVG: no request, scales to any width,
-       and it is what makes the thing read as a cabinet rather than as a
-       bordered iframe. Decorative, so it is hidden from assistive
-       technology rather than described. */
-    '  <svg class="cab-deck" viewBox="0 0 240 54" aria-hidden="true" focusable="false">',
-    '    <rect x="0" y="0" width="240" height="54" rx="10" fill="#1d110a"/>',
-    '    <rect x="0" y="0" width="240" height="54" rx="10" fill="none" stroke="#3a2416"/>',
-    '    <ellipse cx="52" cy="40" rx="20" ry="7" fill="#0a0603"/>',
-    '    <rect x="49" y="16" width="6" height="22" rx="3" fill="#5a3a1d"/>',
-    '    <circle cx="52" cy="15" r="10" fill="#ff9a3c"/>',
-    '    <circle cx="49" cy="12" r="3.2" fill="#ffd9a8" opacity="0.7"/>',
-    '    <circle cx="140" cy="20" r="11" fill="#ffc266"/>',
-    '    <circle cx="140" cy="20" r="7.5" fill="#e08a1e"/>',
-    '    <circle cx="172" cy="20" r="11" fill="#4fd6e6"/>',
-    '    <circle cx="172" cy="20" r="7.5" fill="#22a6b8"/>',
-    '    <circle cx="156" cy="41" r="11" fill="#ff6b8a"/>',
-    '    <circle cx="156" cy="41" r="7.5" fill="#d33f60"/>',
-    '    <circle cx="204" cy="30" r="11" fill="#9ee27a"/>',
-    '    <circle cx="204" cy="30" r="7.5" fill="#5fae3f"/>',
-    '  </svg>',
-    '  <div class="cab-coin"></div>',
-    /* THE LINK BENEATH, AND IT IS KEPT RATHER THAN DROPPED. On snap-hit
-       it points at the game's own site; here that would be this page's
-       own domain, so it points at the game at the root and opens in a
-       new tab, which leaves the page the reader arrived on intact.
-       It stays because it is the ONLY route to the game without
-       JavaScript: the attract panel is a button that a script turns
-       into an iframe, and with scripts off it does nothing at all. */
-    '  <p class="cab-under"><a class="cab-noscript" href="/" target="_blank" rel="noopener">Open Drift Fever in its own tab</a></p>',
+    '<noscript><p class="cab-under">',
+    '<a href="/" target="_blank" rel="noopener">PLAY DRIFT FEVER</a>',
+    '</p></noscript>',
     '</article>'
   ].join('\n');
 }
@@ -199,7 +174,12 @@ function convert(md, slug) {
    The page shell.
    ------------------------------------------------------------------ */
 function page(meta, body) {
-  var url = SITE + meta.slug;
+  /* WITH THE TRAILING SLASH, because that is the URL the server actually
+     settles on. Each page is slug/index.html, so a static host serves it
+     at slug/ and redirects slug to it. Declaring the canonical without
+     the slash points it at the redirect rather than the destination, and
+     it would disagree with the sitemap, which has to use the real one. */
+  var url = SITE + meta.slug + '/';
   return [
     '<!doctype html>',
     '<html lang="en">',
