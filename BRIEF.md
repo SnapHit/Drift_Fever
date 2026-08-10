@@ -42,6 +42,8 @@ The centre of gravity is not "car games". It is a single game name and the modif
 
 Deduplicated web-intent demand across the driving niche is **647,450 searches a month across 149 terms**.
 
+**One caution on the table above, found while building the content pages on 10 August 2026.** Identical volumes on close variants mean one keyword pool reported several ways, not several keywords. "Drive mad" and "driving mad" both report 368,000; their unblocked variants both report 27,100; and "car games unblocked", "unblocked car games" and "car games that are unblocked" all report 49,500. Do not add those together, and do not write separate pages for them. One page serves every phrasing naturally.
+
 **These are the weakest search results encountered anywhere in this research.** For "drift boss unblocked", position one is a Google Sites page and position two is `mortgagecalculator.org`; Coolmath, who made the game, sit at seven. For "unblocked car games", position three is `childline.org.uk`, a British child welfare charity ranking on an unrelated page. When a mortgage calculator and a children's charity outrank the actual publisher, the barrier is not authority. Nobody serious has bothered, because the traffic is worthless to advertisers. It is not worthless here, because the cost model is zero.
 
 **A rejected alternative, recorded so it is not revisited.** A bullet heaven / Vampire Survivors-style auto-shooter was investigated and dropped. "Vampire survivors unblocked" is 260 a month in the US. The entire clean web-intent cluster for that genre is 10,930 a month across 24 terms, roughly one sixtieth of the driving niche. Decisively, Vampire Survivors was originally an HTML5 browser game and the free browser build is still live on itch.io, ranking first or second for its own unblocked terms. The gap is already filled by the original developer, for nothing.
@@ -67,7 +69,9 @@ Two conclusions. The driving audience genuinely is school children on managed de
 
 ## 4. The five design pillars
 
-Drift Boss is the incumbent and it is mediocre. It forces a non-skippable tutorial on every single run, the control is unpleasant, and it is punishingly easy to die. The first three pillars fix those. The last two are the reason this is not a clone.
+Drift Boss is the incumbent and it is mediocre. It forces a non-skippable tutorial on every single run, the control is unpleasant, and it is easy to die. The first three pillars fix those. The last two are the reason this is not a clone.
+
+**Verified against the live game, 10 August 2026, and it has moved.** This section was written when Drift Boss was a bare reflex test. An April 2026 update added skins, minigames, loot chests and a card system, on top of three coin-bought boosters, a daily reward and a spin-to-win wheel. One booster, Car Insurance, restarts you where you fell instead of ending the run. So "punishingly easy to die" is now qualified: a paid second life exists. Re-check the incumbent before relying on any claim in this section.
 
 ### 4.1 Give the player a neutral
 
@@ -127,7 +131,9 @@ This still scores the risk in the sense that matters, because a deep slide is ri
 
 Emotionally, the edge stops being the thing you avoid and becomes the thing you court — the scrape band is survivable, so committing to a corner rather than backing out of it is the whole skill. Nothing in this browser niche does this. Drift Hunters has drift scoring but is a heavy WebGL free-roam simulator; Drift Boss is a reflex test with a distance counter. The space between them is empty.
 
-This also answers the observed market gap: every site competing for the sequel terms advertises progression, shops and power-ups, because the originals have none. A live multiplier is progression inside the run and is far cheaper than a shop.
+A live multiplier is progression inside the run and is far cheaper than a shop.
+
+**A claim that used to sit here has been withdrawn.** This paragraph read: every site competing for the sequel terms advertises progression, shops and power-ups, because the originals have none. That was true when it was written and it is false now. Drift Boss carries skins, loot chests, a card system, boosters, a daily reward and a spin wheel as of April 2026. Do not pitch this game as offering progression the incumbent lacks; it does not. The argument for a live multiplier stands on its own terms, because scoring the risk inside the run is a different thing from a shop between runs.
 
 ### 4.5 Change the shape of the run, and give them someone to chase
 
@@ -209,6 +215,8 @@ That solves a real problem. Audio must default to off for this audience, but a m
 ## 8. Tilt controls
 
 Tilt is an **opt-in option behind an explicit button**. The default is always keyboard and touch, and the game must be fully playable by someone who never touches the tilt button.
+
+**Tilt is not a differentiator, and was never checked before being treated as one.** Drift Hunters already supports it: the creator's own listing names accelerometer and touchscreen among its inputs, confirmed 10 August 2026. Tilt is still worth building, because it plays well and testers picked it up unprompted, but it is a feature and not a claim. Do not write copy asserting this game does something the incumbents do not.
 
 ### 8.1 The one decision that must be made before any physics is written
 
@@ -350,6 +358,8 @@ These are to be answered by playing rather than in advance. Putting answers here
 Not the first session's job, but the game is being built to serve it, so the shape matters.
 
 One game, several pages, each targeting a query and each carrying the playable game, framed from the same origin so tilt keeps working.
+
+**This section has been executed.** Seven pages were written on 10 August 2026 against CONTENT-BRIEF.md, with twenty-one outbound links verified live. Targets, in build order: car games unblocked (49,500, KD 10), drift hunters unblocked (40,500, KD 7), unblocked games premium (33,100, KD 5), drift boss unblocked (27,100, KD 1), racing games unblocked (12,100, KD 11), drift games unblocked (8,100, KD 6), driving games unblocked (8,100, KD 16). Hub and spoke: the car games page is the hub, the three other category pages are spokes. See the handback note for what differs between pages and which are expected to underperform.
 
 **Two rules that are already project law:**
 
