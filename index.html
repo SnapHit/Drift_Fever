@@ -343,6 +343,161 @@
     #pads.six button svg { width: 21px; height: 21px; }
     #pads.six .padGroup { gap: 5px; }
   }
+
+  /* ----------------------------------------------------------------
+     THE ONLY LINKS IN THE GAME. Eight of them, and the entire design of
+     them is that they are the last thing on this screen anybody looks
+     at.
+
+     WHY THEY EXIST. The seven content pages all link here and to each
+     other, and nothing linked back, so the strongest page on the site
+     was a dead end and every link into the cluster came from a page with
+     no authority of its own. These are the route back. The eighth is a
+     credit to the studio and it is the only outbound link in the file.
+
+     A LINK IS NOT A REQUEST, which is the only reason this is allowed to
+     exist at all. Nothing here is fetched, prefetched, preconnected or
+     dns-prefetched, and nothing is measured when one is clicked. The
+     file still asks the network for nothing but itself.
+
+     WHERE IT SITS, AND WHY IT IS A CHILD OF #pads. The title screen has
+     one piece of free space: the band between the last line the canvas
+     draws and the top of the corner pads. Measured on the rendered
+     frame, that band is 26px at 390 wide, 30px at 320 and 360, and 22px
+     in landscape. It is two lines of small type and not a pixel more.
+
+     The pads are 64, 60, 56, 54, 50 or 44 tall depending on the width
+     and on whether tilt has added its sixth button, so anchoring to the
+     bottom of the viewport would need that arithmetic repeated in six
+     places and would silently break the day a seventh size appeared.
+     Nested inside #pads and anchored with bottom:100%, this sits exactly
+     on top of whatever the pads currently are, in every combination, for
+     nothing. #pads is position:fixed, which makes it the containing
+     block; left and right resolve against its padding box, so the side
+     safe area insets and its 12px are inherited too.
+
+     IT IS STILL THE PAGE FOOTER. #pads is a plain div, not an article or
+     a section, so a <footer> inside it is contentinfo exactly as it
+     would be at the end of the body.
+
+     POINTER EVENTS, WHICH IS THE HOUSE RULE AT THE TOP OF THIS FILE.
+     none is inherited from #pads and only the anchors take it back, so
+     the space between and around them falls through to the canvas and
+     still steers. This block is also removed outright while a run is on,
+     so during play there is nothing here to eat a tap at all.
+
+     NOT A NAV BAR, which was the one thing this was told not to become.
+     No underlines at rest, no boxes, no rules, no background, one weight
+     of type at eight or nine pixels, and dimmer than the dimmest line
+     the canvas draws above it. It reads as the fine print round the edge
+     of a cabinet, which is what it is.
+     ---------------------------------------------------------------- */
+  #more {
+    position: absolute;
+    left: 0;
+    right: 0;
+    /* Flush to the top of the pads, plus a hair, so the two never touch.
+       left and right resolve against #pads's PADDING box, which is the
+       full viewport width, so the side inset has to be asked for here
+       rather than inherited. */
+    bottom: calc(100% + 2px);
+    /* THE SIDE INSETS ARE ASKED FOR, NOT INHERITED. left and right on an
+       absolutely positioned child resolve against the containing block's
+       PADDING box, and #pads's padding box is the full viewport width,
+       so its own inset padding does nothing for this. Written out the
+       same way #pads and #chrome write theirs, so a rounded corner or a
+       camera cutout never has type under it. */
+    padding-left: calc(env(safe-area-inset-left, 0px) + 16px);
+    padding-right: calc(env(safe-area-inset-right, 0px) + 16px);
+    box-sizing: border-box;
+    text-align: center;
+    font: 600 9px/11px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: 0.03em;
+    /* TITLE_DIM, and it is in PALETTE_FIXED, so the biome rotation can
+       never walk this away from the canvas line above it. The canvas
+       draws its own dimmest line at 0.55 of this colour, and this is
+       under that, which is the whole brief: quieter than the quietest
+       thing already on the screen. */
+    color: rgba(242, 180, 100, 0.38);
+    -webkit-touch-callout: none;
+  }
+  /* AWAY IS visibility, NOT display, AND THAT IS LOAD BEARING.
+
+     The title screen reserves room for this block by reading its height
+     off the DOM on every resize, and a display:none element measures
+     zero. Hidden that way, a rotation during a run would cache a zero
+     reserve, and the title screen would come back with its bottom row
+     drawn straight through the links. visibility keeps the box, and the
+     layout, and therefore the measurement, while taking the block off
+     the screen, out of the tab order and out of the accessibility tree.
+
+     It is only ever away during play, which no crawler reaches. On the
+     title screen, which is what a crawler renders, it is plainly
+     visible. */
+  #more.away { visibility: hidden; }
+  /* Eight and nine are one pixel apart and that pixel is the difference
+     between two lines and three. */
+  @media (max-width: 400px) {
+    #more { font-size: 8px; line-height: 10px; }
+  }
+  /* NOT ON A PHONE HELD SIDEWAYS, AND THAT IS A MEASUREMENT RATHER THAN
+     A PREFERENCE.
+
+     A landscape handset is short, not narrow, and the title screen has
+     no room to give there. Measured across six landscape sizes from 568
+     by 320 up to 915 by 412, the stack had between zero and nine pixels
+     of slack against the floor the wordmark is allowed to shrink to,
+     while the fine print needs twelve for a single line and twenty two
+     for two. Taking it anyway drew the RANDOM TRACK button straight
+     through "the note button, bottom left, turns it off". The screen
+     keeps its composition and the links stand down.
+
+     THE CRAWLER IS UNAFFECTED, WHICH IS WHY THIS IS ALLOWED. Google
+     renders with a mobile viewport in portrait, and at 412 wide the
+     block is on screen, upright and clear of everything by eighteen
+     pixels. There is no size Google renders at where this rule hides
+     anything. A tablet in landscape is 768 tall and keeps them too:
+     the cutoff is 500, well under any tablet and well over any handset.
+
+     display, not visibility, because here the point is that the title
+     screen must NOT reserve the band. The measurement in resize() reads
+     zero for a display:none element and the guard beside it turns that
+     into a reserve of nothing. */
+  @media (max-height: 500px) {
+    #more { display: none; }
+  }
+  #more a {
+    pointer-events: auto;
+    color: inherit;
+    text-decoration: none;
+    /* A LINK NEVER BREAKS IN THE MIDDLE. At 390 wide the wrap fell
+       between "racing" and "games", so one destination was split across
+       two lines with a separator sitting between the halves and read as
+       two different links. The block still wraps; it just wraps between
+       links rather than inside one.
+
+       Nothing else here lifts the row into a strip of buttons. The
+       target is the words and only the words. */
+    white-space: nowrap;
+  }
+  /* ONLY ON DELIBERATE ATTENTION. At rest there is no underline, because
+     eight underlined items in a row is a nav bar however dim it is. A
+     pointer or a focus ring on one is somebody who has already decided
+     to look, and they get the affordance then. */
+  #more a:hover, #more a:focus-visible {
+    color: rgba(255, 217, 162, 0.92);
+    text-decoration: underline;
+  }
+  #more a:focus-visible {
+    outline: 1px solid rgba(255, 176, 58, 0.9);
+    outline-offset: 2px;
+  }
+  /* The credit, quieter than the seven and set apart from them, because
+     it is a byline and not another destination. */
+  #more .studio {
+    margin-left: 1.5em;
+    color: rgba(242, 180, 100, 0.26);
+  }
   /* The boot credit owns the whole screen for its half second, so the
      game's own chrome is out of the way while it is up. It comes back the
      instant the credit clears, and the credit can only ever happen once
@@ -468,6 +623,37 @@
     <button id="flipBtn" type="button" hidden aria-label="Reverse tilt direction"></button>
     <button id="pauseBtn" type="button" aria-label="Pause"></button>
   </div>
+  <!-- ================================================================
+       THE FINE PRINT. See the long note in the stylesheet for where it
+       sits and why it is nested in here.
+
+       RELATIVE HREFS, NO LEADING SLASH, AND THAT IS NOT A STYLE CHOICE.
+       This file is reachable at two addresses: driftfever.com, where the
+       pages are at the root, and snaphit.github.io/Drift_Fever/, which
+       is what og:url in the head still points at, where they are under
+       the project path. A root relative /car-games-online/ is correct on
+       the first and a 404 on the second. Relative is correct on both.
+
+       IT IS RENDERED IN THE MARKUP RATHER THAN BUILT BY SCRIPT, so a
+       crawler that reads the HTML and a crawler that renders it both
+       find the same eight links. The script only ever takes it away.
+
+       THE OUTBOUND ONE GETS target AND rel, which is the rule the seven
+       content pages already follow for all twenty one of theirs. The
+       seven internal ones do not: sending a reader to another page of
+       this site in a new tab would break the back button as the way
+       home.
+       ================================================================ -->
+  <footer id="more">
+    <a href="car-games-online/">car games</a> ·
+    <a href="where-to-play-drift-hunters/">drift hunters</a> ·
+    <a href="browser-games-official-sites/">unblocked games premium</a> ·
+    <a href="drift-boss-one-button-games/">drift boss</a> ·
+    <a href="racing-games-online/">racing games</a> ·
+    <a href="drift-games-online/">drift games</a> ·
+    <a href="driving-games-online/">driving games</a>
+    <a class="studio" href="https://snap-hit.online/" target="_blank" rel="noopener">more games by SnapHit Studios</a>
+  </footer>
 </div>
 <!-- ==================================================================
      THE SNAPHIT LOCKUPS, INLINE, AS SVG MARKUP.
@@ -2072,6 +2258,15 @@ const FEEL = {
   FIREWORK_SHELL_SIZE:     0.60,     // of a spark, so the rising shell is smaller
 
   DEATH_BOTTOM:              96,     // pixels above the safe area, the button's centre
+  /* THE AIR BETWEEN THE TITLE SCREEN'S LAST LINE AND THE FINE PRINT
+     UNDER IT. The fine print's own height is not a constant and must not
+     become one: it is one line of type in landscape and two in portrait,
+     it depends on the width, the type metrics and where the browser
+     chooses to break, and it is read off the DOM on every resize. This
+     is only the gap above it, which is a look and therefore belongs
+     here. The title screen is the only screen that reserves any of this;
+     the death and completion screens still sit on DEATH_BOTTOM alone. */
+  TITLE_FINE_GAP:             6,     // pixels, canvas copy to fine print
   DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
   RESUME_FLASH_TIME:       0.45,     // the wash on arriving back at the gate
 
@@ -4462,6 +4657,7 @@ let wetSheenGradient = null;
 let safeTop = 0;         // notch or camera cutout, measured from CSS
 let safeBottom = 0;      // home indicator and gesture bar, measured from CSS
 let padsTop = 1e9;       // top of the corner pad row, measured from the DOM
+let fineBand = 0;        // room the title screen gives the fine print, from the DOM
 let scrapeGradientLeft = null;
 let scrapeGradientRight = null;
 let scrapeOutGradientLeft = null;
@@ -4507,6 +4703,33 @@ function resize() {
      every button that respects this clean off the top of the screen.
      endBootChrome calls resize again the moment the row exists. */
   padsTop = (padBox && padBox.height > 0) ? padBox.top : (h - safeBottom);
+  /* HOW MUCH ROOM THE FINE PRINT NEEDS, read rather than assumed.
+
+     The bottom of the title screen had exactly fourteen pixels of free
+     space in portrait and ten in landscape, measured on the rendered
+     frame, and eight links need twenty. So the title screen reserves the
+     band instead of the fine print being squeezed into what was left,
+     and the reserve is the element's real height because that is the
+     only thing that knows whether the type broke over one line or two.
+
+     ZERO WHEN THERE IS NO FINE PRINT, which is the framed case, where
+     the element has been removed outright. The title screen then sits
+     exactly where it always did, so a cabinet on a content page is
+     composed identically to the game before this existed.
+
+     Measurable even while it is away, because away is visibility rather
+     than display: see the note in the stylesheet. Without that this
+     would read zero on any resize during a run and the title screen
+     would come back with its bottom row sitting on top of the links. */
+  const fineEl = document.getElementById('more');
+  const fineH = fineEl ? fineEl.offsetHeight : 0;
+  /* A HEIGHT OF ZERO MEANS THERE IS NOTHING TO RESERVE FOR, and the gap
+     must not be reserved on its own. Zero happens three ways: framed, so
+     the element was removed; a landscape handset, where the stylesheet
+     takes it off with display; and the boot flash, where the whole pad
+     row is display:none. endBootChrome calls resize again the moment
+     that row exists. */
+  fineBand = fineH ? fineH + FEEL.TITLE_FINE_GAP : 0;
   measureTiltPad();
 
   // The distant road fades into the horizon glow rather than staying sharp
@@ -4622,6 +4845,26 @@ window.addEventListener('keydown', function (e) {
      tap is, so dismissing the credit cannot begin a game nobody has
      looked at yet. */
   if (bootFlash > 0) { firstGesture(); skipBoot(); return; }
+  /* THE FINE PRINT IS KEYBOARD REACHABLE, AND THAT TAKES TWO CARVE OUTS
+     FROM "ANY KEY STARTS A RUN", both of them here.
+
+     Section 6 is blunt that many sessions on a school Chromebook are
+     keyboard only, and a link nobody can reach with a keyboard is a link
+     that audience does not have. Without these two lines it is exactly
+     that: the first Tab press would start a run and take the whole
+     footer off the screen before focus ever arrived, and if focus did
+     somehow get there Enter would follow the link AND begin a game
+     behind it.
+
+     TAB, because it is the key that means "move", not the key that means
+     "go", and nobody has ever pressed it to start an arcade game.
+
+     ANYTHING AIMED AT A LINK, because once focus is in the footer the
+     player is reading it rather than playing. F, T, R, E, S, Escape and
+     P are all already carved out of "any key" a few lines below; these
+     are the same idea for the same reason. */
+  if (e.key === 'Tab') return;
+  if (e.target && e.target.closest && e.target.closest('#more')) return;
   const k = e.key;
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { held.keyLeft = true; e.preventDefault(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { held.keyRight = true; e.preventDefault(); }
@@ -11675,6 +11918,73 @@ function syncCredit() {
   creditEl.hidden = !want;
 }
 
+
+/* ------------------------------------------------------------------
+   THE FINE PRINT, WHICH IS ONLY EVER ON THE TITLE SCREEN AND ONLY EVER
+   WHEN THIS PAGE IS THE PAGE.
+
+   FRAMED, IT IS DELETED. The game is embedded in an arcade cabinet on
+   all seven content pages, and inside that frame these links are worse
+   than useless in both directions a link can go. Left alone, one
+   navigates the iframe, and the reader is left looking at a content page
+   rendered inside a picture of a phone. Given target="_top" it throws
+   them out of the article they were reading to go to another article
+   they can already see linked in the text beside them. Neither is a
+   thing to do to somebody.
+
+   They are also redundant there: every content page carries the whole
+   cluster in its own copy, so the frame would be offering a second, worse
+   copy of the navigation the page already has. And a cabinet screen with
+   a row of links along the bottom stops reading as a cabinet and starts
+   reading as a browser, which is the one thing that mock is for.
+
+   THE CRAWLER IS UNAFFECTED, AND THAT IS THE WHOLE REASON THIS IS SAFE.
+   Google fetches and renders driftfever.com as a top level document of
+   its own; it does not discover this file only through the iframes.
+   Rendered at the top level, self and top are the same window, so the
+   links are there. This is not cloaking either: the test is the
+   embedding context, never the user agent, so a crawler at
+   driftfever.com is shown exactly what a person at driftfever.com is
+   shown.
+
+   REMOVED RATHER THAN HIDDEN, because there is no state of this game in
+   which a framed copy should have them, and an element that is not in
+   the document cannot be revealed by a later bug.
+
+   THE try/catch IS NOT DECORATION. Reading window.top across origins is
+   allowed for this comparison and throws on nothing current, but a
+   throw here would take the whole script with it, and a game that does
+   not boot because of a footer would be an absurd way to lose.
+   ------------------------------------------------------------------ */
+const moreEl = document.getElementById('more');
+let framed = false;
+try { framed = window.self !== window.top; } catch (e) { framed = true; }
+if (framed && moreEl && moreEl.parentNode) moreEl.parentNode.removeChild(moreEl);
+
+/* The markup ships visible and the script only ever takes it away, so
+   this starts true to agree with it, exactly as creditShown starts false
+   to agree with its own hidden attribute. Get that wrong and the first
+   reconcile sees no change and never writes again. */
+let moreShown = true;
+
+/* ONE RECONCILE PER FRAME, WRITING ONLY ON A CHANGE, which is the same
+   discipline syncCredit is built on and for the same reason: this is a
+   DOM write inside a 60fps loop and it must not happen sixty times a
+   second.
+
+   THE TILT CALIBRATION TERM. The calibration is the one thing in this
+   game that takes a row off another screen, and the row it takes is this
+   one: while it is up the title screen returns before it draws its
+   bottom block at all. So the fine print goes with it and comes back
+   when it does. */
+function syncMore() {
+  if (framed) return;
+  const want = state === TITLE && !paused && !tiltCalOnScreen();
+  if (want === moreShown) return;
+  moreShown = want;
+  moreEl.classList.toggle('away', !want);
+}
+
 /* The lockup is an HTML overlay and the plate under it is canvas, and
    that split is deliberate. The overlay stays sharp at any device pixel
    ratio for free and costs nothing per frame; the plate has to be in the
@@ -12880,8 +13190,28 @@ function drawOverlay(w, h) {
     const below = s * FEEL.TITLE_GAP_PROMPT + promptSize / 2
                 + s * FEEL.TITLE_GAP_FACTS + factSize + musBlock;
     const top = Math.max(safeTop + s * 0.030, h * FEEL.TITLE_TOP);
+    /* THE FINE PRINT TAKES ONLY THE ROOM THE SCREEN CAN SPARE.
+
+       Lifting the bottom group by the fine print's full height squeezes
+       everything above it, and on a phone held sideways there is not
+       always that much to give. Measured: at 568 by 320 the stack had
+       eighteen pixels of slack, the fine print asked for twenty six, and
+       the RANDOM TRACK button was drawn straight through "the note
+       button, bottom left, turns it off".
+
+       So the slack is worked out first, against the same floor the
+       wordmark is allowed to shrink to, and the lift is clamped to it.
+       Where there is room, which is every phone held upright, the fine
+       print gets its whole band. Where there is not, the screen keeps
+       its composition and the fine print keeps whatever is going, which
+       is still more than the ten to fourteen pixels it started with,
+       because the pads are below the clamp rather than inside it. */
+    const bottomTop0 = h - safeBottom - FEEL.DEATH_BOTTOM - s * 0.092;
+    const slack = bottomTop0 - top - below - s * FEEL.TITLE_AIR
+                - s * FEEL.TITLE_WM_MIN;
+    const fine = Math.max(0, Math.min(fineBand, slack));
     // The top of the RANDOM TRACK button, which the stack must clear.
-    const bottomTop = h - safeBottom - FEEL.DEATH_BOTTOM - s * 0.092;
+    const bottomTop = bottomTop0 - fine;
     const wmMaxH = Math.min(h * FEEL.TITLE_WM_TALL,
                             Math.max(s * FEEL.TITLE_WM_MIN,
                                      bottomTop - top - below - s * FEEL.TITLE_AIR));
@@ -12972,7 +13302,12 @@ function drawOverlay(w, h) {
        on the death screen and the mode switch sits on the pause overlay.
        Its one line of explanation goes UNDERNEATH it, because a caption
        above a button reads as belonging to whatever is above THAT. */
-    const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
+    /* THE WHOLE BOTTOM GROUP LIFTS BY THE FINE PRINT'S HEIGHT, and only
+       on this screen. The death and completion screens read
+       DEATH_BOTTOM on its own a few hundred lines from here and are
+       untouched, because they carry no fine print: it is a title screen
+       thing and it lives and dies with the title screen. */
+    const by0 = h - safeBottom - FEEL.DEATH_BOTTOM - fine;
     altRect.to = ENDLESS;
     canvasButton(altRect, 'RANDOM TRACK', w / 2, by0 - s * 0.050,
                  Math.round(s * 0.038), COLOUR.TEXT, w);
@@ -15322,11 +15657,12 @@ function render() {
   // somebody to, and which owns the screen once it is running.
   drawTiltHint(w, h);
   drawTuneName(w, h);
-  /* Both lockups are DOM, so the frame ends by making the document agree
-     with what was just drawn rather than by drawing them. Neither writes
-     anything unless something actually changed. */
+  /* Both lockups and the fine print are DOM, so the frame ends by making
+     the document agree with what was just drawn rather than by drawing
+     them. None of the three writes anything unless something changed. */
   syncBoot();
   syncCredit();
+  syncMore();
   drawHud(w, h);
 }
 
