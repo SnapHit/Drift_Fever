@@ -1,22 +1,31 @@
 #!/bin/sh
-# THE SITE AS SERVED, NOT AS BUILT.
+# THE LIVE SITE, CHECKED AGAINST THIS REPOSITORY.
 #
 #   ./publish-check.sh
 #
-# Everything this checks has been verified against a local build already.
-# None of that is worth anything: the questions here are about redirects,
-# about what a host chooses to publish out of a repository, and about
-# whether a file is where a tag says it is, and a host is the only thing
-# that can answer those. Run it after a deploy and before submitting the
-# sitemap.
+# WHAT THIS IS FOR, AND WHY THE LAST VERSION WAS USELESS. It had 48
+# checks and it did not notice that the site had been frozen three
+# sessions behind, that deploys had been failing for days, or that
+# /.git was being served. It was written against GitHub Pages and Pages
+# stopped being the host. Every check in it was about what Jekyll would
+# publish out of a repository, and Jekyll never ran.
+#
+# THE SITE IS A CLOUDFLARE WORKER. wrangler.jsonc points the assets
+# directory at the repository root, driftfever.com and www are custom
+# domains on it, and `npx wrangler deploy` is the deploy. What reaches
+# the web is decided by .assetsignore, which is an allowlist.
+#
+# THE FIRST CHECK IS THE ONE THAT MATTERS. It compares the live
+# index.html against the one in this working tree, by byte count. Two
+# numbers. If they differ the deploy has not landed, and that single
+# line would have caught the frozen site, the failed builds and the
+# stale content together. Everything after it assumes the site is
+# current; if the first check fails, fix that before reading the rest.
 #
 # Two optional arguments, both for testing this script rather than the
-# site. The first is where to fetch from, the second is what the
-# canonical tags are expected to say. They differ only when pointing this
-# at a local server, where the pages are served from 127.0.0.1 and still
-# correctly claim driftfever.com:
+# site: where to fetch from, and what the canonical tags should say.
 #
-#   ./publish-check.sh http://127.0.0.1:8794 https://driftfever.com
+#   ./publish-check.sh http://127.0.0.1:8799 https://driftfever.com
 #
 # curl and grep. Nothing else, so it runs anywhere.
 
@@ -24,14 +33,13 @@ BASE="${1:-https://driftfever.com}"
 CANON="${2:-https://driftfever.com}"
 BASE="${BASE%/}"
 CANON="${CANON%/}"
+HERE=$(dirname "$0")
 
 pass=0
 fail=0
+ok()  { pass=$((pass+1)); printf '  ok    %s\n' "$1"; }
+bad() { fail=$((fail+1)); printf '  FAIL  %s\n' "$1"; }
 
-ok()   { pass=$((pass+1)); printf '  ok    %s\n' "$1"; }
-bad()  { fail=$((fail+1)); printf '  FAIL  %s\n' "$1"; }
-
-# The eight canonical paths, which are the sitemap and nothing else.
 PATHS="/
 /car-games-online/
 /where-to-play-drift-hunters/
@@ -41,36 +49,69 @@ PATHS="/
 /drift-games-online/
 /driving-games-online/"
 
-# What must not be on the web. The first six are what was asked for; the
-# rest are the same leak wearing the names it was moved to, because a
-# folder renamed back would reappear silently and this is the check that
-# would catch it.
-LEAKS="/BRIEF.md
-/CLAUDE.md
-/VISUAL.md
-/content/
-/content/1-car-games.md
-/reference/
-/reference/snaphit-index.html
-/brand/
-/brand/make-og-card.js
-/_content/
-/_content/1-car-games.md
-/_reference/
-/_reference/snaphit-index.html
-/_config.yml
-/build-pages.js
-/publish-check.sh
-/README.md
-/SESSION-1-PROMPT.md
-/drift-fever-retention-handoff.md"
+# ------------------------------------------------------------------
+printf '\n== IS THE LIVE SITE THIS BUILD\n\n'
+LOCAL=$(wc -c < "$HERE/index.html" | tr -d ' ')
+# --compressed, so the number is the decoded size whatever the Worker
+# chose to do on the wire, which is what makes it comparable to a file
+# on disk at all.
+LIVE=$(curl -sS --compressed "$BASE/" | wc -c | tr -d ' ')
+printf '  repo index.html %s bytes\n  live index.html %s bytes\n' "$LOCAL" "$LIVE"
+if [ "$LOCAL" = "$LIVE" ]; then
+  ok "the live game is this build"
+else
+  bad "THE DEPLOY HAS NOT LANDED. live $LIVE, repo $LOCAL, difference $((LIVE - LOCAL))"
+  printf '        run: npx wrangler deploy\n'
+  printf '        everything below is measured against a stale site.\n'
+fi
+
+# WHO IS ANSWERING, printed rather than asserted. The whole of this
+# session was caused by nobody knowing which host was serving the
+# domain, so the answer goes on the report every time.
+SRV=$(curl -sSI "$BASE/" | tr -d '\r' | grep -iE '^(server|cf-ray|x-served-by|via):' | head -3)
+printf '  answering:\n%s\n' "$(printf '%s' "$SRV" | sed 's/^/        /')"
+
+# IS ANYBODY ELSE STILL SERVING THIS REPOSITORY. The root cause of the
+# outage this script was rewritten after was two hosts configured for one
+# repository and nobody knowing which one the domain pointed at. A second
+# live copy is also a second copy of everything this repository contains,
+# under whatever rules THAT host has rather than .assetsignore.
+printf '\n== IS ANYTHING ELSE SERVING THIS REPO\n\n'
+GH=$(curl -sSL -o /dev/null -w '%{http_code}' --max-time 15 \
+     "https://snaphit.github.io/Drift_Fever/" 2>/dev/null)
+case "$GH" in
+  # 000 IS NOT A PASS. It means curl could not connect at all, which is
+  # a blocked network as often as it is a host that is really gone, and
+  # a check that goes green because it could not run is the exact shape
+  # of the failure this script was rewritten after.
+  000) printf '  ????  could not reach snaphit.github.io at all. NOT checked.\n'
+       printf '        Confirm by hand that GitHub Pages is off for this repo.\n' ;;
+  404) ok "the old GitHub Pages copy is gone (404)" ;;
+  *) bad "GitHub Pages is STILL SERVING this repo ($GH)"
+     printf '        https://snaphit.github.io/Drift_Fever/\n'
+     printf '        Two hosts for one repository is what caused the outage.\n'
+     printf '        Turn Pages off in the repository settings.\n'
+     GHMD=$(curl -sSL -o /dev/null -w '%{http_code}' --max-time 15 \
+            "https://snaphit.github.io/Drift_Fever/BRIEF.md" 2>/dev/null)
+     [ "$GHMD" = "200" ] && printf '        And it is serving BRIEF.md (%s).\n' "$GHMD" ;;
+esac
+
+# ------------------------------------------------------------------
+printf '\n== IS A MISSING PATH REALLY A 404\n\n'
+# THE CONTROL, AND WITHOUT IT EVERY 404 BELOW IS WORTHLESS. A Worker
+# with single page app fallback answers 200 and the index for anything
+# it does not recognise, which would make all nineteen leak checks pass
+# while every one of those files was being served.
+CTRL=$(curl -sS -o /dev/null -w '%{http_code}' "$BASE/no-such-path-9f3a2c7b1e")
+if [ "$CTRL" = "404" ]; then
+  ok "an unknown path returns 404, so the leak checks below mean something"
+else
+  bad "an unknown path returns $CTRL, NOT 404. The Worker is falling back."
+  printf '        Every 404 check below is void until this is fixed.\n'
+fi
 
 # ------------------------------------------------------------------
 printf '\n== THE EIGHT PAGES, DIRECT, NO REDIRECT FOLLOWED\n\n'
-# NOT -L. Following a redirect would report 200 for a URL that is really
-# a 301, and a canonical pointing at a redirect is the exact mistake the
-# trailing slashes are there to avoid. Anything but a straight 200 is
-# chased separately so the report says where it went.
 for p in $PATHS; do
   code=$(curl -sS -o /dev/null -w '%{http_code}' "$BASE$p")
   if [ "$code" = "200" ]; then
@@ -82,51 +123,76 @@ for p in $PATHS; do
 done
 
 # ------------------------------------------------------------------
-printf '\n== WHAT MUST NOT BE PUBLISHED\n\n'
-for p in $LEAKS; do
-  code=$(curl -sSL -o /dev/null -w '%{http_code}' "$BASE$p")
-  # -L HERE, deliberately, and it is the opposite choice to the one
-  # above. A 301 to a served copy is a leak with a redirect in front of
-  # it, so what matters is where it ENDS UP, not what it answers first.
-  if [ "$code" = "404" ]; then
-    ok "404   $p"
-  else
-    bad "$code, NOT 404   $p"
-  fi
-done
-
-# ------------------------------------------------------------------
-printf '\n== THE SITEMAP AND ROBOTS\n\n'
-for p in /sitemap.xml /robots.txt; do
+printf '\n== THE ASSETS THE SITE NEEDS\n\n'
+for p in /cabinet.js /cabinet.css /sitemap.xml /robots.txt /og-card.png \
+         /apple-touch-icon-180.png \
+         /music/track-1.m4a /music/track-2.m4a /music/track-3.m4a /music/track-4.m4a; do
   code=$(curl -sS -o /dev/null -w '%{http_code}' "$BASE$p")
   [ "$code" = "200" ] && ok "200   $p" || bad "$code, expected 200   $p"
 done
 
+# ------------------------------------------------------------------
+printf '\n== .git IS NOT ON THE WEB\n\n'
+# THE WORST OF THEM, and it is worst because it is not the current
+# files, it is every commit ever made. A served .git/config and
+# .git/objects is the whole history, recoverable by anybody who thinks
+# to look.
+for p in /.git/HEAD /.git/config /.git/index /.git/COMMIT_EDITMSG \
+         /.git/refs/heads/main /.git/logs/HEAD /.git/packed-refs; do
+  code=$(curl -sSL -o /dev/null -w '%{http_code}' "$BASE$p")
+  [ "$code" = "404" ] && ok "404   $p" || bad "$code, NOT 404   $p"
+done
+
+# ------------------------------------------------------------------
+printf '\n== NO MARKDOWN IS SERVED\n\n'
+# Generated from what is actually in the repository, so a document added
+# later is checked without anybody remembering to add it here.
+MD=$(ls "$HERE" | grep '\.md$')
+if [ -z "$MD" ]; then
+  printf '  (no markdown at the root to check)\n'
+else
+  for f in $MD; do
+    code=$(curl -sSL -o /dev/null -w '%{http_code}' "$BASE/$f")
+    [ "$code" = "404" ] && ok "404   /$f" || bad "$code, NOT 404   /$f"
+  done
+fi
+# And the two folders full of it.
+for p in /_content/ /_content/1-car-games.md /_reference/ /_reference/snaphit-index.html; do
+  code=$(curl -sSL -o /dev/null -w '%{http_code}' "$BASE$p")
+  [ "$code" = "404" ] && ok "404   $p" || bad "$code, NOT 404   $p"
+done
+
+# ------------------------------------------------------------------
+printf '\n== NO DOTFILE IS SERVED\n\n'
+for p in /.assetsignore /.gitignore /.env /.DS_Store /.wrangler/ /.jekyll-cache/; do
+  code=$(curl -sSL -o /dev/null -w '%{http_code}' "$BASE$p")
+  [ "$code" = "404" ] && ok "404   $p" || bad "$code, NOT 404   $p"
+done
+
+# ------------------------------------------------------------------
+printf '\n== THE REST OF WHAT MUST NOT BE PUBLISHED\n\n'
+for p in /brand/ /brand/make-og-card.js /build-pages.js /publish-check.sh \
+         /wrangler.jsonc /_config.yml /CNAME /package.json /node_modules/; do
+  code=$(curl -sSL -o /dev/null -w '%{http_code}' "$BASE$p")
+  [ "$code" = "404" ] && ok "404   $p" || bad "$code, NOT 404   $p"
+done
+
+# ------------------------------------------------------------------
+printf '\n== THE SITEMAP AND ROBOTS\n\n'
 sm=$(curl -sS "$BASE/sitemap.xml" | tr '<' '\n' | grep '^loc>' | sed 's/^loc>//')
 n=$(printf '%s\n' "$sm" | grep -c 'http')
-if [ "$n" = "8" ]; then
-  ok "the sitemap lists exactly 8 URLs"
-else
-  bad "the sitemap lists $n URLs, expected 8"
-fi
-
-# Every entry names the canonical host and carries its trailing slash,
-# and the set is exactly the eight above. A sitemap that lists a URL the
-# pages do not claim is worse than one that omits it.
+[ "$n" = "8" ] && ok "the sitemap lists exactly 8 URLs" \
+                || bad "the sitemap lists $n URLs, expected 8"
 for u in $sm; do
   case "$u" in
-    "$CANON"/*|"$CANON") ;;
+    "$CANON"/*) ;;
     *) bad "sitemap entry is on the wrong host: $u"; continue ;;
   esac
-  case "$u" in
-    */) ;;
-    *) bad "sitemap entry has no trailing slash: $u"; continue ;;
-  esac
+  case "$u" in */) ;; *) bad "sitemap entry has no trailing slash: $u"; continue ;; esac
   want=$(printf '%s\n' "$PATHS" | grep -c "^${u#$CANON}\$")
   [ "$want" = "1" ] && ok "in the sitemap and in the eight   ${u#$CANON}" \
                     || bad "sitemap lists a URL that is not one of the eight: $u"
 done
-
 for p in $PATHS; do
   printf '%s\n' "$sm" | grep -q "^$CANON$p\$" \
     || bad "one of the eight is missing from the sitemap: $p"
@@ -135,19 +201,11 @@ done
 # ------------------------------------------------------------------
 printf '\n== EVERY CANONICAL AGAINST THE URL IT SITS ON\n\n'
 for p in $PATHS; do
-  # -L, so a page behind a redirect is still read rather than reported
-  # as having no canonical at all. The redirect itself is section one's
-  # to complain about and one fault should produce one failure.
-  got=$(curl -sSL "$BASE$p" \
-        | tr '>' '\n' \
-        | grep -i 'rel="canonical"' \
-        | sed -E 's/.*href="([^"]*)".*/\1/' \
-        | head -1)
+  got=$(curl -sSL "$BASE$p" | tr '>' '\n' | grep -i 'rel="canonical"' \
+        | sed -E 's/.*href="([^"]*)".*/\1/' | head -1)
   want="$CANON$p"
-  if [ -z "$got" ]; then
-    bad "no canonical at all on   $p"
-  elif [ "$got" = "$want" ]; then
-    ok "canonical matches   $got"
+  if [ -z "$got" ]; then bad "no canonical at all on   $p"
+  elif [ "$got" = "$want" ]; then ok "canonical matches   $got"
   else
     bad "canonical mismatch on $p"
     printf '        it says  %s\n        want     %s\n' "$got" "$want"
@@ -156,8 +214,6 @@ done
 
 # ------------------------------------------------------------------
 printf '\n== THE SHARE CARD RESOLVES\n\n'
-# Read out of the page rather than assumed, because the point of the
-# check is that the tag and the file agree.
 img=$(curl -sS "$BASE/" | tr '>' '\n' | grep -i 'property="og:image"' \
       | sed -E 's/.*content="([^"]*)".*/\1/' | head -1)
 printf '  og:image on the game root is  %s\n' "$img"
@@ -165,10 +221,8 @@ case "$img" in
   "$CANON"/*) ok "og:image is absolute and on the canonical host" ;;
   *) bad "og:image is not on the canonical host: $img" ;;
 esac
-# Fetched from BASE rather than from the tag, so this still works when
-# pointed at a local server.
-imgpath="${img#$CANON}"
-hdr=$(curl -sS -o /dev/null -w '%{http_code} %{content_type} %{size_download}' "$BASE$imgpath")
+hdr=$(curl -sS -o /dev/null -w '%{http_code} %{content_type} %{size_download}' \
+      "$BASE${img#$CANON}")
 case "$hdr" in
   200\ image/*) ok "og:image resolves: $hdr" ;;
   *) bad "og:image does not resolve: $hdr" ;;

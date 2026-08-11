@@ -1,12 +1,48 @@
-.git/**
-.wrangler/**
-_content/**
-_reference/**
-brand/**
-*.md
-!index.html
-_config.yml
-wrangler.jsonc
-build-pages.js
-publish-check.sh
-.gitignore
+# WHAT THE WORKER MAY PUBLISH.
+#
+# THE REPOSITORY ROOT IS THE WEB ROOT. wrangler.jsonc points the assets
+# directory at ".", so every file in this repository is a candidate for
+# a public URL, including the ones nobody would ever write down as
+# something to publish. Measured with wrangler's own walker: 842 paths,
+# 773 of them inside .git, which is every commit ever made rather than
+# merely the current files.
+#
+# SO THIS IS AN ALLOWLIST, NOT A DENYLIST, AND THAT IS THE WHOLE POINT.
+# A denylist has to name every mistake in advance and fails OPEN: a file
+# nobody thought of is served. That is exactly how this went wrong. The
+# first version of this file was a good denylist and it still missed two
+# things, because neither had been invented when it was written:
+# .jekyll-cache, left behind by a tool that no longer runs here, and
+# CNAME, left behind by the host that no longer serves this.
+#
+# `/*` hides everything at the top level, and the lines under it put
+# back the eleven things that are the site. It only matches one level
+# deep, so re-including a directory re-includes what is in it, which is
+# how the seven pages and the music work. Anything new is NOT SERVED
+# until somebody adds it here on purpose, and publish-check.sh will say
+# so, because it asks for all eight URLs and expects 200.
+#
+# .assetsignore itself does not need a line: wrangler drops it before
+# uploading, confirmed in the deploy log as "Ignoring asset:
+# .assetsignore". Everything else is here because it was watched being
+# excluded rather than assumed to be.
+
+/*
+
+!/index.html
+!/cabinet.js
+!/cabinet.css
+!/og-card.png
+!/apple-touch-icon-180.png
+!/sitemap.xml
+!/robots.txt
+!/music/
+
+# The seven content pages, each a directory with an index.html in it.
+!/car-games-online/
+!/where-to-play-drift-hunters/
+!/browser-games-official-sites/
+!/drift-boss-one-button-games/
+!/racing-games-online/
+!/drift-games-online/
+!/driving-games-online/
