@@ -35,27 +35,53 @@
      is only read when somebody adds the page to their home screen. -->
 <link rel="apple-touch-icon" href="apple-touch-icon-180.png">
 
-<!-- Share previews. Social scrapers do not execute the page and will not
-     render a data URI, so the card has to be a real file, and og:image
-     has to be ABSOLUTE because most scrapers do not resolve a relative
-     one. og-card.png is generated from the same path data as everything
+<!-- ==================================================================
+     THE CANONICAL ADDRESS, AND IT IS THE ONLY PLACE IN THIS FILE THAT
+     NAMES A HOST.
+
+     THE GAME IS REACHABLE AT TWO ADDRESSES, and that is the whole
+     reason this block matters. driftfever.com is the site; the GitHub
+     Pages project path it was first published at still answers. Two
+     live copies of the same page is the duplicate content problem the
+     seven pages were moved out of the served tree to avoid, and the
+     answer here is the same one the pages use: say which address is the
+     real one and say it absolutely.
+
+     THIS DOES NOT AFFECT THE RELATIVE LINKS. Everything else in this
+     file, the touch icon above and the seven links at the bottom, stays
+     relative with no leading slash so the game keeps working at both
+     addresses. Only the tags that a scraper or a crawler reads out of
+     context, where there is no page to resolve against, name the host.
+
+     SOCIAL SCRAPERS DO NOT EXECUTE THE PAGE and will not render a data
+     URI, so the card has to be a real file and og:image has to be
+     absolute because most scrapers do not resolve a relative one.
+     og-card.png is generated from the same path data as the favicon
      above by the brand tooling.
 
-     SITE_URL, in effect, is the four absolute URLs below. It is the
-     GitHub Pages address the game is served from today. If the game ever
-     moves to its own domain, these are the lines to change and they are
-     deliberately together so it is one edit. -->
+     SITE_URL, in effect, is the four absolute URLs below, and they are
+     deliberately together so a move is one edit. The count in this note
+     said four when there were three, which is how a stale address
+     survives a reading: canonical, og:url, og:image and twitter:image
+     is four, and the canonical is the one that was missing.
+
+     WITH THE TRAILING SLASH, the same rule the seven pages follow: the
+     server settles on driftfever.com/ and the sitemap lists it that
+     way, so declaring it without the slash would point the canonical at
+     a redirect and disagree with the sitemap.
+     ================================================================== -->
+<link rel="canonical" href="https://driftfever.com/">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://snaphit.github.io/Drift_Fever/">
+<meta property="og:url" content="https://driftfever.com/">
 <meta property="og:title" content="Drift Fever">
 <meta property="og:description" content="A drift game in one file. Everybody drives the same road today, a new one tomorrow. No downloads, nothing to install.">
-<meta property="og:image" content="https://snaphit.github.io/Drift_Fever/og-card.png">
+<meta property="og:image" content="https://driftfever.com/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Drift Fever">
 <meta name="twitter:description" content="A drift game in one file. Everybody drives the same road today, a new one tomorrow. No downloads, nothing to install.">
-<meta name="twitter:image" content="https://snaphit.github.io/Drift_Fever/og-card.png">
+<meta name="twitter:image" content="https://driftfever.com/og-card.png">
 <style>
   html, body {
     margin: 0;
@@ -629,10 +655,15 @@
 
        RELATIVE HREFS, NO LEADING SLASH, AND THAT IS NOT A STYLE CHOICE.
        This file is reachable at two addresses: driftfever.com, where the
-       pages are at the root, and snaphit.github.io/Drift_Fever/, which
-       is what og:url in the head still points at, where they are under
-       the project path. A root relative /car-games-online/ is correct on
-       the first and a 404 on the second. Relative is correct on both.
+       pages are at the root, and the GitHub Pages project path it was
+       first published at, where they are under /Drift_Fever/. A root
+       relative /car-games-online/ is correct on the first and a 404 on
+       the second. Relative is correct on both.
+
+       THE CANONICAL IN THE HEAD NAMES driftfever.com and this does not
+       contradict it. Which address search should index is a different
+       question from which address a click has to work at, and these
+       have to work at both.
 
        IT IS RENDERED IN THE MARKUP RATHER THAN BUILT BY SCRIPT, so a
        crawler that reads the HTML and a crawler that renders it both

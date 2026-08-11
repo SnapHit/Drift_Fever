@@ -54,6 +54,7 @@ exclude:
   - _content/
   - brand/
   - build-pages.js
+  - publish-check.sh
   # The project's own documents. Jekyll would publish each as HTML.
   - BRIEF.md
   - CLAUDE.md
