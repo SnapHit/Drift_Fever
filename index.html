@@ -2339,6 +2339,42 @@ const FEEL = {
   RESUME_FLASH_TIME:       0.45,     // the wash on arriving back at the gate
 
   /* ----------------------------------------------------------------
+     THE SHARE CARD, which is the growth engine rather than a feature.
+
+     Handoff 2.5: the Wordle grid, not the puzzle, took that game from
+     ninety players to millions, and it worked because it showed the
+     SHAPE of an attempt rather than reducing it to a number. A shape
+     leaves the recipient something to ask about. A score does not.
+
+     1200 BY 630 because it is the card shape every chat app, every
+     scraper and every feed already handles, and because og-card.png is
+     that shape, so a link preview and a shared result look like the same
+     product. Drawn at exactly this size, not scaled: a card is generated
+     once per run and there is nothing to gain from a device pixel ratio.
+
+     EVERYTHING ON IT IS SIZED FOR A THUMBNAIL. The smallest type on the
+     card is the URL at 40px, which is a hair over 3% of the width, and
+     the level blocks read as three different densities before any of the
+     type resolves at all. Nothing here is fine detail.
+
+     THE COLOURS ARE WRITTEN OUT rather than read from COLOUR, for the
+     same reason the boot splash writes its own field: COLOUR is what a
+     biome rotates, and a card whose palette depended on which biome the
+     player happened to die in would not be a brand. */
+  CARD_W:                  1200,
+  CARD_H:                   630,
+  CARD_PAD:                  64,     // the margin everything sits inside
+  CARD_WORDMARK:            300,     // ink width of DRIFT FEVER
+  CARD_BLOCK_GAP:            18,     // between two level blocks
+  CARD_BLOCK_H:              92,     // and how tall they are
+  /* How long to wait for toBlob before giving up and sharing the text.
+     It has never been reached in testing: the whole card measures a few
+     milliseconds. It exists because a share that hangs is worse than a
+     share that is plain, and a callback that never fires is exactly how
+     that happens. */
+  CARD_BLOB_TIMEOUT:       2500,     // milliseconds
+
+  /* ----------------------------------------------------------------
      Audio. Everything here is synthesised: oscillators and one generated
      noise buffer. Nothing is fetched, nothing is decoded, and there is no
      sample data in the file, because section 6's audience is behind a
@@ -6543,7 +6579,23 @@ function openingHandover() {
    otherwise quietly put a blocker inside it. */
 function unlockAt(seconds) { return Math.max(FEEL.OPENING_SECONDS, seconds); }
 
-function onRunEnded() { /* nothing to feed any more, see runsEver */ }
+/* CALLED THE INSTANT A RUN ENDS, by both the crash and the line, and it
+   is where the share card is started.
+
+   NOT WHEN THE BUTTON IS DRAWN, which is where this began and which was
+   measured to be too late. toBlob encodes off the main thread but
+   delivers its callback as a task, and on the frames right after a
+   finale, with the fireworks running, that task was measured arriving
+   between 500 and 1500 milliseconds later. A player who taps SHARE
+   quickly would have got the plain text share and never known why.
+
+   Started here it has the whole of the finale, the result roll and the
+   input lock to finish in, which on any machine is several seconds.
+   buildShareCardSoon is keyed on the result, so the drawShareButton call
+   that remains is a free safety net rather than a second build. */
+function onRunEnded() {
+  buildShareCardSoon();
+}
 
 /* ------------------------------------------------------------------
    THE CLOCK THE ROAD IS BUILT AGAINST, AND WHY THE DAILY NEEDS ITS OWN.
@@ -13059,7 +13111,12 @@ function drawFinish(w, h) {
      is the screen somebody most wants to send to a friend, and having it
      on the crash screen and not on the win would be an odd thing to
      explain. */
-  drawShareButton(w, h, s, btnY, Math.round(s * 0.038));
+  /* THE HERO CASE, and it is the completion screen's alone: the whole
+     day, every level of it, with no continue anywhere. dayClean is the
+     game's own test for that and it is what the title screen's trophy
+     reads too. */
+  drawShareButton(w, h, s, btnY, Math.round(s * 0.038),
+                  mode === DAILY && dayDone() && dayClean());
   /* THE PROMPT MOVED UP A ROW, because it used to sit centred on btnY
      and the share button now occupies that row. It goes above the row
      rather than beside it, which is where the death screen has always
@@ -13239,6 +13296,363 @@ function hitRect(rect, e) {
    through any move of the game, and it is left out entirely off http
    and https, where it would be somebody's local file path.
    ================================================================== */
+/* ==================================================================
+   THE CARD.
+
+   WHAT IS ON IT, and every one of these is here for a reason:
+
+     THE WORDMARK, so it is obvious which game this came from before a
+     single word is read. Same Path2D the title screen draws, so the two
+     cannot drift apart.
+
+     THE TRACK NUMBER, which is the whole reason a shared score means
+     anything at all. Everybody on that date drove those roads, so a
+     number off track 47 is a claim two people can settle.
+
+     THE SHAPE OF THE DAY, one block per level, three states: finished
+     clean, finished on continues, never got there. THIS is the Wordle
+     grid and it is the point of the exercise. It is read as three
+     DENSITIES before any type resolves, so it survives a thumbnail, and
+     it is not carried by colour alone, so it survives a colour blind
+     reader too.
+
+     THE SCORE AND THE TIME for the day so far, and CLEAN DAY when every
+     level of it was clean, which is the hardest thing in this game and
+     therefore the loudest thing on the card.
+
+     AND THE ADDRESS, INSIDE THE IMAGE. Many share targets take the file
+     or the text and not both, so a card that spreads and leads nowhere
+     is worse than no card. It is 40px on a 1200px card, which is larger
+     than the level numbers would have been, and it is the one thing here
+     that must survive being screenshotted out of a chat.
+
+   NO SPOILERS. Nothing on it describes the road: not a corner, not a
+   hazard, not a gate position, not a length beyond the count of levels
+   that already shows in the HUD. A friend can read it and still drive
+   the day cold, which is the property that makes it worth sending.
+
+   NOT ONE REQUEST. A canvas, some paths and some text. Nothing is
+   fetched, nothing is stored, and the whole thing is generated at share
+   time and thrown away.
+   ================================================================== */
+const CARD_INK = '#0b0503';     // the game's own void, as the boot splash writes it
+const CARD_AMBER = '#ff9424';
+const CARD_CREAM = '#ffd9a2';
+const CARD_GOLD = '#fbbf45';
+const CARD_DIM = '#7a5a3a';
+
+function cardRound(g, x, y, w2, h2, r) {
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.lineTo(x + w2 - r, y); g.quadraticCurveTo(x + w2, y, x + w2, y + r);
+  g.lineTo(x + w2, y + h2 - r); g.quadraticCurveTo(x + w2, y + h2, x + w2 - r, y + h2);
+  g.lineTo(x + r, y + h2); g.quadraticCurveTo(x, y + h2, x, y + h2 - r);
+  g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y);
+  g.closePath();
+}
+
+/* Its own text helper rather than the game's, because the game's writes
+   to the one global context and this draws to an offscreen one. */
+function cardText(g, s, x, y, size, weight, colour, align) {
+  g.font = weight + ' ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  g.textAlign = align || 'center';
+  g.textBaseline = 'middle';
+  g.fillStyle = colour;
+  g.fillText(s, x, y);
+}
+
+/* THE DAY, SUMMED. The per level records are the source: a level's best
+   is a clean run's score and its time is the time that run took, so the
+   totals are the day driven at its best rather than whatever the last
+   run happened to do. Levels never reached contribute nothing, which is
+   why an unfinished day shows a smaller number and a shorter time and
+   both are true. */
+function dayTotals() {
+  let score = 0, time = 0, done = 0, clean = 0;
+  const n = levelCount();
+  const rows = [];
+  for (let i = 1; i <= n; i++) {
+    const r = recFor(i);
+    score += r.best;
+    time += r.time;
+    if (r.done) done++;
+    if (r.clean) clean++;
+    rows.push(r.done ? (r.clean ? 2 : 1) : 0);
+  }
+  return { score: score, time: time, done: done, clean: clean, n: n, rows: rows };
+}
+
+function buildShareCard() {
+  const W = FEEL.CARD_W, H = FEEL.CARD_H, PAD = FEEL.CARD_PAD;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  if (!g) return null;
+  const daily = mode === DAILY;
+  const t = dayTotals();
+
+  /* The field. A flat ground with one soft warm lift off the bottom
+     edge, which is the game's own horizon glow and the cheapest way to
+     make a flat rectangle read as this game rather than as a slide. */
+  g.fillStyle = CARD_INK;
+  g.fillRect(0, 0, W, H);
+  const glow = g.createLinearGradient(0, H, 0, H * 0.35);
+  glow.addColorStop(0, 'rgba(255,148,36,0.20)');
+  glow.addColorStop(1, 'rgba(255,148,36,0)');
+  g.fillStyle = glow;
+  g.fillRect(0, H * 0.35, W, H * 0.65);
+  // A hairline frame, so the card has an edge against a white chat bubble.
+  g.strokeStyle = 'rgba(255,148,36,0.55)';
+  g.lineWidth = 6;
+  g.strokeRect(3, 3, W - 6, H - 6);
+
+  /* THE WORDMARK, through the same routine the title screen uses. It
+     takes a context, so the offscreen one goes straight in. */
+  if (BRAND.wordmark.path) {
+    const art = BRAND.wordmark;
+    const boxW = FEEL.CARD_WORDMARK / (art.ink.r - art.ink.l);
+    const boxH = boxW * art.h / art.w;
+    // Pushed by the artwork's own asymmetric margin, so the ink starts
+    // on the pad rather than the box doing.
+    const cx = PAD + boxW / 2 - (art.ink.l - (1 - art.ink.r)) * boxW / 2;
+    drawBrand(g, art, cx, 40 + boxH / 2, boxW);
+  } else {
+    cardText(g, 'DRIFT FEVER', PAD, 100, 76, '900', CARD_GOLD, 'left');
+  }
+
+  /* The track, top right, opposite the mark. */
+  const head = daily ? 'TRACK #' + trackNumber(todayStamp) : 'RANDOM TRACK';
+  cardText(g, head, W - PAD, 92, 54, '800', CARD_CREAM, 'right');
+  if (daily) {
+    cardText(g, t.done + ' OF ' + t.n + ' FINISHED', W - PAD, 148,
+             32, '700', CARD_DIM, 'right');
+  }
+
+  /* ----------------------------------------------------------------
+     THE SHAPE. One block per level, sized from the count so five, three
+     or eight all fill the same width. LEVEL_COUNT is read rather than
+     assumed, which is the one thing this was explicitly not allowed to
+     hardcode.
+     ---------------------------------------------------------------- */
+  const rowY = 228;
+  const bh = FEEL.CARD_BLOCK_H;
+  if (daily && t.n > 0) {
+    const gap = FEEL.CARD_BLOCK_GAP;
+    const span = W - PAD * 2;
+    const bw = (span - gap * (t.n - 1)) / t.n;
+    for (let i = 0; i < t.n; i++) {
+      const x = PAD + i * (bw + gap);
+      const kind = t.rows[i];
+      const r = Math.min(18, bw * 0.22);
+      if (kind === 2) {
+        /* CLEAN. Solid and bright, the densest thing in the row. */
+        cardRound(g, x, rowY, bw, bh, r);
+        g.fillStyle = CARD_GOLD; g.fill();
+      } else if (kind === 1) {
+        /* CONTINUED. The same block filled to a bar across its middle,
+           so it reads as half of a full one at any size. Not merely a
+           different colour: a colour blind reader gets the same answer. */
+        cardRound(g, x, rowY, bw, bh, r);
+        g.fillStyle = 'rgba(255,148,36,0.22)'; g.fill();
+        g.strokeStyle = CARD_AMBER; g.lineWidth = 5; g.stroke();
+        g.save();
+        cardRound(g, x, rowY, bw, bh, r); g.clip();
+        g.fillStyle = CARD_AMBER;
+        g.fillRect(x, rowY + bh * 0.56, bw, bh * 0.44);
+        g.restore();
+      } else {
+        /* NEVER GOT THERE. An outline and nothing in it. */
+        cardRound(g, x, rowY, bw, bh, r);
+        g.fillStyle = 'rgba(255,255,255,0.04)'; g.fill();
+        g.strokeStyle = CARD_DIM; g.lineWidth = 4; g.stroke();
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------------
+     THE FIGURES, ON AN EXPLICIT BAND RATHER THAN STACKED OFFSETS.
+
+     The first version laid every row out as "the last row plus a gap"
+     and three things collided at once: a six digit score ran into the
+     time, the CLEAN DAY badge sat on top of both, and the POINTS label
+     landed on the same line as the address. Card space is fixed and
+     small, so the bands are written down and each one is a fit rather
+     than a hope.
+     ---------------------------------------------------------------- */
+  /* THE BANDS, WRITTEN DOWN. Every one of these was arrived at by
+     drawing the card and looking at it, and the numbers are here rather
+     than as offsets so the next person can see the whole budget at once:
+
+       40 .. 210   the wordmark, whose box is 170 tall at an ink width
+                   of 300, and whose SECOND LINE is the thing that ran
+                   into the blocks when the ink was 360
+      228 .. 320   the shape row
+      336 .. 408   the figures
+      410 .. 438   their labels
+      460 .. 544   the clean badge, when there is one
+      572 .. 612   the address */
+  const FIG_Y = 372, LABEL_Y = 424, BADGE_Y = 460, BADGE_H = 84, URL_Y = 592;
+
+  /* Shrinks until it fits, because a score is anything from two digits
+     to seven and a card that overflows on a good day is a card that
+     fails exactly when it is worth sending. */
+  function fitText(str, x, y, want, weight, colour, align, room) {
+    let size = want;
+    for (let k = 0; k < 40; k++) {
+      g.font = weight + ' ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      if (g.measureText(str).width <= room || size <= 12) break;
+      size -= 2;
+    }
+    cardText(g, str, x, y, size, weight, colour, align);
+    return size;
+  }
+
+  const score = daily ? t.score : banked;
+  const allClean = daily && t.done === t.n && t.clean === t.n && t.n > 0;
+
+  // LEFT: the score. A third of the width, which holds seven digits.
+  fitText(String(score), PAD, FIG_Y, 72, '900', CARD_CREAM, 'left', 330);
+  cardText(g, 'POINTS', PAD, LABEL_Y, 28, '700', CARD_DIM, 'left');
+
+  // CENTRE: the time, and only when there is one.
+  if (daily && t.time > 0) {
+    fitText(timeLabel(t.time), W / 2, FIG_Y, 72, '900', CARD_CREAM, 'center', 300);
+    cardText(g, t.done === t.n ? 'FULL DAY' : 'SO FAR', W / 2, LABEL_Y, 28,
+             '700', CARD_DIM, 'center');
+  }
+
+  /* A RANDOM TRACK HAS NO SHAPE AND NO DAY, so the shape row and the two
+     day figures are all absent and the card came out as a wordmark, a
+     score and a lot of nothing. It gets the two figures the plain text
+     share has always carried instead: how far, and how many gates. They
+     are not spoilers, because a random road is different every run and
+     nobody else can drive it. */
+  if (!daily) {
+    fitText(runDistance + 'm', W / 2, FIG_Y, 72, '900', CARD_CREAM, 'center', 300);
+    cardText(g, 'DISTANCE', W / 2, LABEL_Y, 28, '700', CARD_DIM, 'center');
+    fitText(String(gatesPassed), W - PAD, FIG_Y, 72, '900', CARD_CREAM, 'right', 300);
+    cardText(g, gatesPassed === 1 ? 'GATE' : 'GATES', W - PAD, LABEL_Y, 28,
+             '700', CARD_DIM, 'right');
+  }
+
+  /* RIGHT: how much of the day was clean, and it is only a figure when
+     the badge below is not going to say it louder. */
+  if (daily && !allClean) {
+    fitText(t.clean + ' CLEAN', W - PAD, FIG_Y, 72, '900', CARD_AMBER, 'right', 330);
+    cardText(g, 'OF ' + t.n, W - PAD, LABEL_Y, 28, '700', CARD_DIM, 'right');
+  }
+
+  /* CLEAN IS THE LOUDEST THING ON THE CARD, because it is the hardest
+     thing in the game and because it is the claim worth making to
+     somebody else. It gets a whole band to itself and a filled pill, so
+     it is the one element that still reads when the card is a thumbnail
+     in a chat list. Only when EVERY level of the day was clean. */
+  if (allClean) {
+    const label = 'CLEAN DAY';
+    const size = 68;
+    g.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    const tw = g.measureText(label).width;
+    const bw2 = tw + 72, bh2 = BADGE_H;
+    cardRound(g, W / 2 - bw2 / 2, BADGE_Y, bw2, bh2, 24);
+    g.fillStyle = CARD_GOLD; g.fill();
+    cardText(g, label, W / 2, BADGE_Y + bh2 / 2, size, '900', CARD_INK, 'center');
+  }
+
+  /* AND THE ADDRESS. See the note at the top: this is the half of the
+     card that has to work when the text does not travel with it. */
+  /* 46px, not 40. Measured by rendering the card at the sizes it is
+     actually seen at: at 380px, which is a phone chat bubble, 40 was
+     legible and 46 is unmissable, and this is the one element on the
+     card that has to survive being screenshotted out of a thread. */
+  cardText(g, 'driftfever.com', W / 2, URL_Y, 46, '800', CARD_AMBER, 'center');
+  return c;
+}
+
+/* ------------------------------------------------------------------
+   THE BLOB, BUILT BEFORE IT IS ASKED FOR.
+
+   navigator.share MUST BE CALLED INSIDE THE USER GESTURE. toBlob is
+   asynchronous, so generating the card when the button is tapped and
+   sharing in the callback loses the activation and iOS refuses it. That
+   is the whole reason this is built ahead: the card is made when the end
+   of run screen arrives, and by the time anybody has read the score and
+   reached for the button the File already exists and share is called
+   straight out of the tap.
+
+   IT IS ALSO WHY NOTHING BLOCKS. The completion screen never waits for
+   this, because it is not on the path to anything: the screen draws, the
+   restart input is live, and the card turns up whenever it turns up. If
+   it has not by the time the button is pressed, the button shares the
+   text and says nothing about it.
+
+   KEYED ON THE RUN, so it is built once per result rather than once per
+   frame, and rebuilt when the result changes. */
+const shareCard = { blob: null, key: '', want: '', building: false };
+
+function shareCardKey() {
+  const t = dayTotals();
+  return (mode === DAILY ? 'd' : 'e') + ':' + level + ':' + banked + ':'
+       + t.score + ':' + t.rows.join('') + ':' + Math.round(finishTime * 10);
+}
+
+/* A BUILD IN FLIGHT MUST NOT SWALLOW A NEWER RESULT, and the first
+   version of this did exactly that.
+
+   Measured: driving a whole day, onRunEnded fires once a level, the
+   first call set building and every call after it returned early, so the
+   card in flight was LEVEL ONE'S while the player was looking at the
+   completed day. It self corrected a frame after the stale build landed,
+   but for the second and a half in between the cached blob was a picture
+   of a different run, and a tap in that window would have shared it.
+   Sharing somebody else's result under your own name is the worst thing
+   this feature could do.
+
+   So the WANTED key and the BUILT key are separate. Asking for a new one
+   clears the blob at once, because whatever is cached is now known to be
+   the wrong run, and a build that finishes against a key nobody wants
+   any more publishes nothing and starts again. */
+function buildShareCardSoon() {
+  const key = shareCardKey();
+  if (key === shareCard.want) return;
+  shareCard.want = key;
+  shareCard.blob = null;
+  shareCard.key = '';
+  // The one in flight will notice on the way out and restart itself.
+  if (shareCard.building) return;
+  startShareCardBuild();
+}
+
+function startShareCardBuild() {
+  const key = shareCard.want;
+  shareCard.building = true;
+  let done = false;
+  const settle = function (b) {
+    if (done) return;
+    done = true;
+    shareCard.building = false;
+    if (key !== shareCard.want) { startShareCardBuild(); return; }
+    shareCard.key = key;
+    shareCard.blob = b || null;
+  };
+  /* OFF THE RENDER PATH ENTIRELY. This is asked for by the frame that
+     ends a run, and doing the work there would put the whole card on the
+     one frame a crash or a finale lands. A zero timeout is enough: it
+     runs after the frame has been presented. */
+  setTimeout(function () {
+    try {
+      const c = buildShareCard();
+      if (!c || !c.toBlob) { settle(null); return; }
+      /* A CALLBACK THAT NEVER FIRES IS EXACTLY HOW A SHARE HANGS, so it
+         is given a deadline and the text share takes over if it is
+         missed. Measured, toBlob delivers in about 75ms on an idle main
+         thread and up to 1.5 seconds on a busy one, so the deadline is
+         generous on purpose: it is a backstop, not a budget. */
+      setTimeout(function () { settle(null); }, FEEL.CARD_BLOB_TIMEOUT);
+      c.toBlob(function (b) { settle(b); }, 'image/png');
+    } catch (e) { settle(null); }
+  }, 0);
+}
+
 function shareRun() {
   const daily = mode === DAILY;
   /* THE LEVEL IS PART OF WHICH TRACK IT WAS. A score off track 47 is a
@@ -13266,9 +13680,37 @@ function shareRun() {
   }
   const text = head + '\n' + body + (url ? '\n' + url : '');
 
-  /* Every one of these can throw or be absent, and a share button that
-     breaks the death screen would be far worse than one that quietly
-     shows the text instead. */
+  /* THREE ROUTES, EACH A FALLBACK FOR THE ONE ABOVE IT, and every one of
+     them can throw or be absent. A share button that breaks the end of
+     run screen would be far worse than one that quietly shows the text.
+
+     1. THE CARD PLUS THE TEXT, where the browser will take a file. This
+        is every current phone, which is where sharing actually happens,
+        and ChromeOS, which is section 6's machine.
+     2. THE TEXT, where share exists but files are refused.
+     3. THE CLIPBOARD, which is most desktop browsers.
+
+     The card is only used if it is ALREADY BUILT. Nothing waits for it:
+     an unfinished card silently becomes route two, which is exactly what
+     the game did before this existed. */
+  try {
+    /* THE KEY IS CHECKED AT THE TAP as well as at the build. settle
+       already refuses to publish a stale card, so this can only ever
+       agree with it; it is here because sharing the wrong run is the one
+       failure worth two guards. */
+    if (navigator.share && navigator.canShare && window.File
+        && shareCard.blob && shareCard.key === shareCardKey()) {
+      const file = new File([shareCard.blob], 'drift-fever.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        /* SYNCHRONOUS, inside the tap. See the note on shareCard: the
+           File exists already precisely so this line is reached without
+           an await in front of it. */
+        const p1 = navigator.share({ files: [file], text: text });
+        if (p1 && p1.then) p1.then(function () {}, function () {});
+        return;
+      }
+    }
+  } catch (e) {}
   try {
     if (navigator.share) {
       const p2 = navigator.share({ text: text });
@@ -13276,6 +13718,41 @@ function shareRun() {
       return;
     }
   } catch (e) {}
+  /* THE DESKTOP ROUTE IS THE CLIPBOARD, NOT A DOWNLOAD, and that is a
+     decision rather than the easy option.
+
+     A programmatic download raises a download bar or a shelf, and BRIEF
+     section 6 lists popups, interstitials and prompts as the behaviour
+     that gets a domain looked at and categorised by the filters this
+     audience sits behind. It is also the least useful outcome on a
+     managed Chromebook, where the file lands somewhere the player may
+     not be able to attach it from. The clipboard is instant, silent,
+     works in every desktop browser and cannot trip a filter.
+
+     THE IMAGE GOES ON THE CLIPBOARD TOO where the browser supports it,
+     which is Chrome and Edge, so a desktop player can paste the card
+     straight into a chat rather than losing it. Both types go in ONE
+     ClipboardItem so the receiving app picks whichever it wants, and if
+     the image half is refused the text half still goes. And if the card
+     is all that arrives, the address is drawn on it, which is the whole
+     reason that line is there. */
+  try {
+    if (navigator.clipboard && window.ClipboardItem
+        && shareCard.blob && shareCard.key === shareCardKey()) {
+      const item = new ClipboardItem({
+        'image/png': shareCard.blob,
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      });
+      navigator.clipboard.write([item]).then(
+        function () { showNote('Card copied. Paste it anywhere.', 3); },
+        function () { copyTextOnly(text); });
+      return;
+    }
+  } catch (e) {}
+  copyTextOnly(text);
+}
+
+function copyTextOnly(text) {
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(
@@ -13302,7 +13779,13 @@ function hitShare(e) {
    in to clear the corner pads. It sits in the same place whether restart
    is drawn or not, so it never migrates under a thumb heading for the
    centre. */
-function drawShareButton(w, h, s, btnY, size) {
+function drawShareButton(w, h, s, btnY, size, hero) {
+  /* THE CARD IS ASKED FOR HERE, which is the first frame the button is
+     on screen and therefore the earliest moment it could possibly be
+     wanted. It is keyed on the result, so this is one build per run and
+     not one per frame, and it does its work on a timeout so this frame
+     pays nothing for it. */
+  buildShareCardSoon();
   const dx = Math.min(w * 0.30, s * 0.28);
   /* AND IT IS THE ONE THING IN THIS ROW THAT SITS OVER THE PADS, so it
      is the one thing that has to clear them. btnY is a fixed pixel drop
@@ -13312,7 +13795,34 @@ function drawShareButton(w, h, s, btnY, size) {
      and the share would appear to be broken. Lifted just far enough,
      which on every phone is not at all. */
   const y = Math.min(btnY, padsTop - size * 1.1 - 6);
-  canvasButton(shareRect, 'SHARE', w / 2 + dx, y, size, COLOUR.GATE, w);
+  /* LOUDER ON A CLEAN DAY AND NOWHERE ELSE. Finishing every level of a
+     day without a continue is the best moment this game has and it is
+     the one worth sending to somebody, so the button grows and takes the
+     record gold there. Making it prominent everywhere would make it
+     prominent nowhere, and it would be competing with the reflex tap on
+     every death screen in between.
+
+     THE SIZE IS THE ONLY THING THAT MOVES. It stays on the same row, at
+     the same offset, so the landscape pairing with RANDOM TRACK that was
+     measured last session still holds. */
+  const big = hero ? Math.round(size * 1.22) : size;
+  const yy = Math.min(y, padsTop - big * 1.1 - 6);
+  /* AND IT SAYS SO WHILE THE CARD IS STILL COMING.
+
+     On the completion screen this is never seen: the finale, the result
+     roll and the input lock together are several seconds and the card is
+     started the moment the run ends. On a DEATH screen the button is
+     live after about 0.85 seconds, and the card was measured taking
+     between 0.5 and 1.5 under a busy main thread, so there the two can
+     genuinely race.
+
+     Tapping it in that state is not an error and does not wait: it
+     shares the text, which is what the game did before this session
+     existed. The three dots are there so the player knows a better
+     version is a moment away, not so they are made to wait for it. */
+  canvasButton(shareRect, shareCard.building ? 'SHARE ...' : 'SHARE',
+               w / 2 + dx, yy, big,
+               hero ? COLOUR.SCORE_BEST : COLOUR.GATE, w);
 }
 
 /* THE TWO LINES OF FACT UNDER THE PROMPT, and there are two rather than
