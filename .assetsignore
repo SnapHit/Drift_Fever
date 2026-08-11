@@ -1,0 +1,12 @@
+.git/**
+.wrangler/**
+_content/**
+_reference/**
+brand/**
+*.md
+!index.html
+_config.yml
+wrangler.jsonc
+build-pages.js
+publish-check.sh
+.gitignore
