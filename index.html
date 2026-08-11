@@ -1885,7 +1885,19 @@ const FEEL = {
      28 hazards passed cleanly, it calls 39% of them close, at a median
      gap of 215. */
   HAZARD_CLOSE_MARGIN:      400,     // LIVE, world units of clear air that counts as close
-  HAZARD_CLOSE_BONUS:       260,     // LIVE, points
+  /* RAISED FROM 260, WHICH WAS BELOW THE NOISE FLOOR OF SIMPLY DRIVING.
+
+     The mechanism was built and it works: driven, it fires on the
+     hazards it should and stays silent on the ones it should not. What
+     it did not do was register, and the arithmetic says why. A second of
+     driving at a good multiplier measures 800 to 1200 points, so 260 was
+     a quarter of a second. The callout said a thing had happened and the
+     score disagreed with it.
+
+     1200 is about a second of driving: enough to see on the counter,
+     and still under a minimum jump landing, which is the harder thing to
+     do and should stay the bigger prize. */
+  HAZARD_CLOSE_BONUS:      1200,     // LIVE, points
 
   /* The checkpoint, which is the structural beat of the run. Light runs
      down the posts as the car closes on it, which is earned because the
@@ -2013,7 +2025,15 @@ const FEEL = {
      TOTAL IS THE SUM OF ALL THREE, and it is derived rather than written
      down a fourth time. bootTotal() is the one place it exists. */
   BOOT_FADE_IN:            0.18,     // LIVE, seconds, arriving
-  BOOT_HOLD:               1.50,     // LIVE, seconds at full opacity
+  /* CUT FROM 1.50 ON A COLD PLAY. A publisher lockup is worth a beat and
+     it is not worth a second and a half: at 1.50 the whole splash ran
+     1.96 seconds, which is long enough to be waited through rather than
+     seen. At 1.00 it is 1.46, a third off, and the two fades are
+     untouched because the arrival and the departure were never the part
+     that dragged. Everything else about it stands: skippable from the
+     first frame, cold load only, never between runs, nothing waits on
+     it. */
+  BOOT_HOLD:               1.00,     // LIVE, seconds at full opacity
   BOOT_FADE_OUT:           0.28,     // LIVE, seconds, leaving
   /* Small and quiet on the death screen, under the score. It must not
      crowd the score, the records, the continue button or the share
@@ -2102,6 +2122,23 @@ const FEEL = {
   TITLE_BLINK_ON:          0.62,     // LIVE, share of the period lit
   TITLE_FACT_ALPHA:        0.80,
   TITLE_SUB_ALPHA:         0.55,
+  /* THE RESET LINE, and it is its own row because it was a footnote.
+
+     The road genuinely regenerates every local midnight and two devices
+     on the same date get the same five roads. That is the single best
+     reason to come back and it was the last of five things joined by
+     middots on the dimmest line on the screen, at 0.029 of the smaller
+     dimension and 0.80 alpha, where it read as a timestamp.
+
+     ONE LINE, NOT A BLOCK. It is half again the size of the facts line
+     and at full alpha, which is enough to be read rather than skimmed,
+     and it is still a third of the prompt and a fifth of the wordmark,
+     so nothing on this screen has moved in the order it is read. The
+     facts line loses the countdown in the same change, so the screen
+     carries the same amount of text and simply weights it correctly. */
+  TITLE_GAP_RESET:        0.042,     // LIVE, of s, facts line down to it
+  TITLE_RESET_SIZE:       0.042,     // LIVE, of s
+  TITLE_RESET_ALPHA:       1.00,     // LIVE
   /* The music warning. Its own three numbers rather than the facts
      line's, because it is the one line on that screen a player might
      need to act on and it is allowed to be a little louder than the
@@ -2984,6 +3021,31 @@ const FEEL = {
      should pay, but slip is worth more because slip is the game. */
   JUMP_BOOST_SECONDS:      0.90,     // LIVE, seconds every landing pays
   JUMP_BOOST_BEST:         1.80,     // LIVE, seconds more at quality one
+  /* AND POINTS, WHICH IS THE HALF THAT WAS MISSING. A bit of clock is
+     insurance, not a reward: it pays out later, invisibly, as a run that
+     happened to last longer, and nothing about it says a thing was
+     landed.
+
+     SIZED AGAINST WHAT A SECOND OF DRIVING IS WORTH, measured rather
+     than picked. At these rates a second at a good multiplier is 800 to
+     1200 points, so a minimum landing pays about a second and a full one
+     about four. That is a number big enough to see arrive on a counter
+     that is already climbing, and small enough that a day of jumps moves
+     a total by single figure percentages.
+
+     ON THE SAME QUALITY AS THE CLOCK, so slip and air decide both and
+     there is one rule to learn. Slip is 0.68 of it and air 0.32: a
+     sideways landing pays about four times a straight one, which is the
+     skill expression and the reason to aim at a ramp rather than take
+     it.
+
+     FLAT, NOT MULTIPLIED BY THE MULTIPLIER, and that is deliberate. Every
+     other point in this game arrives through the multiplier, so a jump
+     award that also scaled would be the only thing paying it twice, and
+     it would be worth four hundred seconds of driving at a multiplier of
+     one and four at twelve. A landing is worth what a landing is worth. */
+  JUMP_POINTS:              900,     // LIVE, points every landing pays
+  JUMP_POINTS_BEST:        3600,     // LIVE, points more at quality one
   JUMP_LAND_SLIP_REF:      0.62,     // slipNorm that counts as fully sideways
   JUMP_LAND_SLIP_WEIGHT:   0.68,     // LIVE, slip's share of the quality
   JUMP_LIP_LOSS:           0.34,     // LIVE, share of the launch lost at the ramp's edge
@@ -3086,7 +3148,7 @@ const FEEL = {
      THE LAST GATE IS THE FINISH. There is no extra structure after a
      count of checkpoints: gate N ends the run, which is why the pips and
      the countdown and the line are all the same number. */
-  LEVEL_COUNT:                3,     // LIVE, and read by everything
+  LEVEL_COUNT:                5,     // LIVE, and read by everything
   LEVEL_GATES_FIRST:          2,     // LIVE, gates on level one
   LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
   /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
@@ -3095,6 +3157,28 @@ const FEEL = {
      being a wall without level one gaining anything or level three
      losing anything. One is the old straight line. */
   LEVEL_RAMP_POWER:         1.6,     // LIVE
+  /* WHERE THE DIFFICULTY STOPS CLIMBING, and it is the whole of how five
+     levels extend the ceiling without raising the floor.
+
+     THE PROBLEM IT SOLVES. Difficulty used to be a pure function of how
+     far along the levels a level sat, so going from three to five
+     stretched the curve: measured, level three fell from the full
+     difficulty band to 0.33, which is what level TWO used to be. A
+     player who gets stuck at level three today would have cleared three
+     and four and stopped at five, and the day would have got longer for
+     exactly the people it must not get longer for.
+
+     So difficulty reaches its ceiling at THIS level and holds. At three,
+     levels one two and three have the bands they have always had, to the
+     bit, and four and five are the same road at the same settings, only
+     longer. The early curve is not touched and the newcomer's wall does
+     not move.
+
+     LENGTH IS A SEPARATE RAMP, and a straight one. See levelGatesFor.
+     Difficulty is bent because level two was a wall; length is not,
+     because an even step is the thing that was asked for and 2 3 4 5 6
+     gates is 33.3 seconds a level, every level. */
+  LEVEL_HARD_AT:              3,     // LIVE, the level that reaches full difficulty
   /* The run out past the finish, laid in fixed size pieces so the
      slicing is a pure function of the segment index rather than of how
      far the camera had got. See topUpRoad. NOT live: changing it changes
@@ -4566,6 +4650,9 @@ const TUNABLES = [
   { key: 'TITLE_BLINK_ON',     label: 'blinkOn', step: 0.02, min: 0.05, max: 1.0,   dp: 2, group: 20 },
   { key: 'TITLE_FACT_ALPHA',   label: 'ttlFctA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
   { key: 'TITLE_SUB_ALPHA',    label: 'ttlSubA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
+  { key: 'TITLE_GAP_RESET',    label: 'ttlRstG', step: 0.004,min: 0,    max: 0.30,  dp: 3, group: 20 },
+  { key: 'TITLE_RESET_SIZE',   label: 'ttlRstS', step: 0.002,min: 0.01, max: 0.12,  dp: 3, group: 20 },
+  { key: 'TITLE_RESET_ALPHA',  label: 'ttlRstA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
   { key: 'DEATH_BOTTOM',       label: 'deadBtm', step: 4,    min: 20,   max: 300,   dp: 0, group: 20 },
   { key: 'DEATH_PROMPT_GAP',   label: 'deadGap', step: 0.005,min: 0.02, max: 0.30,  dp: 3, group: 20 },
   /* The jumps. Two groups, because the air and the placement are tuned on
@@ -4624,6 +4711,7 @@ const TUNABLES = [
   { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
+  { key: 'LEVEL_HARD_AT',      label: 'hardAt',  step: 1,    min: 2,    max: 8,     dp: 0, group: 27 },
   { key: 'FINISH_HEIGHT',      label: 'finTall', step: 100,  min: 400,  max: 8000,  dp: 0, group: 27 },
   { key: 'PIP_SIZE',           label: 'pip',     step: 0.001,min: 0.005,max: 0.06,  dp: 3, group: 27 },
   { key: 'PIP_GAP',            label: 'pipGap',  step: 0.001,min: 0,    max: 0.04,  dp: 3, group: 27 },
@@ -4921,8 +5009,20 @@ window.addEventListener('keydown', function (e) {
      death screen is RESTART and those two states are disjoint. E still
      works, silently, so anyone who learned it when the mode was called
      endless is not stranded by the rename. */
+  /* AND ON THE COMPLETION SCREEN ONCE THE DAY IS DONE, which is the
+     keyboard's half of the RANDOM TRACK button that screen now carries.
+     Section 6 says many sessions are keyboard only and a canvas button
+     is a target a keyboard cannot reach at all, so a route that exists
+     only as a rectangle does not exist for that half of the audience.
+
+     Behind the same input lock as the button, so the key cannot be part
+     of a reflex either, and only when the day is done, which is the only
+     state the button is drawn in. */
   else if ((k === 'r' || k === 'R' || k === 'e' || k === 'E')
-           && state === TITLE && bootFlash <= 0) {
+           && bootFlash <= 0
+           && (state === TITLE
+               || (state === FINISHED && mode === DAILY && dayDone()
+                   && deadFor >= FEEL.DEATH_INPUT_LOCK))) {
     firstGesture(); startEndless(); return;
   }
   /* S SHARES, because section 6 says many sessions are keyboard only and
@@ -6819,19 +6919,38 @@ function clampLevel(n) { return clamp(Math.round(n), 1, levelCount()); }
    band(first) is still 0 to the bit, so level one keeps its no clock and
    no hazards guards, and band(last) is still 1, so the last level keeps
    the full difficulty. Only the middle moves. */
+/* AND IT SATURATES AT LEVEL_HARD_AT RATHER THAN AT THE LAST LEVEL, which
+   is what lets the count grow without the curve stretching under it. The
+   denominator is the hard level, not the count, so levels past it all
+   come out at exactly 1 and are the same road at the same settings. */
 function levelBand(lvl) {
   const n = levelCount();
   if (n <= 1) return 1;
-  const t = (clampLevel(lvl) - 1) / (n - 1);
+  const hard = clamp(Math.round(FEEL.LEVEL_HARD_AT), 2, n);
+  const t = clamp((clampLevel(lvl) - 1) / (hard - 1), 0, 1);
   return Math.pow(t, Math.max(0.1, FEEL.LEVEL_RAMP_POWER));
 }
 
-/* GATES PER LEVEL, interpolated across the band, so the lengths ramp
-   whatever the count is. Rounded, and never fewer than one. */
+/* GATES PER LEVEL, AND THIS RAMP IS STRAIGHT.
+
+   It used to interpolate across levelBand, which tied length to
+   difficulty. That was invisible at three levels and wrong at five: the
+   bent band put levels one and two at the same two gates, then stepped
+   3, 5, 6, so two levels were the same length and the step into level
+   four was twice the step either side of it.
+
+   Straight across the whole count instead, so the gates come out 2 3 4 5
+   6 and every level is one gate and 33.3 seconds longer than the one
+   before it. The even step was the thing asked for and this is the only
+   integer ramp from two to six over five levels that gives it.
+
+   Rounded, and never fewer than one. */
 function levelGatesFor(lvl) {
   const a = Math.max(1, Math.round(FEEL.LEVEL_GATES_FIRST));
   const b = Math.max(1, Math.round(FEEL.LEVEL_GATES_LAST));
-  return Math.max(1, Math.round(a + (b - a) * levelBand(lvl)));
+  const n = levelCount();
+  const t = n <= 1 ? 1 : (clampLevel(lvl) - 1) / (n - 1);
+  return Math.max(1, Math.round(a + (b - a) * t));
 }
 
 /* A LEVEL'S OWN SEED. The day's seed hashed with the level, so the three
@@ -8506,13 +8625,21 @@ function land(localHalf) {
   /* EVERY JUMP PAYS. One rule, learnable in one jump, which is the whole
      reason the old coin flip had to go: a reward that turns up less than
      half the time teaches nothing except that the ramp is unreliable. */
-  const pay = (FEEL.JUMP_BOOST_SECONDS + FEEL.JUMP_BOOST_BEST * q)
-            * (bad ? FEEL.JUMP_LAND_BAD_KEEP : 1);
+  const keep = bad ? FEEL.JUMP_LAND_BAD_KEEP : 1;
+  const pay = (FEEL.JUMP_BOOST_SECONDS + FEEL.JUMP_BOOST_BEST * q) * keep;
   clock = Math.min(FEEL.CLOCK_MAX, clock + pay);
   clockPop = FEEL.CLOCK_POP_TIME;
 
+  /* AND THE POINTS, on the same quality and the same bad landing rule as
+     the clock, so there is one thing to learn about a landing rather
+     than two. Straight into score, which is what the next gate banks, so
+     a jump taken on the last stretch still counts: finishRun banks the
+     remainder at the line. */
+  const points = Math.round((FEEL.JUMP_POINTS + FEEL.JUMP_POINTS_BEST * q) * keep);
+  score += points;
+
   landImpact(q, tier, bad, localHalf);
-  sayLanding(tier, pay);
+  sayLanding(tier, pay, points);
   audioLanding(tier, q, bad);
 }
 
@@ -8595,12 +8722,20 @@ function landImpact(q, tier, bad, localHalf) {
    The routine rung is deliberately just the number. Something happened,
    it paid, and the screen does not make a fuss about it, which is what
    leaves room for the one that does. */
-function sayLanding(tier, pay) {
-  const secs = '+' + pay.toFixed(1) + 's';
-  if (tier < 0) { sayDrift('ROUGH LANDING  ' + secs, COLOUR.HAZARD_WARN, 1); return; }
-  if (tier === 0) { sayDrift(secs, COLOUR.GATE, 1); return; }
-  if (tier === 1) { sayDrift('CLEAN LANDING  ' + secs, COLOUR.SCORE, 1.15, true); return; }
-  sayDrift('SIDEWAYS LANDING  ' + secs, COLOUR.SCORE_BEST, 1.4, true);
+/* THE POINTS COME FIRST AND THE SECONDS FOLLOW, because the points are
+   the reward and the seconds are the insurance. The line used to read
+   "+1.5s" and a player had to infer that anything had been earned at all
+   from a counter that is climbing anyway.
+
+   ONE LINE, NOT TWO, and the same four rungs the landing already had. A
+   second callout per landing would double the busiest thing on the
+   screen, and jumps are frequent. */
+function sayLanding(tier, pay, points) {
+  const both = '+' + points + '  +' + pay.toFixed(1) + 's';
+  if (tier < 0) { sayDrift('ROUGH LANDING  ' + both, COLOUR.HAZARD_WARN, 1); return; }
+  if (tier === 0) { sayDrift(both, COLOUR.GATE, 1); return; }
+  if (tier === 1) { sayDrift('CLEAN LANDING  ' + both, COLOUR.SCORE, 1.15, true); return; }
+  sayDrift('SIDEWAYS LANDING  ' + both, COLOUR.SCORE_BEST, 1.4, true);
 }
 
 /* The curvature the camera leans on. An average of the road ahead of the
@@ -10189,7 +10324,15 @@ function ghostPass() {
   if (ghost.said > 0) return;
   ghost.said = FEEL.GHOST_PASS_COOLDOWN;
   if (ahead) sayDrift('GHOST AHEAD', COLOUR.GHOST_EDGE, 1, true);
-  else sayDrift('PASSED THE GHOST', COLOUR.GATE, 1.1, true);
+  else {
+    sayDrift('PASSED THE GHOST', COLOUR.GATE, 1.1, true);
+    /* A SOUND, WHICH IT NEVER HAD. Going past the only rival in the game
+       was a line of text and nothing else, which is the definition of a
+       silent event. No flash: the screen wash belongs to the record
+       break and stacking two of them is exactly what the juice audit is
+       for. The cooldown above already stops a dead heat repeating it. */
+    audioSting(STING_GHOST);
+  }
 }
 
 /* Drawn from the SAME boundary tables the road is, so it sits in the
@@ -12156,7 +12299,7 @@ function drawScore(w, h) {
      in this game uses, and it is the one piece of this session that is
      allowed to persist, because the whole point of it is that the player
      is in new territory until the run ends. */
-  if (beatBest) {
+  if (scoreBeaten()) {
     ctx.font = '900 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -12226,7 +12369,7 @@ function drawHudBar(w, h) {
   ctx.font = '900 ' + ssize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   const sw = ctx.measureText(label).width;
   const scx = x0 + sw / 2;
-  if (beatBest) {
+  if (scoreBeaten()) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineJoin = 'round';
@@ -12297,7 +12440,7 @@ function drawPipStrip(x0, x1, y) {
    built up with the rest of the ramps, beside the palette they come out
    of. */
 function scoreHeatColour(t) {
-  return rampAt(beatBest ? SCORE_RECORD_RAMP : SCORE_RAMP, t);
+  return rampAt(scoreBeaten() ? SCORE_RECORD_RAMP : SCORE_RAMP, t);
 }
 
 /* The pit timer. A plate, tabular digits, and the distance to the next
@@ -12873,6 +13016,33 @@ function drawFinish(w, h) {
        fittedSize(rec, '700', Math.round(s * 0.028), w * 0.9), '700');
   ctx.globalAlpha = rev;
 
+  /* THE REASON TO COME BACK, AND THE ONLY SCREEN THAT EARNS IT.
+
+     Finishing the day is the best moment in this game and it said
+     nothing at all about there being more. It says it here, once, on the
+     one completion in five that ends a day, and never on the other four:
+     a player rolling from level two into level three is not deciding
+     whether to return tomorrow, they are deciding whether to tap now,
+     and telling them about tomorrow at that moment argues against the
+     thing they are already doing.
+
+     IT CANNOT DELAY ANYTHING. It is inside the reveal like every other
+     line on this screen, so it arrives with the result rather than
+     holding it up, and the restart input is live throughout regardless
+     of what this is doing. The celebration is two beats above it and has
+     already happened.
+
+     THE SAME SENTENCE THE TITLE SCREEN CARRIES, off the same countdown,
+     so the promise made here is the promise kept there. */
+  if (mode === DAILY && dayDone()) {
+    const more = newTracksLine(true);
+    ctx.globalAlpha = 0.95 * rev;
+    text(more, w / 2, y0 + s * 0.452,
+         fittedSize(more, '800', Math.round(s * 0.034), w * 0.9), '800',
+         'center', COLOUR.SCORE_BEST);
+    ctx.globalAlpha = rev;
+  }
+
   /* One action, and there is nothing to continue from: the track is
      over. No restart button either, because with no continue on offer
      the reflex tap already restarts and a second way to do the same
@@ -12911,6 +13081,49 @@ function drawFinish(w, h) {
   text(prompt, w / 2, btnY - s * FEEL.DEATH_PROMPT_GAP,
        fittedSize(prompt, '600', Math.round(s * 0.040), w * 0.88), '600');
   ctx.globalAlpha = 1;
+
+  /* SOMEWHERE TO GO WHEN THE DAY IS BEHIND YOU.
+
+     THE REFLEX TAP IS NOT THE ANSWER AND THAT IS THE DECISION. It still
+     runs the last level again, and it should, for three reasons. The
+     tap means the same thing on every screen in this game, and the one
+     moment most likely to be tapped fast is the frame after a finale, so
+     the moment it means something new is the moment it is wrong. The
+     last level is SCORED: it has today's record, today's ghost and a
+     time worth beating, and a random track has none of the three and
+     says so on the title screen. And demoting somebody into an unscored
+     sandbox at the exact moment they finished the hardest thing in the
+     game is the wrong direction to send them.
+
+     SO THE RANDOM TRACK IS ONE DELIBERATE PRESS, which is what was
+     asked for: this button, or R on a keyboard, and neither can be hit
+     by a reflex. It only exists once the day is done, because before
+     then this screen's whole job is to roll the player into the next
+     level and a second target would compete with it.
+
+     OPPOSITE THE SHARE BUTTON ON THE SAME ROW, which is the arrangement
+     the death screen already uses for RESTART and SHARE and for exactly
+     this reason: the row is targets, the line above it is words, and a
+     button off to the side is a button the reflex tap cannot land on.
+
+     IT WAS ABOVE THE PROMPT FIRST AND THAT WAS WRONG. In landscape the
+     result stack is measured in s from the top and the bottom group is
+     measured in pixels from the bottom, and when h and s are the same
+     number, which is exactly what a phone held sideways is, the two
+     meet: the button was drawn straight through "5 NEW TRACKS TOMORROW".
+     The same trap the comment at the top of this function records about
+     the car. On this row it cannot happen, because the share button has
+     been living here without colliding with anything for sessions. */
+  if (mode === DAILY && dayDone()) {
+    const size = Math.round(s * 0.034);
+    const dx = Math.min(w * 0.30, s * 0.28);
+    // Lifted clear of the pads on the same terms as the share button.
+    const y = Math.min(btnY, padsTop - size * 1.1 - 6);
+    altRect.to = ENDLESS;
+    canvasButton(altRect, 'RANDOM TRACK', w / 2 - dx, y, size, COLOUR.TEXT, w);
+  } else {
+    altRect.live = false;
+  }
 }
 
 /* Did that tap land on the restart button? Canvas rather than a DOM
@@ -13133,9 +13346,41 @@ function titleFactLine() {
   if (bestScore > 0) bits.push('BEST ' + bestScore);
   const r = recFor(nextLevel());
   if (r.best > 0) bits.push('TODAY ' + r.best);
-  bits.push('NEW IN ' + countdownLabel());
+  /* THE COUNTDOWN HAS ITS OWN ROW NOW. See titleResetLine. It was the
+     fifth item on this line and it is the reason to come back. */
   return bits.join('  \u00b7  ');
 }
+
+/* THE ONE LINE THAT SAYS WHY TO COME BACK.
+
+   The whole set regenerates at the local midnight, every level of it,
+   and it is the same set for everybody on that date. A player cannot
+   see any of that from the road, so the screen has to say it, and until
+   now it said it as "NEW IN 2h 2m" at the end of a dim row of five
+   middot separated facts.
+
+   THE COUNT IS IN IT, because "a new track" and "five new tracks" are
+   different offers and the second one is the true one. It reads
+   LEVEL_COUNT rather than saying five, like everything else that knows
+   how long a day is.
+
+   SINGULAR IS HANDLED because LEVEL_COUNT is a live tunable that goes
+   down to one, and "1 NEW TRACKS" on a cycler is the sort of thing that
+   ships. */
+/* ONE SENTENCE, TWO SCREENS, ONE FUNCTION. The title screen says it
+   every time the game is opened and the completion screen says it once,
+   at the end of the day, and the two must not be able to disagree about
+   how many tracks there are or when they arrive. `tomorrow` is the only
+   difference: on the title screen the countdown is the whole of it,
+   and on the completion screen the word is the point, because that is
+   the moment the player is deciding whether there is a reason to come
+   back. */
+function newTracksLine(tomorrow) {
+  const n = levelCount();
+  const what = n === 1 ? 'A NEW TRACK' : n + ' NEW TRACKS';
+  return what + (tomorrow ? ' TOMORROW, IN ' : ' IN ') + countdownLabel();
+}
+function titleResetLine() { return newTracksLine(false); }
 
 /* THE BLINK. Hard on, hard off, in the arcade tradition, which is the
    single change that makes this read as a splash rather than a page. A
@@ -13218,8 +13463,12 @@ function drawOverlay(w, h) {
       ? s * FEEL.TITLE_GAP_MUSIC + musSize * 0.62 + s * FEEL.TITLE_MUSIC_GAP
         + Math.round(s * FEEL.TITLE_MUSIC_SUB)
       : 0;
+    /* The reset line's own row, counted into the stack the wordmark is
+       measured against, or the mark grows into it on a short screen. */
+    const resetSize = Math.round(s * FEEL.TITLE_RESET_SIZE);
+    const resetBlock = s * FEEL.TITLE_GAP_RESET + resetSize;
     const below = s * FEEL.TITLE_GAP_PROMPT + promptSize / 2
-                + s * FEEL.TITLE_GAP_FACTS + factSize + musBlock;
+                + s * FEEL.TITLE_GAP_FACTS + factSize + resetBlock + musBlock;
     const top = Math.max(safeTop + s * 0.030, h * FEEL.TITLE_TOP);
     /* THE FINE PRINT TAKES ONLY THE ROOM THE SCREEN CAN SPARE.
 
@@ -13277,6 +13526,18 @@ function drawOverlay(w, h) {
     text(facts, w / 2, y, fittedSize(facts, '700', factSize, w * 0.92), '700',
          'center', COLOUR.TITLE_DIM);
     ctx.globalAlpha = 1;
+
+    /* AND THE RESET, ON ITS OWN ROW. Bigger than the facts above it and
+       at full strength, in the score's own gold rather than the dim, so
+       the eye stops on it. It is the reason to come back and it used to
+       be the fifth thing on the dimmest line here. */
+    y += s * FEEL.TITLE_GAP_RESET + resetSize / 2;
+    ctx.globalAlpha = clamp(FEEL.TITLE_RESET_ALPHA, 0, 1);
+    const reset = titleResetLine();
+    text(reset, w / 2, y, fittedSize(reset, '800', resetSize, w * 0.92), '800',
+         'center', COLOUR.SCORE_BEST);
+    ctx.globalAlpha = 1;
+    y += resetSize / 2;
 
 
     /* THE WARNING, AND IT IS WHAT MAKES MUSIC ON BY DEFAULT DEFENSIBLE.
@@ -13395,9 +13656,15 @@ function hitDaily(e) {
   return hitRect(dailyRect, e);
 }
 
+/* THE COMPLETION SCREEN CARRIES ONE TOO, once the day is done, so the
+   state test is both of them. The input lock applies there exactly as it
+   does to every other target on that screen: a button that could be hit
+   on the frame the finale ends is a button the reflex tap hits. */
 function hitAlt(e) {
-  if (!altRect.live || state !== TITLE) return false;
-  return hitRect(altRect, e);
+  if (!altRect.live) return false;
+  if (state === TITLE) return hitRect(altRect, e);
+  if (state === FINISHED && deadFor >= FEEL.DEATH_INPUT_LOCK) return hitRect(altRect, e);
+  return false;
 }
 
 /* THE FRONT DOOR, AND IT NEVER ASKS. The furthest level not yet
@@ -13775,8 +14042,25 @@ function clearDailyRecords() {
    record that predates this marker is discarded exactly the way a
    yesterday's record is. Bump this whenever a change alters the geometry
    a seed produces. It costs the day's records once and it is the only
-   honest thing to do with a time set on a different track. */
-const ROAD_GEN = 2;
+   honest thing to do with a time set on a different track.
+
+   BUMPED TO 3 FOR THE FIVE LEVEL DAY, and it is level three that forces
+   it. The seeds did not move: every level's road is the same road it was
+   for a given date. The LENGTHS did. Level three used to run six gates
+   and now runs four, so a best score banked on the old level three was
+   set over 190 seconds of scoring on a track that now ends at 123, and
+   it would sit there unbeatable for the rest of the day. Levels four and
+   five are new and have no records to lose, and levels one and two are
+   the same length they always were.
+
+   THE ALL TIME BEST IS DELIBERATELY NOT TOUCHED. Jump points and the
+   close call raise a run's score by five to ten percent, which makes an
+   old record marginally easier to beat rather than impossible, and that
+   is a difference the next good run settles on its own. Deleting
+   somebody's best score is a real loss and a scoring change does not
+   earn it: session C moved scores three to four times and did not, and
+   this is a tenth of that. */
+const ROAD_GEN = 3;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
@@ -14153,6 +14437,29 @@ let bestKnown = bestScore > 0;
 let beatBest = false;
 let beatFlash = 0;
 
+/* AND THE OTHER BAR, WHICH IS THE ONE A PLAYER MEETS MOST DAYS.
+
+   BEST SCORE is every run that has ever been driven, so passing it is
+   rare and mostly happens on the last level. Today's best on THIS level
+   is the number the ghost is a picture of, it is different on every
+   level, and it resets every night, so it is the bar that is actually in
+   play on an ordinary run.
+
+   ONE HALO, TWO WAYS TO EARN IT. Both breaks light the score for the
+   rest of the run and neither can fire twice, so a run that passes both
+   erupts twice at most and the second one costs nothing on screen that
+   the first did not already spend. scoreBeaten is what the three draw
+   sites read.
+
+   NOTHING TO BEAT IS THE DEFAULT, NOT AN ERROR. dailyBest is zero on a
+   first ever run, on a level not yet finished today, on a fresh install
+   and whenever localStorage is unavailable, which section 6 says is
+   common on school profiles. The comparison is against a positive
+   number, so all four of those cases switch the whole thing off for the
+   run without a single special case. */
+let beatDaily = false;
+function scoreBeaten() { return beatBest || beatDaily; }
+
 /* The chain: unbroken DRIFTING, which is slip and not the multiplier's
    two term test, so a tidy drift down the middle of a wide on ramp road
    still counts. It survives CALLOUT_CHAIN_GRACE of not drifting, which is
@@ -14230,6 +14537,7 @@ function resetSpectacle() {
   driftLock = 0;
   driftGap = 0;
   beatBest = false;
+  beatDaily = false;
   beatFlash = 0;
   breakChain();
   runBestChain = 0;
@@ -14311,13 +14619,34 @@ function updateSpectacle(dt) {
   /* The strongest moment available, and one comparison to find it. It
      only arms on a CLEAN run: a continued run cannot reach the best
      score, so it must not be told that it has. */
-  if (bestKnown && continues === 0 && !beatBest
-      && banked + Math.floor(score) > bestScore) {
+  const onScreen = banked + Math.floor(score);
+  if (bestKnown && continues === 0 && !beatBest && onScreen > bestScore) {
     beatBest = true;
     beatFlash = FEEL.BEST_FLASH_TIME;
     addShake(FEEL.BEST_SHAKE_PX);
     audioSting(STING_BEST);
     sayCallout('NEW BEST', CALL_BEST, COLOUR.SCORE_BEST);
+  }
+  /* TODAY'S BEST ON THIS LEVEL, which is the bar an ordinary run
+     actually meets. Same shape as the break above and the same three
+     guards, plus the daily's own: it is a daily idea, so it does not
+     exist in a random track, and dailyBest is per level because
+     syncLevelRecord loads it from that level's own key.
+
+     ZERO MEANS THERE IS NOTHING TO BEAT and that is the whole of the
+     fresh install, the never finished level, and the school profile with
+     storage switched off. No special case, just a positive number.
+
+     ELSE, NOT A SECOND if, so a run that clears both bars on one frame
+     speaks once. Passing every score ever driven implies passing today's
+     and only the louder of the two should be heard. */
+  else if (mode === DAILY && dailyBest > 0 && continues === 0 && !beatDaily
+           && onScreen > dailyBest) {
+    beatDaily = true;
+    beatFlash = FEEL.BEST_FLASH_TIME;
+    addShake(FEEL.BEST_SHAKE_PX);
+    audioSting(STING_BEST);
+    sayCallout('BEST TODAY  BEATEN', CALL_BEST, COLOUR.SCORE_BEST);
   }
 
   /* A perfect entry: arriving in the scrape band already committed,
@@ -17022,6 +17351,12 @@ const STING_BEST  = { notes: [12, 19, 24, 31], step: 0.075, gain: 0.16, decay: 0
 const STING_GATE  = { notes: [12, 19, 24],     step: 0.070, gain: 0.13, decay: 0.24 };
 const STING_CLOSE = { notes: [24, 31],         step: 0.055, gain: 0.09, decay: 0.16 };
 const STING_CHAIN = { notes: [19, 24, 28],     step: 0.065, gain: 0.12, decay: 0.22 };
+/* PASSING THE GHOST. Rising, because going past somebody is a rising
+   thing, and quieter than the record break because it can happen more
+   than once in a run and the record break cannot. Being passed BY the
+   ghost gets nothing: it is bad news and bad news does not get a
+   fanfare. */
+const STING_GHOST = { notes: [14, 21, 26],     step: 0.058, gain: 0.10, decay: 0.20 };
 // Up off the lip, and back down onto the road. The jump rises, the
 // landing falls, so the pair reads as one arc without a word of copy.
 const STING_JUMP  = { notes: [7, 14, 21, 26],  step: 0.045, gain: 0.13, decay: 0.20 };
