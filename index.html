@@ -14504,7 +14504,18 @@ function drawOverlay(w, h) {
        where nothing that changes anything belongs. Named rather than
        shown as a swatch, because the name is what the unlock announced
        and the car itself is on screen behind this the moment you tap. */
-    const carY = by0 - s * 0.050 - s * 0.098;
+    /* THE ROW LIFTS WHEN THERE IS A LINE UNDER IT, because the car
+       button and its ladder are one block and not two rows.
+
+       Without the lift the ladder was drawn into a gap that is not there.
+       Measured at 390 wide: the car button is 26px tall so its bottom
+       edge is 13px under carY, the gap down to the RANDOM TRACK row is
+       24px, and the line needs 22 of them to clear the button. It
+       overlapped the button by 9px and the row below by 3, and the
+       screenshot shows NEXT WIDEBODY IN 3 TRACKS struck through by the
+       button's own border. */
+    const ladder = nextUnlockLine();
+    const carY = by0 - s * 0.050 - s * 0.098 - (ladder ? s * 0.030 : 0);
     if (carsUnlocked() > 1) {
       canvasButton(carRect, 'CAR  ' + activeCar().name, w / 2, carY,
                    Math.round(s * 0.032), COLOUR.SCORE_BEST, w);
@@ -14521,13 +14532,13 @@ function drawOverlay(w, h) {
        first time player, so the screen does not gain a row for them
        either: on a cold profile this line is the only thing in that
        band and it is the one worth having there. */
-    const ladder = nextUnlockLine();
     if (ladder) {
       ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
-      const ly = carsUnlocked() > 1 ? carY + s * 0.036 : carY;
-      text('NEXT  ' + ladder, w / 2, ly,
-           fittedSize('NEXT  ' + ladder, '700', Math.round(s * 0.027), w * 0.92),
-           '700', 'center', COLOUR.TITLE_DIM);
+      const lsize = fittedSize('NEXT  ' + ladder, '700', Math.round(s * 0.027), w * 0.92);
+      /* Off the button's own rect rather than off a fraction, so it
+         clears whatever the longest car name happens to make it. */
+      const ly = carRect.live ? carRect.y + carRect.h + lsize * 0.85 : carY;
+      text('NEXT  ' + ladder, w / 2, ly, lsize, '700', 'center', COLOUR.TITLE_DIM);
       ctx.globalAlpha = 1;
     }
   } else if (state === DEAD) {
