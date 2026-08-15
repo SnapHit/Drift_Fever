@@ -1417,6 +1417,17 @@ const FEEL = {
      anywhere the player ever visited and never once fired. */
   CLOCK_LOW:                 14,     // LIVE, seconds under which the readout warns
   CHECKPOINT_EVERY:        1500,     // LIVE, segments between gates, about 33 seconds
+  /* WHERE THE FIRST GATE SITS, AS A SHARE OF THAT SPACING, and it was an
+     inline 0.7 in gateSegment until the training run needed it. CLAUDE.md
+     is explicit that nothing tunable may live inline in the game logic
+     and this was the last one in the level system.
+
+     IT DECIDES THE LENGTH OF THE TRAINING RUN, because training is one
+     gate long and the first gate IS its finish. At 0.7 that is 23.3
+     seconds; at 0.84 it is 28.0, which is where the training run was
+     asked to land. Every other level gains the same 4.7 seconds, which
+     is what keeps the day total where it was: see levelGatesFor. */
+  GATE_FIRST_SHARE:        0.84,     // LIVE
   CHECKPOINT_HEIGHT:       1500,     // world units, the posts either side
   CHECKPOINT_POST:          260,     // world units, how thick they are
   /* HALF A SECOND, AND IT WAS NEARLY CUT ON A MEASUREMENT THAT WAS
@@ -3197,7 +3208,27 @@ const FEEL = {
      count of checkpoints: gate N ends the run, which is why the pips and
      the countdown and the line are all the same number. */
   LEVEL_COUNT:                5,     // LIVE, and read by everything
-  LEVEL_GATES_FIRST:          2,     // LIVE, gates on level one
+  /* HOW MANY OF THEM ARE TRAINING, AND THIS IS THE WHOLE OF HOW THE
+     TUTORIAL BECAME A SEPARATE THING WITHOUT A SECOND SYSTEM.
+
+     The count is still ONE number that everything reads. Training is not
+     a new kind of level, it is the first N of them, and every question
+     anybody asks about a level is derived: isTraining, firstRealLevel,
+     realLevelCount and realLevelNumber all come off this and off
+     LEVEL_COUNT and nothing writes a 4 or a 5 anywhere.
+
+     IT IS CLAMPED TO LEAVE AT LEAST ONE REAL LEVEL, so setting
+     LEVEL_COUNT to 1 on the cycler gives a game with no training and no
+     special cases rather than a game that is entirely tutorial.
+
+     WHY IT EXISTS AT ALL. Level one was 56.7 seconds of unfailable road
+     presented as LEVEL 1 OF 5, so an experienced player judged the game
+     by it and left. Unfailable is boring by construction if you are good
+     at the game. It is now shorter, it says what it is, and there is a
+     way past it. */
+  TRAINING_LEVELS:            1,     // LIVE
+  TRAINING_GATES:             1,     // LIVE, gates on the training run. See gateSegment for the seconds
+  LEVEL_GATES_FIRST:          3,     // LIVE, gates on the first REAL level
   LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
   /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
      levelBand. Above one compresses the middle levels toward the easy
@@ -4460,6 +4491,7 @@ const TUNABLES = [
   { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
   { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
   { key: 'CHECKPOINT_EVERY',   label: 'gate',    step: 100,  min: 300,  max: 6000,  dp: 0, group: 12 },
+  { key: 'GATE_FIRST_SHARE',   label: 'gate1',   step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 12 },
   { key: 'CLOCK_CHECKPOINT',   label: 'gateSec', step: 1,    min: 0,    max: 60,    dp: 0, group: 12 },
   { key: 'CLOCK_DRIFT_RATE',   label: 'payRate', step: 0.1,  min: 0,    max: 9,     dp: 1, group: 12 },
   { key: 'CLOCK_MIN_SLIP',     label: 'paySlip', step: 0.05, min: 0,    max: 0.95,  dp: 2, group: 12 },
@@ -4776,6 +4808,8 @@ const TUNABLES = [
   { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 },
   { key: 'MODE_NOTE_SECONDS',  label: 'modeSay', step: 1,    min: 0,    max: 30,    dp: 0, group: 26 },
   { key: 'LEVEL_COUNT',        label: 'levels',  step: 1,    min: 1,    max: 8,     dp: 0, group: 27 },
+  { key: 'TRAINING_LEVELS',    label: 'train',   step: 1,    min: 0,    max: 3,     dp: 0, group: 27 },
+  { key: 'TRAINING_GATES',     label: 'trainG',  step: 1,    min: 1,    max: 6,     dp: 0, group: 27 },
   { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
@@ -5067,6 +5101,17 @@ window.addEventListener('keydown', function (e) {
 
      Both cases, so caps lock is not a dead key, and both carve their
      letter out of "any key starts a run" the same way R and P are. */
+  /* AND ON THE TITLE SCREEN T IS NOW THE SECOND ROUTE INSTEAD, which
+     costs nothing: on that screen T used to do exactly what every other
+     key already did, because any key starts today's track there. It is
+     the only letter on the title that was pure duplication, so it is the
+     only one free to carry a route a keyboard could otherwise not reach
+     at all. Section 6 is explicit that many sessions are keyboard only
+     and a canvas button is a target a keyboard cannot hit. */
+  else if ((k === 't' || k === 'T') && bootFlash <= 0
+           && state === TITLE && routeRect.live) {
+    firstGesture(); startTitleRoute(); return;
+  }
   else if ((k === 't' || k === 'T') && bootFlash <= 0
            && (state === TITLE
                || (state === DEAD && mode === ENDLESS
@@ -5187,6 +5232,11 @@ canvas.addEventListener('pointerdown', function (e) {
   if (bootFlash <= 0 && hitCar(e)) {
     firstGesture();
     pickCar(nextCar());
+    return;
+  }
+  if (bootFlash <= 0 && hitRoute(e)) {
+    firstGesture();
+    startTitleRoute();
     return;
   }
   if (bootFlash <= 0 && hitAlt(e)) {
@@ -6556,6 +6606,30 @@ function loadFinishedEver() {
   finishedEver = isFinite(v) && v > 0 ? v : 0;
 }
 
+/* HAS THIS BROWSER EVER FINISHED THE TRAINING RUN, and it is the one bit
+   that decides what the front door does.
+
+   ACROSS DAYS, NOT WITHIN ONE. recFor(1).done is wiped at midnight with
+   every other daily record, so a flag living there would make the player
+   redo the tutorial every single morning, which is the complaint. This
+   is its own key beside runs and finished, and it only ever goes from
+   0 to 1.
+
+   WITH STORAGE UNAVAILABLE IT READS FALSE FOR EVER, so a locked down
+   profile gets the training run every time. That is the correct
+   direction to fail in: the cost is a shorter warm up somebody may not
+   need, and the alternative is dropping a first time player straight
+   into the first real level. */
+let trainedEver = false;
+function loadTrainedEver() {
+  trainedEver = storeGet('trained') === '1';
+}
+function markTrained() {
+  if (trainedEver) return;
+  trainedEver = true;
+  storeSet('trained', '1');
+}
+
 function loadRunsEver() {
   const v = parseInt(storeGet('runs'), 10);
   runsEver = isFinite(v) && v > 0 ? v : 0;
@@ -6982,6 +7056,39 @@ function countdownLabel() {
 function levelCount() { return Math.max(1, Math.round(FEEL.LEVEL_COUNT)); }
 function clampLevel(n) { return clamp(Math.round(n), 1, levelCount()); }
 
+/* ------------------------------------------------------------------
+   TRAINING, WHICH IS THE FIRST N LEVELS AND NOT A SECOND SYSTEM.
+
+   THE PROBLEM, IN THE AUTHOR'S OWN WORDS. "An experienced player judging
+   the game in ten seconds does not want an interesting easy road, they
+   want to be tested." Two sessions were spent making the easy content
+   interesting, which was solving the wrong thing: level one is easy on
+   purpose and easy is boring if you are good. The gap was that there was
+   no way past it. Everyone drove 56.7 seconds of it before anything got
+   hard, which is the same non skippable tutorial BRIEF.md section 4
+   opens by criticising the incumbent for.
+
+   SO: it is shorter, it is called what it is, and it can be skipped, and
+   once it has been done it is never the default again.
+
+   EVERY ANSWER IS DERIVED. LEVEL_COUNT is still the one number, and
+   TRAINING_LEVELS says how many at the front of it are the warm up.
+   Nothing below or downstream writes a level number.
+
+   AT LEAST ONE REAL LEVEL ALWAYS SURVIVES, so LEVEL_COUNT on the cycler
+   still means what it always meant: at a count of one there is no
+   training at all and every test here goes quiet.
+   ------------------------------------------------------------------ */
+function trainingLevels() {
+  return clamp(Math.round(FEEL.TRAINING_LEVELS), 0, levelCount() - 1);
+}
+function isTraining(lvl) { return clampLevel(lvl) <= trainingLevels(); }
+function firstRealLevel() { return trainingLevels() + 1; }
+function realLevelCount() { return levelCount() - trainingLevels(); }
+/* A real level's number as the player is shown it: level 2 of 5 is
+   LEVEL 1/4, because the training run is not one of the four. */
+function realLevelNumber(lvl) { return clampLevel(lvl) - trainingLevels(); }
+
 /* WHERE A LEVEL SITS BETWEEN EASY AND HARD, 0 to 1. The first level is
    0, the last is 1, and everything in between is spaced evenly. With one
    level only there is nothing to interpolate and it is the whole game,
@@ -7029,11 +7136,24 @@ function levelBand(lvl) {
    integer ramp from two to six over five levels that gives it.
 
    Rounded, and never fewer than one. */
+/* AND THE RAMP NOW RUNS ACROSS THE REAL LEVELS ONLY, because the
+   training run is not a rung on it. It has its own count, which is one,
+   and one gate is 28.0 seconds because the first gate is the finish.
+
+   THE DAY TOTAL, WHICH IS THE THING THAT HAD TO HOLD. It was 2 3 4 5 6
+   gates at a first gate of 0.70, so 56.7 90.0 123.3 156.7 190.0, total
+   616.7 seconds. It is now 1 3 4 5 6 at a first gate of 0.84, so 28.0
+   94.7 128.0 161.3 194.7, total 606.7. Ten seconds shorter, 1.6 per
+   cent, and the training run more than halves. The four real levels
+   still step by exactly one gate each, which is the property the
+   straight ramp existed for. */
 function levelGatesFor(lvl) {
+  const l = clampLevel(lvl);
+  if (isTraining(l)) return Math.max(1, Math.round(FEEL.TRAINING_GATES));
   const a = Math.max(1, Math.round(FEEL.LEVEL_GATES_FIRST));
   const b = Math.max(1, Math.round(FEEL.LEVEL_GATES_LAST));
-  const n = levelCount();
-  const t = n <= 1 ? 1 : (clampLevel(lvl) - 1) / (n - 1);
+  const n = realLevelCount();
+  const t = n <= 1 ? 1 : (l - firstRealLevel()) / (n - 1);
   return Math.max(1, Math.round(a + (b - a) * t));
 }
 
@@ -7075,7 +7195,8 @@ function levelHardD() { return clamp(levelBand(level) * 2 - 1, 0, 1); }
    spacing so the opening is not a full gate long, which is where it has
    always been; everything after is one spacing apart. */
 function gateSegment(k) {
-  return Math.round(FEEL.CHECKPOINT_EVERY * 0.7) + (k - 1) * FEEL.CHECKPOINT_EVERY;
+  return Math.round(FEEL.CHECKPOINT_EVERY * FEEL.GATE_FIRST_SHARE)
+       + (k - 1) * FEEL.CHECKPOINT_EVERY;
 }
 
 let dailyGates = 6;
@@ -8213,7 +8334,9 @@ function startRun() {
   cpValid = false;
   resumeFlash = 0;
   clearDebris();
-  nextGate = Math.round(FEEL.CHECKPOINT_EVERY * 0.7);
+  // gateSegment(1), asked of the function that owns the answer rather
+  // than recomputed from the same two constants beside it.
+  nextGate = gateSegment(1);
   /* Every run opens on the unturned palette. That is the game's own
      colour and it is what the boot flash and the death screen sit in, so
      it stays the thing a cold player sees first. The variety is at the
@@ -13188,7 +13311,13 @@ function finishPrompt() {
      because "the next level" is vaguer than the game already is: the HUD
      has been saying LEVEL 2/3 for the whole run. */
   if (rollsForward()) {
-    return tapOrKey() + ' for level ' + (level + 1) + ' of ' + levelCount();
+    /* OFF THE TRAINING RUN IT SAYS WHAT COMES NEXT IN WORDS, not by
+       number. "level 1 of 4" after a screen that said TRAINING reads as
+       going backwards, and the thing the player has to be told here is
+       that the game proper starts on the next tap. */
+    if (isTraining(level)) return tapOrKey() + ' for the first real level';
+    return tapOrKey() + ' for level ' + realLevelNumber(level + 1)
+         + ' of ' + realLevelCount();
   }
   /* THE LAST LEVEL, WITH THE DAY BEHIND IT. It does not roll anywhere:
      startNextLevel's guard fails and startRun puts the player back on
@@ -13265,9 +13394,14 @@ function drawFinish(w, h) {
        finishing one of three while the HUD directly above it read
        TRACK #8   LEVEL 3/3, so the same word meant the whole road in one
        place and a third of it in another. One word each, everywhere. */
-    const size = fittedSize('LEVEL COMPLETE', '900', want, room);
+    /* AND TRAINING COMPLETE ON THE TRAINING RUN, by the same argument
+       one step further: the HUD said TRAINING for the whole of it, so
+       the banner saying LEVEL COMPLETE would be the third name for one
+       thing on one screen. */
+    const head = isTraining(level) ? 'TRAINING COMPLETE' : 'LEVEL COMPLETE';
+    const size = fittedSize(head, '900', want, room);
     bannerCy = (h * 0.42) + (y0 - h * 0.42) * set;
-    brandText('LEVEL COMPLETE', w / 2, bannerCy, Math.max(8, size),
+    brandText(head, w / 2, bannerCy, Math.max(8, size),
               Math.min(1, bIn * 1.4));
   }
 
@@ -13361,7 +13495,16 @@ function drawFinish(w, h) {
      line you were racing is the whole point of racing it, so it gets the
      record colour and a sign that reads at a glance. */
   let line, colour = COLOUR.TEXT;
-  if (finishMargin !== null) {
+  /* THE TRAINING RUN SAYS WHAT IT WAS FOR, IN THE LINE THAT ALREADY
+     EXISTS. A swap and not an extra row: this screen's stack is measured
+     from the type sizes and has no slack in it, and the four messages
+     below are all about racing a ghost or keeping a run clean, neither
+     of which is what just happened. The prompt underneath says where the
+     tap goes; this says why the last twenty eight seconds happened. */
+  if (isTraining(level)) {
+    line = 'THAT WAS THE WARM UP. THE REAL LEVELS START NOW';
+    colour = COLOUR.SCORE_BEST;
+  } else if (finishMargin !== null) {
     const faster = finishMargin < 0;
     line = (faster ? 'BEAT YOUR GHOST BY  ' : 'BEHIND YOUR GHOST BY  ')
          + Math.abs(finishMargin).toFixed(1) + 's';
@@ -13555,6 +13698,11 @@ function hitRestart(e) {
    restarts the run you were in, one action, nothing to hunt for.
    ================================================================== */
 const dailyRect = { x: 0, y: 0, w: 0, h: 0, live: false };
+/* The title screen's second route into today's track. See
+   titleRouteLevel: what it offers depends on whether the training run
+   has ever been finished, and it is not drawn at all when there is no
+   training to have. */
+const routeRect = { x: 0, y: 0, w: 0, h: 0, live: false };
 const altRect = { x: 0, y: 0, w: 0, h: 0, live: false, to: 0 };
 /* THE CAR CYCLE, and it is one small control rather than a screen.
    Handoff 9 forbids new screens and BRIEF.md 12 forbids menus; a button
@@ -13689,11 +13837,14 @@ function cardText(g, s, x, y, size, weight, colour, align) {
    run happened to do. Levels never reached contribute nothing, which is
    why an unfinished day shows a smaller number and a shorter time and
    both are true. */
+/* THE REAL LEVELS ONLY, for the same reason dayDone counts them only:
+   the card is a picture of the DAY, and a player who skipped the warm up
+   would otherwise send a picture of a perfect day with a hole in it. */
 function dayTotals() {
   let score = 0, time = 0, done = 0, clean = 0;
-  const n = levelCount();
+  const n = realLevelCount();
   const rows = [];
-  for (let i = 1; i <= n; i++) {
+  for (let i = firstRealLevel(); i <= levelCount(); i++) {
     const r = recFor(i);
     score += r.best;
     time += r.time;
@@ -14445,6 +14596,7 @@ function drawOverlay(w, h) {
        emptiness is the design and not an oversight. */
     dailyRect.live = false;
     altRect.live = false;
+    routeRect.live = false;
     /* THE CALIBRATION OWNS THIS BAND WHILE IT IS UP, and it is the only
        thing in the game that ever takes a row off another screen. It is
        a few seconds, it is asked for deliberately, and the alternative
@@ -14499,42 +14651,90 @@ function drawOverlay(w, h) {
          fittedSize(sub, '700', Math.round(s * 0.027), w * 0.92), '700',
          'center', COLOUR.TITLE_DIM);
     ctx.globalAlpha = 1;
-    /* THE CAR, ABOVE THE SECOND CHOICE and well clear of the centre of
-       the bottom row, which is where a reflex tap lands hardest and
-       where nothing that changes anything belongs. Named rather than
-       shown as a swatch, because the name is what the unlock announced
-       and the car itself is on screen behind this the moment you tap. */
-    /* THE ROW LIFTS WHEN THERE IS A LINE UNDER IT, because the car
-       button and its ladder are one block and not two rows.
+    /* ----------------------------------------------------------------
+       THE THREE ROWS ABOVE THE MODE ROW, STACKED UPWARDS AND MEASURED
+       RATHER THAN SPACED BY A FRACTION.
 
-       Without the lift the ladder was drawn into a gap that is not there.
-       Measured at 390 wide: the car button is 26px tall so its bottom
-       edge is 13px under carY, the gap down to the RANDOM TRACK row is
-       24px, and the line needs 22 of them to clear the button. It
-       overlapped the button by 9px and the row below by 3, and the
-       screenshot shows NEXT WIDEBODY IN 3 TRACKS struck through by the
-       button's own border. */
+       THIS IS THE THIRD TIME A CAPTION HAS BEEN DRAWN THROUGH THE THING
+       UNDER IT. A fraction of s is not a row height: a button is
+       size * 2.2 tall and a caption under it is another size and a bit,
+       and 0.098 of the smaller screen dimension happens to be enough for
+       the first and not for the second. The unlock ladder went through
+       the CAR button; the route caption went through RANDOM TRACK.
+
+       So `top` walks up from the mode row and every row asks for exactly
+       what it needs: the button's own half height, plus its caption if
+       it has one, plus a gutter. Nothing here is a guess and nothing can
+       be made wrong by a longer label, because canvasButton and
+       fittedSize are asked the same question that will be asked when
+       they draw.
+       ---------------------------------------------------------------- */
+    const gutter = s * 0.020;
+    const csize = Math.round(s * 0.026);
+    let stackTop = (by0 - s * 0.050) - bsize * 1.1;     // top of the mode row
+
+    /* THE ROUTE, AND IT IS THE ONLY THING ADDED TO THIS SCREEN THIS
+       SESSION.
+
+       It goes at the bottom of this group rather than in the empty band
+       above, because the bottom of this screen is where every target in
+       this game lives and a button floating in the middle of the road
+       would be the first one that does not. Drawn in the daily's own
+       teal, so it reads as another way into today's track rather than as
+       a third mode beside RANDOM TRACK.
+
+       ITS CAPTION IS WHAT MAKES IT A CHOICE. A button on its own says
+       what it does and nothing about the alternative, and the
+       alternative here is invisible: it is tapping the screen. So the
+       line underneath names the default and how long it costs, and the
+       pair reads as two routes rather than as one button. */
+    if (trainingLevels() > 0) {
+      const rsize = Math.round(s * 0.033);
+      const cap = titleRouteCaption();
+      const capSize = fittedSize(cap, '700', csize, w * 0.92);
+      const capH = capSize * 0.85 + capSize * 0.62;     // baseline drop plus half a line
+      const routeY = stackTop - gutter - capH - rsize * 1.1;
+      canvasButton(routeRect, titleRouteLabel(), w / 2, routeY,
+                   rsize, COLOUR.GATE, w);
+      ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
+      text(cap, w / 2, routeRect.y + routeRect.h + capSize * 0.85, capSize,
+           '700', 'center', COLOUR.TITLE_DIM);
+      ctx.globalAlpha = 1;
+      stackTop = routeRect.y;
+    } else {
+      routeRect.live = false;
+    }
+
+    /* THE CAR, above all of it and well clear of the centre of the
+       bottom row, which is where a reflex tap lands hardest and where
+       nothing that changes anything belongs. Named rather than shown as
+       a swatch, because the name is what the unlock announced and the
+       car itself is on screen behind this the moment you tap.
+
+       ITS LADDER IS THE SAME SHAPE AS THE ROUTE'S CAPTION: one dim line
+       under the button it is about, so the two are measured the same
+       way. Six cars exist and a player saw NEW CAR UNLOCKED once with no
+       way of knowing there was another or what it wanted; this line
+       disappears entirely once they are all earned rather than sitting
+       there saying nothing. */
     const ladder = nextUnlockLine();
-    const carY = by0 - s * 0.050 - s * 0.098 - (ladder ? s * 0.030 : 0);
+    const lsize = ladder
+      ? fittedSize('NEXT  ' + ladder, '700', csize, w * 0.92) : 0;
+    const ladderH = ladder ? lsize * 0.85 + lsize * 0.62 : 0;
+    const csize2 = Math.round(s * 0.032);
+    /* IT SHARES ITS ROW WITH THE LADDER WHEN THERE IS NO CAR BUTTON,
+       which is a first time player, so the screen does not gain a row
+       for them either: on a cold profile that line is the only thing in
+       this band and it is the one worth having there. */
+    const carY = stackTop - gutter - ladderH - (carsUnlocked() > 1 ? csize2 * 1.1 : 0);
     if (carsUnlocked() > 1) {
       canvasButton(carRect, 'CAR  ' + activeCar().name, w / 2, carY,
-                   Math.round(s * 0.032), COLOUR.SCORE_BEST, w);
+                   csize2, COLOUR.SCORE_BEST, w);
     } else {
       carRect.live = false;
     }
-    /* THE LADDER, WHICH WAS INVISIBLE. Six cars exist and a player saw
-       NEW CAR UNLOCKED once with no way of knowing there was another or
-       what it wanted. One line, dim, directly under the car it is about,
-       and it disappears entirely once they are all earned rather than
-       sitting there saying nothing.
-
-       IT SHARES THE CAR'S ROW WHEN THERE IS NO CAR BUTTON, which is a
-       first time player, so the screen does not gain a row for them
-       either: on a cold profile this line is the only thing in that
-       band and it is the one worth having there. */
     if (ladder) {
       ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
-      const lsize = fittedSize('NEXT  ' + ladder, '700', Math.round(s * 0.027), w * 0.92);
       /* Off the button's own rect rather than off a fraction, so it
          clears whatever the longest car name happens to make it. */
       const ly = carRect.live ? carRect.y + carRect.h + lsize * 0.85 : carY;
@@ -14545,16 +14745,19 @@ function drawOverlay(w, h) {
     dailyRect.live = false;
     altRect.live = false;
     carRect.live = false;
+    routeRect.live = false;
     drawResult(w, h);
   } else if (state === FINISHED) {
     dailyRect.live = false;
     altRect.live = false;
     carRect.live = false;
+    routeRect.live = false;
     drawFinish(w, h);
   } else {
     dailyRect.live = false;
     altRect.live = false;
     carRect.live = false;
+    routeRect.live = false;
   }
 }
 
@@ -14567,6 +14770,13 @@ function hitCar(e) {
   const x = e.clientX - r.left, y = e.clientY - r.top;
   return x >= carRect.x && x <= carRect.x + carRect.w
       && y >= carRect.y && y <= carRect.y + carRect.h;
+}
+
+/* THE SECOND ROUTE. Title screen only, and tested before the tap that
+   starts a run, the same way the car cycle and RANDOM TRACK are. */
+function hitRoute(e) {
+  if (!routeRect.live || state !== TITLE) return false;
+  return hitRect(routeRect, e);
 }
 
 function hitDaily(e) {
@@ -14986,7 +15196,7 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-const ROAD_GEN = 4;
+const ROAD_GEN = 5;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
@@ -15022,25 +15232,102 @@ const ROAD_GEN = 4;
    on a first visit is level one and after a completed day is the last
    level, replayable for a better score.
    ------------------------------------------------------------------ */
+/* AND THE TRAINING RUN DROPS OUT OF IT THE MOMENT IT HAS BEEN DONE ONCE,
+   for ever, on every future day. That is the whole of "nobody should be
+   made to redo the tutorial". It is still not a choice: the front door
+   still picks, it just stops picking the warm up for somebody who has
+   already had it. The warm up is reachable from the title screen by
+   name, which is where a choice is allowed to live. */
 function nextLevel() {
-  for (let i = 1; i <= levelCount(); i++) if (!recFor(i).done) return i;
+  const from = trainedEver ? firstRealLevel() : 1;
+  for (let i = from; i <= levelCount(); i++) if (!recFor(i).done) return i;
   return levelCount();
+}
+
+/* ------------------------------------------------------------------
+   THE SECOND ROUTE, AND WHY IT IS NOT A MENU.
+
+   BRIEF.md section 12 rules out menus, settings screens and difficulty
+   selection, and handoff section 9 rules out new screens. This is none
+   of them. It is one more button on a title screen that already carries
+   RANDOM TRACK, SHARE and CAR; tapping anywhere still starts a run with
+   no choice made and no screen in the way; and it selects a STARTING
+   POINT rather than a difficulty, which is the distinction that matters.
+   Nothing about any level changes because of it.
+
+   IT IS ALSO THE THING SECTION 4 OPENS BY DEMANDING. The first sentence
+   of the five pillars is that Drift Boss forces a non skippable tutorial
+   on every single run. Shipping one of those ourselves and then having
+   no way past it was the actual failure.
+
+   WHAT IT OFFERS IS ALWAYS THE ONE THE FRONT DOOR IS NOT. Untrained, the
+   door is training and this is the way past it. Trained, the door is the
+   next real level and this is the way back to the warm up.
+   ------------------------------------------------------------------ */
+function titleRouteLevel() {
+  if (!trainedEver) return firstRealLevel();
+  for (let i = 1; i <= trainingLevels(); i++) if (!recFor(i).done) return i;
+  return 1;
+}
+function titleRouteLabel() {
+  return trainedEver ? 'TRAINING RUN' : 'SKIP THE TRAINING';
+}
+/* How long a level takes at base speed, in whole seconds, which is the
+   only number an expert deciding whether to skip actually wants. Off
+   gateSegment, so it cannot drift away from where the finish really is. */
+function levelSeconds(lvl) {
+  return Math.round(gateSegment(levelGatesFor(lvl))
+                    * FEEL.SEGMENT_LENGTH / FEEL.SPEED);
+}
+/* And what the tap itself does, said plainly under the button, because
+   the button only makes sense against the thing it is an alternative to. */
+function titleRouteCaption() {
+  const n = nextLevel();
+  const key = hasKeyboard ? '     press T' : '';
+  if (isTraining(n)) {
+    return 'tap anywhere for training, ' + levelSeconds(n) + ' seconds' + key;
+  }
+  const lv = levelLabel(n);
+  return 'tap anywhere for ' + (lv ? lv.toLowerCase() : "today's track") + key;
+}
+function startTitleRoute() {
+  mode = DAILY;
+  rollDayIfNeeded();
+  level = clampLevel(titleRouteLevel());
+  startRun();
 }
 
 /* Has the whole day been finished, and was every level of it clean. The
    clean version is the hardest thing available in the game and it is the
    loudest thing recorded. */
+/* TRAINING IS NOT PART OF THE DAY, AND THAT IS A DECISION WITH A REASON.
+
+   A player who skips the warm up has no training completion recorded,
+   ever, and if the day required one then the hardest achievement in the
+   game would be gated behind the tutorial. That is the coercion this
+   session exists to remove, reintroduced through the back door.
+
+   The records argument is the stronger one though. `clean` means
+   finished with no continues. The training run cannot be continued: it
+   is one gate long, so there is no checkpoint behind you and
+   canContinue is false for the whole of it. Its clean bit is therefore
+   free for anybody who finishes it at all, and a free bit inside the
+   loudest thing the game records makes that thing quieter. A clean day
+   is the four levels that can actually be failed.
+
+   The day is still every level that counts, so nothing else about
+   dayDone changes: it is the loop bounds that moved, not the meaning. */
 function dayDone() {
-  for (let i = 1; i <= levelCount(); i++) if (!recFor(i).done) return false;
+  for (let i = firstRealLevel(); i <= levelCount(); i++) if (!recFor(i).done) return false;
   return true;
 }
 function dayClean() {
-  for (let i = 1; i <= levelCount(); i++) if (!recFor(i).clean) return false;
+  for (let i = firstRealLevel(); i <= levelCount(); i++) if (!recFor(i).clean) return false;
   return true;
 }
 function levelsDone() {
   let n = 0;
-  for (let i = 1; i <= levelCount(); i++) if (recFor(i).done) n++;
+  for (let i = firstRealLevel(); i <= levelCount(); i++) if (recFor(i).done) n++;
   return n;
 }
 
@@ -15085,12 +15372,24 @@ function bankDaily(finished) {
        it yet on purpose: storing it now means the number is real when
        the display arrives rather than starting from zero. */
     const wasUnlocked = carsUnlocked();
-    if (!r.done) {
+    /* AND THE TRAINING RUN IS NOT A TRACK FINISHED, for the same reason
+       it is not part of the day, plus one of its own: it is 28 seconds
+       and the shortest real level is 95, so counting it would make the
+       warm up the cheapest way to earn every car in the game. The
+       once-per-day guard limits that to one a day rather than removing
+       it. A player who has only ever done training has finished no
+       tracks, which is true. */
+    if (!r.done && !isTraining(level)) {
       finishedEver++;
       storeSet('finished', String(finishedEver));
     }
     r.done = true;
     if (continues === 0) r.clean = true;
+    /* AND THE ONE BIT THAT OUTLIVES THE DAY. Written here rather than
+       anywhere on the completion screen, because this is the function
+       that already owns "a level was finished" and a second place that
+       decides it is a second place to get it wrong. */
+    if (isTraining(level)) markTrained();
     /* AND A WHOLE DAY CLEAN, WHICH EARNED NOTHING UNTIL NOW. It is the
        hardest thing available in this game: every level of the day
        finished with no continues at all. Counted once per day, AFTER
@@ -16543,8 +16842,22 @@ function drawPips(w, h, y) {
    Suppressed entirely at a count of one, because "LEVEL 1 OF 1" is a
    sentence about a system the player does not have. */
 function levelLabel(lvl) {
-  if (levelCount() <= 1) return '';
-  return 'LEVEL ' + clampLevel(lvl) + '/' + levelCount();
+  /* THE TRAINING RUN SAYS SO, EVERYWHERE, and this is the single most
+     important line in the change. An expert told this is training judges
+     it as training. An expert who thinks it is the game judges the game
+     and closes the tab, which is exactly what happened.
+
+     THE REAL LEVELS ARE NUMBERED WITHOUT IT. LEVEL 1/4 rather than
+     LEVEL 2/5, because a player who skipped the warm up has not skipped
+     a level and should not be shown a gap where one used to be.
+
+     STILL LEVEL AND NOT TRACK, deliberately: this line sits beside
+     TRACK #14, which is the day's road, and two different things called
+     TRACK on one line is worse than the mild inconsistency with the copy
+     that calls them tracks in prose. */
+  if (isTraining(lvl)) return 'TRAINING';
+  if (realLevelCount() <= 1) return '';
+  return 'LEVEL ' + realLevelNumber(lvl) + '/' + realLevelCount();
 }
 
 function modeLine() {
@@ -18618,6 +18931,7 @@ else bootChromeHidden = false;
 // the eased ramp is one of the inputs to it.
 loadRunsEver();
 loadFinishedEver();
+loadTrainedEver();
 recomputeCamera();
 if (debugAllowed) { setDebug(true); tiltAssert(); }
 // Before the first road is built, or the title screen is generated at
