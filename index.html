@@ -2819,7 +2819,12 @@ const FEEL = {
      CURVE_HARD times CENTRIFUGAL is already 55% of full lock, and at 100%
      a corner is unsurvivable however well it is driven. Difficulty comes
      from sequencing and from road width. */
-  OPENING_STRAIGHT:         140,     // segments of calm before anything happens
+  /* CUT FROM 140. At 45 segments a second that was 3.1 seconds of dead
+     straight before anything at all, and it measured as two full seconds
+     of every column reading zero. 34 is three quarters of a second:
+     enough for forward motion and the road edges to register, and not
+     enough to be a wait. See resetRoad. */
+  OPENING_STRAIGHT:          34,     // segments of calm before anything happens
   RAMP_SHORT:                10,
   RAMP_MED:                  26,
   RAMP_LONG:                 48,
@@ -7511,12 +7516,57 @@ function resetRoad(seed) {
   roadWidth = 1;
   restOwed = 0;
   lastDir = 1;
-  // No tutorial. The opening is the tutorial: a calm straight at full
-  // width, then one gentle curve that teaches hold to turn without a word.
-  addRun(FEEL.OPENING_STRAIGHT, 0, 0, 1, 1, false);
-  addRun(30, 0, FEEL.CURVE_GENTLE, 1, 1, true);
-  addRun(90, FEEL.CURVE_GENTLE, FEEL.CURVE_GENTLE, 1, 1, false);
-  addRun(30, FEEL.CURVE_GENTLE, 0, 1, 1, true);
+  /* THE OPENING IS A DEMONSTRATION, NOT A CORRIDOR.
+
+     WHAT IT WAS AND WHY IT FAILED. 140 segments of dead straight, then
+     one gentle curve. Measured with no input at all: seconds one and two
+     were literally zero, every column of them, and the first slip
+     arrived at 3.63 seconds. Then the car parked against the opening
+     edge and seconds six to nine were zero again. Experienced players
+     said nothing happens in the first ten seconds and the measurement
+     says they were right: for six of those ten seconds, nothing did.
+
+     WHAT IT IS NOW. A short lead in so forward motion registers, then a
+     REAL corner, then the opposite one, then a third. Measured at 45
+     segments a second, the first corner starts biting under a second in
+     and the car is sideways well before three.
+
+     ALTERNATING IS THE WHOLE TRICK, and it is what makes this work for a
+     player who does nothing. One corner in one direction pushes a
+     passive car to that edge and holds it there, which is exactly the
+     flat stretch the old opening had after its curve. Corners that swap
+     direction push it back across the road, so a player who never
+     touches the screen is carried through slide, counter slide and
+     slide again, and the multiplier climbs on its own. The game
+     demonstrates itself.
+
+     WIDER WHILE IT DOES IT. The alternation is deliberately violent for
+     an opening, so the road is opened out through it and closes back to
+     normal by the time the seeded road takes over. Nothing here can kill
+     regardless, because the opening holds the edge rather than ending
+     the run, but a car pinned to the lip is a car that has stopped
+     sliding, and the width is what keeps it moving instead.
+
+     IT IS NOT SEEDED AND IT MUST NOT BE. These are the same segments on
+     every level, every day and every device, which is what lets two
+     players compare a time at all. Changing them changes every road's
+     first eight seconds, which is why ROAD_GEN moves with it. */
+  addRun(FEEL.OPENING_STRAIGHT, 0, 0, 1.14, 1.26, false);
+  /* THE HOLDS ARE SHORT ON PURPOSE. At 74 segments each the car reached
+     the edge with a third of the corner still to run and sat there, and
+     the seconds either side of the reversal measured 0.08 and 0.05 slip:
+     the same flat stretch this was built to remove, moved along a bit.
+     The corner has to reverse while the car is still travelling. */
+  addRun(18, 0, FEEL.CURVE_MEDIUM, 1.26, 1.26, true);
+  addRun(44, FEEL.CURVE_MEDIUM, FEEL.CURVE_MEDIUM, 1.26, 1.26, false);
+  addRun(30, FEEL.CURVE_MEDIUM, -FEEL.CURVE_MEDIUM, 1.26, 1.26, true);
+  addRun(44, -FEEL.CURVE_MEDIUM, -FEEL.CURVE_MEDIUM, 1.26, 1.26, false);
+  addRun(30, -FEEL.CURVE_MEDIUM, FEEL.CURVE_MEDIUM, 1.26, 1.26, true);
+  addRun(44, FEEL.CURVE_MEDIUM, FEEL.CURVE_MEDIUM, 1.26, 1.22, false);
+  // Easing down and closing to normal width, handing over to the seeded road.
+  addRun(34, FEEL.CURVE_MEDIUM, -FEEL.CURVE_GENTLE, 1.22, 1.10, true);
+  addRun(70, -FEEL.CURVE_GENTLE, -FEEL.CURVE_GENTLE, 1.10, 1.02, false);
+  addRun(30, -FEEL.CURVE_GENTLE, 0, 1.02, 1, true);
   addRun(60, 0, 0, 1, 1, false);
 }
 
@@ -14563,6 +14613,13 @@ function clearDailyRecords() {
    five are new and have no records to lose, and levels one and two are
    the same length they always were.
 
+   BUMPED TO 4 FOR THE OPENING REBUILD. The first 350 segments of every
+   road are not seeded, they are written out in resetRoad, and they have
+   changed: a short lead in and three alternating corners instead of 140
+   segments of straight and one gentle bend. Every level of every day
+   therefore starts on different geometry, so every stored time and every
+   stored ghost was set on a road that no longer exists.
+
    THE ALL TIME BEST IS DELIBERATELY NOT TOUCHED. Jump points and the
    close call raise a run's score by five to ten percent, which makes an
    old record marginally easier to beat rather than impossible, and that
@@ -14570,7 +14627,7 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-const ROAD_GEN = 3;
+const ROAD_GEN = 4;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
