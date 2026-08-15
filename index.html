@@ -2335,6 +2335,13 @@ const FEEL = {
      here. The title screen is the only screen that reserves any of this;
      the death and completion screens still sit on DEATH_BOTTOM alone. */
   TITLE_FINE_GAP:             6,     // pixels, canvas copy to fine print
+  /* WHEN A MISS IS NEAR ENOUGH TO BE WORTH SAYING. Handoff 7.3: the
+     mechanic works on proximity and reporting a distant miss is only a
+     reminder that you are bad at it, so both of these are ceilings and
+     the line simply does not appear above them. A gate is 3000 metres
+     apart, so 600 is the last fifth of the run in to it. */
+  NEAR_GATE_METRES:         600,     // LIVE, metres to the next gate that counts as near
+  NEAR_SCORE_SHARE:        0.15,     // LIVE, share of the bar being chased that counts as near
   DEATH_PROMPT_GAP:        0.115,    // of the smaller dimension, prompt above the button
   RESUME_FLASH_TIME:       0.45,     // the wash on arriving back at the gate
 
@@ -3271,6 +3278,26 @@ const FEEL = {
   GHOST_CABIN_BACK:        0.22,     // and set back, so it has a bonnet
   GHOST_PASS_GAP:           900,     // world units of hysteresis, so a dead heat is not a strobe
   GHOST_PASS_COOLDOWN:      2.5,     // seconds between pass callouts
+
+  /* THE PACE CAR. A ghost for a player who has never driven this level
+     and therefore has nothing to race. See ghostSynthesise: it is driven
+     by the real drift model over the real road rather than drawn as a
+     curve, so everything below is a driver's parameter and not a shape.
+
+     THE TWO THAT DECIDE THE WHOLE FEATURE ARE THE FIRST TWO. Together
+     they say when it gets passed: the head start closes at
+     (1 - PACE) * SPEED, so the catch is HEAD * PACE / (1 - PACE)
+     seconds, and the callout fires PASS_GAP later. At 0.90 and 0.40 that
+     is 3.6 and 4.6 seconds, both inside the unfailable opening, which is
+     the point. It must be beaten by somebody who has never played. */
+  GHOST_PACE:              0.90,     // its speed, as a share of SPEED. Under 1 or it cannot be passed
+  GHOST_HEAD_START:        0.40,     // seconds of road it is given at the line
+  GHOST_LINE_INSIDE:       0.70,     // how far toward the inside of a corner it aims, in half widths
+  GHOST_LOOK_SEGMENTS:       14,     // how far up the road it reads the corner. Lower turns in later
+  GHOST_STEER_P:           2.10,     // lane holding gain, half widths of error to full lock
+  GHOST_STEER_D:           0.85,     // damping on its own sideways speed, or it weaves
+  GHOST_SYNTH_EDGE:        0.80,     // it never reaches the scrape band at 0.87
+  GHOST_SYNTH_SUBSTEPS:       8,     // physics steps per sample, about 74 a second
 
   /* ----------------------------------------------------------------
      Progressive difficulty, in two halves that are deliberately not the
@@ -8118,6 +8145,12 @@ function startRun() {
   biomeSeed(mode === DAILY ? (levelSeedFor(todayStamp, level) ^ 0x5bf03635)
                            : ((Math.random() * 0xFFFFFFFF) >>> 0));
   resetRoad(nextSeed());
+  /* AFTER THE ROAD, BECAUSE IT DRIVES ON IT. syncLevelRecord above has
+     already loaded this level's stored line if there is one, so this
+     only ever fires for a level that has never been finished OR failed,
+     which is to say a first ever run. The moment one ends, ghostBank
+     writes the player's own and the pace car is gone for good. */
+  if (mode === DAILY && !ghost.live) ghostSynthesise();
   ghost.i = 0;
   ghost.said = 0;
   ghost.shown = false;
@@ -8912,11 +8945,21 @@ function hazardBand(carIndex, localHalf) {
    debris, and the world holds still for a moment. A hazard was a solid
    thing that killed you by being touched, and it read as the game simply
    stopping. */
-const OFF_ROAD = 0, HIT_OBJECT = 1;
+/* THREE CAUSES, NOT TWO, AND THE THIRD WAS INVISIBLE. Running the clock
+   out called crash() with no argument, so it recorded as OFF_ROAD and
+   the death screen could not tell a player who drove off the road from
+   one who simply ran out of time. Those are opposite mistakes and the
+   fix for each is the opposite thing.
+
+   RAN_OUT IS NEVER AN IMPACT, which is all the rest of the file asks:
+   every other reader tests `=== HIT_OBJECT` and treats anything else as
+   a fall, so a third value behaves exactly as OFF_ROAD did everywhere
+   except where it is named. */
+const OFF_ROAD = 0, HIT_OBJECT = 1, RAN_OUT = 2;
 let deathKind = OFF_ROAD;
 
 function crash(kind) {
-  deathKind = kind === HIT_OBJECT ? HIT_OBJECT : OFF_ROAD;
+  deathKind = (kind === HIT_OBJECT || kind === RAN_OUT) ? kind : OFF_ROAD;
   audioCrash();
   runDistance = Math.round(position / 100);   // world units are centimetres
   bankScore();
@@ -10187,6 +10230,7 @@ const ghostRec = { x: [], yaw: [], dt: [], n: 0, live: false, nextZ: 0, lastT: 0
 const ghost = {
   x: [], yaw: [], t: [], n: 0,
   live: false,        // there is a line to replay
+  synth: false,       // and it was GENERATED, not recorded. See ghostSynthesise
   shown: false,       // and it is on screen right now
   i: 0,               // replay cursor, monotonic
   pos: 0,             // where it is along the road, same space as `position`
@@ -10197,8 +10241,16 @@ const ghost = {
 
 function ghostClear() {
   ghost.x.length = 0; ghost.yaw.length = 0; ghost.t.length = 0;
-  ghost.n = 0; ghost.live = false; ghost.shown = false;
+  ghost.n = 0; ghost.live = false; ghost.synth = false; ghost.shown = false;
 }
+
+/* What the ghost is called on screen, and it is the whole of "this is
+   not your line". A generated one is a PACE CAR and a recorded one is a
+   GHOST, everywhere the player can read it: the mode line, the gap
+   readout and both pass callouts. From the second run onwards the word
+   changes on its own, which is a better explanation of what a ghost is
+   than any sentence would be. */
+function ghostNoun() { return ghost.synth ? 'PACE CAR' : 'GHOST'; }
 
 function ghostEncode() {
   const out = [];
@@ -10334,6 +10386,99 @@ function ghostBank() {
 }
 
 /* ------------------------------------------------------------------
+   THE PACE CAR, AND WHY THE BEST FEATURE IN THE GAME WAS INVISIBLE.
+
+   The ghost is the last run on this level, so on a level nobody has
+   driven there is no ghost, so a player's FIRST run of a track, which is
+   the run that decides whether they play a second one, is the only run
+   with nothing on the road beside them. The one feature that turns a
+   score into a race was unreachable until after the race would have
+   mattered. This generates one instead.
+
+   IT IS DRIVEN, NOT DRAWN, and that is the whole of why it is credible.
+   A line plotted as a curve through the corners would have no slip in
+   it: the car would be a shape sliding along a path. This runs the REAL
+   drift model, the same three lines update runs, over the REAL road,
+   with a lane holding driver on the front of it. Heading and travel come
+   apart in the corners exactly the way the player's do, so the yaw
+   angle it is drawn at is a genuine slip angle and it is sideways
+   because it is sliding, not because it was told to be.
+
+   IT COVERS THE OPENING AND NOTHING MORE, and that is deliberate rather
+   than a limit worked around. Only the opening exists as road when a run
+   starts: the daily generates ahead of the camera and trims behind, so
+   there is nothing further up to drive on yet. That turns out to be
+   exactly the right span. The opening is where the demonstration belongs
+   and it is the stretch a first timer cannot die in, so the whole race
+   with the pace car happens somewhere failing is impossible.
+
+   BEATABLE, WHICH IS A NUMBER AND NOT AN OPINION. See GHOST_PACE.
+   ------------------------------------------------------------------ */
+function ghostSynthesise() {
+  ghostClear();
+  const step = ghostStep();
+  const speed = FEEL.SPEED * FEEL.GHOST_PACE;
+  const rate = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE;
+  const sub = Math.max(1, Math.round(FEEL.GHOST_SYNTH_SUBSTEPS));
+  const dt = step / speed / sub;
+  // The same exponential form update uses, so the two agree exactly
+  // rather than approximately, at whatever substep this runs at.
+  const kh = 1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME);
+  const kg = 1 - Math.exp(-dt / FEEL.GRIP_TIME);
+  const last = segments.length - 1;
+  if (last < 1) return false;
+  const nMax = Math.min(Math.floor(last * FEEL.SEGMENT_LENGTH / step),
+                        FEEL.GHOST_MAX_SAMPLES - 1);
+  /* z is its own distance along the road, x its offset from the centre
+     in world units, hv and lv the heading and travel speeds the drift
+     model calls headingV and lateralV. t starts NEGATIVE, which is the
+     head start: at runTime zero the replay cursor is already some way
+     up the road and there is a car in front of the player on frame one. */
+  let z = 0, x = 0, hv = 0, lv = 0, t = -FEEL.GHOST_HEAD_START;
+  for (let i = 0; i <= nMax; i++) {
+    const at = clamp(Math.round(z / FEEL.SEGMENT_LENGTH), 0, last);
+    ghost.x.push(x);
+    ghost.yaw.push(Math.atan(hv / speed) * FEEL.CAR_YAW_GAIN
+                   + segments[at].curve * curveScale * FEEL.CAR_CURVE_YAW);
+    ghost.t.push(t);
+    for (let k = 0; k < sub; k++) {
+      const j = clamp(Math.round(z / FEEL.SEGMENT_LENGTH), 0, last);
+      const half = segments[j].hw;
+      const curve = segments[j].curve * curveScale;
+      /* THE DRIVER, and it is four numbers. It aims at the INSIDE of the
+         corner it can see up the road, which is the side centrifugal is
+         pushing it away from, so holding that line costs it real lock
+         and real slip. Aiming at the centre was tried and the car simply
+         got shoved wide with the wheel nearly straight, which looks like
+         a car being blown about rather than one being driven. */
+      const soon = segments[clamp(j + Math.round(FEEL.GHOST_LOOK_SEGMENTS), 0, last)];
+      const aim = clamp(soon.curve * curveScale / FEEL.CURVE_HARD, -1, 1)
+                * FEEL.GHOST_LINE_INSIDE * half;
+      const steer = clamp(FEEL.GHOST_STEER_P * (aim - x) / half
+                          - FEEL.GHOST_STEER_D * (lv / rate), -1, 1);
+      const intent = steer * rate;
+      hv += (intent - hv) * kh;
+      lv += (intent - curve * FEEL.CENTRIFUGAL * rate - lv) * kg;
+      x += lv * dt;
+      // The edge, on the same rule the car has: the wall takes the
+      // sideways speed that is pushing into it and nothing else. It is a
+      // guard rather than a shape, and it measures as never touched.
+      const wall = half * FEEL.GHOST_SYNTH_EDGE;
+      if (Math.abs(x) > wall) {
+        x = clamp(x, -wall, wall);
+        if (lv * x > 0) lv = 0;
+      }
+      z += speed * dt;
+      t += dt;
+    }
+  }
+  ghost.n = ghost.x.length;
+  ghost.live = ghost.n > 1;
+  ghost.synth = ghost.live;
+  return ghost.live;
+}
+
+/* ------------------------------------------------------------------
    THE LINE BETWEEN SAMPLES, AND WHY IT IS A CURVE AND NOT A CHORD.
 
    The samples are evenly spaced in DISTANCE, so index space is the
@@ -10400,7 +10545,14 @@ function ghostUpdate(dt) {
        ghost simply is not there any more, which is exactly what having
        outlasted it means. */
     ghost.pos = (ghost.n - 1) * ghostStep();
-    ghostPass();
+    /* A RECORDED ghost that has run out is still worth passing: reaching
+       the point where your last run ended is the whole meaning of it. A
+       PACE CAR that has run out has only left the built road, so drawing
+       level with the spot it stopped at is nothing at all, and announcing
+       it put PASSED THE PACE CAR on screen for a car that had not been
+       visible for seconds. Measured: it fired at 11.9s for a player who
+       never got near it. */
+    if (!ghost.synth) ghostPass();
     return;
   }
   const a = ghost.t[ghost.i], b = ghost.t[ghost.i + 1];
@@ -10425,9 +10577,9 @@ function ghostPass() {
   ghost.ahead = ahead;
   if (ghost.said > 0) return;
   ghost.said = FEEL.GHOST_PASS_COOLDOWN;
-  if (ahead) sayDrift('GHOST AHEAD', COLOUR.GHOST_EDGE, 1, true);
+  if (ahead) sayDrift(ghostNoun() + ' AHEAD', COLOUR.GHOST_EDGE, 1, true);
   else {
-    sayDrift('PASSED THE GHOST', COLOUR.GATE, 1.1, true);
+    sayDrift('PASSED THE ' + ghostNoun(), COLOUR.GATE, 1.1, true);
     /* A SOUND, WHICH IT NEVER HAD. Going past the only rival in the game
        was a line of text and nothing else, which is the definition of a
        silent event. No flash: the screen wash belongs to the record
@@ -11389,6 +11541,36 @@ function nextCar() {
   }
   return 0;
 }
+/* THE NEXT CAR AND HOW FAR AWAY IT IS.
+
+   Six cars exist and the ladder was invisible: a player saw NEW CAR
+   UNLOCKED once and had no way of knowing there was another one, or
+   what it wanted. Handoff 5 ranks unlocks fifth and the whole value of
+   them is the SHOWING, not the having.
+
+   THE NEAREST LOCKED ONE, by whichever of its two requirements is still
+   outstanding. Nothing is invented: need is levels finished and days is
+   whole days finished clean, and both are already counted. Empty once
+   they are all earned, because a ladder with nothing left on it is
+   clutter rather than a goal. */
+function nextUnlockLine() {
+  for (let i = 0; i < CARS.length; i++) {
+    if (carUnlocked(i)) continue;
+    const c = CARS[i];
+    const tracks = Math.max(0, c.need - finishedEver);
+    const days = Math.max(0, c.days - cleanDaysEver);
+    /* The one still outstanding, and the LONGER one when both are, so
+       the number shown is the one that actually gates it. */
+    if (days > 0 && (tracks === 0 || days * 5 >= tracks)) {
+      return c.name + ' IN ' + days + (days === 1 ? ' CLEAN DAY' : ' CLEAN DAYS');
+    }
+    if (tracks > 0) {
+      return c.name + ' IN ' + tracks + (tracks === 1 ? ' TRACK' : ' TRACKS');
+    }
+  }
+  return '';
+}
+
 function pickCar(i) {
   carPick = i;
   storeSet('car', String(i));
@@ -12702,6 +12884,49 @@ function roundRect(x, y, w2, h2, r) {
    just ended. */
 const restartRect = { x: 0, y: 0, w: 0, h: 0, live: false };
 
+/* WHAT ENDED THE RUN, IN THREE WORDS, where the eye already goes.
+
+   Handoff 7.3: a death screen that says only that you died teaches
+   nothing, and the player has to leave it knowing what to fix. These
+   are the three things that can end a run and they want opposite
+   answers: off the road means steer earlier, a hazard means read the
+   lane arrows, out of time means drift more because the clock is fed by
+   slip. */
+function deathCauseLine() {
+  if (deathKind === HIT_OBJECT) return 'HIT A HAZARD';
+  if (deathKind === RAN_OUT) return 'OUT OF TIME';
+  return 'OFF THE ROAD';
+}
+
+/* AND HOW CLOSE IT WAS, BUT ONLY WHEN IT WAS CLOSE.
+
+   Handoff 7.3 is explicit that this works on proximity and that a
+   distant miss is just a reminder that you are bad at it, so every
+   branch here has a ceiling and returns nothing above it.
+
+   THE GATE COMES FIRST because it is the one the player can picture.
+   They watched the pips; one more gate is a thing they nearly had.
+   Distance is in metres off the same hundred-to-one that runDistance
+   uses. Then the score, against today's best on this level if there is
+   one and the all time best otherwise, because being just short of a
+   number you have seen is the other kind of near. */
+function nearMissLine() {
+  if (mode === DAILY && state === DEAD && nextGate > carSegIndex) {
+    const away = Math.round((nextGate - carSegIndex) * FEEL.SEGMENT_LENGTH / 100);
+    if (away <= FEEL.NEAR_GATE_METRES) return away + 'm SHORT OF THE NEXT GATE';
+  }
+  const final = banked;
+  const bar = (mode === DAILY && dailyBest > 0) ? dailyBest
+            : (bestScore > 0 ? bestScore : 0);
+  if (bar > 0 && final < bar) {
+    const off = bar - final;
+    if (off <= bar * FEEL.NEAR_SCORE_SHARE) {
+      return off + (mode === DAILY && dailyBest > 0 ? " OFF TODAY'S BEST" : ' OFF YOUR BEST');
+    }
+  }
+  return '';
+}
+
 function drawResult(w, h) {
   const s = Math.min(w, h);
   const final = banked;
@@ -12742,10 +12967,12 @@ function drawResult(w, h) {
     text('FURTHEST YET', w / 2, y0, Math.round(s * 0.05), '900', 'center', COLOUR.GATE);
     ctx.globalAlpha = 1;
   } else {
-    text(!clean ? 'CONTINUED RUN'
-         : daily ? "TODAY  " + dailyBest
-         : 'BEST  ' + bestScore,
-         w / 2, y0, Math.round(s * 0.042), '700');
+    /* THE CAUSE, IN THE SLOT THAT USED TO RESTATE THE RECORDS. TODAY and
+       BEST were both already on the rec line lower down, so this is a
+       swap and not an addition: no row is added, nothing below moves,
+       and landscape is not made any tighter than it already is. */
+    text(deathCauseLine(), w / 2, y0, Math.round(s * 0.046), '800',
+         'center', COLOUR.HAZARD_WARN);
   }
 
   arcadeNumber(String(shown), w / 2, y0 + s * 0.095, Math.round(s * 0.145),
@@ -12798,9 +13025,17 @@ function drawResult(w, h) {
      is obvious without a word of explanation. */
   const rec = which + '     ' + (daily ? 'TODAY  ' + dailyBest + '     ' : '')
             + 'BEST  ' + bestScore + '     FURTHEST  ' + furthest + 'm';
-  ctx.globalAlpha = 0.72;
-  text(rec, w / 2, y0 + s * 0.30,
-       fittedSize(rec, '700', Math.round(s * 0.032), w * 0.9), '700');
+  /* THE NEAR MISS TAKES THIS ROW WHEN THERE IS ONE, and takes it rather
+     than sits under it. A fourth restatement of BEST is the least
+     valuable line on this screen and being forty metres short of a gate
+     is the most, so on the runs where the second exists it replaces the
+     first. Again a swap: the row count does not change. */
+  const near = nearMissLine();
+  const line = near || rec;
+  ctx.globalAlpha = near ? 0.95 : 0.72;
+  text(line, w / 2, y0 + s * 0.30,
+       fittedSize(line, near ? '800' : '700', Math.round(s * 0.032), w * 0.9),
+       near ? '800' : '700', 'center', near ? COLOUR.SCORE_BEST : COLOUR.TEXT);
   ctx.globalAlpha = 1;
 
   /* The prompt and the buttons, anchored to the bottom edge rather than
@@ -12816,7 +13051,44 @@ function drawResult(w, h) {
   const btnY = h - safeBottom - FEEL.DEATH_BOTTOM;
   const size = Math.round(s * 0.038);
   const rowH = size * 2.2 * 1.35;
-  drawShareButton(w, h, s, btnY, size);
+
+  /* SHARE IS SIZED AND PLACED FROM THE ROOM LEFT BESIDE A CENTRED
+     RESTART, AND THIS IS A BUG FIX RATHER THAN A TIDY UP.
+
+     It sat at a fixed fraction of the width to the right of centre. The
+     two rects overlapped by 3.5 pixels at 390 wide and at every one of
+     the eight sizes rects32 measures, and the check has been failing
+     since the share button was added. A tap in the overlap goes to
+     whichever hit test runs first, which is share, so the reflex RESTART
+     had a dead strip down its right hand edge on every phone.
+
+     The fraction cannot be made to work. Widening it clears SHARE at 390
+     with under two pixels to spare at two of the eight sizes, and it
+     still overlaps by twenty five while the card is building and the
+     label is SHARE ..., which on a death screen is the first second the
+     button is live.
+
+     So the room is measured and the button is sized to it, which is the
+     one move that keeps the comment below true. Restart does not move.
+     It is measured against the WIDEST label share can show, so the row
+     does not shift when the card lands and the dots go away. */
+  let shSize = size, shCx;
+  if (resume) {
+    ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    const reW = Math.min(w * 0.92, ctx.measureText('RESTART').width + size * 2.4);
+    const edge = Math.max(8, s * 0.02);
+    const gap = size * 0.6;
+    const room = w / 2 - edge - reW / 2 - gap;
+    let shW = 0;
+    while (shSize > 8) {
+      ctx.font = '800 ' + shSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      shW = ctx.measureText('SHARE ...').width + shSize * 2.4;
+      if (shW <= room) break;
+      shSize--;
+    }
+    shCx = w / 2 + reW / 2 + gap + shW / 2;
+  }
+  drawShareButton(w, h, s, btnY, shSize, false, shCx);
 
   /* THE DAILY, OFFERED AT THE MOMENT THE PLAYER IS DECIDING WHETHER TO
      GO AGAIN. That is the honest place to say there is something else,
@@ -12847,7 +13119,7 @@ function drawResult(w, h) {
     ctx.globalAlpha = 0.55;
     const sub = 'track #' + trackNumber(todayStamp) + ', '
               + levelCount() + ' levels, one road for everyone'
-              + (ghost.live ? ', your ghost is waiting' : '')
+              + (ghost.live && !ghost.synth ? ', your ghost is waiting' : '')
               + (hasKeyboard ? '     press T' : '');
     text(sub, w / 2, stack - size * 1.5,
          fittedSize(sub, '700', Math.round(s * 0.026), w * 0.92), '700');
@@ -13715,7 +13987,14 @@ function shareRun() {
              + (daily ? 'TRACK #' + trackNumber(todayStamp) + (lv ? '   ' + lv : '')
                       : 'RANDOM TRACK');
   let body;
-  if (state === FINISHED) {
+  if (state === TITLE) {
+    /* SENT FROM THE TITLE SCREEN, where there is no run to describe.
+       The card is a picture of the DAY, so the text is too: how much of
+       it is done and how much of that was clean. */
+    const t = dayTotals();
+    body = t.done + ' of ' + t.n + ' finished'
+         + (t.done > 0 ? ', ' + t.clean + ' clean, ' + t.score + ' points' : '');
+  } else if (state === FINISHED) {
     body = banked + ' points, finished in ' + timeLabel(finishTime)
          + (finishClean ? ', clean'
             : ', on ' + continues + (continues === 1 ? ' continue' : ' continues'));
@@ -13817,6 +14096,10 @@ function copyTextOnly(text) {
 const shareRect = { x: 0, y: 0, w: 0, h: 0, live: false };
 function hitShare(e) {
   if (!shareRect.live) return false;
+  /* THE TITLE SCREEN CARRIES ONE NOW. No input lock there: nothing has
+     just happened that a reflex could still be spending, and the button
+     is off centre for the same reason it is everywhere else. */
+  if (state === TITLE) return hitRect(shareRect, e);
   if (state !== DEAD && state !== FINISHED) return false;
   return hitRect(shareRect, e);
 }
@@ -13829,7 +14112,7 @@ function hitShare(e) {
    in to clear the corner pads. It sits in the same place whether restart
    is drawn or not, so it never migrates under a thumb heading for the
    centre. */
-function drawShareButton(w, h, s, btnY, size, hero) {
+function drawShareButton(w, h, s, btnY, size, hero, cx) {
   /* THE CARD IS ASKED FOR HERE, which is the first frame the button is
      on screen and therefore the earliest moment it could possibly be
      wanted. It is keyed on the result, so this is one build per run and
@@ -13870,8 +14153,13 @@ function drawShareButton(w, h, s, btnY, size, hero) {
      shares the text, which is what the game did before this session
      existed. The three dots are there so the player knows a better
      version is a moment away, not so they are made to wait for it. */
+  /* cx overrides the offset entirely, which is what the title screen
+     needs: there the pairing is packed from the measured label widths
+     rather than from a fraction, because the two labels are very
+     different lengths and a symmetric offset clears one and not the
+     other. Everywhere else it is undefined and nothing changes. */
   canvasButton(shareRect, shareCard.building ? 'SHARE ...' : 'SHARE',
-               w / 2 + dx, yy, big,
+               cx === undefined ? w / 2 + dx : cx, yy, big,
                hero ? COLOUR.SCORE_BEST : COLOUR.GATE, w);
 }
 
@@ -13902,6 +14190,19 @@ function titleFactLine() {
   if (levelCount() > 1) {
     bits.push(dayDone() ? (dayClean() ? 'DAY COMPLETE, CLEAN' : 'DAY COMPLETE')
                         : levelLabel(nextLevel()));
+  }
+  /* THE CUMULATIVE COUNT, WHICH WAS STORED AND NEVER SHOWN. finishedEver
+     is levels finished across every day, monotonic by construction, and
+     handoff section 4 is explicit that it is what replaces any notion of
+     a streak: it only ever goes up, so it survives a weekend and it
+     survives a summer, and it cannot tell a child they failed.
+
+     IN THE FACTS LINE, NOT A ROW OF ITS OWN. It is a trophy, not an
+     instruction, and this screen has been stripped twice to keep it
+     spare. Absent at zero, so a first visit still reads as a clean start
+     rather than as a form with nothing in it. */
+  if (finishedEver > 0) {
+    bits.push(finishedEver + (finishedEver === 1 ? ' TRACK' : ' TRACKS'));
   }
   if (bestScore > 0) bits.push('BEST ' + bestScore);
   const r = recFor(nextLevel());
@@ -14160,9 +14461,37 @@ function drawOverlay(w, h) {
        untouched, because they carry no fine print: it is a title screen
        thing and it lives and dies with the title screen. */
     const by0 = h - safeBottom - FEEL.DEATH_BOTTOM - fine;
+    /* TWO TARGETS ON THIS ROW NOW, PAIRED THE WAY EVERY OTHER SCREEN IN
+       THIS GAME PAIRS THEM. Handoff 3.1 calls the share the growth
+       engine and it was reachable only from a completion, which is the
+       rarest screen in the game: a player has to finish a level to tell
+       anybody about it. From here it is one tap, and the card it builds
+       is a picture of the whole day rather than of one run.
+
+       RANDOM TRACK MOVES OFF CENTRE TO MAKE ROOM, and that is the cost.
+       It is the same offset pairing the completion screen has carried
+       since it was measured clear of the pads in both orientations, and
+       the centre of the bottom row is deliberately left empty on every
+       screen in this game because that is where a reflex tap lands. */
+    /* THE OFFSET IS MEASURED, NOT PICKED. A fixed fraction of the width
+       put RANDOM TRACK's left edge on the screen edge at 390: the two
+       labels are very different lengths, so a symmetric offset that
+       clears one does not clear the other. Each half is given room for
+       its own label plus a gutter, and the pair is centred in what is
+       left. canvasButton sizes itself the same way, so measuring the
+       text here asks exactly the question it will answer. */
+    const bsize = Math.round(s * 0.033);
+    ctx.font = '800 ' + bsize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    const altW = ctx.measureText('RANDOM TRACK').width + bsize * 2.4;
+    const shW = ctx.measureText('SHARE').width + bsize * 2.4;
+    const edge = Math.max(8, s * 0.02);
+    // The pair, packed from the outside in, and never past the middle.
+    const altCx = Math.max(edge + altW / 2, w / 2 - (altW / 2 + s * 0.03));
+    const shCx = Math.min(w - edge - shW / 2, w / 2 + (shW / 2 + s * 0.03));
     altRect.to = ENDLESS;
-    canvasButton(altRect, 'RANDOM TRACK', w / 2, by0 - s * 0.050,
-                 Math.round(s * 0.038), COLOUR.TEXT, w);
+    canvasButton(altRect, 'RANDOM TRACK', altCx, by0 - s * 0.050,
+                 bsize, COLOUR.TEXT, w);
+    drawShareButton(w, h, s, by0 - s * 0.050, bsize, false, shCx);
     ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
     const sub = 'not scored against the world'
               + (hasKeyboard ? '     press R' : '');
@@ -14175,12 +14504,31 @@ function drawOverlay(w, h) {
        where nothing that changes anything belongs. Named rather than
        shown as a swatch, because the name is what the unlock announced
        and the car itself is on screen behind this the moment you tap. */
+    const carY = by0 - s * 0.050 - s * 0.098;
     if (carsUnlocked() > 1) {
-      canvasButton(carRect, 'CAR  ' + activeCar().name, w / 2,
-                   by0 - s * 0.050 - s * 0.098, Math.round(s * 0.032),
-                   COLOUR.SCORE_BEST, w);
+      canvasButton(carRect, 'CAR  ' + activeCar().name, w / 2, carY,
+                   Math.round(s * 0.032), COLOUR.SCORE_BEST, w);
     } else {
       carRect.live = false;
+    }
+    /* THE LADDER, WHICH WAS INVISIBLE. Six cars exist and a player saw
+       NEW CAR UNLOCKED once with no way of knowing there was another or
+       what it wanted. One line, dim, directly under the car it is about,
+       and it disappears entirely once they are all earned rather than
+       sitting there saying nothing.
+
+       IT SHARES THE CAR'S ROW WHEN THERE IS NO CAR BUTTON, which is a
+       first time player, so the screen does not gain a row for them
+       either: on a cold profile this line is the only thing in that
+       band and it is the one worth having there. */
+    const ladder = nextUnlockLine();
+    if (ladder) {
+      ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
+      const ly = carsUnlocked() > 1 ? carY + s * 0.036 : carY;
+      text('NEXT  ' + ladder, w / 2, ly,
+           fittedSize('NEXT  ' + ladder, '700', Math.round(s * 0.027), w * 0.92),
+           '700', 'center', COLOUR.TITLE_DIM);
+      ctx.globalAlpha = 1;
     }
   } else if (state === DEAD) {
     dailyRect.live = false;
@@ -14371,7 +14719,7 @@ function updateClock(dt) {
   if (noClock) { if (clock < FEEL.CLOCK_START) clock = FEEL.CLOCK_START; return; }
   clock += (FEEL.CLOCK_DRIFT_RATE * slipPay() - 1) * dt;
   if (clock > FEEL.CLOCK_MAX) clock = FEEL.CLOCK_MAX;
-  if (clock <= 0) { clock = 0; crash(); }
+  if (clock <= 0) { clock = 0; crash(RAN_OUT); }
 }
 
 /* Crossing a gate. Everything a gate does happens here, once, on the
@@ -16106,6 +16454,10 @@ function modeSecondLine() {
   if (mode !== DAILY) return null;
   if (continues > 0) return 'CONTINUED RUN, IT CANNOT TAKE THE RECORD';
   if (!ghost.live) return 'NO GHOST YET, THIS RUN BECOMES ONE';
+  /* The pace car has to say BOTH things in one line: that the car ahead
+     is not yours, and that yours is one run away. A player told only the
+     first would read it as a rival they are stuck with. */
+  if (ghost.synth) return 'CHASING A PACE CAR, THIS RUN BECOMES YOUR GHOST';
   return 'CHASING YOUR LAST RUN';
 }
 
@@ -16194,7 +16546,10 @@ function modeLine() {
   if (dailyBest > 0) bits.push('BEST ' + dailyBest);
   let line = bits.join('   ');
   if (continues > 0) line += '   CONTINUED';
-  else if (ghost.live) line += '   ' + ghostGapLabel();
+  else if (ghost.live) {
+    const gap = ghostGapLabel();
+    if (gap) line += '   ' + gap;
+  }
   return { line: line, colour: COLOUR.GATE };
 }
 
@@ -16254,10 +16609,15 @@ function drawModeMark(w, h) {
    callouts say when you pass it, this says where it is the rest of the
    time. */
 function ghostGapLabel() {
-  if (runTime >= ghost.t[ghost.n - 1]) return 'GHOST OUTLASTED';
+  /* THE PACE CAR SAYS NOTHING ONCE IT IS DONE. It only has the opening
+     to drive, so its line runs out around ten seconds in and a run is
+     three minutes: OUTLASTED would be true and then sit there for the
+     rest of the track, which is furniture. A recorded ghost keeps it,
+     because outlasting a run of your own is the thing it measures. */
+  if (runTime >= ghost.t[ghost.n - 1]) return ghost.synth ? '' : 'GHOST OUTLASTED';
   const gap = (position - ghost.pos) / FEEL.SPEED;
-  if (Math.abs(gap) < 0.05) return 'GHOST LEVEL';
-  return 'GHOST ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 's';
+  if (Math.abs(gap) < 0.05) return ghostNoun() + ' LEVEL';
+  return ghostNoun() + ' ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 's';
 }
 
 function drawCallout(w, h) {
