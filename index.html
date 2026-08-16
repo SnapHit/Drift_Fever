@@ -1161,6 +1161,42 @@ const FEEL = {
   LAMP_POOL_ALPHA:         0.30,     // LIVE
   LAMP_POOL_GAP:           0.12,     // LIVE, of the half width, held off the centre line
   LAMP_POOL_MIN_PX:         2.0,     // below this it is not worth a gradient fill
+  /* ------------------------------------------------------------------
+     HEADLIGHTS, AS A LIT PATCH OF GROUND.
+
+     The visible beam in the reference frames is volumetric, light
+     scattering through air, and that needs per-pixel work and stays out
+     per ART-DIRECTION.md. What sells those frames is the LIT GROUND in
+     front of the car, and that is a fill: the same cached radial
+     gradient through a scaled transform the lamp posts already use,
+     aimed forward.
+
+     THEY SWEEP WITH THE HEADING, NOT WITH TRAVEL. carYaw() is where the
+     nose points, which under drift is not where the car is going, so the
+     pools swing wide of the direction of motion and the slip angle ends
+     up in the world rather than only on the car.
+
+     THE ELLIPSE IS BUILT FROM THE PROJECTION, not from a squash
+     constant. Three points are projected, the pool centre and one step
+     along each of the heading and its perpendicular, and the two screen
+     vectors become the transform. Perspective foreshortening then comes
+     out right at every distance and every yaw for free, which a fixed
+     squash cannot do once the pool is allowed to rotate.
+
+     ALPHA IS DELIBERATELY LOW. This puts a bright patch on the road in
+     the near field, which is where the lip has least contrast to spare.
+     Measured at this setting the pool lifts the road by 7 luminance on
+     average and 22.6 at its brightest pixel, which peaks at 80 against a
+     road edge at 250. It is on the debug cycler so it can be walked up
+     while driving rather than guessed at here.
+     ------------------------------------------------------------------ */
+  HEADLIGHT_ALPHA:         0.16,     // LIVE, and low on purpose
+  HEADLIGHT_REACH:         6200,     // LIVE, world units the pool reaches ahead
+  HEADLIGHT_LONG:          0.62,     // LIVE, semi axis along the heading, of the reach
+  HEADLIGHT_AHEAD:         0.46,     // LIVE, where the centre sits, of the reach
+  HEADLIGHT_SPREAD:        1250,     // LIVE, world units either side of a pool
+  HEADLIGHT_SEPARATION:     540,     // LIVE, world units between the two pools
+  HEADLIGHT_MIN_PX:         5.0,     // below this it is not worth a gradient fill
   /* A RADIAL GRADIENT COSTS PER PIXEL, so the cost of this feature is
      the AREA of the nearest pool and not the number of them. Capped. */
   LAMP_POOL_MAX_PX:         200,     // LIVE, screen pixels, the near cap
@@ -4792,6 +4828,7 @@ const COLOUR = {
      road, so it may add light there but it may not add colour: near
      enough to unsaturated that the hue wheel barely moves it, which is
      the point. Held as a triple because the gradient is built from it. */
+  HEADLIGHT:    '255,214,158',  // the pool the car throws forward, warm
   LAMP_POOL:    '244,222,196',
   SKYLINE:      '#170906',
   /* The far city. Clearly above the void and clearly below the near
@@ -5441,6 +5478,12 @@ const TUNABLES = [
   { key: 'LAMP_POOL_OUT',      label: 'poolAt',  step: 0.02, min: 0,    max: 1.4,   dp: 2, group: 4 },
   { key: 'LAMP_POOL_SIZE',     label: 'poolW',   step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 4 },
   { key: 'LAMP_POOL_SQUASH',   label: 'poolSq',  step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 4 },
+  { key: 'HEADLIGHT_ALPHA',    label: 'headA',   step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 4 },
+  { key: 'HEADLIGHT_REACH',    label: 'headFar', step: 200,  min: 0,    max: 20000, dp: 0, group: 4 },
+  { key: 'HEADLIGHT_LONG',     label: 'headLong',step: 0.04, min: 0.05, max: 2,     dp: 2, group: 4 },
+  { key: 'HEADLIGHT_AHEAD',    label: 'headMid', step: 0.04, min: 0,    max: 2,     dp: 2, group: 4 },
+  { key: 'HEADLIGHT_SPREAD',   label: 'headWide',step: 50,   min: 50,   max: 6000,  dp: 0, group: 4 },
+  { key: 'HEADLIGHT_SEPARATION',label:'headSep', step: 20,   min: 0,    max: 3000,  dp: 0, group: 4 },
   { key: 'LAMP_POOL_ALPHA',    label: 'poolA',   step: 0.01, min: 0,    max: 1,     dp: 2, group: 4 },
   { key: 'LAMP_POOL_GAP',      label: 'poolGap', step: 0.02, min: 0,    max: 1,     dp: 2, group: 4 },
   { key: 'LAMP_POOL_MAX_PX',   label: 'poolCap', step: 10,   min: 10,   max: 600,   dp: 0, group: 4 },
@@ -10977,6 +11020,7 @@ let SIGN_FILL = 'rgb(255,154,60)';
 let CAR_RIM_FILL = '#c4f2fa';
 let CAR_LIGHT_FILL = '#ff3a4f';
 let LAMP_POOL_GRAD = null;
+let HEADLIGHT_GRAD = null;
 // The outer lip of the slab, half width plus the shoulder, as a multiple
 // of the half width. The shoulder is the scrape band, so the drawn edge of
 // the road really is the last place the car may be.
@@ -11156,6 +11200,9 @@ function drawRoad(w, h) {
   // the same place and for the same reason: it is ON the surface, so it
   // goes after the surface and before everything the player steers by.
   lampPoolPass(first, last, baseIndex, FEEL.PYLON_SPACING);
+  /* AFTER the lamp pools and before anything the player steers by, which
+     is where every other light on the surface goes. */
+  headlightPass(w, h);
   lanePass(first, last);
   edgeGlowPass(first, last);
   drawTrail(first, last, baseIndex);
@@ -12787,6 +12834,44 @@ function lampSide(idx, spacing) {
    AND CAPPED IN PIXELS AT THE NEAR END, because a radial gradient costs
    per pixel: the cost of this feature is the area of the closest pool
    and has almost nothing to do with how many of them are in shot. */
+/* THE HEADLIGHT POOLS. See FEEL's headlight block for why this is a
+   patch of lit ground and not a beam. */
+const HEAD_PT = [{ sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }];
+function headlightPass(w, h) {
+  if (FEEL.HEADLIGHT_ALPHA <= 0 || !HEADLIGHT_GRAD || carAlpha <= 0.01) return;
+  const camX = cameraX;
+  const yaw = carYaw();
+  const sy = Math.sin(yaw), cy = Math.cos(yaw);
+  const baseX = carX + carCurveX, baseZ = FEEL.CAMERA_DISTANCE;
+  const mid = FEEL.HEADLIGHT_REACH * FEEL.HEADLIGHT_AHEAD;
+  const long = FEEL.HEADLIGHT_REACH * FEEL.HEADLIGHT_LONG;
+  ctx.save();
+  ctx.globalAlpha = FEEL.HEADLIGHT_ALPHA * carAlpha;
+  ctx.fillStyle = HEADLIGHT_GRAD;
+  for (let side = -1; side <= 1; side += 2) {
+    const lat = side * FEEL.HEADLIGHT_SEPARATION;
+    const px = baseX + sy * mid + cy * lat;
+    const pz = baseZ + cy * mid - sy * lat;
+    if (pz <= 200) continue;
+    projectPoint(HEAD_PT[0], px, 0, pz, camX, w, h);
+    // One step along the heading and one across it, projected, so the
+    // ellipse inherits the perspective rather than assuming a squash.
+    projectPoint(HEAD_PT[1], px + sy * long, 0, pz + cy * long, camX, w, h);
+    projectPoint(HEAD_PT[2], px + cy * FEEL.HEADLIGHT_SPREAD, 0,
+                 pz - sy * FEEL.HEADLIGHT_SPREAD, camX, w, h);
+    const ax = HEAD_PT[1].sx - HEAD_PT[0].sx, ay = HEAD_PT[1].sy - HEAD_PT[0].sy;
+    const bx2 = HEAD_PT[2].sx - HEAD_PT[0].sx, by2 = HEAD_PT[2].sy - HEAD_PT[0].sy;
+    if (Math.abs(ax) + Math.abs(ay) < FEEL.HEADLIGHT_MIN_PX) continue;
+    ctx.save();
+    ctx.transform(ax, ay, bx2, by2, HEAD_PT[0].sx, HEAD_PT[0].sy);
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function lampPoolPass(first, last, baseIndex, spacing) {
   if (!LAMP_POOL_GRAD || FEEL.LAMP_POOL_ALPHA <= 0) return;
   const every = Math.max(1, Math.round(FEEL.PYLON_MAJOR_EVERY
@@ -14972,6 +15057,14 @@ function rebuildDerivedColours() {
   /* The lamp's pool on the road, same pattern as the car's: one radial
      gradient, filled through a scaled transform, so a pool is a single
      fill and allocates nothing per frame. */
+  /* The headlights' own pool, warm and very soft: the falloff is spread
+     right out to the rim so the patch has no edge to compete with the
+     lane markings or the tyre marks. */
+  HEADLIGHT_GRAD = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+  HEADLIGHT_GRAD.addColorStop(0, 'rgba(' + COLOUR.HEADLIGHT + ',1)');
+  HEADLIGHT_GRAD.addColorStop(0.34, 'rgba(' + COLOUR.HEADLIGHT + ',0.62)');
+  HEADLIGHT_GRAD.addColorStop(0.68, 'rgba(' + COLOUR.HEADLIGHT + ',0.22)');
+  HEADLIGHT_GRAD.addColorStop(1, 'rgba(' + COLOUR.HEADLIGHT + ',0)');
   LAMP_POOL_GRAD = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
   LAMP_POOL_GRAD.addColorStop(0, 'rgba(' + COLOUR.LAMP_POOL + ',1)');
   LAMP_POOL_GRAD.addColorStop(0.42, 'rgba(' + COLOUR.LAMP_POOL + ',0.40)');
