@@ -929,7 +929,7 @@ const FEEL = {
      asked for and which measures clean; at zero the road stays dark and
      the ground carries the light, which is what the frames show reading
      as a place rather than as grey. Both pass every hierarchy check. */
-  ROAD_ABOVE_TERRAIN:         0,     // LIVE
+  ROAD_ABOVE_TERRAIN:         1,     // LIVE
   EDGE_LIP_FRACTION:       0.13,     // of the half width, the bright lip itself
 
   /* ------------------------------------------------------------------
@@ -1296,9 +1296,18 @@ const FEEL = {
   DEPTH_EASE:              2.40,     // LIVE, above one holds the foreground
   DEPTH_STEPS:               20,     // LIVE, distinct fills a depth pass may use
   GROUND_GRADIENT_STOPS:     24,     // LIVE, the plane is one fill, so stops are free
-  SCENERY_FADE_FAR:        0.94,     // LIVE, how far an object at the draw distance
+  SCENERY_FADE_FAR:        0.74,     // LIVE, how far an object at the draw distance
                                      // has gone toward the ground it stands on
-  SCENERY_FADE_EASE:       2.60,     // LIVE, above one keeps the far band readable
+  SCENERY_FADE_EASE:       1.80,     // LIVE, above one keeps the near field's colour
+  SCENERY_DEPTH_STEPS:        6,     // LIVE, depth buckets the scenery batches into.
+                                     // Six materials by two faces by this many is the
+                                     // fill count, so it is the batching budget.
+  /* THE LIT WINDOWS. SIZE is a share of the object's height and BUCKETS
+     is the last depth bucket that gets any: nothing bright goes near the
+     vanishing point, which is the rule the whole horizon end obeys. */
+  SCENERY_WINDOW_SIZE:     0.045,    // LIVE, of the object height
+  SCENERY_WINDOW_MIN_PX:     1.1,    // below this it is a shimmering speck
+  SCENERY_WINDOW_BUCKETS:      2,    // LIVE, the last bucket that gets any
   /* FIELDS ON THE TERRAIN SHOULDER. See groundPatchPass.
 
      THEY WERE ON THE GROUND PLANE AND THEY WERE NOT THERE. Measured off
@@ -4032,10 +4041,19 @@ const BIOME_ROLE_RULES = [
   ['EMISSIVE_CORE',   'core'],
   ['SKY_',            'sky'],  ['HAZE',      'sky'],
   ['HORIZON_',        'sky'],
-  ['SCENERY_',        'scn'],
+  /* THE WINDOWS BEFORE THE REST OF THE SCENERY, because the first prefix
+     that matches wins and SCN_WINDOW_WARM starts with SCN_. It landed in
+     the scenery role, which forced a 236 luminance light source into the
+     scenery band AND dragged that band's authored maximum from 132 to
+     236, so the affine map compressed every material toward the floor:
+     measured, bark drew at 38 where it is authored at 52 and the
+     internal contrasts came out at 11 where they are authored at 22. */
+  ['SCN_WINDOW',      'win'],
+  ['SCN_',            'scn'],
   ['GROUND_',         'gnd'],  ['TERRAIN_',  'gnd'],
   ['GRID',            'gnd'],
-  ['SKYLINE_WINDOW',  'win'],  ['SKYLINE',   'cit'],
+  ['SKYLINE_WINDOW',  'win'],  ['SCN_WINDOW','win'],
+  ['SKYLINE',         'cit'],
   ['SIGN',            'cit'],
   ['CAR_',            'car'],  ['GHOST',     'car'],
   ['SCRAPE',          'car'],  ['SMOKE',     'car'],
@@ -4121,7 +4139,16 @@ function biomeRole(key) {
    surface at 40, and the terrain carries the biome's colour because it
    is the surface with room to carry it.
 
-   Flip ROAD_ABOVE_TERRAIN to see the other one on the phone. Both pass.
+   THAT ARGUMENT EXPIRED WHEN THE SCENERY GOT ITS COLOUR BACK, and the
+   default is the other way round now. It held while every object beside
+   the road was a black lump, because then the road was the only large
+   thing carrying any tone and lifting it took the last colour out of the
+   frame. With six materials on the objects the colour lives out in the
+   world where it belongs, the road can sit above the terrain the way it
+   was asked to three times over, and the frame does not go grey because
+   the road is no longer the only thing in it.
+
+   Flip ROAD_ABOVE_TERRAIN to 0 to see the other one. Both pass.
    ================================================================== */
 const BIOME_ROLE_BAND_DEFAULT = {
   /* THE EDGE FLOOR IS WHERE IT WAS AUTHORED, not lifted. The dim end of
@@ -4131,12 +4158,12 @@ const BIOME_ROLE_BAND_DEFAULT = {
      needs lifting when the road surface is lifted under it, which is the
      other band set's problem and not this one's. */
   edge: [78, 250],  win: [180, 215], surf: [20, 76],
-  cit:  [4, 150],   gnd: [22, 66],   scn:  [1, 56],
+  cit:  [4, 150],   gnd: [22, 66],   scn:  [24, 132],
   sky:  [3, 74]
 };
 const BIOME_ROLE_BAND_ROAD_ABOVE = {
-  edge: [108, 250], win: [180, 215], surf: [45, 110],
-  cit:  [4, 150],   gnd: [12, 48],   scn:  [1, 42],
+  edge: [92, 250],  win: [180, 215], surf: [45, 110],
+  cit:  [4, 150],   gnd: [14, 48],   scn:  [24, 132],
   sky:  [3, 74]
 };
 let BIOME_ROLE_BAND = BIOME_ROLE_BAND_DEFAULT;
@@ -4154,7 +4181,7 @@ let BIOME_ROLE_BAND = BIOME_ROLE_BAND_DEFAULT;
    that IS the role, so each one is named here. */
 const BIOME_ROLE_ANCHOR = {
   edge: 'EDGE_LIGHT', win: 'SKYLINE_WINDOW', surf: 'ROAD_LIGHT',
-  cit:  'SKYLINE',    gnd: 'TERRAIN_LIT',    scn:  'SCENERY_NEAR_LIT',
+  cit:  'SKYLINE',    gnd: 'TERRAIN_LIT',    scn:  'SCN_FOLIAGE_LIT',
   sky:  'SKY_LOW',    car: 'CAR_TOP'
 };
 
@@ -4186,51 +4213,63 @@ const BIOME_PALETTE = [
   /* 0  ember dusk: warm ochre ground, cold blue structures     gap 172 */
   { name: 'ember dusk',
     sky: [ 12, 0.80], gnd: [ 28, 0.72], scn: [200, 0.60], cit: [196, 0.75],
+    win: [ 40, 0.55],
     surf:[ 22, 0.52], edge:[ 32, 1.00], car: [190, 0.85] },
   /* 1  deep emerald ground, warm terracotta structures         gap 130 */
   { name: 'emerald and terracotta',
     sky: [162, 0.70], gnd: [150, 0.68], scn: [ 20, 0.72], cit: [ 26, 0.80],
+    win: [ 38, 0.60],
     surf:[158, 0.46], edge:[150, 1.00], car: [ 30, 0.80] },
   /* 2  steel slate ground, burnt coral structures              gap 160 */
   { name: 'slate and coral',
     sky: [218, 0.45], gnd: [212, 0.30], scn: [ 12, 0.70], cit: [  8, 0.85],
+    win: [ 26, 0.62],
     surf:[210, 0.30], edge:[  8, 1.00], car: [ 14, 0.75] },
   /* 3  cool ochre earth, cold cyan buildings                   gap 146 */
   { name: 'ochre and cyan',
     sky: [206, 0.55], gnd: [ 44, 0.62], scn: [190, 0.75], cit: [194, 0.90],
+    win: [ 44, 0.50],
     surf:[ 40, 0.44], edge:[196, 1.00], car: [196, 0.80] },
   /* 4  ash, and one hot signal. Hue is meaningless at this saturation
         and the edge is the only thing in the frame with a colour.       */
   { name: 'ash',
     sky: [  0, 0.05], gnd: [  0, 0.06], scn: [  0, 0.05], cit: [  0, 0.08],
+    win: [ 34, 0.30],
     surf:[  0, 0.05], edge:[ 20, 1.00], car: [  0, 0.30] },
   /* 5  violet hour, lime structures                            gap 175 */
   { name: 'violet hour',
     sky: [286, 0.75], gnd: [280, 0.85], scn: [105, 0.70], cit: [ 98, 0.85],
+    win: [ 46, 0.55],
     surf:[276, 0.50], edge:[292, 1.00], car: [100, 0.85] },
   /* 6  cold blue night, amber structures                       gap 175 */
   { name: 'cold blue, amber',
     sky: [220, 0.65], gnd: [210, 0.55], scn: [ 35, 0.70], cit: [ 40, 0.85],
+    win: [ 36, 0.62],
     surf:[206, 0.42], edge:[ 42, 1.00], car: [ 38, 0.80] },
   /* 7  acid green ground, magenta structures                   gap 195 */
   { name: 'acid and magenta',
     sky: [100, 0.70], gnd: [ 90, 0.80], scn: [285, 0.70], cit: [300, 0.90],
+    win: [ 50, 0.55],
     surf:[ 94, 0.48], edge:[ 86, 1.00], car: [292, 0.85] },
   /* 8  rust ground, teal structures                            gap 170 */
   { name: 'rust and teal',
     sky: [  8, 0.70], gnd: [ 15, 0.80], scn: [185, 0.70], cit: [180, 0.85],
+    win: [ 42, 0.58],
     surf:[ 12, 0.54], edge:[178, 1.00], car: [182, 0.85] },
   /* 9  indigo ground, gold structures                          gap 165 */
   { name: 'indigo and gold',
     sky: [254, 0.70], gnd: [250, 0.65], scn: [ 55, 0.72], cit: [ 48, 0.90],
+    win: [ 44, 0.60],
     surf:[246, 0.46], edge:[250, 1.00], car: [ 52, 0.85] },
   /* 10 bone pale earth, cold blue structures                   gap 175 */
   { name: 'bone and cold blue',
     sky: [220, 0.22], gnd: [ 40, 0.16], scn: [215, 0.40], cit: [210, 0.45],
+    win: [205, 0.35],
     surf:[ 36, 0.18], edge:[210, 0.85], car: [212, 0.55] },
   /* 11 crimson ground, cyan structures                         gap 175 */
   { name: 'crimson and cyan',
     sky: [348, 0.72], gnd: [350, 0.78], scn: [175, 0.72], cit: [170, 0.88],
+    win: [ 40, 0.58],
     surf:[352, 0.50], edge:[340, 1.00], car: [172, 0.85] }
 ];
 
@@ -4506,63 +4545,58 @@ const COLOUR = {
      as banding if anyone looks closely. Near is the most separated pair,
      and each band further out is flatter and closer to the sky, which is
      aerial perspective done in three steps. */
-  /* FOUR BANDS, RAMPING FROM NEARLY BLACK NEAR TO NEARLY THE GROUND FAR.
+  /* ==================================================================
+     THE SCENERY, BY MATERIAL RATHER THAN BY DEPTH BAND.
 
-     THE MEASUREMENT THAT SET THESE, and it took three attempts to point
-     the instrument at the right thing. Render the frame; render it again
-     with sceneryPass suppressed; every pixel that moved is an object and
-     the second frame IS what was behind it. No assumption about geometry
-     survives that, which is why the two earlier tables were both wrong:
-     one compared lit against shade WITHIN an object, which says nothing
-     about visibility, and the second compared objects against the GROUND
-     PLANE, which turns out to be 1.9 per cent of the frame. What is
-     actually behind an object is the terrain shoulder, which is 12 to 15
-     per cent, and nobody had ever measured against it.
+     WHAT WAS WRONG, and the measurement that let it through. Every
+     object in the world shared one lit colour and one shade colour, so a
+     tree and a house were made of the same two greys and the world was a
+     texture rather than a set of things. The four-role palette then put
+     that pair into an enforced dark band and the depth table faded it
+     toward the ground, and between them the near band landed at
+     luminance 13 of 255 with 8 units between its lit and shade faces.
+     Everything beside the road became a black cut-out.
 
-     Measured that way the shipped world was 5.2 and 21.1 units, and the
-     first attempt at fixing it reached 7.7. Objects were being darkened
-     against a background that was itself dark. The ground had to come up
-     with them, and the shoulder is the ground that is on screen.
+     THE OBJECT AGAINST BACKGROUND NUMBERS PASSED THE WHOLE TIME, because
+     a black shape on a lit ground has enormous separation. That
+     measurement answers "can I see a shape". It does not answer "does it
+     look like a thing", and it was being read as though it did.
 
-     THE RAMP IS THE FADE IN. Near objects are almost black, and each
-     band further out sits closer to its own ground, so a thing emerges
-     rather than arriving. The step from the haze band to the far band is
-     the big one and it cannot be otherwise: the haze band must be at
-     zero separation and the far band must be at thirty, so thirty units
-     have to be spent somewhere. Four bands rather than three put that
-     step at three quarters of the draw distance instead of at the draw
-     distance itself, which is the whole reason there are four. */
-  SCENERY_NEAR_LIT:   '#100c08',
-  SCENERY_NEAR_SHADE: '#080603',
-  SCENERY_MID_LIT:    '#17120b',
-  SCENERY_MID_SHADE:  '#0e0b06',
-  SCENERY_FAR_LIT:    '#151418',
-  SCENERY_FAR_SHADE:  '#0e0c10',
-  /* THE FOURTH BAND IS THE SKY, WHICH IS THE WHOLE OF THE FADE IN.
+     SO: SIX MATERIALS, EACH WITH ITS OWN HUE, and different kinds are
+     different colours at the same depth. Each keeps its own hue offset
+     from the role anchor, so a biome moves the whole family and the bark
+     stays browner than the foliage wherever it goes.
 
-     Objects enter the world at the draw distance, and an object that
-     arrives at full contrast is the most amateur-looking thing a
-     renderer does. Continuous atmospheric perspective would solve it and
-     ART-DIRECTION.md refuses it as unaffordable, accepting discrete
-     bands as the trade. So the outermost band is authored within a
-     couple of luminance units of SKY_LOW: an object crossing the draw
-     distance is drawn in very nearly the colour of what is behind it,
-     and it separates as it walks in through three steps rather than
-     appearing.
+     INTERNAL CONTRAST IS THE OTHER HALF and it is authored here: 22 to
+     28 units between a material's lit and shade face, against 8 before.
+     Under about 20 an object is a flat cut-out however well separated it
+     is from what is behind it.
 
-     FOUR BANDS RATHER THAN THREE IS EXACTLY WHY. Three bands put the
-     first visible step at the draw distance itself, which is where a
-     step is most visible because that is the moment something arrives.
-     A fourth pushes every step inward to where objects are already on
-     screen and already moving. */
-  /* THE HAZE BAND IS THE ONE PLACE 30 UNITS IS THE WRONG TARGET, and
-     it is deliberate rather than a miss. Its whole job is that an object
-     entering at the draw distance is NOT visible, so it does not pop.
-     It is authored a few units off its own ground, so a thing emerges
-     from the ground it stands on and darkens as it walks in, over three
-     bands, instead of arriving. */
-  SCENERY_HAZE_LIT:   '#3f3a47',
-  SCENERY_HAZE_SHADE: '#3a3744',
+     The scn band is [24, 132], which is where these are authored, so
+     biome zero is exactly this and every other biome is this structure
+     at its own hue and saturation.
+     ================================================================== */
+  SCN_BARK_LIT:      '#4c2f1e',   // 51.9
+  SCN_BARK_SHADE:    '#23160e',   // 24.2, 28 under its own lit face
+  SCN_FOLIAGE_LIT:   '#365c2b',   // 80.4, and the role's hue anchor
+  SCN_FOLIAGE_SHADE: '#233c1c',   // 52.4
+  SCN_WALL_LIT:      '#7e7044',   // 111.8
+  SCN_WALL_SHADE:    '#584e30',   // 78.0
+  SCN_ROOF_LIT:      '#76303f',   // 64.0, and never the wall colour
+  SCN_ROOF_SHADE:    '#3f1a22',   // 34.4
+  SCN_SIGN_LIT:      '#4892a9',   // 131.9, a sign face rather than a dark rectangle
+  SCN_SIGN_SHADE:    '#356a7b',   // 96.0
+  SCN_METAL_LIT:     '#4f5c79',   // 91.3, posts and guardrails catching a little light
+  SCN_METAL_SHADE:   '#343d4f',   // 60.4
+  /* THE POINTS OF LIGHT, and this is the inversion the whole session is
+     about. The reference frames are a dark ground with lit windows and
+     lamps scattered through it; ours was a lit ground with black objects.
+     A lit window is a LIGHT SOURCE, so it is allowed to be far brighter
+     than the wall it sits in, and one or two pixels of it cannot
+     threaten a road edge at 249. In the win role, which is the band that
+     already exists for exactly this. */
+  SCN_WINDOW_WARM:   '#ffeac9',   // 236.1
+  SCN_WINDOW_COOL:   '#b0deff',   // 214.6
   /* THE GROUND IS THE LIT THING NOW, AND THE OBJECTS ON IT ARE DARK.
 
      A SILHOUETTE HAS TO READ AGAINST ITS BACKGROUND, and there are only
@@ -5370,6 +5404,9 @@ const TUNABLES = [
   { key: 'GROUND_GRADIENT_STOPS',label:'dpthStop',step: 2,   min: 2,    max: 64,    dp: 0, group: 21 },
   { key: 'SCENERY_FADE_FAR',   label: 'scnFade', step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'SCENERY_FADE_EASE',  label: 'scnFadeE',step: 0.10, min: 0.2,  max: 6,     dp: 2, group: 21 },
+  { key: 'SCENERY_DEPTH_STEPS',label: 'scnDepth',step: 1,    min: 1,    max: 16,    dp: 0, group: 21 },
+  { key: 'SCENERY_WINDOW_SIZE',label: 'winSize', step: 0.005,min: 0,    max: 0.3,   dp: 3, group: 21 },
+  { key: 'SCENERY_WINDOW_BUCKETS',label:'winFar',step: 1,    min: 0,    max: 16,    dp: 0, group: 21 },
   { key: 'GROUND_PATCH_EVERY', label: 'fldEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'GROUND_PATCH_DENSITY',label:'fldDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'GROUND_PATCH_SHIFT', label: 'fldTone', step: 0.5, min: 0,    max: 40,    dp: 1, group: 21 },
@@ -10837,6 +10874,8 @@ let CAR_LIGHT_RAMP = null;
 const CAR_LIGHT_DIR = [0, 1, 0];
 let REFLECTOR_WARM_FILL = COLOUR.EMISSIVE_CORE;
 let REFLECTOR_COOL_FILL = 'rgb(' + COLOUR.WET_SHEEN + ')';
+let SCN_WINDOW_WARM_FILL = COLOUR.SCN_WINDOW_WARM;
+let SCN_WINDOW_COOL_FILL = COLOUR.SCN_WINDOW_COOL;
 let SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
 let PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
 /* The signage, item 8, and the road pool under a lamp, item 9. Both are
@@ -12923,9 +12962,7 @@ function depthShadeRgb(hsl, baseL, u) {
 
 function buildDepthLut() {
   const src = { gnd: COLOUR.GROUND_NEAR, terLit: COLOUR.TERRAIN_LIT,
-                terShade: COLOUR.TERRAIN_SHADE,
-                scnLit: COLOUR.SCENERY_NEAR_LIT,
-                scnShade: COLOUR.SCENERY_NEAR_SHADE };
+                terShade: COLOUR.TERRAIN_SHADE };
   const raw = {};
   for (const k in src) {
     const c = rgbOf(src[k]);
@@ -12935,39 +12972,15 @@ function buildDepthLut() {
       arr.push(depthShadeRgb(hsl, hsl[2], i / (DEPTH_LUT_SIZE - 1)));
     }
   }
-  /* THE FADE IN AT THE DRAW DISTANCE LIVES HERE NOW. It used to be four
-     authored scenery bands whose outermost was written a couple of units
-     off its own ground, so a thing emerged instead of arriving. With a
-     continuous table there are no bands to author, so the table itself
-     carries it: an object's colour is blended toward THE GROUND AT THE
-     SAME DEPTH, all the way to SCENERY_FADE_FAR at the draw distance.
-
-     Which is strictly better than the four bands were, because the step
-     between the haze band and the far band, the one this project has
-     been apologising for since the fourth band was added, does not
-     exist in a continuous blend. */
   for (const k in raw) {
     const arr = DEPTH_LUT[k];
     arr.length = 0;
-    const isScn = k === 'scnLit' || k === 'scnShade';
     for (let i = 0; i < DEPTH_LUT_SIZE; i++) {
       const c = raw[k][i];
-      let r = c[0], g = c[1], b = c[2];
-      if (isScn) {
-        /* EASED, LIKE THE DEPTH INDEX ITSELF. Blending linearly across the
-           table put a quarter of the fade into the far band, where the
-           objects still have to read: measured, far separation fell from
-           37 to 27 and the masses breaking the skyline fell from 32 to
-           16. The fade belongs in the last stretch, not spread over the
-           whole of it. */
-        const u = Math.pow(i / (DEPTH_LUT_SIZE - 1), FEEL.SCENERY_FADE_EASE)
-                * FEEL.SCENERY_FADE_FAR;
-        const gd = raw.gnd[i];
-        r += (gd[0] - r) * u; g += (gd[1] - g) * u; b += (gd[2] - b) * u;
-      }
-      arr.push('rgb(' + Math.round(r) + ',' + Math.round(g) + ',' + Math.round(b) + ')');
+      arr.push('rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')');
     }
   }
+  buildMaterialLut(raw);
   const n = Math.max(1, Math.round(FEEL.DEPTH_STEPS));
   DEPTH_BUCKET_IX.length = 0;
   for (let b = 0; b < n; b++) {
@@ -12975,6 +12988,61 @@ function buildDepthLut() {
     // than of its near edge.
     DEPTH_BUCKET_IX.push(Math.min(DEPTH_LUT_SIZE - 1,
                                   Math.round((b + 0.5) / n * (DEPTH_LUT_SIZE - 1))));
+  }
+}
+
+/* ==================================================================
+   ONE DEPTH TABLE PER MATERIAL, AT THE RESOLUTION THE PASSES USE.
+
+   The ground and the shoulder get 256 steps because the ground plane is
+   a gradient and can read them all. The scenery cannot: it is paths, and
+   one fill per colour is gate one's rule, so it quantises into
+   SCENERY_DEPTH_STEPS buckets and a table longer than that would be
+   entries nobody ever reads. Twelve materials by a handful of buckets is
+   about a hundred strings, built when the palette changes.
+
+   ATTENUATED TOWARD THE TERRAIN, NOT TOWARD THE GROUND AND NOT TOWARD
+   BLACK. An object stands on the shoulder, so the shoulder at its own
+   depth is what the air between it and the camera should be washing it
+   toward. Blending toward the ground plane, which is what the first
+   version did, pulled every object toward the darkest thing in the far
+   field and that is half of why they went black.
+
+   AND THE CURVE IS EASED SO COLOUR SURVIVES IN THE NEAR FIELD and is
+   surrendered late. At ease one a tree twenty metres away is already a
+   third of the way to being terrain.
+   ================================================================== */
+const SCN_MAT_LIT = [];
+const SCN_MAT_SHADE = [];
+const SCN_MAT_NAMES = ['BARK', 'FOLIAGE', 'WALL', 'ROOF', 'SIGN', 'METAL'];
+const MAT_BARK = 0, MAT_FOLIAGE = 1, MAT_WALL = 2,
+      MAT_ROOF = 3, MAT_SIGN = 4, MAT_METAL = 5;
+
+function buildMaterialLut(raw) {
+  const steps = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
+  SCN_MAT_LIT.length = 0; SCN_MAT_SHADE.length = 0;
+  for (let m = 0; m < SCN_MAT_NAMES.length; m++) {
+    for (let f = 0; f < 2; f++) {
+      const key = 'SCN_' + SCN_MAT_NAMES[m] + (f === 0 ? '_LIT' : '_SHADE');
+      const c = rgbOf(COLOUR[key]);
+      const hsl = rgbToHsl(c[0], c[1], c[2]);
+      const out = [];
+      for (let b = 0; b < steps; b++) {
+        // The bucket's centre in eased depth, matching depthBucket().
+        const t = (b + 0.5) / steps;
+        const ix = Math.min(DEPTH_LUT_SIZE - 1, Math.round(t * (DEPTH_LUT_SIZE - 1)));
+        const s0 = depthShadeRgb(hsl, hsl[2], t);
+        /* The shoulder at this depth, which is what the object is washed
+           toward. Lit face toward the lit shoulder, shade toward shade,
+           so a near black silhouette is never the destination. */
+        const tgt = f === 0 ? raw.terLit[ix] : raw.terShade[ix];
+        const u = Math.pow(t, FEEL.SCENERY_FADE_EASE) * FEEL.SCENERY_FADE_FAR;
+        out.push('rgb(' + Math.round(s0[0] + (tgt[0] - s0[0]) * u) + ','
+                        + Math.round(s0[1] + (tgt[1] - s0[1]) * u) + ','
+                        + Math.round(s0[2] + (tgt[2] - s0[2]) * u) + ')');
+      }
+      (f === 0 ? SCN_MAT_LIT : SCN_MAT_SHADE).push(out);
+    }
   }
 }
 
@@ -13298,142 +13366,272 @@ const SCENERY_PROFILE = [
 const SCENERY_LIT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];     // scratch, x then y
 const SCENERY_SHADE = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+/* ==================================================================
+   THE SCENERY, WALKED ONCE AND FLUSHED BY MATERIAL.
+
+   IT USED TO WALK THE BOUNDARY TABLE ONCE PER BAND PER FACE, which was
+   forty walks to draw one world, and every object it drew came out in
+   the same two colours. Six materials on top of that would have been two
+   hundred and forty walks.
+
+   So the walk happens once and every object it places is written into
+   flat arrays: position, size, kind and depth bucket, no object
+   allocated and the arrays reused by resetting a count rather than being
+   replaced. A counting sort puts the indices in bucket order, and the
+   flush then goes material by material inside each bucket, one path per
+   colour, chunked under gate one's ceiling exactly as before.
+
+   FAR TO NEAR, which the old loop had backwards. It ran band zero first
+   and band zero is the NEAREST, so distant objects were painted over
+   near ones. It rarely showed because objects rarely overlap, and it was
+   wrong every time they did.
+   ================================================================== */
+const SCN_MAX = 2048;
+const SCN_X = new Float32Array(SCN_MAX);
+const SCN_Y = new Float32Array(SCN_MAX);
+const SCN_W = new Float32Array(SCN_MAX);
+const SCN_H = new Float32Array(SCN_MAX);
+const SCN_K = new Uint8Array(SCN_MAX);
+const SCN_B = new Uint8Array(SCN_MAX);
+const SCN_ORDER = new Uint16Array(SCN_MAX);
+const SCN_BSTART = new Uint16Array(64);
+const SCN_BCOUNT = new Uint16Array(64);
+let SCN_N = 0;
+
+/* WHICH MATERIAL EACH HALF OF EACH KIND IS MADE OF, and the profile
+   point the upper half starts at. A tree is bark below and foliage
+   above, a house is wall below and a roof that is NOT the wall colour
+   above, a sign is a metal post under a sign face. The mass has one
+   material because at that distance it is a treeline rather than a tree.
+   Split -1 means the whole profile is the low material. */
+const KIND_MAT_LOW  = [MAT_BARK, MAT_WALL, MAT_FOLIAGE, MAT_METAL, MAT_METAL, MAT_WALL];
+const KIND_MAT_HIGH = [MAT_FOLIAGE, MAT_ROOF, -1, MAT_SIGN, MAT_SIGN, MAT_METAL];
+const KIND_SPLIT    = [2, 2, -1, 2, 2, 2];
+
 function sceneryPass(first, last, baseIndex, w, h) {
   if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
-  const limit = chunkLimit();
   const every = Math.max(1, Math.round(FEEL.SCENERY_EVERY));
-  const bands = Math.max(1, DEPTH_BUCKET_IX.length);
+  const buckets = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
   sceneryDrawn = 0;
-  /* BAND BY BAND AND FACE BY FACE, so every fill is one colour and the
-     depth bands stay separable for the haze in gate four. Six fills at
-     most before chunking, and each of those is already chunked. */
-  for (let band = 0; band < bands; band++) {
-    for (let face = 0; face < 2; face++) {
-      const lut = face === 0 ? DEPTH_LUT.scnLit : DEPTH_LUT.scnShade;
-      ctx.fillStyle = lut[DEPTH_BUCKET_IX[band]] ||
-                      (face === 0 ? SCENERY_BAND_LIT[0] : SCENERY_BAND_SHADE[0]);
-      let sub = 0;
-      ctx.beginPath();
-      for (let n = first; n <= last; n++) {
-        if (!bvis[n]) continue;
-        const seg = segAt(baseIndex + n);
-        if (!seg) break;
-        /* WHICH BAND THIS BOUNDARY IS IN, off its own distance, so an
-           object stays in one band for its whole life rather than
-           flickering between two as the camera moves. */
-        if (depthBucket(bz[n]) !== band) continue;
-        /* EVERY SITE IN THE SPAN THIS ANCHOR COVERS, not just the
-           anchor's own index. Gate one merges far segments, so the
-           anchor may stand for a dozen of them, and placing only on the
-           anchor put 31 objects on screen where the budget is 600 to
-           1,500 and left the far field, which is where the masses
-           belong, empty. Interpolated across the anchor's own two
-           boundaries, which is the same straight line the merged road
-           quad is drawn on. */
-        const span = bspan[n] || 1;
-        const base = seg.index;
-        for (let j = 0; j < span; j++) {
-          const idx = base + j;
-          if (idx % every) continue;
-          const f = span > 1 ? j / span : 0;
-          const cx = bx[n] + (bx[n + 1] - bx[n]) * f;
-          const cy = by[n] + (by[n + 1] - by[n]) * f;
-          const cw = bw[n] + (bw[n + 1] - bw[n]) * f;
-          const ch = bh[n] + (bh[n + 1] - bh[n]) * f;
-        // Two objects per site, one each side, each with its own draw.
-        for (let side = -1; side <= 1; side += 2) {
-        /* SEVERAL THINGS PER SITE, AT DIFFERENT DISTANCES OUT. One
-           object per segment per side put everything in a line beside
-           the road; the ground now runs to the horizon and wants
-           filling across its whole width. Each slot has its own salt, so
-           they are independent draws rather than the same object moved. */
+  SCN_N = 0;
+
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const seg = segAt(baseIndex + n);
+    if (!seg) break;
+    /* THE BUCKET IS THE BOUNDARY'S, not the object's, so an object stays
+       in one bucket for its whole life rather than flickering between
+       two as the camera moves. */
+    const bucket = Math.min(buckets - 1, (depthU(bz[n]) * buckets) | 0);
+    /* EVERY SITE IN THE SPAN THIS ANCHOR COVERS, not just the anchor's
+       own index. Gate one merges far segments, so the anchor may stand
+       for a dozen of them, and placing only on the anchor put 31 objects
+       on screen where the budget is 600 to 1,500. */
+    const span = bspan[n] || 1;
+    const base = seg.index;
+    for (let j = 0; j < span; j++) {
+      const idx = base + j;
+      if (idx % every) continue;
+      const f = span > 1 ? j / span : 0;
+      const cx = bx[n] + (bx[n + 1] - bx[n]) * f;
+      const cy = by[n] + (by[n + 1] - by[n]) * f;
+      const cw = bw[n] + (bw[n + 1] - bw[n]) * f;
+      const ch = bh[n] + (bh[n + 1] - bh[n]) * f;
+      for (let side = -1; side <= 1; side += 2) {
         for (let slot = 0; slot < FEEL.SCENERY_PER_SITE; slot++) {
           const salt = idx * 7 + slot * 131 + (side > 0 ? 3 : 0);
           const h1 = terrainHash(salt);
           if (h1 > FEEL.SCENERY_DENSITY) continue;
           const h2 = terrainHash(salt * 13 + 5);
           const h3 = terrainHash(salt * 29 + 11);
-          /* THE MID DISTANCE GETS MASSES AND THE NEAR FIELD GETS
-             OBJECTS, which is the density rule stated as a kind rule. */
-          /* WHAT GROWS WHERE. The near band gets the detailed, man made
-             things, because near is where detail is legible at all: a
-             sign or a banner reads as itself at forty pixels and as
-             noise at four. The far band gets nothing but broad masses,
-             which is SCENERY.md's rule stated as a kind rule, and it is
-             also the cheap direction: vertices inside a subpath are
-             linear while subpaths are quadratic, so one wide mass buys
-             what six trees would cost. */
+          /* WHAT GROWS WHERE, as a share of the depth range. The near
+             field gets the detailed man made things because near is
+             where detail is legible at all; the far field gets broad
+             masses, which is SCENERY.md's rule stated as a kind rule and
+             is also the cheap direction. */
+          const kb = bucket / buckets;
           let kind;
-          /* AS A SHARE OF THE DEPTH RANGE, not as a band index. The rule
-             was written when there were four bands and band 0 was the
-             near quarter; there are fourteen buckets now and band 0 is
-             a fourteenth, so an index would have put the detailed near
-             field things in the first seven per cent of the world. */
-          const kb = band / bands;
-          if (kb < 0.25)             kind = h2 < 0.40 ? 0 : (h2 < 0.62 ? 1 : (h2 < 0.80 ? 3 : 4));
-          else if (kb < 0.50)        kind = h2 < 0.34 ? 0 : (h2 < 0.56 ? 1 : (h2 < 0.74 ? 2 : 5));
-          else if (kb >= 0.88)       kind = 2;
-          else                       kind = h2 < 0.52 ? 2 : (h2 < 0.78 ? 0 : 5);
-          const prof = SCENERY_PROFILE[kind];
+          if (kb < 0.25)       kind = h2 < 0.40 ? 0 : (h2 < 0.62 ? 1 : (h2 < 0.80 ? 3 : 4));
+          else if (kb < 0.50)  kind = h2 < 0.34 ? 0 : (h2 < 0.56 ? 1 : (h2 < 0.74 ? 2 : 5));
+          else if (kb >= 0.88) kind = 2;
+          else                 kind = h2 < 0.52 ? 2 : (h2 < 0.78 ? 0 : 5);
           /* HEIGHT VARIETY ABOVE ALL, because a skyline of identical
              objects is a texture and a skyline of varied ones is a
              place. Squared, so most things are ordinary and a few are
-             much taller, which is what a real treeline or roofline does.
-             A tower gets its own multiplier on top of that. */
+             much taller. */
           const tall = 0.40 + 2.10 * h3 * h3;
           const scale = FEEL.SCENERY_SIZE * tall
                       * (kind === 2 ? FEEL.SCENERY_MASS_SCALE : 1)
                       * (kind === 5 ? FEEL.SCENERY_TOWER_SCALE : 1);
           const wide = scale * (kind === 2 ? FEEL.SCENERY_MASS_WIDE : 1)
                              * (kind === 4 ? FEEL.SCENERY_BANNER_WIDE : 1);
-          /* SCATTERED ACROSS THE WHOLE GROUND, NOT HUGGING THE VERGE.
-             The offset is in road half widths, which is a fixed WORLD
-             distance, so a thing far out converges toward the vanishing
-             point exactly as it should. The old spread was 0.72 of a
-             band that was itself only 5.4 wide, so everything sat beside
-             the road. Now it reaches SCENERY_FAR out, and the near
-             sites whose offsets land off the side of the screen are
-             culled below rather than drawn. */
-          const off = FEEL.SCENERY_CLEAR
-                    + h3 * h3 * FEEL.SCENERY_FAR_OUT;
+          const off = FEEL.SCENERY_CLEAR + h3 * h3 * FEEL.SCENERY_FAR_OUT;
           const bxp = cx + side * cw * off;
           const byp = cy - ch * FEEL.TERRAIN_HEIGHT * terrainRise(idx) * 0.5;
           const px = ch * wide, py = ch * scale;
           if (py < FEEL.SCENERY_MIN_PX) continue;
-          /* AND TOO CLOSE IS CULLED AS WELL AS TOO FAR. An object a few
-             metres from the camera projects to most of the frame height
-             and lands as a flat slab across the corner, with its own lit
-             and shade faces so far apart that neither reads as a face.
-             ART-DIRECTION.md asks for the near field to stay sparse so
-             the road keeps the air around it, and this is that rule
-             expressed as a number rather than as a placement fudge. */
+          /* TOO CLOSE IS CULLED AS WELL AS TOO FAR: an object a few
+             metres from the camera lands as a flat slab across the
+             corner with neither face reading as a face. */
           if (py > h * FEEL.SCENERY_MAX_SHARE) continue;
-          /* OFF THE SIDE OF THE SCREEN IS CULLED HERE rather than left
-             to the rasteriser, because a subpath costs whether or not
-             any of it lands: the whole point of gate one is that this
-             renderer pays for geometry. With the spread now reaching
-             right across the ground, most near sites are off screen and
-             this is what keeps them free. */
+          /* OFF THE SIDE IS CULLED HERE rather than left to the
+             rasteriser, because a subpath costs whether or not any of it
+             lands. */
           if (bxp + px < -40 || bxp - px > w + 40) continue;
           if (byp - py > h + 40) continue;
-          /* The lit face is the left half and the shade face the right,
-             every object, every band, every biome. */
-          const dir = face === 0 ? -1 : 1;
-          ctx.moveTo(bxp, byp);
-          for (let k = 0; k < prof.length; k++) {
-            ctx.lineTo(bxp + dir * px * prof[k][1], byp - py * prof[k][0]);
-          }
-          ctx.lineTo(bxp, byp - py);
-          ctx.closePath();
-          sub++;
-          if (face === 0) sceneryDrawn++;
-          if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
-        }
-        }
+          if (SCN_N >= SCN_MAX) { n = last + 1; break; }
+          SCN_X[SCN_N] = bxp; SCN_Y[SCN_N] = byp;
+          SCN_W[SCN_N] = px;  SCN_H[SCN_N] = py;
+          SCN_K[SCN_N] = kind; SCN_B[SCN_N] = bucket;
+          SCN_N++;
+          sceneryDrawn++;
         }
       }
-      if (sub > 0) ctx.fill();
     }
+  }
+  if (!SCN_N) return;
+
+  // Counting sort into bucket order. Two passes over the counts and one
+  // over the objects; nothing allocated.
+  for (let b = 0; b < buckets; b++) { SCN_BCOUNT[b] = 0; }
+  for (let i = 0; i < SCN_N; i++) SCN_BCOUNT[SCN_B[i]]++;
+  let acc = 0;
+  for (let b = 0; b < buckets; b++) { SCN_BSTART[b] = acc; acc += SCN_BCOUNT[b]; }
+  for (let b = 0; b < buckets; b++) SCN_BCOUNT[b] = 0;
+  for (let i = 0; i < SCN_N; i++) {
+    const b = SCN_B[i];
+    SCN_ORDER[SCN_BSTART[b] + SCN_BCOUNT[b]] = i;
+    SCN_BCOUNT[b]++;
+  }
+
+  const limit = chunkLimit();
+  // Far to near, so a near object paints over a far one and not the
+  // other way round.
+  for (let b = buckets - 1; b >= 0; b--) {
+    const from = SCN_BSTART[b], cnt = SCN_BCOUNT[b];
+    if (!cnt) continue;
+    for (let m = 0; m < SCN_MAT_NAMES.length; m++) {
+      const lit = SCN_MAT_LIT[m], shade = SCN_MAT_SHADE[m];
+      if (!lit) continue;
+      for (let face = 0; face < 2; face++) {
+        ctx.fillStyle = (face === 0 ? lit : shade)[Math.min(b, lit.length - 1)];
+        const dir = face === 0 ? -1 : 1;
+        let sub = 0;
+        ctx.beginPath();
+        for (let q = 0; q < cnt; q++) {
+          const i = SCN_ORDER[from + q];
+          const kind = SCN_K[i];
+          const low = KIND_MAT_LOW[kind], high = KIND_MAT_HIGH[kind];
+          if (low !== m && high !== m) continue;
+          const prof = SCENERY_PROFILE[kind];
+          const split = KIND_SPLIT[kind];
+          const bxp = SCN_X[i], byp = SCN_Y[i], px = SCN_W[i], py = SCN_H[i];
+          if (split < 0 || (low === m && high === m)) {
+            // One material for the whole silhouette.
+            ctx.moveTo(bxp, byp);
+            for (let k = 0; k < prof.length; k++) {
+              ctx.lineTo(bxp + dir * px * prof[k][1], byp - py * prof[k][0]);
+            }
+            ctx.lineTo(bxp, byp - py);
+            ctx.closePath();
+            sub++;
+          } else {
+            if (low === m) {
+              // The trunk, the wall, the post: base up to the split.
+              ctx.moveTo(bxp, byp);
+              for (let k = 0; k < split; k++) {
+                ctx.lineTo(bxp + dir * px * prof[k][1], byp - py * prof[k][0]);
+              }
+              ctx.lineTo(bxp, byp - py * prof[split - 1][0]);
+              ctx.closePath();
+              sub++;
+            }
+            if (high === m) {
+              // The canopy, the roof, the board: the split up to the top.
+              ctx.moveTo(bxp, byp - py * prof[split - 1][0]);
+              for (let k = split; k < prof.length; k++) {
+                ctx.lineTo(bxp + dir * px * prof[k][1], byp - py * prof[k][0]);
+              }
+              ctx.lineTo(bxp, byp - py);
+              ctx.closePath();
+              sub++;
+            }
+          }
+          if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+        }
+        if (sub > 0) ctx.fill();
+      }
+    }
+  }
+  sceneryWindowPass(buckets);
+}
+
+/* ==================================================================
+   LIT WINDOWS, AND THIS IS THE INVERSION THE SESSION IS ABOUT.
+
+   A dark ground with points of light scattered through it reads as an
+   inhabited landscape; a lit ground with black objects reads as a
+   silhouette map. These are the points of light: two or three pixels of
+   window on the wall of a near or mid house, and a catch of light on a
+   tower.
+
+   Batched into two colour groups exactly as the reflector pins are, off
+   the objects the walk already collected, so this costs one more pass
+   over an array that is already in memory and two fills.
+
+   GATED BY DISTANCE, hard. Past SCENERY_WINDOW_BUCKETS a window is under
+   a pixel and a sub pixel point of light near the horizon is noise on
+   the part of the frame the road ahead is read from. Nothing bright
+   goes near the vanishing point.
+   ================================================================== */
+const SCN_WIN_XY = [new Float64Array(1024), new Float64Array(1024)];
+const SCN_WIN_N = [0, 0];
+
+function sceneryWindowPass(buckets) {
+  if (FEEL.SCENERY_WINDOW_SIZE <= 0) return;
+  SCN_WIN_N[0] = 0; SCN_WIN_N[1] = 0;
+  const maxB = Math.min(buckets - 1, Math.round(FEEL.SCENERY_WINDOW_BUCKETS));
+  for (let i = 0; i < SCN_N; i++) {
+    if (SCN_B[i] > maxB) continue;
+    const kind = SCN_K[i];
+    if (kind !== 1 && kind !== 5) continue;          // houses and towers
+    const py = SCN_H[i], px = SCN_W[i];
+    const size = py * FEEL.SCENERY_WINDOW_SIZE;
+    if (size < FEEL.SCENERY_WINDOW_MIN_PX) continue;
+    const prof = SCENERY_PROFILE[kind];
+    const wallW = px * prof[0][1], wallH = py * prof[KIND_SPLIT[kind] - 1][0];
+    const bxp = SCN_X[i], byp = SCN_Y[i];
+    /* Deterministic off the placement, like everything else out here:
+       nothing may read elapsed time, the frame count or the camera. */
+    const hh = terrainHash((bxp * 0.5 | 0) * 31 + (byp | 0) * 7 + kind);
+    const c = hh > 0.62 ? 1 : 0;
+    const rows = kind === 5 ? 3 : 2;
+    const a = SCN_WIN_XY[c];
+    for (let r = 0; r < rows; r++) {
+      const y = byp - wallH * (0.30 + 0.28 * r);
+      for (let s = -1; s <= 1; s += 2) {
+        const x = bxp + s * wallW * 0.42;
+        const at = SCN_WIN_N[c] * 3;
+        if (at + 3 > a.length) break;
+        a[at] = x - size * 0.5; a[at + 1] = y - size * 0.5; a[at + 2] = size;
+        SCN_WIN_N[c]++;
+      }
+    }
+  }
+  const limit = chunkLimit();
+  for (let c = 0; c < 2; c++) {
+    if (!SCN_WIN_N[c]) continue;
+    ctx.fillStyle = c === 0 ? SCN_WINDOW_WARM_FILL : SCN_WINDOW_COOL_FILL;
+    const a = SCN_WIN_XY[c];
+    let sub = 0;
+    ctx.beginPath();
+    for (let i = 0; i < SCN_WIN_N[c]; i++) {
+      const at = i * 3;
+      ctx.rect(a[at], a[at + 1], a[at + 2], a[at + 2] * 1.35);
+      sub++;
+      if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+    }
+    if (sub > 0) ctx.fill();
   }
 }
 
@@ -14150,8 +14348,6 @@ function signHueShift() {
    thing derived from the palette. A band colour that missed a rotation
    would put the last biome's world behind this one's road. */
 let GROUND_BAND = ['#5d3a24', '#573b2d', '#473c45', '#3e3a49'];
-let SCENERY_BAND_LIT = ['#100c08', '#17120b', '#151418', '#3f3a47'];
-let SCENERY_BAND_SHADE = ['#080603', '#0e0b06', '#0e0c10', '#3a3744'];
 let sceneryDrawn = 0;
 
 function rebuildDerivedColours() {
@@ -14161,14 +14357,6 @@ function rebuildDerivedColours() {
   GROUND_BAND[1] = COLOUR.GROUND_MID;
   GROUND_BAND[2] = COLOUR.GROUND_FAR;
   GROUND_BAND[3] = COLOUR.GROUND_HAZE;
-  SCENERY_BAND_LIT[0] = COLOUR.SCENERY_NEAR_LIT;
-  SCENERY_BAND_LIT[1] = COLOUR.SCENERY_MID_LIT;
-  SCENERY_BAND_LIT[2] = COLOUR.SCENERY_FAR_LIT;
-  SCENERY_BAND_LIT[3] = COLOUR.SCENERY_HAZE_LIT;
-  SCENERY_BAND_SHADE[0] = COLOUR.SCENERY_NEAR_SHADE;
-  SCENERY_BAND_SHADE[1] = COLOUR.SCENERY_MID_SHADE;
-  SCENERY_BAND_SHADE[2] = COLOUR.SCENERY_FAR_SHADE;
-  SCENERY_BAND_SHADE[3] = COLOUR.SCENERY_HAZE_SHADE;
   EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
   // The roof lights run toward this biome's own hot hue, so the ramp has
   // to follow the place.
@@ -14184,6 +14372,8 @@ function rebuildDerivedColours() {
      already this biome's colours and cannot drift out of the wheel. */
   REFLECTOR_WARM_FILL = COLOUR.EMISSIVE_CORE;
   REFLECTOR_COOL_FILL = 'rgb(' + COLOUR.WET_SHEEN + ')';
+  SCN_WINDOW_WARM_FILL = COLOUR.SCN_WINDOW_WARM;
+  SCN_WINDOW_COOL_FILL = COLOUR.SCN_WINDOW_COOL;
   CAR_LIGHT_RAMP = rampBetween(COLOUR.CAR_AMBIENT, COLOUR.CAR_KEY);
   const lx = FEEL.CAR_LIGHT_X, ly = FEEL.CAR_LIGHT_Y, lz = FEEL.CAR_LIGHT_Z;
   const ln = Math.sqrt(lx * lx + ly * ly + lz * lz) || 1;
