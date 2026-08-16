@@ -924,6 +924,12 @@ const FEEL = {
      distance. Below roughly 350 the cliff simply is not there.
      LIVE, because it and the thickness are one shape. */
   ROAD_FLARE:               880,     // LIVE
+  /* WHICH BAND SET THE BIOMES ARE BUILT FROM. See BIOME_ROLE_BAND: at
+     one the road surface sits clear above the terrain, which is what was
+     asked for and which measures clean; at zero the road stays dark and
+     the ground carries the light, which is what the frames show reading
+     as a place rather than as grey. Both pass every hierarchy check. */
+  ROAD_ABOVE_TERRAIN:         0,     // LIVE
   EDGE_LIP_FRACTION:       0.13,     // of the half width, the bright lip itself
 
   /* ------------------------------------------------------------------
@@ -3916,106 +3922,307 @@ const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         JUMP_LIP: 1, JUMP_GLOW: 1, JUMP_ARROW: 1 };
 
 /* ==================================================================
-   WHICH FAMILY EACH COLOUR BELONGS TO, because a place has more than one
-   colour in it and a single global rotation cannot produce that.
+   WHICH ROLE EACH COLOUR PLAYS, because a place has several colours in
+   it and one hue rotated cannot produce that.
 
-   Everything in the palette used to turn by the same angle, so the hue
-   DIFFERENCE between the trees and the ground they stand on, or between
-   a window and the building it is in, was the same number in all twelve
-   biomes. Families are what let those differ, which is what puts more
-   than one colour in a single frame.
+   THE GENERATOR BEFORE THIS ONE TURNED EVERYTHING BY ONE ANGLE with
+   saturation held and lightness solved back to the authored luminance.
+   That is an ISOMETRY: every hue difference, every saturation and every
+   luminance in the palette is invariant under it, so the picture cannot
+   change, only the angle it is viewed from. A frame was also very nearly
+   monochrome, because every colour in it was the same hue.
+
+   So the palette is now cut into ROLES, each of which gets its own hue
+   and its own saturation per biome, and each of which is FORCED into a
+   luminance band. The band is what makes the value hierarchy structural
+   rather than something measured afterwards and hoped for: a biome
+   cannot be authored that puts the terrain above the road, because the
+   terrain band stops below the road band and the solve lands inside it.
 
    ORDER MATTERS. The first prefix that matches wins, so SKYLINE_WINDOW
    has to be tested before SKYLINE or the windows join the buildings.
 
-   THREE FAMILIES ARE DELIBERATELY POOR IN KNOBS, and each for a reason
-   that is a hard rule rather than taste:
+   FOUR ROLES ARE POOR IN KNOBS, each for a reason that is a rule:
 
-     void   takes the base turn and nothing else. It is what every
-            translucent layer is solved against and it is the bottom of
-            the value ranking, so a recipe is not allowed to lift it.
+     void   takes nothing. It is what every translucent layer is solved
+            against and it is the floor of the ranking.
      core   the near white inside every emissive thing. Saturating it
-            makes it a coloured shape again, which is the one thing it
-            exists to prevent.
-     rd     the road, the edge, the lip and everything lit that stands
-            on the road. It takes hue and saturation so a world can have
-            a hot road in a cold place, and it NEVER takes a luminance
-            multiplier, because the edge being brightest in all twelve
-            biomes is the rule that outranks every other decision here.
+            makes it a coloured shape again, which is what it exists to
+            prevent.
+     car    keeps its authored luminances exactly. It turns and it can
+            change saturation, and it may not move in value, because
+            findable at a glance in all twelve is a hard rule and the
+            car is the one thing the player is always looking for.
+     win    the lit windows, held bright, because they are the points of
+            light the city is read by.
    ================================================================== */
-const BIOME_FAMILY_RULES = [
+const BIOME_ROLE_RULES = [
   ['VOID',            'void'],
   ['EMISSIVE_CORE',   'core'],
-  ['SKY_',            'sky'],
-  ['HAZE',            'sky'],
+  ['SKY_',            'sky'],  ['HAZE',      'sky'],
   ['HORIZON_',        'sky'],
   ['SCENERY_',        'scn'],
-  ['GROUND_',         'gnd'],
-  ['TERRAIN_',        'gnd'],
+  ['GROUND_',         'gnd'],  ['TERRAIN_',  'gnd'],
   ['GRID',            'gnd'],
-  ['SKYLINE_WINDOW',  'win'],
-  ['SKYLINE',         'cit'],
+  ['SKYLINE_WINDOW',  'win'],  ['SKYLINE',   'cit'],
   ['SIGN',            'cit'],
-  ['CAR_',            'car'],
-  ['GHOST',           'car'],
-  ['SCRAPE',          'car'],
-  ['SMOKE',           'car'],
-  ['ROAD_',           'rd'],  ['WALL',      'rd'],
-  ['SHOULDER_',       'rd'],  ['EDGE_',     'rd'],
-  ['LANE',            'rd'],  ['SLAB_',     'rd'],
-  ['PYLON',           'rd'],  ['LAMP',      'rd'],
-  ['WET_SHEEN',       'rd'],  ['GATE',      'rd'],
-  ['TRAIL_',          'rd']
+  ['CAR_',            'car'],  ['GHOST',     'car'],
+  ['SCRAPE',          'car'],  ['SMOKE',     'car'],
+  ['ROAD_',           'surf'], ['WALL',      'surf'],
+  ['SHOULDER_',       'surf'], ['LANE',      'surf'],
+  ['EDGE_',           'edge'], ['SLAB_',     'edge'],
+  ['PYLON',           'edge'], ['LAMP',      'edge'],
+  ['WET_SHEEN',       'edge'], ['GATE',      'edge'],
+  ['TRAIL_',          'edge']
 ];
-function biomeFamily(key) {
-  for (let i = 0; i < BIOME_FAMILY_RULES.length; i++) {
-    if (key.indexOf(BIOME_FAMILY_RULES[i][0]) === 0) return BIOME_FAMILY_RULES[i][1];
+function biomeRole(key) {
+  for (let i = 0; i < BIOME_ROLE_RULES.length; i++) {
+    if (key.indexOf(BIOME_ROLE_RULES[i][0]) === 0) return BIOME_ROLE_RULES[i][1];
   }
-  // Anything unclassified takes the base turn and nothing else, which is
-  // exactly what the whole palette used to do. A new colour is therefore
-  // never made worse by being forgotten here, only less interesting.
+  /* Anything unclassified turns and nothing else, which is what the whole
+     palette used to do. A colour that is forgotten here is therefore
+     never made worse, only less interesting. */
   return 'other';
 }
 
 /* ==================================================================
-   THE TWELVE PLACES.
+   THE LUMINANCE BANDS, AND WHERE THE NUMBERS CAME FROM.
 
-   ONE ROW IS ONE PLACE, not one angle. hue turns the whole palette as
-   before; everything after it is what makes the place. sat scales every
-   saturation in the world, so a row can be rich or nearly colourless.
-   The per family columns are offsets ON TOP of hue and multipliers ON
-   TOP of sat, and they are what puts several colours in one frame:
-   scenery that is not the family of the ground it stands on, windows
-   that are not the family of the building they are in, a road that
-   agrees with the world or fights it.
+   Every one of these is off a measurement rather than an assumption, and
+   the measurement that unlocked them is the three pass bloom: the road
+   edge used to peak at 212 and the lip at the two second planning
+   horizon rendered at 159. With the near white core it peaks at 249 and
+   that lip renders at 220. Sixty units of new headroom above the road is
+   what finally pays for lifting the road surface clear of the terrain,
+   which is a constraint this project reported as unmeetable twice while
+   the edge was dimmer.
 
-   skyL and gndL move the SKY and GROUND in value against each other, so
-   it is not always a dark ground under a darker sky. Those are the only
-   two luminance knobs, and the void, the road and the edge do not have
-   one at all. See BIOME_FAMILY_RULES.
+   THE SCALE IS THE ONE EVERY TABLE IS MEASURED ON, which is the plain
+   weighted sum over sRGB bytes and not the linear relative luminance the
+   old solver used. Two different quantities were both being called
+   luminance, one in the code and one in every report. They are the same
+   number now.
 
-   EVERY ROW IS MEASURED, NOT TRUSTED. The object against background
-   instrument runs over all twelve and the value ranking runs over all
-   twelve; a row that cannot hold the hierarchy is a wrong row and gets
-   retuned rather than the hierarchy being relaxed to admit it.
+   Read down the list and the hierarchy is the list:
+
+     edge      108 .. 250   brightest, and the dimmest thing in the role
+                            still clears the road surface
+     win       180 .. 215   points of light in the city
+     surf       65 .. 130   the road, clear of the terrain by twenty
+     cit          5 .. 170   silhouettes with lit faces
+     gnd        20 ..  62   below the road
+     scn         5 ..  56   dark against the ground, except the haze band
+                            at the top of the range, which is the fade in
+     sky         3 ..  84   below the terrain, except the horizon glow
+     void      6.1          the floor, untouched
+
+   Within a role the authored range is mapped onto the band AFFINELY, so
+   the order and the relative spacing the palette was authored with all
+   survive: WALL still sits under ROAD_DARK, TERRAIN_SHADE still sits
+   under TERRAIN_LIT, and the scenery's four depth bands keep their ramp.
    ================================================================== */
-const BIOME_RECIPE = [
-  //                        hue   sat  skyH  skyL  gndH  gndL  scnH  citH  citS  winH   rdH   rdS
-  /* ember dusk         */ [   0, 1.00,    0, 1.00,    0, 1.00,    0,    0, 1.00,    0,    0, 1.00],
-  /* cold blue night    */ [ 205, 0.90,   18, 0.86,  -14, 0.94,   26,  -34, 1.10,   52,  -22, 1.15],
-  /* ash, one hot sign  */ [ 120, 0.16,    0, 1.06,    0, 1.00,    0,    0, 0.35,    0, -108, 5.50],
-  /* violet hour        */ [ 275, 1.10,  -26, 1.10,   16, 0.96,  -40,   36, 0.95,   70,  -14, 0.95],
-  /* sodium fields      */ [  95, 0.78,   36, 0.90,  -22, 1.10,   54,   22, 1.05,  -46,   30, 1.10],
-  /* cold place, hot rd */ [ 190, 0.95,   22, 0.94,   10, 0.90,   38,  -28, 1.00,   64, -168, 1.25],
-  /* rust and magenta   */ [ 330, 1.20,   24, 1.00,  -18, 1.04,   28,   46, 1.10,  -34,    8, 1.00],
-  /* pale steel         */ [ 215, 0.32,  -18, 2.10,   12, 0.86,   22,  -40, 0.70,   88,   -8, 1.30],
-  /* acid               */ [  68, 1.25,   30, 0.92,  -26, 1.06,  -52,   38, 1.15,   44,   18, 0.95],
-  /* indigo city        */ [ 240, 0.95,  -14, 1.06,   22, 0.92,   44,   62, 1.20,  -58,  -10, 1.05],
-  /* bleached warm      */ [  25, 0.45,   14, 1.75,  -12, 1.18,   30,  -24, 0.80,   66,   12, 1.35],
-  /* cyan on charcoal   */ [ 178, 1.05,   -8, 0.90,   26, 0.96,   50,   34, 1.05,  -40,   26, 1.00]
+/* ==================================================================
+   TWO BAND SETS, AND WHY THERE ARE TWO.
+
+   "Terrain below the road" was asked for three times and it is built. It
+   is the ROAD_ABOVE set below and one constant turns it on. It is not
+   the default, and the reason is compositional rather than a matter of
+   taste, so here it is with the measurement attached.
+
+   THE ROAD IS ABOUT SIXTY PER CENT OF THIS FRAME. The camera is 2,200
+   units up looking down a road that fills most of the screen; that is
+   the composition the whole game is built on and BRIEF.md's camera
+   section is not open. Whatever tone the road surface is, that tone is
+   the frame's dominant tone.
+
+   So "road surface: dark, neutral, desaturated" and "terrain below the
+   road" cannot both hold without the frame going grey. Making the road
+   the brightest large surface makes grey the brightest large surface,
+   and every biome then reads grey dominant however far apart their hues
+   are. Three builds were measured and photographed to establish this:
+   a bright road on a lit ground, a dark ground with lit structures, and
+   a lifted road on a lit ground. All three pass every hierarchy check
+   and all three read as one grey place at twelve angles.
+
+   The default therefore keeps the road DARK and the ground LIT, which is
+   what the last two sessions measured and what the frames show reading
+   as a place: the road is read by its edge, which is at 250 against a
+   surface at 40, and the terrain carries the biome's colour because it
+   is the surface with room to carry it.
+
+   Flip ROAD_ABOVE_TERRAIN to see the other one on the phone. Both pass.
+   ================================================================== */
+const BIOME_ROLE_BAND_DEFAULT = {
+  /* THE EDGE FLOOR IS WHERE IT WAS AUTHORED, not lifted. The dim end of
+     the edge role is the glows and the tyre marks, and lifting them
+     toward white is what takes the colour out of them: a glow at 178 is
+     paler than the same hue at 108 however saturated it is. It only
+     needs lifting when the road surface is lifted under it, which is the
+     other band set's problem and not this one's. */
+  edge: [78, 250],  win: [180, 215], surf: [20, 76],
+  cit:  [4, 150],   gnd: [22, 66],   scn:  [1, 56],
+  sky:  [3, 74]
+};
+const BIOME_ROLE_BAND_ROAD_ABOVE = {
+  edge: [108, 250], win: [180, 215], surf: [45, 110],
+  cit:  [4, 150],   gnd: [12, 48],   scn:  [1, 42],
+  sky:  [3, 74]
+};
+let BIOME_ROLE_BAND = BIOME_ROLE_BAND_DEFAULT;
+
+/* THE COLOUR THAT DEFINES EACH ROLE, named rather than derived.
+
+   A key's own hue offset from its role is carried across to wherever the
+   role moves, so the two window colours stay apart and the cool wet
+   sheen stays cool against the warm lip. That needs an anchor, and the
+   first version used the saturation weighted circular mean of the role.
+   IT PUT THE ROAD EDGE FORTY FIVE DEGREES OUT: the edge role holds a
+   warm near white lip, a cool blue sheen, a cyan gate and the tyre
+   marks, so its mean sits at 89 degrees where nothing in it actually is,
+   and every authored orange came out pink. An anchor has to be a colour
+   that IS the role, so each one is named here. */
+const BIOME_ROLE_ANCHOR = {
+  edge: 'EDGE_LIGHT', win: 'SKYLINE_WINDOW', surf: 'ROAD_LIGHT',
+  cit:  'SKYLINE',    gnd: 'TERRAIN_LIT',    scn:  'SCENERY_NEAR_LIT',
+  sky:  'SKY_LOW',    car: 'CAR_TOP'
+};
+
+/* ==================================================================
+   THE TWELVE PLACES, HAND AUTHORED, ONE ROW EACH.
+
+   Every pair is [hue in degrees, saturation multiplier on what the
+   palette was authored with]. The hue is ABSOLUTE: it is where that role
+   sits on the wheel in that place, not an offset from anything, so a row
+   reads as a design rather than as a delta.
+
+   THE SCENERY HUE IS COMPLEMENTARY OR SPLIT COMPLEMENTARY TO THE
+   TERRAIN, always, and that is the whole point of the exercise. Deep
+   emerald ground with warm terracotta structures, steel slate with burnt
+   coral, cool ochre earth with cold cyan buildings. The gap is printed
+   in the comment on every row and it is never under 130 degrees except
+   in the two rows that are deliberately colourless, where hue means
+   nothing anyway.
+
+   SATURATION VARIES AS MUCH AS HUE. Row 4 is at 0.06 with one hot accent
+   in the edge, row 10 is bone pale, rows 5 and 7 are rich.
+
+   THE VALUE STRUCTURE IS IDENTICAL IN ALL TWELVE and that is deliberate,
+   not a limitation: it is the bands doing their job. A place is made of
+   hue and saturation here, and readability is made of value, so varying
+   the first cannot damage the second.
+   ================================================================== */
+const BIOME_PALETTE = [
+  /* 0  ember dusk: warm ochre ground, cold blue structures     gap 172 */
+  { name: 'ember dusk',
+    sky: [ 12, 0.80], gnd: [ 28, 0.72], scn: [200, 0.60], cit: [196, 0.75],
+    surf:[ 22, 0.52], edge:[ 32, 1.00], car: [190, 0.85] },
+  /* 1  deep emerald ground, warm terracotta structures         gap 130 */
+  { name: 'emerald and terracotta',
+    sky: [162, 0.70], gnd: [150, 0.68], scn: [ 20, 0.72], cit: [ 26, 0.80],
+    surf:[158, 0.46], edge:[150, 1.00], car: [ 30, 0.80] },
+  /* 2  steel slate ground, burnt coral structures              gap 160 */
+  { name: 'slate and coral',
+    sky: [218, 0.45], gnd: [212, 0.30], scn: [ 12, 0.70], cit: [  8, 0.85],
+    surf:[210, 0.30], edge:[  8, 1.00], car: [ 14, 0.75] },
+  /* 3  cool ochre earth, cold cyan buildings                   gap 146 */
+  { name: 'ochre and cyan',
+    sky: [206, 0.55], gnd: [ 44, 0.62], scn: [190, 0.75], cit: [194, 0.90],
+    surf:[ 40, 0.44], edge:[196, 1.00], car: [196, 0.80] },
+  /* 4  ash, and one hot signal. Hue is meaningless at this saturation
+        and the edge is the only thing in the frame with a colour.       */
+  { name: 'ash',
+    sky: [  0, 0.05], gnd: [  0, 0.06], scn: [  0, 0.05], cit: [  0, 0.08],
+    surf:[  0, 0.05], edge:[ 20, 1.00], car: [  0, 0.30] },
+  /* 5  violet hour, lime structures                            gap 175 */
+  { name: 'violet hour',
+    sky: [286, 0.75], gnd: [280, 0.85], scn: [105, 0.70], cit: [ 98, 0.85],
+    surf:[276, 0.50], edge:[292, 1.00], car: [100, 0.85] },
+  /* 6  cold blue night, amber structures                       gap 175 */
+  { name: 'cold blue, amber',
+    sky: [220, 0.65], gnd: [210, 0.55], scn: [ 35, 0.70], cit: [ 40, 0.85],
+    surf:[206, 0.42], edge:[ 42, 1.00], car: [ 38, 0.80] },
+  /* 7  acid green ground, magenta structures                   gap 195 */
+  { name: 'acid and magenta',
+    sky: [100, 0.70], gnd: [ 90, 0.80], scn: [285, 0.70], cit: [300, 0.90],
+    surf:[ 94, 0.48], edge:[ 86, 1.00], car: [292, 0.85] },
+  /* 8  rust ground, teal structures                            gap 170 */
+  { name: 'rust and teal',
+    sky: [  8, 0.70], gnd: [ 15, 0.80], scn: [185, 0.70], cit: [180, 0.85],
+    surf:[ 12, 0.54], edge:[178, 1.00], car: [182, 0.85] },
+  /* 9  indigo ground, gold structures                          gap 165 */
+  { name: 'indigo and gold',
+    sky: [254, 0.70], gnd: [250, 0.65], scn: [ 55, 0.72], cit: [ 48, 0.90],
+    surf:[246, 0.46], edge:[250, 1.00], car: [ 52, 0.85] },
+  /* 10 bone pale earth, cold blue structures                   gap 175 */
+  { name: 'bone and cold blue',
+    sky: [220, 0.22], gnd: [ 40, 0.16], scn: [215, 0.40], cit: [210, 0.45],
+    surf:[ 36, 0.18], edge:[210, 0.85], car: [212, 0.55] },
+  /* 11 crimson ground, cyan structures                         gap 175 */
+  { name: 'crimson and cyan',
+    sky: [348, 0.72], gnd: [350, 0.78], scn: [175, 0.72], cit: [170, 0.88],
+    surf:[352, 0.50], edge:[340, 1.00], car: [172, 0.85] }
 ];
-const R_HUE = 0, R_SAT = 1, R_SKYH = 2, R_SKYL = 3, R_GNDH = 4, R_GNDL = 5,
-      R_SCNH = 6, R_CITH = 7, R_CITS = 8, R_WINH = 9, R_RDH = 10, R_RDS = 11;
+
+/* THE PLAIN WEIGHTED SUM OVER sRGB BYTES. See BIOME_ROLE_BAND: this is
+   the quantity every table, every threshold and every report in this
+   project calls luminance, so it is the one the solver targets. */
+function byteLuma(r, g, b) { return 0.2126 * r + 0.7152 * g + 0.0722 * b; }
+
+/* WHAT EACH ROLE WAS AUTHORED AS: its luminance range, so the affine map
+   onto the band has something to map FROM, and its hue, so a key's own
+   offset from its role can be carried across to wherever the role moves.
+
+   THE HUE ANCHOR IS THE CIRCULAR MEAN WEIGHTED BY SATURATION, because
+   the hue of a near grey is arbitrary and averaging it in unweighted
+   drags the anchor to somewhere nothing in the role actually sits. */
+let ROLE_BASE = null;
+function buildRoleBase(base, voidRgb) {
+  const acc = {};
+  for (const k in base) {
+    if (PALETTE_FIXED[k]) continue;
+    const c = rgbOf(base[k]), a = c[3];
+    const r = a >= 1 ? c[0] : c[0] * a + voidRgb[0] * (1 - a);
+    const g = a >= 1 ? c[1] : c[1] * a + voidRgb[1] * (1 - a);
+    const bl = a >= 1 ? c[2] : c[2] * a + voidRgb[2] * (1 - a);
+    const L = byteLuma(r, g, bl);
+    const hsl = rgbToHsl(r, g, bl);
+    const nm = biomeRole(k);
+    const o = acc[nm] || (acc[nm] = { lo: 1e9, hi: -1e9, x: 0, y: 0, w: 0 });
+    if (L < o.lo) o.lo = L;
+    if (L > o.hi) o.hi = L;
+    if (BIOME_ROLE_ANCHOR[nm] === k) o.hue = hsl[0];
+  }
+  for (const nm in acc) if (acc[nm].hue === undefined) acc[nm].hue = 0;
+  return acc;
+}
+
+/* ONE COLOUR, MOVED TO A ROLE'S HUE AND SATURATION AND SOLVED INTO ITS
+   BAND. Lightness rises monotonically with luminance at fixed hue and
+   saturation, and compositing at fixed alpha is monotonic in it too, so
+   twenty bisections land inside a thousandth. This runs once per colour
+   per biome at load and never in a frame. */
+function roleColour(colour, hue, sat, wantL, was, now) {
+  const c = rgbOf(colour);
+  const a = c[3];
+  function over(rgb, bg) {
+    if (a >= 1 || !bg) return byteLuma(rgb[0], rgb[1], rgb[2]);
+    return byteLuma(rgb[0] * a + bg[0] * (1 - a),
+                    rgb[1] * a + bg[1] * (1 - a),
+                    rgb[2] * a + bg[2] * (1 - a));
+  }
+  const want = clamp(wantL, 0, 255);
+  let lo = 0, hi = 1, out = hslToRgb(hue, sat, 0.5);
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo + hi) / 2;
+    out = hslToRgb(hue, sat, mid);
+    if (over(out, now) < want) lo = mid; else hi = mid;
+  }
+  if (colour.charAt(0) === '#') return '#' + hex2(out[0]) + hex2(out[1]) + hex2(out[2]);
+  if (colour.indexOf('(') >= 0) {
+    return 'rgba(' + out[0] + ',' + out[1] + ',' + out[2] + ',' + c[3] + ')';
+  }
+  return out[0] + ',' + out[1] + ',' + out[2];
+}
 
 let PALETTE_BASE = null;
 let BIOMES = [];
@@ -4025,41 +4232,59 @@ function buildBiomes() {
     PALETTE_BASE = {};
     for (const k in COLOUR) PALETTE_BASE[k] = COLOUR[k];
   }
-  const n = clamp(Math.round(FEEL.BIOME_COUNT), 1, BIOME_RECIPE.length);
   const wasVoid = rgbOf(PALETTE_BASE.VOID);
+  if (!ROLE_BASE) ROLE_BASE = buildRoleBase(PALETTE_BASE, wasVoid);
+  BIOME_ROLE_BAND = FEEL.ROAD_ABOVE_TERRAIN >= 0.5 ? BIOME_ROLE_BAND_ROAD_ABOVE
+                                                   : BIOME_ROLE_BAND_DEFAULT;
+  const n = clamp(Math.round(FEEL.BIOME_COUNT), 1, BIOME_PALETTE.length);
   BIOMES = [];
   BIOME_HUE = [];
   for (let i = 0; i < n; i++) {
-    const r = BIOME_RECIPE[i];
-    const deg = r[R_HUE];
+    const rec = BIOME_PALETTE[i];
     const b = {};
-    /* The void first, because the translucent layers are solved against
-       it and it has to be this biome's void rather than the last one's.
-       It takes the turn and the world's saturation and nothing else. */
-    b.VOID = recolour(PALETTE_BASE.VOID, deg, r[R_SAT], 1);
-    const nowVoid = rgbOf(b.VOID);
+    // The void first: everything translucent is solved against it, and it
+    // has to be this biome's void rather than the last one's. It does not
+    // move at all, which is what keeps it the floor of the ranking.
+    b.VOID = PALETTE_BASE.VOID;
+    const nowVoid = wasVoid;
     for (const k in PALETTE_BASE) {
       if (k === 'VOID') continue;
       if (PALETTE_FIXED[k]) { b[k] = PALETTE_BASE[k]; continue; }
-      const fam = biomeFamily(k);
-      let h = deg, sat = r[R_SAT], lum = 1;
-      if (fam === 'core')     { sat = 1; }
-      else if (fam === 'sky') { h += r[R_SKYH]; lum = r[R_SKYL]; }
-      else if (fam === 'gnd') { h += r[R_GNDH]; lum = r[R_GNDL]; }
-      else if (fam === 'scn') { h += r[R_SCNH]; }
-      else if (fam === 'cit') { h += r[R_CITH]; sat *= r[R_CITS]; }
-      else if (fam === 'win') { h += r[R_CITH] + r[R_WINH]; sat *= r[R_CITS]; }
-      else if (fam === 'rd')  { h += r[R_RDH];  sat *= r[R_RDS]; }
-      b[k] = recolour(PALETTE_BASE[k], h, sat, lum, wasVoid, nowVoid);
+      const role = biomeRole(k);
+      const spec = rec[role];
+      if (!spec) { b[k] = PALETTE_BASE[k]; continue; }   // core, other
+      const src = ROLE_BASE[role];
+      const c = rgbOf(PALETTE_BASE[k]), a = c[3];
+      const rr = a >= 1 ? c[0] : c[0] * a + wasVoid[0] * (1 - a);
+      const gg = a >= 1 ? c[1] : c[1] * a + wasVoid[1] * (1 - a);
+      const bb = a >= 1 ? c[2] : c[2] * a + wasVoid[2] * (1 - a);
+      const hsl = rgbToHsl(rr, gg, bb);
+      /* THE KEY'S OWN OFFSET FROM ITS ROLE IS CARRIED, not discarded, so
+         a role landing on one hue does not flatten the relationships
+         inside it: the two window colours stay apart, the cool sheen
+         stays cool against the warm lip. */
+      const hue = spec[0] + (hsl[0] - src.hue);
+      const sat = clamp(hsl[1] * spec[1], 0, 1);
+      const band = BIOME_ROLE_BAND[role];
+      let wantL = byteLuma(rr, gg, bb);
+      if (band) {
+        const span = src.hi - src.lo;
+        const f = span > 0.01 ? (wantL - src.lo) / span : 0.5;
+        wantL = band[0] + f * (band[1] - band[0]);
+      }
+      b[k] = roleColour(PALETTE_BASE[k], hue, sat, wantL, wasVoid, nowVoid);
     }
     BIOMES.push(b);
-    BIOME_HUE.push(deg);
+    BIOME_HUE.push(rec.gnd[0]);
   }
   biomeBag.length = 0;
   biomeRecent.length = 0;
   lastBiomeHue = -999;
 }
 
+/* The sequencer keeps consecutive places apart on the wheel, and the hue
+   that matters for that is the GROUND's, because the ground is most of
+   the frame. */
 function biomeHue(i) { return BIOME_HUE[((i % BIOME_HUE.length) + BIOME_HUE.length) % BIOME_HUE.length]; }
 function hueGap(a, b) {
   const d = Math.abs(((a - b) % 360 + 360) % 360);
@@ -4998,6 +5223,7 @@ const TUNABLES = [
   { key: 'GRIP_TIME',          label: 'grip',    step: 0.02, min: 0.04, max: 1.0,   dp: 2, group: 2 },
   { key: 'ROAD_THICKNESS',     label: 'thick',   step: 20,   min: 0,    max: 1200,  dp: 0, group: 3 },
   { key: 'ROAD_FLARE',         label: 'flare',   step: 20,   min: 0,    max: 1400,  dp: 0, group: 3 },
+  { key: 'ROAD_ABOVE_TERRAIN',label:'roadUp', step: 1,    min: 0,    max: 1,     dp: 0, group: 4 },
   { key: 'PYLON_SPACING',      label: 'pylons',  step: 1,    min: 2,    max: 40,    dp: 0, group: 4 },
   { key: 'REFLECT_SEGMENTS',   label: 'reflLen', step: 1,    min: 0,    max: 40,    dp: 0, group: 4 },
   { key: 'REFLECT_WIDEN',      label: 'reflW',   step: 0.1,  min: 1,    max: 10,    dp: 1, group: 4 },
@@ -7527,7 +7753,9 @@ function nudgeTuning(dir) {
   FEEL[t.key] = parseFloat(next.toFixed(t.dp + 2));
   // Cutting the wheel into a different number of steps is a different set
   // of colours, so it is regenerated rather than left stale.
-  if (t.key === 'BIOME_COUNT') { buildBiomes(); applyBiome(biome); }
+  if (t.key === 'BIOME_COUNT' || t.key === 'ROAD_ABOVE_TERRAIN') {
+    buildBiomes(); applyBiome(biome);
+  }
   markTuning();
   saveTuning();
 }
