@@ -1450,6 +1450,25 @@ const FEEL = {
      against a clock that lived at 40 it was thirty two seconds below
      anywhere the player ever visited and never once fired. */
   CLOCK_LOW:                 14,     // LIVE, seconds under which the readout warns
+  /* ------------------------------------------------------------------
+     THE TWO RENDERER CONSTANTS FROM SCENERY.md, AND NEITHER OF THEM IS
+     A LOOK. Both exist because path cost in this renderer grows with the
+     SQUARE of the number of subpaths in a single path, which the file's
+     batching convention was written before anybody knew.
+
+     SEG_MERGE_PX: a run of road segments spanning less than this many
+     screen pixels is drawn as one quad. At zero the road is drawn
+     exactly as it always was, segment by segment. See the coalescing
+     block in drawRoad.
+
+     PATH_CHUNK_SUBPATHS: the most subpaths that may go into one fill.
+     Zero or Infinity is the old single-fill behaviour. See chunkLimit.
+
+     BOTH LIVE, because the first is a legibility trade at the horizon
+     and the second is an alpha trade at the chunk joins, and both of
+     those are things to look at on a phone rather than argue about. */
+  SEG_MERGE_PX:             1.0,     // LIVE
+  PATH_CHUNK_SUBPATHS:       64,     // LIVE
   CHECKPOINT_EVERY:        1500,     // LIVE, segments between gates, about 33 seconds
   /* WHERE THE FIRST GATE SITS, AS A SHARE OF THAT SPACING, and it was an
      inline 0.7 in gateSegment until the training run needed it. CLAUDE.md
@@ -4601,6 +4620,8 @@ const TUNABLES = [
   { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
   { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
   { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
+  { key: 'SEG_MERGE_PX',       label: 'segPx',   step: 0.25, min: 0,    max: 8,     dp: 2, group: 12 },
+  { key: 'PATH_CHUNK_SUBPATHS',label: 'chunk',   step: 16,   min: 0,    max: 1024,  dp: 0, group: 12 },
   { key: 'CHECKPOINT_EVERY',   label: 'gate',    step: 100,  min: 300,  max: 6000,  dp: 0, group: 12 },
   { key: 'GATE_FIRST_SHARE',   label: 'gate1',   step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 12 },
   { key: 'CLOCK_CHECKPOINT',   label: 'gateSec', step: 1,    min: 0,    max: 60,    dp: 0, group: 12 },
@@ -10082,6 +10103,57 @@ function drawRoad(w, h) {
   if (first < 0) return;
 
   drawWalls(count);
+
+  /* ------------------------------------------------------------------
+     THE FAR FIELD, COALESCED. SCENERY.md change one.
+
+     136 of the 192 visible segments are under one screen pixel tall and
+     together occupy 44 rows of a 768 row screen. Every pass that walks
+     the road pays for all 136 of them, and path cost grows with the
+     SQUARE of the number of subpaths in one path, so the cheapest
+     geometry in the frame is charged the most.
+
+     A run of segments spanning less than SEG_MERGE_PX becomes one quad:
+     the absorbed segments have their visibility cleared and the
+     surviving anchor's FAR boundary is moved out to where the run
+     actually ended. Every pass downstream then walks a shorter road
+     without knowing anything about this.
+
+     AFTER drawWalls AND NOT BEFORE IT, which is a deliberate reading of
+     "before any pass consumes bvis". drawWalls does not consume bvis: it
+     walks from segment zero with its own culling and its own break on
+     bw[n] < WALL_CULL_PX. Moving a boundary out from under it would have
+     made that break fire on a merged far boundary and taken every wall
+     beyond the first merge off the screen. Run after it, the walls are
+     byte for byte the walls that shipped.
+
+     bz IS NOT MOVED. The six arrays named are the six that describe
+     where a boundary is on screen; bz is how far away it is, and it is
+     what drawWalls and the harnesses use to find a distance. Moving it
+     would make the merged anchor claim to be somewhere it is not.
+
+     SEG_MERGE_PX AT ZERO IS EXACTLY THE OLD DRAWING, by the guard on the
+     first line rather than by the arithmetic happening to agree. */
+  if (FEEL.SEG_MERGE_PX > 0) {
+    let a = first;
+    while (a <= last) {
+      if (!bvis[a]) { a++; continue; }
+      let e = a;
+      while (e < last && by[a] - by[e + 1] < FEEL.SEG_MERGE_PX) {
+        let nx = e + 1;
+        while (nx <= last && !bvis[nx]) nx++;
+        if (nx > last) break;
+        e = nx;
+      }
+      if (e > a) {
+        const src = e + 1;
+        bx[a + 1] = bx[src]; by[a + 1] = by[src]; bw[a + 1] = bw[src];
+        bt[a + 1] = bt[src]; bf[a + 1] = bf[src]; bh[a + 1] = bh[src];
+        for (let k = a + 1; k <= e; k++) bvis[k] = 0;
+      }
+      a = e + 1;
+    }
+  }
   drawSlabUnderline(first, last);
   /* AFTER the underline, not before. The underline's own glow is drawn
      around the slab bottom and is up to three pixels tall, against a mean
@@ -11319,11 +11391,10 @@ function lanePass(first, last) {
    width and glow as the multiplier climbs and the lip itself can only
    ever gain luminance, from the hot ramp on its dim stripe. */
 function edgeGlowPass(first, last) {
-  glowBandPath(first, last, EDGE_OUT - FEEL.EDGE_LIP_FRACTION - FEEL.EDGE_GLOW_SPREAD,
-               EDGE_OUT + FEEL.EDGE_GLOW_SPREAD);
   ctx.globalAlpha = FEEL.EDGE_GLOW_ALPHA;
   ctx.fillStyle = EDGE_GLOW_FILL;
-  ctx.fill();
+  glowBandFill(first, last, EDGE_OUT - FEEL.EDGE_LIP_FRACTION - FEEL.EDGE_GLOW_SPREAD,
+               EDGE_OUT + FEEL.EDGE_GLOW_SPREAD);
   ctx.globalAlpha = 1;
   if (worldHeat <= 0.01) return;
 
@@ -11336,20 +11407,57 @@ function edgeGlowPass(first, last) {
   const spread = FEEL.EDGE_GLOW_SPREAD
                * (1 + FEEL.HEAT_EDGE_SPREAD * worldHeat
                     + FEEL.FINALE_EDGE_SPREAD * finaleFree);
-  ctx.beginPath();
-  glowBandPath(first, last, EDGE_OUT - lip - spread, EDGE_OUT - lip, true);
-  glowBandPath(first, last, EDGE_OUT, EDGE_OUT + spread, true);
+  /* THE TWO BANDS ARE CHUNKED SEPARATELY RATHER THAN INTERLEAVED, so the
+     order of the subpaths is exactly the order they were emitted in
+     before. They are disjoint anyway, one inboard of the lip and one
+     outboard, so filling them apart cannot double-blend them against
+     each other however the chunks fall. */
   ctx.globalAlpha = Math.min(1, FEEL.HEAT_EDGE_GLOW * worldHeat
                                 + FEEL.FINALE_EDGE_GLOW * finaleFree);
   ctx.fillStyle = EDGE_GLOW_FILL;
-  ctx.fill();
+  glowBandFill(first, last, EDGE_OUT - lip - spread, EDGE_OUT - lip);
+  glowBandFill(first, last, EDGE_OUT, EDGE_OUT + spread);
   ctx.globalAlpha = 1;
 }
 
 /* Both edges, the whole draw distance, between two fractions of the half
    width. Pass keep to add to a path already open rather than start one. */
-function glowBandPath(first, last, inner, outer, keep) {
-  if (!keep) ctx.beginPath();
+/* ------------------------------------------------------------------
+   HOW MANY SUBPATHS MAY GO IN ONE FILL. SCENERY.md change two.
+
+   The file's batching convention exists to avoid per-call overhead and
+   it is the right instinct for a handful of shapes. At 964 subpaths it
+   is the wrong one, because path cost is quadratic in subpath count:
+   measured, 800 subpaths in one fill is 11.3ms and the same 800 across
+   eight fills is 1.5ms, for identical pixels.
+
+   ZERO OR INFINITY IS THE OLD BEHAVIOUR, one fill for the lot. The floor
+   of two is because a segment emits two subpaths, one per side, and a
+   chunk that cannot hold a whole segment would split a road in half
+   down the middle.
+   ------------------------------------------------------------------ */
+function chunkLimit() {
+  const v = FEEL.PATH_CHUNK_SUBPATHS;
+  if (!v || v <= 0 || !isFinite(v)) return Infinity;
+  return Math.max(2, Math.round(v));
+}
+
+/* THE EDGE GLOW BAND, BUILT AND FILLED IN DEPTH CHUNKS.
+
+   It owns its own fill now, so the caller sets the style and the alpha
+   BEFORE calling rather than after. Same geometry, same order, same
+   colours; the only thing that changed is how many fills the same
+   subpaths are spread across.
+
+   THE ONE THING TO WATCH IS ALPHA. Both callers fill under 1. A single
+   path merges overlapping subpaths before blending; separate fills blend
+   twice, so a chunk join can double-blend where two chunks overlap.
+   Measured in the report; the constant is the lever if a seam ever
+   reads. */
+function glowBandFill(first, last, inner, outer) {
+  const limit = chunkLimit();
+  let sub = 0;
+  ctx.beginPath();
   for (let n = first; n <= last; n++) {
     if (!bvis[n]) continue;
     // The band is under a pixel from here on, so it costs fill rate and
@@ -11364,7 +11472,10 @@ function glowBandPath(first, last, inner, outer, keep) {
     ctx.moveTo(bx[n] + c1, y1); ctx.lineTo(bx[n] + a1, y1);
     ctx.lineTo(bx[n + 1] + a2, y2); ctx.lineTo(bx[n + 1] + c2, y2);
     ctx.closePath();
+    sub += 2;
+    if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
   }
+  if (sub > 0) ctx.fill();
 }
 
 /* The bleed. Hangs off the outer bottom corner of the slab, downward and
@@ -11439,17 +11550,20 @@ function edgeBleedPass(first, last) {
 function drawSlabUnderline(first, last) {
   const scaleW = FEEL.SLAB_BOTTOM_WIDTH / FEEL.ROAD_HALF_WIDTH_BASE;
   const scaleG = FEEL.SLAB_BOTTOM_GLOW / FEEL.ROAD_HALF_WIDTH_BASE;
-  underlinePath(first, last, scaleG);
   ctx.globalAlpha = FEEL.EDGE_GLOW_ALPHA;
   ctx.fillStyle = SLAB_BOTTOM_GLOW_FILL;
-  ctx.fill();
+  underlineFill(first, last, scaleG);
   ctx.globalAlpha = 1;
-  underlinePath(first, last, scaleW);
   ctx.fillStyle = COLOUR.SLAB_BOTTOM;
-  ctx.fill();
+  underlineFill(first, last, scaleW);
 }
 
-function underlinePath(first, last, thick) {
+/* THE SLAB UNDERLINE, CHUNKED THE SAME WAY AND FOR THE SAME REASON. It
+   was 768 subpaths in one path, the second largest in the frame. Owns
+   its fill, so the caller sets the style first. */
+function underlineFill(first, last, thick) {
+  const limit = chunkLimit();
+  let sub = 0;
   ctx.beginPath();
   for (let n = first; n <= last; n++) {
     if (!bvis[n]) continue;
@@ -11463,7 +11577,10 @@ function underlinePath(first, last, thick) {
     ctx.moveTo(bx[n] + o1, y1 - t1); ctx.lineTo(bx[n] + o1, y1 + t1);
     ctx.lineTo(bx[n + 1] + o2, y2 + t2); ctx.lineTo(bx[n + 1] + o2, y2 - t2);
     ctx.closePath();
+    sub += 2;
+    if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
   }
+  if (sub > 0) ctx.fill();
 }
 
 /* Posts down both edges. Three batched fills for the lot: the faint glow,
