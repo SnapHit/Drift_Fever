@@ -26,17 +26,34 @@ existing city given real height. These are flat shapes projected and filled, whi
 exactly what this renderer does. The same investigation established there is room for
 600 to 1,500 objects per frame once the batching defect is fixed.
 
-**NOT REACHABLE, AT ANY FRAME BUDGET.** The light itself. In the reference images a
-lighthouse beam falls as a volumetric cone across terrain, headlights pool on the
-ground and fade, and snow is lit where light reaches it and blue-grey where it does
-not. That is per-object shading with a light direction and coloured bounce. Canvas 2D
-fills a shape with one flat colour.
+**REVISED 13 AUGUST 2026. THIS SECTION USED TO SAY THE LIGHT WAS UNREACHABLE. IT WAS
+WRONG, AND THE REASON IT WAS WRONG MATTERS.**
 
-**The limit is the shading model, not the speed.** No amount of frame budget changes
-it. You can give each object a lit face and a shade face, and that is worth doing, but
-it will read as a stylistic decision rather than as light.
+The original claim: per-object shading with a light direction is impossible because
+Canvas 2D fills a shape with one flat colour, and therefore the limit is the shading
+model rather than the speed.
 
-**So: the silhouette and the depth structure are the target. The light is not.**
+The first half is false. A face can be filled with a colour chosen from its own normal,
+which is exactly what flat shading is, and it is how every low-poly game of this kind
+looks the way it does. The car already does this: drawBox spins each face normal into
+world space every frame for the back-face cull, so the dot product is one array index
+on a vector the loop already holds. Measured cost: 3.6ms off, 3.4ms on. Free.
+
+The second half was true but only because of how the scenery happened to be built.
+Scenery objects are 2D profiles from SCENERY_PROFILE, mirrored into a lit half and a
+shade half. There are no faces out there to take a normal of. That is a property of
+this particular implementation, not of Canvas 2D.
+
+**SO THE TARGET IS NOW REAL GEOMETRY.** Scenery objects get faces with normals, shaded
+against one world light. Depth sorting so objects occlude correctly. Cast shadows on
+the ground. This is a renderer change and it is the thing that actually closes the gap
+to the reference images, which nine sessions of palette and silhouette work did not.
+
+**What is still unreachable:** volumetric light. A beam falling through air, headlight
+cones on terrain, coloured bounce between surfaces. Those need per-pixel work and they
+stay out of scope.
+
+**The silhouette and depth structure remain necessary and are no longer sufficient.**
 
 ---
 
@@ -53,6 +70,19 @@ achievable, it uses what already exists, and it is the single idea the art direc
 should be built around.
 
 ---
+
+## The frame budget, which decides how far this goes
+
+Gate 1 of the scenery work found the renderer's cost is quadratic in the number of
+subpaths in a single fill, and fixing it took the throttled build from 21fps to 62fps.
+That win is what funds real geometry.
+
+Faces, normals and sorting cost more than flat profiles. The target is unchanged: 60fps
+on a five-year-old Celeron Chromebook, which is the audience. Anything that cannot hold
+that ships behind a constant defaulted off, with its cost measured and reported.
+
+Object count is not the binding constraint. Subpaths per fill is. Keep every fill well
+under 64 subpaths and the count stops mattering until the thousands.
 
 ## The value structure, which is not negotiable
 
