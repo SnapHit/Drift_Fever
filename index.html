@@ -1013,6 +1013,15 @@ const FEEL = {
   PYLON_WIDTH:               85,
   PYLON_MAJOR_WIDTH:        110,
   PYLON_OUT:               0.06,     // of the half width, how far outboard they stand
+  /* THE REFLECTOR PINS. See drawReflectors. CULL is a share of the draw
+     distance and it is the important one: past it a pin is under a pixel
+     and a sub pixel point of light is noise on the part of the frame the
+     player reads the road ahead from. */
+  REFLECTOR_EVERY:            1,     // LIVE, every nth marker post carries one
+  REFLECTOR_SIZE:          0.62,     // LIVE, of the post width
+  REFLECTOR_HEIGHT:        0.66,     // LIVE, up the post
+  REFLECTOR_MIN_PX:         1.4,     // below this it is a shimmering speck
+  REFLECTOR_CULL:          0.34,     // LIVE, share of the draw distance
   /* ----------------------------------------------------------------
      REFLECTION STREAKS. Item 2, and the single best ratio in the
      investigation: every lit thing on a wet surface throws a long soft
@@ -1255,6 +1264,41 @@ const FEEL = {
      MIN_PX drops an object once it is too small to be a shape rather
      than letting it become a shimmering speck at the draw distance.
      ------------------------------------------------------------------ */
+  /* ------------------------------------------------------------------
+     DEPTH BY HUE AS WELL AS BY VALUE.
+
+     Depth was cued by dimming toward one hue: four bands of the same
+     colour getting darker. Real aerial perspective turns as well as
+     dims, warm near and cold far, and turning is the half that was
+     missing. So the near end of the world is the biome's own hue and the
+     far end is pulled toward one cold hue, which gives every biome a
+     different foreground and the same kind of horizon.
+
+     PULLED TOWARD A HUE RATHER THAN OFFSET BY AN ANGLE, because an
+     offset is only "cooler" for some biomes and is warmer for the rest.
+     The pull takes the short way round the wheel.
+
+     EASED ABOVE ONE SO THE FALL HAPPENS LATE. At ease 1 the foreground
+     is already desaturating a third of the way in, which throws away the
+     part of the frame with the most pixels in it. Above one the
+     foreground holds its colour and the whole shift lands in the last
+     third, where the objects are small and the dimming reads as air
+     rather than as a wash.
+
+     THE FAR END IS FORCED DARK AND THAT IS THE POINT OF LUM_FAR. Whatever
+     the hue does, the vanishing point has to stay dark behind the far
+     road or the planning horizon goes with it.
+     ------------------------------------------------------------------ */
+  DEPTH_FAR_HUE:            228,     // LIVE, the hue the horizon runs toward
+  DEPTH_HUE_PULL:          0.62,     // LIVE, how far toward it the far end gets
+  DEPTH_SAT_FAR:           0.40,     // LIVE, share of near saturation at the horizon
+  DEPTH_LUM_FAR:           0.44,     // LIVE, share of near lightness at the horizon
+  DEPTH_EASE:              2.40,     // LIVE, above one holds the foreground
+  DEPTH_STEPS:               20,     // LIVE, distinct fills a depth pass may use
+  GROUND_GRADIENT_STOPS:     24,     // LIVE, the plane is one fill, so stops are free
+  SCENERY_FADE_FAR:        0.94,     // LIVE, how far an object at the draw distance
+                                     // has gone toward the ground it stands on
+  SCENERY_FADE_EASE:       2.60,     // LIVE, above one keeps the far band readable
   /* FIELDS ON THE TERRAIN SHOULDER. See groundPatchPass.
 
      THEY WERE ON THE GROUND PLANE AND THEY WERE NOT THERE. Measured off
@@ -2960,6 +3004,33 @@ const FEEL = {
      70% wider than the rear of the car and looked like a bar bolted
      across it. This is a hard ceiling in tail half widths and the spread
      is clamped to it however large it gets. */
+  /* ------------------------------------------------------------------
+     ITEM 5: A REAL LIGHT VECTOR ON THE CAR, PROTOTYPED AND DEFAULTED OFF.
+
+     Faces take a colour from the dot of their world space normal with a
+     light direction, interpolated along a warm key to cool ambient ramp,
+     instead of being hand authored per face. See drawBox.
+
+     THE CAP IS DERIVED FROM THE MEASURED HIERARCHY, not assumed. The
+     suggestion of 0.45 face lightness came with an assumption that the
+     road lip sits at 0.95 or above; measured, the edge peaks at 249.4
+     and the car at 233, so a 0.45 cap would take about eighty luminance
+     units off the car and make it harder to find rather than easier.
+     CAR_KEY is authored at the car's existing peak instead, so the
+     brightest face under the light lands where the brightest face lands
+     now and the ranking does not move.
+
+     THE DIRECTION IS FIXED IN WORLD SPACE, which is the whole point: the
+     car turning changes which faces catch it, which is the form the
+     hand authored version cannot give. Slightly above, ahead and to the
+     left, so a car sliding right lights its flank.
+     ------------------------------------------------------------------ */
+  CAR_LIGHT_VECTOR:           0,     // LIVE, off. 1 turns the prototype on
+  CAR_LIGHT_X:            -0.55,     // LIVE, the key direction, world space
+  CAR_LIGHT_Y:             0.68,     // LIVE
+  CAR_LIGHT_Z:             0.48,     // LIVE
+  CAR_LIGHT_GAMMA:         0.85,     // LIVE, under one opens the mid tones
+  CAR_LIGHT_FLOOR:         0.18,     // LIVE, the ambient a face never falls below
   CAR_LIGHT_GLOW_MAX:      0.98,     // of the tail half width, laterally
   CAR_LIGHT_GLOW_BACK:       34,     // world units the glow sits behind the strip
   CAR_RIM_GLOW_SPREAD:      1.9,
@@ -4831,7 +4902,13 @@ const COLOUR = {
   CAR_LIGHT_AMBER: '#ff9a2a',
   CAR_LIGHT_COOL:  '#8fe8ff',
   CAR_SEAM_GOLD: 'rgba(232,200,119,0.5)',
-  CAR_SEAM_LIGHT: 'rgba(180,240,255,0.45)',
+/* ITEM 5's TWO ENDS. The key is authored at the car's own measured peak
+     so the brightest lit face lands where the brightest hand authored
+     face lands now, and the ambient is a cool dark the unlit faces fall
+     to. In the car role, so both turn with the place. */
+  CAR_KEY:      '#ffe9c4',
+  CAR_AMBIENT:  '#1d2430',
+    CAR_SEAM_LIGHT: 'rgba(180,240,255,0.45)',
   TRAIL_ALT:    '120,52,220',   // a violet cool end for the marks
   /* The stops of the three multi stop ramps, which used to be written
      into the code that built them. They are palette, so they live in the
@@ -5233,6 +5310,16 @@ const TUNABLES = [
   { key: 'WET_SHEEN_ALPHA',    label: 'sheenA',  step: 0.01, min: 0,    max: 0.8,   dp: 2, group: 4 },
   { key: 'WET_SHEEN_FADE',     label: 'sheenH',  step: 0.02, min: 0.02, max: 1.0,   dp: 2, group: 4 },
   { key: 'PYLON_HEIGHT',       label: 'post',    step: 30,   min: 60,   max: 2400,  dp: 0, group: 4 },
+  { key: 'CAR_LIGHT_VECTOR',   label: 'lightV',  step: 1,    min: 0,    max: 1,     dp: 0, group: 4 },
+  { key: 'CAR_LIGHT_X',        label: 'lightX',  step: 0.05, min: -1,   max: 1,     dp: 2, group: 4 },
+  { key: 'CAR_LIGHT_Y',        label: 'lightY',  step: 0.05, min: -1,   max: 1,     dp: 2, group: 4 },
+  { key: 'CAR_LIGHT_Z',        label: 'lightZ',  step: 0.05, min: -1,   max: 1,     dp: 2, group: 4 },
+  { key: 'CAR_LIGHT_GAMMA',    label: 'lightG',  step: 0.05, min: 0.1,  max: 4,     dp: 2, group: 4 },
+  { key: 'CAR_LIGHT_FLOOR',    label: 'lightF',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'REFLECTOR_EVERY',    label: 'refEvery',step: 1,    min: 1,    max: 12,    dp: 0, group: 4 },
+  { key: 'REFLECTOR_SIZE',     label: 'refSize', step: 0.04, min: 0,    max: 2,     dp: 2, group: 4 },
+  { key: 'REFLECTOR_HEIGHT',   label: 'refHigh', step: 0.04, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'REFLECTOR_CULL',     label: 'refCull', step: 0.02, min: 0.02, max: 1,     dp: 2, group: 4 },
   { key: 'LAMP_EVERY',         label: 'lampN',   step: 1,    min: 1,    max: 12,    dp: 0, group: 4 },
   { key: 'GLOW_WIDE_SCALE',    label: 'bloomW',  step: 0.1,  min: 1,    max: 9,     dp: 1, group: 4 },
   { key: 'GLOW_MID_SCALE',     label: 'bloomM',  step: 0.1,  min: 1,    max: 6,     dp: 1, group: 4 },
@@ -5274,6 +5361,15 @@ const TUNABLES = [
   { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
   { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
   { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
+  { key: 'DEPTH_FAR_HUE',      label: 'dpthHue', step: 4,    min: 0,    max: 359,   dp: 0, group: 21 },
+  { key: 'DEPTH_HUE_PULL',     label: 'dpthPull',step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'DEPTH_SAT_FAR',      label: 'dpthSat', step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'DEPTH_LUM_FAR',      label: 'dpthLum', step: 0.02, min: 0.02, max: 1,     dp: 2, group: 21 },
+  { key: 'DEPTH_EASE',         label: 'dpthEase',step: 0.10, min: 0.2,  max: 6,     dp: 2, group: 21 },
+  { key: 'DEPTH_STEPS',        label: 'dpthStep',step: 1,    min: 1,    max: 32,    dp: 0, group: 21 },
+  { key: 'GROUND_GRADIENT_STOPS',label:'dpthStop',step: 2,   min: 2,    max: 64,    dp: 0, group: 21 },
+  { key: 'SCENERY_FADE_FAR',   label: 'scnFade', step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SCENERY_FADE_EASE',  label: 'scnFadeE',step: 0.10, min: 0.2,  max: 6,     dp: 2, group: 21 },
   { key: 'GROUND_PATCH_EVERY', label: 'fldEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'GROUND_PATCH_DENSITY',label:'fldDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'GROUND_PATCH_SHIFT', label: 'fldTone', step: 0.5, min: 0,    max: 40,    dp: 1, group: 21 },
@@ -5789,12 +5885,22 @@ function resize() {
      with the scenery bands standing on it. */
   const gfar = FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH;
   const gK = CAMERA_DEPTH * camHeight * h / 2;
+  /* THE GROUND PLANE READS THE DEPTH TABLE AT FULL RESOLUTION. A canvas
+     gradient takes as many stops as it likes for one fill, so the plane
+     gets the whole 256 step curve sampled at GROUND_GRADIENT_STOPS
+     rather than the four bands it used to have. Screen y is solved from
+     depth by the same projection the road uses, so the colour lands
+     where that depth actually is on screen. */
   groundGradient = ctx.createLinearGradient(0, horizonY, 0, h);
-  for (let k = GROUND_BAND.length - 1; k >= 0; k--) {
-    const dz = gfar * (k + 1) / GROUND_BAND.length;
+  const stops = Math.max(2, Math.round(FEEL.GROUND_GRADIENT_STOPS));
+  for (let k = stops - 1; k >= 0; k--) {
+    const t = (k + 0.5) / stops;
+    const dz = gfar * t;
     const y = horizonY + gK / dz;
+    const ix = Math.min(DEPTH_LUT_SIZE - 1,
+                        Math.round(Math.pow(t, FEEL.DEPTH_EASE) * (DEPTH_LUT_SIZE - 1)));
     groundGradient.addColorStop(clamp((y - horizonY) / Math.max(1, h - horizonY), 0, 1),
-                                GROUND_BAND[k]);
+                                DEPTH_LUT.gnd[ix] || GROUND_BAND[0]);
   }
   skyGradient = ctx.createLinearGradient(0, -40, 0, horizonY);
   skyGradient.addColorStop(0, 'rgb(' + COLOUR.SKY_HIGH + ')');
@@ -10725,6 +10831,12 @@ const WALL_CULL_PX = 1.6;
 
 let EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
 let EMISSIVE_CORE_FILL = COLOUR.EMISSIVE_CORE;
+/* Item 5's ramp and direction, both built when the palette changes so the
+   draw loop does no colour arithmetic and no vector normalising. */
+let CAR_LIGHT_RAMP = null;
+const CAR_LIGHT_DIR = [0, 1, 0];
+let REFLECTOR_WARM_FILL = COLOUR.EMISSIVE_CORE;
+let REFLECTOR_COOL_FILL = 'rgb(' + COLOUR.WET_SHEEN + ')';
 let SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
 let PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
 /* The signage, item 8, and the road pool under a lamp, item 9. Both are
@@ -12380,6 +12492,87 @@ function drawPylons(first, last, baseIndex, w) {
   // The lit heads, item 9. Two more batched fills for every lamp in
   // shot, wide and faint then solid, on top of the posts they stand on.
   drawLampHeads(first, last, baseIndex, spacing, scaleH);
+  drawReflectors(first, last, baseIndex, spacing, scaleH, w);
+}
+
+/* ==================================================================
+   REFLECTOR PINS, AND THE POINT IS THE BATCHING RATHER THAN THE PINS.
+
+   A pin is a few pixels of pure colour on the side of a marker post. It
+   reads as a POINT OF LIGHT rather than as a shape, which is a different
+   kind of detail from anything else out here: everything else in this
+   world is a silhouette, and a world of nothing but silhouettes has no
+   sparkle in it.
+
+   COLLECTED FLAT, FLUSHED ONE PATH PER COLOUR. The x, y and size of
+   every pin go into one Float64Array per colour during the walk, and
+   each colour is then one path. Nothing is allocated: the arrays are
+   module level, their fill counts are reset to zero rather than the
+   arrays being replaced, and there is no object per pin anywhere.
+
+   AND CHUNKED UNDER THE CEILING gate one established. Path cost grows
+   with the SQUARE of the subpaths in one fill, so a colour with more
+   pins than chunkLimit() is flushed in pieces rather than as one path.
+   Pins are small and there are two colours, so in practice this is one
+   or two fills each.
+
+   STOPPED WELL BEFORE THE VANISHING POINT. Past REFLECTOR_CULL a pin is
+   under a pixel and a sub pixel point of light is not a highlight, it is
+   noise on the one part of the frame the player is reading for the road
+   ahead.
+   ================================================================== */
+const REFLECT_XY = [new Float64Array(768), new Float64Array(768)];
+const REFLECT_N = [0, 0];
+
+function drawReflectors(first, last, baseIndex, spacing, scaleH, w) {
+  if (FEEL.REFLECTOR_SIZE <= 0) return;
+  REFLECT_N[0] = 0; REFLECT_N[1] = 0;
+  const every = Math.max(1, Math.round(FEEL.REFLECTOR_EVERY));
+  const far = FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH;
+  const cull = FEEL.REFLECTOR_CULL * far;
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    if (bz[n] > cull) break;               // bz rises along the walk
+    const idx = baseIndex + n;
+    if (idx % spacing !== 0) continue;
+    if (((idx / spacing) % every) !== 0) continue;
+    const major = ((idx / spacing) % FEEL.PYLON_MAJOR_EVERY) === 0;
+    const hWorld = major ? FEEL.PYLON_MAJOR_HEIGHT : FEEL.PYLON_HEIGHT;
+    const rise = bw[n] * hWorld * scaleH;
+    const size = bw[n] * (major ? FEEL.PYLON_MAJOR_WIDTH : FEEL.PYLON_WIDTH)
+               * scaleH * FEEL.REFLECTOR_SIZE;
+    if (size < FEEL.REFLECTOR_MIN_PX) continue;
+    const out = bw[n] * (EDGE_OUT + FEEL.PYLON_OUT);
+    const y = by[n] - rise * FEEL.REFLECTOR_HEIGHT;
+    /* The majors take the warm pin and the minors the cool one, so the
+       pattern along the verge is the same rhythm the posts already have
+       rather than a second one laid over it. */
+    const c = major ? 0 : 1;
+    const a = REFLECT_XY[c];
+    for (let s = -1; s <= 1; s += 2) {
+      const x = bx[n] + s * out;
+      if (x < -size || x > w + size) continue;
+      const at = REFLECT_N[c] * 3;
+      if (at + 3 > a.length) break;
+      a[at] = x - size * 0.5; a[at + 1] = y - size * 0.5; a[at + 2] = size;
+      REFLECT_N[c]++;
+    }
+  }
+  const limit = chunkLimit();
+  for (let c = 0; c < 2; c++) {
+    if (!REFLECT_N[c]) continue;
+    ctx.fillStyle = c === 0 ? REFLECTOR_WARM_FILL : REFLECTOR_COOL_FILL;
+    const a = REFLECT_XY[c];
+    let sub = 0;
+    ctx.beginPath();
+    for (let i = 0; i < REFLECT_N[c]; i++) {
+      const at = i * 3;
+      ctx.rect(a[at], a[at + 1], a[at + 2], a[at + 2]);
+      sub++;
+      if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+    }
+    if (sub > 0) ctx.fill();
+  }
 }
 
 /* THE HEADS, AS A PAINTER OF THEIR OWN AND NOT TWO FILLS INSIDE
@@ -12688,6 +12881,112 @@ function pylonPath(first, last, baseIndex, spacing, widen, scaleH, which) {
    colour, because a cached fill that missed a rotation puts the last
    biome in the middle of this one. */
 const TONE_CACHE = {};
+
+/* ==================================================================
+   THE DEPTH TABLE, 256 STEPS, ONE SET PER BIOME.
+
+   Built once when the palette changes and never touched inside a frame:
+   the draw loops index it, and there is no colour arithmetic and no
+   allocation per frame anywhere in the world passes.
+
+   WHY 256 WHEN THE PASSES ONLY USE FOURTEEN. The table is the truth
+   about what colour a given depth is, and the ground plane reads it at
+   full resolution because a canvas gradient takes as many stops as it
+   likes for one fill. The shoulder and the scenery cannot: they are
+   paths, and one fill per colour is the rule gate one established, so
+   those two QUANTISE THE INDEX into DEPTH_STEPS buckets and read the
+   table at the bucket's centre. The table stays the single definition
+   either way, and raising DEPTH_STEPS costs fills rather than accuracy.
+
+   THE EASE IS APPLIED WHEN THE INDEX IS TAKEN, not when the table is
+   built, so the table is linear in the shift and the curve is one
+   pow() on a number the loop already has.
+   ================================================================== */
+const DEPTH_LUT_SIZE = 256;
+const DEPTH_LUT = { gnd: [], terLit: [], terShade: [],
+                    scnLit: [], scnShade: [] };
+const DEPTH_BUCKET_IX = [];
+
+/* One colour, moved u of the way to the horizon. Hue takes the SHORT way
+   round toward DEPTH_FAR_HUE, so a warm biome and a cold one both end at
+   the same kind of far, and lightness is scaled rather than solved
+   because this runs 1,280 times per biome and the horizon only has to
+   land dark, not land on a number. */
+function depthShadeRgb(hsl, baseL, u) {
+  let d = (FEEL.DEPTH_FAR_HUE - hsl[0]) % 360;
+  if (d > 180) d -= 360; else if (d < -180) d += 360;
+  const h = hsl[0] + d * FEEL.DEPTH_HUE_PULL * u;
+  const sat = hsl[1] * (1 - (1 - FEEL.DEPTH_SAT_FAR) * u);
+  const l = baseL * (1 - (1 - FEEL.DEPTH_LUM_FAR) * u);
+  return hslToRgb(h, clamp(sat, 0, 1), clamp(l, 0, 1));
+}
+
+function buildDepthLut() {
+  const src = { gnd: COLOUR.GROUND_NEAR, terLit: COLOUR.TERRAIN_LIT,
+                terShade: COLOUR.TERRAIN_SHADE,
+                scnLit: COLOUR.SCENERY_NEAR_LIT,
+                scnShade: COLOUR.SCENERY_NEAR_SHADE };
+  const raw = {};
+  for (const k in src) {
+    const c = rgbOf(src[k]);
+    const hsl = rgbToHsl(c[0], c[1], c[2]);
+    const arr = raw[k] = [];
+    for (let i = 0; i < DEPTH_LUT_SIZE; i++) {
+      arr.push(depthShadeRgb(hsl, hsl[2], i / (DEPTH_LUT_SIZE - 1)));
+    }
+  }
+  /* THE FADE IN AT THE DRAW DISTANCE LIVES HERE NOW. It used to be four
+     authored scenery bands whose outermost was written a couple of units
+     off its own ground, so a thing emerged instead of arriving. With a
+     continuous table there are no bands to author, so the table itself
+     carries it: an object's colour is blended toward THE GROUND AT THE
+     SAME DEPTH, all the way to SCENERY_FADE_FAR at the draw distance.
+
+     Which is strictly better than the four bands were, because the step
+     between the haze band and the far band, the one this project has
+     been apologising for since the fourth band was added, does not
+     exist in a continuous blend. */
+  for (const k in raw) {
+    const arr = DEPTH_LUT[k];
+    arr.length = 0;
+    const isScn = k === 'scnLit' || k === 'scnShade';
+    for (let i = 0; i < DEPTH_LUT_SIZE; i++) {
+      const c = raw[k][i];
+      let r = c[0], g = c[1], b = c[2];
+      if (isScn) {
+        /* EASED, LIKE THE DEPTH INDEX ITSELF. Blending linearly across the
+           table put a quarter of the fade into the far band, where the
+           objects still have to read: measured, far separation fell from
+           37 to 27 and the masses breaking the skyline fell from 32 to
+           16. The fade belongs in the last stretch, not spread over the
+           whole of it. */
+        const u = Math.pow(i / (DEPTH_LUT_SIZE - 1), FEEL.SCENERY_FADE_EASE)
+                * FEEL.SCENERY_FADE_FAR;
+        const gd = raw.gnd[i];
+        r += (gd[0] - r) * u; g += (gd[1] - g) * u; b += (gd[2] - b) * u;
+      }
+      arr.push('rgb(' + Math.round(r) + ',' + Math.round(g) + ',' + Math.round(b) + ')');
+    }
+  }
+  const n = Math.max(1, Math.round(FEEL.DEPTH_STEPS));
+  DEPTH_BUCKET_IX.length = 0;
+  for (let b = 0; b < n; b++) {
+    // The bucket's centre, so a bucket is the colour of its middle rather
+    // than of its near edge.
+    DEPTH_BUCKET_IX.push(Math.min(DEPTH_LUT_SIZE - 1,
+                                  Math.round((b + 0.5) / n * (DEPTH_LUT_SIZE - 1))));
+  }
+}
+
+/* The depth of a boundary as a share of the draw distance, eased. */
+function depthU(z) {
+  const t = clamp(z / (FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH), 0, 0.9999);
+  return Math.pow(t, FEEL.DEPTH_EASE);
+}
+function depthBucket(z) {
+  const n = Math.max(1, DEPTH_BUCKET_IX.length);
+  return Math.min(n - 1, (depthU(z) * n) | 0);
+}
 function shiftTone(base, by) {
   const key = base + '|' + by;
   let v = TONE_CACHE[key];
@@ -12882,13 +13181,27 @@ function terrainPass(first, last, baseIndex) {
   const reach = FEEL.TERRAIN_REACH;
   const lift = FEEL.TERRAIN_HEIGHT;
   for (let side = -1; side <= 1; side += 2) {
-    ctx.fillStyle = side < 0 ? COLOUR.TERRAIN_LIT : COLOUR.TERRAIN_SHADE;
+    const lut = side < 0 ? DEPTH_LUT.terLit : DEPTH_LUT.terShade;
+    /* ONE FILL PER DEPTH BUCKET, not one per side. bz rises monotonically
+       along the walk, so the bucket only ever moves forward and a flush
+       on change is enough: no sorting and no second pass. Fills go from
+       two to at most DEPTH_STEPS per side, which is CHEAPER rather than
+       dearer here, because path cost grows with the SQUARE of the
+       subpaths in one fill. */
+    let bucket = -1;
     let sub = 0;
     ctx.beginPath();
     for (let n = first; n <= last; n++) {
       if (!bvis[n]) continue;
       const s1 = segAt(baseIndex + n);
       if (!s1) break;
+      const bk = depthBucket(bz[n]);
+      if (bk !== bucket) {
+        if (sub > 0) { ctx.fill(); ctx.beginPath(); sub = 0; }
+        bucket = bk;
+        ctx.fillStyle = lut[DEPTH_BUCKET_IX[bk]] ||
+                        (side < 0 ? COLOUR.TERRAIN_LIT : COLOUR.TERRAIN_SHADE);
+      }
       /* The far boundary's own index, which after the gate one merge is
          not always n + 1 in the world even though it is in the table. */
       const i1 = s1.index;
@@ -12989,14 +13302,16 @@ function sceneryPass(first, last, baseIndex, w, h) {
   if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
   const limit = chunkLimit();
   const every = Math.max(1, Math.round(FEEL.SCENERY_EVERY));
-  const bands = SCENERY_BAND_LIT.length;
+  const bands = Math.max(1, DEPTH_BUCKET_IX.length);
   sceneryDrawn = 0;
   /* BAND BY BAND AND FACE BY FACE, so every fill is one colour and the
      depth bands stay separable for the haze in gate four. Six fills at
      most before chunking, and each of those is already chunked. */
   for (let band = 0; band < bands; band++) {
     for (let face = 0; face < 2; face++) {
-      ctx.fillStyle = face === 0 ? SCENERY_BAND_LIT[band] : SCENERY_BAND_SHADE[band];
+      const lut = face === 0 ? DEPTH_LUT.scnLit : DEPTH_LUT.scnShade;
+      ctx.fillStyle = lut[DEPTH_BUCKET_IX[band]] ||
+                      (face === 0 ? SCENERY_BAND_LIT[0] : SCENERY_BAND_SHADE[0]);
       let sub = 0;
       ctx.beginPath();
       for (let n = first; n <= last; n++) {
@@ -13006,8 +13321,7 @@ function sceneryPass(first, last, baseIndex, w, h) {
         /* WHICH BAND THIS BOUNDARY IS IN, off its own distance, so an
            object stays in one band for its whole life rather than
            flickering between two as the camera moves. */
-        const t = clamp(bz[n] / (FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH), 0, 0.999);
-        if (Math.floor(t * bands) !== band) continue;
+        if (depthBucket(bz[n]) !== band) continue;
         /* EVERY SITE IN THE SPAN THIS ANCHOR COVERS, not just the
            anchor's own index. Gate one merges far segments, so the
            anchor may stand for a dozen of them, and placing only on the
@@ -13050,9 +13364,15 @@ function sceneryPass(first, last, baseIndex, w, h) {
              linear while subpaths are quadratic, so one wide mass buys
              what six trees would cost. */
           let kind;
-          if (band === 0)            kind = h2 < 0.40 ? 0 : (h2 < 0.62 ? 1 : (h2 < 0.80 ? 3 : 4));
-          else if (band === 1)       kind = h2 < 0.34 ? 0 : (h2 < 0.56 ? 1 : (h2 < 0.74 ? 2 : 5));
-          else if (band === bands-1) kind = 2;
+          /* AS A SHARE OF THE DEPTH RANGE, not as a band index. The rule
+             was written when there were four bands and band 0 was the
+             near quarter; there are fourteen buckets now and band 0 is
+             a fourteenth, so an index would have put the detailed near
+             field things in the first seven per cent of the world. */
+          const kb = band / bands;
+          if (kb < 0.25)             kind = h2 < 0.40 ? 0 : (h2 < 0.62 ? 1 : (h2 < 0.80 ? 3 : 4));
+          else if (kb < 0.50)        kind = h2 < 0.34 ? 0 : (h2 < 0.56 ? 1 : (h2 < 0.74 ? 2 : 5));
+          else if (kb >= 0.88)       kind = 2;
           else                       kind = h2 < 0.52 ? 2 : (h2 < 0.78 ? 0 : 5);
           const prof = SCENERY_PROFILE[kind];
           /* HEIGHT VARIETY ABOVE ALL, because a skyline of identical
@@ -13630,7 +13950,37 @@ function drawBox(ox, oy, oz, hw, hh, hl, extraYaw, rolled, faceColours, stroked,
     const vz = (a.wz + b.wz + c.wz + d.wz) * 0.25;
     if (n.wx * vx + n.wy * vy + n.wz * vz >= 0) continue;   // facing away
     if (f === 0) drawBox.drewRear = true;
-    ctx.fillStyle = colour;
+    /* ITEM 5, THE WORLD SPACE LIGHT VECTOR, BEHIND A CONSTANT AND OFF.
+
+       THE EXPENSIVE HALF WAS ALREADY HERE. n is this face's normal in
+       world space, spun with the box and the roll, and it is computed
+       every frame anyway for the back face cull two lines up. So the
+       whole of the proposal that was priced as unknown is one dot
+       product and one array index on a vector this loop already holds:
+       no cross product to add, because the boxes are axis aligned and
+       BOX_FACES carries their normals, and nothing per frame to build
+       because the key to ambient ramp is a table made when the palette
+       changes.
+
+       WHAT IT CANNOT DO IS THE SCENERY, and that is worth saying plainly
+       because it is where the proposal was aimed. Scenery objects are 2D
+       profiles from SCENERY_PROFILE, mirrored into a lit half and a
+       shade half. There are no faces out there to take a normal of, so
+       there is nothing for a light vector to dot with. Giving them real
+       normals means giving them 3D geometry, which is a different
+       renderer, and ART-DIRECTION.md's limit stands for them. */
+    let colourNow = colour;
+    if (FEEL.CAR_LIGHT_VECTOR >= 0.5 && CAR_LIGHT_RAMP
+        && (faceColours === BODY_COLOURS || faceColours === CABIN_COLOURS)) {
+      let dp = n.wx * CAR_LIGHT_DIR[0] + n.wy * CAR_LIGHT_DIR[1] + n.wz * CAR_LIGHT_DIR[2];
+      dp = dp < 0 ? 0 : dp;
+      const lit = FEEL.CAR_LIGHT_FLOOR
+                + (1 - FEEL.CAR_LIGHT_FLOOR) * Math.pow(dp, FEEL.CAR_LIGHT_GAMMA);
+      let ix = (lit * (CAR_LIGHT_RAMP.length - 1)) | 0;
+      if (ix < 0) ix = 0; else if (ix >= CAR_LIGHT_RAMP.length) ix = CAR_LIGHT_RAMP.length - 1;
+      colourNow = CAR_LIGHT_RAMP[ix];
+    }
+    ctx.fillStyle = colourNow;
     polygon(a.sx, a.sy, b.sx, b.sy, c.sx, c.sy, d.sx, d.sy);
     // The fold lines. At fifty pixels across, flat tones alone do not
     // separate the roof from the boot from the side, and the car reads as
@@ -13806,6 +14156,7 @@ let sceneryDrawn = 0;
 
 function rebuildDerivedColours() {
   for (const k in TONE_CACHE) delete TONE_CACHE[k];
+  buildDepthLut();
   GROUND_BAND[0] = COLOUR.GROUND_NEAR;
   GROUND_BAND[1] = COLOUR.GROUND_MID;
   GROUND_BAND[2] = COLOUR.GROUND_FAR;
@@ -13828,6 +14179,15 @@ function rebuildDerivedColours() {
   SMOKE_FILL = 'rgb(' + COLOUR.SMOKE + ')';
   EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
   EMISSIVE_CORE_FILL = COLOUR.EMISSIVE_CORE;
+  /* THE TWO PIN COLOURS. Not new palette entries: the warm one is the
+     edge's own core and the cool one is the wet sheen, so the pins are
+     already this biome's colours and cannot drift out of the wheel. */
+  REFLECTOR_WARM_FILL = COLOUR.EMISSIVE_CORE;
+  REFLECTOR_COOL_FILL = 'rgb(' + COLOUR.WET_SHEEN + ')';
+  CAR_LIGHT_RAMP = rampBetween(COLOUR.CAR_AMBIENT, COLOUR.CAR_KEY);
+  const lx = FEEL.CAR_LIGHT_X, ly = FEEL.CAR_LIGHT_Y, lz = FEEL.CAR_LIGHT_Z;
+  const ln = Math.sqrt(lx * lx + ly * ly + lz * lz) || 1;
+  CAR_LIGHT_DIR[0] = lx / ln; CAR_LIGHT_DIR[1] = ly / ln; CAR_LIGHT_DIR[2] = lz / ln;
   SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
   PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
   JUMP_GLOW_FILL = 'rgb(' + COLOUR.JUMP_GLOW + ')';
