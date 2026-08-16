@@ -3979,8 +3979,27 @@ const COLOUR = {
   SCENERY_NEAR_SHADE: '#22110b',
   SCENERY_MID_LIT:    '#3d2115',
   SCENERY_MID_SHADE:  '#1d1319',
-  SCENERY_FAR_LIT:    '#221520',
-  SCENERY_FAR_SHADE:  '#1a1220',
+  SCENERY_FAR_LIT:    '#2a1a22',
+  SCENERY_FAR_SHADE:  '#1f1521',
+  /* THE FOURTH BAND IS THE SKY, WHICH IS THE WHOLE OF THE FADE IN.
+
+     Objects enter the world at the draw distance, and an object that
+     arrives at full contrast is the most amateur-looking thing a
+     renderer does. Continuous atmospheric perspective would solve it and
+     ART-DIRECTION.md refuses it as unaffordable, accepting discrete
+     bands as the trade. So the outermost band is authored within a
+     couple of luminance units of SKY_LOW: an object crossing the draw
+     distance is drawn in very nearly the colour of what is behind it,
+     and it separates as it walks in through three steps rather than
+     appearing.
+
+     FOUR BANDS RATHER THAN THREE IS EXACTLY WHY. Three bands put the
+     first visible step at the draw distance itself, which is where a
+     step is most visible because that is the moment something arrives.
+     A fourth pushes every step inward to where objects are already on
+     screen and already moving. */
+  SCENERY_HAZE_LIT:   '#2d1a26',
+  SCENERY_HAZE_SHADE: '#281620',
   TERRAIN_LIT:   '#2a1409',
   TERRAIN_SHADE: '#180b06',
   GRID:         'rgba(150,58,22,0.22)',
@@ -12867,17 +12886,19 @@ function signHueShift() {
    than branching, and rebuilt in rebuildDerivedColours like every other
    thing derived from the palette. A band colour that missed a rotation
    would put the last biome's world behind this one's road. */
-let SCENERY_BAND_LIT = ['#3a1c0d', '#2b1710', '#221520'];
-let SCENERY_BAND_SHADE = ['#180c07', '#171017', '#1a1220'];
+let SCENERY_BAND_LIT = ['#5c2f14', '#3d2115', '#2a1a22', '#2d1a26'];
+let SCENERY_BAND_SHADE = ['#22110b', '#1d1319', '#1f1521', '#281620'];
 let sceneryDrawn = 0;
 
 function rebuildDerivedColours() {
   SCENERY_BAND_LIT[0] = COLOUR.SCENERY_NEAR_LIT;
   SCENERY_BAND_LIT[1] = COLOUR.SCENERY_MID_LIT;
   SCENERY_BAND_LIT[2] = COLOUR.SCENERY_FAR_LIT;
+  SCENERY_BAND_LIT[3] = COLOUR.SCENERY_HAZE_LIT;
   SCENERY_BAND_SHADE[0] = COLOUR.SCENERY_NEAR_SHADE;
   SCENERY_BAND_SHADE[1] = COLOUR.SCENERY_MID_SHADE;
   SCENERY_BAND_SHADE[2] = COLOUR.SCENERY_FAR_SHADE;
+  SCENERY_BAND_SHADE[3] = COLOUR.SCENERY_HAZE_SHADE;
   EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
   // The roof lights run toward this biome's own hot hue, so the ramp has
   // to follow the place.
