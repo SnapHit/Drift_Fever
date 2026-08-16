@@ -930,6 +930,36 @@ const FEEL = {
      the ground carries the light, which is what the frames show reading
      as a place rather than as grey. Both pass every hierarchy check. */
   ROAD_ABOVE_TERRAIN:         1,     // LIVE
+  /* ------------------------------------------------------------------
+     REAL GEOMETRY IN THE NEAR FIELD.
+
+     Scenery was 2D profiles mirrored into a lit half and a shade half.
+     There are no faces in that, so nothing could be shaded from a light
+     direction, nothing could occlude anything and nothing could cast a
+     shadow. ART-DIRECTION.md called that a ceiling of Canvas 2D and its
+     revision of 13 August corrects it: it was a property of this
+     implementation.
+
+     GEO_MIN_PX IS WHERE THE MONEY IS, and it is set off a measurement
+     rather than a guess. Sampled over a whole run in portrait, the
+     median object draws at nine pixels tall and 77 per cent of them are
+     under fifteen. Faces, normals and a light direction are invisible at
+     that size whatever they cost. Only about sixty objects a frame clear
+     sixteen pixels, so geometry goes to those and everything smaller
+     stays a flat silhouette, which is correct aerial perspective as well
+     as correct budgeting.
+
+     That is also why it is affordable: the objects that need geometry
+     are the few that are big, and big flat things are nearly free in
+     this renderer.
+     ------------------------------------------------------------------ */
+  GEO_MIN_PX:                16,     // LIVE, below this an object stays a flat profile
+  GEO_DEPTH:               0.95,     // LIVE, an object's depth as a share of its width
+  GEO_TONES:                  5,     // LIVE, shade steps a face may quantise to
+  GEO_AMBIENT:             0.30,     // LIVE, the darkest a face gets, as a share of lit
+  SHADOW_ALPHA:            0.42,     // LIVE, how dark a cast shadow is
+  SHADOW_LENGTH:           1.35,     // LIVE, shadow length as a share of object height
+  SHADOW_MIN_PX:            2.5,     // below this it is a smudge, not a contact cue
   EDGE_LIP_FRACTION:       0.13,     // of the half width, the bright lip itself
 
   /* ------------------------------------------------------------------
@@ -1335,6 +1365,14 @@ const FEEL = {
   SCENERY_DENSITY:         0.70,     // LIVE, share of sites that grow something
   SCENERY_SIZE:            1100,     // LIVE, world units tall at scale one
   SCENERY_CLEAR:            1.7,     // LIVE, half widths clear of the road edge
+  /* AND IT IS BACK AT TWO, WHICH IS THE SQUARING THAT SHIPPED. Biasing
+     the scatter toward the verge does make near objects big enough to
+     show geometry, and it makes the verge a dense wall of them: at three
+     the mid field packs edge to edge and reads worse than the sparse
+     world it replaced. ART-DIRECTION.md's near field stays sparse rule
+     wins. Objects are big when the road happens to bring them close, and
+     geometry goes to those. */
+  SCENERY_OUT_BIAS:         2.0,     // LIVE, exponent biasing the scatter toward the verge
   SCENERY_FAR_OUT:           26,     // LIVE, half widths the scatter reaches, squared toward the road
   /* TWO AND NOT FOUR, AND THE NUMBER IS THE AUTHOR'S TO CHANGE.
 
@@ -3034,7 +3072,7 @@ const FEEL = {
      hand authored version cannot give. Slightly above, ahead and to the
      left, so a car sliding right lights its flank.
      ------------------------------------------------------------------ */
-  CAR_LIGHT_VECTOR:           0,     // LIVE, off. 1 turns the prototype on
+  CAR_LIGHT_VECTOR:           1,     // LIVE. The same world light the scenery uses.
   CAR_LIGHT_X:            -0.55,     // LIVE, the key direction, world space
   CAR_LIGHT_Y:             0.68,     // LIVE
   CAR_LIGHT_Z:             0.48,     // LIVE
@@ -5335,6 +5373,12 @@ const TUNABLES = [
   { key: 'ROAD_THICKNESS',     label: 'thick',   step: 20,   min: 0,    max: 1200,  dp: 0, group: 3 },
   { key: 'ROAD_FLARE',         label: 'flare',   step: 20,   min: 0,    max: 1400,  dp: 0, group: 3 },
   { key: 'ROAD_ABOVE_TERRAIN',label:'roadUp', step: 1,    min: 0,    max: 1,     dp: 0, group: 4 },
+  { key: 'GEO_MIN_PX',         label: 'geoMin',  step: 1,    min: 4,    max: 200,   dp: 0, group: 21 },
+  { key: 'GEO_DEPTH',          label: 'geoDeep', step: 0.05, min: 0.1,  max: 3,     dp: 2, group: 21 },
+  { key: 'GEO_TONES',          label: 'geoTone', step: 1,    min: 2,    max: 12,    dp: 0, group: 21 },
+  { key: 'GEO_AMBIENT',        label: 'geoAmb',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SHADOW_ALPHA',       label: 'shadA',   step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SHADOW_LENGTH',      label: 'shadLen', step: 0.05, min: 0,    max: 4,     dp: 2, group: 21 },
   { key: 'PYLON_SPACING',      label: 'pylons',  step: 1,    min: 2,    max: 40,    dp: 0, group: 4 },
   { key: 'REFLECT_SEGMENTS',   label: 'reflLen', step: 1,    min: 0,    max: 40,    dp: 0, group: 4 },
   { key: 'REFLECT_WIDEN',      label: 'reflW',   step: 0.1,  min: 1,    max: 10,    dp: 1, group: 4 },
@@ -5415,6 +5459,7 @@ const TUNABLES = [
   { key: 'SCENERY_SIZE',       label: 'scnSize', step: 20,  min: 0,    max: 3000,  dp: 0, group: 21 },
   { key: 'SCENERY_CLEAR',      label: 'scnClear',step: 0.1, min: 0,    max: 12,    dp: 1, group: 21 },
   { key: 'SCENERY_FAR_OUT',    label: 'scnFar',  step: 1,   min: 0,    max: 80,    dp: 0, group: 21 },
+  { key: 'SCENERY_OUT_BIAS',   label: 'scnBias', step: 0.2, min: 0.4,  max: 10,    dp: 1, group: 21 },
   { key: 'SCENERY_PER_SITE',   label: 'scnSlot', step: 1,   min: 0,    max: 12,    dp: 0, group: 21 },
   { key: 'SCENERY_MAX_SHARE',  label: 'scnMax',  step: 0.02,min: 0.04, max: 1.5,   dp: 2, group: 21 },
   { key: 'TERRAIN_REACH',      label: 'terrW',   step: 0.2,  min: 0,    max: 24,    dp: 1, group: 12 },
@@ -13367,6 +13412,282 @@ const SCENERY_LIT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];     // scratch, x then y
 const SCENERY_SHADE = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 /* ==================================================================
+   REAL GEOMETRY FOR THE OBJECTS BIG ENOUGH TO SHOW IT.
+
+   An object here is a small set of BOXES in world space. Each box has six
+   faces with known normals, because the boxes are axis aligned in the
+   road's own frame, so there is no cross product to take: the normals are
+   the six unit axes and the back face cull and the shading are both one
+   dot product on them.
+
+   THE WORLD IS RECOVERED FROM THE BOUNDARY TABLE, which is already
+   projected, so nothing new has to be tracked. by[k] is where world
+   height zero lands and bh[k] is the world to pixel scale at that
+   boundary, so a screen rise divided by bh is a world height; and
+   bx[k] = w/2 + scale*(x - camX)*w/2 with bh[k] = scale*w/2 gives the
+   road centre's world x relative to the camera as (bx[k] - w/2)/bh[k].
+   From there projectPoint, which the car already uses, does the rest.
+
+   ONE WORLD LIGHT FOR EVERYTHING. CAR_LIGHT_DIR is the same vector the
+   car's faces are shaded against, so a house and the car agree about
+   where the light is. That agreement is the thing that makes a scene
+   read as composed rather than assembled.
+
+   BATCHED BY MATERIAL, DEPTH AND TONE, never one fill per object. The
+   shade is quantised to GEO_TONES steps, so the group key is a small
+   integer and a counting sort puts every face of one colour together.
+   Gate one's rule holds: every fill stays under chunkLimit() subpaths.
+   ================================================================== */
+const GEO_MAX_FACES = 1400;
+const GEO_XY = new Float32Array(GEO_MAX_FACES * 8);
+const GEO_KEY = new Uint16Array(GEO_MAX_FACES);
+const GEO_ORDER = new Uint16Array(GEO_MAX_FACES);
+let GEO_N = 0;
+const GEO_GROUPS = 6 * 32 * 12;
+const GEO_START = new Uint16Array(GEO_GROUPS);
+const GEO_COUNT = new Uint16Array(GEO_GROUPS);
+const GEO_PT = [{ sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 },
+                { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }];
+/* The eight corners of a unit box, then which four make each face and
+   which way that face points. Winding is irrelevant here because the
+   cull is done on the normal against the view vector, not on the sign of
+   the projected area. */
+const GEO_BOX_FACE = [
+  { ix: [0, 1, 3, 2], nx: 0, ny: 0, nz: -1 },   // toward the camera
+  { ix: [5, 4, 6, 7], nx: 0, ny: 0, nz: 1 },
+  { ix: [4, 0, 2, 6], nx: -1, ny: 0, nz: 0 },
+  { ix: [1, 5, 7, 3], nx: 1, ny: 0, nz: 0 },
+  { ix: [2, 3, 7, 6], nx: 0, ny: 1, nz: 0 },    // top
+  { ix: [4, 5, 1, 0], nx: 0, ny: -1, nz: 0 }
+];
+
+/* THE SHADOWS, COLLECTED SEPARATELY AND FILLED ONCE. A shadow is the
+   object's footprint pushed away from the light and flattened onto the
+   ground it stands on. It does not need to be correct, only consistent,
+   and it is the single strongest cue that a thing is standing on a
+   surface rather than pasted onto it. One subpath per object and one
+   fill for the whole world. */
+const SHADOW_XY = new Float32Array(2048 * 8);
+let SHADOW_N = 0;
+
+function geoPushFace(a, b, c, d, key) {
+  if (GEO_N >= GEO_MAX_FACES) return;
+  const at = GEO_N * 8;
+  GEO_XY[at] = a.sx; GEO_XY[at + 1] = a.sy;
+  GEO_XY[at + 2] = b.sx; GEO_XY[at + 3] = b.sy;
+  GEO_XY[at + 4] = c.sx; GEO_XY[at + 5] = c.sy;
+  GEO_XY[at + 6] = d.sx; GEO_XY[at + 7] = d.sy;
+  GEO_KEY[GEO_N] = key;
+  GEO_N++;
+}
+
+/* One box, in the road's frame, relative to the camera. wx and wz are
+   world offsets from the camera, wy is height above the road plane. */
+function geoBox(wx, wy, wz, hw, hh, hd, mat, bucket, camX, w, h) {
+  if (wz <= 1) return;
+  const tones = Math.max(2, Math.round(FEEL.GEO_TONES));
+  for (let i = 0; i < 8; i++) {
+    projectPoint(GEO_PT[i],
+                 camX + wx + ((i & 1) ? hw : -hw),
+                 wy + ((i & 2) ? hh : 0),
+                 wz + ((i & 4) ? hd : -hd), camX, w, h);
+  }
+  for (let f = 0; f < GEO_BOX_FACE.length; f++) {
+    const face = GEO_BOX_FACE[f];
+    /* FACING AWAY IS DROPPED. The face centre against the camera, which
+       sits at height camHeight and at the origin in z. */
+    const vx = wx + face.nx * hw;
+    const vy = wy + hh * 0.5 + face.ny * hh * 0.5 - camHeight;
+    const vz = wz + face.nz * hd;
+    if (face.nx * vx + face.ny * vy + face.nz * vz >= 0) continue;
+    let dp = face.nx * CAR_LIGHT_DIR[0] + face.ny * CAR_LIGHT_DIR[1]
+           + face.nz * CAR_LIGHT_DIR[2];
+    if (dp < 0) dp = 0;
+    const lit = FEEL.GEO_AMBIENT + (1 - FEEL.GEO_AMBIENT) * dp;
+    let tone = (lit * tones) | 0;
+    if (tone < 0) tone = 0; else if (tone >= tones) tone = tones - 1;
+    const key = (bucket * SCN_MAT_NAMES.length + mat) * tones + tone;
+    geoPushFace(GEO_PT[face.ix[0]], GEO_PT[face.ix[1]],
+                GEO_PT[face.ix[2]], GEO_PT[face.ix[3]], key);
+  }
+}
+
+/* A gable roof: two slopes meeting at a ridge, drawn as two quads and
+   two triangles. The triangles are pushed as degenerate quads so the
+   flush loop stays one shape. */
+function geoRoof(wx, wy, wz, hw, hh, hd, mat, bucket, camX, w, h) {
+  if (wz <= 1) return;
+  const tones = Math.max(2, Math.round(FEEL.GEO_TONES));
+  const e = GEO_PT;
+  projectPoint(e[0], camX + wx - hw, wy, wz - hd, camX, w, h);
+  projectPoint(e[1], camX + wx + hw, wy, wz - hd, camX, w, h);
+  projectPoint(e[2], camX + wx - hw, wy, wz + hd, camX, w, h);
+  projectPoint(e[3], camX + wx + hw, wy, wz + hd, camX, w, h);
+  projectPoint(e[4], camX + wx, wy + hh, wz - hd, camX, w, h);
+  projectPoint(e[5], camX + wx, wy + hh, wz + hd, camX, w, h);
+  // The two slopes, normals leaning out and up, and the two gable ends.
+  const sl = Math.sqrt(hw * hw + hh * hh) || 1;
+  const nx = hh / sl, ny = hw / sl;
+  const faces = [
+    [e[0], e[4], e[5], e[2], -nx, ny, 0],
+    [e[1], e[3], e[5], e[4], nx, ny, 0],
+    [e[0], e[1], e[4], e[4], 0, 0, -1],
+    [e[2], e[5], e[3], e[3], 0, 0, 1]
+  ];
+  for (let f = 0; f < faces.length; f++) {
+    const q = faces[f];
+    const vx = wx + q[4] * hw, vy = wy + hh * 0.5 - camHeight, vz = wz + q[6] * hd;
+    if (q[4] * vx + q[5] * vy + q[6] * vz >= 0) continue;
+    let dp = q[4] * CAR_LIGHT_DIR[0] + q[5] * CAR_LIGHT_DIR[1] + q[6] * CAR_LIGHT_DIR[2];
+    if (dp < 0) dp = 0;
+    const lit = FEEL.GEO_AMBIENT + (1 - FEEL.GEO_AMBIENT) * dp;
+    let tone = (lit * tones) | 0;
+    if (tone < 0) tone = 0; else if (tone >= tones) tone = tones - 1;
+    geoPushFace(q[0], q[1], q[2], q[3],
+                (bucket * SCN_MAT_NAMES.length + mat) * tones + tone);
+  }
+}
+
+/* THE SHAPE OF EACH KIND, IN BOXES. Proportions are shares of the
+   object's own height so a tall hash and a short one are the same thing
+   at different sizes. */
+function geoObject(kind, wx, wy, wz, halfW, height, bucket, camX, w, h) {
+  const d = FEEL.GEO_DEPTH;
+  if (kind === 0) {                                   // a tree
+    const th = height * 0.34, tw = halfW * 0.16;
+    geoBox(wx, wy, wz, tw, th, tw * 1.4, MAT_BARK, bucket, camX, w, h);
+    geoBox(wx, wy + th, wz, halfW * 0.86, height * 0.66, halfW * 0.86 * d,
+           MAT_FOLIAGE, bucket, camX, w, h);
+  } else if (kind === 1) {                            // a house
+    const wallH = height * 0.58;
+    geoBox(wx, wy, wz, halfW * 0.72, wallH, halfW * 0.72 * d,
+           MAT_WALL, bucket, camX, w, h);
+    geoRoof(wx, wy + wallH, wz, halfW * 0.86, height * 0.42, halfW * 0.72 * d,
+            MAT_ROOF, bucket, camX, w, h);
+  } else if (kind === 3) {                            // a road sign
+    const ph = height * 0.56, pw = halfW * 0.10;
+    geoBox(wx, wy, wz, pw, ph, pw, MAT_METAL, bucket, camX, w, h);
+    geoBox(wx, wy + ph, wz, halfW * 0.74, height * 0.44, pw * 0.6,
+           MAT_SIGN, bucket, camX, w, h);
+  } else if (kind === 4) {                            // a banner on two posts
+    const pw = halfW * 0.07;
+    geoBox(wx - halfW * 0.82, wy, wz, pw, height, pw, MAT_METAL, bucket, camX, w, h);
+    geoBox(wx + halfW * 0.82, wy, wz, pw, height, pw, MAT_METAL, bucket, camX, w, h);
+    geoBox(wx, wy + height * 0.62, wz, halfW * 0.86, height * 0.34, pw * 0.5,
+           MAT_SIGN, bucket, camX, w, h);
+  } else {                                            // a tower
+    const bh2 = height * 0.78;
+    geoBox(wx, wy, wz, halfW * 0.40, bh2, halfW * 0.40 * d,
+           MAT_WALL, bucket, camX, w, h);
+    geoBox(wx, wy + bh2, wz, halfW * 0.58, height * 0.22, halfW * 0.58 * d,
+           MAT_METAL, bucket, camX, w, h);
+  }
+}
+
+/* The footprint, pushed away from the light and flattened. */
+function geoShadow(wx, wy, wz, halfW, height, camX, w, h) {
+  if (SHADOW_N >= 2048 || wz <= 1) return;
+  const len = height * FEEL.SHADOW_LENGTH;
+  const ox = -CAR_LIGHT_DIR[0] * len, oz = -CAR_LIGHT_DIR[2] * len;
+  const e = GEO_PT;
+  projectPoint(e[0], camX + wx - halfW, wy, wz - halfW, camX, w, h);
+  projectPoint(e[1], camX + wx + halfW, wy, wz - halfW, camX, w, h);
+  projectPoint(e[2], camX + wx + halfW + ox, wy, wz + halfW + oz, camX, w, h);
+  projectPoint(e[3], camX + wx - halfW + ox, wy, wz + halfW + oz, camX, w, h);
+  if (Math.abs(e[0].sx - e[1].sx) < FEEL.SHADOW_MIN_PX) return;
+  const at = SHADOW_N * 8;
+  for (let i = 0; i < 4; i++) { SHADOW_XY[at + i * 2] = e[i].sx; SHADOW_XY[at + i * 2 + 1] = e[i].sy; }
+  SHADOW_N++;
+}
+
+function geoFlush() {
+  if (!GEO_N) return;
+  const tones = Math.max(2, Math.round(FEEL.GEO_TONES));
+  const mats = SCN_MAT_NAMES.length;
+  const buckets = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
+  const groups = Math.min(GEO_GROUPS, buckets * mats * tones);
+  for (let g = 0; g < groups; g++) GEO_COUNT[g] = 0;
+  for (let i = 0; i < GEO_N; i++) if (GEO_KEY[i] < groups) GEO_COUNT[GEO_KEY[i]]++;
+  let acc = 0;
+  for (let g = 0; g < groups; g++) { GEO_START[g] = acc; acc += GEO_COUNT[g]; GEO_COUNT[g] = 0; }
+  for (let i = 0; i < GEO_N; i++) {
+    const k = GEO_KEY[i];
+    if (k >= groups) continue;
+    GEO_ORDER[GEO_START[k] + GEO_COUNT[k]] = i;
+    GEO_COUNT[k]++;
+  }
+  const limit = chunkLimit();
+  /* Far to near, so a near object paints over a far one. */
+  for (let b = buckets - 1; b >= 0; b--) {
+    for (let m = 0; m < mats; m++) {
+      const lit = SCN_MAT_LIT[m], shade = SCN_MAT_SHADE[m];
+      if (!lit) continue;
+      const bi = Math.min(b, lit.length - 1);
+      for (let t = 0; t < tones; t++) {
+        const g = (b * mats + m) * tones + t;
+        if (g >= groups || !GEO_COUNT[g]) continue;
+        /* The tone picks between this material's own shade and lit
+           colours at this depth, so a face's colour is still the
+           material's colour and the light only decides where between
+           its two ends it sits. */
+        ctx.fillStyle = t === 0 ? shade[bi]
+                      : t === tones - 1 ? lit[bi]
+                      : mixColours(shade[bi], lit[bi], t / (tones - 1));
+        let sub = 0;
+        ctx.beginPath();
+        for (let q = 0; q < GEO_COUNT[g]; q++) {
+          const at = GEO_ORDER[GEO_START[g] + q] * 8;
+          ctx.moveTo(GEO_XY[at], GEO_XY[at + 1]);
+          ctx.lineTo(GEO_XY[at + 2], GEO_XY[at + 3]);
+          ctx.lineTo(GEO_XY[at + 4], GEO_XY[at + 5]);
+          ctx.lineTo(GEO_XY[at + 6], GEO_XY[at + 7]);
+          ctx.closePath();
+          sub++;
+          if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+        }
+        if (sub > 0) ctx.fill();
+      }
+    }
+  }
+}
+
+function shadowFlush() {
+  if (!SHADOW_N || FEEL.SHADOW_ALPHA <= 0) return;
+  const limit = chunkLimit();
+  ctx.globalAlpha = FEEL.SHADOW_ALPHA;
+  ctx.fillStyle = COLOUR.CAR_SHADOW;
+  let sub = 0;
+  ctx.beginPath();
+  for (let i = 0; i < SHADOW_N; i++) {
+    const at = i * 8;
+    ctx.moveTo(SHADOW_XY[at], SHADOW_XY[at + 1]);
+    ctx.lineTo(SHADOW_XY[at + 2], SHADOW_XY[at + 3]);
+    ctx.lineTo(SHADOW_XY[at + 4], SHADOW_XY[at + 5]);
+    ctx.lineTo(SHADOW_XY[at + 6], SHADOW_XY[at + 7]);
+    ctx.closePath();
+    sub++;
+    if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+  }
+  if (sub > 0) ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+/* Two cached colours mixed, memoised, because the tone steps are a
+   handful of fixed pairs and this must not allocate in a frame. */
+const MIX_CACHE = {};
+function mixColours(a, b, t) {
+  const key = a + '|' + b + '|' + t.toFixed(3);
+  let v = MIX_CACHE[key];
+  if (v) return v;
+  const p = rgbOf(a), q = rgbOf(b);
+  v = 'rgb(' + Math.round(p[0] + (q[0] - p[0]) * t) + ','
+             + Math.round(p[1] + (q[1] - p[1]) * t) + ','
+             + Math.round(p[2] + (q[2] - p[2]) * t) + ')';
+  MIX_CACHE[key] = v;
+  return v;
+}
+
+/* ==================================================================
    THE SCENERY, WALKED ONCE AND FLUSHED BY MATERIAL.
 
    IT USED TO WALK THE BOUNDARY TABLE ONCE PER BAND PER FACE, which was
@@ -13407,6 +13728,9 @@ let SCN_N = 0;
 const KIND_MAT_LOW  = [MAT_BARK, MAT_WALL, MAT_FOLIAGE, MAT_METAL, MAT_METAL, MAT_WALL];
 const KIND_MAT_HIGH = [MAT_FOLIAGE, MAT_ROOF, -1, MAT_SIGN, MAT_SIGN, MAT_METAL];
 const KIND_SPLIT    = [2, 2, -1, 2, 2, 2];
+/* Which kinds are built from boxes once they are big enough. See the
+   note at the solid test in sceneryPass. */
+const GEO_KINDS     = [0, 1, 0, 1, 1, 1];
 
 function sceneryPass(first, last, baseIndex, w, h) {
   if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
@@ -13414,6 +13738,11 @@ function sceneryPass(first, last, baseIndex, w, h) {
   const buckets = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
   sceneryDrawn = 0;
   SCN_N = 0;
+  GEO_N = 0;
+  SHADOW_N = 0;
+  // The camera's own world x, the same one the boundary walk projected
+  // against, so the geometry lands exactly where the road put the ground.
+  const camX = cameraX;
 
   for (let n = first; n <= last; n++) {
     if (!bvis[n]) continue;
@@ -13465,9 +13794,41 @@ function sceneryPass(first, last, baseIndex, w, h) {
                       * (kind === 5 ? FEEL.SCENERY_TOWER_SCALE : 1);
           const wide = scale * (kind === 2 ? FEEL.SCENERY_MASS_WIDE : 1)
                              * (kind === 4 ? FEEL.SCENERY_BANNER_WIDE : 1);
-          const off = FEEL.SCENERY_CLEAR + h3 * h3 * FEEL.SCENERY_FAR_OUT;
+          /* HOW FAR OUT, AND THIS IS WHY EVERY OBJECT WAS SMALL.
+
+             The offset is squared toward the road, which sounds like it
+             hugs the verge and does not: the median lands at eight half
+             widths. Near the camera a half width is seventy nine pixels,
+             so eight of them is six hundred and thirty pixels off the
+             side of a three hundred and ninety pixel screen, and the
+             object is culled before it is drawn. Measured, the nearest
+             depth bucket threw away 67 per cent of its placements that
+             way, and the ones that survived were the distant ones, which
+             are small by definition. The whole world drew at a median of
+             seven and a half pixels tall.
+
+             OUT_BIAS IS THE EXPONENT ON THAT SQUARING. At four the
+             median lands at 3.3 half widths, which is on the shoulder
+             and on screen, and the tail still reaches right across the
+             plain so the far field stays populated.
+
+             IT HAS TO BE A PROPERTY OF THE SITE AND NOT OF THE VIEWING
+             DISTANCE. Making the spread depend on how far away the
+             camera is would have been the obvious fix and it is wrong:
+             an object's offset would change as you drove toward it, so
+             the world would slide sideways. */
+          const off = FEEL.SCENERY_CLEAR
+                    + Math.pow(h3, FEEL.SCENERY_OUT_BIAS) * FEEL.SCENERY_FAR_OUT;
           const bxp = cx + side * cw * off;
-          const byp = cy - ch * FEEL.TERRAIN_HEIGHT * terrainRise(idx) * 0.5;
+          /* AND IT STANDS ON THE SURFACE RATHER THAN ABOVE IT. The base
+             used to be lifted by half the ridge height whatever the
+             offset was, so anything out past the shoulder floated. The
+             shoulder rises from the road edge to the ridge over
+             TERRAIN_REACH half widths, so an object's ground is that
+             profile at its own offset, and the plane beyond it. */
+          const rise = ch * FEEL.TERRAIN_HEIGHT * terrainRise(idx);
+          const onBank = clamp((off - EDGE_OUT) / Math.max(0.01, FEEL.TERRAIN_REACH), 0, 1);
+          const byp = cy - rise * (off <= EDGE_OUT + FEEL.TERRAIN_REACH ? onBank : 0);
           const px = ch * wide, py = ch * scale;
           if (py < FEEL.SCENERY_MIN_PX) continue;
           /* TOO CLOSE IS CULLED AS WELL AS TOO FAR: an object a few
@@ -13480,26 +13841,58 @@ function sceneryPass(first, last, baseIndex, w, h) {
           if (bxp + px < -40 || bxp - px > w + 40) continue;
           if (byp - py > h + 40) continue;
           if (SCN_N >= SCN_MAX) { n = last + 1; break; }
+          /* THE WORLD POSITION, RECOVERED FROM THE BOUNDARY TABLE. See
+             the geometry block: by is where world height zero lands, ch
+             is the world to pixel scale, and the road centre's world x
+             relative to the camera falls out of bx and ch. */
+          const wz = bz[n];
+          const wx = (cx - w / 2) / ch + side * cw * off / ch;
+          const wy = (cy - by[n]) / ch * -1;
+          const halfW = px / ch, height = py / ch;
+          /* BIG ENOUGH TO SHOW GEOMETRY GETS GEOMETRY. Everything else
+             stays a flat profile, which is where 77 per cent of the
+             world lives and where faces would be invisible anyway. */
+          /* GEOMETRY GOES TO THE KINDS THAT FAIL, NOT TO EVERY KIND.
+
+             Trees and the far masses stay flat profiles, and that is a
+             finding rather than a saving. A tree's flat silhouette is a
+             canopy overhanging a trunk and it reads as a tree at eight
+             pixels; built as boxes the same tree reads as a hedge,
+             because a box canopy has a flat top and a hard corner and
+             nothing about it says foliage. Houses, signs, banners and
+             towers are boxy things, they are the ones the stranger test
+             failed on, and they are the ones boxes help. */
+          const solid = py >= FEEL.GEO_MIN_PX && GEO_KINDS[kind] === 1;
+          if (solid) {
+            geoObject(kind, wx, wy, wz, halfW, height, bucket, camX, w, h);
+            geoShadow(wx, wy, wz, halfW * 0.8, height, camX, w, h);
+          }
+          if (!solid && py >= FEEL.SHADOW_MIN_PX * 2) {
+            geoShadow(wx, wy, wz, halfW * 0.7, height * 0.8, camX, w, h);
+          }
           SCN_X[SCN_N] = bxp; SCN_Y[SCN_N] = byp;
           SCN_W[SCN_N] = px;  SCN_H[SCN_N] = py;
-          SCN_K[SCN_N] = kind; SCN_B[SCN_N] = bucket;
+          SCN_K[SCN_N] = kind; SCN_B[SCN_N] = solid ? 255 : bucket;
           SCN_N++;
           sceneryDrawn++;
         }
       }
     }
   }
-  if (!SCN_N) return;
+  /* SHADOWS FIRST, under everything, because they are ON the ground. */
+  shadowFlush();
+  if (!SCN_N) { geoFlush(); return; }
 
   // Counting sort into bucket order. Two passes over the counts and one
   // over the objects; nothing allocated.
   for (let b = 0; b < buckets; b++) { SCN_BCOUNT[b] = 0; }
-  for (let i = 0; i < SCN_N; i++) SCN_BCOUNT[SCN_B[i]]++;
+  for (let i = 0; i < SCN_N; i++) if (SCN_B[i] < buckets) SCN_BCOUNT[SCN_B[i]]++;
   let acc = 0;
   for (let b = 0; b < buckets; b++) { SCN_BSTART[b] = acc; acc += SCN_BCOUNT[b]; }
   for (let b = 0; b < buckets; b++) SCN_BCOUNT[b] = 0;
   for (let i = 0; i < SCN_N; i++) {
     const b = SCN_B[i];
+    if (b >= buckets) continue;              // it got real geometry instead
     SCN_ORDER[SCN_BSTART[b] + SCN_BCOUNT[b]] = i;
     SCN_BCOUNT[b]++;
   }
@@ -13563,6 +13956,9 @@ function sceneryPass(first, last, baseIndex, w, h) {
       }
     }
   }
+  /* AND THE SOLID ONES OVER THE FLAT ONES, because a solid object is a
+     near object by definition and near paints over far. */
+  geoFlush();
   sceneryWindowPass(buckets);
 }
 
