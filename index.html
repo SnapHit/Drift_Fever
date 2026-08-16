@@ -926,11 +926,40 @@ const FEEL = {
   ROAD_FLARE:               880,     // LIVE
   EDGE_LIP_FRACTION:       0.13,     // of the half width, the bright lip itself
 
-  /* Glow, done by drawing a bright thing twice: once wide and faint, once
-     normal. That is two fills and no shadowBlur, which stays banned. It is
-     used on the road edges, the car lights and the tyre marks, and nowhere
-     else, because it is what separates neon from coloured lines and it
-     stops meaning anything if everything has it. */
+  /* ------------------------------------------------------------------
+     THE BLOOM, AND IT IS THREE PASSES RATHER THAN TWO.
+
+     Glow is done by drawing a bright thing more than once, wider and
+     fainter underneath. No shadowBlur and no filter, both of which stay
+     banned: they are per-pixel work on a renderer that already pays for
+     geometry, and neither can be chunked.
+
+     TWO PASSES MAKE A COLOURED SHAPE. THREE MAKE A LIGHT. With a wide
+     faint pass and a normal one, the brightest thing in the frame is
+     whatever colour the emitter is, and a saturated colour at full alpha
+     reads as paint. Real light blows its own core out toward white while
+     the colour survives only in the falloff, so the third pass is a THIN
+     NEAR-WHITE CORE inside the emitter, and it is the pass that does the
+     work: it is what makes a lamp read as lit rather than as a yellow
+     rectangle.
+
+     THE SCALES ARE MULTIPLES OF THE EMITTER, so one recipe drives the
+     road edge, the lamp heads, the gate lights, the car's light bar and
+     the neon signs, and the four cannot drift apart. The core is held
+     UNDER one so the emitter's own colour survives as a rim around it:
+     at exactly one the road edge's light and dark rumble stripes would
+     both be painted out and the stripe rhythm, which is speed feedback,
+     would go with them.
+
+     NOT ON EVERYTHING BRIGHT. Only on things that are meant to be
+     sources: it is what separates neon from coloured lines and it stops
+     meaning anything if everything has it.
+     ------------------------------------------------------------------ */
+  GLOW_WIDE_SCALE:          3.5,     // LIVE, multiples of the emitter, faint outer pass
+  GLOW_MID_SCALE:           1.8,     // LIVE, the middle pass
+  GLOW_CORE_SCALE:         0.55,     // LIVE, the near white core, held under one
+  GLOW_WIDE_ALPHA:         0.25,     // LIVE
+  GLOW_MID_ALPHA:          0.50,     // LIVE
   EDGE_GLOW_SPREAD:        0.22,     // of the half width, each side of the lip
   EDGE_GLOW_ALPHA:         0.46,
 
@@ -1074,8 +1103,6 @@ const FEEL = {
   LAMP_EVERY:                 1,     // LIVE, every nth marker post carries a lamp
   LAMP_HEAD_WIDTH:          230,     // world units, wider than the post under it
   LAMP_HEAD_HEIGHT:         110,     // world units
-  LAMP_HEAD_GLOW:           2.6,     // LIVE, multiple of the head, for the faint pass
-  LAMP_HEAD_GLOW_ALPHA:    0.24,     // LIVE
   LAMP_HEAD_MIN_PX:         1.2,     // never thinner than this, at any dpr
   /* THE POOL SITS INBOARD OF THE POST THAT THROWS IT, and that is not a
      liberty. The posts stand at EDGE_OUT + PYLON_OUT, which is outboard
@@ -2990,8 +3017,6 @@ const FEEL = {
   CAR_POOL_ALPHA:          0.30,     // the light the car spills onto the road
   CAR_POOL_SIZE:            5.2,     // multiple of the body half width
   CAR_POOL_SQUASH:         0.62,     // it lies on the road, so it is an ellipse
-  CAR_LIGHT_GLOW_SPREAD:    2.3,     // multiple of the light strip, for its glow
-  CAR_LIGHT_GLOW_ALPHA:    0.34,
 
   /* Tyre marks. They live on the road segments, so they are bounded by
      the segment window and cannot grow through a long run. They are only
@@ -3793,10 +3818,32 @@ function mixTriple(a, b, t) {
        + Math.round(p[2] + (q[2] - p[2]) * k);
 }
 
-function rotateHue(colour, deg, was, now) {
+/* ONE COLOUR, TURNED, DESATURATED OR RESATURATED, AND MOVED IN VALUE.
+
+   THIS USED TO ONLY TURN, and that was the whole reason twelve biomes
+   read as one place at twelve angles. Rotating every colour by the same
+   angle with saturation held and lightness solved back to the original
+   luminance is an ISOMETRY: every hue difference between two colours,
+   every saturation, and every luminance in the palette is invariant
+   under it. The picture cannot change, only the angle it is viewed from,
+   and a mood is made of exactly the things that were being held fixed.
+
+   So there are three knobs now rather than one. `satMul` scales
+   saturation, which is what makes a world rich or nearly colourless.
+   `lumMul` scales the target luminance, which is what lets the ground
+   sit above the sky in one place and below it in another. `deg` still
+   turns. Lightness is still solved by bisection so the result lands on
+   the luminance asked for rather than near it, which is what keeps the
+   hierarchy measurable rather than hopeful.
+
+   THE TARGET IS CLAMPED, not the bisection. At lumMul above one a colour
+   already near white cannot reach the target at its hue and saturation,
+   and the bisection then returns the brightest it can, which is correct
+   and is why lumMul is never applied to the road or the edge. */
+function recolour(colour, deg, satMul, lumMul, was, now) {
   // The unturned biome is the palette exactly as it was written, not the
   // palette after a round trip through HSL and back.
-  if (!deg) return colour;
+  if (!deg && satMul === 1 && lumMul === 1) return colour;
   const c = rgbOf(colour);
   const a = c[3];
   function over(rgb, bg) {
@@ -3805,9 +3852,9 @@ function rotateHue(colour, deg, was, now) {
                     rgb[1] * a + bg[1] * (1 - a),
                     rgb[2] * a + bg[2] * (1 - a));
   }
-  const want = over(c, was);
+  const want = clamp(over(c, was) * lumMul, 0, 255);
   const hsl = rgbToHsl(c[0], c[1], c[2]);
-  const h = hsl[0] + deg, sat = hsl[1];
+  const h = hsl[0] + deg, sat = clamp(hsl[1] * satMul, 0, 1);
   /* Luminance rises monotonically with L at fixed hue and saturation, and
      compositing at fixed alpha is monotonic in it too, so twenty
      bisections put it within a thousandth. Cheaper solutions were not
@@ -3823,6 +3870,11 @@ function rotateHue(colour, deg, was, now) {
     return 'rgba(' + out[0] + ',' + out[1] + ',' + out[2] + ',' + c[3] + ')';
   }
   return out[0] + ',' + out[1] + ',' + out[2];
+}
+
+// Turning alone, which is still what the sign's own hue dodge wants.
+function rotateHue(colour, deg, was, now) {
+  return recolour(colour, deg, 1, 1, was, now);
 }
 
 /* What does NOT turn with the world. The HUD is a readout, and a readout
@@ -3863,36 +3915,152 @@ const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         JUMP_DECK: 1, JUMP_DECK_DARK: 1, JUMP_SIDE: 1,
                         JUMP_LIP: 1, JUMP_GLOW: 1, JUMP_ARROW: 1 };
 
+/* ==================================================================
+   WHICH FAMILY EACH COLOUR BELONGS TO, because a place has more than one
+   colour in it and a single global rotation cannot produce that.
+
+   Everything in the palette used to turn by the same angle, so the hue
+   DIFFERENCE between the trees and the ground they stand on, or between
+   a window and the building it is in, was the same number in all twelve
+   biomes. Families are what let those differ, which is what puts more
+   than one colour in a single frame.
+
+   ORDER MATTERS. The first prefix that matches wins, so SKYLINE_WINDOW
+   has to be tested before SKYLINE or the windows join the buildings.
+
+   THREE FAMILIES ARE DELIBERATELY POOR IN KNOBS, and each for a reason
+   that is a hard rule rather than taste:
+
+     void   takes the base turn and nothing else. It is what every
+            translucent layer is solved against and it is the bottom of
+            the value ranking, so a recipe is not allowed to lift it.
+     core   the near white inside every emissive thing. Saturating it
+            makes it a coloured shape again, which is the one thing it
+            exists to prevent.
+     rd     the road, the edge, the lip and everything lit that stands
+            on the road. It takes hue and saturation so a world can have
+            a hot road in a cold place, and it NEVER takes a luminance
+            multiplier, because the edge being brightest in all twelve
+            biomes is the rule that outranks every other decision here.
+   ================================================================== */
+const BIOME_FAMILY_RULES = [
+  ['VOID',            'void'],
+  ['EMISSIVE_CORE',   'core'],
+  ['SKY_',            'sky'],
+  ['HAZE',            'sky'],
+  ['HORIZON_',        'sky'],
+  ['SCENERY_',        'scn'],
+  ['GROUND_',         'gnd'],
+  ['TERRAIN_',        'gnd'],
+  ['GRID',            'gnd'],
+  ['SKYLINE_WINDOW',  'win'],
+  ['SKYLINE',         'cit'],
+  ['SIGN',            'cit'],
+  ['CAR_',            'car'],
+  ['GHOST',           'car'],
+  ['SCRAPE',          'car'],
+  ['SMOKE',           'car'],
+  ['ROAD_',           'rd'],  ['WALL',      'rd'],
+  ['SHOULDER_',       'rd'],  ['EDGE_',     'rd'],
+  ['LANE',            'rd'],  ['SLAB_',     'rd'],
+  ['PYLON',           'rd'],  ['LAMP',      'rd'],
+  ['WET_SHEEN',       'rd'],  ['GATE',      'rd'],
+  ['TRAIL_',          'rd']
+];
+function biomeFamily(key) {
+  for (let i = 0; i < BIOME_FAMILY_RULES.length; i++) {
+    if (key.indexOf(BIOME_FAMILY_RULES[i][0]) === 0) return BIOME_FAMILY_RULES[i][1];
+  }
+  // Anything unclassified takes the base turn and nothing else, which is
+  // exactly what the whole palette used to do. A new colour is therefore
+  // never made worse by being forgotten here, only less interesting.
+  return 'other';
+}
+
+/* ==================================================================
+   THE TWELVE PLACES.
+
+   ONE ROW IS ONE PLACE, not one angle. hue turns the whole palette as
+   before; everything after it is what makes the place. sat scales every
+   saturation in the world, so a row can be rich or nearly colourless.
+   The per family columns are offsets ON TOP of hue and multipliers ON
+   TOP of sat, and they are what puts several colours in one frame:
+   scenery that is not the family of the ground it stands on, windows
+   that are not the family of the building they are in, a road that
+   agrees with the world or fights it.
+
+   skyL and gndL move the SKY and GROUND in value against each other, so
+   it is not always a dark ground under a darker sky. Those are the only
+   two luminance knobs, and the void, the road and the edge do not have
+   one at all. See BIOME_FAMILY_RULES.
+
+   EVERY ROW IS MEASURED, NOT TRUSTED. The object against background
+   instrument runs over all twelve and the value ranking runs over all
+   twelve; a row that cannot hold the hierarchy is a wrong row and gets
+   retuned rather than the hierarchy being relaxed to admit it.
+   ================================================================== */
+const BIOME_RECIPE = [
+  //                        hue   sat  skyH  skyL  gndH  gndL  scnH  citH  citS  winH   rdH   rdS
+  /* ember dusk         */ [   0, 1.00,    0, 1.00,    0, 1.00,    0,    0, 1.00,    0,    0, 1.00],
+  /* cold blue night    */ [ 205, 0.90,   18, 0.86,  -14, 0.94,   26,  -34, 1.10,   52,  -22, 1.15],
+  /* ash, one hot sign  */ [ 120, 0.16,    0, 1.06,    0, 1.00,    0,    0, 0.35,    0, -108, 5.50],
+  /* violet hour        */ [ 275, 1.10,  -26, 1.10,   16, 0.96,  -40,   36, 0.95,   70,  -14, 0.95],
+  /* sodium fields      */ [  95, 0.78,   36, 0.90,  -22, 1.10,   54,   22, 1.05,  -46,   30, 1.10],
+  /* cold place, hot rd */ [ 190, 0.95,   22, 0.94,   10, 0.90,   38,  -28, 1.00,   64, -168, 1.25],
+  /* rust and magenta   */ [ 330, 1.20,   24, 1.00,  -18, 1.04,   28,   46, 1.10,  -34,    8, 1.00],
+  /* pale steel         */ [ 215, 0.32,  -18, 2.10,   12, 0.86,   22,  -40, 0.70,   88,   -8, 1.30],
+  /* acid               */ [  68, 1.25,   30, 0.92,  -26, 1.06,  -52,   38, 1.15,   44,   18, 0.95],
+  /* indigo city        */ [ 240, 0.95,  -14, 1.06,   22, 0.92,   44,   62, 1.20,  -58,  -10, 1.05],
+  /* bleached warm      */ [  25, 0.45,   14, 1.75,  -12, 1.18,   30,  -24, 0.80,   66,   12, 1.35],
+  /* cyan on charcoal   */ [ 178, 1.05,   -8, 0.90,   26, 0.96,   50,   34, 1.05,  -40,   26, 1.00]
+];
+const R_HUE = 0, R_SAT = 1, R_SKYH = 2, R_SKYL = 3, R_GNDH = 4, R_GNDL = 5,
+      R_SCNH = 6, R_CITH = 7, R_CITS = 8, R_WINH = 9, R_RDH = 10, R_RDS = 11;
+
 let PALETTE_BASE = null;
 let BIOMES = [];
+let BIOME_HUE = [];
 function buildBiomes() {
   if (!PALETTE_BASE) {
     PALETTE_BASE = {};
     for (const k in COLOUR) PALETTE_BASE[k] = COLOUR[k];
   }
-  const n = Math.max(1, Math.round(FEEL.BIOME_COUNT));
+  const n = clamp(Math.round(FEEL.BIOME_COUNT), 1, BIOME_RECIPE.length);
   const wasVoid = rgbOf(PALETTE_BASE.VOID);
   BIOMES = [];
+  BIOME_HUE = [];
   for (let i = 0; i < n; i++) {
-    const deg = i * 360 / n;
+    const r = BIOME_RECIPE[i];
+    const deg = r[R_HUE];
     const b = {};
-    // The void first, because the translucent layers are solved against
-    // it and it has to be this biome's void rather than the last one's.
-    b.VOID = rotateHue(PALETTE_BASE.VOID, deg);
+    /* The void first, because the translucent layers are solved against
+       it and it has to be this biome's void rather than the last one's.
+       It takes the turn and the world's saturation and nothing else. */
+    b.VOID = recolour(PALETTE_BASE.VOID, deg, r[R_SAT], 1);
     const nowVoid = rgbOf(b.VOID);
     for (const k in PALETTE_BASE) {
       if (k === 'VOID') continue;
-      b[k] = PALETTE_FIXED[k] ? PALETTE_BASE[k]
-                              : rotateHue(PALETTE_BASE[k], deg, wasVoid, nowVoid);
+      if (PALETTE_FIXED[k]) { b[k] = PALETTE_BASE[k]; continue; }
+      const fam = biomeFamily(k);
+      let h = deg, sat = r[R_SAT], lum = 1;
+      if (fam === 'core')     { sat = 1; }
+      else if (fam === 'sky') { h += r[R_SKYH]; lum = r[R_SKYL]; }
+      else if (fam === 'gnd') { h += r[R_GNDH]; lum = r[R_GNDL]; }
+      else if (fam === 'scn') { h += r[R_SCNH]; }
+      else if (fam === 'cit') { h += r[R_CITH]; sat *= r[R_CITS]; }
+      else if (fam === 'win') { h += r[R_CITH] + r[R_WINH]; sat *= r[R_CITS]; }
+      else if (fam === 'rd')  { h += r[R_RDH];  sat *= r[R_RDS]; }
+      b[k] = recolour(PALETTE_BASE[k], h, sat, lum, wasVoid, nowVoid);
     }
     BIOMES.push(b);
+    BIOME_HUE.push(deg);
   }
   biomeBag.length = 0;
   biomeRecent.length = 0;
   lastBiomeHue = -999;
 }
 
-function biomeHue(i) { return i * 360 / BIOMES.length; }
+function biomeHue(i) { return BIOME_HUE[((i % BIOME_HUE.length) + BIOME_HUE.length) % BIOME_HUE.length]; }
 function hueGap(a, b) {
   const d = Math.abs(((a - b) % 360 + 360) % 360);
   return d > 180 ? 360 - d : d;
@@ -4189,6 +4357,22 @@ const COLOUR = {
   LANE:         '#6b3524',     // dim on purpose, it must never read as an edge
 
   EDGE_GLOW:    '255,146,44',   // the faint wide pass under the lip
+  /* THE CORE OF EVERY EMISSIVE THING, and the same one for all of them.
+
+     A light source photographs as white in the middle whatever colour it
+     is, because the sensor or the eye is saturated there and only the
+     falloff carries the hue. So this is very nearly white with the
+     smallest warm bias, it is the innermost of the three bloom passes on
+     the road edge, the lamp heads, the gate lights, the car's light bar
+     and the signs, and it is the reason those read as sources rather
+     than as bright paint.
+
+     IT MUST STAY NEAR WHITE IN ALL TWELVE BIOMES. Its hue turns with the
+     wheel like everything else and at this saturation that moves it by
+     under a luminance unit, but the per biome saturation in BIOME_RECIPE
+     is not allowed near it: a saturated core is a coloured shape again,
+     which is the whole thing this exists to stop. */
+  EMISSIVE_CORE: '#fffdf6',
   SLAB_BOTTOM:  '#d2551a',      // the underside line, dimmer than the top lip
   SLAB_BOTTOM_GLOW: '186,72,22',
   PYLON:        '#d85a22',
@@ -4824,8 +5008,11 @@ const TUNABLES = [
   { key: 'WET_SHEEN_FADE',     label: 'sheenH',  step: 0.02, min: 0.02, max: 1.0,   dp: 2, group: 4 },
   { key: 'PYLON_HEIGHT',       label: 'post',    step: 30,   min: 60,   max: 2400,  dp: 0, group: 4 },
   { key: 'LAMP_EVERY',         label: 'lampN',   step: 1,    min: 1,    max: 12,    dp: 0, group: 4 },
-  { key: 'LAMP_HEAD_GLOW',     label: 'lampGW',  step: 0.2,  min: 1,    max: 8,     dp: 1, group: 4 },
-  { key: 'LAMP_HEAD_GLOW_ALPHA',label:'lampGA',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'GLOW_WIDE_SCALE',    label: 'bloomW',  step: 0.1,  min: 1,    max: 9,     dp: 1, group: 4 },
+  { key: 'GLOW_MID_SCALE',     label: 'bloomM',  step: 0.1,  min: 1,    max: 6,     dp: 1, group: 4 },
+  { key: 'GLOW_CORE_SCALE',    label: 'bloomC',  step: 0.05, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'GLOW_WIDE_ALPHA',    label: 'bloomWA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 4 },
+  { key: 'GLOW_MID_ALPHA',     label: 'bloomMA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 4 },
   { key: 'LAMP_POOL_OUT',      label: 'poolAt',  step: 0.02, min: 0,    max: 1.4,   dp: 2, group: 4 },
   { key: 'LAMP_POOL_SIZE',     label: 'poolW',   step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 4 },
   { key: 'LAMP_POOL_SQUASH',   label: 'poolSq',  step: 0.02, min: 0.02, max: 1.5,   dp: 2, group: 4 },
@@ -5193,7 +5380,7 @@ const TUNABLES = [
   { key: 'JUMP_ARROW_HEIGHT',  label: 'chevTall',step: 20,   min: 80,   max: 2000,  dp: 0, group: 24 },
   { key: 'JUMP_ARROW_HALF',    label: 'chevWide',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
-  { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 36,    dp: 0, group: 25 },
+  { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 12,    dp: 0, group: 25 },
   { key: 'BIOME_MIN_STEP',     label: 'hueGap',  step: 5,    min: 0,    max: 180,   dp: 0, group: 25 },
   { key: 'MODE_NOTE_SECONDS',  label: 'modeSay', step: 1,    min: 0,    max: 30,    dp: 0, group: 26 },
   { key: 'LEVEL_COUNT',        label: 'levels',  step: 1,    min: 1,    max: 8,     dp: 0, group: 27 },
@@ -9971,27 +10158,37 @@ function drawSigns(w, period, step, shift, baseY, minH, spanH) {
     }
   }
   if (signN) {
-    const g = FEEL.SIGN_GLOW_INFLATE;
-    ctx.beginPath();
-    for (let k = 0; k < signN; k++) {
-      const at = k * 4;
-      // The faint pass is held to the horizon as well, or the glow
-      // alone would put light beside the far road.
-      const gy = signXY[at + 1] - g;
-      const gh = Math.min(signXY[at + 3] + g * 2, horizonY - gy);
-      if (gh <= 0) continue;
-      ctx.rect(signXY[at] - g, gy, signXY[at + 2] + g * 2, gh);
+    /* THE SIGN'S INFLATION IS IN PIXELS, NOT IN MULTIPLES, because a sign
+       is a few pixels tall at the far end of the city and a multiple of a
+       few pixels is nothing. So the wide pass keeps its authored pixel
+       inflation and the middle pass is placed between the sign and it by
+       the shared ratios, which is the same falloff shape expressed in the
+       unit this emitter is authored in.
+
+       NEGATIVE FOR THE CORE, which insets rather than inflates. */
+    const wideG = FEEL.SIGN_GLOW_INFLATE;
+    const midG = wideG * (FEEL.GLOW_MID_SCALE - 1)
+                       / Math.max(0.001, FEEL.GLOW_WIDE_SCALE - 1);
+    for (let pass = 0; pass < 4; pass++) {
+      const g = pass === 0 ? wideG : pass === 1 ? midG : 0;
+      const inset = pass === 3 ? (1 - FEEL.GLOW_CORE_SCALE) / 2 : 0;
+      ctx.beginPath();
+      for (let k = 0; k < signN; k++) {
+        const at = k * 4;
+        const iw = signXY[at + 2] * inset, ih = signXY[at + 3] * inset;
+        // The faint passes are held to the horizon as well, or the glow
+        // alone would put light beside the far road.
+        const gy = signXY[at + 1] - g + ih;
+        const gh = Math.min(signXY[at + 3] + g * 2 - ih * 2, horizonY - gy);
+        if (gh <= 0) continue;
+        ctx.rect(signXY[at] - g + iw, gy, signXY[at + 2] + g * 2 - iw * 2, gh);
+      }
+      ctx.globalAlpha = FEEL.SIGN_ALPHA
+                      * (pass === 0 ? FEEL.GLOW_WIDE_ALPHA
+                       : pass === 1 ? FEEL.GLOW_MID_ALPHA : 1);
+      ctx.fillStyle = pass === 3 ? EMISSIVE_CORE_FILL : SIGN_FILL;
+      ctx.fill();
     }
-    ctx.globalAlpha = FEEL.SIGN_ALPHA * FEEL.SIGN_GLOW_ALPHA;
-    ctx.fillStyle = SIGN_FILL;
-    ctx.fill();
-    ctx.beginPath();
-    for (let k = 0; k < signN; k++) {
-      const at = k * 4;
-      ctx.rect(signXY[at], signXY[at + 1], signXY[at + 2], signXY[at + 3]);
-    }
-    ctx.globalAlpha = FEEL.SIGN_ALPHA;
-    ctx.fill();
     ctx.globalAlpha = 1;
   }
 }
@@ -10299,6 +10496,7 @@ const GLOW_CULL_PX = 2.5;
 const WALL_CULL_PX = 1.6;
 
 let EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
+let EMISSIVE_CORE_FILL = COLOUR.EMISSIVE_CORE;
 let SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
 let PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
 /* The signage, item 8, and the road pool under a lamp, item 9. Both are
@@ -10557,16 +10755,7 @@ function drawFinishGate(first, last, baseIndex) {
   const pw = Math.max(2, bw[n] * post);
   const banner = (by[n] - top) * FEEL.FINISH_BANNER;
 
-  for (let pass = 0; pass < 2; pass++) {
-    const spread = pass === 0 ? pw * 2.2 : 0;
-    ctx.globalAlpha = pass === 0 ? 0.26 : 1;
-    ctx.fillStyle = pass === 0 ? GATE_GLOW_FILL : COLOUR.GATE_POST;
-    ctx.beginPath();
-    ctx.rect(lx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
-    ctx.rect(rx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
+  bloomPosts(lx, rx, pw, top, by[n] - top, GATE_GLOW_FILL, COLOUR.GATE_POST);
 
   /* The banner across the top, in the score's own gold rather than the
      gate's cyan. Every checkpoint all day has been cyan; the one that
@@ -10645,18 +10834,9 @@ function drawGate(first, last, baseIndex) {
   const lx = bx[n] + bw[n] * (out + post * 0.5), rx = bx[n] - bw[n] * (out + post * 0.5);
   const pw = Math.max(2, bw[n] * post);
 
-  // Wide and faint, then solid, the same two pass glow everything lit in
-  // this game uses.
-  for (let pass = 0; pass < 2; pass++) {
-    const spread = pass === 0 ? pw * 1.9 : 0;
-    ctx.globalAlpha = pass === 0 ? 0.3 : 1;
-    ctx.fillStyle = pass === 0 ? GATE_GLOW_FILL : COLOUR.GATE_POST;
-    ctx.beginPath();
-    ctx.rect(lx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
-    ctx.rect(rx - pw / 2 - spread / 2, top, pw + spread, by[n] - top);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
+  // Wide and faint, medium, solid, then a near white core: the same
+  // three pass bloom everything lit in this game uses.
+  bloomPosts(lx, rx, pw, top, by[n] - top, GATE_GLOW_FILL, COLOUR.GATE_POST);
   // The beam across, in the bright colour, so the eye reads a doorway.
   ctx.fillStyle = COLOUR.GATE;
   ctx.fillRect(Math.min(lx, rx) - pw / 2, top - beam / 2,
@@ -11698,11 +11878,63 @@ function lanePass(first, last) {
    drawn inboard and outboard of the lip only. The edge therefore gains
    width and glow as the multiplier climbs and the lip itself can only
    ever gain luminance, from the hot ramp on its dim stripe. */
+/* THE THREE BLOOM BANDS AS FRACTIONS OF THE HALF WIDTH, concentric on
+   the lip. Written once here rather than three times at each call site,
+   because the one thing that must never drift is that they share a
+   centre: bands that do not are a smear rather than a falloff. */
+function glowBandAt(scale) {
+  const lip = FEEL.EDGE_LIP_FRACTION;
+  const mid = EDGE_OUT - lip / 2;
+  const half = scale * lip / 2;
+  GLOW_BAND[0] = mid - half;
+  GLOW_BAND[1] = mid + half;
+  return GLOW_BAND;
+}
+const GLOW_BAND = [0, 0];
+
+/* THE SAME THREE PASSES FOR AN EMITTER THAT IS A PAIR OF UPRIGHTS, which
+   is both gates. Widened about each post's own centre, so the bands stay
+   concentric the way the road edge's do: bands that do not share a
+   centre are a smear rather than a falloff. The body is drawn in the
+   emitter's colour and the core inside it is not. */
+function bloomPosts(lx, rx, pw, top, height, glowColour, bodyColour) {
+  for (let pass = 0; pass < 4; pass++) {
+    const scale = pass === 0 ? FEEL.GLOW_WIDE_SCALE
+                : pass === 1 ? FEEL.GLOW_MID_SCALE
+                : pass === 2 ? 1 : FEEL.GLOW_CORE_SCALE;
+    ctx.globalAlpha = pass === 0 ? FEEL.GLOW_WIDE_ALPHA
+                    : pass === 1 ? FEEL.GLOW_MID_ALPHA : 1;
+    ctx.fillStyle = pass === 2 ? bodyColour
+                  : pass === 3 ? EMISSIVE_CORE_FILL : glowColour;
+    const w = pw * scale;
+    ctx.beginPath();
+    ctx.rect(lx - w / 2, top, w, height);
+    ctx.rect(rx - w / 2, top, w, height);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
 function edgeGlowPass(first, last) {
-  ctx.globalAlpha = FEEL.EDGE_GLOW_ALPHA;
+  /* WIDE AND FAINT, THEN MEDIUM, THEN A NEAR WHITE CORE. The first two
+     are the emitter's own colour and the third is not, which is the
+     whole point: see FEEL's bloom block. Chunked by glowBandFill like
+     everything else out here, so three bands cost three walks of the
+     boundary table rather than one path of three times the subpaths. */
   ctx.fillStyle = EDGE_GLOW_FILL;
-  glowBandFill(first, last, EDGE_OUT - FEEL.EDGE_LIP_FRACTION - FEEL.EDGE_GLOW_SPREAD,
-               EDGE_OUT + FEEL.EDGE_GLOW_SPREAD);
+  ctx.globalAlpha = FEEL.GLOW_WIDE_ALPHA;
+  let b = glowBandAt(FEEL.GLOW_WIDE_SCALE);
+  glowBandFill(first, last, b[0], b[1]);
+  ctx.globalAlpha = FEEL.GLOW_MID_ALPHA;
+  b = glowBandAt(FEEL.GLOW_MID_SCALE);
+  glowBandFill(first, last, b[0], b[1]);
+  /* THE CORE IS AT FULL ALPHA AND IT IS THE ONLY PASS THAT IS. It lands
+     inside the lip, so the lip's own light and dark stripes survive as a
+     rim on both sides of it and the rumble rhythm still reads. */
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = EMISSIVE_CORE_FILL;
+  b = glowBandAt(FEEL.GLOW_CORE_SCALE);
+  glowBandFill(first, last, b[0], b[1]);
   ctx.globalAlpha = 1;
   if (worldHeat <= 0.01) return;
 
@@ -11930,12 +12162,21 @@ function drawPylons(first, last, baseIndex, w) {
    have reported the heads at the brightness of the posts. Only whole
    painters may be stubbed, which this project has paid for before. */
 function drawLampHeads(first, last, baseIndex, spacing, scaleH) {
-  lampHeadPath(first, last, baseIndex, spacing, FEEL.LAMP_HEAD_GLOW, scaleH);
-  ctx.globalAlpha = FEEL.LAMP_HEAD_GLOW_ALPHA;
+  /* Wide and faint, medium, the head itself, then the near white core
+     inside it. The head keeps the lamp's own colour so the hue survives
+     as a rim, which is what stops the core reading as a white sticker. */
+  lampHeadPath(first, last, baseIndex, spacing, FEEL.GLOW_WIDE_SCALE, scaleH);
+  ctx.globalAlpha = FEEL.GLOW_WIDE_ALPHA;
   ctx.fillStyle = COLOUR.LAMP;
+  ctx.fill();
+  lampHeadPath(first, last, baseIndex, spacing, FEEL.GLOW_MID_SCALE, scaleH);
+  ctx.globalAlpha = FEEL.GLOW_MID_ALPHA;
   ctx.fill();
   ctx.globalAlpha = 1;
   lampHeadPath(first, last, baseIndex, spacing, 1, scaleH);
+  ctx.fill();
+  lampHeadPath(first, last, baseIndex, spacing, FEEL.GLOW_CORE_SCALE, scaleH);
+  ctx.fillStyle = EMISSIVE_CORE_FILL;
   ctx.fill();
 }
 
@@ -13358,6 +13599,7 @@ function rebuildDerivedColours() {
 
   SMOKE_FILL = 'rgb(' + COLOUR.SMOKE + ')';
   EDGE_GLOW_FILL = 'rgb(' + COLOUR.EDGE_GLOW + ')';
+  EMISSIVE_CORE_FILL = COLOUR.EMISSIVE_CORE;
   SLAB_BOTTOM_GLOW_FILL = 'rgb(' + COLOUR.SLAB_BOTTOM_GLOW + ')';
   PYLON_GLOW_FILL = 'rgb(' + COLOUR.PYLON_GLOW + ')';
   JUMP_GLOW_FILL = 'rgb(' + COLOUR.JUMP_GLOW + ')';
@@ -13597,14 +13839,22 @@ function drawCar(w, h) {
   const lightZ = tail[0] * halfL - 6;
   const hot = scraping ? 1 : 0;
   // Laterally clamped, vertically and rearwardly free.
-  const glowHalf = Math.min(lightHalf * FEEL.CAR_LIGHT_GLOW_SPREAD,
-                            halfW * tail[2] * FEEL.CAR_LIGHT_GLOW_MAX);
-  for (let pass = 0; pass < 2; pass++) {
-    const wide = pass === 0 ? glowHalf : lightHalf;
-    const tall = pass === 0 ? lightT * FEEL.CAR_LIGHT_GLOW_SPREAD : lightT;
-    const z = pass === 0 ? lightZ - FEEL.CAR_LIGHT_GLOW_BACK : lightZ;
-    ctx.globalAlpha = (pass === 0 ? FEEL.CAR_LIGHT_GLOW_ALPHA * (1 + hot * 0.8) : 1) * carAlpha;
-    ctx.fillStyle = pass === 0 ? CAR_LIGHT_GLOW_FILL
+  /* FOUR PASSES: wide and faint, medium, the strip itself, then the near
+     white core inside it. The lateral clamp is on the two glow passes
+     only, because a strip wider than the tail is a strip that has left
+     the car. */
+  const cap = halfW * tail[2] * FEEL.CAR_LIGHT_GLOW_MAX;
+  for (let pass = 0; pass < 4; pass++) {
+    const scale = pass === 0 ? FEEL.GLOW_WIDE_SCALE
+                : pass === 1 ? FEEL.GLOW_MID_SCALE
+                : pass === 2 ? 1 : FEEL.GLOW_CORE_SCALE;
+    const wide = pass < 2 ? Math.min(lightHalf * scale, cap) : lightHalf * scale;
+    const tall = lightT * scale;
+    const z = pass < 2 ? lightZ - FEEL.CAR_LIGHT_GLOW_BACK : lightZ;
+    ctx.globalAlpha = (pass === 0 ? FEEL.GLOW_WIDE_ALPHA * (1 + hot * 0.8)
+                     : pass === 1 ? FEEL.GLOW_MID_ALPHA : 1) * carAlpha;
+    ctx.fillStyle = pass < 2 ? CAR_LIGHT_GLOW_FILL
+                  : pass === 3 ? EMISSIVE_CORE_FILL
                   : (hot ? COLOUR.CAR_LIGHT_HOT : CAR_LIGHT_FILL);
     quadInCar(-wide, lightY - tall, z, wide, lightY + tall, z, camX, w, h);
   }
