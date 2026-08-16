@@ -958,7 +958,7 @@ const FEEL = {
   GEO_TONES:                  5,     // LIVE, shade steps a face may quantise to
   GEO_AMBIENT:             0.30,     // LIVE, the darkest a face gets, as a share of lit
   SHADOW_ALPHA:            0.42,     // LIVE, how dark a cast shadow is
-  SHADOW_LENGTH:           1.35,     // LIVE, shadow length as a share of object height
+  SHADOW_LENGTH:           0.95,     // LIVE, shadow length as a share of object height
   SHADOW_MIN_PX:            2.5,     // below this it is a smudge, not a contact cue
   EDGE_LIP_FRACTION:       0.13,     // of the half width, the bright lip itself
 
@@ -1329,15 +1329,25 @@ const FEEL = {
   SCENERY_FADE_FAR:        0.74,     // LIVE, how far an object at the draw distance
                                      // has gone toward the ground it stands on
   SCENERY_FADE_EASE:       1.80,     // LIVE, above one keeps the near field's colour
+  /* THE COLOUR IN THE WORLD. VARIANTS is how many hue steps a material
+     is offered, SPREAD is how far either side of its own hue those go,
+     and SAT_LIFT is a general push because the instruction to keep the
+     scenery dark went too far and everything was coming out of a narrow
+     dim band. */
+  SCENERY_HUE_VARIANTS:       5,     // LIVE
+  SCENERY_HUE_SPREAD:        26,     // LIVE, degrees either side
+  SCENERY_SAT_LIFT:        1.45,     // LIVE
   SCENERY_DEPTH_STEPS:        6,     // LIVE, depth buckets the scenery batches into.
                                      // Six materials by two faces by this many is the
                                      // fill count, so it is the batching budget.
   /* THE LIT WINDOWS. SIZE is a share of the object's height and BUCKETS
      is the last depth bucket that gets any: nothing bright goes near the
      vanishing point, which is the rule the whole horizon end obeys. */
-  SCENERY_WINDOW_SIZE:     0.045,    // LIVE, of the object height
+  SCENERY_WINDOW_SIZE:     0.062,    // LIVE, of the object height
   SCENERY_WINDOW_MIN_PX:     1.1,    // below this it is a shimmering speck
-  SCENERY_WINDOW_BUCKETS:      2,    // LIVE, the last bucket that gets any
+  SCENERY_WINDOW_BUCKETS:      3,    // LIVE, the last bucket that gets any
+  SCENERY_WINDOW_DARK:      0.30,    // LIVE, share of windows that are not lit
+  SCENERY_WINDOW_COOL_AT:   0.72,    // LIVE, above this a window is the cool one
   /* FIELDS ON THE TERRAIN SHOULDER. See groundPatchPass.
 
      THEY WERE ON THE GROUND PLANE AND THEY WERE NOT THERE. Measured off
@@ -1361,9 +1371,33 @@ const FEEL = {
   GROUND_PATCH_LOW:        0.55,     // how far up the slope one may start
   GROUND_PATCH_HIGH:       0.85,     // and how much further up it reaches
   GROUND_PATCH_SHIFT:       9.0,     // LIVE, luminance units off the shoulder
-  SCENERY_EVERY:              1,     // LIVE, segments between sites
-  SCENERY_DENSITY:         0.70,     // LIVE, share of sites that grow something
-  SCENERY_SIZE:            1100,     // LIVE, world units tall at scale one
+  GROUND_PATCH_HUE:         9.0,     // LIVE, degrees a field turns off the shoulder
+  /* ------------------------------------------------------------------
+     FEWER, CLOSER, BIGGER.
+
+     THE MEASUREMENT THIS COMES FROM. Sampled over a whole run in
+     portrait, an object drew at a median of seven and a half pixels and
+     43 per cent of them were under eight, because objects scattered out
+     to 27.7 road half widths and the nearest depth bucket threw away 67
+     per cent of its placements off the side of the screen. What survived
+     was the distant tail, and the distant tail is small.
+
+     THE FIX IS NOT MORE OBJECTS NEAR THE VERGE. Biasing the scatter
+     inward while leaving the count alone was tried and it made a wall of
+     objects edge to edge, because the same population was squeezed into
+     a fifth of the space. The count has to fall further than the space
+     does.
+
+     So: a site every third segment instead of every one, one draw per
+     site instead of two, a scatter that reaches nine half widths instead
+     of twenty seven, and objects twice the world size. Roughly a fifth
+     of the objects, all of them where they can be seen and big enough to
+     be worth drawing. A dozen houses you can see beats two hundred you
+     cannot, and the far field emptying out is the price.
+     ------------------------------------------------------------------ */
+  SCENERY_EVERY:              3,     // LIVE, segments between sites
+  SCENERY_DENSITY:         0.82,     // LIVE, share of sites that grow something
+  SCENERY_SIZE:            2350,     // LIVE, world units tall at scale one
   SCENERY_CLEAR:            1.7,     // LIVE, half widths clear of the road edge
   /* AND IT IS BACK AT TWO, WHICH IS THE SQUARING THAT SHIPPED. Biasing
      the scatter toward the verge does make near objects big enough to
@@ -1373,7 +1407,7 @@ const FEEL = {
      wins. Objects are big when the road happens to bring them close, and
      geometry goes to those. */
   SCENERY_OUT_BIAS:         2.0,     // LIVE, exponent biasing the scatter toward the verge
-  SCENERY_FAR_OUT:           26,     // LIVE, half widths the scatter reaches, squared toward the road
+  SCENERY_FAR_OUT:            9,     // LIVE, half widths the scatter reaches, squared toward the road
   /* TWO AND NOT FOUR, AND THE NUMBER IS THE AUTHOR'S TO CHANGE.
 
      At four this draws 611 objects and costs 3.9ms at x1 and 27.9 at x6,
@@ -1386,9 +1420,9 @@ const FEEL = {
 
      LIVE, so raising it is one press on the phone rather than an edit.
      If a real Chromebook turns out to have the room, four is better. */
-  SCENERY_PER_SITE:           2,     // LIVE, independent draws per segment per side
+  SCENERY_PER_SITE:           1,     // LIVE, independent draws per segment per side
   SCENERY_TOWER_SCALE:     1.90,     // a tower is the tall thing in a treeline
-  SCENERY_BANNER_WIDE:     2.60,     // and a banner is the wide one
+  SCENERY_BANNER_WIDE:     1.15,     // and a banner is the wide one
   SCENERY_MASS_SCALE:      1.55,     // a mid distance mass is bigger than a tree
   SCENERY_MASS_WIDE:       3.20,     // and much wider, which is what makes it a mass
   SCENERY_MIN_PX:           1.5,
@@ -5448,12 +5482,18 @@ const TUNABLES = [
   { key: 'GROUND_GRADIENT_STOPS',label:'dpthStop',step: 2,   min: 2,    max: 64,    dp: 0, group: 21 },
   { key: 'SCENERY_FADE_FAR',   label: 'scnFade', step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'SCENERY_FADE_EASE',  label: 'scnFadeE',step: 0.10, min: 0.2,  max: 6,     dp: 2, group: 21 },
+  { key: 'SCENERY_HUE_VARIANTS',label:'scnVars', step: 1,    min: 1,    max: 9,     dp: 0, group: 21 },
+  { key: 'SCENERY_HUE_SPREAD', label: 'scnHue',  step: 2,    min: 0,    max: 90,    dp: 0, group: 21 },
+  { key: 'SCENERY_SAT_LIFT',   label: 'scnSat',  step: 0.05, min: 0.1,  max: 3,     dp: 2, group: 21 },
   { key: 'SCENERY_DEPTH_STEPS',label: 'scnDepth',step: 1,    min: 1,    max: 16,    dp: 0, group: 21 },
   { key: 'SCENERY_WINDOW_SIZE',label: 'winSize', step: 0.005,min: 0,    max: 0.3,   dp: 3, group: 21 },
   { key: 'SCENERY_WINDOW_BUCKETS',label:'winFar',step: 1,    min: 0,    max: 16,    dp: 0, group: 21 },
+  { key: 'SCENERY_WINDOW_DARK',label: 'winDark', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SCENERY_WINDOW_COOL_AT',label:'winCool',step: 0.05,min: 0,   max: 1,     dp: 2, group: 21 },
   { key: 'GROUND_PATCH_EVERY', label: 'fldEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'GROUND_PATCH_DENSITY',label:'fldDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'GROUND_PATCH_SHIFT', label: 'fldTone', step: 0.5, min: 0,    max: 40,    dp: 1, group: 21 },
+  { key: 'GROUND_PATCH_HUE',   label: 'fldHue',  step: 1,   min: 0,    max: 60,    dp: 1, group: 21 },
   { key: 'SCENERY_EVERY',      label: 'scnEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'SCENERY_DENSITY',    label: 'scnDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'SCENERY_SIZE',       label: 'scnSize', step: 20,  min: 0,    max: 3000,  dp: 0, group: 21 },
@@ -13059,6 +13099,14 @@ function buildDepthLut() {
    ================================================================== */
 const SCN_MAT_LIT = [];
 const SCN_MAT_SHADE = [];
+/* ONE SET PER MATERIAL PER HUE VARIANT. A row of houses that is all one
+   colour is one house drawn several times, so every object takes a
+   seeded variant and its material is turned by that much. Affordable now
+   only because objects are drawn one at a time: with the old colour
+   batching this would have multiplied the fill count by the variant
+   count, and at seventy objects there is no batch to multiply. */
+const SCN_VAR_LIT = [];
+const SCN_VAR_SHADE = [];
 const SCN_MAT_NAMES = ['BARK', 'FOLIAGE', 'WALL', 'ROOF', 'SIGN', 'METAL'];
 const MAT_BARK = 0, MAT_FOLIAGE = 1, MAT_WALL = 2,
       MAT_ROOF = 3, MAT_SIGN = 4, MAT_METAL = 5;
@@ -13089,6 +13137,37 @@ function buildMaterialLut(raw) {
       (f === 0 ? SCN_MAT_LIT : SCN_MAT_SHADE).push(out);
     }
   }
+  /* And the same again per hue variant, turned either side of the
+     material's own hue and lifted in saturation, so a frame holds a
+     range of greens and a range of wall colours rather than one of each. */
+  const vN = Math.max(1, Math.round(FEEL.SCENERY_HUE_VARIANTS));
+  SCN_VAR_LIT.length = 0; SCN_VAR_SHADE.length = 0;
+  for (let m = 0; m < SCN_MAT_NAMES.length; m++) {
+    const vl = [], vs = [];
+    for (let v = 0; v < vN; v++) {
+      const t = vN > 1 ? (v / (vN - 1)) * 2 - 1 : 0;
+      for (let f = 0; f < 2; f++) {
+        const key = 'SCN_' + SCN_MAT_NAMES[m] + (f === 0 ? '_LIT' : '_SHADE');
+        const c = rgbOf(COLOUR[key]);
+        const hsl = rgbToHsl(c[0], c[1], c[2]);
+        hsl[0] += t * FEEL.SCENERY_HUE_SPREAD;
+        hsl[1] = clamp(hsl[1] * FEEL.SCENERY_SAT_LIFT, 0, 1);
+        const out = [];
+        for (let b = 0; b < steps; b++) {
+          const tt = (b + 0.5) / steps;
+          const ix = Math.min(DEPTH_LUT_SIZE - 1, Math.round(tt * (DEPTH_LUT_SIZE - 1)));
+          const s0 = depthShadeRgb(hsl, hsl[2], tt);
+          const tgt = f === 0 ? raw.terLit[ix] : raw.terShade[ix];
+          const u = Math.pow(tt, FEEL.SCENERY_FADE_EASE) * FEEL.SCENERY_FADE_FAR;
+          out.push('rgb(' + Math.round(s0[0] + (tgt[0] - s0[0]) * u) + ','
+                          + Math.round(s0[1] + (tgt[1] - s0[1]) * u) + ','
+                          + Math.round(s0[2] + (tgt[2] - s0[2]) * u) + ')');
+        }
+        (f === 0 ? vl : vs).push(out);
+      }
+    }
+    SCN_VAR_LIT.push(vl); SCN_VAR_SHADE.push(vs);
+  }
 }
 
 /* The depth of a boundary as a share of the draw distance, eased. */
@@ -13100,15 +13179,22 @@ function depthBucket(z) {
   const n = Math.max(1, DEPTH_BUCKET_IX.length);
   return Math.min(n - 1, (depthU(z) * n) | 0);
 }
-function shiftTone(base, by) {
-  const key = base + '|' + by;
+function shiftTone(base, by, hueBy) {
+  const hb = hueBy || 0;
+  const key = base + '|' + by + '|' + hb;
   let v = TONE_CACHE[key];
   if (v) return v;
   const c = rgbOf(base);
   const k = by > 0 ? (1 + by / 40) : 1 / (1 - by / 40);
-  v = 'rgb(' + Math.min(255, Math.round(c[0] * k)) + ','
-             + Math.min(255, Math.round(c[1] * k)) + ','
-             + Math.min(255, Math.round(c[2] * k)) + ')';
+  let r = c[0] * k, g = c[1] * k, b = c[2] * k;
+  if (hb) {
+    const hsl = rgbToHsl(r, g, b);
+    const o = hslToRgb(hsl[0] + hb, hsl[1], hsl[2]);
+    r = o[0]; g = o[1]; b = o[2];
+  }
+  v = 'rgb(' + Math.min(255, Math.round(r)) + ','
+             + Math.min(255, Math.round(g)) + ','
+             + Math.min(255, Math.round(b)) + ')';
   TONE_CACHE[key] = v;
   return v;
 }
@@ -13258,9 +13344,13 @@ function groundPatchPass(first, last, baseIndex, w, h) {
       /* One fill per TONE, and the tone is quantised to the side and to
          the sign of the shift, so the whole pass is four fills rather
          than one per patch. */
+      /* THE FIELDS TURN AS WELL AS CHANGE TONE. One tone shifted up and
+         down is two greys; a hue step either way makes a lot from a
+         pasture and the two read as different ground. */
       const base = side < 0 ? COLOUR.TERRAIN_LIT : COLOUR.TERRAIN_SHADE;
-      const want = shiftTone(base, hB > 0.5 ? FEEL.GROUND_PATCH_SHIFT
-                                            : -FEEL.GROUND_PATCH_SHIFT);
+      const step = ((hA * 4) | 0);
+      const want = shiftTone(base, (hB > 0.5 ? 1 : -1) * FEEL.GROUND_PATCH_SHIFT,
+                             (step - 1.5) * FEEL.GROUND_PATCH_HUE);
       if (want !== lastFill) {
         if (sub > 0) { ctx.fill(); ctx.beginPath(); sub = 0; }
         ctx.fillStyle = want;
@@ -13441,11 +13531,27 @@ const SCENERY_SHADE = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const GEO_MAX_FACES = 1400;
 const GEO_XY = new Float32Array(GEO_MAX_FACES * 8);
 const GEO_KEY = new Uint16Array(GEO_MAX_FACES);
-const GEO_ORDER = new Uint16Array(GEO_MAX_FACES);
 let GEO_N = 0;
-const GEO_GROUPS = 6 * 32 * 12;
-const GEO_START = new Uint16Array(GEO_GROUPS);
-const GEO_COUNT = new Uint16Array(GEO_GROUPS);
+/* ONE RECORD PER OBJECT, WHICH IS WHAT THE SMALLER COUNT BOUGHT.
+
+   Batching every face in the world by colour is what a world of three
+   hundred objects needs, and it makes a correct painter's order
+   impossible: a near object's wall gets painted over by a far object's
+   roof because they share a fill. At seventy objects that trade is off.
+   Objects are sorted back to front and drawn one at a time, faces
+   grouped by tone WITHIN the object, which is a handful of fills each
+   and gives correct occlusion and a free hand with colour.
+
+   It also means an object can have its OWN hue without multiplying the
+   batch count, because there is no batch to multiply. */
+const GEO_OBJ_MAX = 320;
+const GEO_OBJ_FROM = new Uint16Array(GEO_OBJ_MAX);
+const GEO_OBJ_N = new Uint16Array(GEO_OBJ_MAX);
+const GEO_OBJ_Z = new Float64Array(GEO_OBJ_MAX);
+const GEO_OBJ_VAR = new Uint8Array(GEO_OBJ_MAX);
+const GEO_OBJ_B = new Uint8Array(GEO_OBJ_MAX);
+const GEO_OBJ_ORDER = new Uint16Array(GEO_OBJ_MAX);
+let GEO_OBJ_COUNT = 0;
 const GEO_PT = [{ sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 },
                 { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }, { sx: 0, sy: 0 }];
 /* The eight corners of a unit box, then which four make each face and
@@ -13506,9 +13612,45 @@ function geoBox(wx, wy, wz, hw, hh, hd, mat, bucket, camX, w, h) {
     const lit = FEEL.GEO_AMBIENT + (1 - FEEL.GEO_AMBIENT) * dp;
     let tone = (lit * tones) | 0;
     if (tone < 0) tone = 0; else if (tone >= tones) tone = tones - 1;
-    const key = (bucket * SCN_MAT_NAMES.length + mat) * tones + tone;
     geoPushFace(GEO_PT[face.ix[0]], GEO_PT[face.ix[1]],
-                GEO_PT[face.ix[2]], GEO_PT[face.ix[3]], key);
+                GEO_PT[face.ix[2]], GEO_PT[face.ix[3]], mat * tones + tone);
+  }
+}
+
+/* A FRUSTUM: a box whose top is narrower than its base. A tree canopy is
+   not a box, and built as one it reads as a hedge because a flat top and
+   a hard corner say nothing about foliage. Tapered it reads as a tree,
+   and it is the same six faces and the same one dot product each. */
+function geoTaper(wx, wy, wz, hw, hh, hd, topScale, mat, bucket, camX, w, h) {
+  if (wz <= 1) return;
+  const tones = Math.max(2, Math.round(FEEL.GEO_TONES));
+  for (let i = 0; i < 8; i++) {
+    const up = (i & 2) ? 1 : 0;
+    const k = up ? topScale : 1;
+    projectPoint(GEO_PT[i],
+                 camX + wx + ((i & 1) ? hw * k : -hw * k),
+                 wy + (up ? hh : 0),
+                 wz + ((i & 4) ? hd * k : -hd * k), camX, w, h);
+  }
+  for (let f = 0; f < GEO_BOX_FACE.length; f++) {
+    const face = GEO_BOX_FACE[f];
+    const vx = wx + face.nx * hw;
+    const vy = wy + hh * 0.5 + face.ny * hh * 0.5 - camHeight;
+    const vz = wz + face.nz * hd;
+    if (face.nx * vx + face.ny * vy + face.nz * vz >= 0) continue;
+    /* The side normals lean outward and up by the taper, which is what
+       makes a tapered thing catch the light differently from a box. */
+    const lean = (1 - topScale) * hw / Math.max(0.001, hh);
+    let nx = face.nx, ny = face.ny + (face.ny === 0 ? lean : 0), nz = face.nz;
+    const len = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+    nx /= len; ny /= len; nz /= len;
+    let dp = nx * CAR_LIGHT_DIR[0] + ny * CAR_LIGHT_DIR[1] + nz * CAR_LIGHT_DIR[2];
+    if (dp < 0) dp = 0;
+    const lit = FEEL.GEO_AMBIENT + (1 - FEEL.GEO_AMBIENT) * dp;
+    let tone = (lit * tones) | 0;
+    if (tone < 0) tone = 0; else if (tone >= tones) tone = tones - 1;
+    geoPushFace(GEO_PT[face.ix[0]], GEO_PT[face.ix[1]],
+                GEO_PT[face.ix[2]], GEO_PT[face.ix[3]], mat * tones + tone);
   }
 }
 
@@ -13543,8 +13685,7 @@ function geoRoof(wx, wy, wz, hw, hh, hd, mat, bucket, camX, w, h) {
     const lit = FEEL.GEO_AMBIENT + (1 - FEEL.GEO_AMBIENT) * dp;
     let tone = (lit * tones) | 0;
     if (tone < 0) tone = 0; else if (tone >= tones) tone = tones - 1;
-    geoPushFace(q[0], q[1], q[2], q[3],
-                (bucket * SCN_MAT_NAMES.length + mat) * tones + tone);
+    geoPushFace(q[0], q[1], q[2], q[3], mat * tones + tone);
   }
 }
 
@@ -13554,10 +13695,15 @@ function geoRoof(wx, wy, wz, hw, hh, hd, mat, bucket, camX, w, h) {
 function geoObject(kind, wx, wy, wz, halfW, height, bucket, camX, w, h) {
   const d = FEEL.GEO_DEPTH;
   if (kind === 0) {                                   // a tree
-    const th = height * 0.34, tw = halfW * 0.16;
+    const th = height * 0.30, tw = halfW * 0.15;
     geoBox(wx, wy, wz, tw, th, tw * 1.4, MAT_BARK, bucket, camX, w, h);
-    geoBox(wx, wy + th, wz, halfW * 0.86, height * 0.66, halfW * 0.86 * d,
-           MAT_FOLIAGE, bucket, camX, w, h);
+    /* TWO STACKED FRUSTA, NOT A CONE. At a taper of 0.22 a tree is a
+       pyramid and reads as one; two shallower stages give a canopy with
+       a shoulder in it, which is what says foliage at forty pixels. */
+    geoTaper(wx, wy + th, wz, halfW * 0.92, height * 0.40, halfW * 0.92 * d,
+             0.74, MAT_FOLIAGE, bucket, camX, w, h);
+    geoTaper(wx, wy + th + height * 0.40, wz, halfW * 0.68, height * 0.30,
+             halfW * 0.68 * d, 0.30, MAT_FOLIAGE, bucket, camX, w, h);
   } else if (kind === 1) {                            // a house
     const wallH = height * 0.58;
     geoBox(wx, wy, wz, halfW * 0.72, wallH, halfW * 0.72 * d,
@@ -13585,10 +13731,22 @@ function geoObject(kind, wx, wy, wz, halfW, height, bucket, camX, w, h) {
 }
 
 /* The footprint, pushed away from the light and flattened. */
-function geoShadow(wx, wy, wz, halfW, height, camX, w, h) {
+function geoShadow(wx, wy, wz, halfW, height, camX, w, h, roadCx, roadHw) {
   if (SHADOW_N >= 2048 || wz <= 1) return;
   const len = height * FEEL.SHADOW_LENGTH;
-  const ox = -CAR_LIGHT_DIR[0] * len, oz = -CAR_LIGHT_DIR[2] * len;
+  let ox = -CAR_LIGHT_DIR[0] * len;
+  const oz = -CAR_LIGHT_DIR[2] * len;
+  /* A SHADOW MAY NOT FALL ON THE ROAD, and that is a readability rule
+     rather than a physical one. Objects are 2,350 world units tall now,
+     so a shadow runs over three thousand against a road half width of
+     2,300 and shadows from the left verge reach across the lip. The
+     offset is clamped so the far edge stops at the road edge. Same light
+     everywhere, it just stops. */
+  if (roadHw > 0) {
+    const edge = roadHw * EDGE_OUT, near = wx - roadCx;
+    if (near > edge) ox = Math.max(ox, edge - near + halfW);
+    else if (near < -edge) ox = Math.min(ox, -edge - near - halfW);
+  }
   const e = GEO_PT;
   projectPoint(e[0], camX + wx - halfW, wy, wz - halfW, camX, w, h);
   projectPoint(e[1], camX + wx + halfW, wy, wz - halfW, camX, w, h);
@@ -13601,52 +13759,52 @@ function geoShadow(wx, wy, wz, halfW, height, camX, w, h) {
 }
 
 function geoFlush() {
-  if (!GEO_N) return;
+  if (!GEO_OBJ_COUNT) return;
   const tones = Math.max(2, Math.round(FEEL.GEO_TONES));
   const mats = SCN_MAT_NAMES.length;
-  const buckets = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
-  const groups = Math.min(GEO_GROUPS, buckets * mats * tones);
-  for (let g = 0; g < groups; g++) GEO_COUNT[g] = 0;
-  for (let i = 0; i < GEO_N; i++) if (GEO_KEY[i] < groups) GEO_COUNT[GEO_KEY[i]]++;
-  let acc = 0;
-  for (let g = 0; g < groups; g++) { GEO_START[g] = acc; acc += GEO_COUNT[g]; GEO_COUNT[g] = 0; }
-  for (let i = 0; i < GEO_N; i++) {
-    const k = GEO_KEY[i];
-    if (k >= groups) continue;
-    GEO_ORDER[GEO_START[k] + GEO_COUNT[k]] = i;
-    GEO_COUNT[k]++;
+  /* BACK TO FRONT, PROPERLY. Insertion sort on the object list, which is
+     seventy entries and nearly sorted already because the walk goes near
+     to far, so it is a handful of swaps rather than a sort. */
+  for (let i = 0; i < GEO_OBJ_COUNT; i++) GEO_OBJ_ORDER[i] = i;
+  for (let i = 1; i < GEO_OBJ_COUNT; i++) {
+    const v = GEO_OBJ_ORDER[i], z = GEO_OBJ_Z[v];
+    let k = i - 1;
+    while (k >= 0 && GEO_OBJ_Z[GEO_OBJ_ORDER[k]] < z) { GEO_OBJ_ORDER[k + 1] = GEO_OBJ_ORDER[k]; k--; }
+    GEO_OBJ_ORDER[k + 1] = v;
   }
   const limit = chunkLimit();
-  /* Far to near, so a near object paints over a far one. */
-  for (let b = buckets - 1; b >= 0; b--) {
-    for (let m = 0; m < mats; m++) {
-      const lit = SCN_MAT_LIT[m], shade = SCN_MAT_SHADE[m];
-      if (!lit) continue;
-      const bi = Math.min(b, lit.length - 1);
-      for (let t = 0; t < tones; t++) {
-        const g = (b * mats + m) * tones + t;
-        if (g >= groups || !GEO_COUNT[g]) continue;
-        /* The tone picks between this material's own shade and lit
-           colours at this depth, so a face's colour is still the
-           material's colour and the light only decides where between
-           its two ends it sits. */
-        ctx.fillStyle = t === 0 ? shade[bi]
-                      : t === tones - 1 ? lit[bi]
-                      : mixColours(shade[bi], lit[bi], t / (tones - 1));
-        let sub = 0;
-        ctx.beginPath();
-        for (let q = 0; q < GEO_COUNT[g]; q++) {
-          const at = GEO_ORDER[GEO_START[g] + q] * 8;
-          ctx.moveTo(GEO_XY[at], GEO_XY[at + 1]);
-          ctx.lineTo(GEO_XY[at + 2], GEO_XY[at + 3]);
-          ctx.lineTo(GEO_XY[at + 4], GEO_XY[at + 5]);
-          ctx.lineTo(GEO_XY[at + 6], GEO_XY[at + 7]);
-          ctx.closePath();
-          sub++;
-          if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
-        }
-        if (sub > 0) ctx.fill();
+  for (let o = 0; o < GEO_OBJ_COUNT; o++) {
+    const obj = GEO_OBJ_ORDER[o];
+    const from = GEO_OBJ_FROM[obj], n = GEO_OBJ_N[obj];
+    if (!n) continue;
+    const bucket = GEO_OBJ_B[obj], variant = GEO_OBJ_VAR[obj];
+    /* Faces grouped by their own key within the object. The count is at
+       most eight, so a linear scan per distinct key is cheaper than any
+       sort and allocates nothing. */
+    for (let a = 0; a < n; a++) {
+      const key = GEO_KEY[from + a];
+      if (key === 65535) continue;
+      const mat = (key / tones) | 0, tone = key % tones;
+      const lit = SCN_VAR_LIT[mat][variant], shade = SCN_VAR_SHADE[mat][variant];
+      const bi = Math.min(bucket, lit.length - 1);
+      ctx.fillStyle = tone === 0 ? shade[bi]
+                    : tone === tones - 1 ? lit[bi]
+                    : mixColours(shade[bi], lit[bi], tone / (tones - 1));
+      let sub = 0;
+      ctx.beginPath();
+      for (let b = a; b < n; b++) {
+        if (GEO_KEY[from + b] !== key) continue;
+        GEO_KEY[from + b] = 65535;                 // taken
+        const at = (from + b) * 8;
+        ctx.moveTo(GEO_XY[at], GEO_XY[at + 1]);
+        ctx.lineTo(GEO_XY[at + 2], GEO_XY[at + 3]);
+        ctx.lineTo(GEO_XY[at + 4], GEO_XY[at + 5]);
+        ctx.lineTo(GEO_XY[at + 6], GEO_XY[at + 7]);
+        ctx.closePath();
+        sub++;
+        if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
       }
+      if (sub > 0) ctx.fill();
     }
   }
 }
@@ -13730,7 +13888,7 @@ const KIND_MAT_HIGH = [MAT_FOLIAGE, MAT_ROOF, -1, MAT_SIGN, MAT_SIGN, MAT_METAL]
 const KIND_SPLIT    = [2, 2, -1, 2, 2, 2];
 /* Which kinds are built from boxes once they are big enough. See the
    note at the solid test in sceneryPass. */
-const GEO_KINDS     = [0, 1, 0, 1, 1, 1];
+const GEO_KINDS     = [1, 1, 0, 1, 1, 1];
 
 function sceneryPass(first, last, baseIndex, w, h) {
   if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
@@ -13739,6 +13897,7 @@ function sceneryPass(first, last, baseIndex, w, h) {
   sceneryDrawn = 0;
   SCN_N = 0;
   GEO_N = 0;
+  GEO_OBJ_COUNT = 0;
   SHADOW_N = 0;
   // The camera's own world x, the same one the boundary walk projected
   // against, so the geometry lands exactly where the road put the ground.
@@ -13846,7 +14005,8 @@ function sceneryPass(first, last, baseIndex, w, h) {
              is the world to pixel scale, and the road centre's world x
              relative to the camera falls out of bx and ch. */
           const wz = bz[n];
-          const wx = (cx - w / 2) / ch + side * cw * off / ch;
+          const roadCx = (cx - w / 2) / ch, roadHw = cw / ch;
+          const wx = roadCx + side * cw * off / ch;
           const wy = (cy - by[n]) / ch * -1;
           const halfW = px / ch, height = py / ch;
           /* BIG ENOUGH TO SHOW GEOMETRY GETS GEOMETRY. Everything else
@@ -13862,13 +14022,27 @@ function sceneryPass(first, last, baseIndex, w, h) {
              nothing about it says foliage. Houses, signs, banners and
              towers are boxy things, they are the ones the stranger test
              failed on, and they are the ones boxes help. */
-          const solid = py >= FEEL.GEO_MIN_PX && GEO_KINDS[kind] === 1;
+          const solid = py >= FEEL.GEO_MIN_PX && GEO_KINDS[kind] === 1
+                        && GEO_OBJ_COUNT < GEO_OBJ_MAX;
           if (solid) {
+            const from = GEO_N;
             geoObject(kind, wx, wy, wz, halfW, height, bucket, camX, w, h);
-            geoShadow(wx, wy, wz, halfW * 0.8, height, camX, w, h);
+            if (GEO_N > from) {
+              GEO_OBJ_FROM[GEO_OBJ_COUNT] = from;
+              GEO_OBJ_N[GEO_OBJ_COUNT] = GEO_N - from;
+              GEO_OBJ_Z[GEO_OBJ_COUNT] = wz;
+              GEO_OBJ_B[GEO_OBJ_COUNT] = bucket;
+              /* Its own hue, off its own site, so the same house is the
+                 same colour every time it comes round. */
+              GEO_OBJ_VAR[GEO_OBJ_COUNT] =
+                Math.min(SCN_VAR_LIT[0].length - 1,
+                         (terrainHash(salt * 37 + 19) * SCN_VAR_LIT[0].length) | 0);
+              GEO_OBJ_COUNT++;
+            }
           }
-          if (!solid && py >= FEEL.SHADOW_MIN_PX * 2) {
-            geoShadow(wx, wy, wz, halfW * 0.7, height * 0.8, camX, w, h);
+          if (py >= FEEL.SHADOW_MIN_PX * 2) {
+            geoShadow(wx, wy, wz, halfW * (solid ? 0.8 : 0.7),
+                      height * (solid ? 1 : 0.8), camX, w, h, roadCx, roadHw);
           }
           SCN_X[SCN_N] = bxp; SCN_Y[SCN_N] = byp;
           SCN_W[SCN_N] = px;  SCN_H[SCN_N] = py;
@@ -13999,16 +14173,21 @@ function sceneryWindowPass(buckets) {
     const bxp = SCN_X[i], byp = SCN_Y[i];
     /* Deterministic off the placement, like everything else out here:
        nothing may read elapsed time, the frame count or the camera. */
-    const hh = terrainHash((bxp * 0.5 | 0) * 31 + (byp | 0) * 7 + kind);
-    const c = hh > 0.62 ? 1 : 0;
-    const rows = kind === 5 ? 3 : 2;
-    const a = SCN_WIN_XY[c];
+    /* A GRID OF THEM, AND THE COLOUR IS PER WINDOW. One warm or cool
+       choice for a whole building makes a row of identical buildings;
+       mixed within a building is what a lit block actually looks like at
+       night, and warm and cool in the same frame is the point. */
+    const rows = kind === 5 ? 4 : 3, cols = kind === 5 ? 2 : 3;
     for (let r = 0; r < rows; r++) {
-      const y = byp - wallH * (0.30 + 0.28 * r);
-      for (let s = -1; s <= 1; s += 2) {
-        const x = bxp + s * wallW * 0.42;
+      for (let q = 0; q < cols; q++) {
+        const hh = terrainHash((bxp | 0) * 31 + (byp | 0) * 7 + r * 13 + q * 101 + kind);
+        if (hh < FEEL.SCENERY_WINDOW_DARK) continue;      // an unlit one
+        const c = hh > FEEL.SCENERY_WINDOW_COOL_AT ? 1 : 0;
+        const y = byp - wallH * (0.22 + 0.24 * r);
+        const x = bxp + (cols > 1 ? (q / (cols - 1) - 0.5) : 0) * wallW * 1.05;
+        const a = SCN_WIN_XY[c];
         const at = SCN_WIN_N[c] * 3;
-        if (at + 3 > a.length) break;
+        if (at + 3 > a.length) continue;
         a[at] = x - size * 0.5; a[at + 1] = y - size * 0.5; a[at + 2] = size;
         SCN_WIN_N[c]++;
       }
