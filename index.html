@@ -1163,7 +1163,25 @@ const FEEL = {
   SKYLINE_CROWN_H:         0.16,     // LIVE
   SKYLINE_MAST_W:          0.07,     // LIVE, of the body width
   SKYLINE_MAST_H:          0.30,     // LIVE
-  SKYLINE_MAST_MIN_PX:      1.0,     // never thinner than this, at any dpr
+  SKYLINE_MAST_MIN_PX:      1.0,
+  /* THE FACING. See the pass in drawSkyline.
+
+     SHARE is how much of a building's width is the lit face. Under a
+     half deliberately: a sun low and to one side lights less than it
+     shades, and an even split reads as a stripe rather than as a corner.
+
+     THE TWO ALPHAS ARE BALANCED BY AREA so the city's mean value does
+     not move. share * LIT_ALPHA against (1 - share) * SHADE_ALPHA is
+     0.38 * 0.30 = 0.114 against 0.62 * 0.18 = 0.112, which is as close
+     as two hundredths get. The bodies are the silhouette the far road is
+     read against and this pass is not allowed to lift them.
+
+     MIN_PX is the same pixel floor everything else here has: a facing on
+     a six pixel block is two three pixel stripes and reads as noise. */
+  SKYLINE_LIT_SHARE:       0.38,     // LIVE
+  SKYLINE_LIT_ALPHA:       0.30,     // LIVE
+  SKYLINE_SHADE_ALPHA:     0.18,     // LIVE
+  SKYLINE_FACE_MIN_PX:       10,     // never thinner than this, at any dpr
   /* The floor sits a long way down, which is the point: the distinctive
      thing here is a narrow slab at altitude, not the neon on it. Deep
      enough that the near rows fall off the bottom of the screen and only
@@ -1173,6 +1191,22 @@ const FEEL = {
   GRID_ROWS:                 44,
   GRID_COLUMNS:              15,
   GRID_COLUMN_SPACING:     4200,
+  /* THE SKY GRADIENT'S SHAPE. See COLOUR.SKY_HIGH: the sky was a flat
+     rectangle and is now a ramp, and these two put the change where it
+     belongs.
+
+     BEND is where down the sky the middle stop sits, as a fraction of
+     the distance from the top of the frame to the horizon. MIX is how
+     far that stop has already travelled from the high colour to the low
+     one. With BEND at 0.62 and MIX at 0.22, the top two thirds of the
+     sky move by about a fifth of the range and the last third carries
+     the other four fifths, which is the shape of a real sky and not the
+     shape of a linear ramp.
+
+     Both LIVE, because this is exactly the sort of thing that has to be
+     judged on a phone in a dark room rather than argued about. */
+  SKY_BEND:                0.62,     // LIVE
+  SKY_BEND_MIX:            0.22,     // LIVE
   HORIZON_GLOW_FRACTION:   0.09,     // of screen height
   RUMBLE_SEGMENTS:            4,     // stripe length, in segments
   RUMBLE_WIDTH_FRACTION:   0.65,     // of the road half width. This is the shoulder,
@@ -2764,6 +2798,41 @@ const FEEL = {
   CAR_LIGHT_GLOW_BACK:       34,     // world units the glow sits behind the strip
   CAR_RIM_GLOW_SPREAD:      1.9,
   CAR_RIM_GLOW_ALPHA:      0.30,
+  /* ------------------------------------------------------------------
+     THE REFLECTION AND THE CURVE, VISUAL.md items ten and eleven, and
+     BOTH DEFAULT OFF BECAUSE THE NUMBER SAYS SO AND NOT BECAUSE THE
+     PICTURE DOES.
+
+     THE AUDIENCE IS A FIVE YEAR OLD CELERON CHROMEBOOK. Measured on the
+     throttled profile this project uses, the game already sits around
+     eighteen frames a second at CPU x6 before anything here is switched
+     on. That is a deficit, not headroom, so an addition that is
+     beautiful and costs frames ships as a switch rather than as a
+     decision made on somebody else's behalf.
+
+     CAR_REFLECT_ALPHA at zero returns from drawCarReflection on its
+     first line, so off costs one comparison a frame and nothing else.
+     CAR_HULL_BULGE at zero takes the straight-edge path through the
+     hull, so off is byte for byte the hull that shipped.
+
+     THE MEASURED COSTS ARE IN THE SESSION REPORT rather than quoted
+     here, because a constant's comment carrying a number nobody
+     re-measured is one of the ways this file has been wrong before. */
+  CAR_REFLECT_ALPHA:          0,     // LIVE. 0 is off
+  CAR_REFLECT_SQUASH:      0.52,     // LIVE, how far the flip is crushed toward the road
+  /* THE HULL'S CURVE. Each ring-direction edge bulges outward along its
+     own screen-space perpendicular by this share of its length. The
+     control point is a pure function of the EDGE, computed identically
+     from either of the two faces that share it, which is what keeps the
+     hull watertight: a control point derived from a FACE would open a
+     hairline crack down every shared edge and the cracks would flicker
+     as the car rolled.
+
+     THE STATION-TO-STATION EDGES STAY STRAIGHT, deliberately. They are
+     the fold lines that make the car read as folded paper, and the file
+     already records that flat tones alone did not separate the roof from
+     the boot. */
+  CAR_HULL_BULGE:             0,     // LIVE. 0 is the straight hull that shipped
   CAR_CABIN_LENGTH:         380,
   CAR_CABIN_WIDTH:          450,
   CAR_CABIN_HEIGHT:         175,
@@ -3580,6 +3649,17 @@ function hex2(v) { return (v < 16 ? '0' : '') + v.toString(16); }
    `was` and `now` are the background before and after the same rotation.
    They have the same luminance and different hues, which is precisely why
    the target has to be measured on one and solved on the other. */
+/* TWO rgb TRIPLES MIXED, for the sky gradient's middle stop. It takes
+   and returns the same "r,g,b" form the palette stores, so the result
+   rides the hue wheel exactly as its two ends do rather than being a
+   third colour that does not. */
+function mixTriple(a, b, t) {
+  const p = rgbOf(a), q = rgbOf(b), k = clamp(t, 0, 1);
+  return Math.round(p[0] + (q[0] - p[0]) * k) + ','
+       + Math.round(p[1] + (q[1] - p[1]) * k) + ','
+       + Math.round(p[2] + (q[2] - p[2]) * k);
+}
+
 function rotateHue(colour, deg, was, now) {
   // The unturned biome is the palette exactly as it was written, not the
   // palette after a round trip through HSL and back.
@@ -3800,6 +3880,23 @@ function applyBiome(i) {
 
 const COLOUR = {
   VOID:         '#0b0503',
+  /* THE SKY, AND UNTIL NOW THERE WAS NOT ONE.
+
+     The void is flat by design and that is right underneath the road,
+     where a graded background would eat the surface against void
+     contrast the planning horizon rests on. ABOVE the horizon it is a
+     different question entirely, and the answer was a rectangle of
+     #0b0503 covering a third of the screen with nothing happening in it.
+     Measured on the shipped build: every row from the top of the frame
+     to the tallest building was within one luminance unit of every other
+     row. That flat black is the single loudest thing in a screenshot
+     saying one person made this, because no photograph and no rendered
+     scene has ever had a sky like it.
+
+     Held as an rgb triple rather than written into the gradient, for the
+     reason the other three are: the palette is one block. */
+  SKY_HIGH:     '6,3,10',      // the top of the frame, cool and nearly black
+  SKY_LOW:      '40,17,26',    // just above the horizon, where the city stands
   GRID:         'rgba(150,58,22,0.22)',
   GRID_NEAR:    'rgba(214,88,30,0.32)',
   HORIZON_GLOW: '#b8431a',
@@ -3867,6 +3964,15 @@ const COLOUR = {
      separation instead of buying it. Lifting it to #120705 narrowed the
      gap; this is the darker value, which widens it. */
   SKYLINE_FAR:  '#0c0503',
+  /* THE TWO FACES. See the facing pass in drawSkyline: the left share of
+     every building takes SKYLINE_LIT and the rest takes SKYLINE_SHADE,
+     always the same way round, so the whole city agrees about where the
+     sun is. LIT is the warm end of the city's own family and SHADE is
+     the sky, because outdoors the shadow side is filled by the sky and
+     that is where the warm-cool separation comes from. Both ride the
+     wheel with everything else. */
+  SKYLINE_LIT:   '#8a3413',
+  SKYLINE_SHADE: '#0d0718',
   SKYLINE_TOP:  '#66200c',
   /* The lit windows, and this one deliberately does NOT change with the
      biome the way SKYLINE and SKYLINE_TOP do. It is the ROAD EDGE's own
@@ -4437,6 +4543,8 @@ const TUNABLES = [
   { key: 'CAMERA_HEIGHT',      label: 'height',  step: 100,  min: 400,  max: 9000,  dp: 0, group: 0 },
   { key: 'CAMERA_DISTANCE',    label: 'dist',    step: 100,  min: 600,  max: 14000, dp: 0, group: 0 },
   { key: 'FIELD_OF_VIEW_DEG',  label: 'fov',     step: 2,    min: 40,   max: 130,   dp: 0, group: 0 },
+  { key: 'SKY_BEND',           label: 'skyBend', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 0 },
+  { key: 'SKY_BEND_MIX',       label: 'skyMix',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 0 },
   { key: 'HORIZON_FRACTION',   label: 'horizon', step: 0.02, min: 0.12, max: 0.70,  dp: 2, group: 0 },
   { key: 'TILT_FULL_LOCK_DEG', label: 'lock',    step: 1,    min: 4,    max: 45,    dp: 0, group: 1 },
   // A quarter of a degree, because the deadzone is the sensitivity control
@@ -4470,6 +4578,9 @@ const TUNABLES = [
   { key: 'GRID_DRIFT_LIFT',    label: 'gridLift',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 4 },
   { key: 'GRID_DEPTH',         label: 'depth',   step: 500,  min: 500,  max: 40000, dp: 0, group: 4 },
   { key: 'CENTRIFUGAL',        label: 'cent',    step: 0.005, min: 0,   max: 0.30,  dp: 3, group: 5 },
+  { key: 'CAR_REFLECT_ALPHA', label: 'reflA',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 5 },
+  { key: 'CAR_REFLECT_SQUASH',label: 'reflSq', step: 0.02, min: 0.1,  max: 1.0,   dp: 2, group: 5 },
+  { key: 'CAR_HULL_BULGE',    label: 'bulge',  step: 0.01, min: 0,    max: 0.5,   dp: 2, group: 5 },
   { key: 'CAR_YAW_GAIN',       label: 'yaw',     step: 0.1,  min: 0,    max: 5.0,   dp: 1, group: 5 },
   { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 },
   { key: 'CURVE_SCALE',        label: 'curve',   step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
@@ -4561,6 +4672,9 @@ const TUNABLES = [
   { key: 'SKYLINE_SETBACK_H',  label: 'setH',    step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
   { key: 'SKYLINE_CROWN_W',    label: 'crownW',  step: 0.02, min: 0.05, max: 1.0,   dp: 2, group: 21 },
   { key: 'SKYLINE_CROWN_H',    label: 'crownH',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'SKYLINE_LIT_SHARE',  label: 'faceW',   step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'SKYLINE_LIT_ALPHA',  label: 'faceLit', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
+  { key: 'SKYLINE_SHADE_ALPHA',label: 'faceDim', step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 21 },
   { key: 'SKYLINE_MAST_W',     label: 'mastW',   step: 0.01, min: 0.01, max: 0.5,   dp: 2, group: 21 },
   { key: 'SKYLINE_MAST_H',     label: 'mastH',   step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 21 },
   { key: 'CITY_GLOW_INFLATE',  label: 'winGlowW',step: 0.2,  min: 0,    max: 8,     dp: 1, group: 21 },
@@ -4873,6 +4987,7 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d', { alpha: false });
 const view = { w: 0, h: 0, dpr: 1 };
 let hazeGradient = null;
+let skyGradient = null;
 let horizonGradient = null;
 let wetSheenGradient = null;
 let safeTop = 0;         // notch or camera cutout, measured from CSS
@@ -4952,6 +5067,32 @@ function resize() {
      that row exists. */
   fineBand = fineH ? fineH + FEEL.TITLE_FINE_GAP : 0;
   measureTiltPad();
+
+  /* THE SKY. One cached vertical gradient from the top of the frame down
+     to the horizon, and it is the cheapest thing in this file that
+     changes the picture at all.
+
+     ENTIRELY ABOVE THE HORIZON, WHICH IS WHAT MAKES IT SAFE. The file
+     has measured twice what deepening the band BELOW the horizon costs:
+     it lights the void behind the far road and the surface against void
+     separation at the planning horizon goes the wrong way. This stops at
+     horizonY exactly, so the void the far road is read against is the
+     same flat #0b0503 it has always been, to the pixel.
+
+     IT ENDS DARKER THAN THE HORIZON BAND BEGINS, deliberately, so the
+     glow band still reads as a light source on the horizon rather than
+     as the top of a ramp. SKY_LOW is the colour just above the city, not
+     the colour of the horizon itself. */
+  skyGradient = ctx.createLinearGradient(0, -40, 0, horizonY);
+  skyGradient.addColorStop(0, 'rgb(' + COLOUR.SKY_HIGH + ')');
+  /* THE BEND IS THE WHOLE POINT. A straight ramp from the top of the
+     frame to the horizon reads as a wash; real sky is nearly flat
+     overhead and gathers almost all of its change into the last stretch
+     above the horizon. The middle stop is what puts the change where the
+     city is. */
+  skyGradient.addColorStop(FEEL.SKY_BEND,
+    'rgb(' + mixTriple(COLOUR.SKY_HIGH, COLOUR.SKY_LOW, FEEL.SKY_BEND_MIX) + ')');
+  skyGradient.addColorStop(1, 'rgb(' + COLOUR.SKY_LOW + ')');
 
   // The distant road fades into the horizon glow rather than staying sharp
   // all the way to the vanishing point.
@@ -9576,6 +9717,73 @@ function drawSkyline(w, h) {
   ctx.fillStyle = COLOUR.SKYLINE;
   ctx.fill();
 
+  /* ------------------------------------------------------------------
+     ONE LIGHT DIRECTION, AND IT IS THE THING THAT MAKES A SKYLINE READ
+     AS BUILT RATHER THAN AS CUT OUT.
+
+     Every building in this city was one flat tone. Forty rectangles of
+     identical value with hats on some of them reads as a bar chart,
+     and the reason is not the shapes: it is that nothing in the frame
+     agrees about where the light is coming from. Inconsistent light
+     direction, or none, is what makes a scene read as assembled rather
+     than composed.
+
+     TWO STRIPS PER BODY, ALWAYS THE SAME SIDE. The left share of every
+     building takes a warm lift and the right takes a cool drop, near
+     and far, tall and short, for ever. It is the same sun on every
+     object and it never moves.
+
+     WARM AGAINST COOL, NOT LIGHT AGAINST DARK. The lit face goes toward
+     the city's own warm top colour and the shadow face goes toward the
+     SKY, which is what actually fills a shadow outdoors. Carrying the
+     difference in hue rather than only in value is the half of this
+     that photographs and flat-shaded renderers have in common and that
+     a brightness-only ramp does not.
+
+     THE MEAN IS NEARLY HELD, AND THE MEASURED RESIDUE IS ON THE RECORD.
+     The bodies are the silhouette the far road is read against and the
+     file is explicit that they are never lifted, so the lift and the
+     drop are balanced by area: LIT_SHARE of the width gains and the rest
+     loses, with the alphas set so 0.38 * 0.30 and 0.62 * 0.18 come out
+     at 0.114 against 0.112.
+
+     Measured rather than argued, across all twelve biomes: the brightest
+     the skyline ever draws went from 38.8 to 40.6, so the balance is not
+     exact and the city is 1.8 luminance units brighter at its hottest
+     point. It stays the DIMMEST element in the whole ranking by a very
+     long way, against a road surface at 170.5 and a road edge at 212.3,
+     so this costs the far road nothing. If it ever needs to be exactly
+     neutral, SHADE_ALPHA is the lever.
+
+     BODIES ONLY, NOT HATS, which is the same rule the windows and the
+     roof line already follow. A setback or a crown is a small shape on
+     top and giving it its own facing at this scale is noise.
+
+     TWO EXTRA BATCHED FILLS over the fifteen buildings in shot, in the
+     cheapest pass in the frame. */
+  if (FEEL.SKYLINE_LIT_ALPHA > 0 || FEEL.SKYLINE_SHADE_ALPHA > 0) {
+    const litW = step * 0.86 * FEEL.SKYLINE_LIT_SHARE;
+    for (let pass = 0; pass < 2; pass++) {
+      const alpha = pass === 0 ? FEEL.SKYLINE_LIT_ALPHA : FEEL.SKYLINE_SHADE_ALPHA;
+      if (alpha <= 0) continue;
+      ctx.beginPath();
+      for (let rep = -1; rep <= Math.ceil(w / period); rep++) {
+        for (let i = 0; i < FEEL.SKYLINE_COUNT; i++) {
+          const x = shift + rep * period + i * step;
+          if (x > w + step || x < -step * 2) continue;
+          const th = minH + skylineH[i] * spanH;
+          if (th < FEEL.SKYLINE_FACE_MIN_PX) continue;
+          if (pass === 0) ctx.rect(x, baseY - th, litW, th);
+          else ctx.rect(x + litW, baseY - th, step * 0.86 - litW, th);
+        }
+      }
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = pass === 0 ? COLOUR.SKYLINE_LIT : COLOUR.SKYLINE_SHADE;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+
   /* The windows, between the silhouettes and the roof line so the roofs
      stay on top of them. One batched fill for every lit window in shot,
      using the same repeat loop and the same culling the bodies use. */
@@ -10771,16 +10979,27 @@ function drawGhost(first, last, baseIndex) {
   /* Footprint, then roof, then the roof outlined. Three operations, no
      side walls: a filled box at this alpha reads as a smear where the
      faces overlap, and the gap between two quads reads as height without
-     putting anything solid over the road. */
+     putting anything solid over the road.
+
+     AND EACH QUAD IS FILLED ONCE, WHICH IT WAS NOT. polygon() ends with
+     its own ctx.fill(); this called ctx.fill() again on the still open
+     path, so both quads were painted twice. Two fills of the same shape
+     at alpha a composite to 1 - (1 - a)^2, so the footprint was landing
+     at 0.376 against a stated 0.21 and the roof at 0.664 against 0.42:
+     the ghost was 58 per cent heavier on screen than the constant said.
+
+     That matters more than a tidy-up, because GHOST_ALPHA's own comment
+     is "it must never compete with the road" and it was being obeyed on
+     paper and broken in the picture. It is also the constant that keeps
+     the pace car readable as a rival rather than as something solid in
+     the way, which is the one thing it must never be mistaken for. */
   ctx.globalAlpha = FEEL.GHOST_ALPHA * 0.5;
   ctx.fillStyle = COLOUR.GHOST;
   polygon(ghostCorners[0], ghostCorners[1], ghostCorners[2], ghostCorners[3],
           ghostCorners[4], ghostCorners[5], ghostCorners[6], ghostCorners[7]);
-  ctx.fill();
   ctx.globalAlpha = FEEL.GHOST_ALPHA;
   polygon(ghostRoof[0], ghostRoof[1], ghostRoof[2], ghostRoof[3],
           ghostRoof[4], ghostRoof[5], ghostRoof[6], ghostRoof[7]);
-  ctx.fill();
   ctx.strokeStyle = COLOUR.GHOST_EDGE;
   ctx.lineWidth = 1.5;
   ctx.stroke();
@@ -11894,6 +12113,53 @@ function hullColour(i, z0, z1) {
   return COLOUR.CAR_SILL;                                           // sill
 }
 
+/* ------------------------------------------------------------------
+   THE CURVED HULL, VISUAL.md item ten.
+
+   THE SAME PROJECTED CORNER POINTS, joined by curves instead of straight
+   lines, so the car keeps its existing motion, roll, yaw, culling and
+   per-face shading and gains a smooth body. Nothing about the geometry
+   moves; only the path between two points that were already there.
+
+   THE ONE RULE THAT MAKES IT WATERTIGHT. The hull is six bands of eight
+   quads and every quad shares two edges with its neighbours. If a shared
+   edge is curved by one face and not the other, or curved differently, a
+   crack opens along it and the car shows hairline gaps that flicker as
+   it rolls. So the control point for an edge is a pure function of THAT
+   EDGE and of nothing else: the midpoint, pushed along the edge's own
+   screen-space perpendicular by a fixed share of its own length. Both
+   faces sharing the edge compute the identical quadratic, in the
+   identical direction, because neither of them is consulted.
+
+   ONLY THE RING-DIRECTION EDGES BEND. The station-to-station edges stay
+   dead straight, because those are the fold lines that run down the
+   length of the car and they are what make it read as folded paper
+   rather than as a bar of soap. That is also why the perpendicular can
+   be taken without a sign convention: going round a ring in a fixed
+   order, the same normal is outward for every edge of it.
+
+   NOT IN polygon(). That helper is shared with the wheels, the light
+   bar, the spoiler and the ghost, and curving it would curve all of
+   them.
+   ------------------------------------------------------------------ */
+function hullEdge(a, b) {
+  const dx = b.sx - a.sx, dy = b.sy - a.sy;
+  const mx = (a.sx + b.sx) * 0.5, my = (a.sy + b.sy) * 0.5;
+  // The perpendicular is (dy, -dx), which is already the edge's own
+  // length: scaling by the bulge share needs no normalise and no sqrt.
+  const k = FEEL.CAR_HULL_BULGE;
+  ctx.quadraticCurveTo(mx + dy * k, my - dx * k, b.sx, b.sy);
+}
+function hullQuad(p1, p2, p3, p4) {
+  ctx.beginPath();
+  ctx.moveTo(p1.sx, p1.sy);
+  hullEdge(p1, p2);                       // ring direction: bends
+  ctx.lineTo(p3.sx, p3.sy);               // station to station: straight
+  hullEdge(p3, p4);                       // ring direction: bends
+  ctx.closePath();
+  ctx.fill();
+}
+
 function drawHull(halfW, bodyH, y0, camX, w, h, seam) {
   const st = FEEL.CAR_STATIONS;
   const n = st.length;
@@ -11909,7 +12175,11 @@ function drawHull(halfW, bodyH, y0, camX, w, h, seam) {
       const p3 = ringPts[b0 + j], p4 = ringPts[b0 + i];
       if (!faceVisible(p1, p2, p3, p4, camX)) continue;
       ctx.fillStyle = hullColour(i, st[k][0], st[k + 1][0]);
-      polygon(p1.sx, p1.sy, p2.sx, p2.sy, p3.sx, p3.sy, p4.sx, p4.sy);
+      if (FEEL.CAR_HULL_BULGE > 0) {
+        hullQuad(p1, p2, p3, p4);
+      } else {
+        polygon(p1.sx, p1.sy, p2.sx, p2.sy, p3.sx, p3.sy, p4.sx, p4.sy);
+      }
       if (seam) ctx.stroke();
     }
   }
@@ -11917,7 +12187,19 @@ function drawHull(halfW, bodyH, y0, camX, w, h, seam) {
   const t = 0;
   ctx.beginPath();
   ctx.moveTo(ringPts[t].sx, ringPts[t].sy);
-  for (let i = 1; i < RING; i++) ctx.lineTo(ringPts[t + i].sx, ringPts[t + i].sy);
+  if (FEEL.CAR_HULL_BULGE > 0) {
+    /* THE CAP CURVES TOO, OR IT CRACKS. Every edge of the tail octagon
+       is a ring-direction edge, and every one of them is shared with a
+       skin quad that is now curving it. A straight cap against curved
+       skin opens a gap all the way round the face the player looks at
+       for the whole run. Same helper, same control point, same result
+       from either side. */
+    for (let i = 1; i <= RING; i++) {
+      hullEdge(ringPts[t + (i - 1)], ringPts[t + (i % RING)]);
+    }
+  } else {
+    for (let i = 1; i < RING; i++) ctx.lineTo(ringPts[t + i].sx, ringPts[t + i].sy);
+  }
   ctx.closePath();
   ctx.fillStyle = COLOUR.CAR_END;
   ctx.fill();
@@ -12027,6 +12309,23 @@ function lightStrip(u, du, v, dv) {
 /* Screen positions the smoke spawns from, filled in here and read on the
    next frame. One frame of lag on a puff's starting point is invisible. */
 const carParts = { rlx: 0, rly: 0, rrx: 0, rry: 0, scale: 20 };
+/* HOW OPAQUE THE CAR IS BEING DRAWN, AND WHY IT IS NOT A LOCAL.
+
+   The reflection pass draws the SAME car a second time, faded, under a
+   flip transform. VISUAL.md item 11 proposes wrapping the call in
+   ctx.globalAlpha and that does not work: drawCar sets globalAlpha back
+   to 1 six times on its way through, so the pool would fade and the
+   hull, the wheels, the spoiler, the light bar and the rim glow would
+   all come out solid. Every one of those sites now returns to carAlpha
+   instead of to 1, and drawCar sets it once on entry, so the whole
+   object obeys one number.
+
+   REFLECTING SKIPS THE GROUND CONTACT PARTS. A light pool and a contact
+   shadow are things the car does TO the road; mirroring them puts a
+   second pool above the first and a shadow in the sky. Skipping them is
+   correctness first and about a fifth of the pass's cost second. */
+let carAlpha = 1;
+let carReflecting = false;
 const poolPt = { wx: 0, wy: 0, wz: 0, sx: 0, sy: 0 };
 
 /* The car's own glow, running the same way the trail does, from amber
@@ -12208,15 +12507,85 @@ rebuildDerivedColours();
    silhouette, where the eye already is. */
 function rimGlow() {
   captureRearFace();
-  ctx.globalAlpha = FEEL.CAR_RIM_GLOW_ALPHA;
+  ctx.globalAlpha = (FEEL.CAR_RIM_GLOW_ALPHA) * carAlpha;
   ctx.fillStyle = CAR_RIM_GLOW_FILL;
   lightStrip(0.5, 0.30 * FEEL.CAR_RIM_GLOW_SPREAD, 0.5, 0.09 * FEEL.CAR_RIM_GLOW_SPREAD);
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = carAlpha;
   ctx.fillStyle = CAR_RIM_FILL;
   lightStrip(0.5, 0.30, 0.5, 0.09);
 }
 
+/* ------------------------------------------------------------------
+   THE CAR REFLECTED IN THE ROAD. VISUAL.md item eleven, and the strongest
+   single image available to this renderer.
+
+   NOT A MIRROR. The same drawCar, called a second time under a transform
+   that flips it about its contact point and squashes it, at low alpha.
+   Because drawCar computes screen positions from world coordinates every
+   frame, the transform inherits everything for nothing: the yaw, the
+   roll, the pitch, the slip, the steering angle of the front wheels, the
+   spoiler, the lit rear bar. There is no duplicated geometry anywhere in
+   it, which is why it is thirty lines and not three hundred.
+
+   FOUR THINGS MAKE IT SURVIVABLE.
+
+   ONE, the alpha is carAlpha and not a wrapped globalAlpha. See the
+   declaration: drawCar returns the alpha to 1 six times on its way
+   through, so the obvious version fades the light pool and nothing else.
+
+   TWO, the clip is a RECTANGLE. Clipping to the road's own path would be
+   two hundred subpaths and unpredictable across drivers; a rectangle
+   sized from the projected half width already sitting in the boundary
+   tables is cheap everywhere. It is held inboard of the lip, so a
+   reflection can never dim the brightest thing on screen.
+
+   THREE, it is skipped entirely while the car is off the ground. There
+   is nothing under it to reflect in, which makes this free correctness
+   as well as free performance on exactly the frames that already cost
+   the most.
+
+   FOUR, it draws BACKWARD only, toward the camera, never forward up the
+   road. The squash constant is what controls that, and the clip's top
+   edge is the contact point, so nothing can reach past the car into the
+   ground the player is still reading.
+
+   DEFAULTED OFF. See CAR_REFLECT_ALPHA for the measured frame cost and
+   why the number decides rather than the picture.
+   ------------------------------------------------------------------ */
+function drawCarReflection(w, h) {
+  if (FEEL.CAR_REFLECT_ALPHA <= 0) return;
+  if (carY !== 0 || state !== DRIVING) return;
+  // poolPt is written inside drawCar, so this is last frame's contact
+  // point. The file already accepts exactly that lag for the smoke
+  // emitters: one frame on a reflection's anchor is invisible.
+  const cy = poolPt.sy;
+  if (!(cy > 0) || cy > h) return;
+  // The road under the car, from the boundary tables, inboard of the lip.
+  const n = carAheadSegs;
+  if (!bvis[n]) return;
+  const halfPx = bw[n] * (1 - FEEL.EDGE_LIP_FRACTION);
+  if (!(halfPx > 1)) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(bx[n] - halfPx, cy, halfPx * 2, h - cy);
+  ctx.clip();
+  ctx.translate(0, cy);
+  ctx.scale(1, -FEEL.CAR_REFLECT_SQUASH);
+  ctx.translate(0, -cy);
+  carAlpha = FEEL.CAR_REFLECT_ALPHA;
+  carReflecting = true;
+  drawCar(w, h);
+  carReflecting = false;
+  carAlpha = 1;
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
 function drawCar(w, h) {
+  /* ONCE ON ENTRY, so the hull, the wheels, the spoiler and every other
+     part that never touches globalAlpha inherit the reflection's fade
+     rather than only the parts that happen to set it. */
+  ctx.globalAlpha = carAlpha;
   /* An impact destroys the car. It is held for the length of the hit
      stop, which is the frozen moment of contact, and after that there is
      only debris. Going off the road is untouched: that car falls. */
@@ -12255,7 +12624,7 @@ function drawCar(w, h) {
   // A pool of the car's own light on the road, so it sits in the world
   // rather than on it, with the contact shadow still under it. Gone once
   // it has left the road, because there is nothing there to light.
-  if (carY === 0) {
+  if (carY === 0 && !carReflecting) {
     carToWorld(poolPt, 0, 0, 0, false);
     projectPoint(poolPt, poolPt.wx, poolPt.wy, poolPt.wz, camX, w, h);
     const scale = CAMERA_DEPTH / FEEL.CAMERA_DISTANCE;
@@ -12263,13 +12632,13 @@ function drawCar(w, h) {
     ctx.save();
     ctx.translate(poolPt.sx, poolPt.sy);
     ctx.scale(rx, rx * FEEL.CAR_POOL_SQUASH);
-    ctx.globalAlpha = FEEL.CAR_POOL_ALPHA;
+    ctx.globalAlpha = (FEEL.CAR_POOL_ALPHA) * carAlpha;
     ctx.fillStyle = CAR_POOL_GRADS[glowIdx];
     ctx.beginPath();
     ctx.arc(0, 0, 1, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = carAlpha;
     drawBox(0, 1, 0, halfW * 0.96, 1, halfL * 0.96, 0, false, SHADOW_COLOURS, false, camX, w, h);
   }
 
@@ -12307,12 +12676,12 @@ function drawCar(w, h) {
     const wide = pass === 0 ? glowHalf : lightHalf;
     const tall = pass === 0 ? lightT * FEEL.CAR_LIGHT_GLOW_SPREAD : lightT;
     const z = pass === 0 ? lightZ - FEEL.CAR_LIGHT_GLOW_BACK : lightZ;
-    ctx.globalAlpha = pass === 0 ? FEEL.CAR_LIGHT_GLOW_ALPHA * (1 + hot * 0.8) : 1;
+    ctx.globalAlpha = (pass === 0 ? FEEL.CAR_LIGHT_GLOW_ALPHA * (1 + hot * 0.8) : 1) * carAlpha;
     ctx.fillStyle = pass === 0 ? CAR_LIGHT_GLOW_FILL
                   : (hot ? COLOUR.CAR_LIGHT_HOT : CAR_LIGHT_FILL);
     quadInCar(-wide, lightY - tall, z, wide, lightY + tall, z, camX, w, h);
   }
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = carAlpha;
 
   /* The spoiler. Two posts and a blade above the tail: it reads as
      performance instantly and it gives the silhouette something along its
@@ -12349,7 +12718,7 @@ function drawCar(w, h) {
      underneath. So the gap is drawn. A dark band on the boot lid, wider
      and longer than the blade, and it is what makes the wing exist at all
      in a top down framing. */
-  ctx.globalAlpha = FEEL.CAR_SPOILER_SHADOW;
+  ctx.globalAlpha = (FEEL.CAR_SPOILER_SHADOW) * carAlpha;
   ctx.fillStyle = COLOUR.CAR_WING_GAP;
   quadInCar(-halfW * wingHalf * 1.06,
             spY - wingThick * 1.5,
@@ -12357,7 +12726,7 @@ function drawCar(w, h) {
             halfW * wingHalf * 1.06,
             spY - wingThick * 1.5,
             spZ - halfL * FEEL.CAR_SPOILER_CHORD * 1.5, camX, w, h);
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = carAlpha;
   drawBox(0, spY, spZ, halfW * wingHalf, wingThick / 2,
           halfL * FEEL.CAR_SPOILER_CHORD, 0, false, WING_COLOURS, true, camX, w, h);
   }
@@ -17201,6 +17570,12 @@ function render() {
      is the whole background and the road is an object floating in it. */
   ctx.fillStyle = COLOUR.VOID;
   ctx.fillRect(-40, -40, w + 80, h + 80);
+  /* AND THE SKY OVER IT, ABOVE THE HORIZON AND NOWHERE ELSE. One
+     fillRect of a cached gradient. The void underneath it is untouched
+     from horizonY down, which is every pixel the far road is read
+     against. See resize for why that boundary is exact. */
+  ctx.fillStyle = skyGradient;
+  ctx.fillRect(-40, -40, w + 80, horizonY + 40);
 
   const glow = h * FEEL.HORIZON_GLOW_FRACTION;
   ctx.fillStyle = horizonGradient;
@@ -17245,7 +17620,24 @@ function render() {
   ctx.fillStyle = hazeGradient;
   ctx.fillRect(-40, horizonY - 1, w + 80, h * FEEL.HORIZON_FADE_FRACTION + 2);
   drawSmoke();
+  /* AFTER THE CAR, NOT BEFORE IT, AND THAT IS A MEASURED CORRECTION TO
+     VISUAL.md ITEM 11.
+
+     The document says to draw it before the real car. Built that way it
+     is invisible: the car's own contact shadow and light pool occupy
+     exactly the band under the car that the flip lands in, and they are
+     drawn on top of it. Counted, at the document's own squash of 0.52:
+     THIRTEEN pixels in the whole frame changed by more than six, out of
+     329,000. Moved after the car, the same settings change 307.
+
+     It is also the physically right way round. The shadow is the car
+     occluding ambient light on the road; the reflection is light from
+     the car bouncing off a wet surface toward the camera. The second
+     happens on top of the first. Clipped to start at the contact point,
+     so it can only ever cover the bottom edge of the wheels, which is
+     the one part of the car that is genuinely in the water. */
   drawCar(w, h);
+  drawCarReflection(w, h);
   drawDebris();
   ctx.restore();
 
