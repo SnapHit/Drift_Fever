@@ -1186,6 +1186,27 @@ const FEEL = {
      thing here is a narrow slab at altitude, not the neon on it. Deep
      enough that the near rows fall off the bottom of the screen and only
      the distant ones are in shot, which is what real height looks like. */
+  /* ------------------------------------------------------------------
+     THE GROUND PLANE. See terrainPass.
+
+     REACH is how far out the band goes, in road half widths, so it
+     shrinks with distance exactly as the road does and the horizon stays
+     where it is. Beyond it is void, which is what keeps the near field
+     sparse: ART-DIRECTION.md is explicit that emptiness was doing real
+     work and the road must stay the lit object in a dark world rather
+     than one lit object among many.
+
+     HEIGHT is the ridge, in world units, and it is what turns a band
+     into terrain. HILL_SEGMENTS is how often the ridge takes a new
+     value; at 24 a hill is about five seconds of road, which reads as
+     landscape rather than as noise.
+
+     ALL THREE LIVE, because a ground plane is the one change in this
+     session that spends the contrast budget the whole design rests on,
+     and it has to be judgeable on a phone in a dark room. */
+  TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
+  TERRAIN_HEIGHT:           780,     // LIVE, world units the outer ridge rises
+  TERRAIN_HILL_SEGMENTS:     24,     // LIVE
   GRID_DEPTH:             15000,
   GRID_SPACING:            2400,
   GRID_ROWS:                 44,
@@ -3916,6 +3937,13 @@ const COLOUR = {
      reason the other three are: the palette is one block. */
   SKY_HIGH:     '6,3,10',      // the top of the frame, cool and nearly black
   SKY_LOW:      '40,17,26',    // just above the horizon, where the city stands
+  /* THE GROUND EITHER SIDE OF THE ROAD, and the two of them are the one
+     light direction in the world: left is the lit face, right is the
+     shade face, in every biome, for ever. Both are authored far under
+     the road surface, because the value structure is edge, then road,
+     then terrain, then void, and it is measured after every change. */
+  TERRAIN_LIT:   '#2a1409',
+  TERRAIN_SHADE: '#180b06',
   GRID:         'rgba(150,58,22,0.22)',
   GRID_NEAR:    'rgba(214,88,30,0.32)',
   HORIZON_GLOW: '#b8431a',
@@ -4620,6 +4648,9 @@ const TUNABLES = [
   { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
   { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
   { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
+  { key: 'TERRAIN_REACH',      label: 'terrW',   step: 0.2,  min: 0,    max: 24,    dp: 1, group: 12 },
+  { key: 'TERRAIN_HEIGHT',     label: 'terrH',   step: 40,   min: 0,    max: 4000,  dp: 0, group: 12 },
+  { key: 'TERRAIN_HILL_SEGMENTS',label:'terrHz', step: 2,    min: 2,    max: 120,   dp: 0, group: 12 },
   { key: 'SEG_MERGE_PX',       label: 'segPx',   step: 0.25, min: 0,    max: 8,     dp: 2, group: 12 },
   { key: 'PATH_CHUNK_SUBPATHS',label: 'chunk',   step: 16,   min: 0,    max: 1024,  dp: 0, group: 12 },
   { key: 'CHECKPOINT_EVERY',   label: 'gate',    step: 100,  min: 300,  max: 6000,  dp: 0, group: 12 },
@@ -10102,6 +10133,10 @@ function drawRoad(w, h) {
   }
   if (first < 0) return;
 
+  /* THE FLOOR, BEFORE ANYTHING THE PLAYER STEERS BY. See terrainPass:
+     drawn first is what makes it impossible for a hill to occlude the
+     road ahead, because the whole road is painted over it. */
+  terrainPass(first, last, baseIndex);
   drawWalls(count);
 
   /* ------------------------------------------------------------------
@@ -11860,6 +11895,101 @@ function pylonPath(first, last, baseIndex, spacing, widen, scaleH, which) {
    road has no thickness on any straight, which is the flat decal the
    whole change is meant to avoid. So this is a stylisation and the one
    place here where the look wins over the geometry. */
+/* ==================================================================
+   THE GROUND PLANE. Gate two.
+
+   THE WORLD GETS A FLOOR, and three quarters of it already existed:
+   drawGrid has been projecting a wireframe 15,000 units under the road
+   since the beginning. What was missing was a surface.
+
+   IT COSTS NO NEW PROJECTION. The road's own boundary tables already
+   say, for every visible boundary, where the road centre is on screen
+   (bx), how wide it is (bw), what row it is on (by) and how many pixels
+   a world unit is worth there (bh). Terrain at road level is at the same
+   row by construction, so a band from the road's outer edge outward is
+   four points that are already computed. It follows the curve for free,
+   for the same reason the pylons and the gates do.
+
+   DRAWN FIRST, WHICH IS THE WHOLE ANSWER TO OCCLUSION. The 3.5 second
+   planning horizon is a core design pillar and a hill beside the near
+   road covers exactly the rows the far road is read on. So terrain goes
+   down before drawWalls and the entire road is painted over it. It
+   cannot occlude the road ahead because it is never on top of it.
+
+   ELEVATION FROM ONE HASH AND ONE TERM, which is where SCENERY.md ranks
+   it. The outer edge rises by a smoothstepped value sampled every
+   TERRAIN_HILL_SEGMENTS, so the ridge rolls rather than jitters, and the
+   inner edge stays pinned to the road so the road never appears to be
+   cut into a bank.
+
+   DETERMINISTIC AND OFF THE SEGMENT INDEX. terrainHash takes the world
+   segment index and nothing else: no rng(), no elapsed time, no frame
+   count, nothing derived from the camera. Two devices a second apart on
+   the same daily road draw the same hills, which is the requirement the
+   ghost and the share card both rest on.
+
+   ONE LIGHT DIRECTION, and the two sides are the whole of it. The left
+   band is the lit face and the right band is the shade face, in every
+   biome, for ever. It reads as a decision rather than as light, which
+   ART-DIRECTION.md says is the correct ceiling, but a scene where the
+   two sides of the road agree about the sun reads as composed and one
+   where they do not reads as assembled.
+
+   THE VALUE STRUCTURE IS NOT NEGOTIABLE: edge brightest, road lit,
+   TERRAIN DARKER THAN ROAD, void darkest. Both terrain colours are
+   authored well under the road surface and the ranking is measured
+   after every change.
+   ================================================================== */
+function terrainHash(i) {
+  let h = Math.imul((i | 0) ^ 0x9e3779b9, 0x85ebca6b);
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+/* Smoothstepped between hash points so the ridge line has no corners in
+   it. Flat at both ends of every interval, which is what stops the
+   joins reading as facets on a slow pan. */
+function terrainRise(idx) {
+  const step = Math.max(1, Math.round(FEEL.TERRAIN_HILL_SEGMENTS));
+  const a = Math.floor(idx / step);
+  const f = (idx - a * step) / step;
+  const t = f * f * (3 - 2 * f);
+  const h0 = terrainHash(a), h1 = terrainHash(a + 1);
+  return h0 + (h1 - h0) * t;
+}
+function terrainPass(first, last, baseIndex) {
+  if (FEEL.TERRAIN_REACH <= 0) return;
+  const limit = chunkLimit();
+  const reach = FEEL.TERRAIN_REACH;
+  const lift = FEEL.TERRAIN_HEIGHT;
+  for (let side = -1; side <= 1; side += 2) {
+    ctx.fillStyle = side < 0 ? COLOUR.TERRAIN_LIT : COLOUR.TERRAIN_SHADE;
+    let sub = 0;
+    ctx.beginPath();
+    for (let n = first; n <= last; n++) {
+      if (!bvis[n]) continue;
+      const s1 = segAt(baseIndex + n);
+      if (!s1) break;
+      /* The far boundary's own index, which after the gate one merge is
+         not always n + 1 in the world even though it is in the table. */
+      const i1 = s1.index;
+      const i2 = i1 + 1;
+      const in1 = bx[n] + side * bw[n] * EDGE_OUT;
+      const in2 = bx[n + 1] + side * bw[n + 1] * EDGE_OUT;
+      const out1 = in1 + side * bw[n] * reach;
+      const out2 = in2 + side * bw[n + 1] * reach;
+      const y1 = by[n], y2 = by[n + 1];
+      const r1 = y1 - bh[n] * lift * terrainRise(i1);
+      const r2 = y2 - bh[n + 1] * lift * terrainRise(i2);
+      ctx.moveTo(in1, y1); ctx.lineTo(in2, y2);
+      ctx.lineTo(out2, r2); ctx.lineTo(out1, r1);
+      ctx.closePath();
+      sub++;
+      if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+    }
+    if (sub > 0) ctx.fill();
+  }
+}
+
 function drawWalls(count) {
   ctx.beginPath();
   for (let n = 0; n < count; n++) {
