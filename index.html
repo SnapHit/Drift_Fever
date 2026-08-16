@@ -1222,6 +1222,29 @@ const FEEL = {
      MIN_PX drops an object once it is too small to be a shape rather
      than letting it become a shimmering speck at the draw distance.
      ------------------------------------------------------------------ */
+  /* FIELDS ON THE TERRAIN SHOULDER. See groundPatchPass.
+
+     THEY WERE ON THE GROUND PLANE AND THEY WERE NOT THERE. Measured off
+     the frame, the plane is 1.9 per cent of the pixels below the horizon
+     and the shoulder is 12 to 15, so a patch drawn on the plane and out
+     to sixteen half widths landed almost entirely off screen or under
+     the shoulder: 67 pixels out of 1.3 million changed when the whole
+     pass was suppressed. The patches now lie ON the shoulder, between
+     two fractions of its reach, which is where the ground the player
+     reads actually is.
+
+     LOW and HIGH are fractions of TERRAIN_REACH, so 0 is the road edge
+     and 1 is the ridge line. SHIFT is how many luminance units a patch
+     moves off the shoulder, and it is bounded by the object separation:
+     the darkest patch has to stay thirty units above the darkest near
+     object, which at a shoulder of 60 and an object of 19 leaves about
+     eleven. */
+  GROUND_PATCH_EVERY:         7,     // LIVE, segments between patches
+  GROUND_PATCH_SPAN:          6,     // visible boundaries a patch runs for
+  GROUND_PATCH_DENSITY:    0.72,     // LIVE
+  GROUND_PATCH_LOW:        0.55,     // how far up the slope one may start
+  GROUND_PATCH_HIGH:       0.85,     // and how much further up it reaches
+  GROUND_PATCH_SHIFT:       9.0,     // LIVE, luminance units off the shoulder
   SCENERY_EVERY:              1,     // LIVE, segments between sites
   SCENERY_DENSITY:         0.70,     // LIVE, share of sites that grow something
   SCENERY_SIZE:            1100,     // LIVE, world units tall at scale one
@@ -1247,8 +1270,14 @@ const FEEL = {
   SCENERY_MIN_PX:           1.5,
   SCENERY_MAX_SHARE:       0.26,     // LIVE, tallest an object may draw, as a share of the frame
   TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
-  TERRAIN_HEIGHT:           780,     // LIVE, world units the outer ridge rises
-  TERRAIN_HILL_SEGMENTS:     24,     // LIVE
+  /* THE RIDGE RAN DEAD FLAT ACROSS THE FRAME and the reason was the
+     number, not the hash. The lift is bh times this, and bh goes to
+     nothing at the horizon, so 780 world units of hill is invisible at
+     the distance a ridge is actually seen at. Real distant landforms are
+     big. At 4600 the skyline undulates; the hills are also longer, so
+     they read as landform rather than as a saw edge. */
+  TERRAIN_HEIGHT:          4600,     // LIVE, world units the outer ridge rises
+  TERRAIN_HILL_SEGMENTS:     34,     // LIVE
   GRID_DEPTH:             15000,
   GRID_SPACING:            2400,
   GRID_ROWS:                 44,
@@ -1276,6 +1305,28 @@ const FEEL = {
                                      // and it is drawn to match the scrape band below.
   LANE_DASH_FRACTION:      0.02,     // of the road half width
   HORIZON_FADE_FRACTION:   0.14,     // of screen height, the haze band
+  /* HOW HARD THAT BAND HITS, AND IT WAS AN INLINE 0.92 UNTIL IT BECAME
+     THE BIGGEST READABILITY PROBLEM IN THE GAME.
+
+     MEASURED: at TWO SECONDS OUT, which is inside the planning horizon
+     section 4.3 rests on, this band covered the road at alpha 0.603. Six
+     tenths of everything the player reads out there was flat haze
+     colour. With the road surface, the ground beside it and every object
+     on it all pushed six tenths of the way to the same colour, the
+     measured gap between road surface and ground at two seconds was 6.3
+     luminance units across all twelve biomes. That is the brown mush,
+     and it is not the palette's fault.
+
+     WHY IT WAS RIGHT AND IS NOT ANY MORE. It was written when the world
+     was empty: the far road faded into the horizon glow and there was
+     nothing else out there to lose. There is now a ground plane, fields
+     on it and four depth bands of scenery, all of which do aerial
+     perspective properly, by palette, per band. This band was doing the
+     same job a second time and doing it far too hard.
+
+     LIVE, because it is the one number in the file that trades the look
+     of the horizon against the legibility of the planning horizon. */
+  HORIZON_FADE_ALPHA:      0.25,     // LIVE
   MAX_PIXEL_RATIO:            2,     // capped for weak integrated graphics
 
   /* Motion. Speed is constant in this build: speed escalation is step 3
@@ -3991,26 +4042,38 @@ const COLOUR = {
      as banding if anyone looks closely. Near is the most separated pair,
      and each band further out is flatter and closer to the sky, which is
      aerial perspective done in three steps. */
-  /* FOUR BANDS, AND EVERY ONE OF THEM KEEPS A LIT AND A SHADE FACE FAR
-     ENOUGH APART TO GIVE AN OBJECT SHAPE.
+  /* FOUR BANDS, RAMPING FROM NEARLY BLACK NEAR TO NEARLY THE GROUND FAR.
 
-     THE FIRST BUILD GOT THIS WRONG. Far lit was #221520 and far shade
-     was #1a1220: six luminance units apart, so a distant object had no
-     internal form and merged into its neighbours. That is what made the
-     mid distance read as one dark blob rather than as things.
+     THE MEASUREMENT THAT SET THESE, and it took three attempts to point
+     the instrument at the right thing. Render the frame; render it again
+     with sceneryPass suppressed; every pixel that moved is an object and
+     the second frame IS what was behind it. No assumption about geometry
+     survives that, which is why the two earlier tables were both wrong:
+     one compared lit against shade WITHIN an object, which says nothing
+     about visibility, and the second compared objects against the GROUND
+     PLANE, which turns out to be 1.9 per cent of the frame. What is
+     actually behind an object is the terrain shoulder, which is 12 to 15
+     per cent, and nobody had ever measured against it.
 
-     The mean still recedes toward the sky, band by band, which is the
-     aerial perspective. What does NOT recede to nothing is the
-     SEPARATION between the two faces, because that separation is the
-     only thing telling the eye an object has sides. Measured, lit
-     against shade: 42, 25, 17 and 10 luminance from near to far, against
-     6 and 5 before. */
-  SCENERY_NEAR_LIT:   '#6b3718',
-  SCENERY_NEAR_SHADE: '#241209',
-  SCENERY_MID_LIT:    '#4a2a1c',
-  SCENERY_MID_SHADE:  '#251519',
-  SCENERY_FAR_LIT:    '#372232',
-  SCENERY_FAR_SHADE:  '#1c1420',
+     Measured that way the shipped world was 5.2 and 21.1 units, and the
+     first attempt at fixing it reached 7.7. Objects were being darkened
+     against a background that was itself dark. The ground had to come up
+     with them, and the shoulder is the ground that is on screen.
+
+     THE RAMP IS THE FADE IN. Near objects are almost black, and each
+     band further out sits closer to its own ground, so a thing emerges
+     rather than arriving. The step from the haze band to the far band is
+     the big one and it cannot be otherwise: the haze band must be at
+     zero separation and the far band must be at thirty, so thirty units
+     have to be spent somewhere. Four bands rather than three put that
+     step at three quarters of the draw distance instead of at the draw
+     distance itself, which is the whole reason there are four. */
+  SCENERY_NEAR_LIT:   '#100c08',
+  SCENERY_NEAR_SHADE: '#080603',
+  SCENERY_MID_LIT:    '#17120b',
+  SCENERY_MID_SHADE:  '#0e0b06',
+  SCENERY_FAR_LIT:    '#151418',
+  SCENERY_FAR_SHADE:  '#0e0c10',
   /* THE FOURTH BAND IS THE SKY, WHICH IS THE WHOLE OF THE FADE IN.
 
      Objects enter the world at the draw distance, and an object that
@@ -4028,19 +4091,51 @@ const COLOUR = {
      step is most visible because that is the moment something arrives.
      A fourth pushes every step inward to where objects are already on
      screen and already moving. */
-  SCENERY_HAZE_LIT:   '#2f1f2c',
-  SCENERY_HAZE_SHADE: '#201626',
-  /* THE GROUND PLANE, FOUR DEPTH BANDS, near to far. Each is barely
-     lifted off the one beyond it, and the furthest is authored a couple
-     of units above the void it replaces, because that band is what the
-     far road is read against and it is the readability risk in the whole
-     change. Measured after, not asserted here. */
-  GROUND_NEAR:   '#2a1509',
-  GROUND_MID:    '#20110c',
-  GROUND_FAR:    '#190e11',
-  GROUND_HAZE:   '#150c13',
-  TERRAIN_LIT:   '#2a1409',
-  TERRAIN_SHADE: '#180b06',
+  /* THE HAZE BAND IS THE ONE PLACE 30 UNITS IS THE WRONG TARGET, and
+     it is deliberate rather than a miss. Its whole job is that an object
+     entering at the draw distance is NOT visible, so it does not pop.
+     It is authored a few units off its own ground, so a thing emerges
+     from the ground it stands on and darkens as it walks in, over three
+     bands, instead of arriving. */
+  SCENERY_HAZE_LIT:   '#3f3a47',
+  SCENERY_HAZE_SHADE: '#3a3744',
+  /* THE GROUND IS THE LIT THING NOW, AND THE OBJECTS ON IT ARE DARK.
+
+     A SILHOUETTE HAS TO READ AGAINST ITS BACKGROUND, and there are only
+     two ways round: near black objects on a lit ground, or lit objects
+     on a dark one. Both are in the reference frames. This takes the
+     first, because it keeps the ground reading as GROUND rather than as
+     a backdrop, it is what dusk actually looks like, and it means the
+     silhouette carries the form rather than the shading having to.
+
+     WHICH COSTS THE OBJECTS THEIR INTERNAL CONTRAST, and that is the
+     trade rather than an oversight. A dark object on a lit ground is
+     read by its OUTLINE. The lit and shade faces keep 8 to 9 units
+     between them, enough to turn a corner, and the rest of the range is
+     spent where it buys visibility.
+
+     THE FOUR BANDS NO LONGER RECEDE MUCH. They used to fall from 64 to
+     34 toward the sky, which is aerial perspective and is correct for a
+     DARK ground under a dark sky. With a lit ground it is backwards: it
+     drags the far field down to where the objects are and takes their
+     silhouettes away, and the far field is where nearly every object in
+     the world is. The bands now hold their tone and the convergence
+     happens in the horizon fade band instead, which is a gradient and
+     therefore has no step in it at all.
+
+     THE TERRAIN SHOULDER IS THE GROUND THE PLAYER ACTUALLY SEES. It is
+     12 to 15 per cent of the pixels below the horizon; the ground plane
+     behind it is 1.9 in portrait and 0.3 in landscape. Lighting the
+     ground plane and leaving the shoulder dark, which is what the first
+     attempt did, changed almost nothing on screen. So the shoulder is
+     authored into the same family as the plane, with a small lit and
+     shade split, because it is a broad surface and not an object. */
+  GROUND_NEAR:   '#5d3a24',
+  GROUND_MID:    '#573b2d',
+  GROUND_FAR:    '#473c45',
+  GROUND_HAZE:   '#3e3a49',
+  TERRAIN_LIT:   '#4e414c',
+  TERRAIN_SHADE: '#403a48',
   GRID:         'rgba(150,58,22,0.22)',
   GRID_NEAR:    'rgba(214,88,30,0.32)',
   HORIZON_GLOW: '#b8431a',
@@ -4054,8 +4149,28 @@ const COLOUR = {
      saying is that the surface is reflective, not that it is a
      different colour. It rides the wheel with the rest of the road. */
   WET_SHEEN:    '203,229,255',
-  ROAD_LIGHT:   '#33191a',     // the surface, plainly above the void
-  ROAD_DARK:    '#2b1416',
+  /* THE SURFACE, LIFTED AS FAR AS THE EDGE ALLOWS, and no further.
+
+     THE CONSTRAINT THAT CANNOT BE MET, said plainly rather than worked
+     around. Lighting the ground enough for a dark object to read against
+     it puts the ground at 55 to 68, and a surface "clearly above the
+     terrain" therefore has to clear 68. The road edge renders at about
+     103, so a surface at 68 leaves the edge 35 units of lip, against 60
+     in the build this replaces and 71 now. The edge being the brightest,
+     most readable thing on screen is the first rule in this file and it
+     beats the second, so the surface goes as high as it can while the
+     lip stays above what shipped, and stops there. That is exactly here:
+     the lip is 63.8 units at two seconds out and 106.4 at three, against
+     60.5 and 92.9 in the build this replaces.
+
+     WHAT IT DOES NOT BUY, and this is the honest part. The surface still
+     sits below the shoulder beside it: 4.4 units at the haze band, 9.5
+     far, 14.0 mid and 40.1 near, against 10.0, 16.4, 21.9 and 49.4
+     before the lift. It is closer, it is not above. The near figure is
+     mostly the road's own edge glow spilling outward and lifting the
+     shoulder, not the ground being lit. */
+  ROAD_LIGHT:   '#422022',
+  ROAD_DARK:    '#3a1b1e',
   /* The side of the slab. It has to sit below the road surface in value,
      which is what was asked for, and still be separable from the void,
      which is nearly black. There is not much room between those, so most
@@ -4687,6 +4802,7 @@ const TUNABLES = [
   { key: 'CAMERA_HEIGHT',      label: 'height',  step: 100,  min: 400,  max: 9000,  dp: 0, group: 0 },
   { key: 'CAMERA_DISTANCE',    label: 'dist',    step: 100,  min: 600,  max: 14000, dp: 0, group: 0 },
   { key: 'FIELD_OF_VIEW_DEG',  label: 'fov',     step: 2,    min: 40,   max: 130,   dp: 0, group: 0 },
+  { key: 'HORIZON_FADE_ALPHA',label: 'hazeA',   step: 0.04, min: 0,    max: 1.0,   dp: 2, group: 0 },
   { key: 'SKY_BEND',           label: 'skyBend', step: 0.02, min: 0.05, max: 0.95,  dp: 2, group: 0 },
   { key: 'SKY_BEND_MIX',       label: 'skyMix',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 0 },
   { key: 'HORIZON_FRACTION',   label: 'horizon', step: 0.02, min: 0.12, max: 0.70,  dp: 2, group: 0 },
@@ -4745,6 +4861,9 @@ const TUNABLES = [
   { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
   { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
   { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
+  { key: 'GROUND_PATCH_EVERY', label: 'fldEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
+  { key: 'GROUND_PATCH_DENSITY',label:'fldDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'GROUND_PATCH_SHIFT', label: 'fldTone', step: 0.5, min: 0,    max: 40,    dp: 1, group: 21 },
   { key: 'SCENERY_EVERY',      label: 'scnEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'SCENERY_DENSITY',    label: 'scnDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'SCENERY_SIZE',       label: 'scnSize', step: 20,  min: 0,    max: 3000,  dp: 0, group: 21 },
@@ -5279,7 +5398,8 @@ function resize() {
   // all the way to the vanishing point.
   const fade = h * FEEL.HORIZON_FADE_FRACTION;
   hazeGradient = ctx.createLinearGradient(0, horizonY, 0, horizonY + fade);
-  hazeGradient.addColorStop(0, 'rgba(' + COLOUR.HAZE + ',0.92)');
+  hazeGradient.addColorStop(0, 'rgba(' + COLOUR.HAZE + ','
+                               + FEEL.HORIZON_FADE_ALPHA.toFixed(3) + ')');
   hazeGradient.addColorStop(1, 'rgba(' + COLOUR.HAZE + ',0)');
 
   /* Section 7.3 wants a horizon to read curvature against, and taking the
@@ -10273,11 +10393,17 @@ function drawRoad(w, h) {
   /* THE FLOOR, BEFORE ANYTHING THE PLAYER STEERS BY. See terrainPass:
      drawn first is what makes it impossible for a hill to occlude the
      road ahead, because the whole road is painted over it. */
-  /* THE PLANE FIRST OF ALL, THEN THE RIDGE ON IT, THEN THE THINGS
-     STANDING ON BOTH. All three before drawWalls, so the whole road is
-     painted over every one of them and none can occlude it. */
+  /* THE PLANE FIRST OF ALL, THEN THE RIDGE ON IT, THEN THE FIELDS ON THE
+     RIDGE, THEN THE THINGS STANDING ON ALL THREE. All of it before
+     drawWalls, so the whole road is painted over every one of them and
+     none can occlude it.
+
+     THE FIELDS COME AFTER THE RIDGE AND THAT IS NOT COSMETIC. They used
+     to run before it and the ridge painted over every one of them that
+     was inside TERRAIN_REACH, which was nearly all of them. */
   groundPass(w, h);
   terrainPass(first, last, baseIndex);
+  groundPatchPass(first, last, baseIndex, w, h);
   /* AND THE THINGS STANDING ON IT, still before the road for the same
      structural reason: nothing drawn here can occlude the road ahead,
      because the whole road is painted over it. */
@@ -12087,6 +12213,25 @@ function pylonPath(first, last, baseIndex, spacing, widen, scaleH, which) {
    authored well under the road surface and the ranking is measured
    after every change.
    ================================================================== */
+/* A GROUND BAND LIFTED OR DROPPED BY A FIXED NUMBER OF LUMINANCE
+   UNITS, cached by band and direction so the draw path never builds a
+   colour string. Rebuilt with the palette, like every other derived
+   colour, because a cached fill that missed a rotation puts the last
+   biome in the middle of this one. */
+const TONE_CACHE = {};
+function shiftTone(base, by) {
+  const key = base + '|' + by;
+  let v = TONE_CACHE[key];
+  if (v) return v;
+  const c = rgbOf(base);
+  const k = by > 0 ? (1 + by / 40) : 1 / (1 - by / 40);
+  v = 'rgb(' + Math.min(255, Math.round(c[0] * k)) + ','
+             + Math.min(255, Math.round(c[1] * k)) + ','
+             + Math.min(255, Math.round(c[2] * k)) + ')';
+  TONE_CACHE[key] = v;
+  return v;
+}
+
 function terrainHash(i) {
   let h = Math.imul((i | 0) ^ 0x9e3779b9, 0x85ebca6b);
   h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
@@ -12143,6 +12288,111 @@ function groundPass(w, h) {
   if (FEEL.TERRAIN_REACH <= 0 || !groundGradient) return;
   ctx.fillStyle = groundGradient;
   ctx.fillRect(-40, horizonY, w + 80, h - horizonY + 40);
+}
+
+/* ==================================================================
+   FIELDS ON THE SHOULDER, so the ground is terrain rather than a wash.
+
+   The ground shipped as one fill of one gradient with a two tone bank in
+   front of it: no texture, no variation, no features and no edges
+   anywhere, over half the frame. This puts large flat shapes on it,
+   which is the cheap direction in this renderer, since SCENERY.md
+   established it pays for geometry and not for pixels: a patch the size
+   of a quarter of the screen is ONE subpath and costs what a marker post
+   costs.
+
+   ON THE SHOULDER, NOT ON THE PLANE, AND THAT IS THE WHOLE FIX. The
+   first version drew on the ground plane and reached sixteen half widths
+   out. Measured off the frame it moved 67 pixels in 1.3 million: the
+   plane is 1.9 per cent of what is below the horizon, the near sites
+   land off the side of the screen, and everything inside TERRAIN_REACH
+   is painted over by the shoulder afterwards anyway. A patch now lies ON
+   the shoulder, between two fractions of its reach, sharing the
+   shoulder's own four corners, so it sits on the surface instead of
+   cutting across it.
+
+   ONE QUAD PER PATCH, ACROSS MANY SEGMENTS, rather than one per segment.
+   A field has straight edges, so a straight-line approximation across
+   its own length is not an approximation of anything, and it keeps the
+   subpath count in the tens rather than the hundreds.
+
+   THE TONE IS A SHIFT OF THE SHOULDER, NOT A NEW COLOUR. Each patch is
+   the shoulder's own colour lightened or darkened by a hashed amount, so
+   the fields read as the same material catching the light differently.
+   Four tones in all, two sides by two directions, so the pass is four
+   fills however many patches there are.
+
+   DETERMINISTIC, off terrainHash on the world segment index, like
+   everything else out here.
+   ================================================================== */
+function groundPatchPass(first, last, baseIndex, w, h) {
+  if (FEEL.GROUND_PATCH_SHIFT <= 0 || FEEL.GROUND_PATCH_EVERY <= 0) return;
+  if (FEEL.TERRAIN_REACH <= 0) return;
+  const limit = chunkLimit();
+  const every = Math.max(2, Math.round(FEEL.GROUND_PATCH_EVERY));
+  const reach = FEEL.TERRAIN_REACH;
+  const lift = FEEL.TERRAIN_HEIGHT;
+  let sub = 0;
+  let lastFill = '';
+  ctx.beginPath();
+  for (let n = first; n <= last; n++) {
+    if (!bvis[n]) continue;
+    const seg = segAt(baseIndex + n);
+    if (!seg) break;
+    const idx = seg.index;
+    if (idx % every) continue;
+    // The far boundary of this patch: several boundaries on, still visible.
+    let m = n, steps = 0;
+    while (m < last && steps < FEEL.GROUND_PATCH_SPAN) {
+      m++; if (bvis[m]) steps++;
+    }
+    if (m <= n) continue;
+    const segM = segAt(baseIndex + m);
+    if (!segM) continue;
+    for (let side = -1; side <= 1; side += 2) {
+      const hA = terrainHash(idx * 3 + (side > 0 ? 17 : 0));
+      const hB = terrainHash(idx * 5 + (side > 0 ? 23 : 1));
+      const hC = terrainHash(idx * 11 + (side > 0 ? 29 : 2));
+      if (hC > FEEL.GROUND_PATCH_DENSITY) continue;
+      /* UP THE SLOPE, IN FRACTIONS OF THE REACH. Zero is the road edge
+         and one is the ridge, so a patch is always on the shoulder
+         whatever the shoulder is doing. */
+      const f0 = hA * FEEL.GROUND_PATCH_LOW;
+      const f1 = Math.min(1, f0 + 0.15 + hB * FEEL.GROUND_PATCH_HIGH);
+      /* THE SHOULDER'S OWN FOUR CORNERS, built the way terrainPass
+         builds them so a patch lands exactly on the surface. */
+      const inN = bx[n] + side * bw[n] * EDGE_OUT;
+      const inM = bx[m] + side * bw[m] * EDGE_OUT;
+      const outN = inN + side * bw[n] * reach;
+      const outM = inM + side * bw[m] * reach;
+      const yN = by[n], yM = by[m];
+      const rN = yN - bh[n] * lift * terrainRise(idx);
+      const rM = yM - bh[m] * lift * terrainRise(segM.index);
+      const x1 = inN + (outN - inN) * f0, y1 = yN + (rN - yN) * f0;
+      const x2 = inN + (outN - inN) * f1, y2 = yN + (rN - yN) * f1;
+      const x3 = inM + (outM - inM) * f1, y3 = yM + (rM - yM) * f1;
+      const x4 = inM + (outM - inM) * f0, y4 = yM + (rM - yM) * f0;
+      if (Math.max(x1, x2, x3, x4) < -40 || Math.min(x1, x2, x3, x4) > w + 40) continue;
+      if (Math.min(y1, y2, y3, y4) > h + 40) continue;
+      /* One fill per TONE, and the tone is quantised to the side and to
+         the sign of the shift, so the whole pass is four fills rather
+         than one per patch. */
+      const base = side < 0 ? COLOUR.TERRAIN_LIT : COLOUR.TERRAIN_SHADE;
+      const want = shiftTone(base, hB > 0.5 ? FEEL.GROUND_PATCH_SHIFT
+                                            : -FEEL.GROUND_PATCH_SHIFT);
+      if (want !== lastFill) {
+        if (sub > 0) { ctx.fill(); ctx.beginPath(); sub = 0; }
+        ctx.fillStyle = want;
+        lastFill = want;
+      }
+      ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+      ctx.lineTo(x3, y3); ctx.lineTo(x4, y4);
+      ctx.closePath();
+      sub++;
+      if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+    }
+  }
+  if (sub > 0) ctx.fill();
 }
 
 /* THE RIDGE, WHICH IS WHAT IS LEFT OF THE OLD TERRAIN PASS AND IS NOW
@@ -13080,12 +13330,13 @@ function signHueShift() {
    than branching, and rebuilt in rebuildDerivedColours like every other
    thing derived from the palette. A band colour that missed a rotation
    would put the last biome's world behind this one's road. */
-let GROUND_BAND = ['#2a1509', '#20110c', '#190e11', '#150c13'];
-let SCENERY_BAND_LIT = ['#6b3718', '#4a2a1c', '#372232', '#2f1f2c'];
-let SCENERY_BAND_SHADE = ['#241209', '#251519', '#1c1420', '#201626'];
+let GROUND_BAND = ['#5d3a24', '#573b2d', '#473c45', '#3e3a49'];
+let SCENERY_BAND_LIT = ['#100c08', '#17120b', '#151418', '#3f3a47'];
+let SCENERY_BAND_SHADE = ['#080603', '#0e0b06', '#0e0c10', '#3a3744'];
 let sceneryDrawn = 0;
 
 function rebuildDerivedColours() {
+  for (const k in TONE_CACHE) delete TONE_CACHE[k];
   GROUND_BAND[0] = COLOUR.GROUND_NEAR;
   GROUND_BAND[1] = COLOUR.GROUND_MID;
   GROUND_BAND[2] = COLOUR.GROUND_FAR;
