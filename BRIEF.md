@@ -149,7 +149,9 @@ This is genre convention rather than invention. Absolute Drift ships ghosts of t
 
 ## 5. Not pillars, but non-negotiable
 
-- **No tutorial, ever.** The first ten seconds of the actual game are the tutorial: wide road, low speed, one gentle curve that teaches hold-to-turn without a word. The Beakdown spec records that words were tried for the height rule and removed because the visual taught it better.
+- **No tutorial imposed on a returning player.** The first ten seconds of the actual game teach hold-to-turn without a word: wide road, low speed, one gentle curve. The Beakdown spec records that words were tried for the height rule and removed because the visual taught it better.
+
+  **This line used to read "no tutorial, ever" and the game outgrew it.** It shipped a 56 second unfailable non-skippable level 1, which is a tutorial, and is the exact failure section 4 opens by criticising Drift Boss for. Corrected on 12 August 2026: level 1 is now a 28 second run labelled TRAINING, and a SKIP THE TRAINING button starts a confident player on the first real level. Once training has been completed the default flips, so a returning player is never made to redo it. The rule is that a tutorial may be offered and must never be compulsory.
 - **Restart on the same input, instantly.** No menu, no button to hunt for. If leaving the death screen takes more than one action, the one-more-go loop is broken.
 - **No audio in the demo.** If audio ever ships it defaults off and stays off across sessions. Beakdown proved procedural audio works with zero external requests, so this is a later addition rather than a permanent constraint, but the default is not negotiable for a classroom audience.
 - **Every feel constant in one named block**, including any multiplier used inside the update loop. Beakdown's spec identifies a bare inline `3.2` as the single most likely thing in that file to be broken by accident. Do not repeat it.
@@ -190,6 +192,12 @@ Seven things recur across the arcade racing lineage, from the Sega cabinets that
 ### The obvious art direction to refuse
 
 Synthwave. Neon grid, magenta and cyan, chrome type, sun on the horizon. It is literally named after OutRun and every drift game on itch.io reaches for it, so it buys no distinctiveness. Worse, it is dark, which means a dark road against a dark sky. The Beakdown spec records paying for exactly this mistake: platforms had to be lightened across all twelve arenas and given a bright lip because players were losing them against the background. A game where the road edge is the difference between living and dying cannot repeat that.
+
+**THIS SECTION WAS OVERRULED AND THE BUILD DISAGREES WITH IT IN WRITING.** Recorded 12 August 2026, because a future session reading section 7 alone would try to "fix" the palette.
+
+Drift Fever ships as a dark neon night: near-black void, glowing orange road edges, a silhouetted city. That is the look this section refuses. The author chose it deliberately, and the readability half of the argument above was answered rather than ignored: the road is a lit slab floating in void with the edge as the brightest element on screen, measured first in all twelve biomes on every visual pass, so the drivable surface is unmistakable in the way the Beakdown mistake was not. The distinctiveness half of the argument stands unanswered and was accepted as a cost.
+
+What survives from this section and still governs every visual decision: the edge outranks everything but the car, the surface stays separated in value from the void, biome shifts change the whole scheme, and flat stylisation beats fidelity. See VISUAL.md, which is titled "wet neon night" and is the operative art direction.
 
 **Go the other way.** High-key saturated daylight and dusk palettes, flat shading, a dark road with bright verges so the drivable surface is unmistakable, and a biome shift that changes the whole colour scheme. Brighter is more readable, more distinctive in this market, more cheerful for the actual audience, and it makes a better preview card.
 
