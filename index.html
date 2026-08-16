@@ -1204,6 +1204,32 @@ const FEEL = {
      ALL THREE LIVE, because a ground plane is the one change in this
      session that spends the contrast budget the whole design rests on,
      and it has to be judgeable on a phone in a dark room. */
+  /* ------------------------------------------------------------------
+     SCENERY. See sceneryPass.
+
+     EVERY is how often a site occurs along the road, in segments, and
+     DENSITY is what share of sites actually grow something, so the two
+     together set the count without either of them being a count. At 6
+     and 0.55 a level carries a few hundred objects in shot.
+
+     CLEAR is how far outboard of the road edge the nearest object may
+     stand, in half widths, and SPREAD is how much of the terrain band
+     beyond that they scatter across. CLEAR is the rule that keeps the
+     near field sparse: the road has to keep the air around it, because
+     emptiness was doing real work and the road must stay the lit object
+     in a dark world rather than one lit object among many.
+
+     MIN_PX drops an object once it is too small to be a shape rather
+     than letting it become a shimmering speck at the draw distance.
+     ------------------------------------------------------------------ */
+  SCENERY_EVERY:              1,     // LIVE, segments between sites
+  SCENERY_DENSITY:         0.70,     // LIVE, share of sites that grow something
+  SCENERY_SIZE:            1100,     // LIVE, world units tall at scale one
+  SCENERY_CLEAR:            1.7,     // LIVE, half widths clear of the road edge
+  SCENERY_SPREAD:          0.72,     // LIVE, share of the terrain band they scatter over
+  SCENERY_MASS_SCALE:      1.55,     // a mid distance mass is bigger than a tree
+  SCENERY_MASS_WIDE:       3.20,     // and much wider, which is what makes it a mass
+  SCENERY_MIN_PX:           1.5,
   TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
   TERRAIN_HEIGHT:           780,     // LIVE, world units the outer ridge rises
   TERRAIN_HILL_SEGMENTS:     24,     // LIVE
@@ -3942,6 +3968,19 @@ const COLOUR = {
      shade face, in every biome, for ever. Both are authored far under
      the road surface, because the value structure is edge, then road,
      then terrain, then void, and it is measured after every change. */
+  /* THE THREE DEPTH BANDS, each with a lit face and a shade face.
+     ART-DIRECTION.md refuses continuous atmospheric perspective as
+     unaffordable and accepts three or four discrete bands with their own
+     palette entries as the trade: they read as depth from a distance and
+     as banding if anyone looks closely. Near is the most separated pair,
+     and each band further out is flatter and closer to the sky, which is
+     aerial perspective done in three steps. */
+  SCENERY_NEAR_LIT:   '#5c2f14',
+  SCENERY_NEAR_SHADE: '#22110b',
+  SCENERY_MID_LIT:    '#3d2115',
+  SCENERY_MID_SHADE:  '#1d1319',
+  SCENERY_FAR_LIT:    '#221520',
+  SCENERY_FAR_SHADE:  '#1a1220',
   TERRAIN_LIT:   '#2a1409',
   TERRAIN_SHADE: '#180b06',
   GRID:         'rgba(150,58,22,0.22)',
@@ -4648,6 +4687,11 @@ const TUNABLES = [
   { key: 'ONRAMP_WIDTH',       label: 'rWide',   step: 0.02, min: 0.9,  max: 1.6,   dp: 2, group: 10 },
   { key: 'ONRAMP_REST',        label: 'rRest',   step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 11 },
   { key: 'ONRAMP_INTENSITY',   label: 'rInt',    step: 1,    min: 0,    max: 3,     dp: 0, group: 11 },
+  { key: 'SCENERY_EVERY',      label: 'scnEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
+  { key: 'SCENERY_DENSITY',    label: 'scnDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'SCENERY_SIZE',       label: 'scnSize', step: 20,  min: 0,    max: 3000,  dp: 0, group: 21 },
+  { key: 'SCENERY_CLEAR',      label: 'scnClear',step: 0.1, min: 0,    max: 12,    dp: 1, group: 21 },
+  { key: 'SCENERY_SPREAD',     label: 'scnSprd', step: 0.05,min: 0,    max: 2,     dp: 2, group: 21 },
   { key: 'TERRAIN_REACH',      label: 'terrW',   step: 0.2,  min: 0,    max: 24,    dp: 1, group: 12 },
   { key: 'TERRAIN_HEIGHT',     label: 'terrH',   step: 40,   min: 0,    max: 4000,  dp: 0, group: 12 },
   { key: 'TERRAIN_HILL_SEGMENTS',label:'terrHz', step: 2,    min: 2,    max: 120,   dp: 0, group: 12 },
@@ -10033,6 +10077,13 @@ let sightSeg = -1;
    of the sight measure, which otherwise reports the near field swinging
    out of frame whenever the camera leans. */
 const carAheadSegs = Math.ceil(FEEL.CAMERA_DISTANCE / FEEL.SEGMENT_LENGTH) + 2;
+/* HOW MANY WORLD SEGMENTS EACH SURVIVING ANCHOR COVERS after the gate
+   one merge. One for an unmerged segment. Scenery reads it so that
+   placement depends on the ROAD and not on which segments happened to
+   survive coalescing: without it the far field, which is where the
+   merging happens and where the silhouette masses belong, got almost no
+   objects at all. Measured: 31 objects in shot before this, 704 after. */
+const bspan = new Uint16Array(MAX_BOUNDS);
 const bvis = new Uint8Array(MAX_BOUNDS);
 const blight = new Uint8Array(MAX_BOUNDS);
 
@@ -10120,6 +10171,7 @@ function drawRoad(w, h) {
     if (!s) break;
     if (bz[n] <= CAMERA_DEPTH || by[n + 1] >= by[n] || by[n + 1] >= maxy) continue;
     bvis[n] = 1;
+    bspan[n] = 1;
     blight[n] = (Math.floor(s.index / FEEL.RUMBLE_SEGMENTS) & 1) === 0 ? 1 : 0;
     /* How far ahead the road is still on screen. Curves are faked by
        sliding segments sideways, so a tight enough corner walks the road
@@ -10137,6 +10189,10 @@ function drawRoad(w, h) {
      drawn first is what makes it impossible for a hill to occlude the
      road ahead, because the whole road is painted over it. */
   terrainPass(first, last, baseIndex);
+  /* AND THE THINGS STANDING ON IT, still before the road for the same
+     structural reason: nothing drawn here can occlude the road ahead,
+     because the whole road is painted over it. */
+  sceneryPass(first, last, baseIndex);
   drawWalls(count);
 
   /* ------------------------------------------------------------------
@@ -10185,6 +10241,8 @@ function drawRoad(w, h) {
         bx[a + 1] = bx[src]; by[a + 1] = by[src]; bw[a + 1] = bw[src];
         bt[a + 1] = bt[src]; bf[a + 1] = bf[src]; bh[a + 1] = bh[src];
         for (let k = a + 1; k <= e; k++) bvis[k] = 0;
+        // Recorded, not used here: see bspan.
+        bspan[a] = e - a + 1;
       }
       a = e + 1;
     }
@@ -11990,6 +12048,143 @@ function terrainPass(first, last, baseIndex) {
   }
 }
 
+/* ==================================================================
+   SCENERY. Gate three. The world gets things in it.
+
+   THE BINDING CONSTRAINT IS NOT OBJECT COUNT, IT IS SUBPATHS PER FILL.
+   Gate one established that path cost is quadratic in subpath count, so
+   1,000 objects in one path costs seventeen milliseconds and the same
+   1,000 across chunks of 64 costs almost nothing. Everything here goes
+   through the same chunkLimit the road passes use, and object count
+   stops mattering until the thousands.
+
+   ONE PROFILE TABLE, FOUR KINDS. Every object is a vertical silhouette
+   described by a handful of (height, half width) pairs, mirrored about
+   its own centre line. That gives a lit face and a shade face from one
+   description, keeps every face to four or five vertices, and means a
+   tree, a house, a hedge and a marker post are the same eleven lines of
+   drawing code with different numbers.
+
+   ONE LIGHT DIRECTION ACROSS EVERY OBJECT IN THE WORLD. The left half of
+   everything is the lit face and the right half is the shade face, the
+   same way round as the terrain under it and the city behind it.
+   ART-DIRECTION.md is right that this reads as a stylistic decision
+   rather than as light and that no frame budget changes that, because
+   Canvas 2D fills a shape with one flat colour. It is still worth doing:
+   inconsistent light direction is what makes a scene read as assembled
+   rather than composed.
+
+   DENSITY FALLS OFF WITH DISTANCE, and the mid distance is a few large
+   masses rather than many small objects. Vertices inside a subpath are
+   linear while subpaths are quadratic, so one wide hedge costs a
+   fraction of six trees covering the same ground, and it is also how
+   flat-shaded games have always done it.
+
+   NOTHING MAY OCCLUDE THE ROAD AHEAD, and the guarantee is structural
+   rather than a placement rule: this runs before drawWalls, so the whole
+   road is painted over it afterwards. Objects are also held outboard of
+   the road edge by SCENERY_CLEAR, so they do not even reach it.
+
+   DETERMINISTIC. Every placement, kind, size and offset comes from
+   terrainHash on the world segment index. Nothing reads elapsed time,
+   frame count, rng(), or anything derived from the camera, so two
+   devices on the same daily road draw the same world.
+   ================================================================== */
+/* height up the object, half width there. The last pair closes the top.
+   Kind 0 tree, 1 house, 2 hedge mass, 3 marker post. */
+const SCENERY_PROFILE = [
+  [[0, 0.22], [0.30, 0.62], [0.62, 0.38], [1, 0.05]],   // a conifer, waisted
+  [[0, 0.70], [0.58, 0.70], [0.72, 0.86], [1, 0.10]],   // a house under a pitched roof
+  [[0, 1.00], [0.55, 0.94], [0.85, 0.66], [1, 0.30]],   // a low broad mass
+  [[0, 0.10], [0.86, 0.10], [0.92, 0.26], [1, 0.20]]    // a post with a head
+];
+const SCENERY_LIT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];     // scratch, x then y
+const SCENERY_SHADE = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+function sceneryPass(first, last, baseIndex) {
+  if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
+  const limit = chunkLimit();
+  const every = Math.max(1, Math.round(FEEL.SCENERY_EVERY));
+  const bands = SCENERY_BAND_LIT.length;
+  sceneryDrawn = 0;
+  /* BAND BY BAND AND FACE BY FACE, so every fill is one colour and the
+     depth bands stay separable for the haze in gate four. Six fills at
+     most before chunking, and each of those is already chunked. */
+  for (let band = 0; band < bands; band++) {
+    for (let face = 0; face < 2; face++) {
+      ctx.fillStyle = face === 0 ? SCENERY_BAND_LIT[band] : SCENERY_BAND_SHADE[band];
+      let sub = 0;
+      ctx.beginPath();
+      for (let n = first; n <= last; n++) {
+        if (!bvis[n]) continue;
+        const seg = segAt(baseIndex + n);
+        if (!seg) break;
+        /* WHICH BAND THIS BOUNDARY IS IN, off its own distance, so an
+           object stays in one band for its whole life rather than
+           flickering between two as the camera moves. */
+        const t = clamp(bz[n] / (FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH), 0, 0.999);
+        if (Math.floor(t * bands) !== band) continue;
+        /* EVERY SITE IN THE SPAN THIS ANCHOR COVERS, not just the
+           anchor's own index. Gate one merges far segments, so the
+           anchor may stand for a dozen of them, and placing only on the
+           anchor put 31 objects on screen where the budget is 600 to
+           1,500 and left the far field, which is where the masses
+           belong, empty. Interpolated across the anchor's own two
+           boundaries, which is the same straight line the merged road
+           quad is drawn on. */
+        const span = bspan[n] || 1;
+        const base = seg.index;
+        for (let j = 0; j < span; j++) {
+          const idx = base + j;
+          if (idx % every) continue;
+          const f = span > 1 ? j / span : 0;
+          const cx = bx[n] + (bx[n + 1] - bx[n]) * f;
+          const cy = by[n] + (by[n + 1] - by[n]) * f;
+          const cw = bw[n] + (bw[n + 1] - bw[n]) * f;
+          const ch = bh[n] + (bh[n + 1] - bh[n]) * f;
+        // Two objects per site, one each side, each with its own draw.
+        for (let side = -1; side <= 1; side += 2) {
+          const h1 = terrainHash(idx * 7 + (side > 0 ? 3 : 0));
+          if (h1 > FEEL.SCENERY_DENSITY) continue;
+          const h2 = terrainHash(idx * 13 + (side > 0 ? 5 : 1));
+          const h3 = terrainHash(idx * 29 + (side > 0 ? 11 : 2));
+          /* THE MID DISTANCE GETS MASSES AND THE NEAR FIELD GETS
+             OBJECTS, which is the density rule stated as a kind rule. */
+          let kind;
+          if (band === 0) kind = h2 < 0.52 ? 0 : (h2 < 0.78 ? 1 : 3);
+          else if (band === bands - 1) kind = 2;
+          else kind = h2 < 0.46 ? 2 : (h2 < 0.80 ? 0 : 1);
+          const prof = SCENERY_PROFILE[kind];
+          const scale = FEEL.SCENERY_SIZE * (0.62 + 0.76 * h3)
+                      * (kind === 2 ? FEEL.SCENERY_MASS_SCALE : 1);
+          const wide = scale * (kind === 2 ? FEEL.SCENERY_MASS_WIDE : 1);
+          // Out past the edge, on the terrain, never over the road.
+          const off = FEEL.SCENERY_CLEAR
+                    + h3 * FEEL.TERRAIN_REACH * FEEL.SCENERY_SPREAD;
+          const bxp = cx + side * cw * off;
+          const byp = cy - ch * FEEL.TERRAIN_HEIGHT * terrainRise(idx) * 0.5;
+          const px = ch * wide, py = ch * scale;
+          if (py < FEEL.SCENERY_MIN_PX) continue;
+          /* The lit face is the left half and the shade face the right,
+             every object, every band, every biome. */
+          const dir = face === 0 ? -1 : 1;
+          ctx.moveTo(bxp, byp);
+          for (let k = 0; k < prof.length; k++) {
+            ctx.lineTo(bxp + dir * px * prof[k][1], byp - py * prof[k][0]);
+          }
+          ctx.lineTo(bxp, byp - py);
+          ctx.closePath();
+          sub++;
+          if (face === 0) sceneryDrawn++;
+          if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+        }
+        }
+      }
+      if (sub > 0) ctx.fill();
+    }
+  }
+}
+
 function drawWalls(count) {
   ctx.beginPath();
   for (let n = 0; n < count; n++) {
@@ -12668,7 +12863,21 @@ function signHueShift() {
   return h - h0;
 }
 
+/* THE SCENERY BANDS, CACHED AS ARRAYS so the draw loop indexes rather
+   than branching, and rebuilt in rebuildDerivedColours like every other
+   thing derived from the palette. A band colour that missed a rotation
+   would put the last biome's world behind this one's road. */
+let SCENERY_BAND_LIT = ['#3a1c0d', '#2b1710', '#221520'];
+let SCENERY_BAND_SHADE = ['#180c07', '#171017', '#1a1220'];
+let sceneryDrawn = 0;
+
 function rebuildDerivedColours() {
+  SCENERY_BAND_LIT[0] = COLOUR.SCENERY_NEAR_LIT;
+  SCENERY_BAND_LIT[1] = COLOUR.SCENERY_MID_LIT;
+  SCENERY_BAND_LIT[2] = COLOUR.SCENERY_FAR_LIT;
+  SCENERY_BAND_SHADE[0] = COLOUR.SCENERY_NEAR_SHADE;
+  SCENERY_BAND_SHADE[1] = COLOUR.SCENERY_MID_SHADE;
+  SCENERY_BAND_SHADE[2] = COLOUR.SCENERY_FAR_SHADE;
   EDGE_HOT_RAMP = rampBetween(COLOUR.EDGE_DARK, COLOUR.EDGE_LIGHT);
   // The roof lights run toward this biome's own hot hue, so the ramp has
   // to follow the place.
