@@ -1226,10 +1226,26 @@ const FEEL = {
   SCENERY_DENSITY:         0.70,     // LIVE, share of sites that grow something
   SCENERY_SIZE:            1100,     // LIVE, world units tall at scale one
   SCENERY_CLEAR:            1.7,     // LIVE, half widths clear of the road edge
-  SCENERY_SPREAD:          0.72,     // LIVE, share of the terrain band they scatter over
+  SCENERY_FAR_OUT:           26,     // LIVE, half widths the scatter reaches, squared toward the road
+  /* TWO AND NOT FOUR, AND THE NUMBER IS THE AUTHOR'S TO CHANGE.
+
+     At four this draws 611 objects and costs 3.9ms at x1 and 27.9 at x6,
+     against a gate one figure of 3.1 and 18.2. That is more than half
+     the remaining headroom at the throttled profile, which is the one
+     the audience actually has, so it is not mine to spend. At two it
+     draws 306, costs 3.2 and 23.7, and the world still reaches the
+     horizon and still has trees, houses, signs, banners and towers in
+     it at four depths.
+
+     LIVE, so raising it is one press on the phone rather than an edit.
+     If a real Chromebook turns out to have the room, four is better. */
+  SCENERY_PER_SITE:           2,     // LIVE, independent draws per segment per side
+  SCENERY_TOWER_SCALE:     1.90,     // a tower is the tall thing in a treeline
+  SCENERY_BANNER_WIDE:     2.60,     // and a banner is the wide one
   SCENERY_MASS_SCALE:      1.55,     // a mid distance mass is bigger than a tree
   SCENERY_MASS_WIDE:       3.20,     // and much wider, which is what makes it a mass
   SCENERY_MIN_PX:           1.5,
+  SCENERY_MAX_SHARE:       0.26,     // LIVE, tallest an object may draw, as a share of the frame
   TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
   TERRAIN_HEIGHT:           780,     // LIVE, world units the outer ridge rises
   TERRAIN_HILL_SEGMENTS:     24,     // LIVE
@@ -3975,12 +3991,26 @@ const COLOUR = {
      as banding if anyone looks closely. Near is the most separated pair,
      and each band further out is flatter and closer to the sky, which is
      aerial perspective done in three steps. */
-  SCENERY_NEAR_LIT:   '#5c2f14',
-  SCENERY_NEAR_SHADE: '#22110b',
-  SCENERY_MID_LIT:    '#3d2115',
-  SCENERY_MID_SHADE:  '#1d1319',
-  SCENERY_FAR_LIT:    '#2a1a22',
-  SCENERY_FAR_SHADE:  '#1f1521',
+  /* FOUR BANDS, AND EVERY ONE OF THEM KEEPS A LIT AND A SHADE FACE FAR
+     ENOUGH APART TO GIVE AN OBJECT SHAPE.
+
+     THE FIRST BUILD GOT THIS WRONG. Far lit was #221520 and far shade
+     was #1a1220: six luminance units apart, so a distant object had no
+     internal form and merged into its neighbours. That is what made the
+     mid distance read as one dark blob rather than as things.
+
+     The mean still recedes toward the sky, band by band, which is the
+     aerial perspective. What does NOT recede to nothing is the
+     SEPARATION between the two faces, because that separation is the
+     only thing telling the eye an object has sides. Measured, lit
+     against shade: 42, 25, 17 and 10 luminance from near to far, against
+     6 and 5 before. */
+  SCENERY_NEAR_LIT:   '#6b3718',
+  SCENERY_NEAR_SHADE: '#241209',
+  SCENERY_MID_LIT:    '#4a2a1c',
+  SCENERY_MID_SHADE:  '#251519',
+  SCENERY_FAR_LIT:    '#372232',
+  SCENERY_FAR_SHADE:  '#1c1420',
   /* THE FOURTH BAND IS THE SKY, WHICH IS THE WHOLE OF THE FADE IN.
 
      Objects enter the world at the draw distance, and an object that
@@ -3998,8 +4028,17 @@ const COLOUR = {
      step is most visible because that is the moment something arrives.
      A fourth pushes every step inward to where objects are already on
      screen and already moving. */
-  SCENERY_HAZE_LIT:   '#2d1a26',
-  SCENERY_HAZE_SHADE: '#281620',
+  SCENERY_HAZE_LIT:   '#2f1f2c',
+  SCENERY_HAZE_SHADE: '#201626',
+  /* THE GROUND PLANE, FOUR DEPTH BANDS, near to far. Each is barely
+     lifted off the one beyond it, and the furthest is authored a couple
+     of units above the void it replaces, because that band is what the
+     far road is read against and it is the readability risk in the whole
+     change. Measured after, not asserted here. */
+  GROUND_NEAR:   '#2a1509',
+  GROUND_MID:    '#20110c',
+  GROUND_FAR:    '#190e11',
+  GROUND_HAZE:   '#150c13',
   TERRAIN_LIT:   '#2a1409',
   TERRAIN_SHADE: '#180b06',
   GRID:         'rgba(150,58,22,0.22)',
@@ -4710,7 +4749,9 @@ const TUNABLES = [
   { key: 'SCENERY_DENSITY',    label: 'scnDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'SCENERY_SIZE',       label: 'scnSize', step: 20,  min: 0,    max: 3000,  dp: 0, group: 21 },
   { key: 'SCENERY_CLEAR',      label: 'scnClear',step: 0.1, min: 0,    max: 12,    dp: 1, group: 21 },
-  { key: 'SCENERY_SPREAD',     label: 'scnSprd', step: 0.05,min: 0,    max: 2,     dp: 2, group: 21 },
+  { key: 'SCENERY_FAR_OUT',    label: 'scnFar',  step: 1,   min: 0,    max: 80,    dp: 0, group: 21 },
+  { key: 'SCENERY_PER_SITE',   label: 'scnSlot', step: 1,   min: 0,    max: 12,    dp: 0, group: 21 },
+  { key: 'SCENERY_MAX_SHARE',  label: 'scnMax',  step: 0.02,min: 0.04, max: 1.5,   dp: 2, group: 21 },
   { key: 'TERRAIN_REACH',      label: 'terrW',   step: 0.2,  min: 0,    max: 24,    dp: 1, group: 12 },
   { key: 'TERRAIN_HEIGHT',     label: 'terrH',   step: 40,   min: 0,    max: 4000,  dp: 0, group: 12 },
   { key: 'TERRAIN_HILL_SEGMENTS',label:'terrHz', step: 2,    min: 2,    max: 120,   dp: 0, group: 12 },
@@ -5103,6 +5144,7 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const view = { w: 0, h: 0, dpr: 1 };
 let hazeGradient = null;
 let skyGradient = null;
+let groundGradient = null;
 let horizonGradient = null;
 let wetSheenGradient = null;
 let safeTop = 0;         // notch or camera cutout, measured from CSS
@@ -5198,6 +5240,30 @@ function resize() {
      glow band still reads as a light source on the horizon rather than
      as the top of a ramp. SKY_LOW is the colour just above the city, not
      the colour of the horizon itself. */
+  /* THE GROUND, ONE CACHED GRADIENT RATHER THAN FOUR RECTANGLES.
+
+     Four flat bands was the first build of this and the seams showed:
+     a fillRect edge is a dead straight full width line and the eye finds
+     those instantly, which is a worse artefact than the banding it was
+     trading for. A gradient with the same four colours as its stops is
+     the identical one fill, costs the same nothing, and has no edges in
+     it at all.
+
+     THE STOPS ARE PLACED BY DEPTH, NOT BY SCREEN HEIGHT, because for a
+     plane the two are not the same thing: screen row goes as one over
+     distance, so stops spaced evenly down the screen would be wildly
+     uneven in the world. Each stop sits where its quarter of the draw
+     distance actually projects to, which is what makes the ground agree
+     with the scenery bands standing on it. */
+  const gfar = FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH;
+  const gK = CAMERA_DEPTH * camHeight * h / 2;
+  groundGradient = ctx.createLinearGradient(0, horizonY, 0, h);
+  for (let k = GROUND_BAND.length - 1; k >= 0; k--) {
+    const dz = gfar * (k + 1) / GROUND_BAND.length;
+    const y = horizonY + gK / dz;
+    groundGradient.addColorStop(clamp((y - horizonY) / Math.max(1, h - horizonY), 0, 1),
+                                GROUND_BAND[k]);
+  }
   skyGradient = ctx.createLinearGradient(0, -40, 0, horizonY);
   skyGradient.addColorStop(0, 'rgb(' + COLOUR.SKY_HIGH + ')');
   /* THE BEND IS THE WHOLE POINT. A straight ramp from the top of the
@@ -10207,11 +10273,15 @@ function drawRoad(w, h) {
   /* THE FLOOR, BEFORE ANYTHING THE PLAYER STEERS BY. See terrainPass:
      drawn first is what makes it impossible for a hill to occlude the
      road ahead, because the whole road is painted over it. */
+  /* THE PLANE FIRST OF ALL, THEN THE RIDGE ON IT, THEN THE THINGS
+     STANDING ON BOTH. All three before drawWalls, so the whole road is
+     painted over every one of them and none can occlude it. */
+  groundPass(w, h);
   terrainPass(first, last, baseIndex);
   /* AND THE THINGS STANDING ON IT, still before the road for the same
      structural reason: nothing drawn here can occlude the road ahead,
      because the whole road is painted over it. */
-  sceneryPass(first, last, baseIndex);
+  sceneryPass(first, last, baseIndex, w, h);
   drawWalls(count);
 
   /* ------------------------------------------------------------------
@@ -12033,6 +12103,60 @@ function terrainRise(idx) {
   const h0 = terrainHash(a), h1 = terrainHash(a + 1);
   return h0 + (h1 - h0) * t;
 }
+/* ==================================================================
+   THE GROUND PLANE, AND THE CORRECTION THAT MADE IT ONE.
+
+   WHAT WAS WRONG. Terrain was a BAND: it ran TERRAIN_REACH half widths
+   out from the road edge and stopped. Beyond it was void until the
+   skyline, so a frame read road, narrow verge, hard edge, a stripe of
+   empty darkness, then a city pasted on the horizon. The mid distance
+   was empty, and the mid distance is where a landscape reads as a
+   landscape. It is visible in any screenshot, which is the real lesson:
+   a frame capture would have caught it before anybody had to say so.
+
+   WHY A BAND WAS THE WRONG SHAPE AT ALL. A flat plane at road level,
+   seen from a camera above it, projects to EVERY screen row between the
+   horizon and the bottom of the frame. There is no outer edge to place,
+   because the outer edge of a plane is the horizon. Chasing it with a
+   bigger TERRAIN_REACH could never work: the reach is in road half
+   widths, so it shrinks with distance exactly as the road does, and no
+   value of it reaches a horizon that is by definition infinitely far.
+
+   SO IT IS FOUR RECTANGLES. Horizon to the bottom of the frame, banded
+   by DEPTH rather than by screen height, because for a plane the two are
+   not the same: screen row goes as one over distance, so equal bands of
+   screen would be wildly unequal bands of world. The boundaries are the
+   same quarters of the draw distance the scenery bands use, so an object
+   and the ground it stands on always agree about which band they are in.
+
+   AND IT IS THE CHEAPEST SHAPE THERE IS. SCENERY.md measured an eight
+   fold change in viewport pixel count moving render cost by six per
+   cent: this renderer pays for geometry, not for pixels. Four fillRects
+   of a screen each is four subpaths.
+
+   THE VALUE STRUCTURE IS THE RISK HERE AND IT IS MEASURED. The far band
+   is the void the far road is read against, so it is authored barely
+   above the void it replaces, and the ranking and the lip against
+   surface are both re-measured after it.
+   ================================================================== */
+function groundPass(w, h) {
+  if (FEEL.TERRAIN_REACH <= 0 || !groundGradient) return;
+  ctx.fillStyle = groundGradient;
+  ctx.fillRect(-40, horizonY, w + 80, h - horizonY + 40);
+}
+
+/* THE RIDGE, WHICH IS WHAT IS LEFT OF THE OLD TERRAIN PASS AND IS NOW
+   THE ONLY THING IT DOES.
+
+   Distant hills only read when they are silhouetted against something
+   lighter, and the only lighter thing in this world is the sky. So this
+   is no longer trying to be the ground: it is the line where the ground
+   stops being ground, rolling above the horizon into the sky, and the
+   plane underneath it is groundPass's job.
+
+   It still comes off the road's own boundary tables, still rises by one
+   hash and one smoothstepped term on the world segment index, and still
+   runs before drawWalls so it can never occlude the road ahead. */
 function terrainPass(first, last, baseIndex) {
   if (FEEL.TERRAIN_REACH <= 0) return;
   const limit = chunkLimit();
@@ -12111,16 +12235,38 @@ function terrainPass(first, last, baseIndex) {
    ================================================================== */
 /* height up the object, half width there. The last pair closes the top.
    Kind 0 tree, 1 house, 2 hedge mass, 3 marker post. */
+/* SIX RECOGNISABLE THINGS, NOT FOUR BUMPS.
+
+   The first build of this was four small cones and blocks, which is a
+   texture rather than a world. What makes a silhouette read as an object
+   is a WAIST: a thin part with a wide part above it. A trunk under a
+   canopy, a post under a board, a post under a banner. A shape that is
+   simply wide at the bottom and narrow at the top is a bump whatever
+   else is done to it, which is why the old table produced bumps.
+
+   Read as (height up the object, half width there), mirrored about the
+   object's own centre line, so a lit face and a shade face come from one
+   description. The first pair is the base and the last closes the top. */
 const SCENERY_PROFILE = [
-  [[0, 0.22], [0.30, 0.62], [0.62, 0.38], [1, 0.05]],   // a conifer, waisted
-  [[0, 0.70], [0.58, 0.70], [0.72, 0.86], [1, 0.10]],   // a house under a pitched roof
-  [[0, 1.00], [0.55, 0.94], [0.85, 0.66], [1, 0.30]],   // a low broad mass
-  [[0, 0.10], [0.86, 0.10], [0.92, 0.26], [1, 0.20]]    // a post with a head
+  // 0  a tree: a real trunk, then a canopy that overhangs it sixfold
+  [[0, 0.07], [0.32, 0.06], [0.36, 0.46], [0.68, 0.40], [1, 0.07]],
+  // 1  a house: a box, the eaves overhanging, then a pitched roof
+  [[0, 0.66], [0.52, 0.66], [0.56, 0.80], [0.60, 0.72], [1, 0.05]],
+  // 2  a broad mass for the middle and far distance
+  [[0, 1.00], [0.42, 0.92], [0.74, 0.64], [0.90, 0.40], [1, 0.16]],
+  // 3  a road sign: a post and a board, which is the most legible
+  //    man-made silhouette there is at this size
+  [[0, 0.05], [0.58, 0.05], [0.62, 0.42], [0.98, 0.42], [1, 0.36]],
+  // 4  a banner on two posts, wide and thin and unmistakably built
+  [[0, 0.06], [0.62, 0.05], [0.70, 1.00], [0.94, 1.00], [1, 0.86]],
+  // 5  a tower: tall, narrow, with a head on it. The height variety
+  //    that stops a skyline of objects being a skyline of one object
+  [[0, 0.26], [0.72, 0.20], [0.78, 0.34], [0.94, 0.30], [1, 0.10]]
 ];
 const SCENERY_LIT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];     // scratch, x then y
 const SCENERY_SHADE = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-function sceneryPass(first, last, baseIndex) {
+function sceneryPass(first, last, baseIndex, w, h) {
   if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
   const limit = chunkLimit();
   const every = Math.max(1, Math.round(FEEL.SCENERY_EVERY));
@@ -12163,27 +12309,74 @@ function sceneryPass(first, last, baseIndex) {
           const ch = bh[n] + (bh[n + 1] - bh[n]) * f;
         // Two objects per site, one each side, each with its own draw.
         for (let side = -1; side <= 1; side += 2) {
-          const h1 = terrainHash(idx * 7 + (side > 0 ? 3 : 0));
+        /* SEVERAL THINGS PER SITE, AT DIFFERENT DISTANCES OUT. One
+           object per segment per side put everything in a line beside
+           the road; the ground now runs to the horizon and wants
+           filling across its whole width. Each slot has its own salt, so
+           they are independent draws rather than the same object moved. */
+        for (let slot = 0; slot < FEEL.SCENERY_PER_SITE; slot++) {
+          const salt = idx * 7 + slot * 131 + (side > 0 ? 3 : 0);
+          const h1 = terrainHash(salt);
           if (h1 > FEEL.SCENERY_DENSITY) continue;
-          const h2 = terrainHash(idx * 13 + (side > 0 ? 5 : 1));
-          const h3 = terrainHash(idx * 29 + (side > 0 ? 11 : 2));
+          const h2 = terrainHash(salt * 13 + 5);
+          const h3 = terrainHash(salt * 29 + 11);
           /* THE MID DISTANCE GETS MASSES AND THE NEAR FIELD GETS
              OBJECTS, which is the density rule stated as a kind rule. */
+          /* WHAT GROWS WHERE. The near band gets the detailed, man made
+             things, because near is where detail is legible at all: a
+             sign or a banner reads as itself at forty pixels and as
+             noise at four. The far band gets nothing but broad masses,
+             which is SCENERY.md's rule stated as a kind rule, and it is
+             also the cheap direction: vertices inside a subpath are
+             linear while subpaths are quadratic, so one wide mass buys
+             what six trees would cost. */
           let kind;
-          if (band === 0) kind = h2 < 0.52 ? 0 : (h2 < 0.78 ? 1 : 3);
-          else if (band === bands - 1) kind = 2;
-          else kind = h2 < 0.46 ? 2 : (h2 < 0.80 ? 0 : 1);
+          if (band === 0)            kind = h2 < 0.40 ? 0 : (h2 < 0.62 ? 1 : (h2 < 0.80 ? 3 : 4));
+          else if (band === 1)       kind = h2 < 0.34 ? 0 : (h2 < 0.56 ? 1 : (h2 < 0.74 ? 2 : 5));
+          else if (band === bands-1) kind = 2;
+          else                       kind = h2 < 0.52 ? 2 : (h2 < 0.78 ? 0 : 5);
           const prof = SCENERY_PROFILE[kind];
-          const scale = FEEL.SCENERY_SIZE * (0.62 + 0.76 * h3)
-                      * (kind === 2 ? FEEL.SCENERY_MASS_SCALE : 1);
-          const wide = scale * (kind === 2 ? FEEL.SCENERY_MASS_WIDE : 1);
-          // Out past the edge, on the terrain, never over the road.
+          /* HEIGHT VARIETY ABOVE ALL, because a skyline of identical
+             objects is a texture and a skyline of varied ones is a
+             place. Squared, so most things are ordinary and a few are
+             much taller, which is what a real treeline or roofline does.
+             A tower gets its own multiplier on top of that. */
+          const tall = 0.40 + 2.10 * h3 * h3;
+          const scale = FEEL.SCENERY_SIZE * tall
+                      * (kind === 2 ? FEEL.SCENERY_MASS_SCALE : 1)
+                      * (kind === 5 ? FEEL.SCENERY_TOWER_SCALE : 1);
+          const wide = scale * (kind === 2 ? FEEL.SCENERY_MASS_WIDE : 1)
+                             * (kind === 4 ? FEEL.SCENERY_BANNER_WIDE : 1);
+          /* SCATTERED ACROSS THE WHOLE GROUND, NOT HUGGING THE VERGE.
+             The offset is in road half widths, which is a fixed WORLD
+             distance, so a thing far out converges toward the vanishing
+             point exactly as it should. The old spread was 0.72 of a
+             band that was itself only 5.4 wide, so everything sat beside
+             the road. Now it reaches SCENERY_FAR out, and the near
+             sites whose offsets land off the side of the screen are
+             culled below rather than drawn. */
           const off = FEEL.SCENERY_CLEAR
-                    + h3 * FEEL.TERRAIN_REACH * FEEL.SCENERY_SPREAD;
+                    + h3 * h3 * FEEL.SCENERY_FAR_OUT;
           const bxp = cx + side * cw * off;
           const byp = cy - ch * FEEL.TERRAIN_HEIGHT * terrainRise(idx) * 0.5;
           const px = ch * wide, py = ch * scale;
           if (py < FEEL.SCENERY_MIN_PX) continue;
+          /* AND TOO CLOSE IS CULLED AS WELL AS TOO FAR. An object a few
+             metres from the camera projects to most of the frame height
+             and lands as a flat slab across the corner, with its own lit
+             and shade faces so far apart that neither reads as a face.
+             ART-DIRECTION.md asks for the near field to stay sparse so
+             the road keeps the air around it, and this is that rule
+             expressed as a number rather than as a placement fudge. */
+          if (py > h * FEEL.SCENERY_MAX_SHARE) continue;
+          /* OFF THE SIDE OF THE SCREEN IS CULLED HERE rather than left
+             to the rasteriser, because a subpath costs whether or not
+             any of it lands: the whole point of gate one is that this
+             renderer pays for geometry. With the spread now reaching
+             right across the ground, most near sites are off screen and
+             this is what keeps them free. */
+          if (bxp + px < -40 || bxp - px > w + 40) continue;
+          if (byp - py > h + 40) continue;
           /* The lit face is the left half and the shade face the right,
              every object, every band, every biome. */
           const dir = face === 0 ? -1 : 1;
@@ -12196,6 +12389,7 @@ function sceneryPass(first, last, baseIndex) {
           sub++;
           if (face === 0) sceneryDrawn++;
           if (sub >= limit) { ctx.fill(); ctx.beginPath(); sub = 0; }
+        }
         }
         }
       }
@@ -12886,11 +13080,16 @@ function signHueShift() {
    than branching, and rebuilt in rebuildDerivedColours like every other
    thing derived from the palette. A band colour that missed a rotation
    would put the last biome's world behind this one's road. */
-let SCENERY_BAND_LIT = ['#5c2f14', '#3d2115', '#2a1a22', '#2d1a26'];
-let SCENERY_BAND_SHADE = ['#22110b', '#1d1319', '#1f1521', '#281620'];
+let GROUND_BAND = ['#2a1509', '#20110c', '#190e11', '#150c13'];
+let SCENERY_BAND_LIT = ['#6b3718', '#4a2a1c', '#372232', '#2f1f2c'];
+let SCENERY_BAND_SHADE = ['#241209', '#251519', '#1c1420', '#201626'];
 let sceneryDrawn = 0;
 
 function rebuildDerivedColours() {
+  GROUND_BAND[0] = COLOUR.GROUND_NEAR;
+  GROUND_BAND[1] = COLOUR.GROUND_MID;
+  GROUND_BAND[2] = COLOUR.GROUND_FAR;
+  GROUND_BAND[3] = COLOUR.GROUND_HAZE;
   SCENERY_BAND_LIT[0] = COLOUR.SCENERY_NEAR_LIT;
   SCENERY_BAND_LIT[1] = COLOUR.SCENERY_MID_LIT;
   SCENERY_BAND_LIT[2] = COLOUR.SCENERY_FAR_LIT;
