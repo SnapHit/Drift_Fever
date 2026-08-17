@@ -160,6 +160,39 @@ This is genre convention rather than invention. Absolute Drift ships ghosts of t
 
 ## 6. The audience, which drives every technical constraint
 
+### The renderer constraint, which explains why this game looks the way it does
+
+**Added 14 August 2026, after eleven visual sessions each fixed a real defect and moved the
+result less than expected. This is the reason, and it should not have to be rediscovered.**
+
+The comparison people reach for is canvas 2D against canvas 2D. It is the wrong comparison.
+It is **2D-native against pseudo-3D**, and they have opposite cost structures.
+
+A 2D-native game has a fixed camera, no perspective, a static background and enormous temporal
+coherence between frames. It caches, pre-renders and reuses almost everything, so nearly its whole
+budget goes on APPEARANCE.
+
+Drift Fever projects road geometry through a perspective transform every frame with the camera
+moving forward at speed. Nothing repeats between frames. No static background, no cacheable layer,
+no dirty rectangles, no temporal reuse of any kind. **So nearly the whole frame budget goes into
+describing the SHAPE of the world, and almost nothing is left for how it looks.**
+
+That is the actual gap. It is not art direction, and no amount of palette work closes it.
+
+### The principle that follows, and it is the most useful thing in this brief
+
+**STARTUP TIME IS THE CURRENCY FOR SPRITE QUALITY, NOT FRAME TIME.**
+
+The trees do not look like trees because they are drawn from primitives every frame, so their
+complexity is charged sixty times a second. That forces each one down to three or four operations,
+and three or four operations cannot describe a tree.
+
+Baked once into an offscreen canvas at startup, the same tree can be two hundred operations. At
+runtime it costs one `drawImage` either way. Startup time is effectively unlimited: a few
+milliseconds at page load buys an entire art set.
+
+Anything drawn repeatedly should be baked once and blitted, not constructed per frame.
+
 **School children on managed Chromebooks, playing through a content filter.** This is not a guess about who searches "unblocked"; it is what the word means, and the seasonality data in section 3 confirms it empirically.
 
 **Hardware.** Low-end Chromebooks, often Celeron or similar with integrated graphics, some five or more years old.
@@ -188,6 +221,20 @@ Seven things recur across the arcade racing lineage, from the Sega cabinets that
 5. **Flat, minimalist stylisation beats fidelity, and it is the cheap option.** Absolute Drift and Art of Rally are both widely praised for their looks and both are flat-shaded low-poly with no texture detail; one description of Art of Rally is that everything appears cut and folded from paper. They compete on palette, silhouette and composition. **That is exactly what a single file with no assets produces. The constraint is the style.**
 6. **Ghosts are the genre standard.** See 4.5.
 7. **Difficulty offered, not imposed.** Art of Rally is praised for a sliding scale of handling and damage assists. Rather than a difficulty menu, let the margin for error widen or narrow quietly based on how the player is doing.
+
+### The saturation hierarchy, which is the rule every visual change is measured against
+
+**THE MOST SATURATED AND THE BRIGHTEST ELEMENT ON SCREEN MUST BE THE ROAD EDGE, IN EVERY PALETTE.**
+It is the boundary between living and dying, and nothing about beauty outranks it.
+
+This is the actionable form of the readability warning below. It is measured after every visual
+change: peak luminance ranked across every palette, plus the road lip against the road surface at
+two and three seconds of travel ahead. A change that improves a frame and narrows that gap has not
+shipped, it has regressed.
+
+The rest of the hierarchy, in order: road edge, then the road readable against the terrain, then
+terrain below the road, then void and sky darkest. The car is permitted above the edge because it
+is a compact silhouette at a fixed screen position and cannot be mistaken for a road boundary.
 
 ### The obvious art direction to refuse
 
@@ -330,6 +377,9 @@ A list of failures rather than a list of good examples, deliberately. Examples i
 - Do not build the steering as three discrete states. See 8.1.
 - Do not write two permission code paths. See 8.2.
 - Do not use localStorage without wrapping every call in try/catch. School networks and locked-down profiles frequently make storage unavailable, and the game must degrade to playing perfectly with no memory rather than throwing.
+- Do not use generated images as an asset source. Generation cannot supply a consistent set: sixteen rotations of one car returns sixteen different cars, and that is not a prompting problem. Useful for mood reference, not for assets.
+- Do not use `shadowBlur` for glow. Use a cached radial gradient sprite with additive blending, or the stacked-stroke passes already in the file.
+- Do not accept a proposal written for a different renderer. Anything drawn in screen space rather than through the projection, anything using compositing modes that lift the road surface, and anything with one fill per object are all unbuildable here regardless of how good they look elsewhere.
 - Do not optimise for a development machine's frame rate.
 - Do not build a second copy of the game for the content pages later. One file, one source of truth, framed where needed, same origin.
 
