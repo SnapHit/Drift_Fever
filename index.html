@@ -1190,7 +1190,15 @@ const FEEL = {
      road edge at 250. It is on the debug cycler so it can be walked up
      while driving rather than guessed at here.
      ------------------------------------------------------------------ */
-  HEADLIGHT_ALPHA:         0.16,     // LIVE, and low on purpose
+  /* SET FROM THE SWEEP, NOT FROM CAUTION. At 0.16 it was barely visible.
+     Measured: the pool's brightest pixel is 153 at alpha 0.35, 169 at
+     0.50, 185 at 0.65, 200 at 0.80 and 215 at 0.95, against a road edge
+     at 250. The lip is never the binding constraint: even at 0.95 the
+     lip against surface gap at 0.6 seconds only falls from 190.6 to
+     166.8. What binds is the pool's own peak approaching the edge, which
+     it does around 0.80. 0.70 puts the peak about sixty units under the
+     edge and lifts the road by 27 on average. */
+  HEADLIGHT_ALPHA:         0.70,     // LIVE
   HEADLIGHT_REACH:         6200,     // LIVE, world units the pool reaches ahead
   HEADLIGHT_LONG:          0.62,     // LIVE, semi axis along the heading, of the reach
   HEADLIGHT_AHEAD:         0.46,     // LIVE, where the centre sits, of the reach
@@ -1431,7 +1439,7 @@ const FEEL = {
      be worth drawing. A dozen houses you can see beats two hundred you
      cannot, and the far field emptying out is the price.
      ------------------------------------------------------------------ */
-  SCENERY_EVERY:              3,     // LIVE, segments between sites
+  SCENERY_EVERY:              2,     // LIVE, segments between sites
   SCENERY_DENSITY:         0.82,     // LIVE, share of sites that grow something
   SCENERY_SIZE:            2350,     // LIVE, world units tall at scale one
   SCENERY_CLEAR:            1.7,     // LIVE, half widths clear of the road edge
@@ -1458,11 +1466,11 @@ const FEEL = {
      If a real Chromebook turns out to have the room, four is better. */
   SCENERY_PER_SITE:           1,     // LIVE, independent draws per segment per side
   SCENERY_TOWER_SCALE:     1.90,     // a tower is the tall thing in a treeline
-  SCENERY_BANNER_WIDE:     1.15,     // and a banner is the wide one
+  SCENERY_BANNER_WIDE:     2.20,     // and a banner is the wide one
   SCENERY_MASS_SCALE:      1.55,     // a mid distance mass is bigger than a tree
   SCENERY_MASS_WIDE:       3.20,     // and much wider, which is what makes it a mass
   SCENERY_MIN_PX:           1.5,
-  SCENERY_MAX_SHARE:       0.26,     // LIVE, tallest an object may draw, as a share of the frame
+  SCENERY_MAX_SHARE:       0.17,     // LIVE, tallest an object may draw, as a share of the frame
   TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
   /* THE RIDGE RAN DEAD FLAT ACROSS THE FRAME and the reason was the
      number, not the hash. The lift is bh times this, and bh goes to
@@ -13577,8 +13585,8 @@ const SCENERY_PROFILE = [
   // 3  a road sign: a post and a board, which is the most legible
   //    man-made silhouette there is at this size
   [[0, 0.05], [0.58, 0.05], [0.62, 0.42], [0.98, 0.42], [1, 0.36]],
-  // 4  a banner on two posts, wide and thin and unmistakably built
-  [[0, 0.06], [0.62, 0.05], [0.70, 1.00], [0.94, 1.00], [1, 0.86]],
+  // 4  a hedge, wide and low with its weight on the ground
+  [[0, 1.00], [0.72, 0.98], [0.88, 0.80], [0.96, 0.52], [1, 0.18]],
   // 5  a tower: tall, narrow, with a head on it. The height variety
   //    that stops a skyline of objects being a skyline of one object
   [[0, 0.26], [0.72, 0.20], [0.78, 0.34], [0.94, 0.30], [1, 0.10]]
@@ -13800,12 +13808,11 @@ function geoObject(kind, wx, wy, wz, halfW, height, bucket, camX, w, h) {
     geoBox(wx, wy, wz, pw, ph, pw, MAT_METAL, bucket, camX, w, h);
     geoBox(wx, wy + ph, wz, halfW * 0.74, height * 0.44, pw * 0.6,
            MAT_SIGN, bucket, camX, w, h);
-  } else if (kind === 4) {                            // a banner on two posts
-    const pw = halfW * 0.07;
-    geoBox(wx - halfW * 0.82, wy, wz, pw, height, pw, MAT_METAL, bucket, camX, w, h);
-    geoBox(wx + halfW * 0.82, wy, wz, pw, height, pw, MAT_METAL, bucket, camX, w, h);
-    geoBox(wx, wy + height * 0.62, wz, halfW * 0.86, height * 0.34, pw * 0.5,
-           MAT_SIGN, bucket, camX, w, h);
+  } else if (kind === 4) {                            // a hedge
+    geoTaper(wx, wy, wz, halfW, height * 0.72, halfW * 0.34,
+             0.90, MAT_FOLIAGE, bucket, camX, w, h);
+    geoTaper(wx, wy + height * 0.72, wz, halfW * 0.90, height * 0.28,
+             halfW * 0.31, 0.58, MAT_FOLIAGE, bucket, camX, w, h);
   } else {                                            // a tower
     const bh2 = height * 0.78;
     geoBox(wx, wy, wz, halfW * 0.40, bh2, halfW * 0.40 * d,
@@ -13968,11 +13975,16 @@ let SCN_N = 0;
    above, a sign is a metal post under a sign face. The mass has one
    material because at that distance it is a treeline rather than a tree.
    Split -1 means the whole profile is the low material. */
-const KIND_MAT_LOW  = [MAT_BARK, MAT_WALL, MAT_FOLIAGE, MAT_METAL, MAT_METAL, MAT_WALL];
-const KIND_MAT_HIGH = [MAT_FOLIAGE, MAT_ROOF, -1, MAT_SIGN, MAT_SIGN, MAT_METAL];
-const KIND_SPLIT    = [2, 2, -1, 2, 2, 2];
+const KIND_MAT_LOW  = [MAT_BARK, MAT_WALL, MAT_FOLIAGE, MAT_METAL, MAT_FOLIAGE, MAT_WALL];
+const KIND_MAT_HIGH = [MAT_FOLIAGE, MAT_ROOF, -1, MAT_SIGN, -1, MAT_METAL];
+const KIND_SPLIT    = [2, 2, -1, 2, -1, 2];
 /* Which kinds are built from boxes once they are big enough. See the
    note at the solid test in sceneryPass. */
+/* THE FAR MASSES STAY FLAT, and that is an unpriced change rather than a
+   judgement. Geometry on them was built and it looks better; masses are
+   the most numerous kind, so it is also the one patch in this set that
+   could plausibly cost real frame time, and the container was too noisy
+   to price it against the others. Unpriced work does not ship. */
 const GEO_KINDS     = [1, 1, 0, 1, 1, 1];
 
 function sceneryPass(first, last, baseIndex, w, h) {
@@ -14035,6 +14047,7 @@ function sceneryPass(first, last, baseIndex, w, h) {
           const tall = 0.40 + 2.10 * h3 * h3;
           const scale = FEEL.SCENERY_SIZE * tall
                       * (kind === 2 ? FEEL.SCENERY_MASS_SCALE : 1)
+                      * (kind === 4 ? 0.38 : 1)
                       * (kind === 5 ? FEEL.SCENERY_TOWER_SCALE : 1);
           const wide = scale * (kind === 2 ? FEEL.SCENERY_MASS_WIDE : 1)
                              * (kind === 4 ? FEEL.SCENERY_BANNER_WIDE : 1);
