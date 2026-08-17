@@ -1438,9 +1438,37 @@ const FEEL = {
      of the objects, all of them where they can be seen and big enough to
      be worth drawing. A dozen houses you can see beats two hundred you
      cannot, and the far field emptying out is the price.
+
+     AND THEN EVERY WENT TO TWO AND THAT WAS WRONG. Objects went 70 to
+     116 on top of everything already being three times the world size,
+     and the two compound: 66 per cent more objects at three times the
+     size is a verge that is 3.6 objects deep everywhere, measured, which
+     is a wall rather than a place. The count comes back down and the
+     sizes stay. What the space buys is below.
      ------------------------------------------------------------------ */
-  SCENERY_EVERY:              2,     // LIVE, segments between sites
-  SCENERY_DENSITY:         0.82,     // LIVE, share of sites that grow something
+  SCENERY_EVERY:              3,     // LIVE, segments between sites
+  SCENERY_DENSITY:         0.74,     // LIVE, share of sites that grow something
+  /* ------------------------------------------------------------------
+     CLUSTERS AND CLEARINGS, WHICH IS WHAT REGULAR SPACING WAS COSTING.
+
+     Every site rolling the same probability puts something at almost
+     every site: measured at the old density the median gap between two
+     objects on one side of the road was two segments and the longest gap
+     in four thousand segments was ten. That is wallpaper, and wallpaper
+     is what stops any one object being a thing you can point at.
+
+     So the density is modulated by a smooth field along the road. Where
+     it is high the sites crowd into a copse or a row of houses, where it
+     is low the verge opens out and the ones either side of the opening
+     read as individual objects because there is nothing beside them.
+     The field averages one, so the object count is unchanged by this and
+     is set by EVERY and DENSITY alone.
+
+     IT IS A FUNCTION OF THE SITE AND NOT OF THE CAMERA, the same rule
+     the scatter lives under: a clearing is somewhere on the road, not
+     somewhere on the screen, so it does not slide as you drive at it. */
+  SCENERY_CLUMP:           0.92,     // LIVE, 0 is the old even spread, 1 is full swing
+  SCENERY_CLUMP_SEGS:        34,     // LIVE, segments a cluster and its clearing span
   SCENERY_SIZE:            2350,     // LIVE, world units tall at scale one
   SCENERY_CLEAR:            1.7,     // LIVE, half widths clear of the road edge
   /* AND IT IS BACK AT TWO, WHICH IS THE SQUARING THAT SHIPPED. Biasing
@@ -3572,10 +3600,26 @@ const FEEL = {
      SKY: it says aim here and go up. Different plane, different axis,
      different colour family, and a cold player read the old ramp markings
      as a hazard once already. */
-  JUMP_ARROW_COUNT:           4,     // chevrons standing before the ramp
-  JUMP_ARROW_SPACING:        11,     // segments between them
-  JUMP_ARROW_HEIGHT:        820,     // world units, taller than a pylon so it reads far out
-  JUMP_ARROW_HALF:         0.26,     // of the half width
+  /* THE GUARANTEE, AND IT IS THE POINT OF THIS BLOCK. A hazard gets
+     HAZARD_WARN_SEGMENTS of painted road before it, which is a stated
+     distance and therefore a stated amount of time whatever else is
+     happening. A jump had no such number: the run of chevrons was
+     COUNT times SPACING and nobody had ever written down what that came
+     to. It came to 44 segments, which is LESS than the hazard's 45, on
+     the thing you have to be set up for well before you reach it.
+
+     So the distance is authored and the spacing is derived from it. The
+     furthest chevron stands exactly this many segments before the ramp,
+     and jumpFits already reserves straight road for the whole of it. */
+  JUMP_WARN_SEGMENTS:        72,     // a second and six tenths, against the hazard's one
+  JUMP_ARROW_COUNT:           5,     // chevrons standing before the ramp
+  /* AND THE SIZE, WHICH IS WHAT WAS ACTUALLY WRONG. Measured at the old
+     820: four chevrons 10 to 12 pixels tall in an 844 pixel frame at a
+     second and a half out. They were drawn, they were bright and they
+     were nowhere near big enough to be a warning. The mark is now roughly
+     square, 44 per cent of the road wide, and five times the area. */
+  JUMP_ARROW_HEIGHT:       2400,     // world units, twice the ramp lip so it reads far out
+  JUMP_ARROW_HALF:         0.44,     // of the half width, so the road edges stay clear
   JUMP_ARROW_THICK:        0.34,     // of the chevron height, the stroke
   /* When the first one turns up and how often after that. Inside the
      first minute and often enough to meet several in a normal run, which
@@ -5871,8 +5915,8 @@ const TUNABLES = [
   { key: 'JUMP_RAMP_HALF',     label: 'rampWide',step: 0.02, min: 0.1,  max: 1.0,   dp: 2, group: 24 },
   { key: 'JUMP_RUNOUT',        label: 'runout',  step: 2,    min: 4,    max: 80,    dp: 0, group: 24 },
   { key: 'JUMP_ARROW_COUNT',   label: 'chevs',   step: 1,    min: 1,    max: 10,    dp: 0, group: 24 },
-  { key: 'JUMP_ARROW_SPACING', label: 'chevGap', step: 1,    min: 3,    max: 40,    dp: 0, group: 24 },
-  { key: 'JUMP_ARROW_HEIGHT',  label: 'chevTall',step: 20,   min: 80,   max: 2000,  dp: 0, group: 24 },
+  { key: 'JUMP_WARN_SEGMENTS', label: 'chevWarn',step: 2,    min: 10,   max: 160,   dp: 0, group: 24 },
+  { key: 'JUMP_ARROW_HEIGHT',  label: 'chevTall',step: 20,   min: 80,   max: 4000,  dp: 0, group: 24 },
   { key: 'JUMP_ARROW_HALF',    label: 'chevWide',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 12,    dp: 0, group: 25 },
@@ -9137,7 +9181,18 @@ function jumpUnlocked() {
   return buildClock() >= unlockAt(FEEL.JUMP_TIME);
 }
 
-function jumpLead() { return FEEL.JUMP_ARROW_COUNT * FEEL.JUMP_ARROW_SPACING + 4; }
+/* Where chevron m stands, counting from the ramp backwards, so that
+   chevron JUMP_ARROW_COUNT lands exactly on the stated warning distance.
+   Derived rather than authored: the two used to be independent and they
+   drifted apart, which is how the warning ended up shorter than the
+   hazard's. */
+function jumpArrowSpacing() {
+  return FEEL.JUMP_WARN_SEGMENTS / FEEL.JUMP_ARROW_COUNT;
+}
+function jumpArrowSeg(j, m) {
+  return j.from - Math.round(m * jumpArrowSpacing());
+}
+function jumpLead() { return FEEL.JUMP_WARN_SEGMENTS + 4; }
 
 /* The same exclusion rule the hazards live under, asked BEFORE the road
    is built rather than after, so a jump that does not fit costs nothing.
@@ -11540,8 +11595,18 @@ function jumpChevrons(first, last, baseIndex, grow) {
     const j = jumps[k];
     if (j.done) continue;                    // taken, and behind the player
     for (let m = 1; m <= FEEL.JUMP_ARROW_COUNT; m++) {
-      const n = j.from - m * FEEL.JUMP_ARROW_SPACING - baseIndex;
-      if (n < first || n > last || !bvis[n]) continue;
+      let n = jumpArrowSeg(j, m) - baseIndex;
+      if (n < first || n > last) continue;
+      /* AND THIS IS THE OTHER HALF OF THE LATENESS. The far field
+         coalescing clears bvis on every segment it absorbs, and a
+         chevron whose own segment was absorbed simply vanished. Measured
+         on the shipped build: beyond about sixty segments the run drew
+         zero, one, two or three of its four markers depending on where
+         the merges happened to fall, so there was no guarantee at all,
+         only luck. Snap back to the anchor that survived instead. It is
+         at most SEG_MERGE_PX away up the screen, which is a pixel. */
+      while (n > first && !bvis[n]) n--;
+      if (!bvis[n]) continue;
       any = true;
       // The run grows toward the ramp, so it reads as leading somewhere
       // rather than as a row of identical markers.
@@ -13297,6 +13362,25 @@ function terrainHash(i) {
   h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
+/* HOW CROWDED THIS PART OF THE VERGE IS, from nothing to twice the mean.
+
+   The same smoothstepped value noise the ridge uses, at its own
+   wavelength, and the two sides of the road are salted apart so a
+   clearing on the left is not also a clearing on the right. Returns a
+   multiplier on SCENERY_DENSITY whose average over the road is one, so
+   turning this up rearranges the world without adding to it. */
+function sceneryClump(idx, side) {
+  const c = FEEL.SCENERY_CLUMP;
+  if (c <= 0) return 1;
+  const step = Math.max(1, Math.round(FEEL.SCENERY_CLUMP_SEGS));
+  const a = Math.floor(idx / step);
+  const f = (idx - a * step) / step;
+  const t = f * f * (3 - 2 * f);
+  const salt = side > 0 ? 0x51ed : 0;
+  const v0 = terrainHash(a * 977 + salt), v1 = terrainHash((a + 1) * 977 + salt);
+  return 1 + c * (2 * (v0 + (v1 - v0) * t) - 1);
+}
+
 /* Smoothstepped between hash points so the ridge line has no corners in
    it. Flat at both ends of every interval, which is what stops the
    joins reading as facets on a slow pan. */
@@ -13803,6 +13887,18 @@ function geoObject(kind, wx, wy, wz, halfW, height, bucket, camX, w, h) {
            MAT_WALL, bucket, camX, w, h);
     geoRoof(wx, wy + wallH, wz, halfW * 0.86, height * 0.42, halfW * 0.72 * d,
             MAT_ROOF, bucket, camX, w, h);
+  } else if (kind === 2) {                            // a treeline mass
+    /* A BANK, AND ITS DEPTH COMES OFF ITS HEIGHT RATHER THAN ITS WIDTH.
+       A mass is SCENERY_MASS_WIDE times as wide as it is tall, so the
+       usual GEO_DEPTH share of the half width would make a treeline as
+       deep as it is broad, and it would run out over the road. Two
+       shallow stages, so it has a ridge line and a lit flank instead of
+       being one flat colour the whole way along. */
+    const dd = height * 0.55;
+    geoTaper(wx, wy, wz, halfW, height * 0.62, dd,
+             0.88, MAT_FOLIAGE, bucket, camX, w, h);
+    geoTaper(wx, wy + height * 0.62, wz, halfW * 0.88, height * 0.38, dd * 0.78,
+             0.54, MAT_FOLIAGE, bucket, camX, w, h);
   } else if (kind === 3) {                            // a road sign
     const ph = height * 0.56, pw = halfW * 0.10;
     geoBox(wx, wy, wz, pw, ph, pw, MAT_METAL, bucket, camX, w, h);
@@ -13980,22 +14076,35 @@ const KIND_MAT_HIGH = [MAT_FOLIAGE, MAT_ROOF, -1, MAT_SIGN, -1, MAT_METAL];
 const KIND_SPLIT    = [2, 2, -1, 2, -1, 2];
 /* Which kinds are built from boxes once they are big enough. See the
    note at the solid test in sceneryPass. */
-/* THE FAR MASSES STAY FLAT, and that is an unpriced change rather than a
-   judgement. Geometry on them was built and it looks better; masses are
-   the most numerous kind, so it is also the one patch in this set that
-   could plausibly cost real frame time, and the container was too noisy
-   to price it against the others. Unpriced work does not ship. */
-const GEO_KINDS     = [1, 1, 0, 1, 1, 1];
+/* AND THE FAR MASSES NOW TOO, PRICED AT LAST. This was held back one
+   session as an unpriced change: the same build measured 2.5ms and 3.8ms
+   an hour apart, so nothing the size of one kind could be attributed.
+   The fix was to stop comparing builds and start comparing conditions
+   INSIDE one page, flipping GEO_KINDS[2] every eight frames and taking
+   the difference block against neighbouring block, so container drift
+   lands on both sides of the subtraction. Measured that way, over forty
+   pairs a side: 0.0ms at native, p10 to p90 of -0.1 to 0.2, against a
+   whole scenery pass of 0.6ms on the same probe. At a six times CPU
+   throttle it is 0.4 to 0.6ms on a 27ms frame, against 4.1 to 5.2ms for
+   the scenery. It is a tenth of the pass it belongs to, and it is the
+   kind that most needed a lit flank, because a treeline drawn as one
+   flat colour is exactly the wall this session was asked to break up. */
+const GEO_KINDS     = [1, 1, 1, 1, 1, 1];
 
 function sceneryPass(first, last, baseIndex, w, h) {
-  if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
-  const every = Math.max(1, Math.round(FEEL.SCENERY_EVERY));
-  const buckets = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
+  /* CLEARED BEFORE THE GUARD RATHER THAN AFTER IT. Turned off, the pass
+     used to return leaving last frame's counts standing, so anything
+     asking how much scenery is in shot got an answer from a frame that
+     is no longer on screen. Nothing in the game reads them, every
+     measurement of the world does. */
   sceneryDrawn = 0;
   SCN_N = 0;
   GEO_N = 0;
   GEO_OBJ_COUNT = 0;
   SHADOW_N = 0;
+  if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
+  const every = Math.max(1, Math.round(FEEL.SCENERY_EVERY));
+  const buckets = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
   // The camera's own world x, the same one the boundary walk projected
   // against, so the geometry lands exactly where the road put the ground.
   const camX = cameraX;
@@ -14026,7 +14135,7 @@ function sceneryPass(first, last, baseIndex, w, h) {
         for (let slot = 0; slot < FEEL.SCENERY_PER_SITE; slot++) {
           const salt = idx * 7 + slot * 131 + (side > 0 ? 3 : 0);
           const h1 = terrainHash(salt);
-          if (h1 > FEEL.SCENERY_DENSITY) continue;
+          if (h1 > FEEL.SCENERY_DENSITY * sceneryClump(idx, side)) continue;
           const h2 = terrainHash(salt * 13 + 5);
           const h3 = terrainHash(salt * 29 + 11);
           /* WHAT GROWS WHERE, as a share of the depth range. The near
@@ -14074,6 +14183,20 @@ function sceneryPass(first, last, baseIndex, w, h) {
              camera is would have been the obvious fix and it is wrong:
              an object's offset would change as you drove toward it, so
              the world would slide sideways. */
+          /* THE SAME DRAW AS THE HEIGHT, ON PURPOSE, AND IT WAS TESTED.
+
+             Height and offset both come off h3, so how far out a thing
+             stands is perfectly correlated with how tall it is, and that
+             looks like a defect: everything near the road is short and
+             everything tall is at the back. Giving the offset its own
+             draw was built and measured, and it makes the world WORSE by
+             every separation number there is. Tall objects arrive beside
+             the road, where they are enormous, and they bury what is
+             behind them: objects over fifteen pixels that are eighty per
+             cent clear fall from 7.6 a frame to 5, buried ones rise from
+             15.3 to 25.6, and the mean unhidden share of an outline
+             halves from 36 to 17 per cent. The correlation is what keeps
+             the near verge low enough to see the world over. */
           const off = FEEL.SCENERY_CLEAR
                     + Math.pow(h3, FEEL.SCENERY_OUT_BIAS) * FEEL.SCENERY_FAR_OUT;
           const bxp = cx + side * cw * off;
