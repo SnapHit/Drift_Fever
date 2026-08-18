@@ -1603,6 +1603,39 @@ const FEEL = {
   SIGN_MARKER_HIGH:        1500,     // LIVE
   SIGN_POST_WIDE:           650,     // LIVE
   SIGN_POST_HIGH:          1000,     // LIVE
+  /* ------------------------------------------------------------------
+     THE TREES. Same pipeline, same registry, same pass. Three variants,
+     because a stand of one tree stamped repeatedly is wallpaper and this
+     project has already paid for learning that once, with the scenery
+     spacing two sessions ago.
+
+     HOW MANY, AND THE NUMBER IS OFF THE BUDGET RATHER THAN OFF A STILL.
+     A sprite costs 3.7 microseconds native and 21 to 27 under a six
+     times CPU throttle, which is the profile the audience actually has.
+     The path built roadside pass it replaces spent 4.5 to 4.9ms there.
+     Spending the same on trees at the measured per tree cost is the
+     count below, and it is stated as a count rather than as a density so
+     that it can be checked. */
+  TREE_EVERY:                 1,     // LIVE, segments between tree sites
+  TREE_DENSITY:            0.72,     // LIVE, share of sites that grow one
+  TREE_CLEAR:              2.05,     // LIVE, half widths clear of the road centre
+  TREE_FAR_OUT:             7.5,     // LIVE, half widths the scatter reaches
+  TREE_OUT_BIAS:            2.0,     // LIVE, exponent biasing the scatter inward
+  /* A GUARD RATHER THAN A LIMIT, AND THE MEASUREMENT MOVED IT. At 0.34
+     it fired: the largest tree drawn in seventy seconds of play was 287
+     CSS pixels because the cull clipped it, against 325 with the cull
+     removed, so it was popping trees that read perfectly well. The
+     reason it barely matters is geometric: a tree stands at 2.05 half
+     widths or further out, so it leaves the SIDE of the frame long
+     before it can fill it, and the close range billboarding problem this
+     was built to hide never arrives. 0.45 is above anything measured. */
+  TREE_MAX_PX:             0.45,     // LIVE, tallest a tree may draw, share of the frame
+  TREE_BROAD_WIDE:         2400,     // LIVE, world units
+  TREE_BROAD_HIGH:         2800,     // LIVE
+  TREE_CONIFER_WIDE:       1500,     // LIVE
+  TREE_CONIFER_HIGH:       3600,     // LIVE
+  TREE_SCRUB_WIDE:         1900,     // LIVE
+  TREE_SCRUB_HIGH:         1700,     // LIVE
   TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
   /* THE RIDGE RAN DEAD FLAT ACROSS THE FRAME and the reason was the
      number, not the hash. The lift is bh times this, and bh goes to
@@ -5860,6 +5893,18 @@ const TUNABLES = [
   { key: 'SIGN_MARKER_HIGH',   label: 'markH',   step: 50,  min: 200,  max: 6000,  dp: 0, group: 29 },
   { key: 'SIGN_POST_WIDE',     label: 'postW',   step: 25,  min: 100,  max: 4000,  dp: 0, group: 29 },
   { key: 'SIGN_POST_HIGH',     label: 'postH',   step: 50,  min: 200,  max: 6000,  dp: 0, group: 29 },
+  { key: 'TREE_EVERY',         label: 'treeEvry',step: 1,   min: 0,    max: 40,    dp: 0, group: 30 },
+  { key: 'TREE_DENSITY',       label: 'treeDens',step: 0.04,min: 0,    max: 1,     dp: 2, group: 30 },
+  { key: 'TREE_CLEAR',         label: 'treeClr', step: 0.05,min: 1.7,  max: 8,     dp: 2, group: 30 },
+  { key: 'TREE_FAR_OUT',       label: 'treeFar', step: 0.5, min: 0,    max: 40,    dp: 1, group: 30 },
+  { key: 'TREE_OUT_BIAS',      label: 'treeBias',step: 0.2, min: 0.4,  max: 8,     dp: 1, group: 30 },
+  { key: 'TREE_MAX_PX',        label: 'treeMax', step: 0.02,min: 0.04, max: 2,     dp: 2, group: 30 },
+  { key: 'TREE_BROAD_WIDE',    label: 'trBroadW',step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
+  { key: 'TREE_BROAD_HIGH',    label: 'trBroadH',step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
+  { key: 'TREE_CONIFER_WIDE',  label: 'trConeW', step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
+  { key: 'TREE_CONIFER_HIGH',  label: 'trConeH', step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
+  { key: 'TREE_SCRUB_WIDE',    label: 'trScrubW',step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
+  { key: 'TREE_SCRUB_HIGH',    label: 'trScrubH',step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
   { key: 'TERRAIN_REACH',      label: 'terrW',   step: 0.2,  min: 0,    max: 24,    dp: 1, group: 12 },
   { key: 'TERRAIN_HEIGHT',     label: 'terrH',   step: 40,   min: 0,    max: 4000,  dp: 0, group: 12 },
   { key: 'TERRAIN_HILL_SEGMENTS',label:'terrHz', step: 2,    min: 2,    max: 120,   dp: 0, group: 12 },
@@ -8777,10 +8822,20 @@ function addSegment(curve, halfWidth) {
      never changes, which is what keeps the array monomorphic. */
   const idx = segBase + segments.length;
   const sg = signFor(idx);
+  /* TWO SLOTS, NOT ONE, AND THE SECOND ONE IS WHY THE FIRST HAD TO
+     GENERALISE. One slot per segment was enough while the only thing in
+     the world was four gantries and their markers. Trees are placed at a
+     site every few segments on BOTH sides, so a segment routinely
+     carries two, and giving them a slot each is two more numbers rather
+     than an array per segment: no allocation, and the object shape stays
+     the same for every segment ever made, which is what keeps the
+     property access monomorphic. */
+  const tr = treeFor(idx);
   segments.push({
     index: idx, curve: curve, hw: halfWidth,
     ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0,
-    sgn: sg ? sg.id + 1 : 0, sgnX: sg ? sg.off : 0
+    sgn: sg ? sg.id + 1 : 0, sgnX: sg ? sg.off : 0,
+    sg2: tr ? tr.id + 1 : 0, sg2X: tr ? tr.off : 0
   });
 }
 
@@ -14800,6 +14855,235 @@ function bakePost(g, W, H, def) {
    sign does not change size when the road squeezes. The gantry is sized
    against the BASE half width, which is what a real one is built for.
    ------------------------------------------------------------------ */
+/* ==================================================================
+   TREES, THROUGH THE SAME PIPE. The second thing baked, and the one
+   that tests the principle rather than the plumbing.
+
+   A SIGN IS FLAT AND FACES THE CAMERA, so a scaled blit of one is not
+   an approximation of anything, it is the thing. A tree is not, and a
+   scaled flat image of a tree is a billboard: it does not turn as the
+   camera passes it. Trees forgive that better than almost any object
+   because a real one is close to radially symmetric and its silhouette
+   is noise rather than structure, which is why they are the right second
+   test rather than a soft one.
+
+   WHAT THE DETAIL BUDGET BUYS. BRIEF.md: startup time is the currency
+   for sprite quality, not frame time. Drawn from primitives every frame
+   a tree gets three or four operations and three or four operations
+   cannot describe a tree, which is why the old ones read as lollipops.
+   Each of these is between 90 and 160 operations and costs one
+   drawImage. What that pays for, in order of how much it matters at
+   forty pixels:
+
+     AN EDGE THAT IS NOT A CURVE. The canopy is forty to sixty
+     overlapping discs of varying size rather than one shape, so its
+     outline is lumpy at every scale it is ever drawn at. This is the
+     single thing that separates a tree from a circle on a stick.
+     SKY HOLES. Four to seven gaps punched back out of the mass with
+     destination-out, so light comes through it. A solid silhouette
+     reads as a rock.
+     THREE TONAL LAYERS. A dark base, a mid mass offset toward the
+     light, and a smaller lit cap, so the canopy has a volume rather
+     than an area.
+     BRANCHES, drawn before the canopy and visible through the holes.
+     A TRUNK with root flare and a lit edge.
+   ================================================================== */
+
+/* THE TREE PALETTE, PINNED, AND FOR THE SAME REASON THE SIGNS ARE.
+   A baked image cannot follow the biome.
+
+   THE TONES SIT BELOW THE TERRAIN, DELIBERATELY, AND THE FIRST SET WAS
+   WRONG. The hills render at 51 to 54 mid field, and this project's own
+   threshold is that under about 30 units of separation from its
+   background a thing is invisible. The first attempt ran 28 to 77, so
+   the middle of the canopy sat 11 units from the hill and the highlight
+   sat ABOVE it. Rendered at the sizes trees are actually drawn, over the
+   terrain green rather than over the white of an atlas view, they were
+   mush.
+
+   THE SECOND SET WAS WRONG THE OTHER WAY, and the pass being replaced
+   is what settled it. Measured on the legacy path built objects, the old
+   world's roadside things sat at 47 to 65 mean against a background of
+   30 to 42: they were BRIGHTER than the ground by 15 to 23 units, not
+   darker, because they attenuated toward the shoulder rather than toward
+   the plane. A uniformly dark tree at 21 mean against 40 separates by
+   19, which is the same magnitude in the other direction and reads as a
+   hole rather than as an object.
+
+   SO IT STRADDLES. 14 at the base of the canopy through 62 at the lit
+   crown, against a background that runs 30 to 42: the shaded underside
+   is clearly below it, the lit crown clearly above it, and the tree has
+   48 units of its own internal range to describe a shape with. That is
+   what the old objects had and it is what a real tree under a night sky
+   does. What a baked sprite still cannot do is change with depth, and
+   the terrain behind it has twenty depths. See the session report. */
+const TREE_INK = {
+  DARK:   '#061107',                     // luma 14
+  MID:    '#0d1f0c',                     // 26
+  LIT:    '#1c3314',                     // 44
+  RIM:    '#30451c',                     // 62
+  TRUNK:  '#100c08',                     // 13
+  TRUNK_L:'#211911',                     // 26
+  BRANCH: '#0d0a07'                      // 10
+};
+
+/* A seeded stream for the bake, so the same variant is the same tree
+   every time the atlas is built and a rebake on rotation does not
+   reshuffle the world. Nothing here may touch rng(), which belongs to
+   the road. */
+function treeRand(state) {
+  return function () {
+    state = (state + 0x6D2B79F5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* One clump of canopy: a run of overlapping discs along a short arc, so
+   the mass is built from strokes rather than from a scatter. */
+function treeClump(g, r, cx, cy, rad, n, spread) {
+  for (let i = 0; i < n; i++) {
+    const a = r() * 6.2832;
+    const d = Math.sqrt(r()) * spread;
+    const rr = rad * (0.42 + r() * 0.72);
+    g.beginPath();
+    g.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.78, rr, 0, 6.2832);
+    g.fill();
+  }
+}
+
+function treeTrunk(g, W, H, r, baseY, topY, wide, lean) {
+  const lit = signLitSide();
+  const bx0 = W / 2, tx = W / 2 + lean;
+  g.beginPath();
+  g.moveTo(bx0 - wide * 1.9, baseY);
+  g.bezierCurveTo(bx0 - wide * 1.1, baseY - (baseY - topY) * 0.12,
+                  tx - wide * 0.62, topY + (baseY - topY) * 0.3, tx - wide * 0.5, topY);
+  g.lineTo(tx + wide * 0.5, topY);
+  g.bezierCurveTo(bx0 + wide * 1.1, baseY - (baseY - topY) * 0.12,
+                  bx0 + wide * 1.1, baseY - (baseY - topY) * 0.05, bx0 + wide * 1.9, baseY);
+  g.closePath();
+  g.fillStyle = TREE_INK.TRUNK; g.fill();
+  // the lit edge, on the world light's side
+  g.beginPath();
+  const s = lit < 0 ? -1 : 1;
+  g.moveTo(bx0 + s * wide * 1.9, baseY);
+  g.lineTo(bx0 + s * wide * 1.2, baseY);
+  g.lineTo(tx + s * wide * 0.5, topY);
+  g.lineTo(tx + s * wide * 0.2, topY);
+  g.closePath();
+  g.fillStyle = TREE_INK.TRUNK_L; g.fill();
+}
+
+function treeBranches(g, W, H, r, fromY, toY, n, spread) {
+  g.strokeStyle = TREE_INK.BRANCH;
+  g.lineCap = 'round';
+  for (let i = 0; i < n; i++) {
+    const side = i % 2 ? 1 : -1;
+    const t = 0.15 + (i / n) * 0.7;
+    const y0 = fromY + (toY - fromY) * t;
+    g.lineWidth = Math.max(0.8, W * 0.020 * (1 - t * 0.5));
+    g.beginPath();
+    g.moveTo(W / 2, y0);
+    g.quadraticCurveTo(W / 2 + side * spread * 0.5, y0 - (fromY - toY) * 0.10,
+                       W / 2 + side * spread * (0.7 + r() * 0.5),
+                       y0 - (fromY - toY) * (0.18 + r() * 0.16));
+    g.stroke();
+  }
+}
+
+/* The holes. Punched out of everything drawn so far rather than painted
+   in a background colour, because the sprite has to composite over
+   whatever the world puts behind it. */
+function treeHoles(g, r, cx, cy, rad, n) {
+  const old = g.globalCompositeOperation;
+  g.globalCompositeOperation = 'destination-out';
+  g.fillStyle = '#000';
+  for (let i = 0; i < n; i++) {
+    const a = r() * 6.2832, d = Math.sqrt(r()) * rad * 0.78;
+    g.beginPath();
+    g.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.8,
+          rad * (0.055 + r() * 0.10), 0, 6.2832);
+    g.fill();
+  }
+  g.globalCompositeOperation = old;
+}
+
+/* ONE: THE BROAD ONE. A round headed deciduous, the default tree. */
+function bakeTreeBroad(g, W, H, def) {
+  const r = treeRand(0x5eed01);
+  const lit = signLitSide();
+  const baseY = H, trunkTop = H * 0.42;
+  treeTrunk(g, W, H, r, baseY, trunkTop, W * 0.036, W * 0.02);
+  treeBranches(g, W, H, r, baseY * 0.96, trunkTop * 0.55, 6, W * 0.24);
+  const cx = W * 0.5, cy = H * 0.30, rad = W * 0.15;
+  g.fillStyle = TREE_INK.DARK;  treeClump(g, r, cx, cy + H * 0.02, rad, 26, W * 0.30);
+  g.fillStyle = TREE_INK.MID;   treeClump(g, r, cx - lit * W * 0.03, cy, rad * 0.86, 20, W * 0.25);
+  g.fillStyle = TREE_INK.LIT;   treeClump(g, r, cx - lit * W * 0.07, cy - H * 0.05,
+                                          rad * 0.62, 13, W * 0.17);
+  g.fillStyle = TREE_INK.RIM;   treeClump(g, r, cx - lit * W * 0.10, cy - H * 0.08,
+                                          rad * 0.34, 6, W * 0.10);
+  treeHoles(g, r, cx, cy, W * 0.36, 6);
+}
+
+/* TWO: THE CONIFER. Tall, narrow, and its tiers are what make its
+   outline spiky rather than lumpy, which is the difference that reads
+   at forty pixels. */
+function bakeTreeConifer(g, W, H, def) {
+  const r = treeRand(0x5eed02);
+  const lit = signLitSide();
+  treeTrunk(g, W, H, r, H, H * 0.12, W * 0.055, 0);
+  const tiers = 7;
+  for (let i = 0; i < tiers; i++) {
+    const t = i / (tiers - 1);
+    const y = H * (0.90 - t * 0.80);
+    const half = W * (0.46 - t * 0.36);
+    const drop = H * 0.075;
+    for (const [tone, off, sc] of [[TREE_INK.DARK, 0, 1],
+                                   [TREE_INK.MID, -lit * half * 0.16, 0.82],
+                                   [TREE_INK.LIT, -lit * half * 0.30, 0.5]]) {
+      g.fillStyle = tone;
+      g.beginPath();
+      g.moveTo(W / 2 + off, y - drop * 1.5);
+      // a ragged skirt rather than a straight edge
+      const n = 7;
+      for (let k = 0; k <= n; k++) {
+        const u = k / n;
+        const x = W / 2 + off + (u - 0.5) * 2 * half * sc;
+        const yy = y + drop * (0.35 + 0.55 * Math.abs(u - 0.5) * 2)
+                 + (r() - 0.5) * drop * 0.5;
+        g.lineTo(x, yy);
+      }
+      g.closePath();
+      g.fill();
+    }
+  }
+  treeHoles(g, r, W / 2, H * 0.55, W * 0.30, 5);
+}
+
+/* THREE: THE SCRUB. Low, wide, leaning, and multi stemmed. It is what
+   stops a stand of trees being one tree stamped repeatedly. */
+function bakeTreeScrub(g, W, H, def) {
+  const r = treeRand(0x5eed03);
+  const lit = signLitSide();
+  for (const [dx, w2, top] of [[-W * 0.10, W * 0.028, H * 0.55],
+                               [W * 0.06, W * 0.033, H * 0.48]]) {
+    g.save(); g.translate(dx, 0);
+    treeTrunk(g, W, H, r, H, top, w2, -dx * 0.5);
+    g.restore();
+  }
+  treeBranches(g, W, H, r, H * 0.95, H * 0.5, 5, W * 0.26);
+  const cy = H * 0.36, rad = W * 0.14;
+  g.fillStyle = TREE_INK.DARK; treeClump(g, r, W * 0.42, cy + H * 0.04, rad, 20, W * 0.26);
+  g.fillStyle = TREE_INK.DARK; treeClump(g, r, W * 0.64, cy + H * 0.08, rad * 0.8, 14, W * 0.20);
+  g.fillStyle = TREE_INK.MID;  treeClump(g, r, W * 0.46 - lit * W * 0.03, cy,
+                                         rad * 0.78, 16, W * 0.22);
+  g.fillStyle = TREE_INK.LIT;  treeClump(g, r, W * 0.44 - lit * W * 0.06, cy - H * 0.05,
+                                         rad * 0.52, 10, W * 0.14);
+  treeHoles(g, r, W * 0.5, cy, W * 0.34, 7);
+}
+
 const SIGN_COUNTDOWN = [
   { n: '8', line1: 'CITY CENTER', line2: '8 MILES' },
   { n: '6', line1: 'CITY CENTER', line2: '6 MILES' },
@@ -14811,6 +15095,8 @@ const SPRITE_REG = [];
 const SPR_GANTRY_0 = 0;                  // four, one per countdown step
 const SPR_MARKER_0 = 4;                  // four, likewise
 const SPR_POST     = 8;
+const SPR_TREE_0   = 9;                  // three variants
+const SPR_TREE_N   = 3;
 
 (function buildSpriteRegistry() {
   for (let i = 0; i < 4; i++)
@@ -14829,6 +15115,23 @@ const SPR_POST     = 8;
                     wKey: 'SIGN_POST_WIDE', hKey: 'SIGN_POST_HIGH',
                     bakeShare: 0.375, line1: 'A1', line2: '',
                     ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+  /* AND THE TREES, on the same three fields as everything else. The
+     registry is where the pipeline stops being about signs: nothing
+     below this line, and nothing in spritePass, knows that one of these
+     is type and another is foliage.
+
+     THEIR BAKE SHARE IS SMALLER THAN A SIGN'S AND THAT IS NOT A SAVING
+     ON QUALITY. A sign is read, so its limit is the size of set type; a
+     tree is recognised, so its limit is the size of its silhouette. At
+     0.45 a broad tree bakes 454 device pixels tall, which is sharp until
+     it is about 12 segments away. */
+  const TREES = [['treeBroad', bakeTreeBroad, 'TREE_BROAD_WIDE', 'TREE_BROAD_HIGH'],
+                 ['treeConifer', bakeTreeConifer, 'TREE_CONIFER_WIDE', 'TREE_CONIFER_HIGH'],
+                 ['treeScrub', bakeTreeScrub, 'TREE_SCRUB_WIDE', 'TREE_SCRUB_HIGH']];
+  for (const t of TREES)
+    SPRITE_REG.push({ name: t[0], bake: t[1], wKey: t[2], hKey: t[3],
+                      bakeShare: 0.45, line1: '', line2: '',
+                      ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
 })();
 
 /* The world size of a sprite, read live off FEEL rather than frozen into
@@ -14914,6 +15217,9 @@ function spriteBuildAtlas() {
             + '|' + FEEL.SIGN_GANTRY_SPAN + ',' + FEEL.SIGN_GANTRY_HIGH
             + ',' + FEEL.SIGN_MARKER_WIDE + ',' + FEEL.SIGN_MARKER_HIGH
             + ',' + FEEL.SIGN_POST_WIDE + ',' + FEEL.SIGN_POST_HIGH
+            + ',' + FEEL.TREE_BROAD_WIDE + ',' + FEEL.TREE_BROAD_HIGH
+            + ',' + FEEL.TREE_CONIFER_WIDE + ',' + FEEL.TREE_CONIFER_HIGH
+            + ',' + FEEL.TREE_SCRUB_WIDE + ',' + FEEL.TREE_SCRUB_HIGH
             + ',' + FEEL.ROAD_HALF_WIDTH_BASE
             /* THE CAMERA IS AN INPUT AND IT WAS LEFT OUT, which made the
                sentence above this false the first time it was written.
@@ -15025,6 +15331,36 @@ function signFor(idx) {
   return null;
 }
 
+/* WHERE THE TREES STAND, and it is the old scenery placement rule with
+   the object construction taken out of it.
+
+   THE SAME CLUMPING FIELD THE PATH BUILT WORLD USED. Every site rolling
+   the same probability puts something at almost every site, which reads
+   as wallpaper: that was measured two sessions ago and the smooth
+   density field along the road was the answer. It is reused verbatim
+   here, so a stand of trees still comes with a clearing beside it.
+
+   THE SCATTER IS SQUARED TOWARD THE ROAD for the reason written at the
+   scenery's own offset: unbiased, the median lands so far out that the
+   near ones are culled off the side of the screen and only the distant,
+   small ones survive.
+
+   IT DRAWS NOTHING FROM rng(). Arithmetic on the segment index only, so
+   the road is byte for byte the road it was. */
+function treeFor(idx) {
+  const every = Math.round(FEEL.TREE_EVERY);
+  if (every <= 0 || idx <= 0 || idx % every) return null;
+  const salt = idx * 31 + 7;
+  const side = terrainHash(salt * 3 + 1) < 0.5 ? -1 : 1;
+  if (terrainHash(salt) > FEEL.TREE_DENSITY * sceneryClump(idx, side)) return null;
+  const h2 = terrainHash(salt * 13 + 5);
+  const h3 = terrainHash(salt * 29 + 11);
+  const off = FEEL.TREE_CLEAR
+            + Math.pow(h3, FEEL.TREE_OUT_BIAS) * FEEL.TREE_FAR_OUT;
+  return { id: SPR_TREE_0 + Math.min(SPR_TREE_N - 1, (h2 * SPR_TREE_N) | 0),
+           off: side * off };
+}
+
 /* ------------------------------------------------------------------
    THE PASS. Far to near, integer destinations, and drawImage is the
    only call in it: no fillStyle, no globalAlpha, no save, no transform.
@@ -15044,9 +15380,16 @@ function spritePass(first, last, baseIndex, w, h) {
     const seg = segAt(baseIndex + n);
     if (!seg) continue;
     const span = bspan[n] || 1;
-    for (let j = span - 1; j >= 0; j--)            // and back to front inside it
-      spriteAt(atlas, n, span > 1 ? segAt(seg.index + j) : seg,
-               span > 1 ? j / span : 0, w, h);
+    for (let j = span - 1; j >= 0; j--) {          // and back to front inside it
+      const s2 = span > 1 ? segAt(seg.index + j) : seg;
+      const f = span > 1 ? j / span : 0;
+      /* THE TREE SLOT FIRST. Both slots are at the same depth, so their
+         order between themselves is arbitrary and this one is chosen:
+         trees are scenery and signs are information, so a sign is never
+         behind a tree that shares its segment. */
+      spriteAt(atlas, n, s2, f, w, h, 1);
+      spriteAt(atlas, n, s2, f, w, h, 0);
+    }
   }
   /* AND THEN THE NEAR FIELD, WHICH THE ROAD WALK STOPS KEEPING WHILE A
      TALL SIGN IS STILL HALF THE SCREEN.
@@ -15070,16 +15413,19 @@ function spritePass(first, last, baseIndex, w, h) {
     if (bz[n] <= nearStop) break;
     const seg = segAt(baseIndex + n);
     if (!seg) continue;
-    spriteAt(atlas, n, seg, 0, w, h);
+    spriteAt(atlas, n, seg, 0, w, h, 1);
+    spriteAt(atlas, n, seg, 0, w, h, 0);
   }
 }
 
 /* One sign, placed. Split out of the pass so the near field and the far
    field cannot drift apart, which is exactly how the far field came to
    have a rule the near field did not. */
-function spriteAt(atlas, n, s2, f, w, h) {
-  if (!s2 || !s2.sgn) return;
-  const d = SPRITE_REG[s2.sgn - 1];
+function spriteAt(atlas, n, s2, f, w, h, slot) {
+  if (!s2) return;
+  const id = slot ? s2.sg2 : s2.sgn;
+  if (!id) return;
+  const d = SPRITE_REG[id - 1];
   if (!d || !d.aw) return;
   const cx = bx[n] + (bx[n + 1] - bx[n]) * f;
   const cy = by[n] + (by[n + 1] - by[n]) * f;
@@ -15098,7 +15444,7 @@ function spriteAt(atlas, n, s2, f, w, h) {
   const py = ch * spriteWorldH(d) * k;
   if (py < FEEL.SPRITE_MIN_PX) return;
   const px2 = ch * spriteWorldW(d) * k;
-  const off = s2.sgnX;
+  const off = slot ? s2.sg2X : s2.sgnX;
   const cxp = cx + off * cw;
   /* IT STANDS ON THE GROUND IT IS OVER, not on the road plane. The
      shoulder rises from the edge over TERRAIN_REACH half widths, so a
@@ -15113,6 +15459,12 @@ function spriteAt(atlas, n, s2, f, w, h) {
   }
   const dx = cxp - px2 / 2, dy = base - py;
   if (dy > h + 8 || dx + px2 < -8 || dx > w + 8) return;
+  /* TOO CLOSE IS CULLED FOR THE TREES AND NOT FOR THE SIGNS, and the
+     asymmetry is the point of each. A sign that vanishes as you reach it
+     has failed at its job; a tree that fills the frame is a billboard
+     caught in the act, because that is exactly where a flat image stops
+     being able to pretend. TREE_MAX_PX is the size that costs. */
+  if (slot && py > h * FEEL.TREE_MAX_PX) return;
   atlasDraw(atlas, d, dx, dy, px2, py);
   spritesDrawn++;
 }
@@ -21278,6 +21630,7 @@ function drawHud(w, h) {
     /* 29 is the roadside sprite pipeline, added with it. Listed the same
        day it was created, which is the lesson 23 to 26 paid for. */
     tunerLine(29),
+    tunerLine(30),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
