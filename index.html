@@ -187,6 +187,74 @@
     background: #ffb03a;
     color: #2a0d02;
   }
+  /* ----------------------------------------------------------------
+     THE SKIP, WHICH IS THE ONLY CONTROL IN THIS GAME THAT APPEARS
+     DURING A RUN.
+
+     WHY IT IS IN #chrome AND NOT IN #pads. The pads are the row along
+     the bottom, they already run to six on a phone with tilt on, and
+     the stylesheet above records that six of them at 44 across is
+     already the floor. A seventh would push the row into the steering
+     band. #chrome is the other overlay, it is empty during play, and it
+     lives under exactly the same pointer-events rule: none on the
+     container, auto on the buttons, so every pixel around this one
+     falls through to the canvas and still steers. Read the note at the
+     top of this stylesheet before adding anything else here.
+
+     WHY THE TOP AND NOT THE BOTTOM. Every pixel of this game is a
+     steering surface, left half and right half, so there is no corner
+     that is safe by geometry. What there is instead is where thumbs
+     ACTUALLY are, which on a phone held to drive is the bottom two
+     thirds. This sits in the top right, above the HUD's own lines, and
+     it is the furthest point on the screen from where a steering thumb
+     rests. It is also held back for TRAIN_SKIP_AFTER seconds, so the
+     tap that STARTED the run cannot double through onto it.
+
+     QUIET, WHICH IS THE OTHER HALF OF THE BRIEF. It does not take the
+     cream pill the tuner buttons wear. It is the same dim amber as the
+     fine print on the title screen, over a dark plate, so it reads as
+     part of the cabinet rather than as part of the game.
+     ---------------------------------------------------------------- */
+  /* #chrome #skipBtn AND NOT #skipBtn, AND THAT WAS A REAL BUG rather
+     than a style preference. `#chrome button` is one id plus one element
+     and out-specifies a bare id, so the first version of this rule lost
+     every declaration it made and the button shipped wearing the cream
+     pill the tuner buttons wear: the loudest object on the screen, in
+     the corner, during a run. Two ids beat it. */
+  #chrome #skipBtn {
+    font: 700 11px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: 0.08em;
+    color: rgba(242, 180, 100, 0.72);
+    background: rgba(20, 8, 3, 0.42);
+    border: 1px solid rgba(255, 150, 80, 0.30);
+    border-radius: 7px;
+    /* ABSOLUTE, SO IT CAN BE PUT UNDER THE HUD WHEN THE HUD IS WIDE.
+       In portrait the HUD is a stack down the middle and the top right
+       is empty, which is where this belongs. Turn the phone and the HUD
+       becomes a STRIP across the whole top, and measured at 844 by 390
+       it ran the score, the clock, the track and the ghost gap straight
+       under this button. Taken out of the flex row it can be moved down
+       to clear it, off the game's OWN measurement of where its HUD ends
+       rather than off a number copied from it. See syncSkip. */
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    right: calc(env(safe-area-inset-right, 0px) + 8px);
+    /* THE LABEL IS ONE WORD AND THE REASON IS THE NARROWEST HANDSET.
+       SKIP TRAINING measured 132 wide, which at 320 puts its left edge
+       at 180 while the score, centred, reaches 215. They overlapped, and
+       what they overlapped was the number the player is playing for. One
+       word is 52 wide and clears it at every width this game runs at.
+
+       It is not ambiguous shortened: the HUD three lines below it says
+       TRAINING for the whole run, so the corner only has to say what the
+       tap does. */
+    padding: 9px 13px;
+  }
+  #chrome #skipBtn:active {
+    color: #2e0e02;
+    background: rgba(255, 176, 58, 0.92);
+    border-color: #fff6dc;
+  }
   #note {
     max-width: 62vw;
     font: 500 12px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -635,6 +703,7 @@
       <button data-act="reset" type="button">reset</button>
       <button data-act="seed" type="button">seed</button>
     </div>
+    <button id="skipBtn" type="button" hidden>SKIP</button>
   </div>
   <div id="note" hidden></div>
 </div>
@@ -3975,6 +4044,66 @@ const FEEL = {
      way past it. */
   TRAINING_LEVELS:            1,     // LIVE
   TRAINING_GATES:             1,     // LIVE, gates on the training run. See gateSegment for the seconds
+  /* ==================================================================
+     WHAT THE TRAINING RUN TEACHES, AND HOW LONG IT WAITS TO SAY IT.
+
+     BRIEF.md SECTION 5 IS OVERRULED HERE, DELIBERATELY AND IN WRITING.
+     It says no words and that the visual teaches better, and it was
+     written when no tutorial existed. One does now, and the scrape band
+     is the one mechanic in this game that CANNOT be taught by
+     demonstration: the demonstration is dying, and this run is
+     unfailable by design. So it is said in words, at the moment it is
+     happening, in the channel that already exists.
+     ================================================================== */
+  TRAIN_SKIP_AFTER:         2.5,     // LIVE, seconds before the skip appears
+  /* WHERE THE TWO SCRIPTED THINGS STAND, in segments from the start of
+     the run, out of 1260. The rest of the road is the ordinary grammar
+     at the ordinary training intensity; these are two windows in it.
+
+     THE ORDER IS THE LESSON ORDER. The pinch first, because the edge is
+     the mechanic that decides whether the player lives, and the jump
+     after it, because a jump is a reward and a reward means nothing
+     until there is a way to lose. */
+  TRAIN_PINCH_AT:           300,     // LIVE, segments, about 6.7 seconds in
+  TRAIN_PINCH_WIDE:        0.62,     // LIVE, share of full width at its tightest
+  TRAIN_PINCH_CURVE:       5.00,     // LIVE, in the same units as CURVE_HARD
+  /* SWEPT, NOT CHOSEN. The hold decides how long a competent driver
+     spends against the edge, and there is a ceiling on that which is not
+     about difficulty: SCRAPE_TIME_LIMIT is 1.6 seconds, and a bar that
+     EMPTIES in a run that cannot end teaches that an empty bar is
+     survivable, which is the exact opposite of the lesson. Measured over
+     28 days and both competent policies:
+
+        hold   worst stint   bar drained
+          20     0.65/0.95s      41 / 59%
+          26     0.80/1.17s      50 / 73%     <=
+          32     1.02/1.40s      64 / 87%
+          36     1.17/1.53s      73 / 96%
+          44     1.43/1.83s      90 / 100%    empties
+          62     2.10/2.47s     100 / 100%    empties
+
+     26 takes half the bar off the smooth driver and three quarters off
+     the twitchy one, on every one of the 28 days, and leaves better than
+     a quarter of it standing in the worst case. */
+  TRAIN_PINCH_HOLD:          26,     // LIVE, segments it holds at the tightest
+  TRAIN_JUMP_AT:            640,     // LIVE, segments, about 14 seconds in
+  /* THE COACHING'S OWN CLOCK. Beat one on touching the band, beat two
+     after this long whether or not they are still in it, and beat three
+     when they come off. Beat two is on a TIMER rather than on continued
+     contact because the half that matters, that an empty bar ends the
+     run, must reach a player who touches the edge for a tenth of a
+     second and comes straight off it. */
+  TRAIN_SAY_HOLD:          1.30,     // LIVE, seconds from beat one to beat two
+  /* AND THE FALLBACK, for the player who never touches the edge at all.
+     Measured over 28 days of training roads, four driving policies out
+     of five touch the band and the one that does not is the COMPETENT
+     one: a smooth centre seeking line peaks at 0.87 half widths, which
+     is exactly SCRAPE_START, and never crosses it. That player is the
+     reason this exists. Fired this many seconds before the line, and it
+     states the rule rather than claiming they are doing it, because a
+     callout that says YOU ARE SCRAPING to somebody who is not is worse
+     than saying nothing at all. */
+  TRAIN_SAY_LAST:           6.0,     // LIVE, seconds before the line the fallback fires
   LEVEL_GATES_FIRST:          3,     // LIVE, gates on the first REAL level
   LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
   /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
@@ -6318,6 +6447,14 @@ const TUNABLES = [
   { key: 'LEVEL_COUNT',        label: 'levels',  step: 1,    min: 1,    max: 8,     dp: 0, group: 27 },
   { key: 'TRAINING_LEVELS',    label: 'train',   step: 1,    min: 0,    max: 3,     dp: 0, group: 27 },
   { key: 'TRAINING_GATES',     label: 'trainG',  step: 1,    min: 1,    max: 6,     dp: 0, group: 27 },
+  { key: 'TRAIN_SKIP_AFTER',   label: 'skipAt',  step: 0.5,  min: 0,    max: 15,    dp: 1, group: 27 },
+  { key: 'TRAIN_PINCH_AT',     label: 'pinchAt', step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
+  { key: 'TRAIN_PINCH_WIDE',   label: 'pinchW',  step: 0.02, min: 0.30, max: 1.0,   dp: 2, group: 27 },
+  { key: 'TRAIN_PINCH_CURVE',  label: 'pinchC',  step: 0.25, min: 0,    max: 12,    dp: 2, group: 27 },
+  { key: 'TRAIN_PINCH_HOLD',   label: 'pinchLen',step: 4,    min: 4,    max: 300,   dp: 0, group: 27 },
+  { key: 'TRAIN_JUMP_AT',      label: 'jumpAt',  step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
+  { key: 'TRAIN_SAY_HOLD',     label: 'sayHold', step: 0.1,  min: 0.2,  max: 5,     dp: 2, group: 27 },
+  { key: 'TRAIN_SAY_LAST',     label: 'sayLast', step: 0.5,  min: 0,    max: 20,    dp: 1, group: 27 },
   { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
@@ -6724,6 +6861,19 @@ window.addEventListener('keydown', function (e) {
     firstGesture(); shareRun(); return;
   }
   else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
+  /* K SKIPS THE TRAINING RUN, and it is not optional. Section 6 says
+     many sessions on a school Chromebook are keyboard only, and a DOM
+     button in the corner is a target a keyboard cannot reach at all, so
+     without this the way out of the tutorial exists for half the
+     audience. Both cases, so caps lock is not a dead key, and carved out
+     of "any key starts a run" exactly as R, T, E, S, P and F are.
+
+     K rather than S, which shares, or Escape, which pauses. It is the
+     only letter in SKIP that was not already spoken for. */
+  else if ((k === 'k' || k === 'K') && canSkipTraining()
+           && runTime >= FEEL.TRAIN_SKIP_AFTER) {
+    firstGesture(); skipTraining(); return;
+  }
   /* R is the keyboard twin of the RESTART button, for the same reason it
      exists: the reflex key now continues, so starting over has to be a
      deliberate second thing. Both cases, so caps lock is not a dead key. */
@@ -7812,6 +7962,29 @@ if (tilt.supported && storeGet('tilthint') !== '1') {
    ------------------------------------------------------------------ */
 const pauseBtn = document.getElementById('pauseBtn');
 const tunerEl = document.getElementById('tuner');
+const skipBtn = document.getElementById('skipBtn');
+
+/* THE SKIP, AND THE TWO LINES THAT KEEP IT FROM EATING A STEERING TAP.
+
+   stopPropagation on pointerdown is the same guard every other button in
+   this file carries, and it is belt and braces rather than the mechanism:
+   the steering listener is bound to the CANVAS, and this button is a
+   child of #chrome, which is a SIBLING of the canvas. An event that
+   targets the button never travels through the canvas at all, so there is
+   nothing to stop. What actually keeps the rest of that band steerable is
+   pointer-events: none on #chrome, which is the house rule written at the
+   top of the stylesheet and the thing that was missing when Beakdown
+   shipped a button row that ate every tap across its width.
+
+   blur, so the button does not keep keyboard focus and swallow the space
+   bar for the rest of the run. */
+skipBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+skipBtn.addEventListener('click', function (e) {
+  e.stopPropagation();
+  skipBtn.blur();
+  firstGesture();
+  skipTraining();
+});
 
 /* The pause button lives inside #chrome, which already has the
    pointer-events discipline described in the stylesheet. That is the whole
@@ -8232,7 +8405,30 @@ function firstRunEase() { return runsEver <= FEEL.FIRST_RUNS ? 1 : 0; }
    rule. A continue is past it by definition: skipOnRamp says the player
    has already driven the road once and is resuming, not starting. */
 function inOpening() {
-  return !skipOnRamp && runTime < FEEL.OPENING_SECONDS;
+  if (skipOnRamp) return false;
+  /* AND THE WHOLE OF THE TRAINING RUN, NOT ITS FIRST TWENTY SECONDS.
+
+     THIS WAS A REAL HOLE AND IT WAS FOUND BY DRIVING IT. Training is
+     28 seconds and OPENING_SECONDS is 20, so the last eight seconds of
+     the run that is described everywhere as unfailable were not.
+     Measured: holding one direction from the first frame, in all three
+     of hold left, hold right and alternate, the run ended at 20.25,
+     20.60 and 20.35 seconds. Nobody had seen it because the acceptance
+     test written for the opening was "still alive at twenty seconds",
+     which this passed by a quarter of a second.
+
+     Note WHY it dies rather than merely when. The handover already
+     empties the meter, so the meter is not what kills; the WALL moves,
+     from OPENING_EDGE at 1.18 to OFF_ROAD at 1.50, and a car sitting
+     against the held wall with the steering pinned crosses that gap in
+     a fifth of a second. So there was nothing to tune. The window had
+     to cover the run.
+
+     The mechanism below is untouched: the car is held in the band, only
+     the death is removed, and the meter is handed over empty. This
+     changes how far that reaches and nothing else. */
+  if (mode === DAILY && isTraining(level)) return true;
+  return runTime < FEEL.OPENING_SECONDS;
 }
 
 /* THE HANDOVER, and it is the whole difficulty of this feature.
@@ -9210,7 +9406,86 @@ function phraseWeight(p) {
   return FEEL.PHRASE_WEIGHT;
 }
 
+/* ------------------------------------------------------------------
+   THE TRAINING RUN'S TWO SCRIPTED WINDOWS.
+
+   BRIEF.md SECTION 12 SAYS DO NOT BUILD AUTHORED LEVELS AND THIS IS NOT
+   ONE. The training road is still the ordinary grammar at the ordinary
+   training intensity, off the day's seed, different every day. These are
+   two phrases in it whose SHAPE is chosen rather than rolled, for the
+   same reason the countdown signs stand at chosen fractions: a tutorial
+   that teaches a different thing on Tuesday is not a tutorial.
+
+   WHY EACH ONE IS HERE.
+
+   THE PINCH exists because the scrape band cannot be taught by
+   demonstration. Measured over 28 days and five driving policies, four
+   of the five touch the band on their own and the one that does not is
+   the COMPETENT line: a smooth centre seeking driver peaks at 0.87 half
+   widths, which is SCRAPE_START to two decimal places, and never crosses
+   it. A player good enough to hold the middle of the road learns nothing
+   about the one mechanic that decides whether they live. So the road
+   asks the question once.
+
+   THE JUMP exists because there was not one, so the first ramp anybody
+   ever met was in a level where missing it costs something.
+
+   NEITHER CAN END THE RUN. inOpening is true for the whole of training,
+   so the pinch cannot put the car off the road and a bad landing cannot
+   crash it. That is the point: the pinch is where a player finds out
+   that the edge is survivable, and finding that out has to be free.
+
+   BUILT ONCE PER RUN, FLAGGED RATHER THAN WINDOWED. addPhrase is called
+   until the road is long enough and phrases are of varying length, so
+   `at` steps past a mark rather than landing on it. A flag catches the
+   first phrase boundary at or after the mark, which is deterministic
+   because it is arithmetic on the segment index.
+   ------------------------------------------------------------------ */
+let trainPinchBuilt = false, trainJumpBuilt = false;
+
+function buildTrainPinch() {
+  const d = pickDir();
+  const c = FEEL.TRAIN_PINCH_CURVE * d;
+  const n = FEEL.TRAIN_PINCH_WIDE;
+  addRun(FEEL.RAMP_MED, 0, c, roadWidth, n, true);
+  addRun(Math.max(4, Math.round(FEEL.TRAIN_PINCH_HOLD)), c, c, n, n, false);
+  addRun(FEEL.RAMP_MED, c, 0, n, 1, true);
+}
+
+/* The same road buildJumpPhrase lays, without the scheduler in front of
+   it. jumpUnlocked is false for the whole of training and stays false:
+   this is one placed jump and not the beginning of a stream of them, and
+   the scheduler's own rule, that a level with no hazards has no jumps
+   either, is still the right rule for every other level it governs.
+
+   NO rng() CALL, so it costs the road nothing that jumpFits and the
+   interval draw would have cost. Nothing else is placed in training, so
+   there is nothing for it to collide with and nothing to test against. */
+function buildTrainJump() {
+  const lead = jumpLead();
+  const at = segBase + segments.length + lead + 2;
+  const to = at + FEEL.JUMP_RAMP_SEGMENTS - 1;
+  addRun(lead + 2, 0, 0, roadWidth, 1, true);
+  addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
+  jumps.push({ from: at, to: to, riding: false, done: false });
+}
+
+function trainingScript() {
+  if (mode !== DAILY || !isTraining(level)) return false;
+  const at = segBase + segments.length;
+  if (!trainPinchBuilt && at >= FEEL.TRAIN_PINCH_AT) {
+    trainPinchBuilt = true; buildTrainPinch(); return true;
+  }
+  if (!trainJumpBuilt && at >= FEEL.TRAIN_JUMP_AT && !pastFinish(at + 140)) {
+    trainJumpBuilt = true; buildTrainJump(); return true;
+  }
+  return false;
+}
+
 function addPhrase() {
+  // The tutorial's own two phrases, ahead of everything, because they
+  // are the only things on this road that are there for a reason.
+  if (trainingScript()) return;
   /* A due hazard writes the next phrase itself. Ahead of the library
      rather than instead of it: the schedules are sparse, so most phrases
      are still whatever the grammar picks. */
@@ -9257,6 +9532,8 @@ function resetRoad(seed) {
   hazards = [];
   jumps = [];
   jumpDue = 0;
+  trainPinchBuilt = false;
+  trainJumpBuilt = false;
   hazardDue[HAZ_BLOCKER] = 0;
   hazardDue[HAZ_SPLITTER] = 0;
   hazardDue[HAZ_MOVER] = 0;
@@ -9900,6 +10177,11 @@ function startRun() {
   deadFor = 0;
   restartWanted = false;
   wasInOpening = false;
+  // Every run starts with everything still to be said, including the one
+  // the player is about to skip out of. Both here and on a resume, even
+  // though training is one gate long and can never be continued: a flag
+  // that survives a run boundary is a flag that will eventually be wrong.
+  trainingReset();
   lastMarkSeg = -1;
   steering.value = 0;
   drift.headingV = 0;
@@ -10019,6 +10301,11 @@ function resumeRoad(carSeg) {
   segments = [];
   hazards = [];
   jumps = [];
+  /* Unreachable in play, because training is one gate long and therefore
+     cannot be continued, but set here anyway: a flag that survives a
+     road rebuild is a flag that will eventually be wrong. */
+  trainPinchBuilt = true;
+  trainJumpBuilt = true;
   jumpDue = base + Math.round(FEEL.JUMP_EVERY * 0.5);
   /* Each kind gets its ordinary spacing before it is due again, NOT the
      resume point itself. Setting them due immediately guaranteed a hazard
@@ -10075,6 +10362,11 @@ function continueRun() {
   deadFor = 0;
   restartWanted = false;
   wasInOpening = false;
+  // Every run starts with everything still to be said, including the one
+  // the player is about to skip out of. Both here and on a resume, even
+  // though training is one gate long and can never be continued: a flag
+  // that survives a run boundary is a flag that will eventually be wrong.
+  trainingReset();
   lastMarkSeg = -1;
   steering.value = 0;
   drift.headingV = 0;
@@ -10510,6 +10802,7 @@ function land(localHalf) {
 
   landImpact(q, tier, bad, localHalf);
   sayLanding(tier, pay, points);
+  trainingSayLanding(tier);
   audioLanding(tier, q, bad);
 }
 
@@ -17988,6 +18281,45 @@ function syncMore() {
   moreEl.classList.toggle('away', !want);
 }
 
+/* THE SKIP'S VISIBILITY, on the same one reconcile per frame discipline
+   as the two above it and for the same reason: this is a DOM write
+   inside a 60fps loop and it must not happen sixty times a second.
+
+   THE DELAY IS THE ACCIDENT GUARD. A run is started by a tap anywhere,
+   and a player who taps twice, or whose thumb bounces, would otherwise
+   have a live button under the second one within a frame of the first.
+   TRAIN_SKIP_AFTER seconds of nothing there is the whole fix, and it
+   costs a player who genuinely wants out two and a half seconds of a
+   twenty eight second run. */
+let skipShown = false;
+let skipTopPx = -1;
+function syncSkip() {
+  const want = canSkipTraining() && runTime >= FEEL.TRAIN_SKIP_AFTER;
+  if (want !== skipShown) {
+    skipShown = want;
+    skipBtn.hidden = !want;
+  }
+  if (!want) return;
+  /* AND WHERE IT SITS, WHICH IS ONLY A QUESTION IN LANDSCAPE.
+
+     Portrait draws the HUD as a stack down the middle and the top right
+     corner is empty, so the button sits in it. Landscape draws the same
+     HUD as a STRIP across the whole width, and measured at 844 by 390
+     the track line ran under the button. hudBottom is where the game
+     itself says its HUD ends, in the same CSS pixels the button is laid
+     out in, so reading it is exact and stays exact if the HUD moves.
+
+     ROUNDED TO 4 PIXELS AND WRITTEN ONLY ON A CHANGE. hudBottom moves a
+     little as the score kicks, and this is a DOM write inside a 60fps
+     loop; the quantisation is what stops it writing on most frames. */
+  const pad = 8;
+  const wantTop = hudIsBar(view.w, view.h)
+    ? Math.round((hudBottom + pad) / 4) * 4 : pad;
+  if (wantTop === skipTopPx) return;
+  skipTopPx = wantTop;
+  skipBtn.style.top = 'calc(env(safe-area-inset-top, 0px) + ' + wantTop + 'px)';
+}
+
 /* The lockup is an HTML overlay and the plate under it is canvas, and
    that split is deliberate. The overlay stays sharp at any device pixel
    ratio for free and costs nothing per frame; the plate has to be in the
@@ -20719,6 +21051,44 @@ function startTitleRoute() {
   startRun();
 }
 
+/* ------------------------------------------------------------------
+   AND THE WAY OUT, FROM INSIDE THE RUN.
+
+   THE TITLE SCREEN ALREADY OFFERED ONE AND THAT WAS NOT ENOUGH. A
+   player taps to play, gets thirty seconds in, decides they have the
+   idea, and the only ways out were dying and waiting. Section 4 of
+   BRIEF.md opens by naming a non skippable tutorial as the incumbent's
+   worst failure; offering the skip only before the player knows what
+   they are skipping is most of the way to shipping the same thing.
+
+   IT COUNTS AS HAVING BEEN TRAINED, and that is a decision rather than a
+   convenience. markTrained is the one bit that decides what the front
+   door does, and the front door's job is to stop making somebody redo a
+   tutorial they do not want. A player who reached into the top corner of
+   the screen mid run to get out of it has made that choice about as
+   explicitly as it can be made. Tomorrow the door opens on the first
+   real level and the title screen carries TRAINING RUN as the way back.
+
+   IT IS NOT A COMPLETION. markTrained writes one key and nothing else:
+   recFor(1).done stays false, so the run is still there to be done;
+   finishedEver does not move, because no track was finished; the day is
+   untouched, because training was never part of it. Everything in
+   finishRun that records anything is on the far side of reaching the
+   line and none of it is reached from here.
+
+   ONE INPUT, LIKE EVERY OTHER PATH. Tap and the next level is running.
+   No screen, no confirmation, nothing to hunt for.
+   ------------------------------------------------------------------ */
+function canSkipTraining() {
+  return state === DRIVING && !paused && mode === DAILY && isTraining(level);
+}
+function skipTraining() {
+  if (!canSkipTraining()) return;
+  markTrained();
+  level = clampLevel(firstRealLevel());
+  startRun();
+}
+
 /* Has the whole day been finished, and was every level of it clean. The
    clean version is the hardest thing available in the game and it is the
    loudest thing recorded. */
@@ -21077,6 +21447,150 @@ function sayDrift(str, colour, size, urgent) {
   driftSide = calloutAwaySide();
 }
 
+/* ==================================================================
+   WHAT THE TRAINING RUN SAYS OUT LOUD.
+
+   THIS OVERRULES BRIEF.md SECTION 5, WHICH SAYS NO WORDS AND THAT THE
+   VISUAL TEACHES BETTER. That rule was written when no tutorial
+   existed. One does now, and the scrape band is the one mechanic in
+   this game that CANNOT be taught by demonstration, because the
+   demonstration is dying and this run is unfailable by design. A player
+   currently learns the most important rule in the game by losing a run
+   to it, which is the definition of the failure section 2.2 of the
+   retention handoff describes: a death that teaches nothing.
+
+   IT IS THE TRAINING RUN ONLY. Nothing below this line can speak on a
+   real level, on the random track, or after the tutorial has been left.
+
+   IT USES THE CHANNEL THAT ALREADY EXISTS, and the EVENT lane of it
+   rather than the drift lane. The drift lane is what the player is
+   DOING, it is the core loop, and the callout block's own note says it
+   is never queued behind anything. Coaching is a thing happening TO
+   them, which is what the event lane is for, and the two draw on
+   separate rows so a landing and its explanation can be on screen
+   together.
+
+   FOUR THINGS, AND NOT ONE MORE. Two about the edge, one about what to
+   do when it lets go, one about the jump. Every string is short enough
+   to be read at speed on a phone: the longest is 28 characters against
+   the 30 the existing SIDEWAYS LANDING line already carries.
+   ================================================================== */
+const TRAIN_SILENT = 0,    // nothing said yet
+      TRAIN_IN_BAND = 1,   // they are scraping and have been told so
+      TRAIN_WARNED = 2,    // and told what an empty bar costs
+      TRAIN_TOLD = 3,      // or, having never scraped, told the rule flat
+      TRAIN_DONE = 4;      // the edge is taught, whichever way it went
+let trainSay = TRAIN_SILENT;
+let trainSayAt = 0;
+let trainJumpSaid = false;
+let trainLandSaid = false;
+
+function trainingReset() {
+  trainSay = TRAIN_SILENT;
+  trainSayAt = 0;
+  trainJumpSaid = false;
+  trainLandSaid = false;
+}
+
+function trainingOn() {
+  return mode === DAILY && isTraining(level) && state === DRIVING;
+}
+
+/* Segments of road left, as seconds at base speed. Nominal on purpose:
+   the car is slower while it is scraping, so measuring the real time
+   left would make the fallback fire later for the player most likely to
+   need it. What is wanted is a fixed point on the ROAD. */
+function trainingLeft() {
+  return Math.max(0, finishSeg - carSegIndex) * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
+}
+
+function trainingSay(dt) {
+  if (!trainingOn()) return;
+
+  /* ---- THE JUMP, ON THE WAY IN. One idea: it pays. The other idea,
+     that sideways pays more, is held back for the landing, because that
+     is the moment it can be attached to what just happened. */
+  if (!trainJumpSaid) {
+    for (let i = 0; i < jumps.length; i++) {
+      if (carSegIndex >= jumps[i].from - FEEL.JUMP_WARN_SEGMENTS
+          && carSegIndex < jumps[i].from) {
+        sayCallout('JUMP AHEAD  IT PAYS', CALL_GATE, COLOUR.SCORE);
+        trainJumpSaid = true;
+        break;
+      }
+    }
+  }
+
+  /* ---- THE EDGE. Three beats when it happens, two when it does not.
+
+     BEAT TWO IS ON A TIMER AND NOT ON CONTINUED CONTACT, and that is
+     the whole reason it is a state machine rather than two ifs. The
+     half that matters, what an empty bar costs, has to reach the player
+     who touches the edge for a tenth of a second and comes straight off
+     it again, and that player is not in the band when the second beat
+     is due.
+
+     BEAT TWO SAYS "A REAL RUN" AND THAT IS NOT A HEDGE. In training the
+     bar can empty and nothing happens, because the run cannot end. A
+     line reading THE RUN ENDS while the bar sits empty and the car
+     drives on would be contradicted by the screen it is drawn on. The
+     pinch is tuned so a competent driver never sees empty at all, but
+     somebody holding the edge from the first corner will, and for them
+     this line is the explanation rather than a lie. */
+  if (trainSay === TRAIN_SILENT && scraping) {
+    sayCallout('SCRAPING  THE BAR IS DRAINING', CALL_GATE, COLOUR.HAZARD_WARN);
+    trainSay = TRAIN_IN_BAND;
+    trainSayAt = runTime;
+  } else if (trainSay === TRAIN_IN_BAND && runTime - trainSayAt >= FEEL.TRAIN_SAY_HOLD) {
+    sayCallout('AN EMPTY BAR ENDS A REAL RUN', CALL_GATE, COLOUR.HAZARD_WARN);
+    trainSay = TRAIN_WARNED;
+    trainSayAt = runTime;
+  } else if (trainSay === TRAIN_WARNED && !scraping
+             && runTime - trainSayAt >= FEEL.TRAIN_SAY_HOLD) {
+    /* AND ONLY WHEN THEY ACTUALLY COME OFF IT. A player who holds the
+       edge to the line never recovered, and saying they did would be
+       the same lie in the other direction. They keep the first two
+       lines, which are the two that matter. */
+    sayCallout('RECOVERED  THE BAR REFILLS', CALL_GATE, COLOUR.GATE);
+    trainSay = TRAIN_DONE;
+  }
+
+  /* ---- AND THE PLAYER WHO NEVER TOUCHES IT AT ALL.
+
+     MEASURED, AND IT IS THE COMPETENT DRIVER RATHER THAN A CORNER CASE.
+     Over 28 days on the road as it was, four driving policies out of
+     five touched the band and the one that did not was the smooth
+     centre seeking line, which peaked at 0.87 half widths, exactly
+     SCRAPE_START, and never crossed it. The pinch was built for that
+     player and takes them to 28 of 28, but a road is a road and this is
+     the floor under it.
+
+     IT STATES THE RULE RATHER THAN NARRATING THEM. Nothing here claims
+     they are scraping, because they are not, and a callout that says
+     YOU ARE SCRAPING to somebody driving down the middle is worse than
+     silence: it is the game being wrong about the thing it is teaching. */
+  if (trainSay === TRAIN_SILENT && trainingLeft() <= FEEL.TRAIN_SAY_LAST) {
+    sayCallout('THE EDGE HOLDS FOR A MOMENT', CALL_GATE, COLOUR.HAZARD_WARN);
+    trainSay = TRAIN_TOLD;
+    trainSayAt = runTime;
+  } else if (trainSay === TRAIN_TOLD && runTime - trainSayAt >= FEEL.TRAIN_SAY_HOLD) {
+    sayCallout('THEN IT ENDS THE RUN', CALL_GATE, COLOUR.HAZARD_WARN);
+    trainSay = TRAIN_DONE;
+  }
+}
+
+/* THE OTHER HALF OF THE JUMP, SAID ON THE LANDING, because that is the
+   only moment "sideways pays more" can be attached to a number the
+   player just watched appear. The drift lane already carries the score
+   and the seconds; this is the event lane above it saying why they were
+   that size. */
+function trainingSayLanding(tier) {
+  if (!trainingOn() || trainLandSaid) return;
+  trainLandSaid = true;
+  if (tier >= 2) sayCallout('SIDEWAYS PAYS MOST', CALL_GATE, COLOUR.SCORE_BEST);
+  else sayCallout('LAND SIDEWAYS FOR MORE', CALL_GATE, COLOUR.SCORE);
+}
+
 /* The best score break. bestKnown is the whole of the fresh install and
    no storage handling: with nothing stored there is nothing to beat, so
    the effect simply does not exist for that run. */
@@ -21311,6 +21825,7 @@ function updateSpectacle(dt) {
     edgeClear += dt;
   }
   wasScraping = onEdge;
+  trainingSay(dt);
 
   /* The chain. Every link steps the pitch of the audio blip, which is the
      continuous reward and costs nothing on screen; the text only speaks
@@ -22723,6 +23238,7 @@ function render() {
   syncBoot();
   syncCredit();
   syncMore();
+  syncSkip();
   drawHud(w, h);
 }
 
