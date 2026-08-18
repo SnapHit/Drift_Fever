@@ -31,7 +31,11 @@ It was called Tailflick until session ten. Nothing should still say so.
 
 **The site is a Cloudflare Worker, not GitHub Pages.** It is deployed from this repo with `npx wrangler deploy`, configured by `wrangler.jsonc`, and holds `driftfever.com` and `www.driftfever.com` as custom domains.
 
-**Committing to `main` is NOT the deploy.** It used to be, under Pages. It is not any more. A commit that is never deployed is a change the author cannot play, and the live site once sat three sessions behind because of exactly this. Push, then deploy, then run `./publish-check.sh`.
+**PUSHING TO `main` IS THE DEPLOY.** Corrected 15 August 2026, and this paragraph previously said the opposite, which sent several sessions hunting for a Cloudflare API token that does not exist.
+
+The Worker builds from this repo automatically on every push to `main`, and the site is live within a couple of minutes. You do not need to run `wrangler deploy` and you do not need credentials. If your environment refuses `CONNECT` to driftfever.com or reports no `CLOUDFLARE_API_TOKEN`, that is a limitation of the sandbox and not a failed deploy — every session that reported "pushed only" in fact went live, byte-identical to the repo.
+
+`./publish-check.sh` is still the right verification when it can reach the site, and its first check compares the live byte count against the repo's. When the proxy blocks it, say so and move on rather than treating 73 connection failures as findings about the site.
 
 **Jekyll never runs.** There is no `_config.yml` and it would do nothing if there were: it is a Pages mechanism and Pages is not the host. It was deleted in session fifty three because it was inert AND because Cloudflare's project auto-detection read it as a Ruby project and failed every deploy for days. Do not add it back. The underscore prefix on `_content/` and `_reference/` is likewise now only a naming convention: it protects nothing on its own.
 
@@ -47,4 +51,4 @@ npx wrangler deploy --dry-run --outdir /tmp/out
 
 It prints the file count. `WRANGLER_LOG=debug` additionally lists every path and every `Ignoring asset:` line, which is a complete answer either way.
 
-The author plays every change on a phone at driftfever.com, so **a change is not finished until it is deployed and `./publish-check.sh` is clean.**
+The author plays every change on a phone at driftfever.com, so **a change is not finished until it is on `main`.** The deploy follows automatically.
