@@ -1566,16 +1566,57 @@ const FEEL = {
      the frames of every approach, a sign does not grow, and then it
      grows by two device pixels at once. */
   SPRITE_SNAP_PX:             1,     // LIVE, 1 is the brief, 0 is the projection
-  /* WHERE THE COUNTDOWN LANDS, as shares of the run. On the daily the
-     run is the distance to the finish, so these are literally how far
-     through the track each sign stands. Anywhere else they repeat over
-     SIGN_CYCLE_SEGMENTS, because an endless road has no four fifths. */
+  /* WHERE THE COUNTDOWN LANDS, as shares of the leg it counts down.
+
+     On the daily that leg is the whole track, so these are literally
+     how far through it each sign stands, and each sign carries the road
+     that is left from where it stands.
+
+     ON THE RANDOM TRACK THE LEG IS THE GAP BETWEEN CHECKPOINTS, and
+     that is the whole of what changed when the signs stopped being
+     flavour. An endless road has no four fifths and it has no finish
+     either, so a sign there counting down to a finish would be a lie.
+     It has gates, every CHECKPOINT_EVERY segments, forever. So the
+     random track's signs count down to the next gate and say
+     CHECKPOINT, which is true, useful and the same sign. */
   SIGN_AT_1:               0.20,     // LIVE
   SIGN_AT_2:               0.40,     // LIVE
   SIGN_AT_3:               0.60,     // LIVE
   SIGN_AT_4:               0.80,     // LIVE
   SIGN_MARKER_LEAD:          26,     // LIVE, segments the verge marker stands before its gantry
-  SIGN_CYCLE_SEGMENTS:     2400,     // LIVE, the repeat where there is no finish
+  /* WHAT A WORLD UNIT IS WORTH, WHICH THE GAME HAD ALREADY DECIDED.
+
+     The signs used to read CITY CENTRE 8 MILES and that was flavour: a
+     fiction, unattached to anything. They now carry the distance to the
+     finish, so the scale has to be written down.
+
+     THE BRIEF FOR THIS PASS SAID THE GAME STATES NO UNIT ANYWHERE AND
+     THAT IS THE ONE THING IN IT THAT WAS WRONG. It does, on the run
+     summary card, and it has since long before the signs existed:
+
+       runDistance = Math.round(position / 100);   // world units are centimetres
+
+     DIST 8520m, on the card, on every run. So the metre was chosen
+     years ago at a HUNDRED units to it, and picking a second one here
+     would have put two different metres in one game where a player can
+     see both: a sign calling the track 3.4km and the card calling the
+     same drive 8520m at the end of it.
+
+     THE PHYSICAL SIZES THAT FALL OUT ARE ABSURD AND THAT IS FINE. The
+     road is 46m across, a house is 27m to the ridge and the car does
+     324km/h. Every arcade racer in the lineage draws its world two or
+     three times over size so it reads at speed, and nothing in the game
+     ever states a width, a height or a speed. It states a DISTANCE, on
+     the card, and that is the one the signs now agree with.
+
+     SO THE UNIT IS THE KILOMETRE, one decimal, on every sign. The four
+     real levels are 8.5 to 17.5km, so every sign in the game reads
+     between 1.7 and 14.0km; only the training run dips under one, at
+     0.5. Metres would have meant four digits on every panel, and
+     switching between them, which a road sign does and this brief
+     explicitly forbade. */
+  WORLD_UNITS_PER_METRE:    100,     // LIVE, and it is not a free choice
+  SIGN_ROUND_METRES:        100,     // LIVE, so a sign rounds to a tenth of a km
   SIGN_POST_EVERY:          210,     // LIVE, segments between the small post signs, 0 is none
   SIGN_MARKER_OFFSET:      2.10,     // LIVE, half widths out, the verge marker
   SIGN_POST_OFFSET:        2.35,     // LIVE, half widths out, the small post sign
@@ -5924,7 +5965,8 @@ const TUNABLES = [
   { key: 'SIGN_AT_3',          label: 'sign3',   step: 0.02,min: 0.02, max: 0.98,  dp: 2, group: 29 },
   { key: 'SIGN_AT_4',          label: 'sign4',   step: 0.02,min: 0.02, max: 0.98,  dp: 2, group: 29 },
   { key: 'SIGN_MARKER_LEAD',   label: 'signLead',step: 2,   min: 0,    max: 200,   dp: 0, group: 29 },
-  { key: 'SIGN_CYCLE_SEGMENTS',label: 'signLoop',step: 100, min: 400,  max: 9000,  dp: 0, group: 29 },
+  { key: 'WORLD_UNITS_PER_METRE',label:'unitsM', step: 10,  min: 20,   max: 2000,  dp: 0, group: 29 },
+  { key: 'SIGN_ROUND_METRES',  label: 'signRnd', step: 25,  min: 1,    max: 1000,  dp: 0, group: 29 },
   { key: 'SIGN_POST_EVERY',    label: 'postEvry',step: 10,  min: 0,    max: 2000,  dp: 0, group: 29 },
   { key: 'SIGN_MARKER_OFFSET', label: 'markOff', step: 0.05,min: 1.7,  max: 8,     dp: 2, group: 29 },
   { key: 'SIGN_POST_OFFSET',   label: 'postOff', step: 0.05,min: 1.7,  max: 8,     dp: 2, group: 29 },
@@ -14600,7 +14642,12 @@ const SIGN_INK = {
   STUD:        '#d8c78a',
   LAMP:        'rgba(255,238,198,0.13)',
   BLUE_HI:     '#42576e',
-  BLUE_LO:     '#26343f'
+  BLUE_LO:     '#26343f',
+  /* THE CHEQUER'S PALE HALF IS THE SIGN'S OWN BORDER WHITE AND NOT A
+     BRIGHTER ONE. It is the same #cdd6cf that already runs round every
+     panel in the game, so the last sign is louder in PATTERN and not in
+     value, and nothing about it goes near the road edge. */
+  CHEQUER:     '#cdd6cf'
 };
 
 /* WHICH FLANK THE WORLD LIGHT LANDS ON, as a direction in the baked
@@ -14661,8 +14708,67 @@ function signText(g, s, cx, cy, maxW, px, weight, fill) {
    spans the road, and it is the reason the pass had to move after the
    surface: drawn where the path built scenery is drawn, the road would
    have painted straight over the beam. */
+/* A CHEQUERED BAND, which is how the last sign before the line says it
+   is the last sign before the line.
+
+   IT IS A BAND AND NOT A WORD ON PURPOSE. FINISH LINE against FINISH is
+   a distinction nobody reads at the size a sign is read at, and another
+   line of type would have made the panel a HUD element, which is the
+   one thing this was not allowed to become. A chequer is the oldest
+   signal in the sport, it survives being four pixels tall, and it costs
+   nothing because it is baked. */
+function signChequer(g, x, y, w, h, cells, a, b) {
+  const cw = w / Math.max(1, cells), rh = h / 2;
+  for (let i = 0; i < cells; i++) for (let r = 0; r < 2; r++) {
+    g.fillStyle = (i + r) % 2 ? a : b;
+    g.fillRect(x + i * cw, y + r * rh, cw + 0.5, rh + 0.5);
+  }
+}
+
+/* THE ROUTE SHIELD ITSELF, PAINTED IN ONE PLACE AND USED IN TWO.
+
+   IT IS ON THE GANTRY POST AS WELL AS ON ITS OWN POST, and the reason
+   is a measurement. The small post shield is drawn at a MEDIAN of ten
+   CSS pixels and a p90 of twenty four, at which the number is two
+   pixels of type and unreadable; it only resolves in the last second
+   before you pass it. A gantry is drawn at a median of 37 and a p90 of
+   145. So the number rides on both: the small one is the drumbeat, and
+   the gantry is where it can actually be read.
+
+   NO FOURTH OBJECT, which is what was asked. Both of these are sign
+   furniture that was already standing there. */
+function signShield(g, x, y, w, h, route, small) {
+  const grad = g.createLinearGradient(0, y, 0, y + h);
+  grad.addColorStop(0, SIGN_INK.BLUE_HI);
+  grad.addColorStop(1, SIGN_INK.BLUE_LO);
+  signRoundRect(g, x, y, w, h, w * 0.16);
+  g.fillStyle = grad; g.fill();
+  const bi = w * 0.09;
+  signRoundRect(g, x + bi, y + bi, w - 2 * bi, h - 2 * bi, w * 0.10);
+  g.strokeStyle = SIGN_INK.BORDER;
+  g.lineWidth = Math.max(0.8, w * 0.055);
+  g.stroke();
+  const cx = x + w / 2, inner = w - 4 * bi;
+  /* THE WORD IS WHAT JOINS IT TO THE HUD. A bare number on a blue
+     shield is a road number, which is what it looked like when it said
+     A1. Small and dim, so it says itself once and then gets out of the
+     way of the number, which is the part that changes tomorrow. */
+  signText(g, route.cap, cx, y + h * 0.28, inner, h * 0.20, '700', SIGN_INK.INK_DIM);
+  signText(g, route.num, cx, y + h * 0.665, inner, h * 0.50, '900', SIGN_INK.INK);
+  if (!small) {
+    g.fillStyle = SIGN_INK.STUD;
+    for (const fy of [0.14, 0.86]) {
+      g.beginPath();
+      g.arc(cx, y + h * fy, Math.max(0.5, w * 0.035), 0, 6.2832);
+      g.fill();
+    }
+  }
+}
+
 function bakeGantry(g, W, H, def) {
   const lit = signLitSide();
+  const copy = signCopy(def.signStep, 0);
+  const route = signRoute();
   const postW = Math.max(2, W * 0.021);
   const lx = W * 0.030, rx = W - W * 0.030 - postW;
   const beamT = H * 0.050, beamB = H * 0.132;
@@ -14709,8 +14815,18 @@ function bakeGantry(g, W, H, def) {
   g.fillStyle = SIGN_INK.BEAM;
   g.fillRect(lx, beamT, rx + postW - lx, (beamB - beamT) * 0.26);
   g.fillRect(lx, beamB - (beamB - beamT) * 0.26, rx + postW - lx, (beamB - beamT) * 0.26);
-  g.fillStyle = SIGN_INK.BEAM_LIT;
-  g.fillRect(lx, beamT, rx + postW - lx, Math.max(0.7, (beamB - beamT) * 0.075));
+  /* THE LIT TOP RAIL, AND ON THE LAST SIGN IT IS A CHEQUER. Put on the
+     BEAM rather than in the panel because the beam spans the whole road
+     and is the widest thing the sign owns, so it is still readable at
+     the distance the panel's second line has already gone to mush. */
+  if (copy.last) {
+    signChequer(g, lx, beamT, rx + postW - lx,
+                Math.max(1.6, (beamB - beamT) * 0.30), 34,
+                SIGN_INK.CHEQUER, SIGN_INK.BEAM);
+  } else {
+    g.fillStyle = SIGN_INK.BEAM_LIT;
+    g.fillRect(lx, beamT, rx + postW - lx, Math.max(0.7, (beamB - beamT) * 0.075));
+  }
   g.strokeStyle = SIGN_INK.BEAM;
   g.lineWidth = Math.max(0.7, (beamB - beamT) * 0.14);
   g.beginPath();
@@ -14753,9 +14869,9 @@ function bakeGantry(g, W, H, def) {
   // shape every countdown sign on every motorway uses.
   const cx = (panL + panR) / 2;
   const inner = (panR - panL) - 4 * bi;
-  signText(g, def.line1, cx, panT + (panB - panT) * 0.36, inner,
+  signText(g, copy.head, cx, panT + (panB - panT) * 0.36, inner,
            (panB - panT) * 0.235, '800', SIGN_INK.INK);
-  signText(g, def.line2, cx, panT + (panB - panT) * 0.685, inner,
+  signText(g, copy.num + ' ' + copy.unit, cx, panT + (panB - panT) * 0.685, inner,
            (panB - panT) * 0.300, '900', SIGN_INK.INK);
 
   // corner studs, so the panel catches a headlight the way the real ones do
@@ -14765,6 +14881,15 @@ function bakeGantry(g, W, H, def) {
     g.beginPath();
     g.arc(panL + (panR - panL) * fx, panT + (panB - panT) * fy, sr, 0, 6.2832);
     g.fill();
+  }
+
+  // ---- the route shield on the left post, which is where a real one
+  // carries its road number and where this one carries the day's track.
+  {
+    const sw = W * 0.052, sh = sw * 1.28;
+    signShield(g, lx + postW / 2 - sw / 2, H * 0.60, sw, sh, route, 1);
+    g.fillStyle = SIGN_INK.POST_FOOT;
+    g.fillRect(lx + postW / 2 - sw * 0.10, H * 0.60 + sh, sw * 0.20, H * 0.020);
   }
 
   // ---- and the two lamps on the beam, throwing a cone down the face.
@@ -14798,6 +14923,10 @@ function bakeGantry(g, W, H, def) {
    to confirm the gantry a few seconds before it arrives. */
 function bakeMarker(g, W, H, def) {
   const lit = signLitSide();
+  /* ITS OWN DISTANCE, NOT THE GANTRY'S. It stands SIGN_MARKER_LEAD
+     segments short of the gantry it announces, so it is that much
+     further from the line, and the number it carries says so. */
+  const copy = signCopy(def.signStep, FEEL.SIGN_MARKER_LEAD);
   const postW = Math.max(2, W * 0.115);
   const px = W / 2 - postW / 2;
   const panT = H * 0.045, panB = H * 0.66;
@@ -14826,10 +14955,14 @@ function bakeMarker(g, W, H, def) {
   g.stroke();
 
   const cx = (panL + panR) / 2, inner = (panR - panL) - 4 * bi;
-  signText(g, def.line1, cx, panT + (panB - panT) * 0.34, inner,
+  signText(g, copy.num, cx, panT + (panB - panT) * 0.34, inner,
            (panB - panT) * 0.36, '900', SIGN_INK.INK);
-  signText(g, def.line2, cx, panT + (panB - panT) * 0.63, inner,
+  signText(g, copy.unit, cx, panT + (panB - panT) * 0.63, inner,
            (panB - panT) * 0.16, '700', SIGN_INK.INK_DIM);
+  // and the same chequer the last gantry carries, so the pair match
+  if (copy.last)
+    signChequer(g, panL + bi * 1.6, panT + bi * 1.6, (panR - panL) - bi * 3.2,
+                (panB - panT) * 0.085, 8, SIGN_INK.CHEQUER, SIGN_INK.PANEL_EDGE);
 
   // a chevron pointing on down the road, under the copy
   g.fillStyle = SIGN_INK.INK_DIM;
@@ -14857,29 +14990,18 @@ function bakeMarker(g, W, H, def) {
    decorations on it. */
 function bakePost(g, W, H, def) {
   const lit = signLitSide();
+  const route = signRoute();
   const postW = Math.max(1.5, W * 0.10);
   const px = W / 2 - postW / 2;
   const panT = H * 0.05, panB = H * 0.56;
-  const panL = W * 0.06, panR = W * 0.94;
 
   g.fillStyle = SIGN_INK.POST;
   g.fillRect(px, panB * 0.92, postW, H - panB * 0.92);
   g.fillStyle = SIGN_INK.POST_LIT;
   g.fillRect(lit < 0 ? px : px + postW * 0.6, panB * 0.92, postW * 0.4, H - panB * 0.92);
 
-  const grad = g.createLinearGradient(0, panT, 0, panB);
-  grad.addColorStop(0, SIGN_INK.BLUE_HI);
-  grad.addColorStop(1, SIGN_INK.BLUE_LO);
-  signRoundRect(g, panL, panT, panR - panL, panB - panT, (panR - panL) * 0.16);
-  g.fillStyle = grad; g.fill();
-  const bi = (panR - panL) * 0.09;
-  signRoundRect(g, panL + bi, panT + bi, (panR - panL) - 2 * bi, (panB - panT) - 2 * bi,
-                (panR - panL) * 0.10);
-  g.strokeStyle = SIGN_INK.BORDER;
-  g.lineWidth = Math.max(0.8, (panR - panL) * 0.055);
-  g.stroke();
-  signText(g, def.line1, (panL + panR) / 2, (panT + panB) / 2,
-           (panR - panL) - 4 * bi, (panB - panT) * 0.52, '900', SIGN_INK.INK);
+  signShield(g, W * 0.06, panT, W * 0.88, panB - panT, route, 0);
+
   g.fillStyle = SIGN_INK.STUD;
   g.beginPath();
   g.arc(W / 2, panB + (H - panB) * 0.2, Math.max(0.6, W * 0.06), 0, 6.2832);
@@ -15372,18 +15494,74 @@ function bakeHouseBarn(g, W, H, def) {
    rectangle on a period; that is an argument to drawImage, not a state
    change, so the pass's own rule survives.
    ================================================================== */
+/* THE TANK WAS THE SAME GREY AS THE STEEL AND IT DISAPPEARED.
+
+   MEASURED, PER PIXEL, AGAINST WHAT WAS ACTUALLY BEHIND IT rather than
+   against the palette: the tower's strongest tones stood 32.7 luminance
+   units clear of their own background, on a floor of 30, with 12 per
+   cent of the object above that floor. It was drawn plenty big enough,
+   median 44 CSS pixels and p90 118, so size was never the problem.
+
+   WHY IT LOST AND THE MAST DID NOT, given they measured almost the
+   same: the mast has a blinking lamp and a 7,200 unit vertical against
+   the sky. The tank is a solid mass at the height the tree canopies
+   are, in a grey a shade off the terrain it sits on. It had nothing
+   doing the lamp's job.
+
+   SO IT GETS BOTH HALVES: the tank's own tones lifted out of the steel
+   range entirely, and a light. A real one has both, which is the
+   convenient part. The lamp is STEADY where the mast's blinks, and that
+   is deliberate: the mast's blink is the only thing in the world that
+   changes on its own and a second blinker would spend that. */
 const MAST_INK = {
   STEEL:   '#2b2e34',
   STEEL_L: '#474b54',
   STEEL_D: '#171a1f',
   GUY:     '#22252a',
-  TANK:    '#31343b',
-  TANK_L:  '#4a4e58',
-  TANK_D:  '#1c1f24',
-  BAND:    '#585c66',
+  /* THE TANK, LIFTED FROM 52 LUMINANCE TO 116. Still far under the
+     gantry panel's own border ink at 210 and further under the road
+     edge at 253, so nothing here goes near the rule that outranks
+     everything. It is a pale steel and it is deliberately COOL, so it
+     separates from the warm lit windows on the houses below it rather
+     than joining them. */
+  TANK:    '#6d7482',
+  TANK_L:  '#949cad',
+  TANK_D:  '#3f444e',
+  TANK_TOP:'#5b616e',
+  BAND:    '#a8afbd',
+  /* THE LIT BAND AND THE TWO FLOODS UNDER IT, which is what a real tank
+     near a town carries and it is the cheapest way to make one read.
+     The flood is a LINEAR ramp: the sign lamps' note applies here word
+     for word, a radial one rings into visible arcs at this alpha over a
+     dark face and a baked artefact is forever. */
+  TANK_LIT:'#cfd6e2',
+  FLOOD:   'rgba(226,236,255,0.20)',
+  /* THE LAMPS ARE WARM RATHER THAN RED, AND THAT IS THE SATURATION RULE
+     CATCHING SOMETHING THAT HAD ALREADY SHIPPED.
+
+     A static audit of every baked ink was written when the tower's new
+     lamp was found beating the road edge on chroma in eight biomes, and
+     it caught the MAST'S lamp doing the same thing at 181 against an
+     edge floor of 124. That went out last session and no probe saw it,
+     because the in frame ones drive and sample and a lit mast is a rare
+     frame. An ink the audit cannot see is an ink that can break the one
+     rule silently, which is why the gradient stops moved in here too.
+
+     124 IS THE EDGE'S WORST CASE MEASURED AS RENDERED, in biome 4. The
+     next ink down the list is a lit window at 111, so 111 is the
+     ceiling the shipped atlas already lives under and these join it.
+     BRIEF.md's own words are "a slow pulse, WARM OR RED", so warm is
+     what was asked for and it is also what a night camera sees when it
+     looks at a real obstruction light. */
   LAMP_OFF:'#3a2020',
-  LAMP_ON: '#ff5a4a',
-  LAMP_GLOW:'rgba(255,90,74,0.30)'
+  LAMP_ON: '#ffa194',                     // chroma 107, luminance 180
+  LAMP_HOT: 'rgba(255,178,166,0.34)',     // the halo's inner stop
+  LAMP_GLOW:'rgba(255,161,148,0.11)',     // and its steep middle one
+  // the tower's own obstruction light. STEADY, and a shade under the
+  // mast's, so the one thing in the world that changes stays the mast.
+  TOP_LAMP:'#f09a8c',                     // chroma 100, luminance 171
+  TOP_HOT: 'rgba(255,178,166,0.30)',
+  TOP_GLOW:'rgba(240,154,140,0.26)'
 };
 
 /* A lattice leg pair with X bracing between them, which is what says
@@ -15441,9 +15619,9 @@ function bakeMast(g, W, H, def) {
        light. A steep middle stop is what makes it a halo. */
     const r = W * 0.30;
     const lg = g.createRadialGradient(cx, H * 0.032, 0, cx, H * 0.032, r);
-    lg.addColorStop(0, 'rgba(255,120,96,0.34)');
-    lg.addColorStop(0.28, 'rgba(255,90,74,0.11)');
-    lg.addColorStop(1, 'rgba(255,90,74,0)');
+    lg.addColorStop(0, MAST_INK.LAMP_HOT);
+    lg.addColorStop(0.28, MAST_INK.LAMP_GLOW);
+    lg.addColorStop(1, 'rgba(255,161,148,0)');
     g.fillStyle = lg;
     g.fillRect(cx - r, H * 0.032 - r, r * 2, r * 2);
   }
@@ -15457,40 +15635,81 @@ function bakeWaterTower(g, W, H, def) {
   const cx = W / 2, lit = signLitSide();
   const lw = Math.max(1, W * 0.028);
   const tankT = H * 0.06, tankB = H * 0.40;
+  const tank = tankB - tankT;
+  const bodyT = tankT + tank * 0.22, bodyB = tankT + tank * 0.76;
   mastLattice(g, cx, tankB, H * 0.99, W * 0.17, W * 0.34, 5, lw);
-  // the tank: a cylinder with a conical roof and a conical bottom
+
+  // ---- the conical bottom, its own tone rather than the dark one, so
+  // the tank has a bottom instead of fading into the legs
   g.beginPath();
-  g.moveTo(cx - W * 0.32, tankB - (tankB - tankT) * 0.24);
+  g.moveTo(cx - W * 0.32, bodyB);
   g.lineTo(cx, tankB);
-  g.lineTo(cx + W * 0.32, tankB - (tankB - tankT) * 0.24);
+  g.lineTo(cx + W * 0.32, bodyB);
   g.closePath();
   g.fillStyle = MAST_INK.TANK_D; g.fill();
+
+  // ---- the body. Three tones across it, so it is a cylinder and not a
+  // rectangle: the shaded flank, the mass, and the lit flank.
   g.fillStyle = MAST_INK.TANK;
-  g.fillRect(cx - W * 0.32, tankT + (tankB - tankT) * 0.22,
-             W * 0.64, (tankB - tankT) * 0.54);
-  g.fillStyle = lit < 0 ? MAST_INK.TANK_L : MAST_INK.TANK_D;
-  g.fillRect(cx - W * 0.32, tankT + (tankB - tankT) * 0.22,
-             W * 0.19, (tankB - tankT) * 0.54);
+  g.fillRect(cx - W * 0.32, bodyT, W * 0.64, bodyB - bodyT);
+  g.fillStyle = MAST_INK.TANK_L;
+  g.fillRect(lit < 0 ? cx - W * 0.32 : cx + W * 0.13, bodyT, W * 0.19, bodyB - bodyT);
+  g.fillStyle = MAST_INK.TANK_D;
+  g.fillRect(lit < 0 ? cx + W * 0.22 : cx - W * 0.32, bodyT, W * 0.10, bodyB - bodyT);
+
+  // ---- the two floods on the railing, throwing up the belly of it
+  for (const f of [-0.20, 0.20]) {
+    const lx = cx + W * f, ly = bodyB + tank * 0.10, rad = tank * 0.95;
+    const lg = g.createLinearGradient(lx, ly, lx, ly - rad);
+    lg.addColorStop(0, MAST_INK.FLOOD);
+    lg.addColorStop(1, 'rgba(226,236,255,0)');
+    g.fillStyle = lg;
+    g.beginPath();
+    g.moveTo(lx, ly);
+    g.lineTo(lx - rad * 0.34, ly - rad);
+    g.lineTo(lx + rad * 0.34, ly - rad);
+    g.closePath();
+    g.fill();
+    g.fillStyle = MAST_INK.BAND;
+    g.beginPath();
+    g.arc(lx, ly, Math.max(0.6, W * 0.024), 0, 6.2832);
+    g.fill();
+  }
+
+  // ---- the lit band. The brightest thing on the object and the reason
+  // it reads at forty pixels, which is where it actually gets drawn.
+  g.fillStyle = MAST_INK.TANK_LIT;
+  g.fillRect(cx - W * 0.32, bodyT + (bodyB - bodyT) * 0.34, W * 0.64,
+             Math.max(1.4, (bodyB - bodyT) * 0.20));
+
+  // ---- the conical roof, lighter than the body because it faces up
   g.beginPath();
-  g.moveTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.22);
+  g.moveTo(cx - W * 0.34, bodyT);
   g.lineTo(cx, tankT);
-  g.lineTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.22);
+  g.lineTo(cx + W * 0.34, bodyT);
   g.closePath();
-  g.fillStyle = MAST_INK.TANK_D; g.fill();
-  // a band round the tank and a railing on top, which is the scale cue
-  g.fillStyle = MAST_INK.BAND;
-  g.fillRect(cx - W * 0.32, tankT + (tankB - tankT) * 0.46, W * 0.64,
-             Math.max(0.8, H * 0.008));
+  g.fillStyle = MAST_INK.TANK_TOP; g.fill();
+  g.beginPath();
+  g.moveTo(cx + W * 0.34 * lit, bodyT);
+  g.lineTo(cx, tankT);
+  g.lineTo(cx + W * 0.10 * lit, bodyT);
+  g.closePath();
+  g.fillStyle = MAST_INK.TANK_L; g.fill();
+
+  // ---- the railing round the walkway and the ladder down one leg,
+  // which are the two things that say how big it is
   g.strokeStyle = MAST_INK.BAND; g.lineWidth = Math.max(0.7, W * 0.014);
   g.beginPath();
-  g.moveTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.20);
-  g.lineTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.10);
-  g.moveTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.20);
-  g.lineTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.10);
-  g.moveTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.13);
-  g.lineTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.13);
+  g.moveTo(cx - W * 0.40, bodyB + tank * 0.10);
+  g.lineTo(cx + W * 0.40, bodyB + tank * 0.10);
+  for (let i = -3; i <= 3; i++) {
+    const px = cx + W * 0.40 * (i / 3);
+    g.moveTo(px, bodyB + tank * 0.10);
+    g.lineTo(px, bodyB + tank * 0.10 - tank * 0.12);
+  }
+  g.moveTo(cx - W * 0.40, bodyB + tank * 0.10 - tank * 0.12);
+  g.lineTo(cx + W * 0.40, bodyB + tank * 0.10 - tank * 0.12);
   g.stroke();
-  // the ladder down one leg
   g.strokeStyle = MAST_INK.STEEL_L; g.lineWidth = Math.max(0.6, W * 0.010);
   g.beginPath();
   for (let y = tankB; y < H * 0.96; y += H * 0.045) {
@@ -15499,14 +15718,21 @@ function bakeWaterTower(g, W, H, def) {
   g.moveTo(cx + W * 0.05, tankB); g.lineTo(cx + W * 0.05, H * 0.96);
   g.moveTo(cx + W * 0.11, tankB); g.lineTo(cx + W * 0.11, H * 0.96);
   g.stroke();
-}
 
-const SIGN_COUNTDOWN = [
-  { n: '8', line1: 'CITY CENTER', line2: '8 MILES' },
-  { n: '6', line1: 'CITY CENTER', line2: '6 MILES' },
-  { n: '4', line1: 'CITY CENTER', line2: '4 MILES' },
-  { n: '2', line1: 'CITY CENTER', line2: '2 MILES' }
-];
+  // ---- and the obstruction light at the apex. STEADY. Three stops for
+  // the same reason the mast's has three: two render a hard disc.
+  const gr = W * 0.26;
+  const gg = g.createRadialGradient(cx, tankT, 0, cx, tankT, gr);
+  gg.addColorStop(0, MAST_INK.TOP_HOT);
+  gg.addColorStop(0.30, MAST_INK.TOP_GLOW);
+  gg.addColorStop(1, 'rgba(240,154,140,0)');
+  g.fillStyle = gg;
+  g.fillRect(cx - gr, tankT - gr, gr * 2, gr * 2);
+  g.fillStyle = MAST_INK.TOP_LAMP;
+  g.beginPath();
+  g.arc(cx, tankT, Math.max(1, W * 0.042), 0, 6.2832);
+  g.fill();
+}
 
 const SPRITE_REG = [];
 const SPR_GANTRY_0 = 0;                  // four, one per countdown step
@@ -15521,21 +15747,29 @@ const SPR_MAST_ON  = 16;
 const SPR_TOWER    = 17;
 
 (function buildSpriteRegistry() {
+  /* THE COPY IS NO LONGER IN THE REGISTRY, and that is the whole of what
+     it took to make the signs tell the truth.
+
+     It used to hold two frozen strings a row, CITY CENTER and 8 MILES,
+     which is fine for a fiction and impossible for a distance: the
+     distance depends on the track, the track depends on the level, and
+     the level changes four times a session. So a row carries WHICH
+     countdown step it is, the bake asks signCopy what that step says
+     right now, and the nine sign sprites are re-baked in place whenever
+     the answer would change. See spriteSignTextStale. */
   for (let i = 0; i < 4; i++)
-    SPRITE_REG.push({ name: 'gantry' + SIGN_COUNTDOWN[i].n, bake: bakeGantry,
+    SPRITE_REG.push({ name: 'gantry' + (i + 1), bake: bakeGantry,
                       wKey: 'SIGN_GANTRY_SPAN', hKey: 'SIGN_GANTRY_HIGH',
-                      bakeShare: 1.00, spanRoad: 1,
-                      line1: SIGN_COUNTDOWN[i].line1, line2: SIGN_COUNTDOWN[i].line2,
+                      bakeShare: 1.00, spanRoad: 1, signStep: i,
                       ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
   for (let i = 0; i < 4; i++)
-    SPRITE_REG.push({ name: 'marker' + SIGN_COUNTDOWN[i].n, bake: bakeMarker,
+    SPRITE_REG.push({ name: 'marker' + (i + 1), bake: bakeMarker,
                       wKey: 'SIGN_MARKER_WIDE', hKey: 'SIGN_MARKER_HIGH',
-                      bakeShare: 0.50,
-                      line1: SIGN_COUNTDOWN[i].n, line2: 'MILES',
+                      bakeShare: 0.50, signStep: i,
                       ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
   SPRITE_REG.push({ name: 'post', bake: bakePost,
                     wKey: 'SIGN_POST_WIDE', hKey: 'SIGN_POST_HIGH',
-                    bakeShare: 0.375, line1: 'A1', line2: '',
+                    bakeShare: 0.375,
                     ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
   /* AND THE TREES, on the same three fields as everything else. The
      registry is where the pipeline stops being about signs: nothing
@@ -15552,7 +15786,7 @@ const SPR_TOWER    = 17;
                  ['treeScrub', bakeTreeScrub, 'TREE_SCRUB_WIDE', 'TREE_SCRUB_HIGH']];
   for (const t of TREES)
     SPRITE_REG.push({ name: t[0], bake: t[1], wKey: t[2], hKey: t[3],
-                      bakeShare: 0.45, line1: '', line2: '', maxShare: 0.45,
+                      bakeShare: 0.45, maxShare: 0.45,
                       ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
   /* THE HOUSE SHARE IS SET FROM THE MEASURED DRAWN SIZE, not from the
      argument that a house has more inside it than a tree. Measured over
@@ -15566,22 +15800,20 @@ const SPR_TOWER    = 17;
                   ['houseBarn', bakeHouseBarn, 'HOUSE_BARN_WIDE', 'HOUSE_BARN_HIGH']];
   for (const t of HOUSES)
     SPRITE_REG.push({ name: t[0], bake: t[1], wKey: t[2], hKey: t[3],
-                      bakeShare: 0.42, line1: '', line2: '', maxShare: 0.45,
+                      bakeShare: 0.42, maxShare: 0.45,
                       ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
   /* THE MAST IS TWO SPRITES OF ONE OBJECT. blinkWith names the other
      half and the pass swaps the source rectangle on a period, so the
      lamp changes without anything in the pass changing state. */
   SPRITE_REG.push({ name: 'mastOff', bake: bakeMast, lampOn: 0,
                     wKey: 'MAST_WIDE', hKey: 'MAST_HIGH', bakeShare: 0.55,
-                    line1: '', line2: '', blinkWith: SPR_MAST_ON,
+                    blinkWith: SPR_MAST_ON,
                     ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
   SPRITE_REG.push({ name: 'mastOn', bake: bakeMast, lampOn: 1,
                     wKey: 'MAST_WIDE', hKey: 'MAST_HIGH', bakeShare: 0.55,
-                    line1: '', line2: '',
                     ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
   SPRITE_REG.push({ name: 'waterTower', bake: bakeWaterTower,
                     wKey: 'TOWER_WIDE', hKey: 'TOWER_HIGH', bakeShare: 0.55,
-                    line1: '', line2: '',
                     ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
 })();
 
@@ -15599,6 +15831,12 @@ let SPRITE_ATLAS = null;
 let SPRITE_ATLAS_W = 0, SPRITE_ATLAS_H = 0;
 let SPRITE_BAKE_MS = 0;
 let SPRITE_BAKE_SIG = '';
+/* THE NINE SPRITES WITH WORDS ON THEM, WHICH ARE THE FIRST NINE ROWS.
+   Everything after them is foliage, buildings and steel and none of it
+   depends on which track this is. */
+const SPR_SIGN_N = 9;
+let SIGN_TEXT_L = -1, SIGN_TEXT_MODE = -1, SIGN_TEXT_DAY = -1;
+let SIGN_REBAKE_MS = 0, SIGN_REBAKES = 0;
 let SPRITE_BAKE_CAPPED = 0;
 
 /* THE LARGEST SIZE NEEDED, AND THE BRIEF'S ONE UNANSWERABLE QUESTION.
@@ -15746,7 +15984,59 @@ function spriteBuildAtlas() {
   SPRITE_ATLAS_W = cv.width; SPRITE_ATLAS_H = cv.height;
   SPRITE_BAKE_SIG = sig;
   SPRITE_BAKE_MS = performance.now() - t0;
+  spriteSignTextMark();
   return true;
+}
+
+/* ------------------------------------------------------------------
+   RE-BAKING THE NINE SIGNS IN PLACE, WHICH IS WHAT A HONEST DISTANCE
+   COSTS.
+
+   A whole atlas is 17 to 23ms and 12 megabytes and almost none of it
+   would change: the trees, the houses and the steel do not care which
+   track this is. So only the nine rows with words on them are cleared
+   and re-drawn, into the boxes they already own, at the sizes they
+   already have. Nothing is re-packed and no canvas is allocated, which
+   is also why this cannot fail the way the first bake can.
+
+   WHAT MAKES IT STALE IS THREE VALUES AND NOT A STRING. The leg being
+   counted down, the mode, and the day. A string built per frame to
+   compare against would be sixty throwaway strings a second for a value
+   that changes about four times in a session.
+
+   IT IS CHECKED IN THE PASS RATHER THAN AT THE PLACES THAT CHANGE IT,
+   because there are five of those: starting a run, clearing a level,
+   the mode toggle, midnight rolling over with the tab open, and the
+   tuner moving CHECKPOINT_EVERY. One poll at the top of the pass
+   catches all five and cannot be forgotten by the sixth.
+   ------------------------------------------------------------------ */
+function spriteSignTextMark() {
+  SIGN_TEXT_L = signCycle(); SIGN_TEXT_MODE = mode; SIGN_TEXT_DAY = todayStamp;
+}
+function spriteSignTextStale() {
+  return signCycle() !== SIGN_TEXT_L || mode !== SIGN_TEXT_MODE
+      || todayStamp !== SIGN_TEXT_DAY;
+}
+function spriteRebakeSigns() {
+  if (!SPRITE_ATLAS) { spriteSignTextMark(); return; }
+  let g = null;
+  try { g = SPRITE_ATLAS.getContext('2d'); } catch (e) { g = null; }
+  if (!g) { spriteSignTextMark(); return; }
+  const t0 = performance.now();
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (let i = 0; i < SPR_SIGN_N && i < SPRITE_REG.length; i++) {
+    const d = SPRITE_REG[i];
+    if (!d.aw) continue;
+    g.save();
+    g.clearRect(d.ax, d.ay, d.aw, d.ah);
+    g.translate(d.ax, d.ay);
+    g.beginPath(); g.rect(0, 0, d.aw, d.ah); g.clip();
+    try { d.bake(g, d.aw, d.ah, d); } catch (e) { d.aw = 0; }
+    g.restore();
+  }
+  SIGN_REBAKE_MS = performance.now() - t0;
+  SIGN_REBAKES++;
+  spriteSignTextMark();
 }
 
 /* ------------------------------------------------------------------
@@ -15760,22 +16050,107 @@ function spriteBuildAtlas() {
    corner on every daily. Everything below is arithmetic on the segment
    index, so the road is byte for byte the road it was.
    ------------------------------------------------------------------ */
+/* THE LEG THE COUNTDOWN COUNTS DOWN. On the daily it is the track: the
+   finish is the end of it and there is exactly one of it. Anywhere else
+   it is the gap between checkpoint gates, which recurs forever and is
+   the only real target an endless road has. */
+function signToFinish() { return mode === DAILY && finishSeg > 600; }
 function signCycle() {
-  if (mode === DAILY && finishSeg > 600) return finishSeg;
-  return Math.max(400, Math.round(FEEL.SIGN_CYCLE_SEGMENTS));
+  if (signToFinish()) return finishSeg;
+  return Math.max(400, Math.round(FEEL.CHECKPOINT_EVERY));
+}
+
+/* HOW FAR INTO THE CURRENT LEG A SEGMENT IS, so that leg length minus
+   this is the road left to the thing the sign names.
+
+   THE PHASE IS NOT idx % L OFF THE DAILY. The gates do not start at
+   zero: the first stands at GATE_FIRST_SHARE of an interval in, and
+   every one after it an interval on from that. Measuring from zero
+   would have put the random track's signs at a fixed offset from every
+   gate they claimed to be counting down to, which is exactly the kind
+   of quietly wrong number this change exists to remove. */
+function signPhase(idx) {
+  const L = signCycle();
+  if (signToFinish()) return idx % L;
+  const first = gateSegment(1);
+  return ((idx - first) % L + L) % L;
+}
+
+/* THE DISTANCE ON THE SIGN, IN THE GAME'S ONE UNIT, ROUNDED THE WAY A
+   ROAD SIGN ROUNDS. A real countdown sign says 700, not 682, and that
+   is not dishonesty: it is the resolution a sign is read at. The step
+   is a constant so the rounding is visible and tunable rather than a
+   number buried in a format call. */
+function signMetres(segs) {
+  const step = Math.max(1, Math.round(FEEL.SIGN_ROUND_METRES));
+  const m = Math.max(0, segs) * FEEL.SEGMENT_LENGTH
+          / Math.max(1, FEEL.WORLD_UNITS_PER_METRE);
+  return Math.max(step, Math.round(m / step) * step);
+}
+
+/* THE SAME DISTANCE AS THE SIGN PRINTS IT. One decimal always, so 2.0
+   rather than 2, because a countdown where one sign has a decimal point
+   and the next does not reads as two different signs. */
+function signDistanceText(segs) {
+  return (signMetres(segs) / 1000).toFixed(1);
+}
+
+function signShareAt(i) {
+  return i === 0 ? FEEL.SIGN_AT_1 : i === 1 ? FEEL.SIGN_AT_2
+       : i === 2 ? FEEL.SIGN_AT_3 : FEEL.SIGN_AT_4;
+}
+
+/* WHICH OF THE FOUR IS THE LAST ONE BEFORE THE LINE. Read off the
+   shares rather than assumed to be the fourth, because the four are
+   tunable and nothing stops somebody putting them out of order. */
+function signLastStep() {
+  let best = 0;
+  for (let i = 1; i < 4; i++) if (signShareAt(i) > signShareAt(best)) best = i;
+  return best;
+}
+
+/* WHAT ONE COUNTDOWN SIGN SAYS, COMPUTED FROM WHERE IT ACTUALLY STANDS.
+
+   THE MARKER GETS ITS OWN DISTANCE AND NOT ITS GANTRY'S. It stands
+   SIGN_MARKER_LEAD segments earlier, which is 26 segments, 5,200 units,
+   twenty metres. Under the rounding step it comes out the same number
+   almost always, and when it does not, the marker is right. */
+function signCopy(step, lead) {
+  const L = signCycle();
+  const at = Math.round(L * signShareAt(step)) - (lead || 0);
+  const d = signDistanceText(L - at);
+  /* THE CHEQUER ONLY EXISTS WHERE THERE IS A LINE. A gate is not a
+     finish and a chequered board at one would be the same borrowed
+     drama the fictional mileage was. */
+  return { head: signToFinish() ? 'FINISH' : 'CHECKPOINT',
+           num: d, unit: 'km',
+           last: signToFinish() && step === signLastStep() };
+}
+
+/* THE ROUTE SHIELD, WHICH IS WHERE THE DAY'S TRACK NUMBER LIVES.
+
+   THE HUD ALREADY SAYS TRACK #17 AND THE HUD IS EASY TO STOP READING.
+   A shield in the world is not: it recurs every SIGN_POST_EVERY
+   segments, so a player passes twenty of them in a run and absorbs that
+   the road has a number without ever being told.
+
+   THE RANDOM TRACK KEEPS THE PLAIN ROAD NUMBER, because it has no track
+   number and a shield claiming one would be the same fiction the
+   countdown just stopped telling. */
+function signRoute() {
+  if (mode === DAILY) return { cap: 'TRACK', num: '#' + trackNumber(todayStamp) };
+  return { cap: 'ROUTE', num: 'A1' };
 }
 
 function signFor(idx) {
   const L = signCycle();
-  const k = idx % L;
+  const k = signPhase(idx);
   const lead = Math.max(0, Math.round(FEEL.SIGN_MARKER_LEAD));
   for (let i = 0; i < 4; i++) {
     /* Read one at a time rather than off a built key, because this runs
        once per segment laid and a string per segment per sign is thirty
        thousand throwaway strings over a long road for no reason. */
-    const share = i === 0 ? FEEL.SIGN_AT_1 : i === 1 ? FEEL.SIGN_AT_2
-                : i === 2 ? FEEL.SIGN_AT_3 : FEEL.SIGN_AT_4;
-    const at = Math.round(L * share);
+    const at = Math.round(L * signShareAt(i));
     if (k === at) return { id: SPR_GANTRY_0 + i, off: 0 };
     if (lead && k === at - lead)
       return { id: SPR_MARKER_0 + i, off: FEEL.SIGN_MARKER_OFFSET };
@@ -15884,6 +16259,8 @@ let spritesDrawn = 0;
 function spritePass(first, last, baseIndex, w, h) {
   spritesDrawn = 0;
   if (!FEEL.SPRITES_ON || !SPRITE_ATLAS) return;
+  // three integer compares, and a re-bake about four times a session
+  if (spriteSignTextStale()) spriteRebakeSigns();
   const atlas = SPRITE_ATLAS;
   for (let n = last; n >= first; n--) {            // back to front
     if (!bvis[n]) continue;
