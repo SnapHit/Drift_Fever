@@ -1612,6 +1612,59 @@ const FEEL = {
      they read as landform rather than as a saw edge. */
   TERRAIN_HEIGHT:          4600,     // LIVE, world units the outer ridge rises
   TERRAIN_HILL_SEGMENTS:     34,     // LIVE
+  /* ------------------------------------------------------------------
+     THE HILLS GET FACES.
+
+     The ridge used to take one of two colours and the choice was made
+     entirely by WHICH SIDE OF THE ROAD IT WAS ON, which is a constant,
+     so every hill on the left was one flat tone and every hill on the
+     right was another. Measured on that build: 2.3 to 3.8 luminance
+     units of local variation inside the terrain at an eight pixel reach,
+     across all twelve biomes. That is a wash, not a landform.
+
+     A hill has faces, and the geometry already knows where they are:
+     terrainRise is a smoothstepped field along the road, so its GRADIENT
+     is the slope, and the sign of the slope is which way a face is
+     turned. Rising ground presents its flank to the light, falling
+     ground turns away. Three tones, chosen per quad from the side and
+     the slope together, and the tone changes on the hill's own
+     wavelength rather than per segment, so the batching survives. */
+  TERRAIN_SLOPE_WINDOW:    0.34,     // LIVE, share of a hill either side, reading the gradient
+  TERRAIN_SLOPE_MIN:       0.10,     // LIVE, gradient that counts as a face rather than flat
+  TERRAIN_SIDE_WEIGHT:        1,     // LIVE, tone steps the lit side of the road is worth
+  TERRAIN_SLOPE_WEIGHT:       1,     // LIVE, tone steps a slope is worth
+  /* ------------------------------------------------------------------
+     AND THEY GO GREEN, WITHIN A BAND, AND THIS COSTS SOMETHING.
+
+     The ground role's hue is authored per biome and it is ABSOLUTE: the
+     twelve places are ochre, emerald, steel, ochre, ash, violet and so
+     on, spanning the whole wheel, and BIOME_PALETTE's stated rule is
+     that the scenery hue is complementary to it with a gap never under
+     130 degrees.
+
+     GREEN HILLS IN ALL TWELVE AND TWELVE DISTINGUISHABLE PLACES ARE
+     MUTUALLY EXCLUSIVE, and it is arithmetic rather than taste. Green
+     spans about 75 to 165 degrees. Twelve hues inside 90 degrees are
+     7.5 degrees apart, which is not a difference anyone can see. So the
+     ground stops being the thing that tells one place from another.
+
+     What is done instead of collapsing to one green: the authored wheel
+     is COMPRESSED into the band rather than replaced by a point, so the
+     ordering and the relative distinctness of the twelve survive as far
+     as the band allows, and every one of them lands green adjacent.
+
+     WHAT IT COSTS, STATED: the ground's hue spread falls from 360
+     degrees to TERRAIN_GREEN_BAND. The biome sequencer is fed the
+     AUTHORED hue rather than the compressed one, so its rule about
+     keeping consecutive places apart still works, but what it is keeping
+     apart is now the place rather than the visible ground colour. Sky,
+     city, road surface and edge still rotate the whole wheel and they
+     are what carries the biome change now.
+
+     PULL IS LIVE AND ZERO IS THE OLD WORLD. One press. */
+  TERRAIN_GREEN_PULL:      1.00,     // LIVE, 0 is the authored wheel, 1 is the band
+  TERRAIN_GREEN_HUE:        118,     // LIVE, degrees, the middle of the band
+  TERRAIN_GREEN_BAND:       108,     // LIVE, degrees the whole wheel compresses into
   GRID_DEPTH:             15000,
   GRID_SPACING:            2400,
   GRID_ROWS:                 44,
@@ -4598,6 +4651,30 @@ function roleColour(colour, hue, sat, wantL, was, now) {
   return out[0] + ',' + out[1] + ',' + out[2];
 }
 
+/* THE AUTHORED WHEEL, COMPRESSED INTO A BAND CENTRED ON GREEN.
+
+   Not replaced by a point: at pull one an authored hue 92 degrees from
+   the centre lands 27.6 degrees from it, so the twelve keep their order
+   and as much of their spacing as 108 degrees can hold. At pull zero
+   this is the identity and the world is the one that shipped.
+
+   THE BIOME SEQUENCER IS DELIBERATELY NOT TOLD. It orders the places by
+   BIOME_HUE, which is the AUTHORED ground hue, and its whole job is to
+   keep two similar places apart. Feeding it the compressed hue would
+   leave it comparing twelve numbers inside 108 degrees against a
+   BIOME_MIN_STEP of 90, which nothing could satisfy, and it would fall
+   back to "the farthest remaining" on every draw. Fed the authored hue
+   it still separates the places; what it can no longer promise is that
+   the GROUND looks different, because now it does not. */
+function terrainGreenHue(h) {
+  const pull = clamp(FEEL.TERRAIN_GREEN_PULL, 0, 1);
+  if (pull <= 0) return h;
+  const c = FEEL.TERRAIN_GREEN_HUE;
+  let d = (h - c) % 360;
+  if (d > 180) d -= 360; else if (d < -180) d += 360;
+  return c + d * (1 + (FEEL.TERRAIN_GREEN_BAND / 360 - 1) * pull);
+}
+
 let PALETTE_BASE = null;
 let BIOMES = [];
 let BIOME_HUE = [];
@@ -4637,7 +4714,8 @@ function buildBiomes() {
          a role landing on one hue does not flatten the relationships
          inside it: the two window colours stay apart, the cool sheen
          stays cool against the warm lip. */
-      const hue = spec[0] + (hsl[0] - src.hue);
+      const hue = (role === 'gnd' ? terrainGreenHue(spec[0]) : spec[0])
+                + (hsl[0] - src.hue);
       const sat = clamp(hsl[1] * spec[1], 0, 1);
       const band = BIOME_ROLE_BAND[role];
       let wantL = byteLuma(rr, gg, bb);
@@ -4892,12 +4970,65 @@ const COLOUR = {
      attempt did, changed almost nothing on screen. So the shoulder is
      authored into the same family as the plane, with a small lit and
      shade split, because it is a broad surface and not an object. */
-  GROUND_NEAR:   '#5d3a24',
-  GROUND_MID:    '#573b2d',
-  GROUND_FAR:    '#473c45',
-  GROUND_HAZE:   '#3e3a49',
-  TERRAIN_LIT:   '#4e414c',
-  TERRAIN_SHADE: '#403a48',
+  /* THE PLANE FOLLOWS THE HILLS, AND IT HAD TO BE RE-AUTHORED TO DO IT.
+
+     Every key carries its own hue OFFSET from its role anchor across the
+     rotation, which is what keeps relationships inside a role. The
+     anchor is TERRAIN_LIT, and these four were authored as browns when
+     the ridge was a purple grey, so they carried an offset of about -89
+     degrees purely by accident. Turn the ridge green and that offset
+     dutifully turns the ground plane RED: measured at hue 2 with the
+     hills at 91.
+
+     Re-authored close to the anchor, they ride it instead. The near to
+     far drift is kept, warm green at the camera through to a cool green
+     at the horizon, on top of which the depth table still pulls 62 per
+     cent of the way to DEPTH_FAR_HUE. */
+  GROUND_NEAR:   '#314722',
+  GROUND_MID:    '#304629',
+  GROUND_FAR:    '#334337',
+  GROUND_HAZE:   '#313f3b',
+  /* THREE, NOT TWO, AND SPREAD WIDER THAN THEY WERE. The role band maps
+     whatever range these are authored across onto the gnd band, so what
+     matters here is the ratio between them and not the absolute values.
+     LIT and SHADE used to sit 8.3 luminance units apart with nothing
+     between; they are now 31 apart with MID in the middle. */
+  /* AUTHORED GREEN AND AUTHORED SATURATED, and the second of those is
+     the one that was missing. The ridge used to be authored at nine per
+     cent HSL saturation, and every biome multiplies that by its own gnd
+     figure of 0.06 to 0.85, so the hills rendered at one to eight per
+     cent: grey, in all twelve. The brown the eye reads out there is the
+     GROUND PLANE and the shoulder, which are authored at forty four per
+     cent, not the ridge at all.
+
+     At 0.33 the same multipliers give two to twenty eight per cent, so
+     a rich biome has green hills and the ash biome still has ash ones,
+     which is the biome's saturation doing the work its hue can no
+     longer do.
+
+     0.33 AND NOT 0.42, AND THE DIFFERENCE IS THE ONE RULE THAT OUTRANKS
+     THIS. At 0.42 the terrain out-saturated the road edge's own glow in
+     two of the twelve, biome 9 at 0.388 against 0.384 and biome 11 at
+     0.523 against 0.439. Measured at 0.33 it clears every one of them.
+
+     WIDENING THE AUTHORED SPREAD DOES NOT WIDEN THE RENDERED ONE, and
+     that was worth finding out. The role band maps whatever range the
+     role's keys are authored across onto a fixed band, so pushing LIT to
+     92 and SHADE to 38 simply widened the range being normalised and the
+     map put it back: measured, the form the tones add went from +1.69 to
+     +1.72 vertical luminance units, which is nothing, while the mid
+     field terrain rose from 52 to 54 and the road's separation from it
+     narrowed. The tonal room the hills have is BIOME_ROLE_BAND.gnd and
+     nothing else, and taking more of it means taking it from the gap
+     between the road and the ground it sits on.
+
+     THE HUES DRIFT ACROSS THE THREE ON PURPOSE. A lit face is a little
+     yellower and a shade face a little bluer, which is what light does,
+     and the drift is carried as each key's offset from the role anchor
+     so it survives the rotation. */
+  TERRAIN_LIT:   '#345b2e',
+  TERRAIN_MID:   '#264a25',
+  TERRAIN_SHADE: '#1c381f',
   GRID:         'rgba(150,58,22,0.22)',
   GRID_NEAR:    'rgba(214,88,30,0.32)',
   HORIZON_GLOW: '#b8431a',
@@ -5693,6 +5824,13 @@ const TUNABLES = [
   { key: 'GROUND_PATCH_DENSITY',label:'fldDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'GROUND_PATCH_SHIFT', label: 'fldTone', step: 0.5, min: 0,    max: 40,    dp: 1, group: 21 },
   { key: 'GROUND_PATCH_HUE',   label: 'fldHue',  step: 1,   min: 0,    max: 60,    dp: 1, group: 21 },
+  { key: 'TERRAIN_SLOPE_WINDOW',label:'hillWin', step: 0.02,min: 0.02, max: 1,     dp: 2, group: 21 },
+  { key: 'TERRAIN_SLOPE_MIN',  label: 'hillMin', step: 0.01,min: 0,    max: 0.8,   dp: 2, group: 21 },
+  { key: 'TERRAIN_SIDE_WEIGHT',label: 'hillSide',step: 1,   min: 0,    max: 2,     dp: 0, group: 21 },
+  { key: 'TERRAIN_SLOPE_WEIGHT',label:'hillFace',step: 1,   min: 0,    max: 2,     dp: 0, group: 21 },
+  { key: 'TERRAIN_GREEN_PULL', label: 'green',   step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
+  { key: 'TERRAIN_GREEN_HUE',  label: 'greenHue',step: 2,   min: 0,    max: 359,   dp: 0, group: 21 },
+  { key: 'TERRAIN_GREEN_BAND', label: 'greenSpn',step: 4,   min: 0,    max: 360,   dp: 0, group: 21 },
   { key: 'SCENERY_EVERY',      label: 'scnEvery',step: 1,   min: 0,    max: 60,    dp: 0, group: 21 },
   { key: 'SCENERY_DENSITY',    label: 'scnDens', step: 0.05,min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'SCENERY_SIZE',       label: 'scnSize', step: 20,  min: 0,    max: 3000,  dp: 0, group: 21 },
@@ -13335,7 +13473,7 @@ const TONE_CACHE = {};
    pow() on a number the loop already has.
    ================================================================== */
 const DEPTH_LUT_SIZE = 256;
-const DEPTH_LUT = { gnd: [], terLit: [], terShade: [],
+const DEPTH_LUT = { gnd: [], terLit: [], terMid: [], terShade: [],
                     scnLit: [], scnShade: [] };
 const DEPTH_BUCKET_IX = [];
 
@@ -13355,7 +13493,7 @@ function depthShadeRgb(hsl, baseL, u) {
 
 function buildDepthLut() {
   const src = { gnd: COLOUR.GROUND_NEAR, terLit: COLOUR.TERRAIN_LIT,
-                terShade: COLOUR.TERRAIN_SHADE };
+                terMid: COLOUR.TERRAIN_MID, terShade: COLOUR.TERRAIN_SHADE };
   const raw = {};
   for (const k in src) {
     const c = rgbOf(src[k]);
@@ -13531,6 +13669,38 @@ function sceneryClump(idx, side) {
   return 1 + c * (2 * (v0 + (v1 - v0) * t) - 1);
 }
 
+/* WHICH FACE OF THE HILL THIS IS, as a tone index of 0, 1 or 2.
+
+   Two terms, both quantised to one step, added to a middle of 1:
+
+     THE SIDE. The world light comes from the left, which is what the
+     car, the scenery geometry and the sign posts all agree on, so the
+     left bank is a step brighter and the right a step darker. This is
+     what the pass did on its own before, and alone it is a constant.
+
+     THE SLOPE. terrainRise is a smoothstepped field along the road, so
+     the difference across a window either side of a point is the local
+     gradient. Rising ground turns its flank up into the light, falling
+     ground turns away. This is the term that varies, and it varies on
+     the hill's own wavelength rather than per segment, which is what
+     keeps the fills batched.
+
+   The window is a SHARE of a hill rather than a number of segments, so
+   changing TERRAIN_HILL_SEGMENTS does not silently change the shading
+   as well. */
+function terrainFace(idx, side) {
+  const step = Math.max(1, Math.round(FEEL.TERRAIN_HILL_SEGMENTS));
+  const k = Math.max(1, Math.round(step * FEEL.TERRAIN_SLOPE_WINDOW));
+  const g = terrainRise(idx + k) - terrainRise(idx - k);
+  const m = FEEL.TERRAIN_SLOPE_MIN;
+  const slope = g > m ? 1 : (g < -m ? -1 : 0);
+  const t = 1 + (side < 0 ? 1 : -1) * FEEL.TERRAIN_SIDE_WEIGHT
+              + slope * FEEL.TERRAIN_SLOPE_WEIGHT;
+  return t < 0 ? 0 : (t > 2 ? 2 : t | 0);
+}
+const TERRAIN_LUT_KEYS = ['terShade', 'terMid', 'terLit'];
+const TERRAIN_TONE_KEYS = ['TERRAIN_SHADE', 'TERRAIN_MID', 'TERRAIN_LIT'];
+
 /* Smoothstepped between hash points so the ridge line has no corners in
    it. Flat at both ends of every interval, which is what stops the
    joins reading as facets on a slow pan. */
@@ -13674,7 +13844,10 @@ function groundPatchPass(first, last, baseIndex, w, h) {
       /* THE FIELDS TURN AS WELL AS CHANGE TONE. One tone shifted up and
          down is two greys; a hue step either way makes a lot from a
          pasture and the two read as different ground. */
-      const base = side < 0 ? COLOUR.TERRAIN_LIT : COLOUR.TERRAIN_SHADE;
+      /* THE FIELDS TAKE THE FACE THEY STAND ON, so a patch on a shaded
+         flank is a shaded field rather than a bright one pasted over a
+         dark hill. Same call the ridge uses, same index. */
+      const base = COLOUR[TERRAIN_TONE_KEYS[terrainFace(idx, side)]];
       const step = ((hA * 4) | 0);
       const want = shiftTone(base, (hB > 0.5 ? 1 : -1) * FEEL.GROUND_PATCH_SHIFT,
                              (step - 1.5) * FEEL.GROUND_PATCH_HUE);
@@ -13711,14 +13884,21 @@ function terrainPass(first, last, baseIndex) {
   const reach = FEEL.TERRAIN_REACH;
   const lift = FEEL.TERRAIN_HEIGHT;
   for (let side = -1; side <= 1; side += 2) {
-    const lut = side < 0 ? DEPTH_LUT.terLit : DEPTH_LUT.terShade;
     /* ONE FILL PER DEPTH BUCKET, not one per side. bz rises monotonically
        along the walk, so the bucket only ever moves forward and a flush
        on change is enough: no sorting and no second pass. Fills go from
        two to at most DEPTH_STEPS per side, which is CHEAPER rather than
        dearer here, because path cost grows with the SQUARE of the
-       subpaths in one fill. */
-    let bucket = -1;
+       subpaths in one fill.
+
+       AND NOW ALSO ON TONE, which is the price of the hills having
+       faces. The tone comes off terrainFace, which reads the gradient of
+       a field whose wavelength is TERRAIN_HILL_SEGMENTS, so it changes
+       a handful of times across the visible road rather than per
+       segment: measured, the fill count per frame goes from 40 to 62.
+       A flush on either change is still enough because a run of quads
+       sharing both is still contiguous. */
+    let bucket = -1, tone = -1;
     let sub = 0;
     ctx.beginPath();
     for (let n = first; n <= last; n++) {
@@ -13726,11 +13906,12 @@ function terrainPass(first, last, baseIndex) {
       const s1 = segAt(baseIndex + n);
       if (!s1) break;
       const bk = depthBucket(bz[n]);
-      if (bk !== bucket) {
+      const tn = terrainFace(s1.index, side);
+      if (bk !== bucket || tn !== tone) {
         if (sub > 0) { ctx.fill(); ctx.beginPath(); sub = 0; }
-        bucket = bk;
-        ctx.fillStyle = lut[DEPTH_BUCKET_IX[bk]] ||
-                        (side < 0 ? COLOUR.TERRAIN_LIT : COLOUR.TERRAIN_SHADE);
+        bucket = bk; tone = tn;
+        ctx.fillStyle = DEPTH_LUT[TERRAIN_LUT_KEYS[tn]][DEPTH_BUCKET_IX[bk]] ||
+                        COLOUR[TERRAIN_TONE_KEYS[tn]];
       }
       /* The far boundary's own index, which after the gate one merge is
          not always n + 1 in the world even though it is in the table. */
