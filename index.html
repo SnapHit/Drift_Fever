@@ -1616,7 +1616,7 @@ const FEEL = {
      Spending the same on trees at the measured per tree cost is the
      count below, and it is stated as a count rather than as a density so
      that it can be checked. */
-  TREE_EVERY:                 1,     // LIVE, segments between tree sites
+  TREE_EVERY:                 2,     // LIVE, segments between tree sites
   TREE_DENSITY:            0.72,     // LIVE, share of sites that grow one
   TREE_CLEAR:              2.05,     // LIVE, half widths clear of the road centre
   TREE_FAR_OUT:             7.5,     // LIVE, half widths the scatter reaches
@@ -1629,13 +1629,56 @@ const FEEL = {
      widths or further out, so it leaves the SIDE of the frame long
      before it can fill it, and the close range billboarding problem this
      was built to hide never arrives. 0.45 is above anything measured. */
-  TREE_MAX_PX:             0.45,     // LIVE, tallest a tree may draw, share of the frame
+  TREE_MAX_PX:             0.45,     // LIVE, kept for the tuner; the live value
+                                     // per sprite is maxShare in the registry
   TREE_BROAD_WIDE:         2400,     // LIVE, world units
   TREE_BROAD_HIGH:         2800,     // LIVE
   TREE_CONIFER_WIDE:       1500,     // LIVE
   TREE_CONIFER_HIGH:       3600,     // LIVE
   TREE_SCRUB_WIDE:         1900,     // LIVE
   TREE_SCRUB_HIGH:         1700,     // LIVE
+  /* ------------------------------------------------------------------
+     HOUSES. What share of the sites that grow something grow one of
+     these rather than a tree. They are rarer than trees on purpose: a
+     roadside with as many houses as trees is a suburb, and the thing
+     this world is is a road out of one. */
+  HOUSE_SHARE:             0.30,     // LIVE, of what grows, how much is built
+  HOUSE_CLEAR:             2.40,     // LIVE, half widths out, further than a tree
+  HOUSE_FAR_OUT:            5.0,     // LIVE
+  HOUSE_COTTAGE_WIDE:      2600,     // LIVE, world units
+  HOUSE_COTTAGE_HIGH:      1900,     // LIVE
+  HOUSE_TWO_WIDE:          2400,     // LIVE
+  HOUSE_TWO_HIGH:          2700,     // LIVE
+  HOUSE_BARN_WIDE:         3400,     // LIVE
+  HOUSE_BARN_HIGH:         1700,     // LIVE
+  /* ------------------------------------------------------------------
+     LANDMARKS, AND THE PLACEMENT RULE IS THE HALF THAT MATTERS.
+
+     A landmark scattered at random is scenery. A landmark on a rhythm is
+     a landmark, because the third time one arrives the player is already
+     expecting it. So: every LANDMARK_EVERY segments, exactly, from the
+     segment index and nothing else.
+
+     AND WHICH ONE IS COUPLED TO THE SIGNS. The countdown gantries tell a
+     story, CITY CENTRE eight miles and falling, and a world that runs
+     two unrelated systems tells two stories. The mast belongs out of
+     town and the water tower at the edge of it, so the choice is made by
+     how far through the run the landmark stands: masts before
+     LANDMARK_TOWN, towers after it. One story.
+
+     THE BLINK. Period and duty of the lamp on the mast, and it is the
+     only thing in this world that changes without the player doing
+     something. Slow, and off for most of it, because a fast blink reads
+     as a warning and a slow one reads as a place. */
+  LANDMARK_EVERY:           420,     // LIVE, segments between landmarks
+  LANDMARK_TOWN:           0.55,     // LIVE, share of the run after which it is town
+  LANDMARK_OFFSET:         3.10,     // LIVE, half widths out
+  LANDMARK_BLINK:          2.60,     // LIVE, seconds a full blink cycle takes
+  LANDMARK_BLINK_ON:       0.22,     // LIVE, share of that cycle the lamp is lit
+  MAST_WIDE:               1500,     // LIVE, world units
+  MAST_HIGH:               7200,     // LIVE, and it must dwarf a tree
+  TOWER_WIDE:              2100,     // LIVE
+  TOWER_HIGH:              4600,     // LIVE
   TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
   /* THE RIDGE RAN DEAD FLAT ACROSS THE FRAME and the reason was the
      number, not the hash. The lift is bh times this, and bh goes to
@@ -8830,12 +8873,13 @@ function addSegment(curve, halfWidth) {
      than an array per segment: no allocation, and the object shape stays
      the same for every segment ever made, which is what keeps the
      property access monomorphic. */
-  const tr = treeFor(idx);
+  const wl = worldFor(idx, -1), wr = worldFor(idx, 1);
   segments.push({
     index: idx, curve: curve, hw: halfWidth,
     ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0,
     sgn: sg ? sg.id + 1 : 0, sgnX: sg ? sg.off : 0,
-    sg2: tr ? tr.id + 1 : 0, sg2X: tr ? tr.off : 0
+    sg2: wl ? wl.id + 1 : 0, sg2X: wl ? wl.off : 0,
+    sg3: wr ? wr.id + 1 : 0, sg3X: wr ? wr.off : 0
   });
 }
 
@@ -14918,10 +14962,18 @@ function bakePost(g, W, H, def) {
    does. What a baked sprite still cannot do is change with depth, and
    the terrain behind it has twenty depths. See the session report. */
 const TREE_INK = {
-  DARK:   '#061107',                     // luma 14
-  MID:    '#0d1f0c',                     // 26
-  LIT:    '#1c3314',                     // 44
-  RIM:    '#30451c',                     // 62
+  /* THE CANOPY WAS DESATURATED ONCE MORE, AND THE REASON IS A RULE
+     RATHER THAN A LOOK. BRIEF.md asks for the road edge to be the most
+     saturated thing on screen in every palette. Measured as a chroma
+     RATIO, foliage at 0.62 beat an edge band that renders as low as
+     0.546 in five of the twelve. See the session report for why that
+     comparison is the wrong one at a sixth of the brightness, and for
+     the absolute chroma figures that say the opposite. This is a good
+     faith reduction that narrows it anyway and costs nothing visible. */
+  DARK:   '#071107',                     // luma 14
+  MID:    '#0f1e0e',                     // 26
+  LIT:    '#1e3217',                     // 44
+  RIM:    '#324420',                     // 62
   TRUNK:  '#100c08',                     // 13
   TRUNK_L:'#211911',                     // 26
   BRANCH: '#0d0a07'                      // 10
@@ -15084,6 +15136,371 @@ function bakeTreeScrub(g, W, H, def) {
   treeHoles(g, r, W * 0.5, cy, W * 0.34, 7);
 }
 
+/* ==================================================================
+   HOUSES AND LANDMARKS, through the same pipe again.
+
+   THE HOUSE IS THE OBJECT THAT HAS FAILED HARDEST. As flat mirrored
+   profiles at a 7.5 pixel median they were purple slabs; given real
+   geometry they only worked above about twenty pixels. Both failures
+   have the same cause, which is that a house is not a silhouette. A tree
+   is: its outline IS the information, and three operations of outline
+   get you two thirds of the way. A house's outline is a box, and
+   everything that says house is INSIDE it, which is exactly the thing a
+   per frame budget cannot pay for and a bake can.
+
+   So what is inside: a wall with a plinth where it meets the ground, a
+   roof that is a different tone and overhangs the wall it sits on, lit
+   windows, and something that breaks the box, which is a chimney, a
+   lean to, a porch or a gable end.
+
+   THE WINDOWS ARE THE POINT. They are the only light source in the world
+   that is not the road, and a night landscape with lit windows in it
+   reads as inhabited rather than as terrain with boxes on it. They are
+   also the thing most likely to challenge the road edge, so they are
+   authored against it: the brightest window is 214 against an edge that
+   renders 252.9, and the measurement is in the session report.
+   ================================================================== */
+const HOUSE_INK = {
+  WALL:     '#2a2b31',                   // luma 43
+  WALL_LIT: '#3c3d45',                   // 60
+  WALL_DK:  '#1b1c21',                   // 28
+  PLINTH:   '#141419',                   // 20
+  ROOF:     '#1d1f26',                   // 31
+  ROOF_LIT: '#2c2f38',                   // 46
+  ROOF_EDGE:'#0f1014',                   // 16
+  TRIM:     '#4a4c55',                   // 75
+  WIN_WARM: '#d8b269',                   // 183, the ordinary lit window
+  WIN_HOT:  '#f0d79b',                   // 214, the one nearest the light
+  WIN_DARK: '#191a20',                   // 26, an unlit one, which is what
+                                         // makes the lit ones read as lit
+  GLOW:     'rgba(255,214,140,0.16)'
+};
+
+/* A wall face with a plinth under it and a lit edge on the world light's
+   side, which is the same call every house makes so they agree. */
+function houseWall(g, x, y, w, h, lit) {
+  g.fillStyle = HOUSE_INK.WALL;
+  g.fillRect(x, y, w, h);
+  g.fillStyle = lit < 0 ? HOUSE_INK.WALL_LIT : HOUSE_INK.WALL_DK;
+  g.fillRect(x, y, w * 0.28, h);
+  g.fillStyle = lit < 0 ? HOUSE_INK.WALL_DK : HOUSE_INK.WALL_LIT;
+  g.fillRect(x + w * 0.72, y, w * 0.28, h);
+  // the plinth, which is the line that stops it floating
+  g.fillStyle = HOUSE_INK.PLINTH;
+  g.fillRect(x - w * 0.03, y + h * 0.92, w * 1.06, h * 0.08);
+}
+
+/* One window. Warm, small, and with a soft spill on the wall around it,
+   because a light source with a hard edge reads as a sticker.
+
+   THE SPILL IS CLIPPED TO THE WALL BY THE CALLER, and it has to be: the
+   first version filled a square of radial gradient around each window
+   and the corners of it stood outside the building as two pale
+   semicircles hanging in the air. A window lights the wall it is in, not
+   the sky beside it. */
+function houseWindow(g, x, y, w, h, hot, sill) {
+  const r = w * 1.9;
+  const lg = g.createRadialGradient(x + w / 2, y + h / 2, 0, x + w / 2, y + h / 2, r);
+  lg.addColorStop(0, HOUSE_INK.GLOW);
+  lg.addColorStop(1, 'rgba(255,214,140,0)');
+  g.fillStyle = lg;
+  g.fillRect(x + w / 2 - r, y + h / 2 - r, r * 2, r * 2);
+  g.fillStyle = hot ? HOUSE_INK.WIN_HOT : HOUSE_INK.WIN_WARM;
+  g.fillRect(x, y, w, h);
+  if (sill) { g.fillStyle = HOUSE_INK.TRIM; g.fillRect(x - w * 0.12, y + h, w * 1.24, h * 0.16); }
+}
+function houseDarkWindow(g, x, y, w, h) {
+  g.fillStyle = HOUSE_INK.WIN_DARK; g.fillRect(x, y, w, h);
+  g.fillStyle = HOUSE_INK.TRIM; g.fillRect(x - w * 0.1, y + h, w * 1.2, h * 0.14);
+}
+
+/* A pitched roof as a filled path rather than a rectangle, with eaves
+   that overhang the wall on both sides and a ridge line along the top. */
+function houseGable(g, cx, wallTop, halfW, rise, over, lit) {
+  g.beginPath();
+  g.moveTo(cx - halfW - over, wallTop);
+  g.lineTo(cx, wallTop - rise);
+  g.lineTo(cx + halfW + over, wallTop);
+  g.closePath();
+  g.fillStyle = HOUSE_INK.ROOF; g.fill();
+  // the lit pitch
+  g.beginPath();
+  g.moveTo(cx, wallTop - rise);
+  g.lineTo(cx + lit * (halfW + over), wallTop);
+  g.lineTo(cx, wallTop);
+  g.closePath();
+  g.fillStyle = HOUSE_INK.ROOF_LIT; g.fill();
+  g.strokeStyle = HOUSE_INK.ROOF_EDGE;
+  g.lineWidth = Math.max(0.8, rise * 0.06);
+  g.beginPath();
+  g.moveTo(cx - halfW - over, wallTop); g.lineTo(cx, wallTop - rise);
+  g.lineTo(cx + halfW + over, wallTop);
+  g.stroke();
+}
+
+function houseChimney(g, x, y, w, h) {
+  g.fillStyle = HOUSE_INK.WALL_DK; g.fillRect(x, y, w, h);
+  g.fillStyle = HOUSE_INK.ROOF_EDGE; g.fillRect(x - w * 0.18, y, w * 1.36, h * 0.18);
+}
+
+/* ONE: THE COTTAGE. One storey, a steep gable across, a chimney off
+   centre and a porch that breaks the box on one side. */
+function bakeHouseCottage(g, W, H, def) {
+  const lit = signLitSide();
+  const wallT = H * 0.46, wallB = H * 0.96;
+  const x0 = W * 0.14, w = W * 0.66;
+  houseGable(g, x0 + w / 2, wallT, w / 2, H * 0.34, W * 0.05, lit);
+  houseChimney(g, x0 + w * 0.72, wallT - H * 0.30, W * 0.075, H * 0.22);
+  houseWall(g, x0, wallT, w, wallB - wallT, lit);
+  // the porch, a lean to on the light side
+  const px = lit < 0 ? x0 - W * 0.11 : x0 + w;
+  g.fillStyle = HOUSE_INK.WALL_DK;
+  g.fillRect(px, wallT + H * 0.14, W * 0.11, wallB - wallT - H * 0.14);
+  g.beginPath();
+  g.moveTo(px - W * 0.02, wallT + H * 0.14);
+  g.lineTo(px + W * 0.13, wallT + H * 0.14);
+  g.lineTo(px + W * 0.115, wallT + H * 0.07);
+  g.lineTo(px + W * 0.005, wallT + H * 0.07);
+  g.closePath();
+  g.fillStyle = HOUSE_INK.ROOF; g.fill();
+  const ww = w * 0.15, wh = (wallB - wallT) * 0.30;
+  g.save(); g.beginPath(); g.rect(x0, wallT, w, wallB - wallT); g.clip();
+  houseWindow(g, x0 + w * 0.13, wallT + (wallB - wallT) * 0.22, ww, wh, true, true);
+  houseWindow(g, x0 + w * 0.44, wallT + (wallB - wallT) * 0.22, ww, wh, false, true);
+  houseDarkWindow(g, x0 + w * 0.72, wallT + (wallB - wallT) * 0.22, ww, wh);
+  // a lit doorway, so the ground floor is not all glass
+  g.fillStyle = HOUSE_INK.WIN_WARM;
+  g.fillRect(x0 + w * 0.43, wallT + (wallB - wallT) * 0.66, w * 0.11,
+             (wallB - wallT) * 0.26);
+  g.restore();
+}
+
+/* TWO: THE TWO STOREY. Taller, hipped roof so its ridge is short, two
+   rows of windows and a lean to shed against one end. */
+function bakeHouseTwo(g, W, H, def) {
+  const lit = signLitSide();
+  const wallT = H * 0.34, wallB = H * 0.97;
+  const x0 = W * 0.18, w = W * 0.58;
+  const cx = x0 + w / 2, rise = H * 0.24, over = W * 0.045;
+  // hipped: a trapezoid rather than a triangle
+  g.beginPath();
+  g.moveTo(cx - w / 2 - over, wallT);
+  g.lineTo(cx - w * 0.20, wallT - rise);
+  g.lineTo(cx + w * 0.20, wallT - rise);
+  g.lineTo(cx + w / 2 + over, wallT);
+  g.closePath();
+  g.fillStyle = HOUSE_INK.ROOF; g.fill();
+  g.beginPath();
+  g.moveTo(cx + lit * w * 0.20, wallT - rise);
+  g.lineTo(cx + lit * (w / 2 + over), wallT);
+  g.lineTo(cx, wallT);
+  g.lineTo(cx, wallT - rise);
+  g.closePath();
+  g.fillStyle = HOUSE_INK.ROOF_LIT; g.fill();
+  g.strokeStyle = HOUSE_INK.ROOF_EDGE; g.lineWidth = Math.max(0.8, rise * 0.07);
+  g.beginPath();
+  g.moveTo(cx - w / 2 - over, wallT); g.lineTo(cx - w * 0.20, wallT - rise);
+  g.lineTo(cx + w * 0.20, wallT - rise); g.lineTo(cx + w / 2 + over, wallT);
+  g.stroke();
+  houseChimney(g, cx - w * 0.34, wallT - rise * 0.9, W * 0.06, H * 0.16);
+  houseWall(g, x0, wallT, w, wallB - wallT, lit);
+  // the shed, which is what stops it being a rectangle
+  const sx = lit < 0 ? x0 + w : x0 - W * 0.15;
+  g.fillStyle = HOUSE_INK.WALL_DK;
+  g.fillRect(sx, wallT + (wallB - wallT) * 0.42, W * 0.15, (wallB - wallT) * 0.58);
+  g.beginPath();
+  g.moveTo(sx - W * 0.02, wallT + (wallB - wallT) * 0.42);
+  g.lineTo(sx + W * 0.17, wallT + (wallB - wallT) * 0.42);
+  g.lineTo(sx + W * 0.15, wallT + (wallB - wallT) * 0.30);
+  g.lineTo(sx + W * 0.01, wallT + (wallB - wallT) * 0.34);
+  g.closePath();
+  g.fillStyle = HOUSE_INK.ROOF; g.fill();
+  const ww = w * 0.14, wh = (wallB - wallT) * 0.19;
+  g.save(); g.beginPath(); g.rect(x0, wallT, w, wallB - wallT); g.clip();
+  for (let r = 0; r < 2; r++) {
+    const y = wallT + (wallB - wallT) * (0.12 + r * 0.42);
+    houseWindow(g, x0 + w * 0.12, y, ww, wh, r === 0, true);
+    houseDarkWindow(g, x0 + w * 0.43, y, ww, wh);
+    houseWindow(g, x0 + w * 0.72, y, ww, wh, false, true);
+  }
+  g.restore();
+}
+
+/* THREE: THE BARN. Long, low, a shallow roof and one big dark opening,
+   with a single lamp over it. It is the one that is not a dwelling, and
+   a row of three identical dwellings is what it exists to break up. */
+function bakeHouseBarn(g, W, H, def) {
+  const lit = signLitSide();
+  const wallT = H * 0.44, wallB = H * 0.96;
+  const x0 = W * 0.06, w = W * 0.88;
+  const cx = x0 + w / 2;
+  houseGable(g, cx, wallT, w / 2, H * 0.30, W * 0.03, lit);
+  houseWall(g, x0, wallT, w, wallB - wallT, lit);
+  // the big door
+  const dw = w * 0.26, dx = cx - dw / 2;
+  g.fillStyle = HOUSE_INK.WIN_DARK;
+  g.fillRect(dx, wallT + (wallB - wallT) * 0.34, dw, (wallB - wallT) * 0.60);
+  g.fillStyle = HOUSE_INK.TRIM;
+  g.fillRect(dx, wallT + (wallB - wallT) * 0.34, dw, (wallB - wallT) * 0.05);
+  // one lamp above it, and its spill
+  g.save(); g.beginPath(); g.rect(x0, wallT, w, wallB - wallT); g.clip();
+  const lx = cx, ly = wallT + (wallB - wallT) * 0.24;
+  const lg = g.createRadialGradient(lx, ly, 0, lx, ly, w * 0.22);
+  lg.addColorStop(0, HOUSE_INK.GLOW);
+  lg.addColorStop(1, 'rgba(255,214,140,0)');
+  g.fillStyle = lg; g.fillRect(lx - w * 0.22, ly - w * 0.22, w * 0.44, w * 0.44);
+  g.fillStyle = HOUSE_INK.WIN_HOT;
+  g.fillRect(lx - w * 0.018, ly - w * 0.018, w * 0.036, w * 0.036);
+  const ww = w * 0.08, wh = (wallB - wallT) * 0.24;
+  houseWindow(g, x0 + w * 0.10, wallT + (wallB - wallT) * 0.36, ww, wh, false, false);
+  houseDarkWindow(g, x0 + w * 0.82, wallT + (wallB - wallT) * 0.36, ww, wh);
+  g.restore();
+}
+
+/* ==================================================================
+   LANDMARKS. BRIEF section 8 item 5, and its reasoning is the part that
+   matters: landmarks are what make a procedural world feel authored.
+
+   THE THIRD ONE IN THAT LIST IS ALREADY BUILT. It asks for a radio mast,
+   a water tower and a gantry spanning the road, and the countdown
+   gantry IS the third: one system telling one story beats two systems
+   telling two.
+
+   THE BLINK IS THE ONLY THING IN THIS WORLD THAT CHANGES ON ITS OWN and
+   it is two baked sprites rather than a drawn light. The registry says
+   which sprite is a mast's other half and the pass swaps the source
+   rectangle on a period; that is an argument to drawImage, not a state
+   change, so the pass's own rule survives.
+   ================================================================== */
+const MAST_INK = {
+  STEEL:   '#2b2e34',
+  STEEL_L: '#474b54',
+  STEEL_D: '#171a1f',
+  GUY:     '#22252a',
+  TANK:    '#31343b',
+  TANK_L:  '#4a4e58',
+  TANK_D:  '#1c1f24',
+  BAND:    '#585c66',
+  LAMP_OFF:'#3a2020',
+  LAMP_ON: '#ff5a4a',
+  LAMP_GLOW:'rgba(255,90,74,0.30)'
+};
+
+/* A lattice leg pair with X bracing between them, which is what says
+   structure rather than post. Used by both landmarks. */
+function mastLattice(g, cx, yTop, yBot, halfTop, halfBot, bays, lw) {
+  g.strokeStyle = MAST_INK.STEEL;
+  g.lineWidth = lw;
+  g.beginPath();
+  g.moveTo(cx - halfBot, yBot); g.lineTo(cx - halfTop, yTop);
+  g.moveTo(cx + halfBot, yBot); g.lineTo(cx + halfTop, yTop);
+  g.stroke();
+  g.lineWidth = lw * 0.62;
+  g.beginPath();
+  for (let i = 0; i < bays; i++) {
+    const t0 = i / bays, t1 = (i + 1) / bays;
+    const y0 = yBot + (yTop - yBot) * t0, y1 = yBot + (yTop - yBot) * t1;
+    const h0 = halfBot + (halfTop - halfBot) * t0, h1 = halfBot + (halfTop - halfBot) * t1;
+    g.moveTo(cx - h0, y0); g.lineTo(cx + h1, y1);
+    g.moveTo(cx + h0, y0); g.lineTo(cx - h1, y1);
+    g.moveTo(cx - h1, y1); g.lineTo(cx + h1, y1);
+  }
+  g.stroke();
+  // a lit edge down the light side
+  g.strokeStyle = MAST_INK.STEEL_L;
+  g.lineWidth = lw * 0.5;
+  const s = signLitSide() < 0 ? -1 : 1;
+  g.beginPath();
+  g.moveTo(cx + s * halfBot, yBot); g.lineTo(cx + s * halfTop, yTop);
+  g.stroke();
+}
+
+function bakeMast(g, W, H, def) {
+  const cx = W / 2;
+  const lw = Math.max(1, W * 0.030);
+  mastLattice(g, cx, H * 0.075, H * 0.99, W * 0.055, W * 0.24, 11, lw);
+  // guy wires out to two anchors, which is the detail that says mast
+  g.strokeStyle = MAST_INK.GUY; g.lineWidth = Math.max(0.7, W * 0.012);
+  g.beginPath();
+  for (const s of [-1, 1]) {
+    g.moveTo(cx + s * W * 0.055, H * 0.16);
+    g.lineTo(cx + s * W * 0.46, H * 0.99);
+    g.moveTo(cx + s * W * 0.10, H * 0.44);
+    g.lineTo(cx + s * W * 0.46, H * 0.99);
+  }
+  g.stroke();
+  // the head: a platform and the lamp housing
+  g.fillStyle = MAST_INK.STEEL_D;
+  g.fillRect(cx - W * 0.13, H * 0.10, W * 0.26, H * 0.016);
+  g.fillStyle = MAST_INK.STEEL;
+  g.fillRect(cx - W * 0.035, H * 0.035, W * 0.07, H * 0.070);
+  if (def.lampOn) {
+    /* THREE STOPS, NOT TWO, AND SMALLER. A two stop radial at 0.30 alpha
+       over black rendered as a red DISC with an edge rather than as a
+       glow: the falloff of a linear ramp is far too slow to read as
+       light. A steep middle stop is what makes it a halo. */
+    const r = W * 0.30;
+    const lg = g.createRadialGradient(cx, H * 0.032, 0, cx, H * 0.032, r);
+    lg.addColorStop(0, 'rgba(255,120,96,0.34)');
+    lg.addColorStop(0.28, 'rgba(255,90,74,0.11)');
+    lg.addColorStop(1, 'rgba(255,90,74,0)');
+    g.fillStyle = lg;
+    g.fillRect(cx - r, H * 0.032 - r, r * 2, r * 2);
+  }
+  g.fillStyle = def.lampOn ? MAST_INK.LAMP_ON : MAST_INK.LAMP_OFF;
+  g.beginPath();
+  g.arc(cx, H * 0.032, Math.max(1.2, W * 0.055), 0, 6.2832);
+  g.fill();
+}
+
+function bakeWaterTower(g, W, H, def) {
+  const cx = W / 2, lit = signLitSide();
+  const lw = Math.max(1, W * 0.028);
+  const tankT = H * 0.06, tankB = H * 0.40;
+  mastLattice(g, cx, tankB, H * 0.99, W * 0.17, W * 0.34, 5, lw);
+  // the tank: a cylinder with a conical roof and a conical bottom
+  g.beginPath();
+  g.moveTo(cx - W * 0.32, tankB - (tankB - tankT) * 0.24);
+  g.lineTo(cx, tankB);
+  g.lineTo(cx + W * 0.32, tankB - (tankB - tankT) * 0.24);
+  g.closePath();
+  g.fillStyle = MAST_INK.TANK_D; g.fill();
+  g.fillStyle = MAST_INK.TANK;
+  g.fillRect(cx - W * 0.32, tankT + (tankB - tankT) * 0.22,
+             W * 0.64, (tankB - tankT) * 0.54);
+  g.fillStyle = lit < 0 ? MAST_INK.TANK_L : MAST_INK.TANK_D;
+  g.fillRect(cx - W * 0.32, tankT + (tankB - tankT) * 0.22,
+             W * 0.19, (tankB - tankT) * 0.54);
+  g.beginPath();
+  g.moveTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.22);
+  g.lineTo(cx, tankT);
+  g.lineTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.22);
+  g.closePath();
+  g.fillStyle = MAST_INK.TANK_D; g.fill();
+  // a band round the tank and a railing on top, which is the scale cue
+  g.fillStyle = MAST_INK.BAND;
+  g.fillRect(cx - W * 0.32, tankT + (tankB - tankT) * 0.46, W * 0.64,
+             Math.max(0.8, H * 0.008));
+  g.strokeStyle = MAST_INK.BAND; g.lineWidth = Math.max(0.7, W * 0.014);
+  g.beginPath();
+  g.moveTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.20);
+  g.lineTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.10);
+  g.moveTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.20);
+  g.lineTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.10);
+  g.moveTo(cx - W * 0.34, tankT + (tankB - tankT) * 0.13);
+  g.lineTo(cx + W * 0.34, tankT + (tankB - tankT) * 0.13);
+  g.stroke();
+  // the ladder down one leg
+  g.strokeStyle = MAST_INK.STEEL_L; g.lineWidth = Math.max(0.6, W * 0.010);
+  g.beginPath();
+  for (let y = tankB; y < H * 0.96; y += H * 0.045) {
+    g.moveTo(cx + W * 0.05, y); g.lineTo(cx + W * 0.11, y);
+  }
+  g.moveTo(cx + W * 0.05, tankB); g.lineTo(cx + W * 0.05, H * 0.96);
+  g.moveTo(cx + W * 0.11, tankB); g.lineTo(cx + W * 0.11, H * 0.96);
+  g.stroke();
+}
+
 const SIGN_COUNTDOWN = [
   { n: '8', line1: 'CITY CENTER', line2: '8 MILES' },
   { n: '6', line1: 'CITY CENTER', line2: '6 MILES' },
@@ -15097,6 +15514,11 @@ const SPR_MARKER_0 = 4;                  // four, likewise
 const SPR_POST     = 8;
 const SPR_TREE_0   = 9;                  // three variants
 const SPR_TREE_N   = 3;
+const SPR_HOUSE_0  = 12;                 // three variants
+const SPR_HOUSE_N  = 3;
+const SPR_MAST_OFF = 15;                 // and its other half, one index on
+const SPR_MAST_ON  = 16;
+const SPR_TOWER    = 17;
 
 (function buildSpriteRegistry() {
   for (let i = 0; i < 4; i++)
@@ -15130,8 +15552,37 @@ const SPR_TREE_N   = 3;
                  ['treeScrub', bakeTreeScrub, 'TREE_SCRUB_WIDE', 'TREE_SCRUB_HIGH']];
   for (const t of TREES)
     SPRITE_REG.push({ name: t[0], bake: t[1], wKey: t[2], hKey: t[3],
-                      bakeShare: 0.45, line1: '', line2: '',
+                      bakeShare: 0.45, line1: '', line2: '', maxShare: 0.45,
                       ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+  /* THE HOUSE SHARE IS SET FROM THE MEASURED DRAWN SIZE, not from the
+     argument that a house has more inside it than a tree. Measured over
+     28,070 house draws in a real run: median 17 CSS pixels, p90 41, and
+     the largest ever 177, which is 354 device pixels. At 0.60 the bake
+     was 605 and every house in the game was oversampled by at least a
+     factor of two, which is 2.9MB of atlas bought for nothing. 0.42
+     bakes 423, still above the largest one ever drawn. */
+  const HOUSES = [['houseCottage', bakeHouseCottage, 'HOUSE_COTTAGE_WIDE', 'HOUSE_COTTAGE_HIGH'],
+                  ['houseTwo', bakeHouseTwo, 'HOUSE_TWO_WIDE', 'HOUSE_TWO_HIGH'],
+                  ['houseBarn', bakeHouseBarn, 'HOUSE_BARN_WIDE', 'HOUSE_BARN_HIGH']];
+  for (const t of HOUSES)
+    SPRITE_REG.push({ name: t[0], bake: t[1], wKey: t[2], hKey: t[3],
+                      bakeShare: 0.42, line1: '', line2: '', maxShare: 0.45,
+                      ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+  /* THE MAST IS TWO SPRITES OF ONE OBJECT. blinkWith names the other
+     half and the pass swaps the source rectangle on a period, so the
+     lamp changes without anything in the pass changing state. */
+  SPRITE_REG.push({ name: 'mastOff', bake: bakeMast, lampOn: 0,
+                    wKey: 'MAST_WIDE', hKey: 'MAST_HIGH', bakeShare: 0.55,
+                    line1: '', line2: '', blinkWith: SPR_MAST_ON,
+                    ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+  SPRITE_REG.push({ name: 'mastOn', bake: bakeMast, lampOn: 1,
+                    wKey: 'MAST_WIDE', hKey: 'MAST_HIGH', bakeShare: 0.55,
+                    line1: '', line2: '',
+                    ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+  SPRITE_REG.push({ name: 'waterTower', bake: bakeWaterTower,
+                    wKey: 'TOWER_WIDE', hKey: 'TOWER_HIGH', bakeShare: 0.55,
+                    line1: '', line2: '',
+                    ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
 })();
 
 /* The world size of a sprite, read live off FEEL rather than frozen into
@@ -15220,6 +15671,11 @@ function spriteBuildAtlas() {
             + ',' + FEEL.TREE_BROAD_WIDE + ',' + FEEL.TREE_BROAD_HIGH
             + ',' + FEEL.TREE_CONIFER_WIDE + ',' + FEEL.TREE_CONIFER_HIGH
             + ',' + FEEL.TREE_SCRUB_WIDE + ',' + FEEL.TREE_SCRUB_HIGH
+            + ',' + FEEL.HOUSE_COTTAGE_WIDE + ',' + FEEL.HOUSE_COTTAGE_HIGH
+            + ',' + FEEL.HOUSE_TWO_WIDE + ',' + FEEL.HOUSE_TWO_HIGH
+            + ',' + FEEL.HOUSE_BARN_WIDE + ',' + FEEL.HOUSE_BARN_HIGH
+            + ',' + FEEL.MAST_WIDE + ',' + FEEL.MAST_HIGH
+            + ',' + FEEL.TOWER_WIDE + ',' + FEEL.TOWER_HIGH
             + ',' + FEEL.ROAD_HALF_WIDTH_BASE
             /* THE CAMERA IS AN INPUT AND IT WAS LEFT OUT, which made the
                sentence above this false the first time it was written.
@@ -15347,18 +15803,72 @@ function signFor(idx) {
 
    IT DRAWS NOTHING FROM rng(). Arithmetic on the segment index only, so
    the road is byte for byte the road it was. */
-function treeFor(idx) {
+/* ONE SLOT PER SIDE, AND ONE RULE FILLING BOTH.
+
+   The tree version of this picked a side with a hash and put at most one
+   object on a segment, which is fine while trees are the only thing out
+   there and wrong the moment there are three kinds competing for the
+   same site. Now the two sides are two slots and each is asked
+   independently, which is also what the path built world did.
+
+   THE ORDER IS A PRIORITY. A landmark is on a rhythm and must land, so
+   it is asked first and takes the site. Otherwise the site rolls for
+   whether it grows anything at all, and then for whether that is built
+   or planted.
+
+   IT DRAWS NOTHING FROM rng(). Arithmetic on the segment index and the
+   side, so the road is byte for byte the road it was. */
+function worldFor(idx, side) {
+  const lm = landmarkFor(idx, side);
+  if (lm) return lm;
   const every = Math.round(FEEL.TREE_EVERY);
   if (every <= 0 || idx <= 0 || idx % every) return null;
-  const salt = idx * 31 + 7;
-  const side = terrainHash(salt * 3 + 1) < 0.5 ? -1 : 1;
+  const salt = idx * 31 + (side > 0 ? 7 : 3);
   if (terrainHash(salt) > FEEL.TREE_DENSITY * sceneryClump(idx, side)) return null;
   const h2 = terrainHash(salt * 13 + 5);
   const h3 = terrainHash(salt * 29 + 11);
+  const h4 = terrainHash(salt * 53 + 23);
+  if (h4 < FEEL.HOUSE_SHARE) {
+    /* A HOUSE STANDS BACK FROM THE ROAD, further than a tree does,
+       because a house on the verge reads as a shed and a house behind a
+       tree line reads as a place someone lives. */
+    const off = FEEL.HOUSE_CLEAR
+              + Math.pow(h3, FEEL.TREE_OUT_BIAS) * FEEL.HOUSE_FAR_OUT;
+    return { id: SPR_HOUSE_0 + Math.min(SPR_HOUSE_N - 1, (h2 * SPR_HOUSE_N) | 0),
+             off: side * off };
+  }
   const off = FEEL.TREE_CLEAR
             + Math.pow(h3, FEEL.TREE_OUT_BIAS) * FEEL.TREE_FAR_OUT;
   return { id: SPR_TREE_0 + Math.min(SPR_TREE_N - 1, (h2 * SPR_TREE_N) | 0),
            off: side * off };
+}
+
+/* THE RHYTHM. Exactly every LANDMARK_EVERY segments, alternating sides
+   so they do not all stand on one shoulder, and WHICH one is decided by
+   how far through the run the segment is, against the same length the
+   countdown signs are laid out along. Out of town it is a mast, at the
+   edge of town a water tower. */
+function landmarkFor(idx, side) {
+  const every = Math.round(FEEL.LANDMARK_EVERY);
+  if (every <= 0 || idx <= 0 || idx % every) return null;
+  // alternating sides, so a run of them zigzags rather than lining up
+  const want = ((idx / every) | 0) % 2 ? 1 : -1;
+  if (side !== want) return null;
+  const L = signCycle();
+  const through = (idx % L) / L;
+  const id = through < FEEL.LANDMARK_TOWN ? SPR_MAST_OFF : SPR_TOWER;
+  return { id: id, off: side * FEEL.LANDMARK_OFFSET };
+}
+
+/* WHICH HALF OF A BLINKING SPRITE IS SHOWING. One period for the whole
+   world, because two masts in shot blinking out of step reads as two
+   faults rather than as one place, and real ones on the same network do
+   run together. Returns the registry index to draw. */
+function blinkIndex(d) {
+  if (d.blinkWith === undefined) return -1;
+  const period = Math.max(0.05, FEEL.LANDMARK_BLINK);
+  const t = (runTime / period) % 1;
+  return t < FEEL.LANDMARK_BLINK_ON ? d.blinkWith : -1;
 }
 
 /* ------------------------------------------------------------------
@@ -15383,11 +15893,12 @@ function spritePass(first, last, baseIndex, w, h) {
     for (let j = span - 1; j >= 0; j--) {          // and back to front inside it
       const s2 = span > 1 ? segAt(seg.index + j) : seg;
       const f = span > 1 ? j / span : 0;
-      /* THE TREE SLOT FIRST. Both slots are at the same depth, so their
-         order between themselves is arbitrary and this one is chosen:
-         trees are scenery and signs are information, so a sign is never
-         behind a tree that shares its segment. */
+      /* THE SCENERY SLOTS FIRST. All three are at the same depth, so
+         their order between themselves is arbitrary and this one is
+         chosen: scenery is scenery and a sign is information, so a sign
+         is never behind a tree that shares its segment. */
       spriteAt(atlas, n, s2, f, w, h, 1);
+      spriteAt(atlas, n, s2, f, w, h, 2);
       spriteAt(atlas, n, s2, f, w, h, 0);
     }
   }
@@ -15414,6 +15925,7 @@ function spritePass(first, last, baseIndex, w, h) {
     const seg = segAt(baseIndex + n);
     if (!seg) continue;
     spriteAt(atlas, n, seg, 0, w, h, 1);
+    spriteAt(atlas, n, seg, 0, w, h, 2);
     spriteAt(atlas, n, seg, 0, w, h, 0);
   }
 }
@@ -15423,10 +15935,17 @@ function spritePass(first, last, baseIndex, w, h) {
    have a rule the near field did not. */
 function spriteAt(atlas, n, s2, f, w, h, slot) {
   if (!s2) return;
-  const id = slot ? s2.sg2 : s2.sgn;
+  const id = slot === 0 ? s2.sgn : (slot === 1 ? s2.sg2 : s2.sg3);
   if (!id) return;
-  const d = SPRITE_REG[id - 1];
+  let d = SPRITE_REG[id - 1];
   if (!d || !d.aw) return;
+  /* AND IF IT BLINKS, THE OTHER HALF OF IT. A different source rectangle
+     is an argument to drawImage, not a change of context state, so the
+     pass keeps its rule. */
+  if (d.blinkWith !== undefined) {
+    const alt = blinkIndex(d);
+    if (alt >= 0 && SPRITE_REG[alt] && SPRITE_REG[alt].aw) d = SPRITE_REG[alt];
+  }
   const cx = bx[n] + (bx[n + 1] - bx[n]) * f;
   const cy = by[n] + (by[n + 1] - by[n]) * f;
   const cw = bw[n] + (bw[n + 1] - bw[n]) * f;
@@ -15444,7 +15963,7 @@ function spriteAt(atlas, n, s2, f, w, h, slot) {
   const py = ch * spriteWorldH(d) * k;
   if (py < FEEL.SPRITE_MIN_PX) return;
   const px2 = ch * spriteWorldW(d) * k;
-  const off = slot ? s2.sg2X : s2.sgnX;
+  const off = slot === 0 ? s2.sgnX : (slot === 1 ? s2.sg2X : s2.sg3X);
   const cxp = cx + off * cw;
   /* IT STANDS ON THE GROUND IT IS OVER, not on the road plane. The
      shoulder rises from the edge over TERRAIN_REACH half widths, so a
@@ -15459,12 +15978,14 @@ function spriteAt(atlas, n, s2, f, w, h, slot) {
   }
   const dx = cxp - px2 / 2, dy = base - py;
   if (dy > h + 8 || dx + px2 < -8 || dx > w + 8) return;
-  /* TOO CLOSE IS CULLED FOR THE TREES AND NOT FOR THE SIGNS, and the
-     asymmetry is the point of each. A sign that vanishes as you reach it
-     has failed at its job; a tree that fills the frame is a billboard
-     caught in the act, because that is exactly where a flat image stops
-     being able to pretend. TREE_MAX_PX is the size that costs. */
-  if (slot && py > h * FEEL.TREE_MAX_PX) return;
+  /* TOO CLOSE IS CULLED, AND WHICH SPRITES IT APPLIES TO IS REGISTRY
+     DATA RATHER THAN A GUESS IN THE PASS. A sign that vanishes as you
+     reach it has failed at its job, so signs are never culled. A tree or
+     a house that fills the frame is a billboard caught in the act. A
+     landmark is 7,200 world units tall on purpose and culling it at the
+     size a tree is culled at would delete the thing that makes it a
+     landmark, so its share is zero, which is never. */
+  if (d.maxShare > 0 && py > h * d.maxShare) return;
   atlasDraw(atlas, d, dx, dy, px2, py);
   spritesDrawn++;
 }
