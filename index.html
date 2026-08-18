@@ -2543,6 +2543,64 @@ const FEEL = {
      its own lane now, so praise can come often. */
   CALLOUT_GAP:             1.60,     // LIVE, seconds between repeatable drift callouts
   CALLOUT_LOCK:            0.70,     // LIVE, seconds a louder callout suppresses quieter ones for
+
+  /* ==================================================================
+     COACHING, WHICH IS NOT A CALLOUT AND MUST NOT BE TIMED LIKE ONE.
+
+     A CALLOUT REWARDS SOMETHING THE PLAYER ALREADY KNOWS THEY DID. It
+     names a landing they watched happen, so a fraction of a second is
+     plenty: the player is not reading it, they are being agreed with.
+
+     A COACHING LINE TEACHES SOMETHING THEY DO NOT KNOW YET. There is
+     nothing on screen to agree with, the words ARE the content, and
+     they have to be read while driving, which means glanced at rather
+     than looked at. Measured on the shipped build, every training line
+     inherited CALLOUT_TIME, so the whole of JUMP AHEAD IT PAYS was born,
+     read and dead inside 1.05 seconds, of which the first 0.15 was a
+     fade in and the last 0.40 a fade out. That is 0.5 seconds at full
+     opacity for a five word idea a player has never met.
+
+     LONG ENOUGH TO READ TWICE is the standard, so the number is derived
+     rather than picked: the longest line in the run is 28 characters,
+     a child glancing off a driving task reads at roughly 20 characters
+     a second, so one read is 1.4 seconds and the dwell is two of them
+     plus a beat to look up and back down.
+
+     THE FADES ARE SHARES OF THE DWELL and they are much smaller shares
+     than a callout's, because the point of a longer line is more time at
+     full opacity and not a longer fade. At the values below the line is
+     solid for 79 per cent of its life. */
+  COACH_TIME:              3.20,     // LIVE, seconds a coaching line holds
+  COACH_IN:                0.05,     // of that, the fly in
+  COACH_OUT:               0.16,     // of that, the fade
+  COACH_SIZE:             0.049,     // of the smaller dimension, against CALLOUT_SIZE 0.042
+  COACH_MAX_WIDTH:         0.90,     // of screen width, the widest the PLATE may be
+  /* ITS OWN ROW, BETWEEN THE TWO LANES. The event row sits hard under
+     the HUD stack and reads as more HUD; the drift row is the core
+     loop's and is not taken away from it. This one sits in the middle
+     of the sky band where nothing else is, low enough that the eyes are
+     already near it and high enough to clear the drift lane. */
+  COACH_ROW:               0.30,     // of the sky band, as the two lanes are
+  COACH_MIN_SIZE:         0.026,     // LIVE, of the smaller dimension, the floor it shrinks to
+  COACH_BAND_PAD:          0.06,     // LIVE, of the HUD to horizon gap, top and bottom
+  /* THE BACKING PLATE, WHICH IS THE WHOLE LEGIBILITY FIX.
+
+     The sky band is where the city skyline is, and the skyline is a
+     silhouette full of lit windows in very nearly the colour the score
+     and the jump lines are drawn in. Weight and size do not solve that
+     because the problem is not the text, it is that there is a picture
+     behind it. A plate removes the picture.
+
+     Near black rather than the void colour, and opaque rather than a
+     wash, because a translucent plate over a lit window is a lit window.
+     The rule around it is the LINE'S OWN colour, so the plate reads as
+     part of the message rather than as a panel that appeared. */
+  COACH_PLATE_ALPHA:       0.93,     // LIVE
+  COACH_PLATE_PAD_X:       0.62,     // of the text size
+  COACH_PLATE_PAD_Y:       0.44,     // of the text size
+  COACH_PLATE_ROUND:       0.34,     // of the plate height
+  COACH_PLATE_EDGE:        0.55,     // alpha on the rule around it
+  COACH_PLATE_EDGE_PX:    0.075,     // of the text size
   /* An ENTRY has to be an entry. Slip alone is not enough: a driver
      living on the edge re touches it every second or two, and calling
      each of those a perfect entry measured nine in eighty seconds, which
@@ -4114,9 +4172,10 @@ const FEEL = {
      happening, in the channel that already exists.
      ================================================================== */
   TRAIN_SKIP_AFTER:         2.5,     // LIVE, seconds before the skip appears
-  /* WHERE THE TWO SCRIPTED THINGS STAND, in segments from the start of
-     the run, out of 1260. The rest of the road is the ordinary grammar
-     at the ordinary training intensity; these are two windows in it.
+  /* WHERE THE FOUR SCRIPTED THINGS STAND, in segments from the start of
+     the run, out of TRAIN_SEGMENTS. The rest of the road is the ordinary
+     grammar at the ordinary training intensity; these are four windows
+     in it.
 
      THE ORDER IS THE LESSON ORDER. The pinch first, because the edge is
      the mechanic that decides whether the player lives, and the jump
@@ -4144,24 +4203,141 @@ const FEEL = {
      the twitchy one, on every one of the 28 days, and leaves better than
      a quarter of it standing in the worst case. */
   TRAIN_PINCH_HOLD:          26,     // LIVE, segments it holds at the tightest
-  TRAIN_JUMP_AT:            640,     // LIVE, segments, about 14 seconds in
-  /* THE COACHING'S OWN CLOCK. Beat one on touching the band, beat two
-     after this long whether or not they are still in it, and beat three
-     when they come off. Beat two is on a TIMER rather than on continued
-     contact because the half that matters, that an empty bar ends the
-     run, must reach a player who touches the edge for a tenth of a
-     second and comes straight off it. */
-  TRAIN_SAY_HOLD:          1.30,     // LIVE, seconds from beat one to beat two
-  /* AND THE FALLBACK, for the player who never touches the edge at all.
-     Measured over 28 days of training roads, four driving policies out
-     of five touch the band and the one that does not is the COMPETENT
-     one: a smooth centre seeking line peaks at 0.87 half widths, which
-     is exactly SCRAPE_START, and never crosses it. That player is the
-     reason this exists. Fired this many seconds before the line, and it
-     states the rule rather than claiming they are doing it, because a
-     callout that says YOU ARE SCRAPING to somebody who is not is worse
-     than saying nothing at all. */
-  TRAIN_SAY_LAST:           6.0,     // LIVE, seconds before the line the fallback fires
+  TRAIN_JUMP_AT:           1040,     // LIVE, the ramp's segment, about 23 seconds in
+  /* THE TWO HAZARDS, PLACED RATHER THAN SCHEDULED, exactly as the pinch
+     and the jump above are. A blocker and a mover both exist on every
+     real level and neither appeared here, so the first one anybody ever
+     met was in a run that ends when it is touched.
+
+     LATE ENOUGH THAT THEY HAVE THE STEERING AND THE JUMP. Both stand
+     after the jump's runout, which is where the run has nothing else to
+     say, and they are far enough apart that hazardFits never has to
+     refuse one for standing inside the other's warning run: the rule is
+     HAZARD_WARN_SEGMENTS of clear road either side, and the phrase each
+     one builds is longer than that on its own.
+
+     NEITHER CAN END THE RUN. inOpening is true for the whole of training
+     and the death test asks inOpening, so this is true by construction
+     rather than by placement. Driving into one costs nothing and says
+     so: see trainingSayHit. */
+  TRAIN_BLOCK_AT:          1360,     // LIVE, segments, about 30 seconds in
+  TRAIN_MOVER_AT:          1540,     // LIVE, segments, about 34 seconds in
+  /* HOW FAR AHEAD OF A MARK THE SCRIPT TAKES THE ROAD OVER.
+
+     THE LEAD MUST EXCEED THE LONGEST PHRASE THE GRAMMAR CAN LAY, or a
+     single phrase can step from before the trigger to past the mark and
+     the object lands late anyway. Measured over 28 training roads: the
+     shortest phrase is 24 segments, the median 121, the ninetieth 224
+     and the longest 270. 300 clears all of them.
+
+     THE GAP IS DERIVED FROM THE COACHING, NOT CHOSEN. Two objects need
+     COACH_TIME plus TRAIN_SAY_HOLD between the moments their lines fire,
+     which is 3.55 seconds or 160 segments, and the jump needs more than
+     that because its SECOND line waits for its first: the landing line
+     is queued behind the approach line, so the blocker's warning cannot
+     start until two dwells after the chevrons. THAT IS NOT A CONSTANT:
+     it is derived per object from COACH_TIME, in trainBeat and
+     trainLineFree, because the pinch costs three lines, the jump two and
+     a hazard one, and a single spacing number tuned for any of them is
+     wrong for the other two. */
+  TRAIN_PLACE_LEAD:         300,     // LIVE, segments
+  /* WHICH SIDE THE TRAINING BLOCKER STANDS ON, and how far off centre.
+     The side is arbitrary and it is FIXED, which is the point: a
+     scheduled blocker rolls its side and its offset, and a tutorial
+     object that is somewhere else on Tuesday teaches the road rather
+     than the rule. The offset is the middle of the scheduled range, so
+     the thing they meet first is the ordinary case and not an easy one.
+     PICK A SIDE is about there being a choice; which side is not part
+     of the lesson. */
+  TRAIN_BLOCK_SIDE:           1,     // LIVE, -1 left, +1 right
+  TRAIN_BLOCK_OFFSET:      0.45,     // LIVE, road half widths from the centre line
+  /* AND THE MOVER'S PHASE, for the same reason. A scheduled mover draws
+     its phase, so the same road gives a different crossing every day.
+     This one is named, so the sweep it is doing when the player arrives
+     is the same sweep on every day, and MOVER_PERIOD is 6 seconds
+     against a hazard the car is alongside for about a tenth of one, so
+     what the phase decides is where in the crossing they meet it. */
+  TRAIN_MOVER_PHASE:       1.05,     // LIVE, radians
+  /* HOW LONG THE TRAINING RUN IS, AND IT IS NOW ITS OWN NUMBER.
+
+     IT WAS gateSegment(1), 1260 segments, 28 seconds, because training
+     has one gate and the gate is the line. That was a coincidence of
+     two unrelated numbers rather than a decision: GATE_FIRST_SHARE is
+     where a REAL level's first checkpoint stands and it has nothing to
+     do with how long a lesson takes.
+
+     AND IT DOES NOT FIT IN 28 SECONDS. Measured, not argued. The run
+     now has to hold five things and up to seven coaching lines, each
+     line holding for COACH_TIME so it can be read twice, and the first
+     of them cannot start before the pinch at about ten seconds because
+     that is where the road asks the question. Seven lines at 3.20 with
+     a 0.35 beat between them is 24.8 seconds of speaking that cannot
+     begin until second ten, and 28 minus 10 is 18.
+
+     38 SECONDS IS WHAT THE MEASUREMENT ASKED FOR. Swept, with the road
+     respaced for each dwell and the run then asked how long it had to
+     be: 23.3 seconds at the old 1.05, 28.0 at 1.60, 31.4 at 2.00 and
+     41.4 at 3.20. So 28 seconds holds seven coaching lines only if a
+     line lives for 1.60, which is one read and not two. The tuned road
+     does 3.20 in 38 because the spacing rule leaves exactly the beat
+     each object needs rather than a flat gap.
+
+     AND IT IS DENSER THAN THE 28 SECOND RUN rather than longer in the
+     sense that made the old 56.7 second version boring: five things at
+     roughly one every five seconds against two things in 28.
+
+     THE GATE MOVES WITH IT. Training's single gate IS its finish line,
+     so gateSegment is asked for training's own number rather than a
+     real level's first checkpoint. Nothing else reads it here: training
+     has one gate, and it is this. */
+  TRAIN_SEGMENTS:          1710,     // LIVE, segments, 38 seconds
+  /* WHAT A HIT COSTS IN TRAINING, WHICH IS A SHAKE AND A SENTENCE. It
+     may not cost the run, so the only thing left that can say "that
+     was bad" is the screen moving. Level with a scrape rather than with
+     a crash: it is a warning, not the thing it warns about. */
+  TRAIN_HIT_SHAKE_PX:         7,     // LIVE
+  /* THE BEAT BETWEEN TWO COACHING LINES, and this constant has been
+     REDEFINED rather than retuned.
+
+     It used to be the whole wait from beat one to beat two, 1.30
+     seconds against a line that lived for 1.05, so the number carried
+     both the dwell and the gap. A line now lives for COACH_TIME, so a
+     single number holding the beats apart would have to be kept in step
+     with the dwell by hand and would truncate every sentence the moment
+     it was not. The wait is now COACH_TIME plus this, and this is the
+     air between two ideas: long enough to look up at the road and back
+     down, short enough that the run does not go quiet. */
+  TRAIN_SAY_HOLD:          0.35,     // LIVE, seconds of air after a coaching line
+  /* HOW LONG A COACHING LINE THAT ARRIVED ON A BUSY LANE WILL WAIT.
+     Half of these lines are WARNINGS, and a warning said after the
+     thing it warned about is worse than no warning at all, so a queued
+     line has a deadline and is dropped rather than said late. Set just
+     under the jump's own warning run, which is the shortest gap between
+     a coaching line and the thing it names. A dropped line is a signal
+     that the ROAD is wrong: the probes count them and the count is
+     expected to be zero. */
+  COACH_PATIENCE:          1.40,     // LIVE, seconds
+  /* AND THE FLOOR UNDER THE EDGE LESSON, WHICH IS NOT WHERE IT WAS.
+
+     THE FALLBACK ITSELF IS ANCHORED TO THE PINCH now: passing the pinch
+     without having scraped is what earns the flat statement of the rule.
+     See the note in trainingSay. This is the floor under THAT, for the
+     one case the pinch cannot cover, which is a pinch that was never
+     built because TRAIN_PINCH_AT was tuned past the end of the road.
+
+     IT USED TO BE SECONDS BEFORE THE FINISH AND THAT IS NOW A BUG
+     RATHER THAN A FALLBACK. The end of the training run used to be
+     empty; it holds the blocker and the mover now, so a lesson fired
+     six seconds from the line arrives on a busy lane and is dropped.
+     Measured, with the pinch deliberately moved off the road: nought of
+     six runs were told anything at all. A floor that cannot speak is
+     not a floor.
+
+     So it is seconds INTO the run, and it only applies when no pinch
+     exists. The build head runs a whole draw distance ahead of the car,
+     so any pinch the car will actually meet has been built long before
+     this fires. */
+  TRAIN_SAY_BY:             6.0,     // LIVE, seconds in, only when there is no pinch
   /* ==================================================================
      AND THE FIRST REAL LEVEL'S OWN JUMP.
 
@@ -4356,7 +4532,7 @@ const FEEL = {
 
      A twenty second unfailable window was the right thing when level
      one WAS the tutorial. It is not any more. Training exists, it says
-     it is training, it is 28 seconds, it teaches the edge and the jump,
+     it is training, it teaches the edge, the jump and both hazards,
      and it can be skipped. A player arriving at the first real level has
      either done it or explicitly refused it, and either way the game
      knows they do not need a second one.
@@ -4679,6 +4855,9 @@ const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         BAR_TRACK: 1, BAR_FILL: 1, BAR_LOW: 1,
                         // The title screen's own family. See COLOUR.
                         TITLE_DIM: 1, TITLE_SCRIM: 1,
+                        /* The coaching plate. It exists to be a hole in
+                           the picture, so a biome may not tint it. */
+                        COACH_PLATE: 1,
                         // Danger. Never green, never anywhere near the jump.
                         HAZARD_TOP: 1, HAZARD_SIDE: 1, HAZARD_LIP: 1,
                         HAZARD_GLOW: 1, HAZARD_DARK: 1, HAZARD_WARN: 1,
@@ -5754,7 +5933,14 @@ const COLOUR = {
   TITLE_DIM:    '#f2b464',
   // The wash between the running game and the type, as an rgb triple so
   // the alpha can be a feel constant. Warm, like the void it sits on.
-  TITLE_SCRIM:  '5,2,1'
+  TITLE_SCRIM:  '5,2,1',
+
+  /* THE COACHING PLATE. Near black, as an rgb triple because it is drawn
+     through globalAlpha the way the title scrim is. Not COLOUR.VOID: the
+     void is what the road floats in and it is a shade the eye already
+     reads as distance, while this has to read as an object in front of
+     everything. */
+  COACH_PLATE:  '6,3,2'
 };
 
 /* ==================================================================
@@ -6346,6 +6532,21 @@ const TUNABLES = [
   { key: 'CALLOUT_TIME',       label: 'callFor', step: 0.05, min: 0.3,  max: 4.0,   dp: 2, group: 14 },
   { key: 'CALLOUT_GAP',        label: 'callGap', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 14 },
   { key: 'CALLOUT_LOCK',       label: 'callLock',step: 0.1,  min: 0,    max: 4.0,   dp: 1, group: 14 },
+  { key: 'COACH_TIME',         label: 'coachFor',step: 0.1,  min: 0.5,  max: 8.0,   dp: 2, group: 14 },
+  { key: 'COACH_IN',           label: 'coachIn', step: 0.01, min: 0,    max: 0.4,   dp: 2, group: 14 },
+  { key: 'COACH_OUT',          label: 'coachOut',step: 0.01, min: 0,    max: 0.6,   dp: 2, group: 14 },
+  { key: 'COACH_SIZE',         label: 'coachSz', step: 0.002,min: 0.02, max: 0.09,  dp: 3, group: 14 },
+  { key: 'COACH_MAX_WIDTH',    label: 'coachW',  step: 0.02, min: 0.3,  max: 0.98,  dp: 2, group: 14 },
+  { key: 'COACH_ROW',          label: 'coachRow',step: 0.02, min: 0,    max: 1,     dp: 2, group: 14 },
+  { key: 'COACH_MIN_SIZE',     label: 'coachMin',step: 0.002,min: 0.01, max: 0.09,  dp: 3, group: 14 },
+  { key: 'COACH_BAND_PAD',     label: 'coachPad',step: 0.01, min: 0,    max: 0.3,   dp: 2, group: 14 },
+  { key: 'COACH_PLATE_ALPHA',  label: 'plateA',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 14 },
+  { key: 'COACH_PLATE_PAD_X',  label: 'platePX', step: 0.04, min: 0,    max: 2,     dp: 2, group: 14 },
+  { key: 'COACH_PLATE_PAD_Y',  label: 'platePY', step: 0.04, min: 0,    max: 2,     dp: 2, group: 14 },
+  { key: 'COACH_PLATE_ROUND',  label: 'plateR',  step: 0.02, min: 0,    max: 0.5,   dp: 2, group: 14 },
+  { key: 'COACH_PLATE_EDGE',   label: 'plateE',  step: 0.05, min: 0,    max: 1,     dp: 2, group: 14 },
+  { key: 'COACH_PLATE_EDGE_PX',label: 'plateEW', step: 0.005,min: 0,    max: 0.3,   dp: 3, group: 14 },
+  { key: 'COACH_PATIENCE',     label: 'coachWt', step: 0.1,  min: 0,    max: 6.0,   dp: 2, group: 14 },
   { key: 'CALLOUT_ENTRY_SLIP', label: 'entry',   step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 14 },
   { key: 'HAZARD_CLOSE_MARGIN',label: 'close',   step: 25,   min: 0,    max: 2000,  dp: 0, group: 15 },
   { key: 'HAZARD_CLOSE_BONUS', label: 'closePts',step: 20,   min: 0,    max: 2000,  dp: 0, group: 15 },
@@ -6577,9 +6778,17 @@ const TUNABLES = [
   { key: 'TRAIN_PINCH_WIDE',   label: 'pinchW',  step: 0.02, min: 0.30, max: 1.0,   dp: 2, group: 27 },
   { key: 'TRAIN_PINCH_CURVE',  label: 'pinchC',  step: 0.25, min: 0,    max: 12,    dp: 2, group: 27 },
   { key: 'TRAIN_PINCH_HOLD',   label: 'pinchLen',step: 4,    min: 4,    max: 300,   dp: 0, group: 27 },
-  { key: 'TRAIN_JUMP_AT',      label: 'jumpAt',  step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
-  { key: 'TRAIN_SAY_HOLD',     label: 'sayHold', step: 0.1,  min: 0.2,  max: 5,     dp: 2, group: 27 },
-  { key: 'TRAIN_SAY_LAST',     label: 'sayLast', step: 0.5,  min: 0,    max: 20,    dp: 1, group: 27 },
+  { key: 'TRAIN_JUMP_AT',      label: 'jumpAt',  step: 20,   min: 0,    max: 1800,  dp: 0, group: 27 },
+  { key: 'TRAIN_BLOCK_AT',     label: 'blokAt',  step: 20,   min: 0,    max: 2400,  dp: 0, group: 27 },
+  { key: 'TRAIN_BLOCK_SIDE',   label: 'blokSide',step: 2,    min: -1,   max: 1,     dp: 0, group: 27 },
+  { key: 'TRAIN_BLOCK_OFFSET', label: 'blokOff', step: 0.02, min: 0,    max: 0.9,   dp: 2, group: 27 },
+  { key: 'TRAIN_MOVER_AT',     label: 'moveAt',  step: 20,   min: 0,    max: 2400,  dp: 0, group: 27 },
+  { key: 'TRAIN_PLACE_LEAD',   label: 'placeLd', step: 20,   min: 40,   max: 900,   dp: 0, group: 27 },
+  { key: 'TRAIN_MOVER_PHASE',  label: 'movePh',  step: 0.15, min: 0,    max: 6.3,   dp: 2, group: 27 },
+  { key: 'TRAIN_SEGMENTS',     label: 'trainLen',step: 45,   min: 450,  max: 4000,  dp: 0, group: 27 },
+  { key: 'TRAIN_HIT_SHAKE_PX', label: 'hitShake',step: 1,    min: 0,    max: 30,    dp: 0, group: 27 },
+  { key: 'TRAIN_SAY_HOLD',     label: 'sayGap',  step: 0.05, min: 0,    max: 3,     dp: 2, group: 27 },
+  { key: 'TRAIN_SAY_BY',       label: 'sayBy',   step: 0.5,  min: 0,    max: 20,    dp: 1, group: 27 },
   { key: 'OPEN_JUMP_AT',       label: 'openJmp', step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
   { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
@@ -8542,8 +8751,9 @@ function openingSeconds() {
   /* INFINITY, AND NOT finishClock() PLUS A MARGIN, WHICH IS THE SAME
      MISTAKE THIS SESSION EXISTS TO STOP REPEATING.
 
-     The training run is 28 seconds of ROAD and the window was written as
-     29 seconds of CLOCK, which looked like a whole second of headroom.
+     The training run was 28 seconds of ROAD, 38 now, and the window was
+     written as 29 seconds of CLOCK, which looked like a whole second of
+     headroom.
      It is not headroom, it is a different unit: scraping costs speed, so
      a player leaning on the edge takes longer to cover the same road.
      Driven, holding one direction, the run took 29.37 seconds and died
@@ -8561,9 +8771,9 @@ function inOpening() {
   if (skipOnRamp) return false;
   /* AND THE WHOLE OF THE TRAINING RUN, NOT ITS FIRST TWENTY SECONDS.
 
-     THIS WAS A REAL HOLE AND IT WAS FOUND BY DRIVING IT. Training is
-     28 seconds and the window was 20, so the last eight seconds of
-     the run that is described everywhere as unfailable were not.
+     THIS WAS A REAL HOLE AND IT WAS FOUND BY DRIVING IT. Training was
+     28 seconds, 38 now, and the window was 20, so the last eight seconds
+     of the run that is described everywhere as unfailable were not.
      Measured: holding one direction from the first frame, in all three
      of hold left, hold right and alternate, the run ended at 20.25,
      20.60 and 20.35 seconds. Nobody had seen it because the acceptance
@@ -9129,6 +9339,18 @@ function levelHardD() { return clamp(levelBand(level) * 2 - 1, 0, 1); }
    spacing so the opening is not a full gate long, which is where it has
    always been; everything after is one spacing apart. */
 function gateSegment(k) {
+  /* TRAINING'S ONE GATE IS ITS FINISH LINE, AND IT STANDS WHERE THE
+     LESSONS END rather than where a real level's first checkpoint
+     happens to fall. Those were the same number by coincidence:
+     training has TRAINING_GATES of one, so its line was gateSegment(1),
+     which is GATE_FIRST_SHARE of a CHECKPOINT_EVERY, and neither of
+     those two constants has anything to say about how long a lesson
+     takes. See TRAIN_SEGMENTS.
+
+     ONLY TRAINING, AND ONLY ITS FIRST GATE. Every real level asks this
+     for every one of its gates and gets exactly what it always got, so
+     levels two to five are byte identical and are checked to be. */
+  if (isTraining(level) && k <= 1) return Math.round(FEEL.TRAIN_SEGMENTS);
   return Math.round(FEEL.CHECKPOINT_EVERY * FEEL.GATE_FIRST_SHARE)
        + (k - 1) * FEEL.CHECKPOINT_EVERY;
 }
@@ -9600,6 +9822,33 @@ function phraseWeight(p) {
    because it is arithmetic on the segment index.
    ------------------------------------------------------------------ */
 let trainPinchBuilt = false, trainJumpBuilt = false;
+let trainBlockBuilt = false, trainMoverBuilt = false;
+/* THE EARLIEST SEGMENT AT WHICH THE NEXT COACHING LINE MAY START, which
+   is what the script actually has to space and it is not the same thing
+   as spacing the objects.
+
+   EACH PLACED THING COSTS A DIFFERENT NUMBER OF LINES. The pinch costs
+   three, because a player who scrapes gets SCRAPING, then what an empty
+   bar costs, then RECOVERED. The jump costs two, the approach and the
+   landing. Each hazard costs one. A single "leave this many segments
+   between objects" number cannot express that: tuned for the jump it
+   pushes the mover off the end of the road, and tuned for the mover it
+   drops the blocker's line.
+
+   THE BEAT IS DERIVED FROM COACH_TIME AND NOT NAMED SEPARATELY, so
+   lengthening a coaching line automatically spreads the road out and
+   there is no second number to keep in step. This is the same rule
+   coachSay obeys, in segments instead of seconds. */
+let trainLineFree = 0, trainPlaced = 0;
+
+function trainBeat() {
+  return Math.round((FEEL.COACH_TIME + FEEL.TRAIN_SAY_HOLD)
+                    * FEEL.SPEED / FEEL.SEGMENT_LENGTH);
+}
+/* WHERE THE PINCH ENDED, so the edge lesson can be settled by PASSING it
+   rather than by a clock. Zero until one has been built, which is what
+   the fallback tests before trusting it. */
+let trainPinchEnd = 0;
 
 function buildTrainPinch() {
   const d = pickDir();
@@ -9608,6 +9857,101 @@ function buildTrainPinch() {
   addRun(FEEL.RAMP_MED, 0, c, roadWidth, n, true);
   addRun(Math.max(4, Math.round(FEEL.TRAIN_PINCH_HOLD)), c, c, n, n, false);
   addRun(FEEL.RAMP_MED, c, 0, n, 1, true);
+  trainPinchEnd = segBase + segments.length;
+  /* THREE LINES, which is the scraping path: SCRAPING, then what an
+     empty bar costs, then RECOVERED. The fallback path is two, so this
+     is the floor rather than the average, and a floor is what spacing
+     needs to be. */
+  trainLineFree = trainPinchEnd + 3 * trainBeat();
+  trainPlaced++;
+}
+
+/* THE TRAINING RUN'S OWN BLOCKER AND MOVER.
+
+   buildHazardPhrase WITHOUT THE SCHEDULER IN FRONT OF IT, and without a
+   single one of the rng draws that make a scheduled hazard different
+   every day. A tutorial that teaches a different thing on Tuesday is not
+   a tutorial, which is the same sentence the pinch and the jump are
+   built on.
+
+   EVERY DRAW A SCHEDULED HAZARD MAKES, and what stands in for each:
+
+     the jitter on hazardDue     not made at all. Nothing is scheduled
+                                 here, so there is no next one to place.
+     HAZARD_STRAIGHT_CHANCE      not rolled. The warning run is dead
+                                 straight, which is the readable case and
+                                 the one a first hazard should be. Only
+                                 the reserved road BEFORE it bends, and
+                                 trainFiller picks that side by counting
+                                 rather than by drawing.
+     the approach curve          the same, and for the same reason.
+     the blocker's side          TRAIN_BLOCK_SIDE, so it is the same side
+                                 on every day and the line PICK A SIDE is
+                                 about the choice rather than about which.
+     the blocker's offset        TRAIN_BLOCK_OFFSET.
+     the mover's phase           TRAIN_MOVER_PHASE, passed in, so it is
+                                 crossing rather than parked at one end
+                                 when the player arrives.
+
+   IT STILL ASKS addHazard, so hazardFits still holds: nothing lands past
+   the finish, nothing lands inside another hazard's warning run, and the
+   clear air either side is still measured against the width of the car.
+   A refusal simply lays the road and places nothing, exactly as a
+   scheduled one does, and the probes count that it never happens. */
+function buildTrainHazard(kind, mark) {
+  const warn = FEEL.HAZARD_WARN_SEGMENTS;
+  const len = hazardLength(kind);
+  const head = segBase + segments.length;
+  /* WHERE IT HAS TO STAND, which is the latest of three things: its own
+     named segment, a clear warning run from here, and far enough past
+     the last lesson that its own line has a free lane. The third is
+     what stops two lessons landing on top of each other when a long
+     phrase steps over a mark. */
+  let at = Math.max(mark, head + warn + 2, trainLineFree + warn);
+  /* And the overlap rule the scheduled hazards obey, which is stricter
+     than the gap above only if the gap has been tuned very small. */
+  if (hazards.length) {
+    const last = hazards[hazards.length - 1];
+    if (at < last.to + warn + 2) at = last.to + warn + 2;
+  }
+  trainFiller(at - warn - 2 - head);
+  addRun(warn + 2, 0, 0, roadWidth, 1, true);
+  addRun(len + FEEL.HAZARD_RUNOUT, 0, 0, 1, 1, true);
+  trainLineFree = at - warn + trainBeat();       // one line each
+  trainPlaced++;
+  if (kind === HAZ_BLOCKER)
+    return addHazard(HAZ_BLOCKER, at, at + len - 1,
+                     FEEL.TRAIN_BLOCK_SIDE * FEEL.TRAIN_BLOCK_OFFSET,
+                     FEEL.BLOCKER_HALF, 0, 0);
+  return addHazard(HAZ_MOVER, at, at + len - 1, 0,
+                   FEEL.MOVER_HALF, FEEL.MOVER_SWING, FEEL.TRAIN_MOVER_PHASE);
+}
+
+/* THE ROAD BETWEEN THE HEAD AND A PLACED THING'S WARNING RUN.
+
+   WHY THERE IS ANY. The training script needs its objects on KNOWN
+   segments, because the coaching schedule is a sequence of lines that
+   have to fit between them and a line cannot be shortened. A phrase is
+   24 to 270 segments long, six seconds at the top end, so "the first
+   phrase boundary at or after the mark" carries up to six seconds of
+   slop. Measured across 28 days with that slop in place: the blocker
+   moved over four seconds day to day, and on seven days in twenty eight
+   the mover was squeezed past the finish and did not exist at all.
+
+   SO THE SCRIPT RESERVES THE ROAD INSTEAD, and this is what fills it.
+   NOT A STRAIGHT, because it can be several seconds long and a tutorial
+   that goes flat before every object teaches that objects come after
+   flat. A gentle bend out and back, alternating side by how many things
+   have been placed so it is deterministic and there is no rng() call,
+   returning to zero before the warning run so the entry curve a hazard
+   is checked against is still nothing at all. */
+function trainFiller(n) {
+  if (n <= 0) return;
+  const dir = (trainPlaced % 2) ? 1 : -1;
+  const c = dir * FEEL.CURVE_GENTLE * FEEL.HAZARD_APPROACH_CURVE;
+  const half = n >> 1;
+  if (half > 0) addRun(half, 0, c, roadWidth, 1, true);
+  addRun(n - half, half > 0 ? c : 0, 0, roadWidth, 1, true);
 }
 
 /* The same road buildJumpPhrase lays, without the scheduler in front of
@@ -9626,15 +9970,32 @@ function buildTrainPinch() {
    doing the fun thing. Both placement constants are on the tuner with a
    range that reaches past gate one, so without this a slider could put a
    ramp there. It draws no rng either. */
-function buildPlacedJump() {
+function buildPlacedJump(mark) {
   const lead = jumpLead();
-  const at = segBase + segments.length + lead + 2;
+  const head = segBase + segments.length;
+  /* THE RAMP LANDS ON A NAMED SEGMENT WHEN ONE IS ASKED FOR, and the run
+     in stretches to reach it, but never before the last lesson has
+     finished speaking: the chevrons are where this one's first line
+     fires, so they may not stand ahead of trainLineFree.
+
+     WITHOUT A MARK THE ARITHMETIC IS EXACTLY WHAT IT WAS, which is what
+     keeps every real level's opening jump byte identical: extra is zero,
+     no run is laid, and `at` is the same head plus lead plus two it has
+     always been. */
+  const want = mark === undefined ? 0
+             : Math.max(mark, trainLineFree + FEEL.JUMP_WARN_SEGMENTS);
+  const extra = mark === undefined ? 0 : Math.max(0, want - lead - 2 - head);
+  const at = head + extra + lead + 2;
   const to = at + FEEL.JUMP_RAMP_SEGMENTS - 1;
   if (!jumpFits(at, to)) return false;
+  trainFiller(extra);
   addRun(lead + 2, 0, 0, roadWidth, 1, true);
   addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
   jumps.push({ from: at, to: to, riding: false, done: false });
   if (at > lastPlacedSeg) lastPlacedSeg = at;
+  // Two lines: the approach at the chevrons and the landing behind it.
+  trainLineFree = at - FEEL.JUMP_WARN_SEGMENTS + 2 * trainBeat();
+  trainPlaced++;
   return true;
 }
 
@@ -9686,18 +10047,34 @@ function trainingScript() {
   if (!trainPinchBuilt && at >= FEEL.TRAIN_PINCH_AT) {
     trainPinchBuilt = true; buildTrainPinch(); return true;
   }
-  if (!trainJumpBuilt && at >= FEEL.TRAIN_JUMP_AT && !pastFinish(at + 140)) {
+  /* TRIGGERED EARLY AND PLACED EXACTLY. TRAIN_PLACE_LEAD is how far
+     ahead of a mark the script will take the road over, and it has to
+     exceed the longest phrase the grammar can lay or a phrase could step
+     from before the trigger to past the mark in one go. Each is flagged
+     on the ATTEMPT, so a refusal falls through to the grammar for this
+     turn and is never asked again, which is the only shape that cannot
+     spin topUpRoad against a road that never grows. */
+  if (!trainJumpBuilt && at + FEEL.TRAIN_PLACE_LEAD >= FEEL.TRAIN_JUMP_AT
+      && !pastFinish(FEEL.TRAIN_JUMP_AT + 140)) {
     trainJumpBuilt = true;
-    if (buildPlacedJump()) return true;
+    if (buildPlacedJump(FEEL.TRAIN_JUMP_AT)) return true;
+  }
+  if (!trainBlockBuilt && at + FEEL.TRAIN_PLACE_LEAD >= FEEL.TRAIN_BLOCK_AT) {
+    trainBlockBuilt = true;
+    if (buildTrainHazard(HAZ_BLOCKER, FEEL.TRAIN_BLOCK_AT)) return true;
+  }
+  if (!trainMoverBuilt && at + FEEL.TRAIN_PLACE_LEAD >= FEEL.TRAIN_MOVER_AT) {
+    trainMoverBuilt = true;
+    if (buildTrainHazard(HAZ_MOVER, FEEL.TRAIN_MOVER_AT)) return true;
   }
   return false;
 }
 
 /* HAS THE ROAD GONE TOO LONG WITH NOTHING ON IT.
 
-   NOT IN TRAINING, which is 28 seconds long, carries exactly the two
-   things it is meant to carry and must stay byte for byte the road it
-   is.
+   NOT IN TRAINING, which carries exactly the four things it is meant to
+   carry, all four placed rather than scheduled, and has no room for a
+   fifth.
 
    NOT BEFORE THE OPENING JUMP EITHER. openJumpBuilt says the placed one
    has been laid, and until it has, the level has not introduced a jump
@@ -9786,6 +10163,11 @@ function resetRoad(seed) {
   jumpDue = 0;
   trainPinchBuilt = false;
   trainJumpBuilt = false;
+  trainBlockBuilt = false;
+  trainMoverBuilt = false;
+  trainPinchEnd = 0;
+  trainLineFree = 0;
+  trainPlaced = 0;
   openJumpBuilt = false;
   lastPlacedSeg = 0;
   hazardDue[HAZ_BLOCKER] = 0;
@@ -10006,12 +10388,17 @@ function hazardFits(from, to, xFrac, halfWorld, swingFrac) {
    was refused. */
 let lastPlacedSeg = 0;
 
-function addHazard(kind, from, to, xFrac, halfWorld, swingFrac) {
+/* THE PHASE IS AN OPTIONAL SEVENTH ARGUMENT and every existing caller
+   passes six, so every scheduled hazard still draws its phase from the
+   day's stream exactly where it always did. Only a PLACED one names its
+   own, because a placed thing has to be the same on every day and a draw
+   would also shift every phrase rolled after it. */
+function addHazard(kind, from, to, xFrac, halfWorld, swingFrac, phase) {
   if (!hazardFits(from, to, xFrac, halfWorld, swingFrac)) return false;
   if (from > lastPlacedSeg) lastPlacedSeg = from;
   hazards.push({ kind: kind, from: from, to: to, x: xFrac,
                  half: halfWorld, swing: swingFrac,
-                 phase: rng() * Math.PI * 2,
+                 phase: phase === undefined ? rng() * Math.PI * 2 : phase,
                  /* The close call ledger. gap is the least clear air seen
                     over the whole pass, hit records whether it was ever
                     clipped, and done says it has been settled up. All
@@ -10568,6 +10955,8 @@ function resumeRoad(carSeg) {
      road rebuild is a flag that will eventually be wrong. */
   trainPinchBuilt = true;
   trainJumpBuilt = true;
+  trainBlockBuilt = true;
+  trainMoverBuilt = true;
   openJumpBuilt = true;
   lastPlacedSeg = base;
   jumpDue = base + Math.round(FEEL.JUMP_EVERY * 0.5);
@@ -10931,7 +11320,12 @@ function update(dt) {
      should be true by construction rather than by an argument about
      placement that a tuned PLACE_FLOOR_SECONDS could outlive. */
   const clipped = hazardBand(carIndex, localHalf);
-  if (clipped === 2 && !inOpening()) { crash(HIT_OBJECT); return; }
+  if (clipped === 2) {
+    if (!inOpening()) { crash(HIT_OBJECT); return; }
+    // Training only, and it says what it would have cost. See the note
+    // on trainingSayHit.
+    trainingSayHit();
+  }
 
   scraping = offset > FEEL.SCRAPE_START || clipped === 1;
   scrapeSide = clipped === 1 ? hazardSide
@@ -11218,11 +11612,14 @@ function hazardBand(carIndex, localHalf) {
     if (air < h.gap) h.gap = air;
     if (hi <= x - clip || lo >= x + clip) continue;
     h.hit = true;
+    /* THE SIDE IS SET BEFORE THE RETURN, NOT AFTER IT. On a real level
+       a 2 is followed immediately by crash and nothing reads the side,
+       so this changes nothing there. In training a 2 is survivable and
+       the edge flash it fires has to come from the side the thing
+       actually was. */
+    hazardSide = carFrac < x ? -1 : 1;
     if (hi > x - core && lo < x + core) return 2;
     worst = 1;
-    // The flash belongs on the side the hazard is, not the side of the
-    // road the car happens to be on.
-    hazardSide = carFrac < x ? -1 : 1;
   }
   return worst;
 }
@@ -18553,8 +18950,7 @@ function syncMore() {
    and a player who taps twice, or whose thumb bounces, would otherwise
    have a live button under the second one within a frame of the first.
    TRAIN_SKIP_AFTER seconds of nothing there is the whole fix, and it
-   costs a player who genuinely wants out two and a half seconds of a
-   twenty eight second run. */
+   costs a player who genuinely wants out two and a half seconds. */
 let skipShown = false;
 let skipTopPx = -1;
 function syncSkip() {
@@ -19518,7 +19914,7 @@ function drawFinish(w, h) {
      from the type sizes and has no slack in it, and the four messages
      below are all about racing a ghost or keeping a run clean, neither
      of which is what just happened. The prompt underneath says where the
-     tap goes; this says why the last twenty eight seconds happened. */
+     tap goes; this says why the last half minute happened. */
   if (isTraining(level)) {
     line = 'THAT WAS THE WARM UP. THE REAL LEVELS START NOW';
     colour = COLOUR.SCORE_BEST;
@@ -20863,6 +21259,10 @@ let clockPop = 0;         // seconds left on the big time payout
 /* Where the score was drawn this frame, so the timer can hang off it
    rather than guessing at a fraction of the screen. */
 let scoreTop = 0, scoreSize = 0, hudBottom = 0;
+/* The bottom of the HUD STACK including the strap line that hangs below
+   hudBottom. Written by drawModeMark every frame, read by the coaching
+   plate, which is the only thing that has to stay off it. */
+let modeBottom = 0;
 let runBestMult = 1;      // the best multiplier this run reached
 let gatesPassed = 0;
 let runDistance = 0;      // metres, for the summary
@@ -21200,6 +21600,15 @@ function clearDailyRecords() {
    five are new and have no records to lose, and levels one and two are
    the same length they always were.
 
+   BUMPED TO 8 BECAUSE THE TRAINING ROAD MOVED. It is ten seconds longer
+   and it carries two hazards it did not carry, so every segment past the
+   jump is a different segment. Training banks no record and no completion
+   count, but ghostBank is not gated on it: a training run stores a ghost
+   under its own level, and a ghost recorded on the old road would drive
+   through the new one. The stamp is one number for the whole day, so
+   bumping it for training also clears the four real levels, which have
+   not moved and lose nothing they would have kept past midnight anyway.
+
    BUMPED TO 7 BECAUSE ALL FOUR REAL LEVELS MOVED. Levels three, four
    and five gained the placed opening jump that level two already had,
    and every level gained the gap backstop, so every real road is a
@@ -21229,7 +21638,7 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-const ROAD_GEN = 7;
+const ROAD_GEN = 8;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
@@ -21444,7 +21853,7 @@ function bankDaily(finished) {
        the display arrives rather than starting from zero. */
     const wasUnlocked = carsUnlocked();
     /* AND THE TRAINING RUN IS NOT A TRACK FINISHED, for the same reason
-       it is not part of the day, plus one of its own: it is 28 seconds
+       it is not part of the day, plus one of its own: it is 38 seconds
        and the shortest real level is 95, so counting it would make the
        warm up the cheapest way to earn every car in the game. The
        once-per-day guard limits that to one a day rather than removing
@@ -21673,11 +22082,19 @@ function updateCity(dt) {
    break, which is the one moment loud enough to deserve the whole screen.
 
    Each lane holds one callout, newest wins. Neither ever stacks. */
-const CALL_CLOSE = 2, CALL_CHAIN = 3, CALL_GATE = 4, CALL_BEST = 5;
+/* AND COACHING IS ABOVE ALL OF THEM, which is not a claim that teaching
+   matters more than a record. It matters more than a record IN TRAINING,
+   which is the only place it can speak, and where nothing else on this
+   list is load bearing: training banks no record, and a close call
+   arriving mid sentence is the exact failure this session is fixing. */
+const CALL_CLOSE = 2, CALL_CHAIN = 3, CALL_GATE = 4, CALL_BEST = 5,
+      CALL_COACH = 6;
 let calloutText = '';
 let calloutColour = '';
 let calloutPri = 0;
 let calloutLife = 0;
+let calloutFull = 1;      // what life STARTED at, so the fade knows its own length
+let calloutCoach = false; // coaching draws on its own row, on a plate
 let calloutSide = 1;
 let calloutLock = 0;      // a louder event holding the event lane
 
@@ -21701,6 +22118,8 @@ function sayCallout(str, pri, colour) {
   calloutColour = colour;
   calloutPri = pri;
   calloutLife = FEEL.CALLOUT_TIME;
+  calloutFull = FEEL.CALLOUT_TIME;
+  calloutCoach = false;
   calloutLock = FEEL.CALLOUT_LOCK;
   calloutSide = calloutAwaySide();
   /* The one crossing between the lanes. A best score break is the whole
@@ -21715,6 +22134,40 @@ function sayCallout(str, pri, colour) {
    floor was swallowing tier two entirely, which is exactly the rung that
    says a chain is going somewhere. Tier one and a perfect entry are the
    repeatable ones and they wait their turn. */
+/* THE COACHING CHANNEL, and it writes the event lane DIRECTLY rather
+   than going through sayCallout.
+
+   TWO REASONS, both of which sayCallout cannot give it.
+
+   IT MUST HOLD THE LANE FOR THE WHOLE READ. sayCallout locks the lane
+   for CALLOUT_LOCK, which is 0.70 of a second; a coaching line lives for
+   COACH_TIME, which is three and a bit, so under the ordinary rule a
+   close call landing two seconds in would overwrite a sentence halfway
+   through being read. The lock here is the whole dwell.
+
+   AND IT MUST NOT CLEAR THE DRIFT LANE. sayCallout wipes the drift lane
+   for anything at CALL_BEST or above, which is right for a best score
+   break taking the screen. Coaching outranks a best score break inside
+   training and still must not do that: SIDEWAYS PAYS MOST is drawn while
+   the drift lane carries the number it is talking about, and the whole
+   design note above says those two belong on screen together.
+
+   A COACHING LINE MAY ALWAYS REPLACE A COACHING LINE, because the state
+   machines that speak here already space themselves by COACH_TIME plus a
+   beat, and a line that has been superseded has nothing left to say. */
+function sayCoach(str, colour) {
+  calloutText = str;
+  calloutColour = colour;
+  calloutPri = CALL_COACH;
+  calloutLife = FEEL.COACH_TIME;
+  calloutFull = FEEL.COACH_TIME;
+  calloutCoach = true;
+  calloutLock = FEEL.COACH_TIME;
+  // Centred, so it can never be clipped by the screen edge. See the
+  // note on COACH_MAX_WIDTH.
+  calloutSide = 0;
+}
+
 function sayDrift(str, colour, size, urgent) {
   if (driftLock > 0) return;
   if (!urgent && driftGap > 0) return;
@@ -21749,10 +22202,20 @@ function sayDrift(str, colour, size, urgent) {
    separate rows so a landing and its explanation can be on screen
    together.
 
-   FOUR THINGS, AND NOT ONE MORE. Two about the edge, one about what to
-   do when it lets go, one about the jump. Every string is short enough
-   to be read at speed on a phone: the longest is 28 characters against
-   the 30 the existing SIDEWAYS LANDING line already carries.
+   FIVE THINGS TAUGHT AND EIGHT STRINGS TO TEACH THEM, and the two new
+   things are the two hazards. Two lines about the edge and one about
+   what to do when it lets go; two about the jump, the approach and the
+   landing; one for the blocker and one for the mover; and one that only
+   a player who drives into something ever hears. Seven of the eight are
+   on the schedule, because no run says both edge lines and both fallback
+   lines. Every string is short enough to be read at speed on a phone:
+   the longest is 28 characters against the 30 the existing SIDEWAYS
+   LANDING line already carries.
+
+   THEY ARE ALL COACHING AND NONE OF THEM IS A CALLOUT, so every one of
+   them goes through coachSay and holds for COACH_TIME rather than
+   inheriting the callout dwell. See COACH_TIME for why that distinction
+   is the whole of this.
    ================================================================== */
 const TRAIN_SILENT = 0,    // nothing said yet
       TRAIN_IN_BAND = 1,   // they are scraping and have been told so
@@ -21760,31 +22223,80 @@ const TRAIN_SILENT = 0,    // nothing said yet
       TRAIN_TOLD = 3,      // or, having never scraped, told the rule flat
       TRAIN_DONE = 4;      // the edge is taught, whichever way it went
 let trainSay = TRAIN_SILENT;
-let trainSayAt = 0;
 let trainJumpSaid = false;
 let trainLandSaid = false;
+let trainBlockSaid = false;
+let trainMoveSaid = false;
+let trainHitSaid = false;
+
+/* ------------------------------------------------------------------
+   ONE LESSON AT A TIME, AND THE LANE SAYS WHEN IT IS FREE.
+
+   THE OLD SPACING WAS A NUMBER AND IT CANNOT BE ONE ANY MORE. Every
+   beat used to wait TRAIN_SAY_HOLD after the last one, which worked
+   while a line lived for 1.05 seconds and the gap was 1.30. A line now
+   lives for three and a bit, so a second number holding the beats apart
+   would have to be kept in step with the first by hand, and the moment
+   they drifted the run would truncate its own sentences. So the wait is
+   the LANE being free, which is COACH_TIME plus TRAIN_SAY_HOLD of air,
+   and TRAIN_SAY_HOLD now means the beat between two ideas rather than
+   the whole of one.
+
+   AND A LINE THAT ARRIVES ON A BUSY LANE WAITS RATHER THAN CUTTING IN.
+   Most of what speaks here is anchored to a place on the road, so two
+   can fall together however the road is spaced; the previous behaviour
+   was to overwrite, which truncates the line being read. It queues
+   instead.
+
+   A QUEUED LINE HAS A DEADLINE, because half of these are warnings and
+   a warning said after the thing it warned about is worse than silence.
+   COACH_PATIENCE is short enough that a dropped line is a real signal:
+   if the probe ever reports one, the ROAD is wrong, not the queue.
+   ------------------------------------------------------------------ */
+let coachQuiet = 0;        // seconds until the lane is free again
+let coachQueue = [];
+let coachDropped = 0;      // read by the probes, never by the game
+
+function coachFree() { return coachQuiet <= 0; }
+
+function coachSay(str, colour) {
+  if (coachFree()) { sayCoach(str, colour); coachQuiet = coachHold(); return; }
+  coachQueue.push({ s: str, c: colour, by: runTime + FEEL.COACH_PATIENCE });
+}
+
+function coachHold() { return FEEL.COACH_TIME + FEEL.TRAIN_SAY_HOLD; }
+
+function coachPump(dt) {
+  if (coachQuiet > 0) coachQuiet -= dt;
+  while (coachQueue.length && runTime > coachQueue[0].by) {
+    coachQueue.shift();
+    coachDropped++;
+  }
+  if (!coachQueue.length || !coachFree()) return;
+  const q = coachQueue.shift();
+  sayCoach(q.s, q.c);
+  coachQuiet = coachHold();
+}
 
 function trainingReset() {
   trainSay = TRAIN_SILENT;
-  trainSayAt = 0;
   trainJumpSaid = false;
   trainLandSaid = false;
+  trainBlockSaid = false;
+  trainMoveSaid = false;
+  trainHitSaid = false;
+  coachQuiet = 0;
+  coachQueue = [];
+  coachDropped = 0;
 }
 
 function trainingOn() {
   return mode === DAILY && isTraining(level) && state === DRIVING;
 }
 
-/* Segments of road left, as seconds at base speed. Nominal on purpose:
-   the car is slower while it is scraping, so measuring the real time
-   left would make the fallback fire later for the player most likely to
-   need it. What is wanted is a fixed point on the ROAD. */
-function trainingLeft() {
-  return Math.max(0, finishSeg - carSegIndex) * FEEL.SEGMENT_LENGTH / FEEL.SPEED;
-}
-
 function trainingSay(dt) {
-  if (!trainingOn()) return;
+  if (!trainingOn()) { coachQueue = []; coachQuiet = 0; return; }
+  coachPump(dt);
 
   /* ---- THE JUMP, ON THE WAY IN. One idea: it pays. The other idea,
      that sideways pays more, is held back for the landing, because that
@@ -21793,11 +22305,38 @@ function trainingSay(dt) {
     for (let i = 0; i < jumps.length; i++) {
       if (carSegIndex >= jumps[i].from - FEEL.JUMP_WARN_SEGMENTS
           && carSegIndex < jumps[i].from) {
-        sayCallout('JUMP AHEAD  IT PAYS', CALL_GATE, COLOUR.SCORE);
+        /* AND IT CLOSES THE EDGE LESSON IF ONE IS STILL OPEN. RECOVERED
+           is the only beat here with no deadline of its own: it waits
+           for the car to come OFF the edge, and a player who holds the
+           edge from the pinch to the ramp would otherwise have it arrive
+           in the middle of the jump. It is the confirming beat rather
+           than a rule, so a new lesson closes it. The two that carry
+           rules are both on bounded timers and are never closed. */
+        if (trainSay === TRAIN_WARNED) trainSay = TRAIN_DONE;
+        coachSay('JUMP AHEAD  IT PAYS', COLOUR.SCORE);
         trainJumpSaid = true;
         break;
       }
     }
+  }
+
+  /* ---- THE TWO HAZARDS, EACH ON ITS OWN WARNING RUN. Same two idea
+     discipline as the jump: what it is, and what to do about it. Both
+     fire at the START of the painted warning, which is the moment the
+     player can first see the thing being described, and both are placed
+     rather than scheduled so the line and the object cannot come apart.
+
+     THE BLOCKER SAYS PICK A SIDE rather than GO ROUND, because there
+     are two ways round and choosing is the skill. The mover says TIME
+     IT, because there is only one way past a thing that crosses the
+     whole road and the question is when. */
+  if (!trainBlockSaid && hazardComing(HAZ_BLOCKER)) {
+    coachSay('BLOCKED AHEAD  PICK A SIDE', COLOUR.HAZARD_WARN);
+    trainBlockSaid = true;
+  }
+  if (!trainMoveSaid && hazardComing(HAZ_MOVER)) {
+    coachSay('THIS ONE MOVES  TIME IT', COLOUR.HAZARD_WARN);
+    trainMoveSaid = true;
   }
 
   /* ---- THE EDGE. Three beats when it happens, two when it does not.
@@ -21817,20 +22356,17 @@ function trainingSay(dt) {
      somebody holding the edge from the first corner will, and for them
      this line is the explanation rather than a lie. */
   if (trainSay === TRAIN_SILENT && scraping) {
-    sayCallout('SCRAPING  THE BAR IS DRAINING', CALL_GATE, COLOUR.HAZARD_WARN);
+    coachSay('SCRAPING  THE BAR IS DRAINING', COLOUR.HAZARD_WARN);
     trainSay = TRAIN_IN_BAND;
-    trainSayAt = runTime;
-  } else if (trainSay === TRAIN_IN_BAND && runTime - trainSayAt >= FEEL.TRAIN_SAY_HOLD) {
-    sayCallout('AN EMPTY BAR ENDS A REAL RUN', CALL_GATE, COLOUR.HAZARD_WARN);
+  } else if (trainSay === TRAIN_IN_BAND && coachFree()) {
+    coachSay('AN EMPTY BAR ENDS A REAL RUN', COLOUR.HAZARD_WARN);
     trainSay = TRAIN_WARNED;
-    trainSayAt = runTime;
-  } else if (trainSay === TRAIN_WARNED && !scraping
-             && runTime - trainSayAt >= FEEL.TRAIN_SAY_HOLD) {
+  } else if (trainSay === TRAIN_WARNED && !scraping && coachFree()) {
     /* AND ONLY WHEN THEY ACTUALLY COME OFF IT. A player who holds the
        edge to the line never recovered, and saying they did would be
        the same lie in the other direction. They keep the first two
        lines, which are the two that matter. */
-    sayCallout('RECOVERED  THE BAR REFILLS', CALL_GATE, COLOUR.GATE);
+    coachSay('RECOVERED  THE BAR REFILLS', COLOUR.GATE);
     trainSay = TRAIN_DONE;
   }
 
@@ -21847,15 +22383,92 @@ function trainingSay(dt) {
      IT STATES THE RULE RATHER THAN NARRATING THEM. Nothing here claims
      they are scraping, because they are not, and a callout that says
      YOU ARE SCRAPING to somebody driving down the middle is worse than
-     silence: it is the game being wrong about the thing it is teaching. */
-  if (trainSay === TRAIN_SILENT && trainingLeft() <= FEEL.TRAIN_SAY_LAST) {
-    sayCallout('THE EDGE HOLDS FOR A MOMENT', CALL_GATE, COLOUR.HAZARD_WARN);
+     silence: it is the game being wrong about the thing it is teaching.
+
+     AND IT FIRES AT THE PINCH NOW, NOT NEAR THE LINE, WHICH MATTERS FOR
+     A REASON THAT IS NOT TIDINESS. It used to wait until there were six
+     seconds of road left, which put the edge lesson at the very end of
+     the run. That was harmless while the end of the run was empty. It is
+     not empty any more: the blocker and the mover live there, so the
+     fallback would have landed on top of them, and worse,
+     a player who first touches anything at the blocker would have had
+     the whole three beat edge sequence start there and run past the
+     finish.
+
+     THE PINCH IS WHERE THE EDGE IS TAUGHT, so passing the pinch is what
+     settles it. A player who scraped got the lesson; a player who did
+     not gets the rule, immediately, while the corner that asked the
+     question is still behind them. From that moment trainSay is never
+     TRAIN_SILENT again, so nothing later in the run can restart the
+     sequence, and everything after the pinch is anchored to a place.
+
+     TRAIN_SAY_BY IS THE FLOOR UNDER IT and nothing else. If the pinch
+     were tuned past the finish there would be no pinch to pass, and the
+     run would teach nothing at all rather than teach it late, so the
+     rule is stated flat a few seconds in instead. See TRAIN_SAY_BY for
+     why that is not the old test moved. */
+  const pastPinch = trainPinchEnd > 0 && carSegIndex > trainPinchEnd;
+  const noPinch = !trainPinchBuilt && runTime >= FEEL.TRAIN_SAY_BY;
+  if (trainSay === TRAIN_SILENT && (pastPinch || noPinch)) {
+    coachSay('THE EDGE HOLDS FOR A MOMENT', COLOUR.HAZARD_WARN);
     trainSay = TRAIN_TOLD;
-    trainSayAt = runTime;
-  } else if (trainSay === TRAIN_TOLD && runTime - trainSayAt >= FEEL.TRAIN_SAY_HOLD) {
-    sayCallout('THEN IT ENDS THE RUN', CALL_GATE, COLOUR.HAZARD_WARN);
+  } else if (trainSay === TRAIN_TOLD && coachFree()) {
+    coachSay('THEN IT ENDS THE RUN', COLOUR.HAZARD_WARN);
     trainSay = TRAIN_DONE;
   }
+}
+
+/* IS A PLACED HAZARD OF THIS KIND INSIDE ITS OWN PAINTED WARNING RUN.
+
+   The same shape as the jump's test above and for the same reason: the
+   line has to arrive when the player can first SEE the thing it names,
+   which is where the warning is painted on the road, and not a moment
+   before. HAZARD_WARN_SEGMENTS is the number the road itself is painted
+   with, so the two cannot drift apart. */
+function hazardComing(kind) {
+  for (let i = 0; i < hazards.length; i++) {
+    const h = hazards[i];
+    if (h.kind !== kind) continue;
+    if (carSegIndex >= h.from - FEEL.HAZARD_WARN_SEGMENTS && carSegIndex < h.to)
+      return true;
+  }
+  return false;
+}
+
+/* AND THE PLAYER WHO DRIVES STRAIGHT INTO ONE.
+
+   HARMLESS IS NOT THE SAME AS SILENT, and silent is what it was. A
+   hazard cannot end the training run, because inOpening is true for the
+   whole of it and the death test asks inOpening. That is the design and
+   it stays. But hazardBand returns 2 for a core hit and nothing at all
+   reads a 2 in training: no shake, no flash, no bar, no word. A player
+   who ploughs through the blocker is shown that a blocker can be
+   ploughed through, which is the opposite of the lesson and it is a
+   lesson they take into a level where it ends the run.
+
+   So it costs nothing and it SAYS what it would have cost, which is
+   exactly the shape of AN EMPTY BAR ENDS A REAL RUN, and for the same
+   reason: the true rule cannot be demonstrated on a run that cannot end.
+
+   IT COSTS NO ROOM IN THE SCRIPT. It only ever fires for a player who
+   hit something, and for that player it is the most useful line in the
+   run. A player who drives it properly never hears it and the timeline
+   is the timeline.
+
+   AND IT IS THE ONE LINE THAT INTERRUPTS RATHER THAN QUEUES. Measured:
+   queued, it was dropped on every single run by every policy that
+   drives into anything, 140 of 140, because the line it was waiting
+   behind was the warning about the very thing that had just been hit.
+   That is the wrong way round twice over. This is a RESPONSE and not a
+   warning: what it is about is on the screen right now, so it cannot go
+   stale, and the warning it cuts into has just been comprehensively
+   proven not to have worked. */
+function trainingSayHit() {
+  if (!trainingOn() || trainHitSaid) return;
+  trainHitSaid = true;
+  addShake(FEEL.TRAIN_HIT_SHAKE_PX);
+  sayCoach('A HIT ENDS A REAL RUN', COLOUR.HAZARD_LIP);
+  coachQuiet = coachHold();
 }
 
 /* THE OTHER HALF OF THE JUMP, SAID ON THE LANDING, because that is the
@@ -21866,8 +22479,16 @@ function trainingSay(dt) {
 function trainingSayLanding(tier) {
   if (!trainingOn() || trainLandSaid) return;
   trainLandSaid = true;
-  if (tier >= 2) sayCallout('SIDEWAYS PAYS MOST', CALL_GATE, COLOUR.SCORE_BEST);
-  else sayCallout('LAND SIDEWAYS FOR MORE', CALL_GATE, COLOUR.SCORE);
+  /* AND THIS IS THE ONE THAT ALWAYS HAS TO WAIT. The approach line fires
+     at the start of the jump's warning run and the landing is about two
+     and three quarter seconds later, which is inside one coaching dwell
+     however the road is spaced, because the warning run's length is
+     fixed and is not a lever. So it queues, and lands a beat after the
+     line it belongs with. The drift lane has already shown the number
+     the moment the wheels touched, so nothing about the reward is late;
+     only the sentence explaining it is. */
+  if (tier >= 2) coachSay('SIDEWAYS PAYS MOST', COLOUR.SCORE_BEST);
+  else coachSay('LAND SIDEWAYS FOR MORE', COLOUR.SCORE);
 }
 
 /* The best score break. bestKnown is the whole of the fresh install and
@@ -23101,6 +23722,14 @@ function drawModeMark(w, h) {
   const s = Math.min(w, h);
   const bar = hudIsBar(w, h);
   const y = hudBottom + s * 0.026;
+  /* AND THIS HANGS BELOW hudBottom, WHICH IS WHY IT HAS TO SAY SO.
+     hudBottom is the bottom of the clock box, or of the pip strip in the
+     bar layout, and the strap line under it is drawn here afterwards. A
+     coaching plate clamped to hudBottom therefore sits straight on top of
+     TRACK #17 TRAINING, measured on a tablet and on a Chromebook. So
+     drawModeMark publishes where it actually finished, this frame, and
+     drawCallout runs immediately after it. */
+  modeBottom = hudBottom;
   const info = modeLine();
   const line = info.line, colour = info.colour;
   let below = y;
@@ -23113,11 +23742,12 @@ function drawModeMark(w, h) {
     const second = modeSecondLine();
     if (second && runTime < FEEL.MODE_NOTE_SECONDS) {
       const fade = clamp((FEEL.MODE_NOTE_SECONDS - runTime) / 0.8, 0, 1);
+      const sz = fittedSize(second, '700', Math.round(s * 0.023), w * 0.9);
       ctx.globalAlpha = 0.42 * fade;
-      text(second, w / 2, y,
-           fittedSize(second, '700', Math.round(s * 0.023), w * 0.9), '700',
+      text(second, w / 2, y, sz, '700',
            'center', continues > 0 ? COLOUR.SCORE : colour);
       ctx.globalAlpha = 1;
+      modeBottom = y + sz * 0.5;
     }
     return;
   }
@@ -23125,9 +23755,10 @@ function drawModeMark(w, h) {
     drawPips(w, h, y);
     below = y + s * 0.028;
   }
+  const lineSize = fittedSize(line, '700', Math.round(s * 0.026), w * 0.85);
   ctx.globalAlpha = 0.42;
-  text(line, w / 2, below, fittedSize(line, '700', Math.round(s * 0.026), w * 0.85),
-       '700', 'center', colour);
+  text(line, w / 2, below, lineSize, '700', 'center', colour);
+  modeBottom = below + lineSize * 0.5;
 
   /* Once, at the start of the run, then gone. It is the one thing here
      that is a sentence rather than a readout, and a sentence that stays
@@ -23135,10 +23766,11 @@ function drawModeMark(w, h) {
   const second = modeSecondLine();
   if (second && runTime < FEEL.MODE_NOTE_SECONDS) {
     const fade = clamp((FEEL.MODE_NOTE_SECONDS - runTime) / 0.8, 0, 1);
+    const sz = fittedSize(second, '700', Math.round(s * 0.023), w * 0.9);
     ctx.globalAlpha = 0.42 * fade;
-    text(second, w / 2, below + s * 0.032,
-         fittedSize(second, '700', Math.round(s * 0.023), w * 0.9), '700',
+    text(second, w / 2, below + s * 0.032, sz, '700',
          'center', continues > 0 ? COLOUR.SCORE : colour);
+    modeBottom = below + s * 0.032 + sz * 0.5;
   }
   ctx.globalAlpha = 1;
 }
@@ -23160,46 +23792,165 @@ function ghostGapLabel() {
   return ghostNoun() + ' ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 's';
 }
 
+/* THE COACHING PLATE IS DRAWN FIRST AND THE DRIFT LANE GETS OUT OF ITS
+   WAY, WHICH IS A LAYOUT FIX AND NOT A PRECEDENCE ONE.
+
+   THE SKY BAND IS NOT THE SAME SIZE ON EVERY SCREEN AND THE TEXT IS.
+   Both lane sizes are shares of min(width, height); the band is the gap
+   between the bottom of the HUD stack and the horizon, which is a share
+   of the HEIGHT. In portrait those move together and the two lanes sit
+   comfortably apart. In landscape they come apart badly, and the worst
+   case is the machine this game is actually played on:
+
+     screen        sky band   text   event row   drift row
+     iPhone 14        174px   19px         129         218
+     Chromebook       100px   38px         186         197
+
+   Eleven pixels between two rows of 38 pixel text. THAT IS ALREADY TRUE
+   OF THE TWO EXISTING LANES and is not something this session
+   introduced, but a plate is taller than the text on it, so a coaching
+   line lands squarely on top of the drift lane there.
+
+   So the plate is capped to a share of the band, sat at the top of it,
+   and the drift lane is pushed below it. If the band is too short even
+   for that the drift lane is dropped for the moment, because two
+   unreadable lines are worth less than one readable one, and the one
+   that survives is the one teaching somebody who has never played. */
 function drawCallout(w, h) {
-  drawLane(w, h, calloutText, calloutColour, calloutLife, calloutSide,
-           FEEL.CALLOUT_ROW_EVENT, 1);
+  const plate = drawLane(w, h, calloutText, calloutColour, calloutLife, calloutSide,
+           calloutCoach ? FEEL.COACH_ROW : FEEL.CALLOUT_ROW_EVENT, 1,
+           calloutFull, calloutCoach, null);
   drawLane(w, h, driftText, driftColour, driftLife, driftSide,
-           FEEL.CALLOUT_ROW_DRIFT, driftSize);
+           FEEL.CALLOUT_ROW_DRIFT, driftSize, FEEL.CALLOUT_TIME, false, plate);
 }
 
-function drawLane(w, h, str, colour, life, side, row, scale) {
-  if (life <= 0) return;
+/* THE DWELL IS PASSED IN RATHER THAN READ OFF CALLOUT_TIME, and that is
+   the whole of what made a second duration possible. t is life divided by
+   the length the line was BORN with, so a lane holding a three second
+   coaching line and a lane holding a one second callout each fade over
+   their own life instead of one of them running past the end of the
+   other's clock and coming out negative. */
+function drawLane(w, h, str, colour, life, side, row, scale, full, coach, avoid) {
+  if (life <= 0) return null;
   const s = Math.min(w, h);
-  const t = 1 - life / FEEL.CALLOUT_TIME;             // 0 at birth, 1 at death
+  const t = 1 - life / full;                          // 0 at birth, 1 at death
+  const fadeIn = coach ? FEEL.COACH_IN : FEEL.CALLOUT_IN;
+  const fadeOut = coach ? FEEL.COACH_OUT : FEEL.CALLOUT_OUT;
   let alpha = 1, slide = 0;
-  if (t < FEEL.CALLOUT_IN) {
-    const u = t / FEEL.CALLOUT_IN;
+  if (t < fadeIn) {
+    const u = t / fadeIn;
     alpha = u;
     slide = (1 - u) * w * FEEL.CALLOUT_SLIDE;
-  } else if (t > 1 - FEEL.CALLOUT_OUT) {
-    alpha = (1 - t) / FEEL.CALLOUT_OUT;
+  } else if (t > 1 - fadeOut) {
+    alpha = (1 - t) / fadeOut;
   }
   /* The band of sky between the bottom of the HUD stack and the horizon.
      Both ends are measured rather than assumed, so it holds in portrait
      and in landscape, and it is never over road: everything above the
-     horizon line is sky by construction. The two lanes take fixed shares
+     horizon line is sky by construction. The lanes take fixed shares
      of that band, so they cannot collide however tall it is. */
   const top = hudBottom + s * FEEL.CALLOUT_GAP_TOP;
   const bottom = horizonY - s * FEEL.CALLOUT_RISE;
-  const y = bottom > top ? top + (bottom - top) * row : top;
+  let y = bottom > top ? top + (bottom - top) * row : top;
   /* Sized to fit and then clamped on screen. Offset to the side plus a
      long string plus a narrow handset runs the text off the edge, and a
      callout that cannot be read has cost clutter and bought nothing. */
-  const size = fittedSize(str, '800', Math.round(s * FEEL.CALLOUT_SIZE * scale),
-                          w * FEEL.CALLOUT_MAX_WIDTH);
+  let want = Math.round(s * (coach ? FEEL.COACH_SIZE : FEEL.CALLOUT_SIZE) * scale);
+  /* THE PLATE GETS ITS OWN READING OF THE BAND, AND THE REASON IS A
+     MEASUREMENT.
+
+     CALLOUT_GAP_TOP and CALLOUT_RISE are shares of min(width, height),
+     and on a wide screen that is the HEIGHT, while the gap between the
+     HUD and the horizon is a much smaller number. Measured on a
+     Chromebook at 1024 by 768, which BRIEF.md section 6 names as the
+     machine this is played on: the HUD ends at 146 and the horizon is at
+     246, so there are a hundred pixels of sky, and the two pads take
+     eighty four of them. The lanes are then laid out inside sixteen
+     pixels with thirty eight pixel type. Both existing lanes already
+     overflow that and each other; this is not new and it is not fixed
+     here, but a plate capped to sixteen pixels would be eight pixel type
+     on the one screen the audience actually owns.
+
+     So the plate reads the RAW gap and pads it by a share of ITSELF, and
+     it is never smaller than an ordinary callout however tight the sky
+     is. Overflowing slightly is better than illegible; being pushed onto
+     the road is not, so it is clamped to the horizon. */
+  let cTop = top, cBottom = bottom;
+  if (coach) {
+    const hud = Math.max(hudBottom, modeBottom);
+    const raw = Math.max(1, horizonY - hud);
+    cTop = hud + raw * FEEL.COACH_BAND_PAD;
+    cBottom = horizonY - raw * FEEL.COACH_BAND_PAD;
+    y = cBottom > cTop ? cTop + (cBottom - cTop) * row : cTop;
+    /* SIZED TO THE SKY IT HAS, and the sky is what is left between the
+       bottom of the HUD stack and the horizon. Two things outrank the
+       wanted size and they are ranked against each other: the plate must
+       not cover the HUD and must not cover the road, so it shrinks; and
+       it must stay readable, so it stops shrinking at COACH_MIN_SIZE and
+       overflows instead. On the Chromebook that lands at 25 pixel type
+       in 48 pixels of sky, which is smaller than a callout there and
+       still half again the size of the HUD's own strap line. */
+    const fits = (cBottom - cTop) / (1 + 2 * FEEL.COACH_PLATE_PAD_Y);
+    want = Math.min(want, Math.max(Math.round(fits),
+                                   Math.round(s * FEEL.COACH_MIN_SIZE)));
+  }
+  /* COACH_MAX_WIDTH IS THE WIDEST THE PLATE MAY BE, not the widest the
+     text may be, because the plate is the thing that has to stay on the
+     screen. The padding is charged against the budget before the text is
+     fitted to what is left, using the wanted size to price it: the size
+     only ever comes down from there, so the plate can only end up
+     narrower than the budget and never wider. */
+  const size = coach
+    ? fittedSize(str, '800', want,
+                 w * FEEL.COACH_MAX_WIDTH - 2 * want * FEEL.COACH_PLATE_PAD_X)
+    : fittedSize(str, '800', want, w * FEEL.CALLOUT_MAX_WIDTH);
   ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   const half = ctx.measureText(str).width / 2;
   const edge = s * FEEL.CALLOUT_GAP_TOP;
   let x = w / 2 + side * (w * FEEL.CALLOUT_SIDE + slide);
   x = clamp(x, half + edge, w - half - edge);
   ctx.globalAlpha = alpha;
+  /* THE PLATE, AND IT IS THE FIX RATHER THAN A DECORATION. See
+     COACH_PLATE_ALPHA: the sky band is where the skyline stands, the
+     skyline is full of lit windows in nearly the colour these lines are
+     drawn in, and no amount of weight wins against a picture. This
+     removes the picture for the width of the sentence. */
+  let rect = null;
+  if (coach) {
+    const padX = size * FEEL.COACH_PLATE_PAD_X;
+    const padY = size * FEEL.COACH_PLATE_PAD_Y;
+    const bw = half * 2 + padX * 2, bh = size + padY * 2;
+    /* Kept off the HUD above and off the road below, in that order, so
+       a sky too short for the plate spills upward into the HUD's own
+       margin rather than downward over the corner being driven. */
+    y = Math.min(Math.max(y, cTop + bh / 2), cBottom - bh / 2);
+    y = Math.min(y, horizonY - bh / 2);
+    y = Math.max(y, Math.max(hudBottom, modeBottom) + bh / 2);
+    const r = bh * FEEL.COACH_PLATE_ROUND;
+    ctx.globalAlpha = alpha * FEEL.COACH_PLATE_ALPHA;
+    ctx.fillStyle = 'rgb(' + COLOUR.COACH_PLATE + ')';
+    roundRect(x - bw / 2, y - bh / 2, bw, bh, r);
+    ctx.fill();
+    ctx.globalAlpha = alpha * FEEL.COACH_PLATE_EDGE;
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = Math.max(1, size * FEEL.COACH_PLATE_EDGE_PX);
+    ctx.stroke();
+    ctx.globalAlpha = alpha;
+    rect = { top: y - bh / 2, bottom: y + bh / 2 };
+  } else if (avoid) {
+    /* PUSHED CLEAR OF THE PLATE, OR NOT DRAWN AT ALL. The gap is the
+       same one the plate's own padding uses, so the two read as spaced
+       rather than stacked. */
+    const halfH = size * (0.5 + FEEL.COACH_PLATE_PAD_Y);
+    if (y - halfH < avoid.bottom) y = avoid.bottom + halfH;
+    if (bottom > top && y + halfH > bottom + size * FEEL.COACH_PLATE_PAD_Y) {
+      ctx.globalAlpha = 1;
+      return null;
+    }
+  }
   text(str, x, y, size, '800', 'center', colour);
   ctx.globalAlpha = 1;
+  return rect;
 }
 
 /* The two full screen washes, both short and both capped low. They are
