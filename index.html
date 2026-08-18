@@ -1499,6 +1499,110 @@ const FEEL = {
   SCENERY_MASS_WIDE:       3.20,     // and much wider, which is what makes it a mass
   SCENERY_MIN_PX:           1.5,
   SCENERY_MAX_SHARE:       0.17,     // LIVE, tallest an object may draw, as a share of the frame
+  /* ==================================================================
+     THE ROADSIDE SPRITE PIPELINE. SIGNS ONLY, AND THE OLD PASS IS OFF.
+
+     Everything above this comment builds its objects out of paths every
+     frame. Everything below draws pre baked images. The two are not
+     mixed and only one of them runs: SCENERY_LEGACY is the switch and it
+     ships OFF, which is what was asked for.
+
+     WHAT THAT COSTS, STATED HERE BECAUSE IT IS NOT SMALL. With the
+     legacy pass off the verge holds signs and nothing else. No trees, no
+     houses, no treelines, no towers: measured, 65 objects a frame become
+     between zero and three. Both flags are LIVE, so one press on the
+     phone puts the world back.
+
+     WHY THE SPRITES ARE BAKED AT THE SIZE THEY ARE. See spriteBakeSize.
+     "The largest size needed" has no finite answer in a perspective
+     renderer, so the number that IS finite is used instead: the size at
+     the moment the object leaves the bottom of the frame, capped.
+     ================================================================== */
+  SCENERY_LEGACY:             0,     // LIVE, the path built roadside objects, off
+  SPRITES_ON:                 1,     // LIVE, the baked roadside sprites
+  /* The cap on a sprite's longest baked edge, in DEVICE pixels. A road
+     spanning gantry wants 4,588 of them to stay sharp to the last frame,
+     which is 21 megabytes for one image and 84 for the four the
+     countdown needs. This is the number that makes the atlas affordable
+     and it is the reason a close gantry goes soft. */
+  /* 1008 AND NOT 1024, WHICH IS THE PACKER SHOWING THROUGH. Two 1024
+     wide gantries plus their gutters come to 2052 against an atlas
+     width of 2048, so they missed sharing a shelf by four pixels and
+     the atlas grew a whole extra row: 3.04 million pixels where 2.29
+     does. Sixteen pixels of sharpness for two and a half megabytes. */
+  SPRITE_BAKE_MAX_PX:      1008,
+  /* THE NEAREST BOUNDARY THE ROAD WALK KEEPS, in segments, and it is a
+     measurement rather than a choice. See spriteBakeSize.
+
+     IT IS INVARIANT IN THE FRAME AND NOT IN THE CAMERA. The walk keeps a
+     boundary once by[n+1] is above the bottom of the screen, and the
+     frame height cancels out of that test, which is why the same 1,450
+     world units came back from four very different viewports. What does
+     NOT cancel is CAMERA_HEIGHT and HORIZON_FRACTION, and both are live.
+     Move either a long way and this wants re-measuring; get it wrong and
+     the only consequence is a sprite that upscales sooner than it need,
+     which is why it is a constant and not an assertion. */
+  SPRITE_NEAR_SEGMENTS:       7,
+  SPRITE_ATLAS_MAX_W:      2048,     // widest the one atlas canvas may be
+  SPRITE_ATLAS_PAD:           2,     // transparent gutter, so no neighbour bleeds in
+  SPRITE_MIN_PX:            2.0,     // smaller than this and it is not drawn
+  /* INTEGER DESTINATIONS, AS ASKED, AND THE MEASUREMENT SAYS THEY ARE A
+     PURE COST. Ships at 1, which is the brief.
+
+     Paired inside one page over 1,719 frames at 33 sprites a frame, and
+     again over 2,274 in landscape: rounded minus unrounded is 0.0000ms
+     with a tenth to ninetieth percentile of -0.000 to 0.000. It buys
+     nothing, and the reason it buys nothing is that these sprites are
+     SCALED. The fast path integer destinations exist for is the one to
+     one blit, and a sign is resampled on every single frame of its
+     approach whatever its destination is, so snapping the destination
+     only quantises it.
+
+     WHAT IT COSTS. The context is scaled by the device pixel ratio, so
+     an integer destination is an integer CSS pixel, which is TWO device
+     pixels at dpr 2. Measured over a whole gantry approach: the drawn
+     position stands still on 6.4 per cent of frames while the true one
+     moves, and the drawn SIZE stands still on 33.7 per cent. A third of
+     the frames of every approach, a sign does not grow, and then it
+     grows by two device pixels at once. */
+  SPRITE_SNAP_PX:             1,     // LIVE, 1 is the brief, 0 is the projection
+  /* WHERE THE COUNTDOWN LANDS, as shares of the run. On the daily the
+     run is the distance to the finish, so these are literally how far
+     through the track each sign stands. Anywhere else they repeat over
+     SIGN_CYCLE_SEGMENTS, because an endless road has no four fifths. */
+  SIGN_AT_1:               0.20,     // LIVE
+  SIGN_AT_2:               0.40,     // LIVE
+  SIGN_AT_3:               0.60,     // LIVE
+  SIGN_AT_4:               0.80,     // LIVE
+  SIGN_MARKER_LEAD:          26,     // LIVE, segments the verge marker stands before its gantry
+  SIGN_CYCLE_SEGMENTS:     2400,     // LIVE, the repeat where there is no finish
+  SIGN_POST_EVERY:          210,     // LIVE, segments between the small post signs, 0 is none
+  SIGN_MARKER_OFFSET:      2.10,     // LIVE, half widths out, the verge marker
+  SIGN_POST_OFFSET:        2.35,     // LIVE, half widths out, the small post sign
+  /* HOW BIG EACH SIGN IS IN THE WORLD. These decide the drawn size of
+     every sign, so they are tunable numbers and they belong here rather
+     than inline in the registry.
+
+     THE GANTRY'S IS IN HALF WIDTHS AND THE OTHERS ARE IN WORLD UNITS,
+     because they are different kinds of object. A gantry is built for
+     the road it spans and has to keep its feet outside the edge at every
+     road width; a marker is a marker whatever the road is doing.
+
+     3.86 IS NOT A ROUND NUMBER AND IT IS NOT AN ARBITRARY ONE. It is the
+     narrowest span that keeps the gantry's base plates off the road. The
+     bake insets the post at 0.030 of the box and the plate reaches
+     0.0647, so the plate's inner edge stands at (0.5 - 0.0647) times the
+     span. EDGE_OUT is 1.65 and the lit lip band runs from about 1.52 to
+     1.65, so a span of 3.40 put both posts and both plates at 1.48 to
+     1.64 half widths: squarely on top of the brightest stripe in the
+     frame, in every frame, which is the one rule ART-DIRECTION.md says
+     nothing outranks. 0.4353 times 3.86 is 1.680, clear of it. */
+  SIGN_GANTRY_SPAN:        3.86,     // LIVE, base half widths the whole gantry spans
+  SIGN_GANTRY_HIGH:        2800,     // LIVE, world units to the top of the beam
+  SIGN_MARKER_WIDE:         900,     // LIVE, world units
+  SIGN_MARKER_HIGH:        1500,     // LIVE
+  SIGN_POST_WIDE:           650,     // LIVE
+  SIGN_POST_HIGH:          1000,     // LIVE
   TERRAIN_REACH:            5.4,     // LIVE, road half widths outward from the edge
   /* THE RIDGE RAN DEAD FLAT ACROSS THE FRAME and the reason was the
      number, not the hash. The lift is bh times this, and bh goes to
@@ -5597,6 +5701,27 @@ const TUNABLES = [
   { key: 'SCENERY_OUT_BIAS',   label: 'scnBias', step: 0.2, min: 0.4,  max: 10,    dp: 1, group: 21 },
   { key: 'SCENERY_PER_SITE',   label: 'scnSlot', step: 1,   min: 0,    max: 12,    dp: 0, group: 21 },
   { key: 'SCENERY_MAX_SHARE',  label: 'scnMax',  step: 0.02,min: 0.04, max: 1.5,   dp: 2, group: 21 },
+  /* THE TWO ROADSIDE SYSTEMS, AND ONLY ONE OF THEM SHOULD BE UP. Both
+     LIVE, both here, so the whole comparison is two presses on a phone. */
+  { key: 'SCENERY_LEGACY',     label: 'oldScn',  step: 1,   min: 0,    max: 1,     dp: 0, group: 21 },
+  { key: 'SPRITES_ON',         label: 'sprites', step: 1,   min: 0,    max: 1,     dp: 0, group: 29 },
+  { key: 'SIGN_AT_1',          label: 'sign1',   step: 0.02,min: 0.02, max: 0.98,  dp: 2, group: 29 },
+  { key: 'SIGN_AT_2',          label: 'sign2',   step: 0.02,min: 0.02, max: 0.98,  dp: 2, group: 29 },
+  { key: 'SIGN_AT_3',          label: 'sign3',   step: 0.02,min: 0.02, max: 0.98,  dp: 2, group: 29 },
+  { key: 'SIGN_AT_4',          label: 'sign4',   step: 0.02,min: 0.02, max: 0.98,  dp: 2, group: 29 },
+  { key: 'SIGN_MARKER_LEAD',   label: 'signLead',step: 2,   min: 0,    max: 200,   dp: 0, group: 29 },
+  { key: 'SIGN_CYCLE_SEGMENTS',label: 'signLoop',step: 100, min: 400,  max: 9000,  dp: 0, group: 29 },
+  { key: 'SIGN_POST_EVERY',    label: 'postEvry',step: 10,  min: 0,    max: 2000,  dp: 0, group: 29 },
+  { key: 'SIGN_MARKER_OFFSET', label: 'markOff', step: 0.05,min: 1.7,  max: 8,     dp: 2, group: 29 },
+  { key: 'SIGN_POST_OFFSET',   label: 'postOff', step: 0.05,min: 1.7,  max: 8,     dp: 2, group: 29 },
+  { key: 'SPRITE_MIN_PX',      label: 'sprMin',  step: 0.5, min: 0,    max: 40,    dp: 1, group: 29 },
+  { key: 'SPRITE_SNAP_PX',     label: 'sprSnap', step: 1,   min: 0,    max: 1,     dp: 0, group: 29 },
+  { key: 'SIGN_GANTRY_SPAN',   label: 'gantW',   step: 0.02,min: 1.0,  max: 8,     dp: 2, group: 29 },
+  { key: 'SIGN_GANTRY_HIGH',   label: 'gantH',   step: 50,  min: 400,  max: 9000,  dp: 0, group: 29 },
+  { key: 'SIGN_MARKER_WIDE',   label: 'markW',   step: 25,  min: 100,  max: 4000,  dp: 0, group: 29 },
+  { key: 'SIGN_MARKER_HIGH',   label: 'markH',   step: 50,  min: 200,  max: 6000,  dp: 0, group: 29 },
+  { key: 'SIGN_POST_WIDE',     label: 'postW',   step: 25,  min: 100,  max: 4000,  dp: 0, group: 29 },
+  { key: 'SIGN_POST_HIGH',     label: 'postH',   step: 50,  min: 200,  max: 6000,  dp: 0, group: 29 },
   { key: 'TERRAIN_REACH',      label: 'terrW',   step: 0.2,  min: 0,    max: 24,    dp: 1, group: 12 },
   { key: 'TERRAIN_HEIGHT',     label: 'terrH',   step: 40,   min: 0,    max: 4000,  dp: 0, group: 12 },
   { key: 'TERRAIN_HILL_SEGMENTS',label:'terrHz', step: 2,    min: 2,    max: 120,   dp: 0, group: 12 },
@@ -6017,6 +6142,13 @@ function resize() {
   if (canvas.height !== ch) canvas.height = ch;
 
   horizonY = Math.round(h * FEEL.HORIZON_FRACTION);
+  /* THE SPRITE ATLAS IS SIZED AGAINST THE FRAME WIDTH AND THE DEVICE
+     RATIO, so this is the one place that can know when it needs
+     rebuilding. spriteBuildAtlas compares its own signature and returns
+     immediately when nothing it reads has moved, which matters because
+     live tuning calls resize many times a second while a button is held
+     and because one fullscreen tap calls it three times. */
+  spriteBuildAtlas();
 
   const probe = window.getComputedStyle(document.getElementById('safe'));
   safeBottom = parseFloat(probe.paddingBottom) || 0;
@@ -8498,9 +8630,19 @@ function addSegment(curve, halfWidth) {
   // them too and nothing accumulates over a run.
   const mag = curve < 0 ? -curve : curve;
   if (mag > maxCurveSeen) maxCurveSeen = mag;
+  /* AND WHAT STANDS BESIDE IT, WHICH IS TWO NUMBERS AND NOT AN OBJECT.
+     sgn is a sprite id plus one, so zero is the common case of nothing,
+     and sgnX is how far out it stands in road half widths, signed. The
+     renderer reads exactly these two and cannot ask what kind of thing
+     it is drawing. Written here rather than in a second pass over the
+     array so a segment is complete the moment it exists and its shape
+     never changes, which is what keeps the array monomorphic. */
+  const idx = segBase + segments.length;
+  const sg = signFor(idx);
   segments.push({
-    index: segBase + segments.length, curve: curve, hw: halfWidth,
-    ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0
+    index: idx, curve: curve, hw: halfWidth,
+    ma: 0, ml0: 0, ml1: 0, mr0: 0, mr1: 0,
+    sgn: sg ? sg.id + 1 : 0, sgnX: sg ? sg.off : 0
   });
 }
 
@@ -11273,6 +11415,14 @@ function drawRoad(w, h) {
   drawHazardWarnings(first, last, baseIndex);
   drawJumps(first, last, baseIndex);
   drawPylons(first, last, baseIndex, w);
+  /* THE ROADSIDE SPRITES, AND THE PLACE IS FORCED. The path built
+     scenery runs BEFORE the road, and the reason is written there: it is
+     what makes it impossible for a roadside object to occlude the road
+     ahead. A gantry sign spans the road by definition, so drawn there
+     the surface would paint straight over its beam and there would be no
+     gantry. It goes here instead, with the pylons, which are the other
+     things that stand beside the road and are drawn after it. */
+  spritePass(first, last, baseIndex, w, h);
   drawHazards(first, last, baseIndex);
   // Last in the world and before the car, which render draws afterwards,
   // so the ghost can never sit on top of the thing you are steering.
@@ -14091,6 +14241,715 @@ const KIND_SPLIT    = [2, 2, -1, 2, -1, 2];
    flat colour is exactly the wall this session was asked to break up. */
 const GEO_KINDS     = [1, 1, 1, 1, 1, 1];
 
+/* ==================================================================
+   THE ROADSIDE SPRITE PIPELINE. SIGNS ONLY.
+
+   Everything above draws roadside objects by building paths every frame.
+   This draws them by blitting images baked once at startup. The two are
+   alternatives, not layers: SCENERY_LEGACY runs the old one and it ships
+   at zero, SPRITES_ON runs this one and it ships at one.
+
+   WHY A SPRITE AT ALL. A sign is the one roadside object whose whole job
+   is to be READ, and reading needs type, and type is the most expensive
+   thing this renderer can draw and the one thing it must never draw per
+   frame. Baked once, a sign can carry a lattice beam, bolt heads, a
+   reflective border, two lamp cones and two lines of set type for
+   exactly the same frame cost as a flat rectangle, because the frame
+   cost of any sprite is one drawImage.
+
+   FOUR THINGS A BAKED SPRITE CANNOT DO, and they are the price:
+
+     1. IT CANNOT FOLLOW THE BIOME. COLOUR is rewritten every time the
+        road crosses into a new biome and the whole world turns with it.
+        A baked image cannot. The sign palette is therefore its own
+        table, deliberately NOT in COLOUR, so nothing rotates it and
+        nobody has to remember why it looks wrong in biome seven.
+     2. IT CANNOT TAKE THE DEPTH LUT. The path built objects attenuate
+        toward the terrain shoulder at their own depth. A sprite is one
+        image at every depth, and correcting it would need either a
+        variant per depth bucket, which multiplies the atlas, or an alpha
+        per draw, which is the state change the brief rules out.
+     3. IT CANNOT BE SHARP AT EVERY SIZE. See spriteBakeSize.
+     4. ITS TEXT CANNOT CHANGE. Four countdown copies are four baked
+        sprites off one bake function, not one sprite with a string.
+   ================================================================== */
+
+/* THE SIGN PALETTE, AND IT IS NOT IN COLOUR ON PURPOSE. See note 1
+   above: applyBiome walks COLOUR and rewrites every key it has a biome
+   entry for, and a key beginning SIGN would land in the city role and
+   turn with the skyline. A road sign is standardised furniture; the
+   whole point of it is that it looks the same everywhere.
+
+   THE WHITE IS 212 AND NOT 250, AND THAT IS THE ONE RULE THAT OUTRANKS
+   THIS WHOLE FILE. ART-DIRECTION.md: the road edge is the brightest and
+   most readable thing on screen, in every biome, and nothing about
+   beauty outranks it. The edge peaks at 249. A retroreflective white at
+   241 would have sat level with it. */
+const SIGN_INK = {
+  POST:        '#333941',
+  POST_LIT:    '#5f6874',
+  POST_DARK:   '#1c2027',
+  POST_FOOT:   '#262b32',
+  BEAM:        '#3d444d',
+  BEAM_LIT:    '#69727e',
+  BOLT:        '#7c8794',
+  /* AND THE GREEN IS DESATURATED, WHICH IS THE OTHER HALF OF THE SAME
+     RULE. BRIEF.md was revised on 14 August to state it as a hierarchy of
+     SATURATION as well as brightness: the road edge must be the most
+     saturated element on screen, in every palette.
+
+     THE EDGE IS NOT ONE COLOUR AND THAT IS WHAT MAKES THE RULE
+     MEASURABLE. It is a near white core inside a wide warm glow:
+     EMISSIVE_CORE reads 0.035 of full chroma and EDGE_LIGHT 0.137, while
+     EDGE_GLOW under them reads 0.827. A motorway green at #146b43 is
+     0.81, which sat level with the glow and far above the core.
+
+     Desaturated, the most saturated opaque ink anywhere in the atlas
+     measures 0.456: below the glow, above the core. And measured the way
+     the rule is actually about, by rendering the same frame twice with a
+     gantry 25 segments ahead, the signs raise neither the frame's
+     maximum saturation nor its maximum luminance in any of the twelve
+     biomes. The probe was checked against a pure green panel, which it
+     catches in eleven of them. */
+  PANEL_HI:    '#3d6b53',
+  PANEL_LO:    '#294731',
+  PANEL_EDGE:  '#1f3627',
+  BORDER:      '#cdd6cf',
+  INK:         '#cdd6cf',
+  INK_DIM:     '#9fb0a5',
+  STUD:        '#d8c78a',
+  LAMP:        'rgba(255,238,198,0.13)',
+  BLUE_HI:     '#42576e',
+  BLUE_LO:     '#26343f'
+};
+
+/* WHICH FLANK THE WORLD LIGHT LANDS ON, as a direction in the baked
+   image's x, so a sign is lit from the same side as everything standing
+   beside it. Read once at bake time, which is all a baked image can do
+   with a light.
+
+   MINUS ONE MEANS THE LEFT FLANK IS LIT, AND THE SIGN OF THIS IS NOT
+   OBVIOUS. CAR_LIGHT_DIR points from a surface TOWARD the light, which
+   is how geoBox reads it: a face whose normal is -x gets a dot product
+   of +0.55 against the shipped direction and comes out bright. So with
+   CAR_LIGHT_X at -0.55 it is the LEFT flank of everything in this world
+   that is lit, which is what geoShadow throwing to +x, the terrain's
+   left bank taking TERRAIN_LIT, and FEEL's own "ahead and to the left"
+   all agree on. The first version of this returned the same number and
+   then used it the other way round, so every sign in the game was
+   highlighted on its shaded side, alone among everything on screen. */
+function signLitSide() { return CAR_LIGHT_DIR[0] < 0 ? -1 : 1; }
+
+/* A rounded rectangle without roundRect, which is recent enough that a
+   five year old machine is not a safe bet for it. */
+function signRoundRect(g, x, y, w, h, r) {
+  const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+  g.beginPath();
+  g.moveTo(x + rr, y);
+  g.arcTo(x + w, y, x + w, y + h, rr);
+  g.arcTo(x + w, y + h, x, y + h, rr);
+  g.arcTo(x, y + h, x, y, rr);
+  g.arcTo(x, y, x + w, y, rr);
+  g.closePath();
+}
+
+/* Type set to a width rather than to a size, because the copy is
+   placeholder and a longer string must not run off the panel. */
+function signText(g, s, cx, cy, maxW, px, weight, fill) {
+  let size = px;
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  for (let i = 0; i < 12; i++) {
+    g.font = weight + ' ' + size.toFixed(1)
+           + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    if (g.measureText(s).width <= maxW || size < 4) break;
+    size *= 0.92;
+  }
+  g.fillStyle = fill;
+  g.fillText(s, cx, cy);
+  return size;
+}
+
+/* ------------------------------------------------------------------
+   THE THREE DESIGNS. Each one draws itself into a box of W by H with
+   its feet on the bottom edge, and knows nothing about where it will
+   stand or how big it will be drawn.
+   ------------------------------------------------------------------ */
+
+/* ONE: THE GANTRY. Two posts outside the road edges, a lattice beam
+   across, and the panel hanging under it. This is the only design that
+   spans the road, and it is the reason the pass had to move after the
+   surface: drawn where the path built scenery is drawn, the road would
+   have painted straight over the beam. */
+function bakeGantry(g, W, H, def) {
+  const lit = signLitSide();
+  const postW = Math.max(2, W * 0.021);
+  const lx = W * 0.030, rx = W - W * 0.030 - postW;
+  const beamT = H * 0.050, beamB = H * 0.132;
+  const panT = H * 0.118, panB = H * 0.505;
+  const panL = W * 0.180, panR = W * 0.820;
+  const gy = H;
+
+  // ---- the two posts. Tapered, so they read as structure rather than
+  // as two bars, with a base plate and its bolts at the foot.
+  for (const px of [lx, rx]) {
+    const topIn = postW * 0.11;
+    g.beginPath();
+    g.moveTo(px, gy);
+    g.lineTo(px + postW, gy);
+    g.lineTo(px + postW - topIn, beamT);
+    g.lineTo(px + topIn, beamT);
+    g.closePath();
+    g.fillStyle = SIGN_INK.POST; g.fill();
+    // the lit face, a strip down the side the world light is on
+    g.beginPath();
+    const s = lit < 0 ? 0 : 1;                  // the lit flank, in image x
+    const inw = lit < 0 ? 0.34 : -0.34;
+    g.moveTo(px + postW * s, gy);
+    g.lineTo(px + postW * (s + inw), gy);
+    g.lineTo(px + postW * (s + inw) + topIn * lit, beamT);
+    g.lineTo(px + postW * s - topIn * lit, beamT);
+    g.closePath();
+    g.fillStyle = SIGN_INK.POST_LIT; g.fill();
+    // base plate and bolts
+    const fw = postW * 2.3, fh = H * 0.022;
+    g.fillStyle = SIGN_INK.POST_FOOT;
+    g.fillRect(px + postW / 2 - fw / 2, gy - fh, fw, fh);
+    g.fillStyle = SIGN_INK.BOLT;
+    const br = Math.max(0.6, fh * 0.20);
+    for (let i = -1; i <= 1; i += 2) {
+      g.beginPath();
+      g.arc(px + postW / 2 + i * fw * 0.33, gy - fh * 0.5, br, 0, 6.2832);
+      g.fill();
+    }
+  }
+
+  // ---- the beam. Two rails and a zig zag web between them, which is
+  // the whole difference between a gantry and a plank.
+  g.fillStyle = SIGN_INK.BEAM;
+  g.fillRect(lx, beamT, rx + postW - lx, (beamB - beamT) * 0.26);
+  g.fillRect(lx, beamB - (beamB - beamT) * 0.26, rx + postW - lx, (beamB - beamT) * 0.26);
+  g.fillStyle = SIGN_INK.BEAM_LIT;
+  g.fillRect(lx, beamT, rx + postW - lx, Math.max(0.7, (beamB - beamT) * 0.075));
+  g.strokeStyle = SIGN_INK.BEAM;
+  g.lineWidth = Math.max(0.7, (beamB - beamT) * 0.14);
+  g.beginPath();
+  const webT = beamT + (beamB - beamT) * 0.26, webB = beamB - (beamB - beamT) * 0.26;
+  const bays = 18, span = (rx + postW - lx) / bays;
+  for (let i = 0; i < bays; i++) {
+    const x0 = lx + i * span;
+    g.moveTo(x0, i % 2 ? webT : webB);
+    g.lineTo(x0 + span, i % 2 ? webB : webT);
+  }
+  g.stroke();
+
+  // ---- the panel. A green face with a lit top, a reflective border and
+  // two lines of set type, all of it baked.
+  const grad = g.createLinearGradient(0, panT, 0, panB);
+  grad.addColorStop(0, SIGN_INK.PANEL_HI);
+  grad.addColorStop(1, SIGN_INK.PANEL_LO);
+  signRoundRect(g, panL, panT, panR - panL, panB - panT, (panB - panT) * 0.09);
+  g.fillStyle = grad; g.fill();
+  g.strokeStyle = SIGN_INK.PANEL_EDGE;
+  g.lineWidth = Math.max(0.6, W * 0.0025);
+  g.stroke();
+  // the border, inset, the way a real one is
+  const bi = (panB - panT) * 0.085;
+  signRoundRect(g, panL + bi, panT + bi, (panR - panL) - 2 * bi, (panB - panT) - 2 * bi,
+                (panB - panT) * 0.05);
+  g.strokeStyle = SIGN_INK.BORDER;
+  g.lineWidth = Math.max(0.8, (panB - panT) * 0.030);
+  g.stroke();
+
+  // two brackets holding the panel on the beam
+  g.fillStyle = SIGN_INK.BEAM;
+  for (const f of [0.30, 0.70]) {
+    const bx2 = panL + (panR - panL) * f;
+    g.fillRect(bx2 - W * 0.006, beamB - (beamB - beamT) * 0.1, W * 0.012,
+               panT - beamB + (beamB - beamT) * 0.3);
+  }
+
+  // the copy. Two lines: the place, then the distance, which is the
+  // shape every countdown sign on every motorway uses.
+  const cx = (panL + panR) / 2;
+  const inner = (panR - panL) - 4 * bi;
+  signText(g, def.line1, cx, panT + (panB - panT) * 0.36, inner,
+           (panB - panT) * 0.235, '800', SIGN_INK.INK);
+  signText(g, def.line2, cx, panT + (panB - panT) * 0.685, inner,
+           (panB - panT) * 0.300, '900', SIGN_INK.INK);
+
+  // corner studs, so the panel catches a headlight the way the real ones do
+  g.fillStyle = SIGN_INK.STUD;
+  const sr = Math.max(0.6, (panB - panT) * 0.030);
+  for (const fx of [0.035, 0.965]) for (const fy of [0.10, 0.90]) {
+    g.beginPath();
+    g.arc(panL + (panR - panL) * fx, panT + (panB - panT) * fy, sr, 0, 6.2832);
+    g.fill();
+  }
+
+  // ---- and the two lamps on the beam, throwing a cone down the face.
+  // Free here, and impossible per frame without a gradient per sign.
+  for (const f of [0.30, 0.70]) {
+    const lxp = panL + (panR - panL) * f, lyp = beamB;
+    const rad = (panB - panT) * 1.15;
+    /* A LINEAR RAMP AND NOT A RADIAL ONE. The radial version ringed:
+       at thirteen per cent alpha over a dark panel the eight bit steps
+       of the gradient landed as visible concentric arcs, which is the
+       one artefact a baked image keeps forever. */
+    const lg = g.createLinearGradient(lxp, lyp, lxp, lyp + rad);
+    lg.addColorStop(0, SIGN_INK.LAMP);
+    lg.addColorStop(1, 'rgba(255,238,198,0)');
+    g.fillStyle = lg;
+    g.beginPath();
+    g.moveTo(lxp, lyp);
+    g.lineTo(lxp - rad * 0.42, lyp + rad);
+    g.lineTo(lxp + rad * 0.42, lyp + rad);
+    g.closePath();
+    g.fill();
+    g.fillStyle = SIGN_INK.STUD;
+    g.beginPath();
+    g.arc(lxp, lyp, Math.max(0.7, (beamB - beamT) * 0.16), 0, 6.2832);
+    g.fill();
+  }
+}
+
+/* TWO: THE VERGE MARKER. One post, one tall panel, the distance on it
+   as a numeral. It stands off the road on the shoulder and its job is
+   to confirm the gantry a few seconds before it arrives. */
+function bakeMarker(g, W, H, def) {
+  const lit = signLitSide();
+  const postW = Math.max(2, W * 0.115);
+  const px = W / 2 - postW / 2;
+  const panT = H * 0.045, panB = H * 0.66;
+  const panL = W * 0.055, panR = W * 0.945;
+
+  g.fillStyle = SIGN_INK.POST;
+  g.fillRect(px, panB * 0.9, postW, H - panB * 0.9);
+  g.fillStyle = SIGN_INK.POST_LIT;
+  g.fillRect(lit < 0 ? px : px + postW * 0.66, panB * 0.9, postW * 0.34, H - panB * 0.9);
+  g.fillStyle = SIGN_INK.POST_FOOT;
+  g.fillRect(px - postW * 0.5, H - H * 0.030, postW * 2, H * 0.030);
+
+  const grad = g.createLinearGradient(0, panT, 0, panB);
+  grad.addColorStop(0, SIGN_INK.PANEL_HI);
+  grad.addColorStop(1, SIGN_INK.PANEL_LO);
+  signRoundRect(g, panL, panT, panR - panL, panB - panT, (panR - panL) * 0.10);
+  g.fillStyle = grad; g.fill();
+  g.strokeStyle = SIGN_INK.PANEL_EDGE;
+  g.lineWidth = Math.max(0.6, W * 0.010);
+  g.stroke();
+  const bi = (panR - panL) * 0.075;
+  signRoundRect(g, panL + bi, panT + bi, (panR - panL) - 2 * bi, (panB - panT) - 2 * bi,
+                (panR - panL) * 0.06);
+  g.strokeStyle = SIGN_INK.BORDER;
+  g.lineWidth = Math.max(0.8, (panR - panL) * 0.045);
+  g.stroke();
+
+  const cx = (panL + panR) / 2, inner = (panR - panL) - 4 * bi;
+  signText(g, def.line1, cx, panT + (panB - panT) * 0.34, inner,
+           (panB - panT) * 0.36, '900', SIGN_INK.INK);
+  signText(g, def.line2, cx, panT + (panB - panT) * 0.63, inner,
+           (panB - panT) * 0.16, '700', SIGN_INK.INK_DIM);
+
+  // a chevron pointing on down the road, under the copy
+  g.fillStyle = SIGN_INK.INK_DIM;
+  const ay = panT + (panB - panT) * 0.855, aw = (panR - panL) * 0.30,
+        ah = (panB - panT) * 0.10;
+  g.beginPath();
+  g.moveTo(cx - aw / 2, ay - ah / 2);
+  g.lineTo(cx, ay + ah / 2);
+  g.lineTo(cx + aw / 2, ay - ah / 2);
+  g.lineTo(cx + aw / 2, ay - ah);
+  g.lineTo(cx, ay);
+  g.lineTo(cx - aw / 2, ay - ah);
+  g.closePath();
+  g.fill();
+
+  g.fillStyle = SIGN_INK.STUD;
+  g.beginPath();
+  g.arc(cx, panB + (H - panB) * 0.16, Math.max(0.7, W * 0.055), 0, 6.2832);
+  g.fill();
+}
+
+/* THREE: THE POST SIGN. Small, blue, and recurring. It is the furniture
+   that makes the other two read as signs rather than as decoration,
+   because a road with exactly four signs on it is a road with four
+   decorations on it. */
+function bakePost(g, W, H, def) {
+  const lit = signLitSide();
+  const postW = Math.max(1.5, W * 0.10);
+  const px = W / 2 - postW / 2;
+  const panT = H * 0.05, panB = H * 0.56;
+  const panL = W * 0.06, panR = W * 0.94;
+
+  g.fillStyle = SIGN_INK.POST;
+  g.fillRect(px, panB * 0.92, postW, H - panB * 0.92);
+  g.fillStyle = SIGN_INK.POST_LIT;
+  g.fillRect(lit < 0 ? px : px + postW * 0.6, panB * 0.92, postW * 0.4, H - panB * 0.92);
+
+  const grad = g.createLinearGradient(0, panT, 0, panB);
+  grad.addColorStop(0, SIGN_INK.BLUE_HI);
+  grad.addColorStop(1, SIGN_INK.BLUE_LO);
+  signRoundRect(g, panL, panT, panR - panL, panB - panT, (panR - panL) * 0.16);
+  g.fillStyle = grad; g.fill();
+  const bi = (panR - panL) * 0.09;
+  signRoundRect(g, panL + bi, panT + bi, (panR - panL) - 2 * bi, (panB - panT) - 2 * bi,
+                (panR - panL) * 0.10);
+  g.strokeStyle = SIGN_INK.BORDER;
+  g.lineWidth = Math.max(0.8, (panR - panL) * 0.055);
+  g.stroke();
+  signText(g, def.line1, (panL + panR) / 2, (panT + panB) / 2,
+           (panR - panL) - 4 * bi, (panB - panT) * 0.52, '900', SIGN_INK.INK);
+  g.fillStyle = SIGN_INK.STUD;
+  g.beginPath();
+  g.arc(W / 2, panB + (H - panB) * 0.2, Math.max(0.6, W * 0.06), 0, 6.2832);
+  g.fill();
+}
+
+/* ------------------------------------------------------------------
+   THE REGISTRY. id, bake function, world size, and once the atlas is
+   built, where in it the baked image sits.
+
+   NINE ENTRIES FROM THREE BAKE FUNCTIONS, and that is the brief's three
+   variants met rather than exceeded: the copy is baked in, so four
+   countdown gantries are four images. Nothing outside this table knows
+   that any of them is a sign.
+
+   THE WORLD SIZES ARE IN WORLD UNITS, not in road half widths, so a
+   sign does not change size when the road squeezes. The gantry is sized
+   against the BASE half width, which is what a real one is built for.
+   ------------------------------------------------------------------ */
+const SIGN_COUNTDOWN = [
+  { n: '8', line1: 'CITY CENTER', line2: '8 MILES' },
+  { n: '6', line1: 'CITY CENTER', line2: '6 MILES' },
+  { n: '4', line1: 'CITY CENTER', line2: '4 MILES' },
+  { n: '2', line1: 'CITY CENTER', line2: '2 MILES' }
+];
+
+const SPRITE_REG = [];
+const SPR_GANTRY_0 = 0;                  // four, one per countdown step
+const SPR_MARKER_0 = 4;                  // four, likewise
+const SPR_POST     = 8;
+
+(function buildSpriteRegistry() {
+  for (let i = 0; i < 4; i++)
+    SPRITE_REG.push({ name: 'gantry' + SIGN_COUNTDOWN[i].n, bake: bakeGantry,
+                      wKey: 'SIGN_GANTRY_SPAN', hKey: 'SIGN_GANTRY_HIGH',
+                      bakeShare: 1.00, spanRoad: 1,
+                      line1: SIGN_COUNTDOWN[i].line1, line2: SIGN_COUNTDOWN[i].line2,
+                      ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+  for (let i = 0; i < 4; i++)
+    SPRITE_REG.push({ name: 'marker' + SIGN_COUNTDOWN[i].n, bake: bakeMarker,
+                      wKey: 'SIGN_MARKER_WIDE', hKey: 'SIGN_MARKER_HIGH',
+                      bakeShare: 0.50,
+                      line1: SIGN_COUNTDOWN[i].n, line2: 'MILES',
+                      ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+  SPRITE_REG.push({ name: 'post', bake: bakePost,
+                    wKey: 'SIGN_POST_WIDE', hKey: 'SIGN_POST_HIGH',
+                    bakeShare: 0.375, line1: 'A1', line2: '',
+                    ax: 0, ay: 0, aw: 0, ah: 0, want: 0, up: 1 });
+})();
+
+/* The world size of a sprite, read live off FEEL rather than frozen into
+   the registry, so the six numbers that decide how big a sign is are
+   adjustable from the phone like every other feel constant. A gantry's
+   width is authored in base half widths because it is built for a road;
+   everything else is in world units. */
+function spriteWorldW(d) {
+  return d.spanRoad ? FEEL[d.wKey] * FEEL.ROAD_HALF_WIDTH_BASE : FEEL[d.wKey];
+}
+function spriteWorldH(d) { return FEEL[d.hKey]; }
+
+let SPRITE_ATLAS = null;
+let SPRITE_ATLAS_W = 0, SPRITE_ATLAS_H = 0;
+let SPRITE_BAKE_MS = 0;
+let SPRITE_BAKE_SIG = '';
+let SPRITE_BAKE_CAPPED = 0;
+
+/* THE LARGEST SIZE NEEDED, AND THE BRIEF'S ONE UNANSWERABLE QUESTION.
+
+   "Bake at the largest on screen size needed" has no finite answer as
+   written: an object's drawn size goes to infinity as it reaches the
+   camera plane. The first attempt at a finite one was the size at the
+   moment its top edge passes the bottom of the frame, and it was wrong
+   twice over. In portrait it over asked by 2.3 times. In landscape the
+   two terms of its denominator nearly cancel, so it asked for a marker
+   6.2 times larger than anything ever drawn and every one of the nine
+   sprites came back capped.
+
+   THE ANSWER IS NOT DERIVED, IT IS MEASURED. The renderer never draws a
+   boundary nearer than 1,450 world units: measured over 1,920 frames at
+   each of 390x844 dpr2, 1024x768 dpr1, 844x390 dpr2 and 320x568 dpr2,
+   the largest world to pixel scale the road walk emitted put the nearest
+   kept boundary at 1450 world units in ALL FOUR, because it is a
+   property of the projection rather than of the frame. SPRITE_NEAR_
+   SEGMENTS is that distance, rounded down to 7 segments so the bake is
+   the conservative side of it.
+
+   IT IS STILL CAPPED, and that part of the brief cannot be met. A gantry
+   at that plane wants 2,104 device pixels across in portrait and 4,553
+   in landscape; four of them at the landscape figure is 84 megabytes of
+   atlas. Each design carries its own share of SPRITE_BAKE_MAX_PX,
+   because how much resolution a sign needs is a property of how much
+   type is on it: the gantry carries two lines and takes the whole
+   budget, the marker carries one numeral and takes half. What that
+   costs is reported rather than hidden, as an upscale factor per
+   sprite. */
+function spriteBakeSize(def, w, h, dpr) {
+  const nearZ = Math.max(1, FEEL.SPRITE_NEAR_SEGMENTS) * FEEL.SEGMENT_LENGTH;
+  const perUnit = CAMERA_DEPTH / nearZ * (w / 2) * dpr;   // device px per world unit
+  const wpx = spriteWorldW(def) * perUnit, hpx = spriteWorldH(def) * perUnit;
+  const want = Math.max(wpx, hpx);
+  const cap = Math.max(16, FEEL.SPRITE_BAKE_MAX_PX * def.bakeShare);
+  const k = Math.max(1, want / cap);
+  return { w: Math.max(8, Math.round(wpx / k)), h: Math.max(8, Math.round(hpx / k)),
+           want: Math.round(want), capped: k > 1, up: +k.toFixed(2) };
+}
+
+/* ONE OFFSCREEN CANVAS, SHELF PACKED. Tallest first, left to right,
+   wrapping at SPRITE_ATLAS_MAX_W, which is the widest a canvas can be
+   before old integrated parts start refusing to keep it on the GPU. */
+function spriteBuildAtlas() {
+  const w = view.w, h = view.h, dpr = view.dpr;
+  /* THE KEY IS EXACTLY WHAT THE BAKE READS AND NOTHING ELSE, and the
+     first version got that wrong in a way that cost real frames.
+
+     It keyed on the frame HEIGHT as well, and no part of the bake reads
+     height: the size is CAMERA_DEPTH over the near plane, times half the
+     frame WIDTH, times the device ratio, and the packer takes its width
+     from a constant. Measured across four widths and five heights, the
+     five heights gave five different keys and ONE distinct atlas: every
+     height only change threw away a valid ten megabyte canvas and built
+     a byte identical one.
+
+     THAT IS NOT A CORNER CASE ON A PHONE. onFullscreenChange calls
+     resize three times for one tap, and the browser chrome leaving
+     changes the height before the width settles. Measured under a six
+     times CPU throttle, one height only change is 74 to 83ms of
+     synchronous work in the resize handler, which is five dropped
+     frames; a drag with the width pinned did it forty times for 442ms
+     and 380 megabytes of allocate and discard. */
+  const sig = Math.round(w) + '@' + dpr + '#' + FEEL.SPRITE_BAKE_MAX_PX
+            + '|' + FEEL.SIGN_GANTRY_SPAN + ',' + FEEL.SIGN_GANTRY_HIGH
+            + ',' + FEEL.SIGN_MARKER_WIDE + ',' + FEEL.SIGN_MARKER_HIGH
+            + ',' + FEEL.SIGN_POST_WIDE + ',' + FEEL.SIGN_POST_HIGH
+            + ',' + FEEL.ROAD_HALF_WIDTH_BASE
+            /* THE CAMERA IS AN INPUT AND IT WAS LEFT OUT, which made the
+               sentence above this false the first time it was written.
+               CAMERA_DEPTH is 1/tan(fov/2) and it is the FIRST term of
+               spriteBakeSize. FIELD_OF_VIEW_DEG is live on group 0, and
+               nudging it calls recomputeCamera which calls resize, so
+               the rebake was being asked for and declined: every sign
+               stayed baked for the old field of view for the rest of the
+               session. The near plane and the packing belong here for
+               the same reason, even though neither has a slider yet. */
+            + ';' + CAMERA_DEPTH.toFixed(5)
+            + ',' + FEEL.SPRITE_NEAR_SEGMENTS + ',' + FEEL.SEGMENT_LENGTH
+            + ',' + FEEL.SPRITE_ATLAS_MAX_W + ',' + FEEL.SPRITE_ATLAS_PAD;
+  if (sig === SPRITE_BAKE_SIG) return false;      // nothing about the bake moved
+  const t0 = performance.now();
+
+  const pad = Math.max(0, Math.round(FEEL.SPRITE_ATLAS_PAD));
+  const sizes = SPRITE_REG.map(d => spriteBakeSize(d, w, h, dpr));
+  SPRITE_BAKE_CAPPED = 0;
+  for (let i = 0; i < sizes.length; i++) {
+    SPRITE_REG[i].want = sizes[i].want;
+    SPRITE_REG[i].up = sizes[i].up;
+    if (sizes[i].capped) SPRITE_BAKE_CAPPED++;
+  }
+  const order = SPRITE_REG.map((d, i) => i).sort((a, b) => sizes[b].h - sizes[a].h);
+  const maxW = Math.max(64, Math.round(FEEL.SPRITE_ATLAS_MAX_W));
+  let sx = pad, sy = pad, shelf = 0, atlasW = 0;
+  for (const i of order) {
+    const s = sizes[i];
+    if (sx + s.w + pad > maxW && sx > pad) { sx = pad; sy += shelf + pad; shelf = 0; }
+    SPRITE_REG[i].ax = sx; SPRITE_REG[i].ay = sy;
+    SPRITE_REG[i].aw = s.w; SPRITE_REG[i].ah = s.h;
+    sx += s.w + pad;
+    if (s.h > shelf) shelf = s.h;
+    if (sx > atlasW) atlasW = sx;
+  }
+  const atlasH = sy + shelf + pad;
+
+  /* AND IT MAY FAIL, WHICH IS THE SAME RULE localStorage LIVES UNDER.
+     This asks for eight to twelve megabytes of backing store in one
+     allocation on a machine chosen for being weak. getContext returns
+     NULL rather than throwing when the browser will not give it, and
+     dereferencing that took the whole script down on the line after,
+     which is a black screen and no game at all. A machine that cannot
+     hold the atlas plays a road with no signs on it. */
+  let cv = null, g = null;
+  try {
+    cv = document.createElement('canvas');
+    cv.width = Math.max(1, atlasW); cv.height = Math.max(1, atlasH);
+    g = cv.getContext('2d');
+  } catch (e) { g = null; }
+  if (!g) {
+    SPRITE_ATLAS = null; SPRITE_ATLAS_W = 0; SPRITE_ATLAS_H = 0;
+    SPRITE_BAKE_SIG = sig;              // do not thrash retrying it every resize
+    SPRITE_BAKE_MS = performance.now() - t0;
+    return false;
+  }
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (let i = 0; i < SPRITE_REG.length; i++) {
+    const d = SPRITE_REG[i];
+    g.save();
+    g.translate(d.ax, d.ay);
+    g.beginPath(); g.rect(0, 0, d.aw, d.ah); g.clip();
+    try { d.bake(g, d.aw, d.ah, d); } catch (e) { d.aw = 0; }
+    g.restore();
+  }
+  SPRITE_ATLAS = cv;
+  SPRITE_ATLAS_W = cv.width; SPRITE_ATLAS_H = cv.height;
+  SPRITE_BAKE_SIG = sig;
+  SPRITE_BAKE_MS = performance.now() - t0;
+  return true;
+}
+
+/* ------------------------------------------------------------------
+   WHERE THE SIGNS STAND, WRITTEN INTO THE SEGMENT ARRAY.
+
+   A segment carries an id and a lateral offset and nothing else, which
+   is the whole of what the renderer is allowed to know.
+
+   IT DRAWS NOTHING FROM rng() AND IT MUST NOT. The road is a pure
+   function of the day's seed and one extra call here would move every
+   corner on every daily. Everything below is arithmetic on the segment
+   index, so the road is byte for byte the road it was.
+   ------------------------------------------------------------------ */
+function signCycle() {
+  if (mode === DAILY && finishSeg > 600) return finishSeg;
+  return Math.max(400, Math.round(FEEL.SIGN_CYCLE_SEGMENTS));
+}
+
+function signFor(idx) {
+  const L = signCycle();
+  const k = idx % L;
+  const lead = Math.max(0, Math.round(FEEL.SIGN_MARKER_LEAD));
+  for (let i = 0; i < 4; i++) {
+    /* Read one at a time rather than off a built key, because this runs
+       once per segment laid and a string per segment per sign is thirty
+       thousand throwaway strings over a long road for no reason. */
+    const share = i === 0 ? FEEL.SIGN_AT_1 : i === 1 ? FEEL.SIGN_AT_2
+                : i === 2 ? FEEL.SIGN_AT_3 : FEEL.SIGN_AT_4;
+    const at = Math.round(L * share);
+    if (k === at) return { id: SPR_GANTRY_0 + i, off: 0 };
+    if (lead && k === at - lead)
+      return { id: SPR_MARKER_0 + i, off: FEEL.SIGN_MARKER_OFFSET };
+  }
+  const every = Math.round(FEEL.SIGN_POST_EVERY);
+  if (every > 0 && idx > 0 && idx % every === 0)
+    return { id: SPR_POST,
+             off: (idx / every) % 2 ? FEEL.SIGN_POST_OFFSET : -FEEL.SIGN_POST_OFFSET };
+  return null;
+}
+
+/* ------------------------------------------------------------------
+   THE PASS. Far to near, integer destinations, and drawImage is the
+   only call in it: no fillStyle, no globalAlpha, no save, no transform.
+
+   IT WALKS SPANS AND NOT BOUNDARIES, which is not a nicety. The far
+   field coalescing clears bvis on every segment it absorbs, so a sign
+   asked for at its own boundary would blink out whenever a merge
+   happened to land on it. Same defect the jump chevrons had.
+   ------------------------------------------------------------------ */
+let spritesDrawn = 0;
+function spritePass(first, last, baseIndex, w, h) {
+  spritesDrawn = 0;
+  if (!FEEL.SPRITES_ON || !SPRITE_ATLAS) return;
+  const atlas = SPRITE_ATLAS;
+  for (let n = last; n >= first; n--) {            // back to front
+    if (!bvis[n]) continue;
+    const seg = segAt(baseIndex + n);
+    if (!seg) continue;
+    const span = bspan[n] || 1;
+    for (let j = span - 1; j >= 0; j--)            // and back to front inside it
+      spriteAt(atlas, n, span > 1 ? segAt(seg.index + j) : seg,
+               span > 1 ? j / span : 0, w, h);
+  }
+  /* AND THEN THE NEAR FIELD, WHICH THE ROAD WALK STOPS KEEPING WHILE A
+     TALL SIGN IS STILL HALF THE SCREEN.
+
+     The walk drops a boundary once its far end goes below the bottom of
+     the frame, which is a fixed 1,450 world units whatever the viewport
+     is. A gantry is 2,800 world units tall and does not clear the bottom
+     of the frame until about 700. Measured on the first build of this
+     pass: four gantries in a row vanished with 334 to 382 CSS pixels of
+     themselves still showing, which is 40 to 45 per cent of the frame
+     height, in one frame, directly in front of the player.
+
+     So the near field is walked separately, on the raw boundary values
+     the walk wrote before it stopped keeping them. No spans down here,
+     because coalescing only touches boundaries the walk kept, and it
+     stops well before bz can approach zero: six iterations, and the
+     existing off screen test does the rest. Drawn AFTER the far loop,
+     because these are the nearest things in the pass. */
+  const nearStop = Math.max(1, FEEL.SEGMENT_LENGTH);
+  for (let n = first - 1; n >= 0; n--) {
+    if (bz[n] <= nearStop) break;
+    const seg = segAt(baseIndex + n);
+    if (!seg) continue;
+    spriteAt(atlas, n, seg, 0, w, h);
+  }
+}
+
+/* One sign, placed. Split out of the pass so the near field and the far
+   field cannot drift apart, which is exactly how the far field came to
+   have a rule the near field did not. */
+function spriteAt(atlas, n, s2, f, w, h) {
+  if (!s2 || !s2.sgn) return;
+  const d = SPRITE_REG[s2.sgn - 1];
+  if (!d || !d.aw) return;
+  const cx = bx[n] + (bx[n + 1] - bx[n]) * f;
+  const cy = by[n] + (by[n + 1] - by[n]) * f;
+  const cw = bw[n] + (bw[n + 1] - bw[n]) * f;
+  const ch = bh[n] + (bh[n + 1] - bh[n]) * f;
+  /* A GANTRY IS BUILT FOR THE ROAD IT SPANS, and this is the one thing
+     here that is not a straight multiply. Sized against the nominal half
+     width its posts stand INSIDE the road edge wherever the road is
+     wider than nominal, which is the whole of the opening: it runs at
+     1.26 times base for its first 340 segments. cw over ch is this
+     segment's half width back in world units, so the ratio is the road's
+     own width multiple. Height takes the same factor, because a sprite
+     scaled differently in x and y is a sprite with stretched type on
+     it. */
+  const k = d.spanRoad ? cw / (ch * FEEL.ROAD_HALF_WIDTH_BASE) : 1;
+  const py = ch * spriteWorldH(d) * k;
+  if (py < FEEL.SPRITE_MIN_PX) return;
+  const px2 = ch * spriteWorldW(d) * k;
+  const off = s2.sgnX;
+  const cxp = cx + off * cw;
+  /* IT STANDS ON THE GROUND IT IS OVER, not on the road plane. The
+     shoulder rises from the edge over TERRAIN_REACH half widths, so a
+     marker out on the bank sits on the bank. A gantry has an offset of
+     zero and is untouched by this. */
+  let base = cy;
+  if (off !== 0) {
+    const a = off < 0 ? -off : off;
+    const onBank = clamp((a - EDGE_OUT) / Math.max(0.01, FEEL.TERRAIN_REACH), 0, 1);
+    if (a <= EDGE_OUT + FEEL.TERRAIN_REACH)
+      base = cy - ch * FEEL.TERRAIN_HEIGHT * terrainRise(s2.index) * onBank;
+  }
+  const dx = cxp - px2 / 2, dy = base - py;
+  if (dy > h + 8 || dx + px2 < -8 || dx > w + 8) return;
+  atlasDraw(atlas, d, dx, dy, px2, py);
+  spritesDrawn++;
+}
+
+/* The only drawing call in the pass, kept separate so the pass itself
+   reads as placement and this reads as the blit. Integer destinations,
+   as asked: see the note in the session report about what that costs. */
+function atlasDraw(atlas, d, dx, dy, dw, dh) {
+  if (FEEL.SPRITE_SNAP_PX) {
+    ctx.drawImage(atlas, d.ax, d.ay, d.aw, d.ah,
+                  Math.round(dx), Math.round(dy),
+                  Math.round(dw), Math.round(dh));
+    return;
+  }
+  ctx.drawImage(atlas, d.ax, d.ay, d.aw, d.ah, dx, dy, dw, dh);
+}
+
+
 function sceneryPass(first, last, baseIndex, w, h) {
   /* CLEARED BEFORE THE GUARD RATHER THAN AFTER IT. Turned off, the pass
      used to return leaving last frame's counts standing, so anything
@@ -14102,6 +14961,10 @@ function sceneryPass(first, last, baseIndex, w, h) {
   GEO_N = 0;
   GEO_OBJ_COUNT = 0;
   SHADOW_N = 0;
+  /* AND THE SWITCH. This whole pass is the path built roadside object
+     system, and it is now one of two. It ships off: see the note at
+     SCENERY_LEGACY for what that costs and how to put it back. */
+  if (!FEEL.SCENERY_LEGACY) return;
   if (FEEL.SCENERY_EVERY <= 0 || FEEL.SCENERY_DENSITY <= 0) return;
   const every = Math.max(1, Math.round(FEEL.SCENERY_EVERY));
   const buckets = Math.max(1, Math.round(FEEL.SCENERY_DEPTH_STEPS));
@@ -20231,6 +21094,9 @@ function drawHud(w, h) {
     tunerLine(26),
     tunerLine(27),
     tunerLine(28),
+    /* 29 is the roadside sprite pipeline, added with it. Listed the same
+       day it was created, which is the lesson 23 to 26 paid for. */
+    tunerLine(29),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
