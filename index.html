@@ -3812,7 +3812,11 @@ const FEEL = {
      wide road at eighteen seconds is not a threat, it is the teaching
      moment section 5 says to use instead of words: it is unmissable, it
      is survivable, and it explains itself. */
-  BLOCKER_TIME:              18,     // seconds, inside the on ramp
+  /* 20 AND NOT 18, AND NOTHING MOVED. unlockAt floored every unlock at
+     the twenty second opening, so 18 has always been 20 in play. The
+     floor is now the warning geometry, so the number here has to say
+     what it means. */
+  BLOCKER_TIME:              20,     // seconds
   SPLITTER_TIME:             55,
   MOVER_TIME:                85,
   /* Mean segments between hazards of that kind, and now that the road is
@@ -4104,6 +4108,40 @@ const FEEL = {
      callout that says YOU ARE SCRAPING to somebody who is not is worse
      than saying nothing at all. */
   TRAIN_SAY_LAST:           6.0,     // LIVE, seconds before the line the fallback fires
+  /* ==================================================================
+     AND THE FIRST REAL LEVEL'S OWN JUMP.
+
+     WHAT WAS ACTUALLY WRONG WITH THE FIRST FIFTEEN SECONDS, measured
+     rather than assumed. The corners were never the problem: resetRoad
+     lays 404 segments of authored road at the start of every level, a
+     lead in and three alternating CURVE_MEDIUM corners, and it runs to
+     nine seconds. Driven with one direction held, a car leaves the road
+     in that stretch in 2.3 seconds. There is plenty happening.
+
+     THE HOLE IS NINE TO TWENTY SECONDS, and it is a hole in OBJECTS
+     rather than in road. The authored opening hands over to the grammar
+     at nine, the first blocker cannot be scheduled until twenty and the
+     first jump until thirty, so measured over 28 days the first object
+     of any kind on the first real level arrived at 21.3 seconds.
+
+     ONE JUMP, PLACED, AT ELEVEN. It goes in right after the authored
+     opening ends, so the shape of the level is: corners with real
+     stakes for nine seconds, a jump at eleven, grammar corners to
+     twenty, then the first blocker on its own schedule exactly as
+     before. That is an escalation by KIND every ten seconds or so,
+     which is what section 4.5 asks for, and none of it moves a
+     scheduler or a difficulty ramp.
+
+     THE FIRST REAL LEVEL ONLY. Every later level is byte for byte the
+     road it was, and so is training.
+     ================================================================== */
+  /* 438 IS THE AUTHORED OPENING'S OWN LENGTH, counted rather than
+     estimated: the eleven addRun calls in resetRoad sum to
+     34+18+44+30+44+30+44+34+70+30+60. The first generated phrase is
+     therefore asked for at exactly 438, so every value from 0 to 438
+     gives the identical road and only values ABOVE it move the jump
+     later. Written as 438 so the slider says what it does. */
+  OPEN_JUMP_AT:             438,     // LIVE, segments, the authored opening's length
   LEVEL_GATES_FIRST:          3,     // LIVE, gates on the first REAL level
   LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
   /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
@@ -4259,32 +4297,63 @@ const FEEL = {
   CURVE_SCALE_DEEP:         2.5,     // where the curve scale ends up
   ROAD_SQUEEZE:            0.88,     // road width multiplier at full difficulty
   DEEP_INTENSITY:             3,
-  /* ------------------------------------------------------------------
-     THE UNFAILABLE OPENING. Not easy. Unfailable.
+  /* ==================================================================
+     THE OPENING, AND IT USED TO BE ONE NUMBER DOING TWO JOBS.
 
-     The first OPENING_SECONDS of every run cannot end it. No hazards, no
-     jumps, and the road edge does not kill: a car that runs out of road
-     is held at the lip, scraping, until the opening is over.
+     A twenty second unfailable window was the right thing when level
+     one WAS the tutorial. It is not any more. Training exists, it says
+     it is training, it is 28 seconds, it teaches the edge and the jump,
+     and it can be skipped. A player arriving at the first real level has
+     either done it or explicitly refused it, and either way the game
+     knows they do not need a second one.
 
-     WHY IT IS A HELD EDGE AND NOT A GENTLE CURVE, which is what was
-     asked for. "Curvature low enough that the car cannot leave the road
-     even with the steering held hard over" cannot be built, and not
-     because of tuning. Curvature is the centrifugal push the ROAD makes;
-     the steering is the driver's own input and it is independent of it.
-     At full lock the car crosses the road and leaves it on any curvature
-     there is, including none at all, and no width survives twenty
-     seconds of it. So the thing that has to give is the death, and the
-     acceptance test that was asked for, hold one direction from the
-     first frame and be alive at twenty seconds, is exactly the test of
-     that. Driven, both directions, several seeds: see the report.
+     MEASURED, AND THIS IS THE WHOLE ARGUMENT. On the first real level,
+     over 28 days, the first object of ANY kind arrived at 21.3 seconds,
+     because both jobs floored at the same twenty:
 
-     It is also the right shape for section 5, which refuses a tutorial
-     and says the first seconds of the real game are the tutorial. A new
-     player who holds the wrong thing meets the edge, hears it, sees the
-     sparks, and drives on. That teaches the edge. Dying teaches nothing
-     in the first twenty seconds because there was nothing to have known.
-     ------------------------------------------------------------------ */
-  OPENING_SECONDS:           20,     // LIVE, the part of a run that cannot end it
+        the DEATH WINDOW      nothing can end the run
+        the PLACEMENT FLOOR   nothing may be laid on the road
+
+     And the window was not even buying difficulty. Dropped from 20 to
+     2, the smooth centre seeking driver's median survival moved from
+     59.3 seconds to 58.8: within noise. It was carrying only the driver
+     who holds one direction from the first frame, which is a stuck key
+     rather than a player. So the two jobs are now two numbers.
+     ================================================================== */
+  /* THE DEATH WINDOW. A settling window and not a tutorial: long enough
+     to cover the moment between the tap that starts a run and the hands
+     arriving, short enough that it never decides anything. Training is
+     not this number at all, it is unfailable for its whole length, and
+     openingSeconds is where that lives. */
+  /* THREE, AND IT IS A GRACE RATHER THAN A DIFFICULTY LEVER, which is
+     the point of measuring it. Swept from 0 to 9 seconds over 28 days:
+     the game's own driver model, the pace car's control law converted to
+     the two keys the real car takes, reached the line 28 of 28 at EVERY
+     value, and the same driver with a quarter second of reaction time
+     survived 57.7 seconds at every value. It changes nothing for anybody
+     who looks at the road, which is what the camera in section 4.3
+     exists to let them do.
+
+     What it changes is how much rope a driver with no anticipation at
+     all gets. Reaction only, no lookahead: 4.3 seconds at 2 and under,
+     5.1 at 3 and 4, 14.8 at 6. Three is the knee. Past it the window
+     starts carrying a passive car again, which is the tutorial's job and
+     the tutorial already exists. */
+  OPENING_SETTLE:           3.0,     // LIVE, seconds a real level cannot end in
+  /* THE PLACEMENT FLOOR, WHICH IS ABOUT THE WARNING AND NOT THE DEATH.
+
+     Nothing may be scheduled before this, and the number is now the
+     geometry rather than an inheritance. The longest warning run in the
+     game is the jump's: jumpLead is JUMP_WARN_SEGMENTS plus four, and
+     the phrase lays lead + 2 segments of straight before the ramp, so
+     78 segments, which is 1.73 seconds. A hazard's is warn + 2, 47
+     segments, 1.04 seconds. Three seconds leaves the whole of the
+     longest of them standing after the first second of the run.
+
+     IT IS A GUARD RATHER THAN A SCHEDULE. No unlock time is under it
+     today, and that is the point: it exists so that pulling BLOCKER_TIME
+     down on the phone cannot quietly put a hazard on frame one. */
+  PLACE_FLOOR_SECONDS:      3.0,     // LIVE, earliest a scheduler may place
   /* WHERE THE OPENING HOLDS THE CAR, in the same half widths as the
      bands above. INSIDE the scrape band and not at the lip, and the
      difference is the whole handover.
@@ -6040,7 +6109,8 @@ const TUNABLES = [
   { key: 'SPLITTER_TIME',      label: 'sAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
   { key: 'MOVER_TIME',         label: 'mAt',     step: 5,    min: 0,    max: 300,   dp: 0, group: 9 },
   { key: 'MOVER_PERIOD',       label: 'sweep',   step: 0.5,  min: 1.5,  max: 20,    dp: 1, group: 9 },
-  { key: 'OPENING_SECONDS',    label: 'safeFor', step: 1,    min: 0,    max: 60,    dp: 0, group: 10 },
+  { key: 'OPENING_SETTLE',     label: 'safeFor', step: 0.5,  min: 0,    max: 30,    dp: 1, group: 10 },
+  { key: 'PLACE_FLOOR_SECONDS',label: 'placeAt', step: 0.5,  min: 0,    max: 60,    dp: 1, group: 10 },
   { key: 'OPENING_EDGE',       label: 'safeAt',  step: 0.02, min: 0.5,  max: 1.5,   dp: 2, group: 10 },
   { key: 'ONRAMP_SECONDS',     label: 'ramp',    step: 5,    min: 5,    max: 180,   dp: 0, group: 10 },
   { key: 'FIRST_RUNS',         label: 'easyN',   step: 1,    min: 0,    max: 20,    dp: 0, group: 10 },
@@ -6455,6 +6525,7 @@ const TUNABLES = [
   { key: 'TRAIN_JUMP_AT',      label: 'jumpAt',  step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
   { key: 'TRAIN_SAY_HOLD',     label: 'sayHold', step: 0.1,  min: 0.2,  max: 5,     dp: 2, group: 27 },
   { key: 'TRAIN_SAY_LAST',     label: 'sayLast', step: 0.5,  min: 0,    max: 20,    dp: 1, group: 27 },
+  { key: 'OPEN_JUMP_AT',       label: 'openJmp', step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
   { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
@@ -8404,12 +8475,39 @@ function firstRunEase() { return runsEver <= FEEL.FIRST_RUNS ? 1 : 0; }
 /* THE UNFAILABLE OPENING, in one place, so nothing has to remember the
    rule. A continue is past it by definition: skipOnRamp says the player
    has already driven the road once and is resuming, not starting. */
+/* HOW LONG THIS RUN CANNOT END FOR, and it is the only thing left that
+   the word "opening" means. Placement is PLACE_FLOOR_SECONDS and lives
+   in unlockAt.
+
+   THREE ANSWERS, AND THE MIDDLE ONE IS THE WHOLE OF THIS SESSION.
+   Training is unfailable end to end. A real level gets a settling window
+   and no more. The random track keeps the settling window too, because
+   it has no training in front of it and no levels behind it. */
+function openingSeconds() {
+  /* INFINITY, AND NOT finishClock() PLUS A MARGIN, WHICH IS THE SAME
+     MISTAKE THIS SESSION EXISTS TO STOP REPEATING.
+
+     The training run is 28 seconds of ROAD and the window was written as
+     29 seconds of CLOCK, which looked like a whole second of headroom.
+     It is not headroom, it is a different unit: scraping costs speed, so
+     a player leaning on the edge takes longer to cover the same road.
+     Driven, holding one direction, the run took 29.37 seconds and died
+     at 29.37, a third of a second short of the line.
+
+     That is the acceptance test being calibrated to the window rather
+     than to the run, one session after that exact error was found and
+     recorded. A run that must not end before the line cannot be
+     described in seconds at all, because the line is a place. */
+  if (mode === DAILY && isTraining(level)) return Infinity;
+  return FEEL.OPENING_SETTLE;
+}
+
 function inOpening() {
   if (skipOnRamp) return false;
   /* AND THE WHOLE OF THE TRAINING RUN, NOT ITS FIRST TWENTY SECONDS.
 
      THIS WAS A REAL HOLE AND IT WAS FOUND BY DRIVING IT. Training is
-     28 seconds and OPENING_SECONDS is 20, so the last eight seconds of
+     28 seconds and the window was 20, so the last eight seconds of
      the run that is described everywhere as unfailable were not.
      Measured: holding one direction from the first frame, in all three
      of hold left, hold right and alternate, the run ended at 20.25,
@@ -8427,8 +8525,7 @@ function inOpening() {
      The mechanism below is untouched: the car is held in the band, only
      the death is removed, and the meter is handed over empty. This
      changes how far that reaches and nothing else. */
-  if (mode === DAILY && isTraining(level)) return true;
-  return runTime < FEEL.OPENING_SECONDS;
+  return runTime < openingSeconds();
 }
 
 /* THE HANDOVER, and it is the whole difficulty of this feature.
@@ -8453,11 +8550,17 @@ function openingHandover() {
   wasInOpening = now;
 }
 
-/* Nothing may be PLACED before the opening is over either, and this is
-   the floor under every unlock time rather than a set of edited
-   constants. Tuning BLOCKER_TIME back under the opening on a phone would
-   otherwise quietly put a blocker inside it. */
-function unlockAt(seconds) { return Math.max(FEEL.OPENING_SECONDS, seconds); }
+/* Nothing may be PLACED before this, and it is the floor under every
+   unlock time rather than a set of edited constants. Tuning BLOCKER_TIME
+   down on the phone would otherwise quietly put a blocker on frame one.
+
+   IT USED TO FLOOR AT THE DEATH WINDOW AND THAT WAS THE BUG. One number
+   meant both "cannot die" and "nothing is placed", so shortening either
+   was impossible without shortening the other, and the first real level
+   was structurally guaranteed to be empty for twenty seconds. See the
+   OPENING block. BLOCKER_TIME reads 20 rather than 18 for the same
+   reason: 18 was never the number, because this floor was raising it. */
+function unlockAt(seconds) { return Math.max(FEEL.PLACE_FLOOR_SECONDS, seconds); }
 
 /* CALLED THE INSTANT A RUN ENDS, by both the crash and the line, and it
    is where the share card is started.
@@ -9458,16 +9561,57 @@ function buildTrainPinch() {
    the scheduler's own rule, that a level with no hazards has no jumps
    either, is still the right rule for every other level it governs.
 
-   NO rng() CALL, so it costs the road nothing that jumpFits and the
-   interval draw would have cost. Nothing else is placed in training, so
-   there is nothing for it to collide with and nothing to test against. */
-function buildTrainJump() {
+   NO rng() CALL, so the phrase pick draws after it stay aligned and the
+   road that follows is the same road shifted rather than a new one.
+
+   IT STILL ASKS jumpFits, AND THE FIRST VERSION DID NOT. Nothing is
+   placed near either of these two today, so it never refuses, but
+   jumpFits is also where "never under a gate" lives and that rule is
+   stated as absolute: flying over a gate takes a checkpoint away for
+   doing the fun thing. Both placement constants are on the tuner with a
+   range that reaches past gate one, so without this a slider could put a
+   ramp there. It draws no rng either. */
+function buildPlacedJump() {
   const lead = jumpLead();
   const at = segBase + segments.length + lead + 2;
   const to = at + FEEL.JUMP_RAMP_SEGMENTS - 1;
+  if (!jumpFits(at, to)) return false;
   addRun(lead + 2, 0, 0, roadWidth, 1, true);
   addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
   jumps.push({ from: at, to: to, riding: false, done: false });
+  return true;
+}
+
+/* THE FIRST REAL LEVEL'S JUMP, on the same pattern as training's and for
+   the same reason: it is one placed object, not the start of a stream,
+   so it goes in front of the scheduler rather than through it.
+
+   IT KEEPS THE WHOLE WARNING RUN. buildJump lays lead + 2 segments of
+   straight before the ramp, and lead is JUMP_WARN_SEGMENTS plus four, so
+   the five chevrons stand on the road exactly as they do for a scheduled
+   jump. Nothing here buys engagement by shortening a warning.
+
+   THE SCHEDULER IS NOT TOUCHED. jumpDue is left alone, so the ordinary
+   jump still arrives on its own clock at thirty seconds and the level
+   gets two rather than one moved. */
+let openJumpBuilt = false;
+
+function openingScript() {
+  /* firstRealLevel is trainingLevels plus one, so this already excludes
+     training by construction and a separate isTraining term would read
+     as if the two were independent. It also does the right thing at
+     TRAINING_LEVELS zero, where level one IS the first real level. */
+  if (mode !== DAILY || level !== firstRealLevel()) return false;
+  const at = segBase + segments.length;
+  if (!openJumpBuilt && at >= FEEL.OPEN_JUMP_AT && !pastFinish(at + 140)) {
+    /* THE FLAG IS SET ON THE ATTEMPT, NOT ON THE SUCCESS. Refused, this
+       falls through to the grammar for this phrase and never asks
+       again, which is the only shape that cannot spin topUpRoad against
+       a road that never grows. */
+    openJumpBuilt = true;
+    if (buildPlacedJump()) return true;
+  }
+  return false;
 }
 
 function trainingScript() {
@@ -9477,7 +9621,8 @@ function trainingScript() {
     trainPinchBuilt = true; buildTrainPinch(); return true;
   }
   if (!trainJumpBuilt && at >= FEEL.TRAIN_JUMP_AT && !pastFinish(at + 140)) {
-    trainJumpBuilt = true; buildTrainJump(); return true;
+    trainJumpBuilt = true;
+    if (buildPlacedJump()) return true;
   }
   return false;
 }
@@ -9486,6 +9631,8 @@ function addPhrase() {
   // The tutorial's own two phrases, ahead of everything, because they
   // are the only things on this road that are there for a reason.
   if (trainingScript()) return;
+  // And the first real level's one.
+  if (openingScript()) return;
   /* A due hazard writes the next phrase itself. Ahead of the library
      rather than instead of it: the schedules are sparse, so most phrases
      are still whatever the grammar picks. */
@@ -9534,6 +9681,7 @@ function resetRoad(seed) {
   jumpDue = 0;
   trainPinchBuilt = false;
   trainJumpBuilt = false;
+  openJumpBuilt = false;
   hazardDue[HAZ_BLOCKER] = 0;
   hazardDue[HAZ_SPLITTER] = 0;
   hazardDue[HAZ_MOVER] = 0;
@@ -10306,6 +10454,7 @@ function resumeRoad(carSeg) {
      road rebuild is a flag that will eventually be wrong. */
   trainPinchBuilt = true;
   trainJumpBuilt = true;
+  openJumpBuilt = true;
   jumpDue = base + Math.round(FEEL.JUMP_EVERY * 0.5);
   /* Each kind gets its ordinary spacing before it is due again, NOT the
      resume point itself. Setting them due immediately guaranteed a hazard
@@ -10665,7 +10814,7 @@ function update(dt) {
   /* AND A HAZARD CANNOT END IT EITHER. Nothing is placed inside the
      opening, so this is unreachable on a generated road, but "unfailable"
      should be true by construction rather than by an argument about
-     placement that a tuned OPENING_SECONDS could outlive. */
+     placement that a tuned PLACE_FLOOR_SECONDS could outlive. */
   const clipped = hazardBand(carIndex, localHalf);
   if (clipped === 2 && !inOpening()) { crash(HIT_OBJECT); return; }
 
@@ -20936,6 +21085,14 @@ function clearDailyRecords() {
    five are new and have no records to lose, and levels one and two are
    the same length they always were.
 
+   BUMPED TO 6 BECAUSE THE FIRST REAL LEVEL GAINED A JUMP. Its road is
+   121 segments longer from the ten second mark on, so every phrase after
+   that sits at a different index and the level's stored time, best and
+   ghost were all set on a road that is not there any more. The other
+   four levels did not move and are verified byte for byte unchanged,
+   but the stamp is one number for the whole day and one changed road is
+   enough to have to spend it.
+
    BUMPED TO 4 FOR THE OPENING REBUILD. The first 350 segments of every
    road are not seeded, they are written out in resetRoad, and they have
    changed: a short lead in and three alternating corners instead of 140
@@ -20950,7 +21107,7 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-const ROAD_GEN = 5;
+const ROAD_GEN = 6;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
