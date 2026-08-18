@@ -3973,6 +3973,60 @@ const FEEL = {
      is the lesson the hazards paid for: a feature met once every few runs
      may as well not exist. Both LIVE. */
   JUMP_TIME:                 30,     // LIVE, seconds into the run
+  /* ==================================================================
+     THE FLOOR UNDER THE WHOLE ROAD: nothing may be laid for longer than
+     this with nothing on it.
+
+     IT IS NOT THE RATE THAT IS WRONG, IT IS THE TAIL. Measured over 28
+     days on all four real levels, the road already carries one object
+     every 10.8 to 11.8 seconds on average. What it also carries is
+     stretches of 17 to 22 seconds with nothing at all, and they are not
+     in one place: level two's is at 20 seconds, level three's at 68 per
+     cent of the way through, level four's at 56, level five's at 59.
+
+     THE CAUSE IS FOUR INDEPENDENT SCHEDULERS. Each kind picks its own
+     next position as its interval times 0.65 to 1.35, and none of them
+     knows what the others are doing, so they cluster and they gap. A
+     blocker interval can be 38 seconds and a jump interval 35, and when
+     two long ones land together and no splitter or mover falls between
+     them, that is the hole.
+
+     JUMP_TIME IS NOT THE LEVER AND IT WAS TRIED FIRST. Pulling it from
+     30 down through 26, 22, 18 and 14 moved the median gap around but
+     made the WORST gaps worse and took the share of gaps over fifteen
+     seconds from 9 per cent to 26, because an early jump consumes
+     jumpDue and the next one is pushed out: it robs later road to pay
+     earlier road.
+
+     SO THIS IS A BACKSTOP RATHER THAN A SCHEDULE. It fires only when
+     nothing has been laid for GAP_MAX_SECONDS, so it cannot raise the
+     average density anywhere the road is already busy, and it targets
+     exactly the stretches that are empty.
+
+     IT PLACES A JUMP, WHICH IS THE ONE OBJECT THAT CANNOT MAKE A LEVEL
+     HARDER. Every landing pays, the run out is straight full width
+     road, and the player has already met one: the placed jump stands at
+     eleven seconds on every real level, so a jump is the FIRST kind
+     they meet rather than the second and nothing about the escalation
+     order in section 4.5 is disturbed by using it to fill a hole. */
+  /* EIGHT, SWEPT, AND THE TEST IS THE MEDIAN RATHER THAN THE WORST.
+     A backstop that shortens the tail is filling holes; one that also
+     pulls the median down is making the road busier everywhere, which is
+     making it harder. Over 12 days on all four levels, with gates
+     counted as the events they are:
+
+        setting   median gap        worst gap        over 15s
+        off       6.7 to 8.4      13.2 to 15.7        2%
+        9         6.9 to 8.0      11.2 to 15.0        0%
+        8         7.7 to 8.1      11.9 to 13.1        0%     <=
+        7         6.5 to 7.8      10.7 to 13.1        0%
+        6         7.2 to 7.4      11.0 to 11.6        0%
+
+     At 8 the median is where it was with the backstop off and the worst
+     gap has come in by two to three seconds on every level. At 6 the
+     medians start dropping, which is the road getting busier rather than
+     less empty, and that is the line this must not cross. */
+  GAP_MAX_SECONDS:            8,     // LIVE, seconds of empty road before one is forced
   JUMP_EVERY:              1200,     // LIVE, mean segments between them, about 52s
   JUMP_RUNOUT:               34,     // segments of landing room past the lip, and
                                     // it must exceed the flight, which is about 23
@@ -6476,6 +6530,7 @@ const TUNABLES = [
   { key: 'JUMP_LAND_SHAKE_BAD',label: 'landBmp', step: 1,    min: 0,    max: 40,    dp: 0, group: 23 },
   { key: 'JUMP_TIME',          label: 'jumpAt',  step: 5,    min: 0,    max: 300,   dp: 0, group: 24 },
   { key: 'JUMP_EVERY',         label: 'jumpGap', step: 50,   min: 200,  max: 8000,  dp: 0, group: 24 },
+  { key: 'GAP_MAX_SECONDS',    label: 'gapMax',  step: 1,    min: 3,    max: 60,    dp: 0, group: 24 },
   /* THE LANDING REWARD. Every one of these decides whether a jump is
      worth taking and how loud saying so is, which is exactly the sort of
      thing that has to be found by driving into one. */
@@ -9579,6 +9634,7 @@ function buildPlacedJump() {
   addRun(lead + 2, 0, 0, roadWidth, 1, true);
   addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
   jumps.push({ from: at, to: to, riding: false, done: false });
+  if (at > lastPlacedSeg) lastPlacedSeg = at;
   return true;
 }
 
@@ -9597,11 +9653,21 @@ function buildPlacedJump() {
 let openJumpBuilt = false;
 
 function openingScript() {
-  /* firstRealLevel is trainingLevels plus one, so this already excludes
-     training by construction and a separate isTraining term would read
-     as if the two were independent. It also does the right thing at
-     TRAINING_LEVELS zero, where level one IS the first real level. */
-  if (mode !== DAILY || level !== firstRealLevel()) return false;
+  /* EVERY REAL LEVEL, NOT JUST THE FIRST ONE, AND THE REASON IS A
+     MEASUREMENT RATHER THAN A TIDINESS ARGUMENT.
+
+     It was the first real level only, because that was the level the
+     complaint was about. Then the object timeline was drawn for all
+     four and the longest empty stretch on levels three, four and five
+     turned out to be at the very START of them: 20.4, 23.3 and 21.1
+     seconds with nothing on the road, longer than the 13.5 second gap
+     that this work began over, and every one of them beginning at zero.
+     Only level two had been given anything to open with.
+
+     A player who finishes level two and is handed twenty seconds of
+     empty road is being handed the thing that was just taken away from
+     them, three times. */
+  if (mode !== DAILY || isTraining(level)) return false;
   const at = segBase + segments.length;
   if (!openJumpBuilt && at >= FEEL.OPEN_JUMP_AT && !pastFinish(at + 140)) {
     /* THE FLAG IS SET ON THE ATTEMPT, NOT ON THE SUCCESS. Refused, this
@@ -9627,11 +9693,44 @@ function trainingScript() {
   return false;
 }
 
+/* HAS THE ROAD GONE TOO LONG WITH NOTHING ON IT.
+
+   NOT IN TRAINING, which is 28 seconds long, carries exactly the two
+   things it is meant to carry and must stay byte for byte the road it
+   is.
+
+   NOT BEFORE THE OPENING JUMP EITHER. openJumpBuilt says the placed one
+   has been laid, and until it has, the level has not introduced a jump
+   yet and the backstop has no business inventing the first one. */
+function gapOverdue() {
+  if (mode !== DAILY || isTraining(level) || !openJumpBuilt) return false;
+  const at = segBase + segments.length;
+  return (at - lastEventSeg(at)) * FEEL.SEGMENT_LENGTH / FEEL.SPEED
+         >= FEEL.GAP_MAX_SECONDS;
+}
+
+/* AND A GATE COUNTS AS ONE. It is not an object on the road but it is
+   plainly an event: the score banks, the pips fill, a callout fires and
+   the clock is topped up. A stretch with a gate in it is not empty, and
+   treating it as empty made the backstop reach for a jump right where
+   gate one stands, which jumpFits then refused because nothing may fly
+   over a gate. It was asking for the one thing it could not have. */
+function lastEventSeg(at) {
+  let g = 0;
+  const first = gateSegment(1);
+  if (at >= first) {
+    const k = Math.min(Math.max(1, dailyGates),
+                       1 + Math.floor((at - first) / FEEL.CHECKPOINT_EVERY));
+    g = gateSegment(k);
+  }
+  return g > lastPlacedSeg ? g : lastPlacedSeg;
+}
+
 function addPhrase() {
   // The tutorial's own two phrases, ahead of everything, because they
   // are the only things on this road that are there for a reason.
   if (trainingScript()) return;
-  // And the first real level's one.
+  // And every real level's opening one.
   if (openingScript()) return;
   /* A due hazard writes the next phrase itself. Ahead of the library
      rather than instead of it: the schedules are sparse, so most phrases
@@ -9645,6 +9744,12 @@ function addPhrase() {
   // up loop spinning against a road that never grows.
   if (jumpUnlocked() && jumpDue <= segBase + segments.length
       && buildJumpPhrase()) return;
+  /* AND THE BACKSTOP, LAST, so it only ever speaks when nothing else
+     had anything to say. See GAP_MAX_SECONDS. It asks buildJumpPhrase
+     like any other caller, so jumpFits still refuses a ramp under a
+     gate and the full warning run is still laid, and a refusal falls
+     through to the grammar exactly as a scheduled one does. */
+  if (gapOverdue() && buildJumpPhrase()) return;
 
   const resting = restOwed > 0;
   if (resting) restOwed--;
@@ -9682,6 +9787,7 @@ function resetRoad(seed) {
   trainPinchBuilt = false;
   trainJumpBuilt = false;
   openJumpBuilt = false;
+  lastPlacedSeg = 0;
   hazardDue[HAZ_BLOCKER] = 0;
   hazardDue[HAZ_SPLITTER] = 0;
   hazardDue[HAZ_MOVER] = 0;
@@ -9894,8 +10000,15 @@ function hazardFits(from, to, xFrac, halfWorld, swingFrac) {
   return true;
 }
 
+/* WHERE THE LAST THING WAS PUT, so the backstop knows how long the road
+   has been empty. Written by every path that actually lays something,
+   which is this one and the two jump builders, and never by a path that
+   was refused. */
+let lastPlacedSeg = 0;
+
 function addHazard(kind, from, to, xFrac, halfWorld, swingFrac) {
   if (!hazardFits(from, to, xFrac, halfWorld, swingFrac)) return false;
+  if (from > lastPlacedSeg) lastPlacedSeg = from;
   hazards.push({ kind: kind, from: from, to: to, x: xFrac,
                  half: halfWorld, swing: swingFrac,
                  phase: rng() * Math.PI * 2,
@@ -10093,6 +10206,7 @@ function buildJumpPhrase() {
      shifts the road built after the first jump: that is what removing a
      generator input means and the road is rebuilt from the date daily. */
   jumps.push({ from: at, to: to, riding: false, done: false });
+  if (at > lastPlacedSeg) lastPlacedSeg = at;
   return true;
 }
 
@@ -10455,6 +10569,7 @@ function resumeRoad(carSeg) {
   trainPinchBuilt = true;
   trainJumpBuilt = true;
   openJumpBuilt = true;
+  lastPlacedSeg = base;
   jumpDue = base + Math.round(FEEL.JUMP_EVERY * 0.5);
   /* Each kind gets its ordinary spacing before it is due again, NOT the
      resume point itself. Setting them due immediately guaranteed a hazard
@@ -21085,6 +21200,13 @@ function clearDailyRecords() {
    five are new and have no records to lose, and levels one and two are
    the same length they always were.
 
+   BUMPED TO 7 BECAUSE ALL FOUR REAL LEVELS MOVED. Levels three, four
+   and five gained the placed opening jump that level two already had,
+   and every level gained the gap backstop, so every real road is a
+   different road from about ten seconds on. Training did not move and
+   is verified byte for byte unchanged, but the stamp is one number for
+   the whole day.
+
    BUMPED TO 6 BECAUSE THE FIRST REAL LEVEL GAINED A JUMP. Its road is
    121 segments longer from the ten second mark on, so every phrase after
    that sits at a different index and the level's stored time, best and
@@ -21107,7 +21229,7 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-const ROAD_GEN = 6;
+const ROAD_GEN = 7;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
