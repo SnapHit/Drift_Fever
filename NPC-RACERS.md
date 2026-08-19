@@ -82,6 +82,10 @@ fixed rather than made optional.
 
 ## What already exists to build on
 
+**`ghostSynthesise` NO LONGER EXISTS IN THE FILE. It was removed on 17 August 2026 along with the
+pace car, and it lives only in git history at commit `0bb4018`. Recover it from there rather than
+rewriting it — it is the working starting point for a racer and it was measured.**
+
 `ghostSynthesise` drives the real drift model — HEADING_SNAP_TIME, GRIP_TIME, CENTRIFUGAL,
 STEER_RATE — over the real road with a lane-holding driver aimed at the inside of the corner it can
 see. An NPC is that, with a different target line, a pace law, and a solid car instead of a
@@ -98,4 +102,10 @@ known cost.
 - Whether they can leave the road, and what happens if they do.
 - Whether they interact with hazards and jumps or ignore them.
 - How they are introduced to the player, since the tutorial currently teaches the pace car.
-- Whether the pace car survives alongside them or is replaced by them.
+- ~~Whether the pace car survives alongside them or is replaced by them.~~ Settled 17 August 2026:
+  the pace car is gone. It was passed in the first ten seconds and never seen again, so it added
+  nothing after that. NPCs replace it outright.
+- **A first-ever run now has no ghost and nothing explains what a ghost is.** The pace car was doing
+  that job by being named PACE CAR on run one and GHOST from run two. Whatever introduces the racers
+  has to carry that lesson too, because the daily records, the ghost margin and CHASING YOUR LAST
+  RUN all assume the player knows what a ghost is.
