@@ -221,12 +221,28 @@
      every declaration it made and the button shipped wearing the cream
      pill the tuner buttons wear: the loudest object on the screen, in
      the corner, during a run. Two ids beat it. */
+  /* LOUDER THAN IT WAS, BECAUSE IT WAS READING AS CHROME.
+
+     It wore a 72 per cent amber on a 42 per cent wash behind a 30 per
+     cent border, which is the treatment the fine print and the note
+     wear, and a control the tutorial now points an arrow at cannot look
+     like furniture. The label goes to the score's own gold at full
+     strength, the plate under it goes darker and more opaque so the
+     gold has something to sit on wherever the skyline happens to be,
+     and the border comes up to half.
+
+     AND NO FURTHER, DELIBERATELY. It is still not the loudest thing on
+     the screen: SCORE is bigger, brighter and centred, the road edge is
+     the brightest element in the frame by the rule in BRIEF.md section
+     7, and the headline coaching lines carry the wordmark's three pass
+     ink. This is a live control that reads as one, not a call to
+     action. */
   #chrome #skipBtn {
-    font: 700 11px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font: 800 11px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     letter-spacing: 0.08em;
-    color: rgba(242, 180, 100, 0.72);
-    background: rgba(20, 8, 3, 0.42);
-    border: 1px solid rgba(255, 150, 80, 0.30);
+    color: #ffd24a;
+    background: rgba(14, 5, 2, 0.72);
+    border: 1px solid rgba(255, 176, 58, 0.52);
     border-radius: 7px;
     /* ABSOLUTE, SO IT CAN BE PUT UNDER THE HUD WHEN THE HUD IS WIDE.
        In portrait the HUD is a stack down the middle and the top right
@@ -2582,6 +2598,11 @@ const FEEL = {
      already near it and high enough to clear the drift lane. */
   COACH_ROW:               0.30,     // of the sky band, as the two lanes are
   COACH_MIN_SIZE:         0.026,     // LIVE, of the smaller dimension, the floor it shrinks to
+  /* THE BASELINE STEP BETWEEN TWO ROWS OF A COACHING LINE, as a multiple
+     of the type size. A little over one, because these are single lines
+     of caps with no descenders to clear and a full leading would read as
+     two separate messages rather than one broken over two rows. */
+  COACH_LINE_STEP:         1.14,     // LIVE
   COACH_BAND_PAD:          0.06,     // LIVE, of the HUD to horizon gap, top and bottom
   /* THE BACKING PLATE, WHICH IS THE WHOLE LEGIBILITY FIX.
 
@@ -4106,7 +4127,7 @@ const FEEL = {
      Endless has no end and none of this touches it. The daily needs one,
      because a deterministic road with no end is only endless with extra
      steps: it makes finishing impossible, so there is nothing to
-     compare, and the ghost is a pace car rather than a rival.
+     compare, and the ghost sets a pace rather than being a rival.
 
      THE DAY IS THREE TRACKS, NOT ONE, and they are played in order.
 
@@ -4173,6 +4194,13 @@ const FEEL = {
      happening, in the channel that already exists.
      ================================================================== */
   TRAIN_SKIP_AFTER:         2.5,     // LIVE, seconds before the skip appears
+  /* A BEAT BEFORE THE GAME STARTS TALKING. The title used to arrive on
+     the first frame, which is the frame a player has just tapped to get
+     here and has not yet seen the road on. Long enough to look at what
+     they are driving, short enough that nothing feels stalled, and the
+     rest of the script follows it down the road rather than being
+     squeezed: every mark after it moved by the same amount. */
+  TRAIN_WELCOME_AT:         2.0,     // LIVE, seconds before the first line
   /* WHERE THE FIVE SCRIPTED THINGS STAND, in segments from the start of
      the run, out of TRAIN_SEGMENTS. The rest of the road is the ordinary
      grammar at the ordinary training intensity; these are five windows
@@ -4190,7 +4218,7 @@ const FEEL = {
      question the words have just answered. That is why it sits at 500
      rather than as early as the road allows, which is where it was when
      it had to happen before anything else could be said about it. */
-  TRAIN_PINCH_AT:           500,     // LIVE, the pinch phrase's segment, about 11s in
+  TRAIN_PINCH_AT:           600,     // LIVE, the pinch phrase's segment, about 13s in
   TRAIN_PINCH_WIDE:        0.62,     // LIVE, share of full width at its tightest
   TRAIN_PINCH_CURVE:       5.00,     // LIVE, in the same units as CURVE_HARD
   /* SWEPT, NOT CHOSEN. The hold decides how long a competent driver
@@ -4212,7 +4240,7 @@ const FEEL = {
      the twitchy one, on every one of the 28 days, and leaves better than
      a quarter of it standing in the worst case. */
   TRAIN_PINCH_HOLD:          26,     // LIVE, segments it holds at the tightest
-  TRAIN_JUMP_AT:            880,     // LIVE, the ramp's segment, about 19 seconds in
+  TRAIN_JUMP_AT:           1030,     // LIVE, the ramp's segment, about 22 seconds in
   /* THE THREE BLOCKS, PLACED RATHER THAN SCHEDULED, exactly as the pinch
      and the jump above are. All three kinds exist on every real level
      and none of them appeared here, so the first one anybody ever met
@@ -4235,9 +4263,9 @@ const FEEL = {
      and the death test asks inOpening, so this is true by construction
      rather than by placement. Driving into one costs nothing and says
      so: see trainingSayHit. */
-  TRAIN_BLOCK_AT:          1210,     // LIVE, the static block's segment, about 26s in
-  TRAIN_SPLIT_AT:          1270,     // LIVE, the long centre one, about 28s in
-  TRAIN_MOVER_AT:          1550,     // LIVE, the mover's segment, about 34 seconds in
+  TRAIN_BLOCK_AT:          1360,     // LIVE, the static block's segment, about 30s in
+  TRAIN_SPLIT_AT:          1430,     // LIVE, the long centre one, about 31s in
+  TRAIN_MOVER_AT:          1710,     // LIVE, the mover's segment, about 38 seconds in
   /* HOW FAR AHEAD OF A MARK THE SCRIPT TAKES THE ROAD OVER.
 
      THE LEAD MUST EXCEED THE LONGEST PHRASE THE GRAMMAR CAN LAY PLUS
@@ -4290,26 +4318,30 @@ const FEEL = {
      AND THE SCRIPT IS WHAT SETS IT. Seven unconditional lines and one
      conditional one, each holding for COACH_TIME so it can be read
      twice, with TRAIN_SAY_HOLD of air between: the first three run back
-     to back from the first frame, and everything after them is a lead
-     before a placed thing. 36 seconds is where the last line ends with
-     a beat to spare, and every number in it is derived rather than
+     to back once TRAIN_WELCOME_AT is up, and everything after them is a
+     lead before a placed thing. 39.6 seconds is where the last line ends
+     with a beat to spare, and every number in it is derived rather than
      chosen, so moving COACH_TIME moves the whole road.
 
-     IT WAS 38 UNDER THE PREVIOUS SCRIPT and this one is shorter despite
-     carrying more, because the edge used to cost three beats of a
-     reaction the road had to force and now costs one stated up front.
+     THE THREE AND A HALF SECONDS ON TOP OF 36 ARE BOTH ASKED FOR AND
+     ARITHMETIC. Two of them are TRAIN_WELCOME_AT, a beat before the game
+     starts talking, and the whole script follows it down the road. One
+     is COACH_RECHARGE_EXTRA, and it costs the run twice: once in the
+     line's own dwell and once in the beat reserved after the pinch for
+     it, which is measured at that dwell rather than at COACH_TIME. The
+     remaining half second is rounding the marks to tidy numbers.
 
      DENSER RATHER THAN LONGER, which is the test that matters and the
-     one the old 56.7 second version failed: five placed things at
-     roughly one every five seconds, and nothing anywhere in the run
-     more than about four and a half seconds from the last thing that
-     happened.
+     one the old 56.7 second version failed: five placed things and
+     nothing anywhere in the run more than about six seconds from the
+     last thing that happened, which is the reserved recharge slot for a
+     driver tidy enough not to use it.
 
      THE GATE MOVES WITH IT. Training's single gate IS its finish line,
      so gateSegment is asked for training's own number rather than a
      real level's first checkpoint. Nothing else reads it here: training
      has one gate, and it is this. */
-  TRAIN_SEGMENTS:          1620,     // LIVE, segments, 36 seconds
+  TRAIN_SEGMENTS:          1780,     // LIVE, segments, 39.6 seconds
   /* WHAT A HIT COSTS IN TRAINING, WHICH IS A SHAKE AND A SENTENCE. It
      may not cost the run, so the only thing left that can say "that
      was bad" is the screen moving. Level with a scrape rather than with
@@ -4336,6 +4368,7 @@ const FEEL = {
      that the ROAD is wrong: the probes count them and the count is
      expected to be zero. */
   COACH_PATIENCE:          1.40,     // LIVE, seconds
+  COACH_RECHARGE_EXTRA:     1.0,     // LIVE, seconds the recharge line holds beyond COACH_TIME
   /* THE POINTERS. Everything about the arrow ITSELF comes from the tilt
      hint's constants, because it is the tilt hint's arrow drawn by the
      tilt hint's painter: its type size, its reach, its stroke, its bob
@@ -4488,25 +4521,31 @@ const FEEL = {
   GHOST_PASS_GAP:           900,     // world units of hysteresis, so a dead heat is not a strobe
   GHOST_PASS_COOLDOWN:      2.5,     // seconds between pass callouts
 
-  /* THE PACE CAR. A ghost for a player who has never driven this level
-     and therefore has nothing to race. See ghostSynthesise: it is driven
-     by the real drift model over the real road rather than drawn as a
-     curve, so everything below is a driver's parameter and not a shape.
+  /* THE PACE CAR IS GONE, AND ITS EIGHT CONSTANTS WITH IT.
 
-     THE TWO THAT DECIDE THE WHOLE FEATURE ARE THE FIRST TWO. Together
-     they say when it gets passed: the head start closes at
-     (1 - PACE) * SPEED, so the catch is HEAD * PACE / (1 - PACE)
-     seconds, and the callout fires PASS_GAP later. At 0.90 and 0.40 that
-     is 3.6 and 4.6 seconds, both inside the unfailable opening, which is
-     the point. It must be beaten by somebody who has never played. */
-  GHOST_PACE:              0.90,     // its speed, as a share of SPEED. Under 1 or it cannot be passed
-  GHOST_HEAD_START:        0.40,     // seconds of road it is given at the line
-  GHOST_LINE_INSIDE:       0.70,     // how far toward the inside of a corner it aims, in half widths
-  GHOST_LOOK_SEGMENTS:       14,     // how far up the road it reads the corner. Lower turns in later
-  GHOST_STEER_P:           2.10,     // lane holding gain, half widths of error to full lock
-  GHOST_STEER_D:           0.85,     // damping on its own sideways speed, or it weaves
-  GHOST_SYNTH_EDGE:        0.80,     // it never reaches the scrape band at 0.87
-  GHOST_SYNTH_SUBSTEPS:       8,     // physics steps per sample, about 74 a second
+     It did one job well and then stopped: it was passed inside the first
+     ten seconds by design, because it had to be beatable by somebody who
+     had never played, and after that it was inert for the remaining
+     three minutes. Played, that reads as a car that exists for one
+     moment and then is not part of the game.
+
+     WHAT IT WAS FOR IS NOT GONE, IT IS DEFERRED. NPC-RACERS.md in the
+     repo root has the design that replaces it, and the whole of that
+     design is the one thing this could not do: an opponent that reacts,
+     so passing it does not end the race. Nothing of it is built yet, so
+     a first ever run now has no car beside it at all, and no line
+     explains what a ghost is until the player has made one. That is
+     accepted rather than overlooked.
+
+     THE REAL GHOST IS UNTOUCHED. A recorded last run, its replay, its
+     margin on the HUD and on the finish screen, and CHASING YOUR LAST
+     RUN. Everything below this line is the recorded one.
+
+     AND ghostSynthesise ITSELF IS WORTH KNOWING ABOUT WHEN THE NPCS ARE
+     BUILT. It drove the real drift model over the real road with a lane
+     holding driver, which is exactly the foundation NPC-RACERS.md names,
+     and it is in the history at the commit before this one rather than
+     lost. */
 
   /* ----------------------------------------------------------------
      Progressive difficulty, in two halves that are deliberately not the
@@ -4591,8 +4630,10 @@ const FEEL = {
      openingSeconds is where that lives. */
   /* THREE, AND IT IS A GRACE RATHER THAN A DIFFICULTY LEVER, which is
      the point of measuring it. Swept from 0 to 9 seconds over 28 days:
-     the game's own driver model, the pace car's control law converted to
-     the two keys the real car takes, reached the line 28 of 28 at EVERY
+     the probe's lookahead driver, which aims at the inside of the corner
+     it can see and steers with the two keys the real car takes, and which
+     is the driver model that went out of the game with ghostSynthesise,
+     reached the line 28 of 28 at EVERY
      value, and the same driver with a quarter second of reaction time
      survived 57.7 seconds at every value. It changes nothing for anybody
      who looks at the road, which is what the camera in section 4.3
@@ -6574,6 +6615,7 @@ const TUNABLES = [
   { key: 'COACH_MAX_WIDTH',    label: 'coachW',  step: 0.02, min: 0.3,  max: 0.98,  dp: 2, group: 14 },
   { key: 'COACH_ROW',          label: 'coachRow',step: 0.02, min: 0,    max: 1,     dp: 2, group: 14 },
   { key: 'COACH_MIN_SIZE',     label: 'coachMin',step: 0.002,min: 0.01, max: 0.09,  dp: 3, group: 14 },
+  { key: 'COACH_LINE_STEP',    label: 'coachLead',step:0.02, min: 0.8,  max: 2.0,   dp: 2, group: 14 },
   { key: 'COACH_BAND_PAD',     label: 'coachPad',step: 0.01, min: 0,    max: 0.3,   dp: 2, group: 14 },
   { key: 'COACH_PLATE_ALPHA',  label: 'plateA',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 14 },
   { key: 'COACH_PLATE_PAD_X',  label: 'platePX', step: 0.04, min: 0,    max: 2,     dp: 2, group: 14 },
@@ -6582,6 +6624,7 @@ const TUNABLES = [
   { key: 'COACH_PLATE_EDGE',   label: 'plateE',  step: 0.05, min: 0,    max: 1,     dp: 2, group: 14 },
   { key: 'COACH_PLATE_EDGE_PX',label: 'plateEW', step: 0.005,min: 0,    max: 0.3,   dp: 3, group: 14 },
   { key: 'COACH_PATIENCE',     label: 'coachWt', step: 0.1,  min: 0,    max: 6.0,   dp: 2, group: 14 },
+  { key: 'COACH_RECHARGE_EXTRA',label:'coachRch',step: 0.1,  min: 0,    max: 5.0,   dp: 2, group: 14 },
   { key: 'COACH_EDGE_AIM',     label: 'ptAim',   step: 0.02, min: 0.5,  max: 2.5,   dp: 2, group: 14 },
   { key: 'COACH_POINT_GAP',    label: 'ptGap',   step: 0.004,min: 0,    max: 0.12,  dp: 3, group: 14 },
   { key: 'COACH_BAR_AT',       label: 'ptBar',   step: 0.04, min: -1,   max: 1,     dp: 2, group: 14 },
@@ -6813,6 +6856,7 @@ const TUNABLES = [
   { key: 'TRAINING_LEVELS',    label: 'train',   step: 1,    min: 0,    max: 3,     dp: 0, group: 27 },
   { key: 'TRAINING_GATES',     label: 'trainG',  step: 1,    min: 1,    max: 6,     dp: 0, group: 27 },
   { key: 'TRAIN_SKIP_AFTER',   label: 'skipAt',  step: 0.5,  min: 0,    max: 15,    dp: 1, group: 27 },
+  { key: 'TRAIN_WELCOME_AT',   label: 'sayAt',   step: 0.25, min: 0,    max: 15,    dp: 2, group: 27 },
   { key: 'TRAIN_PINCH_AT',     label: 'pinchAt', step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
   { key: 'TRAIN_PINCH_WIDE',   label: 'pinchW',  step: 0.02, min: 0.30, max: 1.0,   dp: 2, group: 27 },
   { key: 'TRAIN_PINCH_CURVE',  label: 'pinchC',  step: 0.25, min: 0,    max: 12,    dp: 2, group: 27 },
@@ -8826,7 +8870,7 @@ function openingSeconds() {
   /* INFINITY, AND NOT finishClock() PLUS A MARGIN, WHICH IS THE SAME
      MISTAKE THIS SESSION EXISTS TO STOP REPEATING.
 
-     The training run was 28 seconds of ROAD, 36 now, and the window was
+     The training run was 28 seconds of ROAD, 39.6 now, and the window was
      written as 29 seconds of CLOCK, which looked like a whole second of
      headroom.
      It is not headroom, it is a different unit: scraping costs speed, so
@@ -8847,7 +8891,7 @@ function inOpening() {
   /* AND THE WHOLE OF THE TRAINING RUN, NOT ITS FIRST TWENTY SECONDS.
 
      THIS WAS A REAL HOLE AND IT WAS FOUND BY DRIVING IT. Training was
-     28 seconds, 36 now, and the window was 20, so the last eight seconds
+     28 seconds, 39.6 now, and the window was 20, so the last eight seconds
      of the run that is described everywhere as unfailable were not.
      Measured: holding one direction from the first frame, in all three
      of hold left, hold right and alternate, the run ended at 20.25,
@@ -9916,8 +9960,8 @@ let trainBlockBuilt = false, trainSplitBuilt = false, trainMoverBuilt = false;
    coachSay obeys, in segments instead of seconds. */
 let trainLineFree = 0, trainPlaced = 0;
 
-function trainBeat() {
-  return Math.round((FEEL.COACH_TIME + FEEL.TRAIN_SAY_HOLD)
+function trainBeat(dwell) {
+  return Math.round(((dwell || FEEL.COACH_TIME) + FEEL.TRAIN_SAY_HOLD)
                     * FEEL.SPEED / FEEL.SEGMENT_LENGTH);
 }
 function buildTrainPinch(mark) {
@@ -9938,8 +9982,13 @@ function buildTrainPinch(mark) {
      reserved, a tidy driver gets a quiet stretch after the pinch, which
      is the one place in the run where quiet is right, because they have
      just been given a corner to drive. Not reserved, a scraping driver
-     has their recharge line cut off by the jump's. */
-  trainLineFree = segBase + segments.length + trainBeat();
+     has their recharge line cut off by the jump's.
+
+     AND IT IS THE RECHARGE LINE'S OWN BEAT, not the ordinary one. That
+     line holds COACH_RECHARGE_EXTRA longer than the rest, so a beat
+     measured at COACH_TIME would reserve a second less road than the
+     thing it is reserving for. */
+  trainLineFree = segBase + segments.length + trainBeat(rechargeDwell());
   trainPlaced++;
 }
 
@@ -10913,12 +10962,10 @@ function startRun() {
   biomeSeed(mode === DAILY ? (levelSeedFor(todayStamp, level) ^ 0x5bf03635)
                            : ((Math.random() * 0xFFFFFFFF) >>> 0));
   resetRoad(nextSeed());
-  /* AFTER THE ROAD, BECAUSE IT DRIVES ON IT. syncLevelRecord above has
-     already loaded this level's stored line if there is one, so this
-     only ever fires for a level that has never been finished OR failed,
-     which is to say a first ever run. The moment one ends, ghostBank
-     writes the player's own and the pace car is gone for good. */
-  if (mode === DAILY && !ghost.live) ghostSynthesise();
+  /* AND NOTHING IS GENERATED FOR A LEVEL THAT HAS NEVER BEEN DRIVEN.
+     syncLevelRecord above has already loaded this level's stored line if
+     there is one; if there is not, there is no ghost, which is the
+     honest state and is what the mode line already says. */
   ghost.i = 0;
   ghost.said = 0;
   ghost.shown = false;
@@ -13198,7 +13245,6 @@ const ghostRec = { x: [], yaw: [], dt: [], n: 0, live: false, nextZ: 0, lastT: 0
 const ghost = {
   x: [], yaw: [], t: [], n: 0,
   live: false,        // there is a line to replay
-  synth: false,       // and it was GENERATED, not recorded. See ghostSynthesise
   shown: false,       // and it is on screen right now
   i: 0,               // replay cursor, monotonic
   pos: 0,             // where it is along the road, same space as `position`
@@ -13209,16 +13255,8 @@ const ghost = {
 
 function ghostClear() {
   ghost.x.length = 0; ghost.yaw.length = 0; ghost.t.length = 0;
-  ghost.n = 0; ghost.live = false; ghost.synth = false; ghost.shown = false;
+  ghost.n = 0; ghost.live = false; ghost.shown = false;
 }
-
-/* What the ghost is called on screen, and it is the whole of "this is
-   not your line". A generated one is a PACE CAR and a recorded one is a
-   GHOST, everywhere the player can read it: the mode line, the gap
-   readout and both pass callouts. From the second run onwards the word
-   changes on its own, which is a better explanation of what a ghost is
-   than any sentence would be. */
-function ghostNoun() { return ghost.synth ? 'PACE CAR' : 'GHOST'; }
 
 function ghostEncode() {
   const out = [];
@@ -13354,99 +13392,6 @@ function ghostBank() {
 }
 
 /* ------------------------------------------------------------------
-   THE PACE CAR, AND WHY THE BEST FEATURE IN THE GAME WAS INVISIBLE.
-
-   The ghost is the last run on this level, so on a level nobody has
-   driven there is no ghost, so a player's FIRST run of a track, which is
-   the run that decides whether they play a second one, is the only run
-   with nothing on the road beside them. The one feature that turns a
-   score into a race was unreachable until after the race would have
-   mattered. This generates one instead.
-
-   IT IS DRIVEN, NOT DRAWN, and that is the whole of why it is credible.
-   A line plotted as a curve through the corners would have no slip in
-   it: the car would be a shape sliding along a path. This runs the REAL
-   drift model, the same three lines update runs, over the REAL road,
-   with a lane holding driver on the front of it. Heading and travel come
-   apart in the corners exactly the way the player's do, so the yaw
-   angle it is drawn at is a genuine slip angle and it is sideways
-   because it is sliding, not because it was told to be.
-
-   IT COVERS THE OPENING AND NOTHING MORE, and that is deliberate rather
-   than a limit worked around. Only the opening exists as road when a run
-   starts: the daily generates ahead of the camera and trims behind, so
-   there is nothing further up to drive on yet. That turns out to be
-   exactly the right span. The opening is where the demonstration belongs
-   and it is the stretch a first timer cannot die in, so the whole race
-   with the pace car happens somewhere failing is impossible.
-
-   BEATABLE, WHICH IS A NUMBER AND NOT AN OPINION. See GHOST_PACE.
-   ------------------------------------------------------------------ */
-function ghostSynthesise() {
-  ghostClear();
-  const step = ghostStep();
-  const speed = FEEL.SPEED * FEEL.GHOST_PACE;
-  const rate = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE;
-  const sub = Math.max(1, Math.round(FEEL.GHOST_SYNTH_SUBSTEPS));
-  const dt = step / speed / sub;
-  // The same exponential form update uses, so the two agree exactly
-  // rather than approximately, at whatever substep this runs at.
-  const kh = 1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME);
-  const kg = 1 - Math.exp(-dt / FEEL.GRIP_TIME);
-  const last = segments.length - 1;
-  if (last < 1) return false;
-  const nMax = Math.min(Math.floor(last * FEEL.SEGMENT_LENGTH / step),
-                        FEEL.GHOST_MAX_SAMPLES - 1);
-  /* z is its own distance along the road, x its offset from the centre
-     in world units, hv and lv the heading and travel speeds the drift
-     model calls headingV and lateralV. t starts NEGATIVE, which is the
-     head start: at runTime zero the replay cursor is already some way
-     up the road and there is a car in front of the player on frame one. */
-  let z = 0, x = 0, hv = 0, lv = 0, t = -FEEL.GHOST_HEAD_START;
-  for (let i = 0; i <= nMax; i++) {
-    const at = clamp(Math.round(z / FEEL.SEGMENT_LENGTH), 0, last);
-    ghost.x.push(x);
-    ghost.yaw.push(Math.atan(hv / speed) * FEEL.CAR_YAW_GAIN
-                   + segments[at].curve * curveScale * FEEL.CAR_CURVE_YAW);
-    ghost.t.push(t);
-    for (let k = 0; k < sub; k++) {
-      const j = clamp(Math.round(z / FEEL.SEGMENT_LENGTH), 0, last);
-      const half = segments[j].hw;
-      const curve = segments[j].curve * curveScale;
-      /* THE DRIVER, and it is four numbers. It aims at the INSIDE of the
-         corner it can see up the road, which is the side centrifugal is
-         pushing it away from, so holding that line costs it real lock
-         and real slip. Aiming at the centre was tried and the car simply
-         got shoved wide with the wheel nearly straight, which looks like
-         a car being blown about rather than one being driven. */
-      const soon = segments[clamp(j + Math.round(FEEL.GHOST_LOOK_SEGMENTS), 0, last)];
-      const aim = clamp(soon.curve * curveScale / FEEL.CURVE_HARD, -1, 1)
-                * FEEL.GHOST_LINE_INSIDE * half;
-      const steer = clamp(FEEL.GHOST_STEER_P * (aim - x) / half
-                          - FEEL.GHOST_STEER_D * (lv / rate), -1, 1);
-      const intent = steer * rate;
-      hv += (intent - hv) * kh;
-      lv += (intent - curve * FEEL.CENTRIFUGAL * rate - lv) * kg;
-      x += lv * dt;
-      // The edge, on the same rule the car has: the wall takes the
-      // sideways speed that is pushing into it and nothing else. It is a
-      // guard rather than a shape, and it measures as never touched.
-      const wall = half * FEEL.GHOST_SYNTH_EDGE;
-      if (Math.abs(x) > wall) {
-        x = clamp(x, -wall, wall);
-        if (lv * x > 0) lv = 0;
-      }
-      z += speed * dt;
-      t += dt;
-    }
-  }
-  ghost.n = ghost.x.length;
-  ghost.live = ghost.n > 1;
-  ghost.synth = ghost.live;
-  return ghost.live;
-}
-
-/* ------------------------------------------------------------------
    THE LINE BETWEEN SAMPLES, AND WHY IT IS A CURVE AND NOT A CHORD.
 
    The samples are evenly spaced in DISTANCE, so index space is the
@@ -13513,14 +13458,9 @@ function ghostUpdate(dt) {
        ghost simply is not there any more, which is exactly what having
        outlasted it means. */
     ghost.pos = (ghost.n - 1) * ghostStep();
-    /* A RECORDED ghost that has run out is still worth passing: reaching
-       the point where your last run ended is the whole meaning of it. A
-       PACE CAR that has run out has only left the built road, so drawing
-       level with the spot it stopped at is nothing at all, and announcing
-       it put PASSED THE PACE CAR on screen for a car that had not been
-       visible for seconds. Measured: it fired at 11.9s for a player who
-       never got near it. */
-    if (!ghost.synth) ghostPass();
+    /* A ghost that has run out is still worth passing: reaching the
+       point where your last run ended is the whole meaning of it. */
+    ghostPass();
     return;
   }
   const a = ghost.t[ghost.i], b = ghost.t[ghost.i + 1];
@@ -13545,9 +13485,9 @@ function ghostPass() {
   ghost.ahead = ahead;
   if (ghost.said > 0) return;
   ghost.said = FEEL.GHOST_PASS_COOLDOWN;
-  if (ahead) sayDrift(ghostNoun() + ' AHEAD', COLOUR.GHOST_EDGE, 1, true);
+  if (ahead) sayDrift('GHOST AHEAD', COLOUR.GHOST_EDGE, 1, true);
   else {
-    sayDrift('PASSED THE ' + ghostNoun(), COLOUR.GATE, 1.1, true);
+    sayDrift('PASSED THE GHOST', COLOUR.GATE, 1.1, true);
     /* A SOUND, WHICH IT NEVER HAD. Going past the only rival in the game
        was a line of text and nothing else, which is the definition of a
        silent event. No flash: the screen wash belongs to the record
@@ -13628,8 +13568,9 @@ function drawGhost(first, last, baseIndex) {
      That matters more than a tidy-up, because GHOST_ALPHA's own comment
      is "it must never compete with the road" and it was being obeyed on
      paper and broken in the picture. It is also the constant that keeps
-     the pace car readable as a rival rather than as something solid in
-     the way, which is the one thing it must never be mistaken for. */
+     the ghost readable as a record of a run rather than as something
+     solid in the way, which is the one thing it must never be mistaken
+     for. */
   ctx.globalAlpha = FEEL.GHOST_ALPHA * 0.5;
   ctx.fillStyle = COLOUR.GHOST;
   polygon(ghostCorners[0], ghostCorners[1], ghostCorners[2], ghostCorners[3],
@@ -19768,7 +19709,7 @@ function drawResult(w, h) {
     ctx.globalAlpha = 0.55;
     const sub = 'track #' + trackNumber(todayStamp) + ', '
               + levelCount() + ' levels, one road for everyone'
-              + (ghost.live && !ghost.synth ? ', your ghost is waiting' : '')
+              + (ghost.live ? ', your ghost is waiting' : '')
               + (hasKeyboard ? '     press T' : '');
     text(sub, w / 2, stack - size * 1.5,
          fittedSize(sub, '700', Math.round(s * 0.026), w * 0.92), '700');
@@ -21712,6 +21653,12 @@ function clearDailyRecords() {
    five are new and have no records to lose, and levels one and two are
    the same length they always were.
 
+   BUMPED TO 10 BECAUSE THE TRAINING ROAD MOVED AGAIN, three and a half
+   seconds of it: a beat before the first line pushes every mark after it
+   down the road. Same reasoning as every bump below. The four real
+   levels are byte identical and are checked to be, and they lose nothing
+   they would have kept past midnight anyway.
+
    BUMPED TO 9 BECAUSE THE TRAINING ROAD MOVED AGAIN. The script was
    rewritten, so the pinch, the jump, the blocker and the mover all
    stand on different segments, a splitter was added between two of
@@ -21756,7 +21703,7 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-const ROAD_GEN = 9;
+const ROAD_GEN = 10;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
@@ -21971,7 +21918,7 @@ function bankDaily(finished) {
        the display arrives rather than starting from zero. */
     const wasUnlocked = carsUnlocked();
     /* AND THE TRAINING RUN IS NOT A TRACK FINISHED, for the same reason
-       it is not part of the day, plus one of its own: it is 36 seconds
+       it is not part of the day, plus one of its own: it is 40 seconds
        and the shortest real level is 95, so counting it would make the
        warm up the cheapest way to earn every car in the game. The
        once-per-day guard limits that to one a day rather than removing
@@ -22292,16 +22239,16 @@ function sayCallout(str, pri, colour) {
    A COACHING LINE MAY ALWAYS REPLACE A COACHING LINE, because the state
    machines that speak here already space themselves by COACH_TIME plus a
    beat, and a line that has been superseded has nothing left to say. */
-function sayCoach(str, colour, style, point) {
+function sayCoach(str, colour, style, point, dwell) {
   calloutText = str;
   calloutColour = colour;
   calloutPri = CALL_COACH;
-  calloutLife = FEEL.COACH_TIME;
-  calloutFull = FEEL.COACH_TIME;
+  calloutLife = dwell || FEEL.COACH_TIME;
+  calloutFull = calloutLife;
   calloutCoach = true;
   calloutStyle = style || COACH_PLATE_STYLE;
   calloutPoint = point || POINT_NONE;
-  calloutLock = FEEL.COACH_TIME;
+  calloutLock = calloutLife;
   // Centred, so it can never be clipped by the screen edge. See the
   // note on COACH_MAX_WIDTH.
   calloutSide = 0;
@@ -22401,17 +22348,31 @@ let coachDropped = 0;      // read by the probes, never by the game
 
 function coachFree() { return coachQuiet <= 0; }
 
-function coachSay(str, colour, style, point) {
+function coachSay(str, colour, style, point, dwell) {
   if (coachFree()) {
-    sayCoach(str, colour, style, point);
-    coachQuiet = coachHold();
+    sayCoach(str, colour, style, point, dwell);
+    coachQuiet = coachHold(dwell);
     return;
   }
-  coachQueue.push({ s: str, c: colour, y: style, p: point,
+  coachQueue.push({ s: str, c: colour, y: style, p: point, d: dwell,
                     by: runTime + FEEL.COACH_PATIENCE });
 }
 
-function coachHold() { return FEEL.COACH_TIME + FEEL.TRAIN_SAY_HOLD; }
+/* HOW LONG THE LANE IS HELD, which is the line's own dwell plus the beat
+   of air after it. Almost every line takes COACH_TIME; the recharge line
+   asks for longer and the lane has to know, or the next line would be
+   scheduled to arrive while it is still being read. */
+function coachHold(dwell) { return (dwell || FEEL.COACH_TIME) + FEEL.TRAIN_SAY_HOLD; }
+
+/* AND THE ONE LINE THAT HOLDS LONGER THAN THE REST.
+
+   It is the only line in the run that fires while the player is actively
+   recovering from something, which is the worst moment any of them has
+   to be read in: the car has just come off the edge, the bar is refilling
+   and their attention is on the road rather than on the words. A second
+   more is the answer, and it is its own constant so it cannot drag every
+   other line with it. */
+function rechargeDwell() { return FEEL.COACH_TIME + FEEL.COACH_RECHARGE_EXTRA; }
 
 function coachPump(dt) {
   if (coachQuiet > 0) coachQuiet -= dt;
@@ -22421,8 +22382,8 @@ function coachPump(dt) {
   }
   if (!coachQueue.length || !coachFree()) return;
   const q = coachQueue.shift();
-  sayCoach(q.s, q.c, q.y, q.p);
-  coachQuiet = coachHold();
+  sayCoach(q.s, q.c, q.y, q.p, q.d);
+  coachQuiet = coachHold(q.d);
 }
 
 function trainingReset() {
@@ -22477,8 +22438,8 @@ function trainingSay(dt) {
      behind line two rather than losing one arrow. A pointer with no
      target draws nothing, which drawCoachPoint already handles, and
      that is the whole cost of the failure it can actually have. */
-  if (trainStep === 0) {
-    coachSay('WELCOME TO THE DRIFT FEVER TUTORIAL', COLOUR.SCORE,
+  if (trainStep === 0 && runTime >= FEEL.TRAIN_WELCOME_AT) {
+    coachSay('WELCOME TO THE\nDRIFT FEVER TUTORIAL', COLOUR.SCORE,
              COACH_BRAND_STYLE, POINT_NONE);
     trainStep = 1;
   } else if (trainStep === 1 && coachFree()
@@ -22487,7 +22448,7 @@ function trainingSay(dt) {
     trainStep = 2;
   } else if (trainStep === 2 && coachFree()) {
     coachSay('THE EDGES WILL DAMAGE YOU', COLOUR.HAZARD_WARN,
-             COACH_PLATE_STYLE, POINT_EDGES);
+             COACH_BRAND_STYLE, POINT_EDGES);
     trainStep = 3;
   }
 
@@ -22524,8 +22485,8 @@ function trainingSay(dt) {
   if (trainStep >= 3 && !trainRecharged && coachRoom()
       && trainScraped && !scraping && coachFree()) {
     trainRecharged = true;
-    coachSay('STAY ON COURSE TO RECHARGE YOUR BAR', COLOUR.GATE,
-             COACH_PLATE_STYLE, POINT_BAR);
+    coachSay('STAY ON COURSE\nTO RECHARGE YOUR BAR', COLOUR.GATE,
+             COACH_PLATE_STYLE, POINT_BAR, rechargeDwell());
   }
 
   /* ---- 5, THE JUMP, TRAIN_JUMP_LEAD ahead of the ramp rather than at
@@ -22535,7 +22496,7 @@ function trainingSay(dt) {
   if (!trainJumpSaid) {
     for (let i = 0; i < jumps.length; i++) {
       if (comingUp(jumps[i].from, FEEL.TRAIN_JUMP_LEAD)) {
-        coachSay('HIT THE JUMPS FOR MORE POINTS AND TIME', COLOUR.SCORE,
+        coachSay('HIT THE JUMPS\nFOR MORE POINTS AND TIME', COLOUR.SCORE,
                  COACH_PLATE_STYLE, POINT_NONE);
         trainJumpSaid = true;
         break;
@@ -22555,12 +22516,12 @@ function trainingSay(dt) {
      thing the run says. */
   if (!trainBlockSaid && hazardComing(HAZ_BLOCKER, FEEL.TRAIN_BLOCK_LEAD)) {
     coachSay('MOST BLOCKS STAY STILL', COLOUR.HAZARD_WARN,
-             COACH_PLATE_STYLE, POINT_NONE);
+             COACH_BRAND_STYLE, POINT_NONE);
     trainBlockSaid = true;
   }
   if (!trainMoveSaid && hazardComing(HAZ_MOVER, FEEL.TRAIN_MOVER_LEAD)) {
     coachSay('SOME BLOCKS MOVE', COLOUR.HAZARD_WARN,
-             COACH_PLATE_STYLE, POINT_NONE);
+             COACH_BRAND_STYLE, POINT_NONE);
     trainMoveSaid = true;
   }
 }
@@ -22584,7 +22545,7 @@ function trainingSay(dt) {
    landing arrives on the wheels touching down and would be queued
    behind anything that took the lane in it. */
 function coachRoom() {
-  const need = coachHold();
+  const need = coachHold(rechargeDwell());
   /* AND THE LINE IS ROOM TOO. A line started with two seconds of road
      left is a line the player reads half of, and this is the only one
      that can arrive at any moment rather than at a placed object, so it
@@ -22592,7 +22553,7 @@ function coachRoom() {
      not clock: a scraping car takes longer to cover it, so the test is
      conservative in the direction that matters. */
   if ((finishSeg - carSegIndex) * FEEL.SEGMENT_LENGTH / FEEL.SPEED
-      < FEEL.COACH_TIME) return false;
+      < rechargeDwell()) return false;
   if (trainJumpSaid && !trainLandSaid) return false;
   if (!trainJumpSaid && jumpDueWithin(FEEL.TRAIN_JUMP_LEAD + need)) return false;
   if (!trainBlockSaid && hazardComing(HAZ_BLOCKER, FEEL.TRAIN_BLOCK_LEAD + need))
@@ -23785,10 +23746,6 @@ function modeSecondLine() {
   if (mode !== DAILY) return null;
   if (continues > 0) return 'CONTINUED RUN, IT CANNOT TAKE THE RECORD';
   if (!ghost.live) return 'NO GHOST YET, THIS RUN BECOMES ONE';
-  /* The pace car has to say BOTH things in one line: that the car ahead
-     is not yours, and that yours is one run away. A player told only the
-     first would read it as a rival they are stuck with. */
-  if (ghost.synth) return 'CHASING A PACE CAR, THIS RUN BECOMES YOUR GHOST';
   return 'CHASING YOUR LAST RUN';
 }
 
@@ -23965,15 +23922,12 @@ function drawModeMark(w, h) {
    callouts say when you pass it, this says where it is the rest of the
    time. */
 function ghostGapLabel() {
-  /* THE PACE CAR SAYS NOTHING ONCE IT IS DONE. It only has the opening
-     to drive, so its line runs out around ten seconds in and a run is
-     three minutes: OUTLASTED would be true and then sit there for the
-     rest of the track, which is furniture. A recorded ghost keeps it,
-     because outlasting a run of your own is the thing it measures. */
-  if (runTime >= ghost.t[ghost.n - 1]) return ghost.synth ? '' : 'GHOST OUTLASTED';
+  // Outlasting a run of your own is the thing this measures, so it holds
+  // once the recorded line has ended rather than going quiet.
+  if (runTime >= ghost.t[ghost.n - 1]) return 'GHOST OUTLASTED';
   const gap = (position - ghost.pos) / FEEL.SPEED;
-  if (Math.abs(gap) < 0.05) return ghostNoun() + ' LEVEL';
-  return ghostNoun() + ' ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 's';
+  if (Math.abs(gap) < 0.05) return 'GHOST LEVEL';
+  return 'GHOST ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 's';
 }
 
 /* THE COACHING PLATE IS DRAWN FIRST AND THE DRIFT LANE GETS OUT OF ITS
@@ -24040,6 +23994,21 @@ function drawLane(w, h, str, colour, life, side, row, scale, full, coach, avoid)
      long string plus a narrow handset runs the text off the edge, and a
      callout that cannot be read has cost clutter and bought nothing. */
   let want = Math.round(s * (coach ? FEEL.COACH_SIZE : FEEL.CALLOUT_SIZE) * scale);
+  /* ONE STRING, ONE OR TWO ROWS, AND THE ROWS ARE WHAT GET THE TYPE BACK
+     UP. fittedSize shrinks a line until it fits the width it is given, so
+     the LONGEST line decides the size of the whole plate, and a 38
+     character sentence on one row came out at 13 pixels on a 390 wide
+     phone against the 19 the plate was tuned for. Broken over two rows
+     the longest row is 24 characters and the same sentence sets at 19.
+
+     THE BREAK IS IN THE COPY, marked with a newline, because where a
+     sentence divides is a judgement about the sentence and not something
+     a measurement should be guessing at.
+
+     `block` is the height of the type as a multiple of one row, so
+     everything that reasons about the plate's height keeps working with
+     one term added rather than being rewritten. */
+  let rows = coach ? String(str).split('\n') : [str];
   /* THE PLATE GETS ITS OWN READING OF THE BAND, AND THE REASON IS A
      MEASUREMENT.
 
@@ -24074,10 +24043,30 @@ function drawLane(w, h, str, colour, life, side, row, scale, full, coach, avoid)
        overflows instead. On the Chromebook that lands at 25 pixel type
        in 48 pixels of sky, which is smaller than a callout there and
        still half again the size of the HUD's own strap line. */
-    const fits = (cBottom - cTop) / (1 + 2 * FEEL.COACH_PLATE_PAD_Y);
+    /* AND TWO ROWS ARE ONLY WORTH IT IF THERE IS SKY FOR TWO ROWS.
+
+       The break exists to get the TYPE up: fittedSize shrinks a line to
+       the width it is given, so splitting a long sentence lets both
+       halves set larger. On a screen where the sky is short the trade
+       reverses, because a taller plate has to shrink to fit the height
+       instead. Measured on a Chromebook, where the sky between the HUD
+       strap and the horizon is 48 pixels: two rows at the floor size
+       need 60 and spill over the road, while one row of the same
+       sentence sets at 37. So the rows are collapsed rather than the
+       type, and each screen gets whichever is bigger on it. */
+    if (rows.length > 1) {
+      const tall = 1 + (rows.length - 1) * FEEL.COACH_LINE_STEP;
+      const need = Math.round(s * FEEL.COACH_MIN_SIZE)
+                 * (tall + 2 * FEEL.COACH_PLATE_PAD_Y);
+      if (need > cBottom - cTop) rows = [rows.join(' ')];
+    }
+    const fits = (cBottom - cTop)
+               / (1 + (rows.length - 1) * FEEL.COACH_LINE_STEP
+                  + 2 * FEEL.COACH_PLATE_PAD_Y);
     want = Math.min(want, Math.max(Math.round(fits),
                                    Math.round(s * FEEL.COACH_MIN_SIZE)));
   }
+  const block = 1 + (rows.length - 1) * FEEL.COACH_LINE_STEP;
   /* COACH_MAX_WIDTH IS THE WIDEST THE PLATE MAY BE, not the widest the
      text may be, because the plate is the thing that has to stay on the
      screen. The padding is charged against the budget before the text is
@@ -24089,14 +24078,20 @@ function drawLane(w, h, str, colour, life, side, row, scale, full, coach, avoid)
      taking the plate's side padding out of its width budget would make
      it smaller than it needs to be for no reason. */
   const plated = coach && calloutStyle !== COACH_BRAND_STYLE;
-  const size = coach
-    ? fittedSize(str, plated ? '800' : '900', want,
-                 w * FEEL.COACH_MAX_WIDTH
-                 - (plated ? 2 * want * FEEL.COACH_PLATE_PAD_X : 0))
-    : fittedSize(str, '800', want, w * FEEL.CALLOUT_MAX_WIDTH);
-  ctx.font = (plated || !coach ? '800 ' : '900 ') + size
+  const weight = (plated || !coach) ? '800' : '900';
+  const budget = coach
+    ? w * FEEL.COACH_MAX_WIDTH
+      - (plated ? 2 * want * FEEL.COACH_PLATE_PAD_X : 0)
+    : w * FEEL.CALLOUT_MAX_WIDTH;
+  // EVERY ROW HAS TO FIT, so the smallest of the fits is the size.
+  let size = want;
+  for (let i = 0; i < rows.length; i++)
+    size = Math.min(size, fittedSize(rows[i], weight, want, budget));
+  ctx.font = weight + ' ' + size
            + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const half = ctx.measureText(str).width / 2;
+  let half = 0;
+  for (let i = 0; i < rows.length; i++)
+    half = Math.max(half, ctx.measureText(rows[i]).width / 2);
   const edge = s * FEEL.CALLOUT_GAP_TOP;
   let x = w / 2 + side * (w * FEEL.CALLOUT_SIDE + slide);
   x = clamp(x, half + edge, w - half - edge);
@@ -24111,13 +24106,17 @@ function drawLane(w, h, str, colour, life, side, row, scale, full, coach, avoid)
      wordmark's own treatment instead: gold on an orange outline on a
      dark shadow, which is three passes of ink and needs no plate to
      stand off a skyline. */
+  /* WHERE EACH ROW SITS, measured from the middle of the block outward so
+     one row lands exactly where a single line always did. */
+  const step = size * FEEL.COACH_LINE_STEP;
+  const rowY = i => y - (rows.length - 1) * step / 2 + i * step;
   let rect = null;
   if (coach && calloutStyle === COACH_BRAND_STYLE) {
-    const bh = size * (1 + 2 * FEEL.COACH_PLATE_PAD_Y);
+    const bh = size * (block + 2 * FEEL.COACH_PLATE_PAD_Y);
     y = Math.min(Math.max(y, cTop + bh / 2), cBottom - bh / 2);
     y = Math.min(y, horizonY - bh / 2);
     y = Math.max(y, Math.max(hudBottom, modeBottom) + bh / 2);
-    brandText(str, x, y, size, alpha);
+    for (let i = 0; i < rows.length; i++) brandText(rows[i], x, rowY(i), size, alpha);
     drawCoachPoint(w, h, size, alpha);
     ctx.globalAlpha = 1;
     return { top: y - bh / 2, bottom: y + bh / 2 };
@@ -24125,7 +24124,7 @@ function drawLane(w, h, str, colour, life, side, row, scale, full, coach, avoid)
   if (coach) {
     const padX = size * FEEL.COACH_PLATE_PAD_X;
     const padY = size * FEEL.COACH_PLATE_PAD_Y;
-    const bw = half * 2 + padX * 2, bh = size + padY * 2;
+    const bw = half * 2 + padX * 2, bh = size * block + padY * 2;
     /* Kept off the HUD above and off the road below, in that order, so
        a sky too short for the plate spills upward into the HUD's own
        margin rather than downward over the corner being driven. */
@@ -24144,7 +24143,12 @@ function drawLane(w, h, str, colour, life, side, row, scale, full, coach, avoid)
     ctx.globalAlpha = alpha;
     rect = { top: y - bh / 2, bottom: y + bh / 2 };
     drawCoachPoint(w, h, size, alpha);
-  } else if (avoid) {
+    for (let i = 0; i < rows.length; i++)
+      text(rows[i], x, rowY(i), size, weight, 'center', colour);
+    ctx.globalAlpha = 1;
+    return rect;
+  }
+  if (avoid) {
     /* PUSHED CLEAR OF THE PLATE, OR NOT DRAWN AT ALL. The gap is the
        same one the plate's own padding uses, so the two read as spaced
        rather than stacked. */
