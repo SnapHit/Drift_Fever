@@ -4147,19 +4147,42 @@ const FEEL = {
      less empty, and that is the line this must not cross. */
   GAP_MAX_SECONDS:            8,     // LIVE, seconds of empty road before one is forced
   JUMP_EVERY:              1200,     // LIVE, mean segments between them, about 52s
-  JUMP_RUNOUT:               34,     // segments of landing room past the lip, and
-                                    // it must exceed the flight, which is about 23
-  /* THAT LAST COMMENT IS WRONG AND IT IS LEFT THERE ON PURPOSE, because
-     the number it names is the reason this block can be sized honestly.
-     MEASURED, 24 flights over levels two to five: every one of them was
-     44 segments from the lip to the wheels, not 23. So JUMP_RUNOUT does
-     NOT exceed the flight, it falls ten segments short of it, and
-     jumpFits reserves to the same short mark. Nothing here fixes that:
-     it changes what a seed produces and it is somebody's decision rather
-     than a tidy up. It is written down so the next session does not have
-     to measure it again.
+  /* THE LANDING ROOM IS NOT A CONSTANT ANY MORE. It was 34 segments,
+     and its comment said it "must exceed the flight, which is about 23".
+     Both halves were wrong. The flight is 46 segments, not 23, so the
+     runout did not exceed it, it fell TWELVE SHORT, and jumpFits
+     reserved to the same short mark.
 
-     ================================================================
+     WHAT THAT ACTUALLY COST, measured over 757 jumps on 28 days across
+     all five levels: no hazard was ever in a landing zone, because the
+     phrases are laid one after another and the ordering happens to keep
+     them clear. Two gates were, which is a checkpoint taken away for
+     doing the fun thing and is the one case jumpFits names as absolute.
+     And 123 of the 757, one in six, came down on road NARROWER than the
+     lip they left, because the full width run out stopped twelve
+     segments before the wheels did. That is a landing off the road
+     through nobody's fault, which is the section 4.3 failure: you cannot
+     steer in the air, so it cannot be answered with skill.
+
+     AN ESTIMATE IN A COMMENT IS WHAT MADE IT SURVIVE, so the number is
+     no longer written down anywhere. See jumpFlightSegments: the flight
+     is a projectile and it is SOLVED from JUMP_LAUNCH_V,
+     JUMP_RAMP_HEIGHT and JUMP_GRAVITY rather than sampled, so moving any
+     of those three on the tuner moves the reservation with them and the
+     two can never drift apart again. What is left here is the margin on
+     top, which is the only part that is a judgement.
+
+     EIGHT, and it is small because the derivation is an upper bound
+     rather than a typical case. The solved figure assumes a dead centre
+     launch, which is the fullest one JUMP_LIP_LOSS allows, and the
+     integration in the update loop is semi implicit, so it consistently
+     lands SHORTER than the algebra: measured at 44.63 segments at 120fps
+     falling to 42.75 at the clamped frame, against a solved 45.28. The
+     margin covers the quantising of the landing segment and puts the
+     wheels a little way inside guaranteed road rather than on its edge. */
+  JUMP_LAND_MARGIN:           8,     // LIVE, segments of road past the touchdown
+
+  /* ================================================================
      THE ROUGH SHOULDER, WHICH IS WHAT MISSING A JUMP COSTS.
 
      It cost nothing at all. rampRide asks the width once at the foot of
@@ -4186,10 +4209,12 @@ const FEEL = {
      0.95, which is a rule that pays you to leave the road.
 
      AND IT ENDS LONG BEFORE ANYBODY LANDS. JUMP_ROUGH_TAIL against a
-     measured 44 segment flight, so a player who took the jump comes down
-     on clean road however wide the landing is. The shoulder is the cost
-     of MISSING and it is never the cost of a bad landing, which
-     JUMP_LAND_SLOW_BAD already charges for. */
+     solved 46 segment flight, and clamped under it by roughTail rather
+     than merely being smaller than it, so a player who took the jump
+     comes down on clean road however wide the landing is and whatever
+     the tuner is set to. The shoulder is the cost of MISSING and it is
+     never the cost of a bad landing, which JUMP_LAND_SLOW_BAD already
+     charges for. */
   JUMP_ROUGH_TAIL:           26,     // segments of broken ground past the lip
   JUMP_ROUGH_SPEED:        0.78,     // LIVE, forward speed multiplier while on it
   /* THE BAR, AND THE SHOULDER MAY NEVER EMPTY IT. The drain feeds the
@@ -6958,7 +6983,7 @@ const TUNABLES = [
   { key: 'JUMP_RAMP_SEGMENTS', label: 'rampLen', step: 1,    min: 2,    max: 30,    dp: 0, group: 24 },
   { key: 'JUMP_RAMP_HEIGHT',   label: 'rampTop', step: 20,   min: 60,   max: 2000,  dp: 0, group: 24 },
   { key: 'JUMP_RAMP_HALF',     label: 'rampWide',step: 0.02, min: 0.1,  max: 1.0,   dp: 2, group: 24 },
-  { key: 'JUMP_RUNOUT',        label: 'runout',  step: 2,    min: 4,    max: 80,    dp: 0, group: 24 },
+  { key: 'JUMP_LAND_MARGIN',   label: 'landMrgn',step: 1,    min: 0,    max: 40,    dp: 0, group: 24 },
   { key: 'JUMP_ROUGH_TAIL',    label: 'roughLen',step: 2,    min: 0,    max: 60,    dp: 0, group: 24 },
   { key: 'JUMP_ROUGH_SPEED',   label: 'roughSpd',step: 0.02, min: 0.3,  max: 1.0,   dp: 2, group: 24 },
   { key: 'JUMP_ROUGH_DRAIN',   label: 'roughBar',step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 24 },
@@ -10249,7 +10274,7 @@ function buildPlacedJump(mark, lead2) {
   if (!jumpFits(at, to)) return false;
   trainFiller(extra);
   addRun(lead + 2, 0, 0, roadWidth, 1, true);
-  addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
+  addRun(FEEL.JUMP_RAMP_SEGMENTS + jumpRunout(), 0, 0, 1, 1, false);
   jumps.push({ from: at, to: to, riding: false, done: false });
   if (at > lastPlacedSeg) lastPlacedSeg = at;
   /* TWO LINES: the approach, said lead2 seconds before the ramp, and the
@@ -10812,6 +10837,56 @@ function jumpUnlocked() {
    Derived rather than authored: the two used to be independent and they
    drifted apart, which is how the warning ended up shorter than the
    hazard's. */
+/* HOW FAR A JUMP CARRIES, SOLVED RATHER THAN SAMPLED.
+
+   The car leaves the lip at JUMP_RAMP_HEIGHT with an upward speed of
+   JUMP_LAUNCH_V, reduced by JUMP_LIP_LOSS times the square of how far
+   off centre it was, and falls under JUMP_GRAVITY until its height
+   reaches zero. That is a quadratic and it has an answer:
+
+       t = (v + sqrt(v^2 + 2gh)) / g
+
+   THE WORST CASE IS THE ONE THAT MATTERS and it is v at its largest,
+   which is a dead centre launch with no lip loss at all. Forward speed
+   through the flight is FEEL.SPEED times a scrape factor, a rough factor
+   and a landing factor, and every one of those three is at most one, so
+   there is no state the game can be in where the car crosses more ground
+   in the air than this.
+
+   AND THE DISCRETE LOOP LANDS SHORTER THAN THE ALGEBRA, which is why the
+   margin on top can be small. update integrates semi implicitly, taking
+   gravity off the velocity before applying it, so it loses height every
+   step against the closed form: measured on a real ramp at 44.63
+   segments at 120fps, 44.25 at 60, 43.50 at 30 and 42.75 at the clamped
+   frame, against 45.28 solved. The solved figure is an upper bound and
+   the frame rate can only make it smaller. */
+function jumpFlightSegments() {
+  const g = FEEL.JUMP_GRAVITY, h = FEEL.JUMP_RAMP_HEIGHT, v = FEEL.JUMP_LAUNCH_V;
+  const t = (v + Math.sqrt(v * v + 2 * g * h)) / g;
+  return Math.ceil(t * FEEL.SPEED / FEEL.SEGMENT_LENGTH);
+}
+
+/* THE ROAD A JUMP OWNS PAST ITS LIP, and every one of the five places
+   that used to read JUMP_RUNOUT reads this instead: the straight full
+   width run that is laid, the reservation that keeps hazards, gates, the
+   finish line and other jumps out of it, and the spacing to the next
+   jump. One source, so a reservation cannot be short of the road it is
+   reserving. */
+function jumpRunout() {
+  return jumpFlightSegments() + FEEL.JUMP_LAND_MARGIN;
+}
+
+/* AND THE BROKEN GROUND STOPS SHORT OF THE TOUCHDOWN BY CONSTRUCTION.
+
+   JUMP_ROUGH_TAIL is 26 against a 46 segment flight, so it already does.
+   But it is a slider with a range that reaches 60, and a shoulder that
+   outlasted the flight would charge a player the cost of MISSING the
+   jump they just landed. Clamped rather than trusted, so the guarantee
+   survives whatever the tuner is set to. */
+function roughTail() {
+  return Math.min(FEEL.JUMP_ROUGH_TAIL, jumpFlightSegments() - 2);
+}
+
 function jumpArrowSpacing() {
   return FEEL.JUMP_WARN_SEGMENTS / FEEL.JUMP_ARROW_COUNT;
 }
@@ -10832,7 +10907,7 @@ function jumpLead() { return FEEL.JUMP_WARN_SEGMENTS + 4; }
    there is no such constant here to get wrong. */
 function jumpFits(from, to) {
   const lead = jumpLead();
-  const a = from - lead, b = to + FEEL.JUMP_RUNOUT;
+  const a = from - lead, b = to + jumpRunout();
   if (pastFinish(b)) return false;               // nothing crosses the line
   for (let i = 0; i < hazards.length; i++) {
     const h = hazards[i];
@@ -10840,7 +10915,7 @@ function jumpFits(from, to) {
         && h.from - FEEL.HAZARD_WARN_SEGMENTS - 2 <= b) return false;
   }
   for (let i = 0; i < jumps.length; i++) {
-    if (jumps[i].to + FEEL.JUMP_RUNOUT >= a && jumps[i].from - lead <= b) return false;
+    if (jumps[i].to + jumpRunout() >= a && jumps[i].from - lead <= b) return false;
   }
   /* And never under a gate. A gate is the one thing on the road that is
      purely good news, and flying over one would take a checkpoint away
@@ -10863,10 +10938,10 @@ function buildJumpPhrase() {
     jumpDue = segBase + segments.length + Math.round(FEEL.JUMP_EVERY * 0.25);
     return false;
   }
-  jumpDue = to + FEEL.JUMP_RUNOUT
+  jumpDue = to + jumpRunout()
           + Math.round(FEEL.JUMP_EVERY * (0.7 + rng() * 0.6));
   addRun(lead + 2, 0, 0, roadWidth, 1, true);
-  addRun(FEEL.JUMP_RAMP_SEGMENTS + FEEL.JUMP_RUNOUT, 0, 0, 1, 1, false);
+  addRun(FEEL.JUMP_RAMP_SEGMENTS + jumpRunout(), 0, 0, 1, 1, false);
   /* NO COIN FLIP. Every jump pays now, so there is nothing left to draw
      for and the draw is gone rather than left in to preserve a hash.
      It DOES move the generator's stream by one value from here on, which
@@ -11671,7 +11746,7 @@ function roughBand(carIndex, offset) {
   if (carY > 0) return false;
   for (let i = 0; i < jumps.length; i++) {
     const j = jumps[i];
-    if (carIndex >= j.from && carIndex <= j.to + FEEL.JUMP_ROUGH_TAIL) return true;
+    if (carIndex >= j.from && carIndex <= j.to + roughTail()) return true;
   }
   return false;
 }
@@ -13228,7 +13303,7 @@ function roughQuads(first, last, baseIndex, chips) {
   for (let k = 0; k < jumps.length; k++) {
     const j = jumps[k];
     const a = Math.max(j.from - baseIndex, first);
-    const b = Math.min(j.to + FEEL.JUMP_ROUGH_TAIL - baseIndex, last);
+    const b = Math.min(j.to + roughTail() - baseIndex, last);
     for (let n = a; n <= b; n++) {
       if (!bvis[n]) continue;
       /* The far boundary of this anchor, so a merged run out in the far
@@ -22009,7 +22084,16 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-/* BUMPED TO 11 FOR THE ROUGH SHOULDERS, AND THE ROAD DID NOT CHANGE.
+/* BUMPED TO 12 FOR THE LANDING ZONE, AND THIS TIME THE ROAD DID CHANGE.
+
+   The run out past every jump grew from 34 segments to 54, because it
+   was twelve short of the flight and one landing in six was coming down
+   on road narrower than the lip it left. More reserved road means a
+   different road, on every seed, on every level. Records, times and
+   ghosts from the old geometry are not comparable and go.
+
+   ----------------------------------------------------------------
+   BUMPED TO 11 FOR THE ROUGH SHOULDERS, AND THE ROAD DID NOT CHANGE.
 
    Measured over 28 days on all five levels: 140 roads before, 140 after,
    every one of them byte identical, because the shoulder draws no rng
@@ -22024,7 +22108,7 @@ function clearDailyRecords() {
    through ground it never had to pay for, and appears to do something
    the player now cannot. That is the staleness this constant exists to
    clear, and the whole cost of clearing it is one day of records. */
-const ROAD_GEN = 11;
+const ROAD_GEN = 12;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
