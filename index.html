@@ -4021,12 +4021,36 @@ const FEEL = {
      a lag on it. */
   JUMP_CAM_FOLLOW:         0.62,     // LIVE
   JUMP_CAM_TIME:           0.18,     // seconds of lag on that
-  /* THE ARROW, and it must never be confused with the hazard warning.
-     The hazard's arrow lies FLAT ON THE ROAD and points ALONG it: it says
-     move sideways, now. This one STANDS UP off the road and points at the
-     SKY: it says aim here and go up. Different plane, different axis,
-     different colour family, and a cold player read the old ramp markings
-     as a hazard once already. */
+  /* THE CHEVRONS, AND THEY LIE FLAT ON THE ROAD NOW.
+
+     THEY USED TO STAND UP, and the plane was the separation: the hazard's
+     arrow lay flat and pointed along the road, this one stood up and
+     pointed at the sky. That was a real answer to a real problem, because
+     a cold player had read the old ramp markings as a hazard.
+
+     IT WAS PAID FOR AT CLOSE RANGE. A standing chevron is drawn at
+     JUMP_ARROW_HEIGHT world units, which is twice the ramp lip, so the
+     nearest one in the run was taller than the car and painted straight
+     over it. Two marks in a five mark run dominated the frame, and the
+     thing they point at is the small one at the far end.
+
+     SO THE SEPARATION MOVES TO FORM, WHICH IS WHERE THE BARRIER BARS
+     ALREADY PUT IT. Flat against flat, the two marks differ on four
+     axes at once and none of them is hue, because the hue is deliberately
+     shared: see HAZARD_WARN_ARROW.
+
+       hollow against solid   the jump is an outline with the road
+                              showing through it, the hazard is a filled
+                              triangle
+       wide against narrow    the jump spans 2 x JUMP_ARROW_HALF of the
+                              half width, the hazard is one car wide
+       centred against offset the jump sits on the ramp's own line, the
+                              hazard sits wherever the gap is
+       glow against flat      the jump gets the two pass halo the road
+                              edges use, the hazard is one flat alpha
+
+     And the bars remain the thing that only ever appears in front of a
+     hazard. Measured after the change: see the chevron area table. */
   /* THE GUARANTEE, AND IT IS THE POINT OF THIS BLOCK. A hazard gets
      HAZARD_WARN_SEGMENTS of painted road before it, which is a stated
      distance and therefore a stated amount of time whatever else is
@@ -4045,9 +4069,24 @@ const FEEL = {
      second and a half out. They were drawn, they were bright and they
      were nowhere near big enough to be a warning. The mark is now roughly
      square, 44 per cent of the road wide, and five times the area. */
-  JUMP_ARROW_HEIGHT:       2400,     // world units, twice the ramp lip so it reads far out
+  /* HOW FAR UP THE ROAD THE V REACHES, in segments, which is what a
+     height becomes once the mark is lying down. Eleven against the
+     hazard arrowhead's seven, and against a 14.4 segment spacing, so the
+     run reads as five separate marks rather than one painted stripe. */
+  JUMP_ARROW_LENGTH:         11,     // LIVE, segments from the feet to the apex
   JUMP_ARROW_HALF:         0.44,     // of the half width, so the road edges stay clear
-  JUMP_ARROW_THICK:        0.34,     // of the chevron height, the stroke
+  JUMP_ARROW_THICK:        0.34,     // of the chevron's own length, the stroke
+  /* THE FLOOR, AND IT IS THE WHOLE COST OF LYING DOWN. A flat mark
+     foreshortens as one over the square of the distance, so the furthest
+     chevron in the run is a couple of pixels deep long before it is out
+     of the draw distance. Measured at the moment the whole run is first
+     on the road, the five came to 7, 9, 13, 21 and 43 pixels deep, so
+     the three furthest were thinner than the lane dashes they lie
+     between. Below this the mark is stretched up the screen instead of
+     being allowed to vanish, which costs a little accuracy in where its
+     apex sits and buys the thing being legible for the whole run it
+     advertises. */
+  JUMP_ARROW_MIN_PX:         14,     // LIVE, screen pixels, the shortest a chevron may be
   /* When the first one turns up and how often after that. Inside the
      first minute and often enough to meet several in a normal run, which
      is the lesson the hazards paid for: a feature met once every few runs
@@ -4110,6 +4149,65 @@ const FEEL = {
   JUMP_EVERY:              1200,     // LIVE, mean segments between them, about 52s
   JUMP_RUNOUT:               34,     // segments of landing room past the lip, and
                                     // it must exceed the flight, which is about 23
+  /* THAT LAST COMMENT IS WRONG AND IT IS LEFT THERE ON PURPOSE, because
+     the number it names is the reason this block can be sized honestly.
+     MEASURED, 24 flights over levels two to five: every one of them was
+     44 segments from the lip to the wheels, not 23. So JUMP_RUNOUT does
+     NOT exceed the flight, it falls ten segments short of it, and
+     jumpFits reserves to the same short mark. Nothing here fixes that:
+     it changes what a seed produces and it is somebody's decision rather
+     than a tidy up. It is written down so the next session does not have
+     to measure it again.
+
+     ================================================================
+     THE ROUGH SHOULDER, WHICH IS WHAT MISSING A JUMP COSTS.
+
+     It cost nothing at all. rampRide asks the width once at the foot of
+     the ramp and its comment says so plainly: drive past it on the
+     outside and nothing happens. So the only argument for aiming at a
+     ramp was the reward for hitting one, and a reward with no matching
+     cost is a weak lever: the timid line was free.
+
+     A GAP IN THE ROAD WAS THE OBVIOUS VERSION AND IT IS REFUSED. It is
+     binary death with no recovery, which is the exact cliff section 4.2
+     exists to remove, and it would make jumps compulsory rather than
+     rewarding. Broken surface is the shape everything else in this game
+     already has: a real cost you can drive out of.
+
+     WHERE IT IS. From the edge of the deck, JUMP_RAMP_HALF, outward.
+     There is deliberately no constant of its own for that inner edge:
+     the rough starts exactly where the deck stops, so a slider cannot
+     leave a clean strip beside the ramp or eat into the ramp itself.
+
+     THE COST DOES NOT STOP AT THE ROAD EDGE AND THE PAINT DOES. Painting
+     it over the edge stripe would take the top of the value range off
+     the one thing section 7 says may never lose it. Letting the COST
+     stop there instead would have made 1.2 half widths out cheaper than
+     0.95, which is a rule that pays you to leave the road.
+
+     AND IT ENDS LONG BEFORE ANYBODY LANDS. JUMP_ROUGH_TAIL against a
+     measured 44 segment flight, so a player who took the jump comes down
+     on clean road however wide the landing is. The shoulder is the cost
+     of MISSING and it is never the cost of a bad landing, which
+     JUMP_LAND_SLOW_BAD already charges for. */
+  JUMP_ROUGH_TAIL:           26,     // segments of broken ground past the lip
+  JUMP_ROUGH_SPEED:        0.78,     // LIVE, forward speed multiplier while on it
+  /* THE BAR, AND THE SHOULDER MAY NEVER EMPTY IT. The drain feeds the
+     same meter the edge does, because the three bands are the road's own
+     and there is nothing new to learn, but it stops at JUMP_ROUGH_CAP of
+     the limit. So a player who misses a jump always comes off the
+     shoulder with bar left to touch the edge with, the shoulder can
+     never end a run on its own, and it can never set up an edge that
+     kills on contact either. It is felt, and it is survivable, and those
+     are both true by construction rather than by tuning.
+
+     It does not stack with the edge: the shoulder only drains when the
+     car is NOT scraping, so the edge's own arithmetic is untouched to
+     the line. */
+  JUMP_ROUGH_DRAIN:        0.85,     // LIVE, against the edge's own rate of one
+  JUMP_ROUGH_CAP:          0.85,     // LIVE, of SCRAPE_TIME_LIMIT, the most it may take
+  JUMP_ROUGH_SHAKE_PX:        3,     // LIVE, so it is felt through the screen as well
+  JUMP_ROUGH_CHIP:         0.30,     // of the band, how wide the rubble flecks are
 
   /* ----------------------------------------------------------------
      THE BIOME WHEEL. One palette, turned. BIOME_COUNT is how many equal
@@ -4939,7 +5037,8 @@ const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         HAZARD_WARN_BAR: 1, HAZARD_WARN_ARROW: 1,
                         // Go. Never red, never anywhere near the hazard.
                         JUMP_DECK: 1, JUMP_DECK_DARK: 1, JUMP_SIDE: 1,
-                        JUMP_LIP: 1, JUMP_GLOW: 1, JUMP_ARROW: 1 };
+                        JUMP_LIP: 1, JUMP_GLOW: 1, JUMP_ARROW: 1,
+                        JUMP_ROUGH: 1, JUMP_ROUGH_CHIP: 1 };
 
 /* ==================================================================
    WHICH ROLE EACH COLOUR PLAYS, because a place has several colours in
@@ -5863,16 +5962,21 @@ const COLOUR = {
      accident. What still separates a hazard from a ramp is FORM, which
      is what the barrier bars were added for and is a far stronger cue
      than hue: transverse bars across the blocked width appear in front
-     of a hazard and never in front of a jump. */
+     of a hazard and never in front of a jump.
+
+     THAT SENTENCE CARRIES MORE WEIGHT THAN IT USED TO, because the jump
+     chevrons now lie flat as well, so the plane is no longer doing any
+     of the work either. The full list of what separates them is at
+     JUMP_ARROW_LENGTH. */
   HAZARD_WARN_ARROW: '#4dff7a',
 
   /* THE JUMP, and it is a fourth family on purpose.
 
-     Pink says do not touch. Cyan on the ground says move sideways now.
-     GREEN, STANDING UP, says aim here and go up. A cold player once read
-     the old ramp markings as a hazard, so this differs on every axis at
-     once: different hue, different plane, opaque rather than washed, and
-     pointing at the sky rather than along the road.
+     Pink says do not touch. GREEN says this is the way through, on the
+     ground, for both of the things that mean it. What tells a ramp from
+     a gap through a hazard is the shape of the mark and not its colour:
+     a wide hollow chevron with a halo on it against a narrow solid
+     triangle with bars behind it. See JUMP_ARROW_LENGTH.
 
      JUMP_LIP is held below EDGE_LIGHT in value, because the road edge
      owns the top of the range and nothing added here may take it. */
@@ -5880,6 +5984,17 @@ const COLOUR = {
   JUMP_DECK_DARK:'#3a1c18',     // and where it leaves the road, barely off it
   JUMP_SIDE:    '#2a1210',      // the wedge's own flanks, just off the wall value
   JUMP_LIP:     '#4dff7a',      // the edge you leave from
+  /* THE BROKEN GROUND BESIDE IT, AND IT MUST NOT READ AS A HOLE. A gap
+     in the road was refused as a design and a shoulder painted dark
+     enough to look like void would smuggle it back in as a picture: a
+     player who reads it as a hole aims at the ramp out of fear rather
+     than for the reward, and one who reads it as a hole and misses
+     thinks they have died. So it stays inside the road's own value
+     range, a little under the surface it interrupts, and the flecks on
+     it are LIGHTER than the road rather than darker. Rubble catching the
+     light is texture; a dark stripe is a hole. */
+  JUMP_ROUGH:   '#2b1416',      // just under ROAD_DARK, so it reads as surface
+  JUMP_ROUGH_CHIP:'#6b3a2c',    // and the rubble on it, lighter than the road
   JUMP_GLOW:    '77,255,122',
   JUMP_ARROW:   '#4dff7a',      // and HAZARD_WARN_ARROW is this on purpose
 
@@ -6844,9 +6959,16 @@ const TUNABLES = [
   { key: 'JUMP_RAMP_HEIGHT',   label: 'rampTop', step: 20,   min: 60,   max: 2000,  dp: 0, group: 24 },
   { key: 'JUMP_RAMP_HALF',     label: 'rampWide',step: 0.02, min: 0.1,  max: 1.0,   dp: 2, group: 24 },
   { key: 'JUMP_RUNOUT',        label: 'runout',  step: 2,    min: 4,    max: 80,    dp: 0, group: 24 },
+  { key: 'JUMP_ROUGH_TAIL',    label: 'roughLen',step: 2,    min: 0,    max: 60,    dp: 0, group: 24 },
+  { key: 'JUMP_ROUGH_SPEED',   label: 'roughSpd',step: 0.02, min: 0.3,  max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_ROUGH_DRAIN',   label: 'roughBar',step: 0.05, min: 0,    max: 2.0,   dp: 2, group: 24 },
+  { key: 'JUMP_ROUGH_CAP',     label: 'roughCap',step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 24 },
+  { key: 'JUMP_ROUGH_SHAKE_PX',label: 'roughShk',step: 1,    min: 0,    max: 20,    dp: 0, group: 24 },
+  { key: 'JUMP_ROUGH_CHIP',    label: 'roughChip',step:0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'JUMP_ARROW_COUNT',   label: 'chevs',   step: 1,    min: 1,    max: 10,    dp: 0, group: 24 },
   { key: 'JUMP_WARN_SEGMENTS', label: 'chevWarn',step: 2,    min: 10,   max: 160,   dp: 0, group: 24 },
-  { key: 'JUMP_ARROW_HEIGHT',  label: 'chevTall',step: 20,   min: 80,   max: 4000,  dp: 0, group: 24 },
+  { key: 'JUMP_ARROW_LENGTH',  label: 'chevLong',step: 1,    min: 2,    max: 40,    dp: 0, group: 24 },
+  { key: 'JUMP_ARROW_MIN_PX',  label: 'chevFloor',step: 1,   min: 0,    max: 60,    dp: 0, group: 24 },
   { key: 'JUMP_ARROW_HALF',    label: 'chevWide',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'JUMP_ARROW_THICK',   label: 'chevLine',step: 0.02, min: 0.05, max: 0.9,   dp: 2, group: 24 },
   { key: 'BIOME_COUNT',        label: 'biomes',  step: 1,    min: 1,    max: 12,    dp: 0, group: 25 },
@@ -10853,6 +10975,7 @@ let position = 0;        // camera z, world units
 let carX = 0;
 let carFrac = 0;
 let scraping = false;
+let onRough = false;     // beside a ramp rather than on it. See roughBand.
 let scrapeSide = 0;
 let scrapeMeter = 0;     // seconds of edge spent, against SCRAPE_TIME_LIMIT
 let scrapeRisk = 0;      // that meter as 0 to 1, for feedback
@@ -10975,6 +11098,7 @@ function startRun() {
   carX = 0;
   carFrac = 0;
   scraping = false;
+  onRough = false;
   scrapeSide = 0;
   scrapeMeter = 0;
   scrapeRisk = 0;
@@ -11165,6 +11289,7 @@ function continueRun() {
   carX = 0;
   carFrac = 0;
   scraping = false;
+  onRough = false;
   scrapeSide = 0;
   scrapeMeter = 0;
   scrapeRisk = 0;
@@ -11353,7 +11478,8 @@ function update(dt) {
      the shake. It runs down on its own and never stacks. */
   if (landSlow > 0) landSlow = Math.max(0, landSlow - dt);
   const landFactor = landSlow > 0 ? landSlowTo : 1;
-  const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1) * landFactor;
+  const speed = FEEL.SPEED * (scraping ? FEEL.SCRAPE_SPEED_FACTOR : 1)
+              * (onRough ? FEEL.JUMP_ROUGH_SPEED : 1) * landFactor;
   const prevPos = position;
   position += speed * dt;
 
@@ -11436,6 +11562,7 @@ function update(dt) {
     carY += carVY * dt;
     if (carY <= 0) { carY = 0; land(localHalf); }
     scraping = false;
+    onRough = false;
     scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
     scrapeRisk = clamp(scrapeMeter / FEEL.SCRAPE_TIME_LIMIT, 0, 1);
     return;
@@ -11487,6 +11614,12 @@ function update(dt) {
   scraping = offset > FEEL.SCRAPE_START || clipped === 1;
   scrapeSide = clipped === 1 ? hazardSide
              : (scraping ? Math.sign(carFrac) : 0);
+  /* Read after the bands and before the meter, because it is a third
+     place to be rather than a fourth band: a car can be on the shoulder
+     and on the edge at once, and it can be on the shoulder in the middle
+     of a perfectly good piece of road. */
+  onRough = roughBand(carIndex, offset);
+  if (onRough) addShake(FEEL.JUMP_ROUGH_SHAKE_PX);
   if (scraping) {
     scrapeMeter += dt;
     addShake(FEEL.SCRAPE_SHAKE_PX);
@@ -11497,10 +11630,50 @@ function update(dt) {
       if (!inOpening()) { crash(); return; }
       scrapeMeter = FEEL.SCRAPE_TIME_LIMIT;
     }
+  } else if (onRough) {
+    /* THE SHOULDER'S OWN DRAIN, and the three things it does not do.
+
+       It does not stack with the edge, because this is the else of it.
+       It does not push the meter past JUMP_ROUGH_CAP, so it can never
+       end a run and never hand the player an edge that kills on contact.
+       And above that ceiling it does nothing at all rather than pulling
+       the meter DOWN to it, which a bare Math.min would have done and
+       would have made broken ground a place to go and recover. */
+    const ceil = FEEL.SCRAPE_TIME_LIMIT * FEEL.JUMP_ROUGH_CAP;
+    if (scrapeMeter < ceil)
+      scrapeMeter = Math.min(ceil, scrapeMeter + dt * FEEL.JUMP_ROUGH_DRAIN);
   } else {
     scrapeMeter = Math.max(0, scrapeMeter - dt * FEEL.SCRAPE_RECOVER_RATE);
   }
   scrapeRisk = clamp(scrapeMeter / FEEL.SCRAPE_TIME_LIMIT, 0, 1);
+}
+
+/* BESIDE THE RAMP RATHER THAN ON IT.
+
+   True when the car is within a jump's broken ground and outside the
+   width of its deck. The inner edge is JUMP_RAMP_HALF itself rather than
+   a constant of its own, so the paint and the cost cannot drift apart
+   and there is no clean strip beside the deck for a slider to open up.
+
+   NO OUTER EDGE, on purpose: see JUMP_ROUGH_TAIL. Every jump in the list
+   is asked, because two can be inside the draw distance at once and the
+   nearest is not always the one the car is level with. */
+function roughBand(carIndex, offset) {
+  if (offset <= FEEL.JUMP_RAMP_HALF) return false;
+  /* AND NOT WHILE THE WHEELS ARE ON THE DECK. carY is zero unless the
+     car is riding a ramp, and rampRide's own rule is that once the
+     wheels are on it the jump is yours whatever the drift does with you
+     after that: being carried off sideways up a ramp is the good part.
+     The deck is only 0.62 of the half width, so a car that comes on at
+     0.5 and slides can cross that line while still climbing, and without
+     this it would be charged the cost of MISSING the jump it is in the
+     middle of taking. */
+  if (carY > 0) return false;
+  for (let i = 0; i < jumps.length; i++) {
+    const j = jumps[i];
+    if (carIndex >= j.from && carIndex <= j.to + FEEL.JUMP_ROUGH_TAIL) return true;
+  }
+  return false;
 }
 
 /* Up the wedge and off the lip.
@@ -11825,6 +11998,7 @@ function crash(kind) {
   deadFor = 0;
   restartWanted = false;
   scraping = false;
+  onRough = false;
   /* Both lanes go quiet. A callout is feedback on driving and there is no
      driving any more, and leaving one to fade over the result screen is
      exactly the clutter the two lanes were built to avoid. */
@@ -13032,8 +13206,76 @@ function jumpHeightAt(j, i) {
        * clamp((i - j.from) / (j.to - j.from + 1), 0, 1);
 }
 
+/* THE BROKEN GROUND EITHER SIDE OF THE RAMP.
+
+   Two batched fills for every shoulder in shot, whatever else is on the
+   road: the band, then the rubble on it. The same discipline the rest of
+   the frame is drawn under, and the reason the band is not drawn per
+   segment with its own fillStyle.
+
+   IT STOPS AT THE ROAD EDGE AND THE COST DOES NOT. See JUMP_ROUGH_TAIL.
+
+   THE RUBBLE IS PLACED BY ARITHMETIC AND NEVER BY rng(). A draw pass may
+   not touch the generator: it runs a different number of times on a slow
+   machine than on a fast one, so a single rng() call here would make the
+   road itself depend on the frame rate. The scatter comes from an integer
+   hash of the WORLD segment index, so a given fleck sits on a given piece
+   of road on every machine and on every frame it is drawn on. */
+function roughQuads(first, last, baseIndex, chips) {
+  const inner = FEEL.JUMP_RAMP_HALF;
+  let any = false;
+  ctx.beginPath();
+  for (let k = 0; k < jumps.length; k++) {
+    const j = jumps[k];
+    const a = Math.max(j.from - baseIndex, first);
+    const b = Math.min(j.to + FEEL.JUMP_ROUGH_TAIL - baseIndex, last);
+    for (let n = a; n <= b; n++) {
+      if (!bvis[n]) continue;
+      /* The far boundary of this anchor, so a merged run out in the far
+         field paints the whole of the road it swallowed rather than a
+         gap. The ramp itself is drawn the same way and for the same
+         reason. */
+      const f = n + 1;
+      for (let side = -1; side <= 1; side += 2) {
+        let i0 = inner, o0 = 1;
+        if (chips) {
+          /* One fleck per segment per side, its position across the band
+             from the hash and its width a share of the band. */
+          const h = (((n + baseIndex) * 1103515245 + 12345) >>> 16) & 255;
+          const t = (h / 255) * (1 - FEEL.JUMP_ROUGH_CHIP);
+          i0 = inner + (1 - inner) * t;
+          o0 = i0 + (1 - inner) * FEEL.JUMP_ROUGH_CHIP;
+        }
+        any = true;
+        ctx.moveTo(bx[n] + bw[n] * side * i0, by[n]);
+        ctx.lineTo(bx[n] + bw[n] * side * o0, by[n]);
+        ctx.lineTo(bx[f] + bw[f] * side * o0, by[f]);
+        ctx.lineTo(bx[f] + bw[f] * side * i0, by[f]);
+        ctx.closePath();
+      }
+    }
+  }
+  return any;
+}
+
+function drawRoughShoulders(first, last, baseIndex) {
+  if (roughQuads(first, last, baseIndex, false)) {
+    ctx.fillStyle = COLOUR.JUMP_ROUGH;
+    ctx.fill();
+  }
+  if (roughQuads(first, last, baseIndex, true)) {
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = COLOUR.JUMP_ROUGH_CHIP;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
 function drawJumps(first, last, baseIndex) {
   if (!jumps.length) return;
+  /* FIRST, so the wedge and the chevrons are drawn ON it rather than
+     under it, and so it can never paint over the lip. */
+  drawRoughShoulders(first, last, baseIndex);
   for (let k = 0; k < jumps.length; k++) drawRamp(jumps[k], first, last, baseIndex);
   /* Wide and faint, then solid. The same two pass glow the road edges
      use, and still no shadowBlur anywhere in this file. */
@@ -13051,19 +13293,65 @@ function drawJumps(first, last, baseIndex) {
   }
 }
 
-const rampL = [], rampR = [], rampY = [];
+const rampL = [], rampR = [], rampY = [], rampB = [];
 function drawRamp(j, first, last, baseIndex) {
   const RH = FEEL.JUMP_RAMP_HALF;
   const a = Math.max(j.from - baseIndex, first);
   const b = Math.min(j.to + 1 - baseIndex, last + 1);
   if (b - a < 1) return;
-  for (let n = a; n < b; n++) if (!bvis[n]) return;
-  rampL.length = 0; rampR.length = 0; rampY.length = 0;
-  for (let n = a; n <= b; n++) {
-    const rise = bh[n] * jumpHeightAt(j, n + baseIndex);
+
+  /* AND THIS WAS THE REST OF THE LATENESS, the half the chevron fix
+     named and did not reach.
+
+     The guard here used to be "every one of the ramp's segments must be
+     visible, or draw nothing at all". The far field merge clears bvis on
+     every segment it absorbs, so a single absorbed segment anywhere in
+     the run deleted the whole wedge. That is not occasional bad luck: a
+     ramp is JUMP_RAMP_SEGMENTS long and beyond about forty segments the
+     WHOLE of it spans less than SEG_MERGE_PX, so it is always swallowed
+     into one anchor and the guard always fired.
+
+     MEASURED ON THE SHIPPED BUILD, and the known answer case is what
+     makes it a measurement rather than a reading: the ramp first put ink
+     on the canvas at 40 segments, 0.89 seconds out, against a 72 segment
+     warning run. With SEG_MERGE_PX forced to zero the same probe got 179
+     segments, the whole draw distance. So the coalescing was the entire
+     cause and there is no cull: the chevrons stood over empty road for
+     the first 32 segments, 0.71 seconds, of the run they exist to
+     advertise, which is 44 per cent of it.
+
+     Drawn from the anchors that survived instead, which is the same
+     answer the chevrons got. bspan says how many segments an anchor
+     swallowed and the merge moved that anchor's FAR boundary out to
+     where its run ended, so the world position of every boundary used
+     here is known exactly rather than assumed. The wedge can overhang
+     its own lip by at most one merge run, which is under a pixel, on a
+     ramp that is a few pixels tall at that distance. */
+  let n0 = a;
+  while (n0 > first && !bvis[n0]) n0--;
+  if (!bvis[n0]) return;
+  rampL.length = 0; rampR.length = 0; rampY.length = 0; rampB.length = 0;
+  for (let n = n0, world = n0; ; ) {
+    const rise = bh[n] * jumpHeightAt(j, world + baseIndex);
     rampL.push(bx[n] - bw[n] * RH);
     rampR.push(bx[n] + bw[n] * RH);
     rampY.push(by[n] - rise);
+    rampB.push(n);
+    const nx = n + (bspan[n] || 1);
+    /* The far boundary of the last anchor, which is where its run ended
+       and therefore which world segment it stands at. Also the exit when
+       a segment inside the ramp was culled rather than merged, which
+       means the road folded back on itself there and the wedge has
+       nowhere further to go. */
+    if (nx >= b || nx > last || !bvis[nx]) {
+      const riseF = bh[n + 1] * jumpHeightAt(j, nx + baseIndex);
+      rampL.push(bx[n + 1] - bw[n + 1] * RH);
+      rampR.push(bx[n + 1] + bw[n + 1] * RH);
+      rampY.push(by[n + 1] - riseF);
+      rampB.push(n + 1);
+      break;
+    }
+    n = nx; world = nx;
   }
   const top = rampY.length - 1;
 
@@ -13072,7 +13360,7 @@ function drawRamp(j, first, last, baseIndex) {
   for (const side of [rampL, rampR]) {
     ctx.moveTo(side[0], rampY[0]);
     for (let i = 1; i <= top; i++) ctx.lineTo(side[i], rampY[i]);
-    for (let i = top; i >= 0; i--) ctx.lineTo(side[i], by[a + i]);
+    for (let i = top; i >= 0; i--) ctx.lineTo(side[i], by[rampB[i]]);
     ctx.closePath();
   }
   ctx.fillStyle = COLOUR.JUMP_SIDE;
@@ -13094,7 +13382,8 @@ function drawRamp(j, first, last, baseIndex) {
     ctx.lineTo(rampL[i + 1], rampY[i + 1]);
     ctx.closePath();
     ctx.fillStyle = rampAt(JUMP_DECK_RAMP,
-                           jumpHeightAt(j, a + i + baseIndex + 1) / FEEL.JUMP_RAMP_HEIGHT);
+                           (by[rampB[i + 1]] - rampY[i + 1])
+                           / Math.max(0.01, bh[rampB[i + 1]] * FEEL.JUMP_RAMP_HEIGHT));
     ctx.fill();
   }
 
@@ -13102,7 +13391,7 @@ function drawRamp(j, first, last, baseIndex) {
      the single clearest statement that a surface rises, and it is what
      carries the ramp at draw distance once the deck is only a few pixels
      across. */
-  ctx.lineWidth = Math.max(1.5, bh[a] * FEEL.JUMP_RAMP_HEIGHT * 0.06);
+  ctx.lineWidth = Math.max(1.5, bh[rampB[0]] * FEEL.JUMP_RAMP_HEIGHT * 0.06);
   ctx.strokeStyle = COLOUR.JUMP_LIP;
   ctx.globalAlpha = 0.55;
   for (const side of [rampL, rampR]) {
@@ -13115,7 +13404,7 @@ function drawRamp(j, first, last, baseIndex) {
 
   // The lip, only when the real lip is the boundary on screen.
   if (b !== j.to + 1 - baseIndex) return;
-  const thick = Math.max(2, bh[b] * FEEL.JUMP_RAMP_HEIGHT * 0.12);
+  const thick = Math.max(2, bh[rampB[top]] * FEEL.JUMP_RAMP_HEIGHT * 0.12);
   ctx.globalAlpha = 0.3;
   ctx.fillStyle = JUMP_GLOW_FILL;
   ctx.fillRect(rampL[top] - thick, rampY[top] - thick * 1.6,
@@ -13147,18 +13436,34 @@ function jumpChevrons(first, last, baseIndex, grow) {
          at most SEG_MERGE_PX away up the screen, which is a pixel. */
       while (n > first && !bvis[n]) n--;
       if (!bvis[n]) continue;
+      /* THE APEX IS UP THE ROAD NOW RATHER THAN UP THE SCREEN, which is
+         the whole of laying it flat: the six points are the same six
+         points, with the chevron's length spent along the road instead
+         of into the sky. The head gets the same snap back to a surviving
+         anchor the feet get, because the merge can absorb either end. */
+      let nh = n + FEEL.JUMP_ARROW_LENGTH;
+      if (nh > last) nh = last;
+      while (nh > n && !bvis[nh]) nh--;
       any = true;
       // The run grows toward the ramp, so it reads as leading somewhere
       // rather than as a row of identical markers.
       const shrink = grow * (1 - (m - 1) * 0.12);
-      const hy = bh[n] * FEEL.JUMP_ARROW_HEIGHT * shrink;
-      const hx = bw[n] * FEEL.JUMP_ARROW_HALF * shrink;
-      const tx = hx * FEEL.JUMP_ARROW_THICK, ty = hy * FEEL.JUMP_ARROW_THICK;
       const cx = bx[n], base = by[n];
-      ctx.moveTo(cx, base - hy);
+      /* Stretched up the screen when the projection has squashed it under
+         the floor. It only ever fires on the far half of the run, where
+         the mark is a few pixels deep and its exact apex is not a thing
+         anybody can see, and without it the far chevrons foreshorten into
+         scratches. */
+      let deep = (base - by[nh]) * shrink;
+      if (deep < FEEL.JUMP_ARROW_MIN_PX) deep = FEEL.JUMP_ARROW_MIN_PX;
+      const hx = bw[n] * FEEL.JUMP_ARROW_HALF * shrink;
+      const tx = hx * FEEL.JUMP_ARROW_THICK;
+      const tz = deep * FEEL.JUMP_ARROW_THICK;
+      const tip = base - deep;
+      ctx.moveTo(cx, tip);
       ctx.lineTo(cx + hx, base);
       ctx.lineTo(cx + hx - tx, base);
-      ctx.lineTo(cx, base - hy + ty);
+      ctx.lineTo(cx, tip + tz);
       ctx.lineTo(cx - hx + tx, base);
       ctx.lineTo(cx - hx, base);
       ctx.closePath();
@@ -21513,6 +21818,7 @@ function finishRun() {
   deadFor = 0;
   restartWanted = false;
   scraping = false;
+  onRough = false;
   calloutLife = 0;
   driftLife = 0;
   breakChain();
@@ -21703,7 +22009,22 @@ function clearDailyRecords() {
    somebody's best score is a real loss and a scoring change does not
    earn it: session C moved scores three to four times and did not, and
    this is a tenth of that. */
-const ROAD_GEN = 10;
+/* BUMPED TO 11 FOR THE ROUGH SHOULDERS, AND THE ROAD DID NOT CHANGE.
+
+   Measured over 28 days on all five levels: 140 roads before, 140 after,
+   every one of them byte identical, because the shoulder draws no rng
+   and lays no geometry. So by the letter of the rule this bump is not
+   owed and it is made anyway.
+
+   THE REASON IS WHAT A TIME ON THAT ROAD NOW MEANS. Missing a jump used
+   to be free and now costs speed and bar. A record set an hour before
+   this shipped was set on the same road under different rules, and the
+   ghost is worse than the record: it is a replayed position trace, so an
+   old one drives the line it drove at the speed it drove, straight
+   through ground it never had to pay for, and appears to do something
+   the player now cannot. That is the staleness this constant exists to
+   clear, and the whole cost of clearing it is one day of records. */
+const ROAD_GEN = 11;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
