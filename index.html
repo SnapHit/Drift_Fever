@@ -4644,6 +4644,176 @@ const FEEL = {
   GHOST_PASS_GAP:           900,     // world units of hysteresis, so a dead heat is not a strobe
   GHOST_PASS_COOLDOWN:      2.5,     // seconds between pass callouts
 
+  /* ==================================================================
+     THE RACERS. Three opponents, random track only.
+
+     NPC-RACERS.md is the agreed design and this block implements it. The
+     one sentence that governs everything here: THEY RUBBER BAND ON PACE,
+     NOT ON LINE. An opponent that falls behind speeds up and one well
+     ahead eases off, so passing one does not end the race with it.
+
+     THEY ARE THE PACE CAR'S REPLACEMENT and they are built on its
+     corpse: the driver below is ghostSynthesise's, recovered from commit
+     0bb4018, which ran the real drift model over the real road with a
+     lane holding driver aimed at the inside of the corner it can see.
+     What is added is a pace law, a lane of its own, a solid body and a
+     way of getting round things.
+
+     RANDOM TRACK ONLY, and that is the spec's own build order rather
+     than a limitation. The daily's premise is that everyone drives the
+     same road, which is what makes ghosts comparable and the share card
+     mean anything, and racers on the daily have to be deterministic from
+     the seed. The random track has none of those constraints, so the
+     feel gets proved somewhere it cannot break a record.
+     ================================================================== */
+  NPC_COUNT:                  3,     // LIVE, the spec's number. Two or three in play beats eight unseen
+  /* THE DRIVER, and the first four are the pace car's own numbers at the
+     values every earlier measurement in this project was taken at. It
+     aims at the INSIDE of the corner it can see up the road, which is
+     the side centrifugal is pushing it away from, so holding that line
+     costs it real lock and real slip and the car is sideways because it
+     is sliding rather than because it was told to be. */
+  NPC_LOOK_SEGMENTS:         14,     // LIVE, how far up the road it reads
+  NPC_LINE_INSIDE:         0.70,     // LIVE, how much of the inside it takes
+  NPC_STEER_P:             2.10,     // LIVE
+  NPC_STEER_D:             0.85,     // LIVE
+  /* IT CANNOT LEAVE THE ROAD. The same guard the pace car had: the wall
+     takes the sideways speed pushing into it and nothing else. A racer
+     that fell off would be a car the player watches die, which is a
+     worse advertisement for the mechanic than no racer at all. */
+  NPC_EDGE:                0.86,     // LIVE, of the half width, how far out it will go
+  /* THE LANES, WHICH ARE THE WHOLE OF HOW THEY BLOCK. They do not steer
+     at the player and they never will: see the note on contact. What
+     makes the player commit to a side is simply that three cars spread
+     across the road do not leave a lane straight through the middle.
+     Each racer holds an offset from the racing line and changes it on
+     its own clock, which is a fact about the racer and not a reaction to
+     the player. */
+  NPC_LANE_SPREAD:         0.46,     // LIVE, of the half width, how far apart they sit
+  NPC_LANE_HOLD:            5.5,     // LIVE, seconds a racer keeps a lane
+  NPC_LANE_TIME:           1.60,     // LIVE, seconds to slide from one lane to the next
+
+  /* ------------------------------------------------------------------
+     THE PACE LAW, AND IT IS THE FEATURE.
+
+     Too weak and they are ghosts you pass once. Too strong and a car
+     that is always exactly beside you whatever you do is obviously fake,
+     and players hate that more than losing.
+
+     THE SHAPE IS: a free band, then a pull that grows with the gap, then
+     A RELEASE. The release is the part that matters and it is what stops
+     this being a cheat. Past NPC_GIVE_UP the band lets go entirely and
+     the racer settles back to its own natural pace, so a player who is
+     genuinely faster leaves all three behind and STAYS ahead. Without
+     it the band is a tether and the player can never actually win.
+
+     ASYMMETRIC ON PURPOSE. A leading racer eases off harder than a
+     trailing one speeds up, because slowing down reads as a car having a
+     scruffy corner and speeding up reads as a car with a bigger engine
+     than it had a second ago. The cheat is far more visible in one
+     direction than the other. */
+  NPC_BAND:                2200,     // LIVE, world units of free running before anything pulls
+  NPC_BAND_SPAN:           5000,     // LIVE, world units over which the pull reaches full
+  NPC_CATCH:               1.13,     // LIVE, the most a trailing racer speeds up to
+  NPC_EASE:                0.86,     // LIVE, the least a leading racer eases off to
+  /* ------------------------------------------------------------------
+     THE RELEASE IS ON TIME AND NOT ON DISTANCE, AND THAT IS THE SECOND
+     ANSWER TO THIS QUESTION RATHER THAN THE FIRST.
+
+     A distance release was built first and measured, and it cannot work.
+     Any band that reads only the GAP has a stable equilibrium wherever
+     the racer's boosted pace equals the player's, and the car simply
+     sits there: measured on a fast driver, the nearest racer's gap had a
+     median of 3.4 thousand and a NINETIETH PERCENTILE OF 3.4 THOUSAND.
+     Pinned to three digits for a whole run. With the band forced off the
+     same driver saw 11.2 and 20.9, which is what a race looks like.
+
+     AND IT CANNOT BE TUNED OUT, which is why this is a shape change and
+     not a number change. For a fast player to outrun the catch you need
+     the best racer's boosted pace below the player's, and every player
+     in this game is within about five per cent of every other: any
+     setting that lets a good player escape leaves an average one
+     uncontested. Distance alone cannot separate them.
+
+     TIME CAN, because it is a fact about the RUN rather than about the
+     moment. A racer accrues give up while the player is clear of the
+     free band and pays it back while they are not, so what switches the
+     chase off is having been beaten for a sustained stretch rather than
+     being a certain distance behind at an instant. A great run holds a
+     lead long enough that the racers stop coming. An average run keeps
+     losing the lead, never banks the time, and gets a fight for the
+     whole level. A bad run never leads at all and sees all three the
+     whole way. That is the three outcomes asked for, out of one number.
+
+     AND IT COMES BACK. Give up is paid back over NPC_GIVE_BACK, so a
+     player who beats them and then falls apart is raced again. Nothing
+     here is permanent, which is what keeps it a rubber band rather than
+     a switch. */
+  NPC_GIVE_UP:               14,     // LIVE, seconds of holding a clear lead before a racer stops chasing
+  NPC_GIVE_BACK:              8,     // LIVE, seconds of being back in range before it chases again
+  NPC_PACE_TIME:           1.10,     // LIVE, seconds for a racer to reach a new pace
+  /* Their natural speeds, which is what they run at inside the band and
+     what they fall back to once it releases. Spread so the three are not
+     one car drawn three times, and centred a little under the player's
+     own so a clean run is genuinely quicker than they are. */
+  NPC_PACE_BASE:           0.92,     // LIVE, share of FEEL.SPEED, the middle racer
+  NPC_PACE_SPREAD:        0.045,     // LIVE, and the step either side of it
+  NPC_START_SPREAD:        2600,     // LIVE, world units between them on the grid
+  NPC_START_AHEAD:         1800,     // LIVE, how far up the road the first one starts
+
+  /* ------------------------------------------------------------------
+     CONTACT. Solid, tactile, and free.
+
+     Those three pull against each other, which is the spec's own warning
+     about this part. Tactile normally means a velocity change, and a
+     velocity change near the edge is a penalty the player did not cause:
+     the core mechanic is a mercy gradient and an opponent that spends
+     the player's bar for a reason the player did not cause is the
+     difference between hard and unfair.
+
+     SO THE PUSH ONLY EVER GOES INWARD, and that is the whole guarantee.
+     A bump moves the two cars apart laterally, and the share of it that
+     would move the PLAYER further from the centre line is spent on the
+     racer instead. The player can therefore be bumped toward the middle
+     of the road and never toward the edge, whatever the geometry, so
+     contact cannot drain a bar, cannot cause a scrape and cannot end a
+     run. It is a rule rather than a tuning, so it holds at every value
+     below.
+
+     NOTHING TOUCHES FORWARD SPEED. Not the player's, not the racer's.
+     A knock that slowed the player down would be an attack with extra
+     steps. */
+  NPC_BUMP:                   1,     // LIVE, 0 turns contact off and they pass through
+  NPC_BUMP_PUSH:           0.55,     // LIVE, share of the overlap resolved per contact
+  NPC_BUMP_SHARE:          0.30,     // LIVE, the player's share of it, the racer takes the rest
+  NPC_BUMP_SHAKE:             5,     // LIVE, screen pixels, so it lands as a knock
+  NPC_BUMP_COOLDOWN:       0.18,     // LIVE, seconds between shakes, so a lean is not a rattle
+
+  /* The body. Solid rather than the ghost's two translucent slabs,
+     because a rival you can hit has to look like something you can hit.
+     Drawn from the same boundary tables through ghostPoint, so it rides
+     the curve for free and sits in the world rather than on the screen. */
+  /* AND ONE THAT IS NOT ABOUT THE BODY BUT ABOUT THE LENS.
+
+     A racer BEHIND the player sits between the camera and the car, and
+     the camera is only CAMERA_DISTANCE back, so a car a couple of
+     thousand units adrift is a couple of thousand units from the lens.
+     ghostPoint's scale is CAMERA_DEPTH over that distance, so the height
+     term blows up: measured, a racer at a gap of -3271 was 829 units
+     from the camera and its roof was thrown most of the way up the
+     screen, drawing a car as a stripe the height of the frame.
+
+     THE RULE IS A RATIO AND NOT A DISTANCE, because what actually breaks
+     is the car's own length being comparable to its distance from the
+     lens. Below this many body lengths it is not drawn at all, which
+     costs nothing anybody can see: a car that close is behind the camera
+     eye line and mostly out of frame already. */
+  NPC_NEAR_CULL:            3.6,     // LIVE, body lengths from the camera
+  NPC_HEIGHT:               340,     // LIVE, world units to the roof
+  NPC_CABIN_WIDE:          0.68,     // LIVE, the roof as a share of the footprint
+  NPC_CABIN_LONG:          0.60,     // LIVE
+  NPC_CABIN_BACK:          0.20,     // LIVE, set back, so it has a bonnet
+
   /* THE PACE CAR IS GONE, AND ITS EIGHT CONSTANTS WITH IT.
 
      It did one job well and then stopped: it was passed inside the first
@@ -6027,6 +6197,35 @@ const COLOUR = {
      enough down in value that it can never take the road edge's place at
      the top of the range or read as a hazard. Drawn at GHOST_ALPHA on top
      of that, so what lands on screen is dimmer again. */
+  /* THE RACERS, AND THEY ARE NOT THE GHOST'S FAMILY. The ghost is a
+     record of a run and is held down in value so it can never be
+     mistaken for something solid in the way. A racer IS something solid
+     in the way, so it wants the opposite: a body that reads as a car
+     with a driver in it.
+
+     THREE, AND THEY DIFFER BY HUE RATHER THAN BY BRIGHTNESS, so no one
+     of them is more visible than another and none of them competes with
+     the road edge for the top of the value range. Section 7's hierarchy
+     is measured after every visual change and the edge owns the top of
+     it: these sit with the player's own car, which is permitted above
+     the terrain because it is a compact silhouette.
+
+     ONE KEY EACH, NOT AN ARRAY OF THREE. Every value in COLOUR is walked
+     by the biome rotation through rgbOf, which reads a colour string; an
+     array would have been handed to it whole and the palette pass would
+     have thrown on the first biome change. Flat keys, and NOT in
+     PALETTE_FIXED, so the racers turn with the world exactly as the
+     player's own car does. */
+  NPC_BODY_A:   '#8d3f6a',
+  NPC_ROOF_A:   '#c46a97',
+  NPC_SIDE_A:   '#5c2845',
+  NPC_BODY_B:   '#3f6a8d',
+  NPC_ROOF_B:   '#6a97c4',
+  NPC_SIDE_B:   '#28455c',
+  NPC_BODY_C:   '#6a8d3f',
+  NPC_ROOF_C:   '#97c46a',
+  NPC_SIDE_C:   '#455c28',
+  NPC_LIGHT:    '#ff6b6b',      // the tail bar, the detail the camera sees most of
   GHOST:        '#2f7a8f',
   GHOST_EDGE:   '#79c5d8',
 
@@ -6635,6 +6834,38 @@ const TUNABLES = [
   { key: 'TREE_EVERY',         label: 'treeEvry',step: 1,   min: 0,    max: 40,    dp: 0, group: 30 },
   { key: 'TREE_DENSITY',       label: 'treeDens',step: 0.04,min: 0,    max: 1,     dp: 2, group: 30 },
   { key: 'TREE_CLEAR',         label: 'treeClr', step: 0.05,min: 1.7,  max: 8,     dp: 2, group: 30 },
+  /* THE RACERS, group 31. The pace law rows are the ones that matter and
+     they go first, because they are the feature and the rest is support. */
+  { key: 'NPC_COUNT',          label: 'npcs',    step: 1,   min: 0,    max: 6,     dp: 0, group: 31 },
+  { key: 'NPC_PACE_BASE',      label: 'npcPace', step: 0.01,min: 0.5,  max: 1.3,   dp: 2, group: 31 },
+  { key: 'NPC_PACE_SPREAD',    label: 'npcSprd', step: 0.01,min: 0,    max: 0.3,   dp: 2, group: 31 },
+  { key: 'NPC_BAND',           label: 'npcBand', step: 100, min: 0,    max: 12000, dp: 0, group: 31 },
+  { key: 'NPC_BAND_SPAN',      label: 'npcSpan', step: 250, min: 500,  max: 40000, dp: 0, group: 31 },
+  { key: 'NPC_CATCH',          label: 'npcCatch',step: 0.01,min: 1,    max: 1.6,   dp: 2, group: 31 },
+  { key: 'NPC_EASE',           label: 'npcEase', step: 0.01,min: 0.5,  max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_GIVE_UP',        label: 'npcGive', step: 0.5, min: 0.5,  max: 120,   dp: 1, group: 31 },
+  { key: 'NPC_GIVE_BACK',      label: 'npcBack', step: 0.5, min: 0.5,  max: 120,   dp: 1, group: 31 },
+  { key: 'NPC_PACE_TIME',      label: 'npcPcTm', step: 0.05,min: 0.05, max: 6,     dp: 2, group: 31 },
+  { key: 'NPC_LANE_SPREAD',    label: 'npcLane', step: 0.02,min: 0,    max: 0.9,   dp: 2, group: 31 },
+  { key: 'NPC_LANE_HOLD',      label: 'npcLnHld',step: 0.25,min: 0.5,  max: 20,    dp: 2, group: 31 },
+  { key: 'NPC_LANE_TIME',      label: 'npcLnTm', step: 0.1, min: 0.1,  max: 8,     dp: 2, group: 31 },
+  { key: 'NPC_LOOK_SEGMENTS',  label: 'npcLook', step: 1,   min: 2,    max: 60,    dp: 0, group: 31 },
+  { key: 'NPC_LINE_INSIDE',    label: 'npcIn',   step: 0.02,min: 0,    max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_STEER_P',        label: 'npcP',    step: 0.05,min: 0,    max: 6,     dp: 2, group: 31 },
+  { key: 'NPC_STEER_D',        label: 'npcD',    step: 0.05,min: 0,    max: 4,     dp: 2, group: 31 },
+  { key: 'NPC_EDGE',           label: 'npcEdge', step: 0.02,min: 0.2,  max: 1.2,   dp: 2, group: 31 },
+  { key: 'NPC_START_SPREAD',   label: 'npcGrid', step: 100, min: 0,    max: 12000, dp: 0, group: 31 },
+  { key: 'NPC_START_AHEAD',    label: 'npcHead', step: 100, min: -8000,max: 20000, dp: 0, group: 31 },
+  { key: 'NPC_BUMP',           label: 'npcBump', step: 1,   min: 0,    max: 1,     dp: 0, group: 31 },
+  { key: 'NPC_BUMP_PUSH',      label: 'npcPush', step: 0.05,min: 0,    max: 2,     dp: 2, group: 31 },
+  { key: 'NPC_BUMP_SHARE',     label: 'npcShare',step: 0.05,min: 0,    max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_BUMP_SHAKE',     label: 'npcShake',step: 1,   min: 0,    max: 30,    dp: 0, group: 31 },
+  { key: 'NPC_BUMP_COOLDOWN',  label: 'npcBmpCd',step: 0.02,min: 0,    max: 2,     dp: 2, group: 31 },
+  { key: 'NPC_NEAR_CULL',      label: 'npcNear', step: 0.1, min: 0,    max: 12,    dp: 1, group: 31 },
+  { key: 'NPC_HEIGHT',         label: 'npcTall', step: 10,  min: 60,   max: 900,   dp: 0, group: 31 },
+  { key: 'NPC_CABIN_WIDE',     label: 'npcCabW', step: 0.02,min: 0.2,  max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_CABIN_LONG',     label: 'npcCabL', step: 0.02,min: 0.2,  max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_CABIN_BACK',     label: 'npcCabB', step: 0.02,min: -0.5, max: 0.5,   dp: 2, group: 31 },
   { key: 'TREE_FAR_OUT',       label: 'treeFar', step: 0.5, min: 0,    max: 40,    dp: 1, group: 30 },
   { key: 'TREE_OUT_BIAS',      label: 'treeBias',step: 0.2, min: 0.4,  max: 8,     dp: 1, group: 30 },
   { key: 'TREE_MAX_PX',        label: 'treeMax', step: 0.02,min: 0.04, max: 2,     dp: 2, group: 30 },
@@ -11172,6 +11403,8 @@ function startRun() {
   position = 0;
   carX = 0;
   carFrac = 0;
+  // The field lines up again. Random track only; see racersOn.
+  racersReset(0);
   scraping = false;
   onRough = false;
   scrapeSide = 0;
@@ -11363,6 +11596,16 @@ function continueRun() {
   position = cpSeg * FEEL.SEGMENT_LENGTH - FEEL.CAMERA_DISTANCE;
   carX = 0;
   carFrac = 0;
+  /* THE FIELD LINES UP AGAIN AT THE CHECKPOINT, and leaving this out was
+     a real bug rather than a tidy up. saveCheckpoint is called from the
+     gate with no mode test and canContinue asks only for a valid
+     checkpoint and a dead car, so the random track HAS continues. Without
+     this the three cars kept the z they held at the crash, which is
+     however far past the checkpoint the run had got: racerPace then read
+     a large positive gap, applied NPC_EASE, and the field idled at 0.86
+     pace while the player ground all the way back. The race was dead for
+     the whole of every resumed run. */
+  racersReset(position);
   scraping = false;
   onRough = false;
   scrapeSide = 0;
@@ -11611,6 +11854,13 @@ function update(dt) {
 
   const prevX = carX;
   carX += drift.lateralV * dt;
+  carFrac = carX / localHalf;
+  /* AFTER the player has moved this frame and BEFORE carFrac is read by
+     anything that decides. A gap measured against last frame's position
+     would lag the pace law by a frame, and contact resolved before carX
+     moved would separate the cars from where they used to be. carFrac is
+     recomputed below, because contact can move carX. */
+  racersUpdate(dt);
   carFrac = carX / localHalf;
   ghostRecord(prevPos, prevX, dt);
 
@@ -13066,6 +13316,10 @@ function drawRoad(w, h) {
   // Last in the world and before the car, which render draws afterwards,
   // so the ghost can never sit on top of the thing you are steering.
   drawGhost(first, last, baseIndex);
+  /* AND THE RACERS WITH IT, for the same reason and in the same place:
+     they are things in the world, so the player's own car is drawn over
+     them by render and can never be hidden behind one. */
+  drawRacers(first, last, baseIndex, w, h);
 }
 
 /* The warning, painted on the road surface a full second before the
@@ -13877,6 +14131,356 @@ function ghostPass() {
   }
 }
 
+/* ==================================================================
+   THE RACERS.
+
+   Three opponents on the random track. NPC-RACERS.md is the agreed
+   design; the constants block carries the reasoning and this is the
+   machinery.
+
+   THE DRIVER IS ghostSynthesise'S, recovered from commit 0bb4018 rather
+   than rewritten. It runs the REAL drift model, the same three lines
+   update runs, over the REAL road, with a lane holding driver on the
+   front of it. Heading and travel come apart in the corners exactly the
+   way the player's do, so the yaw a racer is drawn at is a genuine slip
+   angle: it is sideways because it is sliding, not because it was told
+   to be. What is new is a pace law, a lane of its own, a way round a
+   hazard, and a solid body.
+
+   THEY LIVE IN THE SAME SPACE THE PLAYER DOES. z is distance along the
+   road in world units, the same variable `position` is in, so a gap is a
+   subtraction. x is offset from the centre in world units, the same
+   `carX` is.
+
+   AND THEY ARE NOT PRUNED WITH THE ROAD. topUpRoad trims segments,
+   hazards and jumps behind segBase, so a racer that has dropped a long
+   way back is standing on road that no longer exists. segAt returns
+   undefined there and every read below is guarded: a racer off the back
+   of the generated road holds its lane and its pace on a straight
+   assumption until the player's own progress brings it back into view,
+   which is exactly what the pace law is about to do anyway.
+   ================================================================== */
+const racers = [];
+let racerBump = 0;          // seconds until another contact may shake the screen
+
+/* On the random track and nowhere else. The daily's roads, records,
+   ghosts and share card are untouched by this whole file, and this one
+   line is what guarantees it: every entry point below is behind it. */
+function racersOn() {
+  return mode === ENDLESS && FEEL.NPC_COUNT > 0;
+}
+
+/* THE GRID IS LAID RELATIVE TO WHERE THE PLAYER IS, and it has to be,
+   because this is called from two places that are nothing like each
+   other. startRun sets position to zero; continueRun sets it to the
+   checkpoint's segment, which is hundreds of thousands of units in.
+   Laid absolutely, a resumed run would put all three cars back at the
+   start of the world, r.give would saturate inside a second, the release
+   would fire and they would never come back. */
+function racersReset(base) {
+  const at = base || 0;
+  racers.length = 0;
+  racerBump = 0;
+  if (!racersOn()) return;
+  const n = Math.max(0, Math.round(FEEL.NPC_COUNT));
+  for (let i = 0; i < n; i++) {
+    /* THE GRID. Spread up the road ahead of the player rather than all
+       beside each other, so the first thing a new run shows is a field
+       to chase rather than a wall. The middle racer runs at
+       NPC_PACE_BASE and the others step either side of it, so the three
+       are not one car drawn three times. */
+    const mid = (n - 1) / 2;
+    racers.push({
+      z: at + FEEL.NPC_START_AHEAD + (n - 1 - i) * FEEL.NPC_START_SPREAD,
+      x: (i - mid) * FEEL.NPC_LANE_SPREAD * FEEL.ROAD_HALF_WIDTH_BASE,
+      hv: 0, lv: 0, yaw: 0,
+      base: FEEL.NPC_PACE_BASE + (i - mid) * FEEL.NPC_PACE_SPREAD,
+      speed: FEEL.SPEED * FEEL.NPC_PACE_BASE,
+      give: 0,                // how beaten it feels. See racerGive.
+      lane: i - mid,          // which lane it wants, in NPC_LANE_SPREAD units
+      laneNow: i - mid,       // and where it actually is between lanes
+      laneT: FEEL.NPC_LANE_HOLD * (0.4 + 0.6 * ((i * 7 + 3) % 5) / 4),
+      tint: i % 3,
+      y: 0, vy: 0, air: false,   // jumps, see racerRamp
+      ride: -1,                  // the jump it is climbing, by `from`
+      /* THE HAZARD LATCH IS DECLARED HERE AND NOT ATTACHED LATER. It is
+         only written by racerAim, and adding it on first contact with a
+         blocker would change the object's shape in the middle of the
+         update loop. The segment object is built one fixed shape for
+         exactly this reason and says so; a car in the same loop is worth
+         the same care. */
+      dodge: -1, dodgeSide: 1
+    });
+  }
+}
+
+/* THE PACE LAW, AND THE RELEASE IS THE POINT OF IT.
+
+   A free band, then a pull that grows with the gap, then a release. The
+   release is what stops this being a tether: past NPC_GIVE_UP the band
+   lets go and the racer settles back to its own natural pace, so a
+   player who is genuinely faster gets away and STAYS away. Reported as a
+   measurement rather than an opinion; see the fast, average and slow
+   tables.
+
+   ASYMMETRIC. A leading racer eases off harder than a trailing one
+   speeds up, because a car that slows down reads as a scruffy corner and
+   a car that speeds up reads as an engine it did not have a second ago.
+   The cheat is far more visible in one direction than the other. */
+function racerPace(r) {
+  const gap = r.z - position;                 // positive: the racer is ahead
+  let want = r.base;
+  if (gap > FEEL.NPC_BAND) {
+    const t = clamp((gap - FEEL.NPC_BAND) / Math.max(1, FEEL.NPC_BAND_SPAN), 0, 1);
+    want *= 1 + (FEEL.NPC_EASE - 1) * t;
+  } else if (gap < -FEEL.NPC_BAND) {
+    const behind = -gap - FEEL.NPC_BAND;
+    const t = clamp(behind / Math.max(1, FEEL.NPC_BAND_SPAN), 0, 1);
+    /* AND HERE IS THE RELEASE, WHICH IS r.give AND IS ACCRUED IN TIME.
+       See NPC_GIVE_UP: a band that reads only the gap pins the car at
+       whatever distance its boosted pace matches the player's, and
+       measured that pin was exact to three digits. This one asks how
+       long the player has BEEN clear, which is a fact about the run. */
+    want *= 1 + (FEEL.NPC_CATCH - 1) * t * (1 - r.give);
+  }
+  return want * FEEL.SPEED;
+}
+
+/* HOW BEATEN THIS ONE FEELS, 0 to 1. Accrued while the player is clear of
+   the free band and paid back while they are not, so it is a memory of
+   the race rather than a reading of this instant. Nothing here is
+   permanent: a player who gets away and then falls apart is chased
+   again, which is what keeps it a band and not a switch. */
+function racerGive(r, dt) {
+  const gap = r.z - position;
+  if (gap < -FEEL.NPC_BAND)
+    r.give = Math.min(1, r.give + dt / Math.max(0.1, FEEL.NPC_GIVE_UP));
+  else
+    r.give = Math.max(0, r.give - dt / Math.max(0.1, FEEL.NPC_GIVE_BACK));
+}
+
+/* WHICH LANE IT WANTS, AND IT IS NEVER AN ANSWER TO THE PLAYER.
+
+   This is the whole of how they block, and the whole of how they do not
+   attack. A racer picks a lane on its own clock and holds it. What makes
+   the player commit to a side is simply that three cars spread across
+   the road do not leave a lane through the middle.
+
+   NO rng(). The road generator's stream is the road, and a draw pulled
+   from it every few seconds by something that is not the road would make
+   the track depend on how long the racers had been driving. The lane
+   walk is arithmetic on the racer's own index and its own clock. */
+function racerLane(r, i, dt) {
+  r.laneT -= dt;
+  if (r.laneT <= 0) {
+    r.laneT = FEEL.NPC_LANE_HOLD;
+    const step = ((i * 3 + Math.round(r.z / 4096)) % 3) - 1;
+    r.lane = clamp(r.lane + (step === 0 ? 1 : step), -1, 1);
+  }
+  const k = 1 - Math.exp(-dt / Math.max(0.01, FEEL.NPC_LANE_TIME));
+  r.laneNow += (r.lane - r.laneNow) * k;
+  return r.laneNow * FEEL.NPC_LANE_SPREAD;
+}
+
+/* THE STEERING TARGET: the inside of the corner it can see, offset into
+   its own lane, and overridden by anything in the way.
+
+   Returns a target x in world units. */
+function racerAim(r, i, dt, seg, half) {
+  const at = Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+  const soon = segAt(at + Math.round(FEEL.NPC_LOOK_SEGMENTS)) || seg;
+  let aim = clamp(soon.curve * curveScale / FEEL.CURVE_HARD, -1, 1)
+          * FEEL.NPC_LINE_INSIDE * half
+          + racerLane(r, i, dt) * half;
+
+  /* AND ROUND ANYTHING IN THE WAY, because a racer that drives through a
+     blocker is not driving. The nearest hazard inside the lookahead
+     overrides the line entirely: clear air is worth more than an apex.
+     The side is held once chosen, for the reason the probe harness
+     learned the hard way — deciding it every frame walks the car to the
+     gap, finds itself momentarily clear, hands back to the racing line,
+     and steers straight back into the thing it was avoiding. */
+  let near = null, nearD = 1e9;
+  for (let k = 0; k < hazards.length; k++) {
+    const h = hazards[k];
+    const d = h.from - at;
+    /* PAST ITS END AND NOT PAST ITS START, and held for longer than the
+       body. A splitter is tens of segments long, so releasing the latch
+       a few segments after h.from hands control back to the racing line
+       while the car is still ALONGSIDE the thing, and the racing line
+       steers at the apex, which is where the hazard is. The lookahead is
+       wider than the hazard's own painted warning so the racer starts
+       moving before the warning does. */
+    if (at > h.to + 14 || d > FEEL.HAZARD_WARN_SEGMENTS * 2) continue;
+    if (d < nearD) { nearD = d; near = h; }
+  }
+  if (!near || (r.dodge >= 0 && r.dodge !== near.from)) {
+    if (!near || near.from > r.dodge) r.dodge = -1;
+  }
+  if (near) {
+    const hx = hazardX(near) * half;
+    const clear = near.half + FEEL.HAZARD_CLIP + FEEL.CAR_BODY_WIDTH / 2;
+    const swing = near.swing ? near.swing * half : 0;
+    if (r.dodge !== near.from) {
+      const roomL = (hx - swing - clear) - (-half);
+      const roomR = half - (hx + swing + clear);
+      r.dodge = near.from;
+      r.dodgeSide = roomR >= roomL ? 1 : -1;
+    }
+    aim = r.dodgeSide > 0
+      ? Math.min(half * 0.80, hx + swing + clear * 1.25)
+      : Math.max(-half * 0.80, hx - swing - clear * 1.25);
+  }
+  return aim;
+}
+
+/* THE RAMPS, AND THEY TAKE THEM.
+
+   A racer that drove straight through a ramp would read as a bug, and
+   the jump is the most spectacular thing on the road: three cars going
+   up it together is the picture the feature is for. It is also nearly
+   free, because ghostPoint already takes a world height, so an airborne
+   racer costs one extra number and no new drawing at all.
+
+   The launch is the player's own arithmetic with the player's own
+   constants, so a racer's flight is the same flight, and it lands on the
+   same guaranteed road jumpRunout reserves. Missing it costs a racer
+   nothing: the rough shoulder is the player's mercy gradient and giving
+   a racer a bar to drain would be inventing a mechanic nobody sees. */
+function racerRamp(r, dt, half) {
+  if (r.air) {
+    r.vy -= FEEL.JUMP_GRAVITY * dt;
+    r.y += r.vy * dt;
+    if (r.y <= 0) { r.y = 0; r.vy = 0; r.air = false; }
+    return;
+  }
+  const at = Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+  for (let i = 0; i < jumps.length; i++) {
+    const j = jumps[i];
+    if (at < j.from || at > j.to) continue;
+    // The width is asked once, at the foot, exactly as rampRide asks it.
+    if (r.ride !== j.from) {
+      if (Math.abs(r.x / half) > FEEL.JUMP_RAMP_HALF) return;
+      r.ride = j.from;
+    }
+    r.y = jumpHeightAt(j, at);
+    return;
+  }
+  if (r.ride >= 0) {
+    /* Off the lip. The same launch the player gets, lip loss and all, so
+       a racer that takes the middle of the deck flies as far as a player
+       who does and one that clips the corner does not. */
+    for (let i = 0; i < jumps.length; i++) {
+      if (jumps[i].from !== r.ride) continue;
+      const off = clamp(Math.abs(r.x / half) / FEEL.JUMP_RAMP_HALF, 0, 1);
+      r.vy = FEEL.JUMP_LAUNCH_V * (1 - FEEL.JUMP_LIP_LOSS * off * off);
+      r.y = FEEL.JUMP_RAMP_HEIGHT;
+      r.air = true;
+      break;
+    }
+    r.ride = -1;
+  }
+}
+
+/* CONTACT. Solid, tactile, and free, and the third of those is a rule
+   rather than a tuning.
+
+   THE PUSH ONLY EVER GOES INWARD FOR THE PLAYER. A bump separates the
+   two cars laterally, and the share that would move the PLAYER further
+   from the centre line is spent on the racer instead. So the player can
+   be knocked toward the middle of the road and never toward the edge,
+   whatever the geometry: contact cannot start a scrape, cannot drain the
+   bar and cannot end a run. That is the spec's requirement met by
+   construction, so it holds at every value of every constant here.
+
+   NOTHING TOUCHES FORWARD SPEED. Not the player's, not the racer's. A
+   knock that slowed the player down would be an attack with extra steps,
+   and the spec is explicit that these block rather than attack.
+
+   THE RACER ABSORBS MOST OF IT, which is what sells the weight: the
+   thing you hit moves more than you do, so it reads as you shouldering
+   past rather than as you bouncing off a wall. */
+function racerContact(r, dt, half) {
+  if (!FEEL.NPC_BUMP || r.air || airborne) return;
+  const dz = Math.abs(r.z - position);
+  if (dz > FEEL.CAR_BODY_LENGTH) return;
+  const dx = r.x - carX;
+  const wide = FEEL.CAR_BODY_WIDTH;
+  const over = wide - Math.abs(dx);
+  if (over <= 0) return;
+  const side = dx >= 0 ? 1 : -1;              // the racer is to that side of the player
+  const push = over * FEEL.NPC_BUMP_PUSH;
+  /* The player's share, and then the inward test. Pushing the player is
+     the opposite direction from the racer: they separate. */
+  let mine = push * FEEL.NPC_BUMP_SHARE * -side;
+  if (Math.abs(carX + mine) > Math.abs(carX)) {
+    /* IT WOULD HAVE MOVED THEM OUTWARD, so they do not move at all and
+       the racer takes the whole separation. This is the guarantee, and
+       it is the one line that makes contact safe next to the edge. */
+    mine = 0;
+    r.x += push * side;
+  } else {
+    carX += mine;
+    r.x += push * side * (1 - FEEL.NPC_BUMP_SHARE);
+  }
+  r.x = clamp(r.x, -half * FEEL.NPC_EDGE, half * FEEL.NPC_EDGE);
+  if (racerBump <= 0) {
+    racerBump = FEEL.NPC_BUMP_COOLDOWN;
+    addShake(FEEL.NPC_BUMP_SHAKE);
+    audioSting(STING_BUMP);
+  }
+}
+
+/* One frame of the whole field. Called from update, after the player's
+   own physics, so a gap is measured against a position that has already
+   moved this frame rather than last frame's. */
+function racersUpdate(dt) {
+  if (racerBump > 0) racerBump -= dt;
+  if (!racersOn() || state !== DRIVING) return;
+  const rate = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE;
+  const kh = 1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME);
+  const kg = 1 - Math.exp(-dt / FEEL.GRIP_TIME);
+  for (let i = 0; i < racers.length; i++) {
+    const r = racers[i];
+    const at = Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+    const seg = segAt(at);
+    /* OFF THE BACK OF THE GENERATED ROAD. topUpRoad trims behind segBase,
+       so a racer that has dropped a long way back is standing on road
+       that has been thrown away. It keeps its pace and its lane on a
+       straight assumption rather than being deleted, because the pace law
+       is about to bring it back. */
+    const half = seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE;
+    const curve = seg ? seg.curve * curveScale : 0;
+
+    racerGive(r, dt);
+    r.speed += (racerPace(r) - r.speed)
+             * (1 - Math.exp(-dt / Math.max(0.01, FEEL.NPC_PACE_TIME)));
+    r.z += r.speed * dt;
+
+    if (seg) racerRamp(r, dt, half);
+    const aim = seg ? racerAim(r, i, dt, seg, half) : r.x;
+    const steer = clamp(FEEL.NPC_STEER_P * (aim - r.x) / half
+                        - FEEL.NPC_STEER_D * (r.lv / rate), -1, 1);
+    if (!(steer === steer)) continue;         // a NaN racer is a stuck racer, not a wild one
+    const intent = steer * rate;
+    r.hv += (intent - r.hv) * kh;
+    r.lv += (intent - curve * FEEL.CENTRIFUGAL * rate - r.lv) * kg;
+    r.x += r.lv * dt;
+    /* The wall, on the same rule the player has: it takes the sideways
+       speed pushing into it and nothing else. A racer cannot leave the
+       road, because a rival the player watches fall off is a worse
+       advertisement for the mechanic than no rival at all. */
+    const wall = half * FEEL.NPC_EDGE;
+    if (Math.abs(r.x) > wall) {
+      r.x = clamp(r.x, -wall, wall);
+      if (r.lv * r.x > 0) r.lv = 0;
+    }
+    r.yaw = Math.atan(r.hv / Math.max(1, r.speed)) * FEEL.CAR_YAW_GAIN
+          + curve * FEEL.CAR_CURVE_YAW;
+    racerContact(r, dt, half);
+  }
+}
+
 /* Drawn from the SAME boundary tables the road is, so it sits in the
    world rather than on the screen and it rides the curve for free.
 
@@ -13962,6 +14566,169 @@ function drawGhost(first, last, baseIndex) {
   ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.globalAlpha = 1;
+}
+
+/* THE RACERS, DRAWN SOLID.
+
+   The ghost is two translucent slabs with a gap between them, and that
+   is right for a record of a run: it must never read as something solid
+   in the way. A racer is EXACTLY something solid in the way, so it gets
+   the opposite treatment — a closed body with sides, a roof and a light
+   bar, at full opacity.
+
+   THROUGH ghostPoint, so it is drawn from the same boundary tables the
+   road is and rides the curve for free. A corner that lands off the
+   tables skips the car for the frame, which is the same rule the ghost
+   has and is why neither of them can be drawn on road that is not there.
+
+   FURTHEST FIRST, so a near car paints over a far one. Three cars can be
+   in shot at once and without this the one behind is drawn on top of the
+   one in front, which is the single most obvious way to make a race look
+   fake. */
+/* THE RACERS GET THEIR OWN PROJECTION, AND NOT BECAUSE ghostPoint IS
+   WRONG.
+
+   ghostPoint lerps bx, by and bh linearly between the two boundaries a
+   point falls between. Those three are hyperbolic in distance, so a
+   straight line between two of them is a good approximation far away and
+   a poor one close up, and it errs by STRETCHING. Far out it does not
+   matter and the ghost is nearly always far out. A racer is not: the
+   whole point of the feature is the moment one is level with you, which
+   is exactly where the approximation is worst, and measured it drew a
+   car alongside as a long thin slab.
+
+   THE SCALE IS COMPUTED FROM THE TRUE DEPTH HERE rather than interpolated
+   toward it. What still has to be interpolated is the accumulated curve
+   offset, because that is only known at boundaries and is a polyline
+   anyway, and it is recovered from bx and bh, which is exactly the pair
+   the road pass built it from.
+
+   AND ghostPoint IS LEFT ALONE, deliberately. It draws the ghost, the
+   ghost is a daily feature, and the daily is not being touched this
+   session. Two functions rather than one shared one is the price of that
+   and it is the right price. */
+const npcPt = { sx: 0, sy: 0, ok: false };
+function racerPoint(worldZ, worldX, worldY, first, last, baseIndex, w, h) {
+  const k = (worldZ + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH - baseIndex;
+  const i = Math.floor(k);
+  npcPt.ok = false;
+  if (i < first || i + 1 > last || !bvis[i]) return npcPt;
+  const dz = worldZ + FEEL.CAMERA_DISTANCE - position;
+  if (dz <= 1) return npcPt;
+  const halfW = w / 2;
+  // Where the road's centre has wandered to, in world units, at each of
+  // the two boundaries. bh is scale * w / 2, so this divides the scale
+  // back out and leaves the offset the road pass accumulated.
+  const o0 = bh[i] !== 0 ? (bx[i] - halfW) / bh[i] : 0;
+  const o1 = bh[i + 1] !== 0 ? (bx[i + 1] - halfW) / bh[i + 1] : 0;
+  const off = o0 + (o1 - o0) * (k - i);
+  const scale = CAMERA_DEPTH / dz;
+  const bhk = scale * halfW;
+  npcPt.sx = halfW + bhk * (off + worldX);
+  npcPt.sy = horizonY + scale * camHeight * h / 2 - bhk * worldY;
+  npcPt.ok = true;
+  return npcPt;
+}
+
+const npcFoot = [0, 0, 0, 0, 0, 0, 0, 0];
+const npcRoof = [0, 0, 0, 0, 0, 0, 0, 0];
+const npcOrder = [];
+function drawRacers(first, last, baseIndex, w, h) {
+  if (!racersOn() || state !== DRIVING) return;
+  npcOrder.length = 0;
+  for (let i = 0; i < racers.length; i++) npcOrder.push(racers[i]);
+  npcOrder.sort((a, b) => b.z - a.z);
+  for (let k = 0; k < npcOrder.length; k++)
+    drawRacer(npcOrder[k], first, last, baseIndex, w, h);
+}
+
+function drawRacer(r, first, last, baseIndex, w, h) {
+  /* Too close to the lens to have a shape. See NPC_NEAR_CULL. The depth
+     is the gap plus the camera's own set back, because a racer's z is in
+     the same space the player's position is. */
+  if (r.z - position + FEEL.CAMERA_DISTANCE
+      < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) return;
+  const c = Math.cos(r.yaw), sn = Math.sin(r.yaw);
+  const hw = FEEL.CAR_BODY_WIDTH / 2, hl = FEEL.CAR_BODY_LENGTH / 2;
+  const rw = hw * FEEL.NPC_CABIN_WIDE, rl = hl * FEEL.NPC_CABIN_LONG;
+  const back = hl * FEEL.NPC_CABIN_BACK;
+  const corners = [[-hw, -hl], [hw, -hl], [hw, hl], [-hw, hl]];
+  const cabin = [[-rw, -rl + back], [rw, -rl + back], [rw, rl + back], [-rw, rl + back]];
+  for (let i = 0; i < 4; i++) {
+    const lx = corners[i][0], lz = corners[i][1];
+    const p = racerPoint(r.z + lx * sn + lz * c, r.x + lx * c - lz * sn,
+                         r.y, first, last, baseIndex, w, h);
+    if (!p.ok) return;
+    npcFoot[i * 2] = p.sx; npcFoot[i * 2 + 1] = p.sy;
+    const cx2 = cabin[i][0], cz2 = cabin[i][1];
+    const q = racerPoint(r.z + cx2 * sn + cz2 * c, r.x + cx2 * c - cz2 * sn,
+                         r.y + FEEL.NPC_HEIGHT, first, last, baseIndex, w, h);
+    if (!q.ok) return;
+    npcRoof[i * 2] = q.sx; npcRoof[i * 2 + 1] = q.sy;
+  }
+  const t = r.tint;
+  const body = t === 0 ? COLOUR.NPC_BODY_A : t === 1 ? COLOUR.NPC_BODY_B : COLOUR.NPC_BODY_C;
+  const roof = t === 0 ? COLOUR.NPC_ROOF_A : t === 1 ? COLOUR.NPC_ROOF_B : COLOUR.NPC_ROOF_C;
+  const flank = t === 0 ? COLOUR.NPC_SIDE_A : t === 1 ? COLOUR.NPC_SIDE_B : COLOUR.NPC_SIDE_C;
+
+  /* FOOTPRINT, THEN THE SIDES, THEN THE ROOF, and the order is not
+     cosmetic. The first version drew the sides and then painted the
+     footprint over their bottom edge, which is the one part of a flat
+     shaded box that says it has height at all.
+
+     AND ONLY THE SIDES FACING THE CAMERA. There is no depth buffer here,
+     so drawing all four walls paints the far one over the near one
+     whenever the winding happens to fall that way, and a car with its
+     inside painted on the outside reads as a flat lozenge. The screen
+     space cross product of each quad is its signed area: positive one
+     way round, negative the other, and the sign is exactly whether the
+     face is turned toward the camera. One multiply and a subtract per
+     wall, which is cheaper than sorting them. */
+  ctx.fillStyle = body;
+  polygon(npcFoot[0], npcFoot[1], npcFoot[2], npcFoot[3],
+          npcFoot[4], npcFoot[5], npcFoot[6], npcFoot[7]);
+  ctx.fillStyle = flank;
+  for (let i = 0; i < 4; i++) {
+    const j = (i + 1) & 3;
+    const x1 = npcFoot[i * 2], y1 = npcFoot[i * 2 + 1];
+    const x2 = npcFoot[j * 2], y2 = npcFoot[j * 2 + 1];
+    const x3 = npcRoof[j * 2], y3 = npcRoof[j * 2 + 1];
+    const x4 = npcRoof[i * 2], y4 = npcRoof[i * 2 + 1];
+    /* THE QUAD'S OWN WINDING, and the first version got this wrong in a
+       way that made every car a flat slab. It compared the footprint
+       EDGE against the direction up to the roof, which for a box whose
+       roof sits directly above its floor gives the same sign on all four
+       walls: they were all culled together, so what reached the screen
+       was a footprint and a roof with nothing joining them, which is the
+       ghost's own two slab look and is exactly what a solid body is not
+       meant to be. The shoelace area of the wall itself is the honest
+       test, because a wall turned away from the camera projects with the
+       opposite winding to one turned toward it. */
+    const area = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1)
+               + (x3 - x1) * (y4 - y1) - (x4 - x1) * (y3 - y1);
+    if (area <= 0) continue;
+    polygon(x1, y1, x2, y2, x3, y3, x4, y4);
+  }
+  ctx.fillStyle = roof;
+  polygon(npcRoof[0], npcRoof[1], npcRoof[2], npcRoof[3],
+          npcRoof[4], npcRoof[5], npcRoof[6], npcRoof[7]);
+  /* AND AN OUTLINE ON THE CABIN. Flat shaded bodies lose their silhouette
+     against a road of a similar value at distance, which is the whole
+     reason the ghost strokes its roof too. It is one stroke on a path
+     that is already built. */
+  ctx.strokeStyle = COLOUR.VOID;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  /* The tail bar. The camera lives behind these cars for most of a run,
+     so it is the detail it sees most of, exactly as it is on the player's
+     own car. Corners 0 and 1 are the rear edge of the footprint. */
+  ctx.strokeStyle = COLOUR.NPC_LIGHT;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(npcFoot[0], npcFoot[1] - 1);
+  ctx.lineTo(npcFoot[2], npcFoot[3] - 1);
+  ctx.stroke();
 }
 
 function drawHazardWarnings(first, last, baseIndex) {
@@ -26345,6 +27112,12 @@ const STING_CHAIN = { notes: [19, 24, 28],     step: 0.065, gain: 0.12, decay: 0
    ghost gets nothing: it is bad news and bad news does not get a
    fanfare. */
 const STING_GHOST = { notes: [14, 21, 26],     step: 0.058, gain: 0.10, decay: 0.20 };
+/* PANEL AGAINST PANEL. Low, short and dull rather than musical, because
+   it is a knock and not an event: two notes a semitone apart is the
+   nearest this synth gets to a thud. Quieter than the ghost pass, since
+   a racing lean can produce several of these in a corner and the pass
+   happens once. NPC_BUMP_COOLDOWN is what stops it becoming a rattle. */
+const STING_BUMP  = { notes: [2, 1],           step: 0.035, gain: 0.07, decay: 0.11 };
 // Up off the lip, and back down onto the road. The jump rises, the
 // landing falls, so the pair reads as one arc without a word of copy.
 const STING_JUMP  = { notes: [7, 14, 21, 26],  step: 0.045, gain: 0.13, decay: 0.20 };
