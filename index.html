@@ -4803,8 +4803,16 @@ const FEEL = {
      A knock that slowed the player down would be an attack with extra
      steps. */
   NPC_BUMP:                   1,     // LIVE, 0 turns contact off and they pass through
-  NPC_BUMP_PUSH:           0.55,     // LIVE, share of the overlap resolved per contact
+  /* ONE, BECAUSE THAT IS WHAT SOLID MEANS. It was 0.55, which resolves
+     just over half the overlap a frame, and against a driver steering
+     back in that settles at a permanent overlap rather than at a touch.
+     Anything under one leaves two cars sharing space by construction. */
+  NPC_BUMP_PUSH:           1.00,     // LIVE, share of the overlap resolved per pass
   NPC_BUMP_SHARE:          0.30,     // LIVE, the player's share of it, the racer takes the rest
+  /* A SANDWICH DOES NOT RESOLVE IN ONE PASS: pushing A off B moves A
+     into C. Three is enough for four cars, and the pass is a handful of
+     subtractions over six pairs. */
+  NPC_SOLVE_PASSES:           3,     // LIVE
   NPC_BUMP_SHAKE:             5,     // LIVE, screen pixels, so it lands as a knock
   NPC_BUMP_COOLDOWN:       0.18,     // LIVE, seconds between shakes, so a lean is not a rattle
 
@@ -6903,6 +6911,7 @@ const TUNABLES = [
   { key: 'NPC_START_AHEAD',    label: 'npcHead', step: 100, min: -8000,max: 20000, dp: 0, group: 31 },
   { key: 'NPC_BUMP',           label: 'npcBump', step: 1,   min: 0,    max: 1,     dp: 0, group: 31 },
   { key: 'NPC_BUMP_PUSH',      label: 'npcPush', step: 0.05,min: 0,    max: 2,     dp: 2, group: 31 },
+  { key: 'NPC_SOLVE_PASSES',   label: 'npcSolve',step: 1,   min: 1,    max: 8,     dp: 0, group: 31 },
   { key: 'NPC_BUMP_SHARE',     label: 'npcShare',step: 0.05,min: 0,    max: 1,     dp: 2, group: 31 },
   { key: 'NPC_BUMP_SHAKE',     label: 'npcShake',step: 1,   min: 0,    max: 30,    dp: 0, group: 31 },
   { key: 'NPC_BUMP_COOLDOWN',  label: 'npcBmpCd',step: 0.02,min: 0,    max: 2,     dp: 2, group: 31 },
@@ -14570,31 +14579,170 @@ function racerRamp(r, dt, half) {
    THE RACER ABSORBS MOST OF IT, which is what sells the weight: the
    thing you hit moves more than you do, so it reads as you shouldering
    past rather than as you bouncing off a wall. */
-function racerContact(r, dt, half) {
-  if (!FEEL.NPC_BUMP || r.air || airborne) return;
-  const dz = Math.abs(r.z - position);
-  if (dz > FEEL.CAR_BODY_LENGTH) return;
-  const dx = r.x - carX;
-  const wide = FEEL.CAR_BODY_WIDTH;
-  const over = wide - Math.abs(dx);
+/* ==================================================================
+   THE SOLID PASS. FOUR CARS, FOUR SPACES, NOBODY INSIDE ANYBODY.
+
+   THEY USED TO PASS THROUGH EACH OTHER AND THE NUMBERS SAY HOW BADLY.
+   Measured over six runs, at the moments two cars were alongside: racer
+   against racer was at worst 600 units inside each other, which is a
+   complete interpenetration of two 600 wide cars, on 84 per cent of
+   those frames, and turning contact OFF changed that to 86 per cent.
+   Identical, because there was no racer against racer contact at all:
+   the old routine only ever compared a racer to the PLAYER. Three of the
+   four cars had nothing holding them apart, which is most of the frame.
+
+   Player against racer was better and still bad: 353 units inside, on
+   52 per cent of alongside frames. Two reasons. The overlap was only
+   ever partly resolved, NPC_BUMP_PUSH of it per frame, so a driver
+   steering back in held a permanent overlap; and where the push had to
+   go OUTWARD to separate the player it was refused, which is the
+   guarantee working exactly as designed and leaving the cars merged.
+
+   ------------------------------------------------------------------
+   SOLID AND FREE, AND THE TWO ARE NOT IN TENSION ONCE THE ASYMMETRY IS
+   NAMED.
+
+   The reason it looked like a tension is that the guarantee was being
+   read as a limit on the SEPARATION when it is only a limit on where
+   the PLAYER may be put. A racer has nowhere it must not be except off
+   the road. So:
+
+     RACER AGAINST RACER   fully solid and symmetric. Half the overlap
+                           each. Nothing constrains them, so nothing is
+                           left unresolved, and this is most of the
+                           frame.
+
+     PLAYER AGAINST RACER  the player may take a share, and only ever
+                           INWARD, exactly as before. THE RACER THEN
+                           TAKES ALL OF THE REST rather than its own
+                           share of it. The overlap is fully resolved
+                           whichever way the geometry falls.
+
+     THE PINNED CASE       racer inside, edge outside, so the player's
+                           share would move them out and is refused. The
+                           racer then yields the WHOLE separation,
+                           because the player is the one who can die and
+                           the racer is not. There is always room: the
+                           road is two half widths across, a car is 600
+                           wide, and NPC_EDGE keeps a racer inside 0.86
+                           of the half width, so a player pinned at the
+                           lip always has a racer's width of road to
+                           push into.
+
+   WHAT CONTACT STILL NEVER DOES. It does not touch forward speed, for
+   anybody. It does not touch the PLAYER'S lateral velocity, and that
+   omission is deliberate rather than an oversight: damping the velocity
+   that is carrying the player INTO a racer would also be damping the
+   velocity carrying them off the edge, so a player pinned at the lip
+   with a racer inside them would be held there. Positions only, inward
+   only, and the player can always steer out of the band.
+
+   SEVERAL PASSES, because a sandwich does not resolve in one. Pushing A
+   off B moves A into C, and one pass leaves the last pair merged.
+   ================================================================== */
+/* HOW MUCH ROAD A CAR ACTUALLY TAKES UP ACROSS AND ALONG, given how
+   sideways it is.
+
+   THE BOX TEST WAS AXIS ALIGNED AND THE CARS ARE NOT. Separation was
+   asking for CAR_BODY_WIDTH of clearance, which is right for a car
+   pointing straight up the road and wrong for every other frame of a
+   drift game: at twenty five degrees of slip a 600 by 880 body reaches
+   916 units across, and the median racer yaw measured over a run is
+   about twenty. So two cars held exactly 600 apart were correctly
+   separated by the arithmetic and visibly overlapping on the screen,
+   which is the complaint this work started from.
+
+   The axis aligned extent of a rotated box is |w cos| + |l sin|, which
+   is two multiplies and an add, and it is exact rather than a fudge. */
+function spanAcross(yaw) {
+  return Math.abs(FEEL.CAR_BODY_WIDTH * Math.cos(yaw))
+       + Math.abs(FEEL.CAR_BODY_LENGTH * Math.sin(yaw));
+}
+function spanAlong(yaw) {
+  return Math.abs(FEEL.CAR_BODY_LENGTH * Math.cos(yaw))
+       + Math.abs(FEEL.CAR_BODY_WIDTH * Math.sin(yaw));
+}
+
+function racerWall(r) {
+  const seg = segAt(Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH));
+  return (seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE) * FEEL.NPC_EDGE;
+}
+
+/* Two racers. Symmetric, and silent: the shake and the sting are the
+   PLAYER'S feedback and a scrape between two cars fifty metres up the
+   road has no business moving the player's screen. */
+function separateRacers(a, b) {
+  if (a.air || b.air) return;
+  if (Math.abs(a.z - b.z) >= (spanAlong(a.yaw) + spanAlong(b.yaw)) * 0.5) return;
+  const dx = b.x - a.x;
+  const over = (spanAcross(a.yaw) + spanAcross(b.yaw)) * 0.5 - Math.abs(dx);
   if (over <= 0) return;
-  const side = dx >= 0 ? 1 : -1;              // the racer is to that side of the player
-  const push = over * FEEL.NPC_BUMP_PUSH;
-  /* The player's share, and then the inward test. Pushing the player is
-     the opposite direction from the racer: they separate. */
-  let mine = push * FEEL.NPC_BUMP_SHARE * -side;
-  if (Math.abs(carX + mine) > Math.abs(carX)) {
-    /* IT WOULD HAVE MOVED THEM OUTWARD, so they do not move at all and
-       the racer takes the whole separation. This is the guarantee, and
-       it is the one line that makes contact safe next to the edge. */
-    mine = 0;
-    r.x += push * side;
-  } else {
-    carX += mine;
-    r.x += push * side * (1 - FEEL.NPC_BUMP_SHARE);
+  const side = dx >= 0 ? 1 : -1;
+  const m = over * 0.5 * FEEL.NPC_BUMP_PUSH;
+  a.x = clamp(a.x - side * m, -racerWall(a), racerWall(a));
+  b.x = clamp(b.x + side * m, -racerWall(b), racerWall(b));
+  /* And the sideways speed that was carrying them together is spent, or
+     two cars wanting the same lane grind against each other for the rest
+     of the run instead of settling side by side. Only the APPROACHING
+     part: a racer already moving apart keeps its line. */
+  const close = b.lv - a.lv;
+  if (close * side < 0) {
+    const share = close * 0.5;
+    a.lv += share; b.lv -= share;
   }
-  r.x = clamp(r.x, -half * FEEL.NPC_EDGE, half * FEEL.NPC_EDGE);
-  if (racerBump <= 0) {
+}
+
+/* The player and one racer. The only asymmetric case in the file. */
+function separatePlayer(r) {
+  if (r.air || airborne) return 0;
+  const mine = carYaw();
+  if (Math.abs(r.z - position) >= (spanAlong(r.yaw) + spanAlong(mine)) * 0.5) return 0;
+  const dx = r.x - carX;
+  const over = (spanAcross(r.yaw) + spanAcross(mine)) * 0.5 - Math.abs(dx);
+  if (over <= 0) return 0;
+  const side = dx >= 0 ? 1 : -1;
+  /* The player's share, and then the inward test, which is the whole
+     guarantee and is unchanged from the day it was written. */
+  let share = over * FEEL.NPC_BUMP_SHARE * FEEL.NPC_BUMP_PUSH;
+  if (Math.abs(carX - side * share) > Math.abs(carX)) share = 0;
+  carX -= side * share;
+  /* AND THE RACER TAKES EVERYTHING LEFT, which is the change. It used to
+     take its own share and leave the remainder merged; it has nowhere it
+     must not be, so it takes the lot. If its own edge clamp bites, the
+     residue simply stays unresolved: the player is never pushed outward
+     to make room, at any value of any constant. */
+  const wall = racerWall(r);
+  const want = over * FEEL.NPC_BUMP_PUSH - share;
+  r.x = clamp(r.x + side * want, -wall, wall);
+  const close = r.lv * -side;
+  if (close < 0) r.lv = 0;      // the racer's own approach is spent
+  return 1;
+}
+
+function racersSeparate() {
+  if (!FEEL.NPC_BUMP) return;
+  let touched = 0;
+  const passes = Math.max(1, Math.round(FEEL.NPC_SOLVE_PASSES));
+  for (let pass = 0; pass < passes; pass++) {
+    for (let i = 0; i < racers.length; i++) {
+      for (let j = i + 1; j < racers.length; j++) separateRacers(racers[i], racers[j]);
+    }
+    for (let i = 0; i < racers.length; i++) touched += separatePlayer(racers[i]);
+  }
+  /* AND ONE MORE RACER PASS TO FINISH ON. The player pass runs last
+     inside the loop and it MOVES RACERS, so a racer shoved clear of the
+     player can land in another racer with nothing after it to notice.
+     Measured, that left racer pairs up to 33 units merged where the
+     player pairs were at zero. This is the cheapest possible fix: six
+     pair tests, no player involvement, so it cannot disturb the
+     guarantee. */
+  for (let i = 0; i < racers.length; i++) {
+    for (let j = i + 1; j < racers.length; j++) separateRacers(racers[i], racers[j]);
+  }
+  /* One knock per contact rather than one per pass, and one cooldown for
+     the whole field: three cars leaning on the player at once is one
+     event to the person holding the phone. */
+  if (touched && racerBump <= 0) {
     racerBump = FEEL.NPC_BUMP_COOLDOWN;
     addShake(FEEL.NPC_BUMP_SHAKE);
     audioSting(STING_BUMP);
@@ -14649,8 +14797,12 @@ function racersUpdate(dt) {
     }
     r.yaw = Math.atan(r.hv / Math.max(1, r.speed)) * FEEL.CAR_YAW_GAIN
           + curve * FEEL.CAR_CURVE_YAW;
-    racerContact(r, dt, half);
   }
+  /* AFTER EVERY CAR HAS MOVED, not inside the loop. Separation is a
+     constraint over the whole field and resolving it one car at a time
+     while the others are still on last frame's positions leaves the last
+     pair merged. */
+  racersSeparate();
 }
 
 /* Drawn from the SAME boundary tables the road is, so it sits in the
