@@ -4815,6 +4815,96 @@ const FEEL = {
   NPC_SOLVE_PASSES:           3,     // LIVE
   NPC_BUMP_SHAKE:             5,     // LIVE, screen pixels, so it lands as a knock
   NPC_BUMP_COOLDOWN:       0.18,     // LIVE, seconds between shakes, so a lean is not a rattle
+  /* ------------------------------------------------------------------
+     SPARKS ON CONTACT, AND THEY ARE WHAT MAKES IT READ AS CONTACT.
+
+     Two cars separating correctly and silently reads as two cars
+     overlapping, which is the report this whole thread started from: the
+     arithmetic was right before the picture was.
+
+     SCALED TO THE HIT. The number thrown is the depth actually resolved
+     against a car's own width, so a graze is a scatter and a proper
+     shoulder is a shower. There is no second particle system: these go
+     into the same debris pool the explosion and the finale use, through
+     takeParticle, so they share one budget and one draw call.
+
+     Math.random AND NEVER rng(). The comment on explode records what
+     that cost: nine draws a particle off the ROAD GENERATOR'S stream for
+     four sessions, so every crash permanently shifted every corner after
+     it and two players on the same daily who had crashed a different
+     number of times were driving different roads. Decoration may not
+     touch the road. */
+  NPC_SPARK_MIN:              2,     // LIVE, particles for the lightest touch
+  NPC_SPARK_MAX:             14,     // LIVE, and for a full width shoulder
+  NPC_SPARK_SPEED:         0.34,     // LIVE, of the smaller screen dimension a second
+  NPC_SPARK_SIZE:        0.0055,     // LIVE, of the smaller dimension
+  NPC_SPARK_TIME:          0.34,     // LIVE, seconds they live
+  NPC_SPARK_DRAG:           4.2,     // LIVE
+  NPC_SPARK_GRAV:          0.55,     // LIVE, of the smaller dimension per second squared
+  /* THE RATE CEILING, AND THREE RACERS LEANING ON EACH OTHER IS WHY IT
+     EXISTS. A contact is continuous once it starts, so an unlimited
+     emitter fires every frame of it and the screen fills. One burst per
+     pair per this many seconds, which turns a lean into a rhythm rather
+     than a fog. Measured firing rate is in the report. */
+  NPC_SPARK_GAP:           0.14,     // LIVE, seconds between bursts from one pair
+  NPC_SPARK_DEPTH:          160,     // LIVE, resolved units that count as a full hit
+
+  /* ------------------------------------------------------------------
+     WRECKS. A RACER THAT HITS A HAZARD IS OUT, AND THEN IT IS BACK.
+
+     They used to drive through blockers, which reads as three ghosts
+     rather than three cars: measured, they were clipping one on about
+     thirty per cent of passes and nothing happened. The same event that
+     ends the player's run has to be an event for them too.
+
+     THEY ARE NEVER ELIMINATED, and that is the constraint rather than a
+     kindness. Three opponents that can be knocked out means a good
+     player can finish alone, and finishing alone is the outcome the pace
+     law exists to prevent: being chased the whole way IS the reward.
+
+     THE SHAPE, and each number is answering a question.
+
+       HOW LONG ARE THEY OUT     NPC_WRECK_TIME. Long enough to read as
+                                 a wreck and to cost real ground, short
+                                 enough that the field is not down to two
+                                 for the rest of the level. It is about a
+                                 second and a half, which at speed is
+                                 sixty segments of road.
+
+       WHERE DO THEY REJOIN      NPC_WRECK_BACK behind the player. On the
+                                 player's bumper would be obviously fake;
+                                 half a level back makes the wreck
+                                 permanent, which is elimination with
+                                 extra steps. Just off the back of the
+                                 camera is the honest answer: gone from
+                                 the mirror, not gone from the race.
+
+       DOES THE PACE LAW CARE    It does not read position and it is not
+                                 going to start. But a car that respawns
+                                 five thousand units back and then runs
+                                 at the player's own pace never returns,
+                                 so a wreck would be permanent by
+                                 arithmetic. So the recovery is its own
+                                 thing, bounded and legible: for
+                                 NPC_WRECK_CATCH seconds it runs
+                                 NPC_WRECK_PACE faster, which closes the
+                                 gap it lost, and then it is an ordinary
+                                 racer again. That is a car pushing to
+                                 get back on terms after a shunt, not a
+                                 band that pulls it to the player forever.
+
+     DETERMINISTIC ON THE DAILY, which is the part to be careful about. A
+     wreck happens because a racer was somewhere, and where it was
+     depends on the player, so WRECKS WILL DIFFER BETWEEN PLAYERS. That
+     is a reaction and the spec allows it. What must not differ is
+     anything recorded, and nothing here touches a recorded value: the
+     wreck reads hazards, writes racer state, and throws particles from
+     Math.random. */
+  NPC_WRECK_TIME:          1.60,     // LIVE, seconds out of the running
+  NPC_WRECK_BACK:          5200,     // LIVE, world units behind the player it rejoins
+  NPC_WRECK_CATCH:          9.0,     // LIVE, seconds of recovery pace afterwards
+  NPC_WRECK_PACE:          1.07,     // LIVE, how much faster while recovering
+  NPC_WRECK_PARTS:           16,     // LIVE, particles the wreck throws
 
   /* THE PAINT. See buildCarPaints: the racers are the player's own car
      rotated a quarter turn each, and these two are what keep the player
@@ -6915,6 +7005,20 @@ const TUNABLES = [
   { key: 'NPC_BUMP_SHARE',     label: 'npcShare',step: 0.05,min: 0,    max: 1,     dp: 2, group: 31 },
   { key: 'NPC_BUMP_SHAKE',     label: 'npcShake',step: 1,   min: 0,    max: 30,    dp: 0, group: 31 },
   { key: 'NPC_BUMP_COOLDOWN',  label: 'npcBmpCd',step: 0.02,min: 0,    max: 2,     dp: 2, group: 31 },
+  { key: 'NPC_SPARK_MIN',      label: 'npcSprkN',step: 1,   min: 0,    max: 30,    dp: 0, group: 31 },
+  { key: 'NPC_SPARK_MAX',      label: 'npcSprkX',step: 1,   min: 0,    max: 60,    dp: 0, group: 31 },
+  { key: 'NPC_SPARK_SPEED',    label: 'npcSprkV',step: 0.02,min: 0.02, max: 2,     dp: 2, group: 31 },
+  { key: 'NPC_SPARK_SIZE',     label: 'npcSprkR',step: 0.0005,min:0.0005,max:0.05, dp: 4, group: 31 },
+  { key: 'NPC_SPARK_TIME',     label: 'npcSprkT',step: 0.02,min: 0.05, max: 2,     dp: 2, group: 31 },
+  { key: 'NPC_SPARK_DRAG',     label: 'npcSprkD',step: 0.2, min: 0,    max: 20,    dp: 1, group: 31 },
+  { key: 'NPC_SPARK_GRAV',     label: 'npcSprkG',step: 0.05,min: 0,    max: 5,     dp: 2, group: 31 },
+  { key: 'NPC_SPARK_GAP',      label: 'npcSprkP',step: 0.02,min: 0,    max: 2,     dp: 2, group: 31 },
+  { key: 'NPC_SPARK_DEPTH',    label: 'npcSprkH',step: 10,  min: 10,   max: 600,   dp: 0, group: 31 },
+  { key: 'NPC_WRECK_TIME',     label: 'npcWrkT', step: 0.1, min: 0,    max: 10,    dp: 2, group: 31 },
+  { key: 'NPC_WRECK_BACK',     label: 'npcWrkB', step: 200, min: 0,    max: 40000, dp: 0, group: 31 },
+  { key: 'NPC_WRECK_CATCH',   label: 'npcWrkC', step: 0.5, min: 0,    max: 40,    dp: 1, group: 31 },
+  { key: 'NPC_WRECK_PACE',     label: 'npcWrkP', step: 0.01,min: 1,    max: 1.5,   dp: 2, group: 31 },
+  { key: 'NPC_WRECK_PARTS',    label: 'npcWrkN', step: 1,   min: 0,    max: 60,    dp: 0, group: 31 },
   { key: 'NPC_SAT',            label: 'npcSat',  step: 0.02,min: 0.1,  max: 1.4,   dp: 2, group: 31 },
   { key: 'NPC_VALUE',          label: 'npcVal',  step: 0.02,min: 0.1,  max: 1.4,   dp: 2, group: 31 },
   { key: 'NPC_NEAR_CULL',      label: 'npcNear', step: 0.1, min: 0,    max: 12,    dp: 1, group: 31 },
@@ -14293,11 +14397,38 @@ function buildCarPaints() {
 const racers = [];
 let racerBump = 0;          // seconds until another contact may shake the screen
 
-/* On the random track and nowhere else. The daily's roads, records,
-   ghosts and share card are untouched by this whole file, and this one
-   line is what guarantees it: every entry point below is behind it. */
+/* EVERY REAL LEVEL, ON BOTH TRACKS, AND NOTHING RACES A TUTORIAL.
+
+   THE DAILY'S PREMISE IS THAT EVERYONE DRIVES THE SAME ROAD, and that is
+   what makes ghosts comparable, records meaningful and the share card
+   honest. NPC-RACERS.md calls the port the part to be careful about and
+   it is right. What that rule actually demands, stated precisely:
+
+     THE ROAD MAY NOT MOVE. Not one segment. A racer is something that
+     drives ON the road, not something that changes it, so nothing in
+     this whole file may touch the generator: no rng() call, no addRun,
+     no topUpRoad, no hazard or jump placed or moved. Verified by the
+     road hash over 28 days on all five levels, before and after.
+
+     THE OPPONENTS MAY NOT DIFFER. Same grid, same pace law, same driver,
+     for everybody on a date. The grid is laid from a fixed offset off
+     the player's own start, the pace law is a pure function of the
+     player's driving, and the driver reads only the road. There is no
+     rng, no clock, no stored preference and no viewport anywhere in the
+     racer path, so two players who drive the same get the same race.
+
+     THEIR REACTIONS MAY DIFFER, and that is the whole point. A racer
+     that goes round a blocker one way for one player and the other way
+     for another is reacting to where the player put it. The spec says
+     so explicitly.
+
+   TRAINING IS EXCLUDED. It is unfailable, it is where the coaching lines
+   live, and three cars racing a lesson is three cars in the way of it.
+   isTraining is the same test everything else in the file uses. */
 function racersOn() {
-  return mode === ENDLESS && FEEL.NPC_COUNT > 0;
+  if (FEEL.NPC_COUNT <= 0) return false;
+  if (mode === ENDLESS) return true;
+  return !isTraining(level);
 }
 
 /* THE GRID IS LAID RELATIVE TO WHERE THE PLAYER IS, and it has to be,
@@ -14313,6 +14444,8 @@ function racersReset(base) {
   racerBump = 0;
   racerFormNow = 0;
   racerClean = 1;
+  contactN = 0;
+  wreckN = 0;
   if (!racersOn()) return;
   const n = Math.max(0, Math.round(FEEL.NPC_COUNT));
   for (let i = 0; i < n; i++) {
@@ -14327,6 +14460,9 @@ function racersReset(base) {
       x: (i - mid) * FEEL.NPC_LANE_SPREAD * FEEL.ROAD_HALF_WIDTH_BASE,
       hv: 0, lv: 0, yaw: 0,
       speed: FEEL.SPEED * FEEL.NPC_PACE_LOW,
+      sparkT: 0,              // seconds until this one may throw sparks again
+      wreck: 0,               // seconds left out of the running. See wreckRacer.
+      recover: 0,             // and seconds of recovery pace after rejoining
       step: i - mid,          // its place in the pace spread, so the three differ
       lane: i - mid,          // which lane it wants, in NPC_LANE_SPREAD units
       laneNow: i - mid,       // and where it actually is between lanes
@@ -14414,6 +14550,15 @@ function racerPace(r) {
   const match = playerPace() * FEEL.NPC_PACE_MATCH;
   let want = FEEL.NPC_PACE_LOW + f * (match - FEEL.NPC_PACE_LOW)
            + r.step * FEEL.NPC_PACE_SPREAD;
+  /* THE ONE POSITIONAL TERM IN THE FILE, AND IT IS BOUNDED AND EARNED.
+     A car that respawns behind and then runs at the player's own pace
+     never comes back, so a wreck would be permanent by arithmetic and
+     the field would be down to two for the rest of the level. This runs
+     for NPC_WRECK_CATCH seconds after a wreck and then stops. It is a
+     car pushing to get back on terms after a shunt, not a band that
+     pulls it to the player forever, and it cannot fire without a wreck
+     having happened first. */
+  if (r.recover > 0) want *= FEEL.NPC_WRECK_PACE;
   /* AND THE LEASH, WHICH ONLY EVER SLOWS. A racer this far ahead is
      about to leave the draw distance, and an empty road is what the
      third rule exists to prevent. It eases to holding station so it
@@ -14561,6 +14706,58 @@ function racerRamp(r, dt, half) {
   }
 }
 
+/* DID THIS ONE HIT SOMETHING. The same band test the player gets, read
+   from the hazard's own geometry rather than a copy of it, so a racer is
+   wrecked by exactly what would have killed the player.
+
+   THE OPENING DOES NOT SPARE THEM. inOpening exists so a player cannot
+   die in the first seconds of a run before their hands arrive, which is
+   a mercy for a person and means nothing to a car. */
+function racerHitsHazard(r, half) {
+  if (r.air || r.wreck > 0) return false;
+  const at = Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+  for (let i = 0; i < hazards.length; i++) {
+    const h = hazards[i];
+    if (at < h.from || at > h.to) continue;
+    /* hazardX ALREADY CARRIES THE MOVER'S SWING, on the road's own clock
+       rather than the run's, which is what keeps a mover in the same
+       place for two players who arrive a second apart. Adding a swing
+       term here would have counted it twice and wrecked racers on empty
+       road beside a mover. */
+    const hx = hazardX(h) * half;
+    const block = h.half + FEEL.CAR_BODY_WIDTH / 2;
+    if (Math.abs(r.x - hx) < block) return true;
+  }
+  return false;
+}
+
+/* WRECKED. Out of the running, then back.
+
+   The player's own crash is explode: shake, hit stop, a screen flash and
+   a shower of debris off the car. A racer gets the debris and the sound
+   and NOT the other three, and that is deliberate rather than lazy. Hit
+   stop freezes the whole world, the flash washes the screen and the
+   shake moves the camera: all three are the PLAYER'S car being destroyed
+   and firing them for somebody else's shunt fifty metres up the road
+   would read as the player having been hit. */
+function wreckRacer(r) {
+  r.wreck = FEEL.NPC_WRECK_TIME;
+  r.recover = 0;
+  r.lv = 0; r.hv = 0;
+  markWreck(r.z, r.x);
+  audioSting(STING_BUMP);
+}
+
+/* Where a wreck happened, held for the draw pass exactly as a contact
+   is, and for the same reason: update has no projection. */
+const wreckZ = [0, 0, 0, 0, 0, 0];
+const wreckX = [0, 0, 0, 0, 0, 0];
+let wreckN = 0;
+function markWreck(z, x) {
+  if (wreckN >= wreckZ.length) return;
+  wreckZ[wreckN] = z; wreckX[wreckN] = x; wreckN++;
+}
+
 /* CONTACT. Solid, tactile, and free, and the third of those is a rule
    rather than a tuning.
 
@@ -14663,6 +14860,46 @@ function spanAlong(yaw) {
        + Math.abs(FEEL.CAR_BODY_WIDTH * Math.sin(yaw));
 }
 
+/* HOW MUCH OF A BUMP THE PLAYER TAKES, AND ON THE DAILY IT IS NONE.
+
+   THE RANDOM TRACK KEEPS THE TWO WAY SHOVE. Nothing there is recorded,
+   nothing is compared, and a knock that moves you is what makes contact
+   feel like contact.
+
+   THE DAILY DOES NOT, AND THIS IS THE PORT'S ONE REAL CONCESSION.
+   Measured, it had to be: with the player takeable, the road itself
+   moved on 2 of 140 daily roads. The chain is real and it is not a bug
+   in the racers. carX runs to carFrac, to scraping, to the speed factor,
+   to position, to WHEN topUpRoad asks for more road, and hazardFits
+   reads curveScale, which updateDifficulty sets from elapsed time. So a
+   player nudged a few units early in a run reaches the generator at a
+   different moment and can be handed a different corner. The daily's
+   whole premise is that everyone drives the same road, and a road that
+   depends on being bumped is not that road.
+
+   IT ALSO CLOSES THE HAZARD HOLE OUTRIGHT ON THE MODE WHERE A RUN IS
+   RECORDED, rather than relying on the refusal above catching every
+   case.
+
+   THE CARS ARE STILL FULLY SOLID. This is a share, not a switch: the
+   racer takes everything the player does not, which is all of it. Four
+   cars, four spaces, and on the daily the player is simply the one that
+   does not move. Measured separation is unchanged, median zero. */
+function bumpShare() {
+  return mode === DAILY ? 0 : FEEL.NPC_BUMP_SHARE;
+}
+
+/* The car's own segment and half width, read the way update reads them,
+   so the hazard refusal above asks exactly the question hazardBand is
+   asked a few lines later in the frame. */
+function carIndex() {
+  return Math.floor((position + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
+}
+function localHalfNow() {
+  const sg = segAt(carIndex());
+  return sg ? sg.hw : FEEL.ROAD_HALF_WIDTH_BASE;
+}
+
 function racerWall(r) {
   const seg = segAt(Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH));
   return (seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE) * FEEL.NPC_EDGE;
@@ -14672,7 +14909,7 @@ function racerWall(r) {
    PLAYER'S feedback and a scrape between two cars fifty metres up the
    road has no business moving the player's screen. */
 function separateRacers(a, b) {
-  if (a.air || b.air) return;
+  if (a.air || b.air || a.wreck > 0 || b.wreck > 0) return;
   if (Math.abs(a.z - b.z) >= (spanAlong(a.yaw) + spanAlong(b.yaw)) * 0.5) return;
   const dx = b.x - a.x;
   const over = (spanAcross(a.yaw) + spanAcross(b.yaw)) * 0.5 - Math.abs(dx);
@@ -14690,11 +14927,20 @@ function separateRacers(a, b) {
     const share = close * 0.5;
     a.lv += share; b.lv -= share;
   }
+  /* AND THE SPARKS, RATE LIMITED PER PAIR. A contact is continuous once
+     it starts, so an unlimited emitter fires every frame of a lean and
+     fills the screen. The clock lives on the pair rather than on the
+     field, so two cars grinding on the left do not silence a separate
+     hit on the right. */
+  if (a.sparkT <= 0 && b.sparkT <= 0) {
+    a.sparkT = FEEL.NPC_SPARK_GAP; b.sparkT = FEEL.NPC_SPARK_GAP;
+    markContact((a.z + b.z) * 0.5, (a.x + b.x) * 0.5, over);
+  }
 }
 
 /* The player and one racer. The only asymmetric case in the file. */
 function separatePlayer(r) {
-  if (r.air || airborne) return 0;
+  if (r.air || airborne || r.wreck > 0) return 0;
   const mine = carYaw();
   if (Math.abs(r.z - position) >= (spanAlong(r.yaw) + spanAlong(mine)) * 0.5) return 0;
   const dx = r.x - carX;
@@ -14703,8 +14949,28 @@ function separatePlayer(r) {
   const side = dx >= 0 ? 1 : -1;
   /* The player's share, and then the inward test, which is the whole
      guarantee and is unchanged from the day it was written. */
-  let share = over * FEEL.NPC_BUMP_SHARE * FEEL.NPC_BUMP_PUSH;
+  let share = over * bumpShare() * FEEL.NPC_BUMP_PUSH;
   if (Math.abs(carX - side * share) > Math.abs(carX)) share = 0;
+  /* AND NOT INTO A HAZARD EITHER, WHICH THE INWARD RULE ALONE DID NOT
+     COVER. A splitter is placed at x = 0, dead centre, so "only ever
+     toward the middle" and "toward a splitter" are the same direction.
+     The rule was written against the road EDGE and it is stated
+     absolutely, that contact cannot end a run at any value of any
+     constant, so the hazard in the middle has to be part of it. Same
+     resolution as the edge: the push is refused and the racer takes the
+     whole separation instead. */
+  if (share) {
+    /* hazardBand READS THE GLOBAL carFrac AND NOT ITS ARGUMENT, so the
+       question has to be asked by setting the value it reads. Set, ask,
+       put back: this is exactly the test update runs a few lines later,
+       rather than a second copy of it that could drift. */
+    const half = localHalfNow();
+    const was = carFrac;
+    carFrac = (carX - side * share) / half;
+    const into = hazardBand(carIndex(), half) === 2;
+    carFrac = was;
+    if (into) share = 0;
+  }
   carX -= side * share;
   /* AND THE RACER TAKES EVERYTHING LEFT, which is the change. It used to
      take its own share and leave the remainder merged; it has nowhere it
@@ -14716,7 +14982,29 @@ function separatePlayer(r) {
   r.x = clamp(r.x + side * want, -wall, wall);
   const close = r.lv * -side;
   if (close < 0) r.lv = 0;      // the racer's own approach is spent
+  if (r.sparkT <= 0) {
+    r.sparkT = FEEL.NPC_SPARK_GAP;
+    markContact((r.z + position) * 0.5, (r.x + carX) * 0.5, over);
+  }
   return 1;
+}
+
+/* WHERE CONTACT HAPPENED, HELD UNTIL THE DRAW PASS.
+
+   Separation runs in update, where there is no projection: the boundary
+   tables belong to the frame being drawn and are not built yet. So a
+   contact records WHERE it was in the world and how hard, and the draw
+   pass turns that into a screen position and throws the sparks. Three
+   numbers in a fixed array, no allocation, cleared every frame. */
+const contactZ = [0, 0, 0, 0, 0, 0];
+const contactX = [0, 0, 0, 0, 0, 0];
+const contactF = [0, 0, 0, 0, 0, 0];
+let contactN = 0;
+function markContact(z, x, depth) {
+  if (contactN >= contactZ.length) return;
+  contactZ[contactN] = z; contactX[contactN] = x;
+  contactF[contactN] = clamp(depth / Math.max(1, FEEL.NPC_SPARK_DEPTH), 0, 1);
+  contactN++;
 }
 
 function racersSeparate() {
@@ -14747,6 +15035,7 @@ function racersSeparate() {
     addShake(FEEL.NPC_BUMP_SHAKE);
     audioSting(STING_BUMP);
   }
+
 }
 
 /* One frame of the whole field. Called from update, after the player's
@@ -14763,6 +15052,7 @@ function racersUpdate(dt) {
   const kg = 1 - Math.exp(-dt / FEEL.GRIP_TIME);
   for (let i = 0; i < racers.length; i++) {
     const r = racers[i];
+    if (r.sparkT > 0) r.sparkT -= dt;
     const at = Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
     const seg = segAt(at);
     /* OFF THE BACK OF THE GENERATED ROAD. topUpRoad trims behind segBase,
@@ -14773,11 +15063,62 @@ function racersUpdate(dt) {
     const half = seg ? seg.hw : FEEL.ROAD_HALF_WIDTH_BASE;
     const curve = seg ? seg.curve * curveScale : 0;
 
+    /* WRECKED, AND THEN BACK. Out for NPC_WRECK_TIME with the car
+       stopped where it is, then put back NPC_WRECK_BACK behind the
+       player and given NPC_WRECK_CATCH seconds of recovery pace to
+       close what the shunt cost. */
+    if (r.wreck > 0) {
+      r.wreck -= dt;
+      if (r.wreck <= 0) {
+        r.wreck = 0;
+        /* STAGGERED, OR TWO WRECKS REJOIN INSIDE EACH OTHER. Putting
+           every rejoining car on the centre line at the same distance
+           back means two racers that wrecked together respawn on the
+           same square of road: measured, the ninety ninth percentile of
+           racer to racer overlap went from 19 units to 857, which is a
+           complete merge. They come back on their own lanes and a car
+           length apart, the same way the grid is laid. */
+        /* REJOINING ON CLEAR ROAD, WHICH THE FIRST VERSION DID NOT DO.
+           Every car came back on the centre line at the same distance
+           behind, so two that wrecked together respawned inside each
+           other, and one that wrecked alone could land on a healthy
+           racer that happened to be there. Measured, the ninety ninth
+           percentile of overlap went from 19 units to 372 the moment
+           wrecks existed, and turning wrecks off put it back exactly.
+
+           Staggered by lane, and then walked further back until it is
+           clear of every other car. The walk is at most a few steps
+           because there are only ever two others. */
+        let back = position - FEEL.NPC_WRECK_BACK
+                 - r.step * FEEL.CAR_BODY_LENGTH * 1.5;
+        const clear = FEEL.CAR_BODY_LENGTH * 2;
+        for (let g = 0; g < 8; g++) {
+          let hit = false;
+          for (let k = 0; k < racers.length; k++) {
+            const o = racers[k];
+            if (o === r || o.wreck > 0) continue;
+            if (Math.abs(o.z - back) < clear) { hit = true; break; }
+          }
+          if (!hit) break;
+          back -= clear;
+        }
+        r.z = back;
+        r.x = r.step * FEEL.NPC_LANE_SPREAD * FEEL.ROAD_HALF_WIDTH_BASE;
+        r.lane = r.step; r.laneNow = r.step;
+        r.lv = 0; r.hv = 0; r.yaw = 0;
+        r.ride = -1; r.air = false; r.y = 0; r.vy = 0;
+        r.dodge = -1;
+        r.recover = FEEL.NPC_WRECK_CATCH;
+      }
+      continue;                      // a wreck does not drive
+    }
+    if (r.recover > 0) r.recover -= dt;
     r.speed += (racerPace(r) - r.speed)
              * (1 - Math.exp(-dt / Math.max(0.01, FEEL.NPC_PACE_TIME)));
     r.z += r.speed * dt;
 
     if (seg) racerRamp(r, dt, half);
+    if (seg && racerHitsHazard(r, half)) { wreckRacer(r); continue; }
     const aim = seg ? racerAim(r, i, dt, seg, half) : r.x;
     const steer = clamp(FEEL.NPC_STEER_P * (aim - r.x) / half
                         - FEEL.NPC_STEER_D * (r.lv / rate), -1, 1);
@@ -14829,6 +15170,28 @@ function ghostPoint(worldZ, worldX, worldY, first, last, baseIndex) {
 
 const ghostCorners = [0, 0, 0, 0, 0, 0, 0, 0];      // four x,y pairs, road plane
 const ghostRoof = [0, 0, 0, 0, 0, 0, 0, 0];
+/* THE GHOST DOES NOT COLLIDE, AND IT IS NOT IN THE SEPARATION PASS AT
+   ALL. Decided when the racers reached the daily, where for the first
+   time a translucent recording and three solid rivals are on the same
+   screen.
+
+   IT IS A RECORDING, NOT A RIVAL. A recording that bumps you is
+   nonsense: the line it drives was set on a run where none of this
+   happened, so a collision with it is a collision with a past that
+   cannot react. It would also break the one thing the ghost is for. The
+   ghost is the player's own last run and the whole point is to see where
+   you were faster; a ghost that could shove you off your line would make
+   the comparison meaningless, and worse, the ghost exists ONLY on the
+   daily, where the time is recorded.
+
+   SO THEY MUST READ AS DIFFERENT THINGS, and they already do, on three
+   axes at once and none of them is hue. The ghost is drawn at
+   GHOST_ALPHA as a footprint and a roof with DAYLIGHT BETWEEN THEM and
+   no sides, which is exactly the two slab look a solid body was built to
+   avoid: the gap says height without putting anything solid on the road.
+   A racer is the player's own hull, closed, opaque, with wheels and a
+   light bar. Translucent against opaque, open against closed, a shape
+   against a car. */
 function drawGhost(first, last, baseIndex) {
   /* The state test belongs here as well as in ghostUpdate. The frame loop
      returns early on a pause and on the hit stop without updating, so a
@@ -14910,7 +15273,103 @@ function drawGhost(first, last, baseIndex) {
    one in front, which is the single most obvious way to make a race look
    fake. */
 const npcOrder = [];
+/* THE SPARKS THEMSELVES, thrown where the draw pass can see. */
+function drawContactSparks(first, last, baseIndex, w, h) {
+  if (!contactN) return;
+  const s = Math.min(w, h);
+  for (let c = 0; c < contactN; c++) {
+    const depth = contactZ[c] - position + FEEL.CAMERA_DISTANCE;
+    /* THE SAME NEAR CULL THE CARS GET. Sparks from a contact behind the
+       lens would be thrown across the whole frame by the projection, and
+       a contact that close is not drawn as cars either. */
+    if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) continue;
+    const k = depth / FEEL.SEGMENT_LENGTH
+            + (position / FEEL.SEGMENT_LENGTH - baseIndex);
+    const i = Math.floor(k);
+    if (i < first || i + 1 > last || !bvis[i]) continue;
+    const f = k - i;
+    const bxk = bx[i] + (bx[i + 1] - bx[i]) * f;
+    const byk = by[i] + (by[i + 1] - by[i]) * f;
+    const bhk = bh[i] + (bh[i + 1] - bh[i]) * f;
+    const sx = bxk + bhk * contactX[c];
+    const sy = byk - bhk * FEEL.CAR_RIDE_HEIGHT;
+    const force = contactF[c];
+    const n = Math.round(FEEL.NPC_SPARK_MIN
+                       + (FEEL.NPC_SPARK_MAX - FEEL.NPC_SPARK_MIN) * force);
+    for (let q = 0; q < n; q++) {
+      const p = takeParticle();
+      /* Math.random, NEVER rng(). See the note on explode: decoration
+         that draws from the road's stream changes the road. */
+      const a = Math.random() * Math.PI * 2;
+      const speed = s * FEEL.NPC_SPARK_SPEED * (0.35 + 0.65 * Math.random())
+                  * (0.5 + 0.5 * force);
+      p.x = sx; p.y = sy;
+      p.vx = Math.cos(a) * speed;
+      // Biased upward, because a panel scraping a panel throws upward.
+      p.vy = Math.sin(a) * speed - speed * 0.55;
+      p.r = s * FEEL.NPC_SPARK_SIZE * (0.4 + 0.6 * Math.random());
+      p.rot = Math.random() * Math.PI;
+      p.spin = 0;
+      p.life = FEEL.NPC_SPARK_TIME * (0.55 + 0.45 * Math.random());
+      p.col = PART_FIRE;                 // sparks are the hot family
+      p.fuse = 0;
+      p.drag = FEEL.NPC_SPARK_DRAG;
+      p.grav = s * FEEL.NPC_SPARK_GRAV;
+      p.fade = FEEL.NPC_SPARK_TIME;
+    }
+  }
+  contactN = 0;
+}
+
+/* THE WRECK ITSELF: the explosion's own debris, thrown from where the
+   car was, in the car family rather than the spark family so it reads as
+   a car coming apart and not as a graze. */
+function drawWrecks(first, last, baseIndex, w, h) {
+  if (!wreckN) return;
+  const s = Math.min(w, h);
+  for (let c = 0; c < wreckN; c++) {
+    const depth = wreckZ[c] - position + FEEL.CAMERA_DISTANCE;
+    if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) continue;
+    const k = depth / FEEL.SEGMENT_LENGTH
+            + (position / FEEL.SEGMENT_LENGTH - baseIndex);
+    const i = Math.floor(k);
+    if (i < first || i + 1 > last || !bvis[i]) continue;
+    const f = k - i;
+    const bxk = bx[i] + (bx[i + 1] - bx[i]) * f;
+    const byk = by[i] + (by[i + 1] - by[i]) * f;
+    const bhk = bh[i] + (bh[i + 1] - bh[i]) * f;
+    const sx = bxk + bhk * wreckX[c];
+    const sy = byk - bhk * FEEL.CAR_BODY_HEIGHT * 0.5;
+    const n = Math.round(FEEL.NPC_WRECK_PARTS);
+    for (let q = 0; q < n; q++) {
+      const p = takeParticle();
+      const a = Math.random() * Math.PI * 2;
+      const speed = s * FEEL.NPC_SPARK_SPEED * 1.6 * (0.35 + 0.65 * Math.random());
+      p.x = sx + (Math.random() * 2 - 1) * s * 0.012;
+      p.y = sy + (Math.random() * 2 - 1) * s * 0.012;
+      p.vx = Math.cos(a) * speed;
+      p.vy = Math.sin(a) * speed - speed * 0.5;
+      p.r = s * FEEL.NPC_SPARK_SIZE * 2.2 * (0.4 + 0.6 * Math.random());
+      p.rot = Math.random() * Math.PI;
+      p.spin = (Math.random() * 2 - 1) * FEEL.EXPLODE_SPIN;
+      p.life = FEEL.NPC_SPARK_TIME * 2.4 * (0.6 + 0.4 * Math.random());
+      // A third fire, the rest bodywork, which is the explosion's own mix.
+      p.col = Math.random() < 0.38 ? PART_FIRE : PART_CAR;
+      p.fuse = 0;
+      p.drag = FEEL.NPC_SPARK_DRAG * 0.6;
+      p.grav = s * FEEL.NPC_SPARK_GRAV;
+      p.fade = FEEL.NPC_SPARK_TIME * 2.4;
+    }
+  }
+  wreckN = 0;
+}
+
 function drawRacers(first, last, baseIndex, w, h) {
+  /* THE SPARKS AND THE WRECKS FIRE EVEN IF THE CARS DO NOT DRAW, and the
+     order matters: an event recorded this frame has to be spent this
+     frame or the array goes stale. */
+  drawContactSparks(first, last, baseIndex, w, h);
+  drawWrecks(first, last, baseIndex, w, h);
   if (!racersOn() || state !== DRIVING) return;
   npcOrder.length = 0;
   for (let i = 0; i < racers.length; i++) npcOrder.push(racers[i]);
@@ -14920,6 +15379,8 @@ function drawRacers(first, last, baseIndex, w, h) {
 }
 
 function drawRacer(r, first, last, baseIndex, w, h) {
+  // Wrecked. The debris is the car for now. See wreckRacer.
+  if (r.wreck > 0) return;
   /* Too close to the lens to have a shape. See NPC_NEAR_CULL. */
   const depth = r.z - position + FEEL.CAMERA_DISTANCE;
   if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) return;
