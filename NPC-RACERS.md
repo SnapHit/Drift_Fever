@@ -84,6 +84,32 @@ obstacle with a mind, not a hazard.
 
 Getting the feel of that right without it becoming a penalty is the hard part of the build.
 
+**Settled 22 August 2026, and the apparent tension was a misreading.** The first version shipped
+"free" and not "solid": cars passed through one another, a median of 884 units merged between two
+racers and 297 between the player and a racer. Two causes. There was **no racer-against-racer
+contact at all** — the routine only ever compared a racer to the player, so three of the four cars
+had nothing holding them apart. And where separating the player would have pushed them *outward*,
+the push was refused and the overlap simply stayed.
+
+The resolution is that **the inward-only rule limits where the PLAYER may be put, not how much
+separation may happen.** A racer has nowhere it must not be except off the road, so:
+
+- **Racer against racer** is fully solid and symmetric — half the overlap each, nothing left over.
+- **Player against racer** keeps the inward-only share unchanged, and **the racer takes all of the
+  rest** instead of its own share.
+- **Pinned** — racer inside, edge outside — the racer yields the whole distance, because the player
+  is the one who can die. There is always room: the road is two half-widths across and `NPC_EDGE`
+  keeps a racer inside 0.86 of one.
+
+One more thing was wrong and it was geometric rather than structural: **the box test was axis-aligned
+while the cars are sideways.** At 25° of slip a 600×880 body reaches 916 units across, so two cars
+held exactly 600 apart were correctly separated by the arithmetic and visibly overlapping on screen.
+The span is `|w·cos| + |l·sin|` now.
+
+Median interpenetration is **zero** on both pair kinds, and the free guarantee measures exactly what
+it did the day it was written: 0 outward pushes in 4986 forced contacts, and identical survival
+pinned in the scrape band with contact on and off.
+
 ### 4. Three of them
 
 Two or three that stay in play beats a field of eight the player never sees. Three is the number.
