@@ -23,13 +23,40 @@ that it is **non-reactive**.
 
 ## The design
 
-### 1. They rubber-band on PACE, not on line
+### 1. They respond on PACE, not on line
 
 An opponent that falls behind speeds up. One that is well ahead eases off. So passing one does not
 remove it from the race — it stays in play, it comes back, and the competition lasts the whole
 level rather than one moment.
 
 **This is the whole value of the feature.** Everything else is support for it.
+
+**CORRECTED 21 August 2026, and the correction inverts the paragraph above.** "Falls behind speeds
+up" is a band on POSITION, and it cannot be made to work. Two versions were built and measured and
+both failed in opposite directions:
+
+- **On distance.** Any law reading only the gap has a stable equilibrium wherever the racer's
+  boosted pace matches the player's, and it sits there. The nearest racer's gap came back with a
+  median of 3.4k and a ninetieth percentile of 3.4k — pinned to three digits for a whole run. That
+  is the car that is always beside you whatever you do.
+- **On time.** A release that let a racer stop chasing once it had been beaten for a sustained
+  stretch fixed the pin, and produced the wrong game: a good player got away permanently. That is
+  rubber-band difficulty with the sign flipped, help the weak and punish the strong, which the
+  retention research kills under a different name.
+
+**So the signal is HOW WELL THE PLAYER IS DRIVING, and never where anybody is.** A player driving
+beautifully gets the full field on them; a player scraping every corner is driving away from a race
+rather than toward one. The three outcomes fall out of one number:
+
+| | |
+|---|---|
+| **Good** | chased hard, all race, and never escapes. Being chased IS the reward; the win is finishing ahead, not finishing alone. |
+| **Mediocre** | a race they can win some of. Passed and repassed, not hounded. |
+| **Poor** | not hounded and never alone. The field goes ahead and holds a pace that keeps it visible on the horizon. |
+
+**This is not the adaptive difficulty section 4 kills.** The road does not change: same track, same
+hazards, same widths, same warnings, same clock. Only the opponents respond, which is what opponents
+are for, and BRIEF section 7 asks for exactly this under "difficulty offered, not imposed".
 
 ### 2. They BLOCK, they do not attack
 
@@ -96,23 +123,29 @@ STEER_RATE — over the real road with a lane-holding driver aimed at the inside
 see. An NPC is that, with a different target line, a pace law, and a solid car instead of a
 translucent one.
 
-The car is already drawn as eight projected corners with faces and normals, so three more are a
-known cost.
+**And the body is the player's own car, settled 21 August 2026.** A racer is the same seven-station
+hull with the same faces, wheels, seams and light bar, drawn by the same functions with `carT`
+pointed elsewhere on the road; only the six body colours differ. That works because the shading here
+is carried in those colours rather than in a light term, so a hue rotation preserves the light
+direction exactly. The three are rotations of the PLAYER'S hue at 90, 180 and 270 degrees, which
+keeps the separation alive in every biome for free and leaves the player on the maximum-separation
+point the file protects. They are desaturated and lowered in contrast so the player stays the most
+findable car on screen.
 
 ---
 
 ## The open questions, answered by the build
 
 - ~~What the pace law actually is, and how strong the rubber band can be before it reads as
-  cheating.~~ **A free band, a pull that grows with the gap, and a release that runs on TIME.** A
-  racer accrues give up while the player is clear of the free band and pays it back while they are
-  not, so what switches the chase off is having been beaten for a sustained stretch rather than
-  being a certain distance behind at an instant. A distance release was built first and measured and
-  it cannot work: any band reading only the gap has a stable equilibrium where its boosted pace
-  matches the player's, and the nearest racer sat there with a median gap of 3.4k and a ninetieth
-  percentile of 3.4k. It also cannot be tuned out, because every player in this game is within about
-  five per cent of every other, so any setting that lets a good player escape leaves an average one
-  uncontested. Time separates them; distance cannot.
+  cheating.~~ **It reads driving quality and nothing positional.** See section 1 above, which
+  records the two laws that were built and thrown away first and why neither could work. The signal
+  is a rolling share of recent time spent OFF the edge, raised to a power because a scrape costs
+  more than the time it takes, with the multiplier as a small second term. The multiplier alone was
+  tried first and is a bad measure of quality here: measured, the mediocre driver ran a HIGHER
+  multiplier than the good one, 9.20 against 8.26, because sawing about is very sideways and
+  sideways is what it pays. At the top of the range a racer runs at 0.996 of what the player is
+  actually covering ground at, which is what makes "never escapes" true rather than hoped for: a
+  fixed top speed cannot follow a good player.
 - ~~Whether they can leave the road, and what happens if they do.~~ **They cannot.** Clamped at
   `NPC_EDGE`, on the same rule the player has: the wall takes the sideways speed pushing into it and
   nothing else. A rival the player watches fall off is a worse advertisement for the mechanic than no
