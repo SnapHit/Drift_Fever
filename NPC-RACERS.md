@@ -285,3 +285,85 @@ The rate ceiling did not move and must not: `NPC_SPARK_GAP` is what stops three 
 other from filling the screen. The measured firing rate is 8.2 bursts a second on a mediocre run
 against 8.6 before, and the peak share of the particle pool held by sparks is 16 per cent against 7,
 so the explosion still has 84 per cent of it to come apart into.
+
+---
+
+## The separator was one dimensional, 23 August 2026
+
+The author sent three frames from the daily with one racer buried most of a body deep inside the
+player's car, while purple, pink and green never overlapped each other in any of them. The pair that
+failed was the one pair with a special rule, in the mode where that rule is strongest.
+
+**The push direction is set by which side the racer is on, and it does not care whether there is
+road there.** The comment above used to argue that there is always room, because a car is 600 wide
+and `NPC_EDGE` keeps a racer inside 0.86 of the half width. That argument is about a player pinned at
+the LIP and it is false everywhere else. Turn it round: the RACER is at 0.86 and the PLAYER is at
+0.82, inboard of it and driving outward. The push is outward, into a wall the racer is already
+against, and the clamp eats the lot. On the daily the player cannot take a share either, so nothing
+resolves at all.
+
+Measured, with a driver written to close on racers: 1468 frames on the daily deeper than 120 units,
+the worst 957 which is more than a whole car, unbroken runs of up to 78 frames, and **one hundred per
+cent of them with the racer hard against `NPC_EDGE`**. Raising `NPC_EDGE` to 0.99 nearly halved it,
+which no other explanation predicts.
+
+**So what across cannot fix is fixed along.** `squeezeOut` runs once after every lateral pass, asks
+what is ACTUALLY still overlapping rather than predicting which case it was, and sheds the remainder
+along the road at `NPC_SQUEEZE_RATE` of the player's ground speed. A car with no road beside it still
+has road in front of it and behind it. It moves the racer's z and nothing else, so the free
+guarantee is untouched by construction on the third axis as much as on the first two, and it does
+not touch pace: a lift was tried, cost three times the handicap that caused the falling-behind
+complaint, and bought nothing measurable.
+
+Two smaller faults fell out of the same investigation and both are absolute rules that were only
+approximately true. A racer respawning from a wreck was placed at `NPC_LANE_SPREAD` of the road's
+BASE half width, an absolute 1518 units, so a car rejoining on a narrow section sat at 0.87 of the
+local half width against an `NPC_EDGE` of 0.86. And the line that spends a racer's sideways speed
+after a bump had its sign inverted against the convention `separateRacers` has always used: it threw
+away the speed of a car that was already leaving and kept the speed of one driving in, so the
+separator pushed a car out and its own velocity carried it straight back. With both fixed, the worst
+residual overlap anywhere is 331 units on the tighter axis and **no merge survives more than a single
+frame**.
+
+## The pace law had its sign inverted for every real player, 23 August 2026
+
+Third report of the same thing: pass them and they never challenge you again. It was not the
+separator. Measured before and after the fix above, on the same eight roads, the pace column is
+identical to three digits and the comeback count went from one to one.
+
+**`NPC_PACE_LOW` was 0.88 of `FEEL.SPEED`, an absolute number, and everything else in the law was
+relative.** 0.88 of full speed is quick against a car doing 0.62 in the scrape band and slow against
+a car doing 1.00 on clean road. So for anybody whose own speed stays near full, a DROP in form made
+the field SLOWER, and the law ran backwards. It only ever looked right because it was calibrated
+against the harness policies, which sit in the scrape band 19 and 45 per cent of a run by
+construction.
+
+**No person does that.** Drivers written to behave like people rather than like control laws --
+reaction lag, a wandering target, lapses of attention, and the sense to concentrate on an obstacle --
+scrape between 1 and 7 per cent of a run across the whole range from expert to poor. Every one of
+them read 0.75 to 0.89 on the form signal, against 0.87 for the perfect control law, and the whole
+of that range moved the racers' pace by 0.65 per cent.
+
+Both ends of the band are a share of the player's own pace now. At form one the field runs at the
+player's pace and the race is decided on the road; at form zero it runs faster, goes ahead, and the
+horizon leash holds it there as something to chase, which is the third rule word for word.
+`NPC_FORM_POWER` went from 5 to 16 at the same time, because a signal whose realistic range is 0.75
+to 0.89 has no resolution left after `NPC_PACE_CURVE` compresses it again.
+
+Measured over twenty runs, with only the anchor moved back to 0.88 as the known answer:
+
+| | player leads all three | retakes a minute |
+|---|---|---|
+| anchor 0.88, the old law | 84 per cent | 0.12 |
+| both ends relative | 19 per cent | 0.47 |
+
+**And there is a real trade here, stated rather than tuned around.** `NPC_PACE_MATCH` sets what a top
+form player's field runs at as a share of their own pace, and no value of it gives a good player both
+a big lead and a field that keeps coming back: below one they pull away smoothly and nobody returns,
+at one they are in the pack all race. At 0.99 the good driver leads 33 per cent of the run and is
+retaken 0.19 times a minute; at 0.995, 19 per cent and 0.47. The spec asks for the second, because
+being chased is the reward and the win is finishing ahead at the line rather than finishing alone.
+One constant moves it if playing says otherwise.
+
+A corner and straight line pace bias was built during this work and removed. The note in the
+constants block records why: it worked, and once the band was relative it carried nothing.

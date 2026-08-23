@@ -4770,18 +4770,45 @@ const FEEL = {
      that gets easier when you are struggling, because it makes two
      players' scores incomparable. Nothing here is on the road, and this
      is the random track, which has no records to make comparable.  */
-  NPC_FORM_TIME:            6.0,     // LIVE, seconds the clean share smooths over
-  NPC_FORM_POWER:           5.0,     // LIVE, how much harder a scrape counts than its duration
+  NPC_FORM_TIME:           10.0,     // LIVE, seconds the clean share smooths over
+  /* AND IT HAD TO GO UP A LONG WAY ONCE THE DRIVERS WERE PEOPLE. At 5,
+     a run that is clean 99 per cent of the time reads 0.95 and one that
+     is clean 93 per cent reads 0.70, and after NPC_PACE_CURVE compresses
+     it again the two land within one per cent of each other in pace.
+     Measured across four drivers built to behave like players rather
+     than like control laws, the whole range of human quality moved the
+     form signal from 0.89 to 0.75 and the racers' pace by 0.65 per cent,
+     which is no signal at all. The harness policies read 0.51 and 0.34
+     only because they sit in the scrape band by construction. */
+  NPC_FORM_POWER:          16.0,     // LIVE, how much harder a scrape counts than its duration
   NPC_FORM_MULT_REF:        9.0,     // LIVE, the multiplier at which the second term is full
   NPC_FORM_SCRAPE:         0.55,     // LIVE, the share of form cleanliness alone accounts for
-  NPC_PACE_LOW:            0.88,     // LIVE, share of FEEL.SPEED at form zero
+  /* AND BOTH ENDS OF THE BAND ARE A SHARE OF THE PLAYER'S OWN PACE.
+
+     THIS END USED TO BE ABSOLUTE, A SHARE OF FEEL.SPEED, and that is the
+     deepest thing wrong with the pace law. 0.88 of full speed is FAST
+     against a car doing 0.62 in the scrape band and SLOW against a car
+     doing 1.00 on clean road, so what the bottom of the range meant
+     depended entirely on how much the player scraped. It was calibrated
+     against the harness policies, which scrape 19 and 45 per cent of a
+     run because they are pinned at a fixed fraction of the half width by
+     construction. Measured against drivers built to behave like people,
+     nobody scrapes more than 7 per cent: every human input sits near 1.00
+     and the whole band collapses onto NPC_PACE_MATCH.
+
+     RELATIVE AT BOTH ENDS INVERTS CLEANLY AND SAYS WHAT THE SPEC SAYS.
+     At form one the field runs at the player's own pace and the race is
+     decided on the road. At form zero it runs FASTER, so it goes ahead
+     and the horizon leash holds it there as something to chase, which is
+     the third rule word for word: not hounded, and never alone. */
+  NPC_PACE_LOW:            1.06,     // LIVE, share of the PLAYER'S pace at form zero
   /* JUST UNDER ONE, AND THE SIGN OF THAT IS THE WHOLE RULE. Above one
      the racers are permanently quicker than the player, the lead can
      never be taken, and measured a good driver spent 0 per cent of the
      run in front. The win is finishing AHEAD, so at the top of the range
      a racer is a whisker SLOWER than the player: close enough to be
      there at the line, slow enough to be beaten by driving well. */
-  NPC_PACE_MATCH:         0.996,     // LIVE, share of the PLAYER'S own pace at form one
+  NPC_PACE_MATCH:         0.995,    // LIVE, share of the PLAYER'S own pace at form one
   NPC_PACE_CURVE:          0.40,     // LIVE, under one so good form reaches the top early
   NPC_PACE_TIME:           1.10,     // LIVE, seconds for a racer to reach a new pace
   /* SMALL, BECAUSE IT IS A SHARE OF FEEL.SPEED AND NOT OF EACH OTHER.
@@ -4789,6 +4816,22 @@ const FEEL = {
      over a hundred second run is sixty three thousand units apart: three
      cars in three different races rather than a field. */
   NPC_PACE_SPREAD:        0.012,     // LIVE, the step between the three, so they are not one car
+  /* A CORNER AND STRAIGHT PACE BIAS WAS BUILT HERE AND REMOVED, and
+     the note stays so the next session does not build it again. One
+     racer quicker through the corners and another down the straights is
+     a lovely idea: the field shuffles for a reason the player can SEE,
+     and it reads nobody's position, so it clears the bar the two
+     rejected laws failed. It was built, it worked, and MEASURED IT
+     CARRIED NOTHING. Against the clean control law over twenty runs it
+     gave 0.38 retakes a minute with the bias and 0.47 without, and the
+     three human drivers could not tell the arms apart at all.
+
+     The reason is that the real fault was elsewhere and this was
+     covering for it. See NPC_PACE_LOW: once the bottom of the band was
+     a share of the player's pace rather than an absolute share of
+     FEEL.SPEED, the law produced place changes on its own and the bias
+     was two constants, a per racer key and a running mean of the road
+     buying nothing. */
   /* ------------------------------------------------------------------
      THE HORIZON LEASH, WHICH IS PRESENTATION AND NOT COMPETITION.
 
@@ -4842,6 +4885,48 @@ const FEEL = {
      Anything under one leaves two cars sharing space by construction. */
   NPC_BUMP_PUSH:           1.00,     // LIVE, share of the overlap resolved per pass
   NPC_BUMP_SHARE:          0.30,     // LIVE, the player's share of it, the racer takes the rest
+  /* AND THE SECOND AXIS, WHICH THE SEPARATOR DID NOT HAVE.
+
+     A racer squeezed between the player and NPC_EDGE has no road left
+     beside it, so no lateral push can resolve anything and the clamp
+     drops the whole separation. It still has road in front of it and
+     behind it. squeezeOut moves it ALONG until it is out of the
+     player's box, which is the same solidity guarantee applied on the
+     axis that is still free.
+
+     RATE LIMITED, BECAUSE ALONG IS NOT LIKE ACROSS. A lateral overlap
+     starts at nothing and grows a few units a frame, so resolving all
+     of it every frame is invisible. A longitudinal overlap can be a
+     whole body length the instant the lateral one appears, because two
+     cars side by side are already fully overlapped along the road, and
+     resolving THAT in one frame is a car teleporting. This is a share of
+     the player's own ground speed, so at 1.0 the squeezed car simply
+     holds station while it is shed and loses a length in about seven
+     frames, which reads as being squeezed out rather than as a jump. */
+  NPC_SQUEEZE_RATE:        1.40,     // LIVE, share of FEEL.SPEED it may be moved along at
+  /* AND IT DOES NOT TOUCH PACE AT ALL, WHICH WAS THE SECOND VERSION'S
+     MISTAKE. A lift of 0.72 while squeezed sounds obviously right: the
+     car has a wing inside somebody's door, so it should back off.
+     Measured, the squeeze fires on about six per cent of racer frames
+     against a driver that closes on them, and 28 per cent off six per
+     cent is a 1.8 per cent handicap over a run, which is THREE TIMES the
+     one that caused the author's second complaint last session. And it
+     bought nothing: with the lift removed the worst residual overlap and
+     the longest unbroken run were the same to within the noise of two
+     arms that diverge anyway. So the second axis is a pure position fix,
+     exactly like the first, and nothing about contact touches pace. */
+  /* AND MERGED HAS TO MEAN MERGED, NOT TOUCHING. The lateral push
+     resolves an overlap to EXACTLY zero, and exactly zero in floating
+     point is a number either side of it, so a residue test written as
+     "greater than nothing" fires on every frame of ordinary contact.
+     Measured, it did: the squeeze ran on 21 per cent of all frames, in
+     episodes up to 82 frames long, and because a squeezed car also takes
+     the 0.72 lift that was a 28 per cent pace cut on a fifth of the run,
+     which is the same handicap this session's predecessor had to undo.
+     Four per cent of a body width is the line: below it the lateral
+     solver has done its job and the cars are in contact, above it there
+     is road it could not give them. */
+  NPC_SQUEEZE_DEEP:          24,     // LIVE, world units of residue that count as merged
   /* A SANDWICH DOES NOT RESOLVE IN ONE PASS: pushing A off B moves A
      into C. Three is enough for four cars, and the pass is a handful of
      subtractions over six pairs. */
@@ -7043,7 +7128,7 @@ const TUNABLES = [
   /* THE RACERS, group 31. The pace law rows are the ones that matter and
      they go first, because they are the feature and the rest is support. */
   { key: 'NPC_COUNT',          label: 'npcs',    step: 1,   min: 0,    max: 6,     dp: 0, group: 31 },
-  { key: 'NPC_PACE_LOW',       label: 'npcLow',  step: 0.01,min: 0.5,  max: 1.3,   dp: 2, group: 31 },
+  { key: 'NPC_PACE_LOW',       label: 'npcLow',  step: 0.01,min: 0.6,  max: 1.6,   dp: 2, group: 31 },
   { key: 'NPC_PACE_MATCH',     label: 'npcMatch',step: 0.005,min: 0.8, max: 1.3,   dp: 3, group: 31 },
   { key: 'NPC_PACE_CURVE',     label: 'npcCurve',step: 0.05,min: 0.1,  max: 4,     dp: 2, group: 31 },
   { key: 'NPC_PACE_SPREAD',    label: 'npcSprd', step: 0.005,min: 0,   max: 0.3,   dp: 3, group: 31 },
@@ -7072,6 +7157,8 @@ const TUNABLES = [
   { key: 'NPC_BUMP_PUSH',      label: 'npcPush', step: 0.05,min: 0,    max: 2,     dp: 2, group: 31 },
   { key: 'NPC_SOLVE_PASSES',   label: 'npcSolve',step: 1,   min: 1,    max: 8,     dp: 0, group: 31 },
   { key: 'NPC_BUMP_SHARE',     label: 'npcShare',step: 0.05,min: 0,    max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_SQUEEZE_RATE',   label: 'npcSqRat',step: 0.05,min: 0,    max: 4,     dp: 2, group: 31 },
+  { key: 'NPC_SQUEEZE_DEEP',   label: 'npcSqDp', step: 4,   min: 0,    max: 400,   dp: 0, group: 31 },
   { key: 'NPC_BUMP_SHAKE',     label: 'npcShake',step: 1,   min: 0,    max: 30,    dp: 0, group: 31 },
   { key: 'NPC_BUMP_COOLDOWN',  label: 'npcBmpCd',step: 0.02,min: 0,    max: 2,     dp: 2, group: 31 },
   { key: 'NPC_SPARK_MIN',      label: 'npcSprkN',step: 1,   min: 0,    max: 30,    dp: 0, group: 31 },
@@ -7108,7 +7195,7 @@ const TUNABLES = [
   { key: 'TREE_SCRUB_WIDE',    label: 'trScrubW',step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
   { key: 'TREE_SCRUB_HIGH',    label: 'trScrubH',step: 50,  min: 200,  max: 9000,  dp: 0, group: 30 },
   { key: 'TERRAIN_REACH',      label: 'terrW',   step: 0.2,  min: 0,    max: 24,    dp: 1, group: 12 },
-  { key: 'TERRAIN_HEIGHT',     label: 'terrH',   step: 40,   min: 0,    max: 4000,  dp: 0, group: 12 },
+  { key: 'TERRAIN_HEIGHT',     label: 'terrH',   step: 40,   min: 0,    max: 8000,  dp: 0, group: 12 },
   { key: 'TERRAIN_HILL_SEGMENTS',label:'terrHz', step: 2,    min: 2,    max: 120,   dp: 0, group: 12 },
   { key: 'SEG_MERGE_PX',       label: 'segPx',   step: 0.25, min: 0,    max: 8,     dp: 2, group: 12 },
   { key: 'PATH_CHUNK_SUBPATHS',label: 'chunk',   step: 16,   min: 0,    max: 1024,  dp: 0, group: 12 },
@@ -14555,6 +14642,7 @@ function racersReset(base) {
       speed: FEEL.SPEED * FEEL.NPC_PACE_LOW,
       sparkT: 0,              // seconds until this one may throw sparks again
       owed: 0,                // world units given up to a lift, waiting to be run back
+      squeeze: 0,             // which way it is being shed along the road, latched. See squeezeOut
       wreck: 0,               // seconds left out of the running. See wreckRacer.
       recover: 0,             // and seconds of recovery pace after rejoining
       step: i - mid,          // its place in the pace spread, so the three differ
@@ -14712,21 +14800,46 @@ function racerBoxed(r) {
    the racers are quick because the player is driving well, not because
    the player got away. */
 function racerPace(r, dt) {
-  /* THE TOP OF THE RANGE IS THE PLAYER'S OWN PACE, NOT A CONSTANT, and
-     that is what makes "never escapes" true rather than hoped for. A
+  /* BOTH ENDS OF THE RANGE ARE THE PLAYER'S OWN PACE, NOT A CONSTANT,
+     and that is what makes "never escapes" true rather than hoped for. A
      fixed top speed cannot follow a good player: whatever it is set to,
      a player quicker than it drifts away, and a player slower than it is
-     overtaken and left. Matching what the player is ACTUALLY covering
-     ground at, plus a whisker, means a good run is shadowed the whole
-     way and has to win on position rather than by pulling away.
+     overtaken and left.
+
+     THE BOTTOM USED TO BE A CONSTANT AND THAT WAS THE WHOLE FAULT. It
+     was 0.88 of FEEL.SPEED, which is quick against a car doing 0.62 in
+     the scrape band and SLOW against a car doing 1.00 on clean road. So
+     for anybody who does not live in the scrape band, a DROP in form
+     made the field SLOWER, and the law had its sign inverted for every
+     real player. Measured over twenty runs with only that number moved:
+     the player led every one of the three cars for 84 per cent of the
+     run and was retaken 0.12 times a minute, which is the author's
+     report in two figures, and it barely moved between a driver playing
+     well and one playing badly. Relative at both ends, the same runs
+     give 19 per cent and 0.47.
 
      AND IT IS STILL NOT POSITIONAL. It reads the player's SPEED, which
      is a fact about how they are driving, and never the gap. Nothing
-     here goes faster because the player is ahead. */
+     here goes faster because the player is ahead.
+
+     THE ONE THING IT TRADES, stated plainly because it is a real trade
+     and not a tuning oversight: NPC_PACE_MATCH sets what a top form
+     player's field runs at as a share of their own pace, and there is no
+     value of it that gives a good player both a big lead and a field
+     that keeps coming back. Below one they pull away smoothly and nobody
+     returns; at one they are in the pack all race and lead about as
+     often as any of the four. Measured at 0.99 the good driver leads 33
+     per cent of the run and is retaken 0.19 times a minute; at 0.995,
+     19 per cent and 0.47. The spec asks for the second: being chased IS
+     the reward and the win is finishing ahead at the line, not finishing
+     alone. */
   const f = Math.pow(clamp(racerFormNow, 0, 1), FEEL.NPC_PACE_CURVE);
-  const match = playerPace() * FEEL.NPC_PACE_MATCH;
-  let want = FEEL.NPC_PACE_LOW + f * (match - FEEL.NPC_PACE_LOW)
-           + r.step * FEEL.NPC_PACE_SPREAD;
+  /* EVERY TERM IS A SHARE OF THE PLAYER'S OWN PACE, the spread included,
+     so the whole law is dimensionally one thing and none of it changes
+     meaning when the player slows down. */
+  const share = FEEL.NPC_PACE_LOW + f * (FEEL.NPC_PACE_MATCH - FEEL.NPC_PACE_LOW)
+              + r.step * FEEL.NPC_PACE_SPREAD;
+  let want = playerPace() * share;
   /* THE ONE POSITIONAL TERM IN THE FILE, AND IT IS BOUNDED AND EARNED.
      A car that respawns behind and then runs at the player's own pace
      never comes back, so a wreck would be permanent by arithmetic and
@@ -14755,7 +14868,7 @@ function racerPace(r, dt) {
     want += extra;
     r.owed = Math.max(0, r.owed - extra * span);
   }
-  /* AND THE LEASH, WHICH ONLY EVER SLOWS. A racer this far ahead is
+  /* AND THE LEASH, WHICH ONLY EVER HOLDS STATION. A racer this far ahead is
      about to leave the draw distance, and an empty road is what the
      third rule exists to prevent. It eases to holding station so it
      stays on the horizon as something to chase. */
@@ -14763,8 +14876,17 @@ function racerPace(r, dt) {
   if (gap > FEEL.NPC_HORIZON) {
     const t = clamp((gap - FEEL.NPC_HORIZON)
                     / Math.max(1, FEEL.NPC_HORIZON_SPAN), 0, 1);
-    // Held at what the player is actually managing, so it sits at a fixed
-    // distance up the road rather than drifting away slowly.
+    /* Held at what the player is actually managing, so it sits at a
+       fixed distance up the road rather than drifting away slowly.
+
+       IT IS A LERP TOWARD playerPace AND NOT A CEILING, so on a run
+       where want is BELOW the player's pace it raises it. That is worth
+       stating because this used to be commented as only ever slowing,
+       which was true when the bottom of the band was an absolute 0.88 of
+       FEEL.SPEED and is not true now that both ends are relative. It can
+       never lift a racer ABOVE the player's own pace, which is the
+       property that matters: it removes a runaway, it does not create
+       one. */
     want = want + (playerPace() - want) * t;
   }
   return want * FEEL.SPEED;
@@ -15039,12 +15161,31 @@ function markWreck(z, x) {
                            share would move them out and is refused. The
                            racer then yields the WHOLE separation,
                            because the player is the one who can die and
-                           the racer is not. There is always room: the
-                           road is two half widths across, a car is 600
-                           wide, and NPC_EDGE keeps a racer inside 0.86
-                           of the half width, so a player pinned at the
-                           lip always has a racer's width of road to
-                           push into.
+                           the racer is not.
+
+     THE OTHER PINNED CASE, WHICH THIS DESCRIPTION SAID COULD NOT HAPPEN
+     AND WHICH IS THE ONE THE AUTHOR PHOTOGRAPHED. The paragraph above
+     used to end "there is always room: the road is two half widths
+     across, a car is 600 wide, and NPC_EDGE keeps a racer inside 0.86 of
+     the half width, so a player pinned at the lip always has a racer's
+     width of road to push into". That argument is about a player pinned
+     at the LIP and it is false everywhere else. Turn it around: the
+     RACER is at 0.86 and the PLAYER is at 0.82, inboard of it, driving
+     outward. The push direction is set by which side the racer is on, so
+     it is outward, into a wall the racer is already against, and the
+     clamp eats the lot.
+
+     MEASURED, on the daily, over eight runs with a driver that closes on
+     racers: 1468 frames deeper than 120 units, the worst 957 which is
+     more than a whole car, unbroken runs of up to 78 frames, and ONE
+     HUNDRED PER CENT of them with the racer hard against NPC_EDGE. The
+     known answer confirms it: raising NPC_EDGE to 0.99 nearly halves it,
+     which no other explanation predicts.
+
+     SO WHAT ACROSS CANNOT FIX IS FIXED ALONG. The separator was one
+     dimensional and the geometry is two dimensional: a car with no road
+     left beside it still has road in front of it and behind it. See
+     squeezeOut, which is the second axis and the whole of the fix.
 
    WHAT CONTACT STILL NEVER DOES. It does not touch forward speed, for
    anybody. It does not touch the PLAYER'S lateral velocity, and that
@@ -15200,8 +15341,19 @@ function separatePlayer(r) {
   const wall = racerWall(r);
   const want = over * FEEL.NPC_BUMP_PUSH - share;
   r.x = clamp(r.x + side * want, -wall, wall);
+  /* AND THE SIDEWAYS SPEED CARRYING IT IN IS SPENT, WHICH IS WHAT THIS
+     LINE MEANT AND THE OPPOSITE OF WHAT IT DID.
+
+     side is the direction from the PLAYER to the racer, so a racer
+     coming at the player is moving along MINUS side and r.lv * -side is
+     POSITIVE. The test asked for negative, so it threw away the speed of
+     a car that was already leaving and kept the speed of one driving in:
+     the separator pushed the car out and the car's own velocity carried
+     it straight back next frame, which is how a contact that should
+     settle in one frame grinds on for dozens. separateRacers has had the
+     convention right since the day it was written. */
   const close = r.lv * -side;
-  if (close < 0) r.lv = 0;      // the racer's own approach is spent
+  if (close > 0) r.lv = 0;      // the racer's own approach is spent
   if (r.sparkT <= 0) {
     r.sparkT = FEEL.NPC_SPARK_GAP;
     markContact((r.z + position) * 0.5, (r.x + carX) * 0.5, over);
@@ -15227,7 +15379,55 @@ function markContact(z, x, depth) {
   contactN++;
 }
 
-function racersSeparate() {
+/* THE SECOND AXIS. What across could not fix, along.
+
+   ASKED RATHER THAN PREDICTED. It would be easy to write this as "if the
+   clamp bit", and that would only catch the wall case. It measures what
+   is ACTUALLY still overlapping after every lateral pass has run, so it
+   catches the wall, a sandwich between the player and another racer, and
+   anything else that leaves a residue, without knowing which happened.
+
+   THE PLAYER IS NEVER MOVED HERE. Only r.z, and only the racer's. The
+   free guarantee is untouched by construction, on a third axis as much
+   as on the first two.
+
+   THE DIRECTION IS THE SIGN OF THE GAP, AND IT IS LATCHED. Shedding
+   backwards a car that is ahead would drag it through the player rather
+   than out of them, so it goes the way it is already going. Latched
+   because two cars exactly level have a sign that flickers, and a car
+   that changes its mind every frame sheds nothing.
+
+   AND IT DOES NOT TOUCH PACE. See NPC_SQUEEZE_DEEP for why a lift was
+   tried and removed: it cost three times the handicap that caused the
+   author's second complaint and bought nothing measurable. Positions
+   only, on both axes, which is the same rule contact has always had. */
+function squeezeOut(r, dt) {
+  if (r.air || airborne || r.wreck > 0) { r.squeeze = 0; return 0; }
+  const mine = carYaw();
+  const across = (spanAcross(r.yaw) + spanAcross(mine)) * 0.5 - Math.abs(r.x - carX);
+  const along = (spanAlong(r.yaw) + spanAlong(mine)) * 0.5 - Math.abs(r.z - position);
+  if (across <= FEEL.NPC_SQUEEZE_DEEP || along <= FEEL.NPC_SQUEEZE_DEEP) {
+    r.squeeze = 0; return 0;
+  }
+  if (!r.squeeze) r.squeeze = (r.z - position) >= 0 ? 1 : -1;
+  const step = Math.min(along, FEEL.NPC_SQUEEZE_RATE * FEEL.SPEED * dt);
+  r.z += r.squeeze * step;
+  /* AND THE WIDTH IS RE-ASKED, because the car has just been moved onto
+     a different piece of road. The wall clamp in the update loop ran
+     before this did, so a car shed onto a narrower segment was holding
+     the wider segment's limit: measured, that put one racer at 0.90 of
+     the half width against an NPC_EDGE of 0.86, which is a rule that is
+     meant to be absolute and was exactly 0.86 before this function
+     existed. */
+  const wall = racerWall(r);
+  if (Math.abs(r.x) > wall) {
+    r.x = clamp(r.x, -wall, wall);
+    if (r.lv * r.x > 0) r.lv = 0;
+  }
+  return step;
+}
+
+function racersSeparate(dt) {
   if (!FEEL.NPC_BUMP) return;
   let touched = 0;
   const passes = Math.max(1, Math.round(FEEL.NPC_SOLVE_PASSES));
@@ -15255,6 +15455,11 @@ function racersSeparate() {
     for (let j = i + 1; j < racers.length; j++) separateRacers(racers[i], racers[j]);
   }
   for (let i = 0; i < racers.length; i++) touched += separatePlayer(racers[i]);
+  /* AND THEN THE SECOND AXIS, ONCE, AFTER EVERY LATERAL PASS HAS HAD ITS
+     GO. Once, because the step is a rate and four passes would spend the
+     frame's budget four times. Last, because it must only ever act on
+     what across could genuinely not fix. */
+  for (let i = 0; i < racers.length; i++) squeezeOut(racers[i], dt);
   /* One knock per contact rather than one per pass, and one cooldown for
      the whole field: three cars leaning on the player at once is one
      event to the person holding the phone. */
@@ -15331,7 +15536,16 @@ function racersUpdate(dt) {
           back -= clear;
         }
         r.z = back;
-        r.x = r.step * FEEL.NPC_LANE_SPREAD * FEEL.ROAD_HALF_WIDTH_BASE;
+        /* AND INSIDE THE ROAD IT IS REJOINING, not inside the road's
+           BASE width. The lane offset is NPC_LANE_SPREAD of
+           ROAD_HALF_WIDTH_BASE, which is an absolute 1518 units, and a
+           car respawning on a narrow section was put at 0.87 of the
+           local half width against an NPC_EDGE of 0.86. The wrecked
+           branch continues before the wall clamp, so nothing caught it
+           until the frame after. It is the same lookup the clamp uses. */
+        const backWall = racerWall(r);
+        r.x = clamp(r.step * FEEL.NPC_LANE_SPREAD * FEEL.ROAD_HALF_WIDTH_BASE,
+                    -backWall, backWall);
         r.lane = r.step; r.laneNow = r.step;
         r.lv = 0; r.hv = 0; r.yaw = 0;
         r.ride = -1; r.air = false; r.y = 0; r.vy = 0;
@@ -15380,7 +15594,7 @@ function racersUpdate(dt) {
      constraint over the whole field and resolving it one car at a time
      while the others are still on last frame's positions leaves the last
      pair merged. */
-  racersSeparate();
+  racersSeparate(dt);
 }
 
 /* Drawn from the SAME boundary tables the road is, so it sits in the
