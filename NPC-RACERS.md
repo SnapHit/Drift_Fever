@@ -1,6 +1,12 @@
 # NPC racers: agreed design, not yet built
 
-Agreed 16 August 2026. Logged for a future session. Nothing here is implemented.
+Agreed 16 August 2026. **Built 20 August 2026, on the random track.** All four stages ship: they
+exist and race, the pace law, blocking, and contact. What follows is the agreed design, with the
+open questions at the bottom now answered by the build rather than left open.
+
+The constants are the `NPC_` block in `index.html` and every one of them is on the tuner, group 31.
+The pace law is the part worth reading: it releases on TIME rather than on distance, and the note
+there records why the distance version could not be made to work.
 
 ---
 
@@ -82,9 +88,8 @@ fixed rather than made optional.
 
 ## What already exists to build on
 
-**`ghostSynthesise` NO LONGER EXISTS IN THE FILE. It was removed on 17 August 2026 along with the
-pace car, and it lives only in git history at commit `0bb4018`. Recover it from there rather than
-rewriting it — it is the working starting point for a racer and it was measured.**
+**`ghostSynthesise` was recovered from `0bb4018` as instructed and is now the racers' driver**, at
+`racerAim` and the integration in `racersUpdate`. It was not rewritten.
 
 `ghostSynthesise` drives the real drift model — HEADING_SNAP_TIME, GRIP_TIME, CENTRIFUGAL,
 STEER_RATE — over the real road with a lane-holding driver aimed at the inside of the corner it can
@@ -96,12 +101,36 @@ known cost.
 
 ---
 
-## Open questions for the build session
+## The open questions, answered by the build
 
-- What the pace law actually is, and how strong the rubber band can be before it reads as cheating.
-- Whether they can leave the road, and what happens if they do.
-- Whether they interact with hazards and jumps or ignore them.
+- ~~What the pace law actually is, and how strong the rubber band can be before it reads as
+  cheating.~~ **A free band, a pull that grows with the gap, and a release that runs on TIME.** A
+  racer accrues give up while the player is clear of the free band and pays it back while they are
+  not, so what switches the chase off is having been beaten for a sustained stretch rather than
+  being a certain distance behind at an instant. A distance release was built first and measured and
+  it cannot work: any band reading only the gap has a stable equilibrium where its boosted pace
+  matches the player's, and the nearest racer sat there with a median gap of 3.4k and a ninetieth
+  percentile of 3.4k. It also cannot be tuned out, because every player in this game is within about
+  five per cent of every other, so any setting that lets a good player escape leaves an average one
+  uncontested. Time separates them; distance cannot.
+- ~~Whether they can leave the road, and what happens if they do.~~ **They cannot.** Clamped at
+  `NPC_EDGE`, on the same rule the player has: the wall takes the sideways speed pushing into it and
+  nothing else. A rival the player watches fall off is a worse advertisement for the mechanic than no
+  rival at all. Measured, 2 frames in many thousands momentarily exceed it where the road narrows
+  under a car already at the limit, worst 1.14 half widths, and it self corrects.
+- ~~Whether they interact with hazards and jumps or ignore them.~~ **They take every jump and they go
+  round hazards.** The launch is the player's own arithmetic with the player's own constants, lip
+  loss included, so a racer's flight is the same flight and lands on the same road `jumpRunout`
+  reserves. Hazards get the latched side avoidance the probe harness learned the hard way; measured
+  they clear four in five. Neither costs them anything: giving a racer a bar to drain would be
+  inventing a mechanic nobody can see.
 - How they are introduced to the player, since the tutorial currently teaches the pace car.
+  **Still open.** Training is daily level one and the racers are random track only, so nothing
+  introduces them yet.
+- **Contact is solid, tactile and free, and the third of those is a rule rather than a tuning.** The
+  share of a bump that would move the PLAYER further from the centre line is spent on the racer
+  instead, so the player is only ever pushed inward. Contact therefore cannot start a scrape, drain
+  the bar or end a run, at any value of any constant. Nothing touches forward speed either way.
 - ~~Whether the pace car survives alongside them or is replaced by them.~~ Settled 17 August 2026:
   the pace car is gone. It was passed in the first ten seconds and never seen again, so it added
   nothing after that. NPCs replace it outright.
