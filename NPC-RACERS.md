@@ -119,6 +119,24 @@ Two or three that stay in play beats a field of eight the player never sees. Thr
 Ship on the random track. It has no comparability constraint, no daily records at risk, and no
 ghost to confuse. Prove the feel there, then port to the daily.
 
+**Ported 23 August 2026, to every real daily level. Training is excluded.** The port cost one
+concession and it was found by measurement, not by argument: **on the daily the player is not pushed
+by contact at all.** With the player takeable, the *road itself* moved on 2 of 140 daily roads.
+
+The chain is real and it is not a bug in the racers. `carX` runs to `carFrac`, to `scraping`, to the
+speed factor, to `position`, to *when* `topUpRoad` asks for more road — and `hazardFits` reads
+`curveScale`, which `updateDifficulty` sets from elapsed time. So a player nudged a few units early
+in a run reaches the generator at a different moment and can be handed a different corner. A road
+that depends on being bumped is not a shared road.
+
+The cars are still fully solid. This is a share, not a switch: the racer takes everything the player
+does not, which on the daily is all of it. Measured separation is unchanged.
+
+**And the inward-only rule had a hole the size of a splitter.** It was written against the road
+*edge*; a splitter sits at x = 0, dead centre, so "only ever toward the middle" and "toward a
+splitter" are the same direction. A push that would land the car inside a hazard band is now refused
+exactly as an outward one is. Measured over 20,725 applied pushes: none left the car inside a hazard.
+
 **The port is the part to be careful about.** The daily's premise is that everyone drives the same
 road, which is what makes ghosts comparable and the share card meaningful. Racers on the daily must
 be deterministic from the seed — same starting positions, same pace law, same behaviour for
@@ -184,8 +202,20 @@ findable car on screen.
   they clear four in five. Neither costs them anything: giving a racer a bar to drain would be
   inventing a mechanic nobody can see.
 - How they are introduced to the player, since the tutorial currently teaches the pace car.
-  **Still open.** Training is daily level one and the racers are random track only, so nothing
-  introduces them yet.
+  **Still open, and now more pressing.** They are on the daily as of 23 August 2026 but training
+  still excludes them, so a first-time player meets three opponents with no warning at the start of
+  level two.
+- ~~What happens to the ghost once there are solid cars as well.~~ **It does not collide, decided
+  23 August 2026.** It is a recording, not a rival: the line it drives was set on a run where none of
+  this happened, so a collision with it is a collision with a past that cannot react, and a ghost
+  that could shove the player off their line would destroy the comparison it exists for. They read as
+  different things already — the ghost is a footprint and a roof with daylight between them and no
+  sides, a racer is a closed opaque hull with wheels and a light bar.
+- ~~Whether a hazard should wreck them.~~ **It does, from 23 August 2026, and they come back.** Out
+  for 1.6s, rejoining 5200 units behind the player, then 9 seconds of recovery pace which closes that
+  to about 2600. They are never eliminated: three opponents that can be knocked out means a good
+  player finishes alone, which is the outcome the pace law exists to prevent. The recovery boost is
+  the only positional term in the file and it cannot fire without a wreck having happened first.
 - **Contact is solid, tactile and free, and the third of those is a rule rather than a tuning.** The
   share of a bump that would move the PLAYER further from the centre line is spent on the racer
   instead, so the player is only ever pushed inward. Contact therefore cannot start a scrape, drain
