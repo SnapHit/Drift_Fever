@@ -193,8 +193,12 @@ findable car on screen.
 - ~~Whether they can leave the road, and what happens if they do.~~ **They cannot.** Clamped at
   `NPC_EDGE`, on the same rule the player has: the wall takes the sideways speed pushing into it and
   nothing else. A rival the player watches fall off is a worse advertisement for the mechanic than no
-  rival at all. Measured, 2 frames in many thousands momentarily exceed it where the road narrows
-  under a car already at the limit, worst 1.14 half widths, and it self corrects.
+  rival at all. It used to be approximate: the clamp read the half width from the segment the car was
+  on at the TOP of the frame and applied it after the car had moved a hundred and fifty units, so on
+  road that narrows it held the car to the old width. Measured 23 August 2026, that let a racer sit
+  at 1.02 half widths for a single frame. The clamp now reads the width where the car actually is and
+  the worst reading over eight runs is 0.86 exactly, which is `NPC_EDGE`, with the forced known
+  answer landing on 1.45 exactly.
 - ~~Whether they interact with hazards and jumps or ignore them.~~ **They take every jump and they go
   round hazards.** The launch is the player's own arithmetic with the player's own constants, lip
   loss included, so a racer's flight is the same flight and lands on the same road `jumpRunout`
@@ -227,3 +231,57 @@ findable car on screen.
   that job by being named PACE CAR on run one and GHOST from run two. Whatever introduces the racers
   has to carry that lesson too, because the daily records, the ghost margin and CHASING YOUR LAST
   RUN all assume the player knows what a ghost is.
+
+---
+
+## What the pile-up actually was, 23 August 2026
+
+The author sent a frame with four cars stacked across the road, each overlapping its neighbour by
+about half a body, and it turned out to be three separate faults with one symptom.
+
+**The one that mattered was a frame of stale yaw.** `separatePlayer` asks how much road each car
+takes up, and both answers are functions of the player's yaw: at twenty degrees the footprint is
+1037 long and 875 wide against 880 and 600 straight ahead. `drift.headingAngle`, which `carYaw`
+reads, was computed BELOW the call to `racersUpdate`, so every contact test in the file ran against
+the yaw the car had a frame earlier. That is worst exactly when it matters, because a car that is
+sideways is a car mid flick, which is when the yaw moves fastest and the footprint is widest, and it
+is also most of this game. The test that failed was the LENGTH one: two cars that did not overlap
+along the road a frame ago were never asked about their width, so a whole car width of interpenetration
+was simply never seen. Moving five lines above the call took the deepest overlap left anywhere in
+eight daily runs from 570 units to 47, and four abreast from a real event to none.
+
+**The aiming was recreating what the separator was asked to fix.** The aim was a SUM: a racing line
+term reaching 0.70 of the half width, shared identically by all three racers, PLUS a lane at 0.46.
+In a corner the racing line moved the whole field the same way at once and the sum asked for 1.16 of
+a half width on a road that ends at 1, so all three clamped to the same place. The lane is now the
+anchor and the racing line gets whatever room is left inside `NPC_EDGE`, and the lane band went to
+0.66 because three lanes at 0.46 span 2116 world units and three sideways cars need about 2700.
+
+**And the queue costs a car its place, not its pace.** A racer pinned at `NPC_EDGE` with somebody in
+its width has nowhere to be pushed, so it lifts to `NPC_YIELD` and slots into file. The first version
+of that was a straight handicap and it caused the author's second complaint: the pace law reads
+driving quality and never the gap, deliberately, so there is nothing in it that notices a car has
+fallen behind. A lift of eight per cent taken on seven per cent of frames is half a per cent of a
+whole run, which over ninety seconds is five thousand units, and measured it took a good driver's
+time in reach from 74 per cent to 58 and let them escape twice in eight runs. What a lift costs is
+now banked in world units and run back off once the road ahead is clear, which restores the chase to
+72 per cent in reach and no escapes in eight while keeping four abreast at none.
+
+So the answer to "were they falling behind because of the pace law" is no: it was traffic, and for
+one session it was traffic I had invented.
+
+## The sparks, 23 August 2026
+
+They fired and could not be seen, and the count was never the problem. Measured on a 390 wide phone,
+a spark drew 1.4 pixels across, and a FULL FORCE burst of fourteen painted 81 pixels of ink against a
+graze's 23, because every extra particle landed inside the same small square. Size first, then the
+throw, then the count: a spark is now about four pixels across at rest and up to eight on a hard hit,
+`NPC_SPARK_BIG` scales the size with the force so a real hit is a bigger burst and not just a denser
+one, and `NPC_SPARK_HOT` brings a share of the burst out in the car's own hot light colour, scaled by
+the SQUARE of the force so a graze has none of it. Peak ink went from 23 / 48 / 81 pixels at graze,
+half and full force to 247 / 830 / 1885, in a 69 by 58 pixel spread instead of 14 by 17.
+
+The rate ceiling did not move and must not: `NPC_SPARK_GAP` is what stops three cars leaning on each
+other from filling the screen. The measured firing rate is 8.2 bursts a second on a mediocre run
+against 8.6 before, and the peak share of the particle pool held by sparks is 16 per cent against 7,
+so the explosion still has 84 per cent of it to come apart into.

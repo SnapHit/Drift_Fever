@@ -4689,7 +4689,40 @@ const FEEL = {
      Each racer holds an offset from the racing line and changes it on
      its own clock, which is a fact about the racer and not a reaction to
      the player. */
-  NPC_LANE_SPREAD:         0.46,     // LIVE, of the half width, how far apart they sit
+  /* WIDE ENOUGH THAT THREE CARS FIT SIDE BY SIDE, which at 0.46 they did
+     not. Three lanes at 0.46 span 0.92 of a half width, which is 2116
+     world units, and three cars sideways need about 2700: they could not
+     be separated because there was nowhere to separate them to. An outer
+     lane sits at this many half widths from the centre, and a car's own
+     half span is about 0.20, so 0.66 puts its outer edge at 0.86, which
+     is exactly NPC_EDGE. The field uses the whole road it is allowed. */
+  NPC_LANE_SPREAD:         0.66,     // LIVE, of the half width, how far apart they sit
+  /* WHAT A BOXED IN RACER DROPS TO. See racerBoxed. Gentle, because it
+     is a lift rather than a brake: the car needs to lose a length or two
+     to slot in behind, not to stop. */
+  NPC_YIELD:               0.92,     // LIVE, share of its pace while something is in front
+  /* AND IT IS PAID BACK, WHICH IS THE DIFFERENCE BETWEEN A QUEUE AND A
+     HANDICAP, and the first version was a handicap.
+
+     A LIFT COSTS GROUND, AND GROUND DOES NOT COME BACK ON ITS OWN. The
+     pace law reads driving quality and never the gap, deliberately, so
+     there is nothing in it that notices a car has fallen behind and
+     nothing that pulls it up again. A racer boxed in for seven per cent
+     of its frames at 0.92 loses about half a per cent of a whole run,
+     which over ninety seconds is five thousand units, and measured it
+     took the good driver's time in reach from 74 per cent to 58 and let
+     them escape twice in eight runs. That is item two of the session,
+     caused by the fix for item one.
+
+     SO THE LIFT IS A LOAN. What a car gives up while boxed is banked in
+     world units and run back off once it is clear, at NPC_YIELD_REPAY of
+     its own pace. The car still loses its PLACE at the moment of the
+     squeeze, which is the whole point of a queue, and the field's pace
+     over the run is untouched. Capped, so a car held up for a very long
+     time comes back through rather than arriving like a missile. */
+  NPC_YIELD_REPAY:         1.05,     // LIVE, of its own pace while paying a lift back
+  NPC_YIELD_DEBT:          5000,     // LIVE, world units, the most it may be owed
+  NPC_YIELD_CLEAR:         0.75,     // LIVE, body lengths of clear road before it pays one back
   NPC_LANE_HOLD:            5.5,     // LIVE, seconds a racer keeps a lane
   NPC_LANE_TIME:           1.60,     // LIVE, seconds to slide from one lane to the next
 
@@ -4834,11 +4867,43 @@ const FEEL = {
      it and two players on the same daily who had crashed a different
      number of times were driving different roads. Decoration may not
      touch the road. */
-  NPC_SPARK_MIN:              2,     // LIVE, particles for the lightest touch
-  NPC_SPARK_MAX:             14,     // LIVE, and for a full width shoulder
-  NPC_SPARK_SPEED:         0.34,     // LIVE, of the smaller screen dimension a second
-  NPC_SPARK_SIZE:        0.0055,     // LIVE, of the smaller dimension
-  NPC_SPARK_TIME:          0.34,     // LIVE, seconds they live
+  /* THE SIZE WAS THE WHOLE PROBLEM AND THE COUNT WAS NOT.
+
+     Measured on a 390 wide phone, counting the pixels a burst actually
+     paints over its whole life: at 0.0055 a spark drew 1.4 pixels
+     across, so a FULL FORCE burst of fourteen of them painted 81 pixels
+     of ink in a 14 by 17 patch against a graze's 23 in 8 by 5. The count
+     ramp existed and could not be seen, because doubling the number of
+     one pixel chips inside one small patch is still one small patch. The
+     author's words were that they read as nothing.
+
+     SO SIZE FIRST, THEN THE SPREAD, THEN THE COUNT. A spark is now about
+     seven pixels across on a graze and eleven on a full hit, it is thrown
+     harder so the burst opens instead of sitting in one place, and the
+     count ceiling comes up last. That reads 247, 830 and 1885 pixels of
+     ink at a graze, half force and a full hit, in 69 by 58 rather than
+     14 by 17. The RATE is untouched: the ceiling is the thing that keeps
+     three cars leaning on each other from filling the screen and it
+     stays exactly where it was. */
+  NPC_SPARK_MIN:              3,     // LIVE, particles for the lightest touch
+  NPC_SPARK_MAX:             28,     // LIVE, and for a full width shoulder
+  NPC_SPARK_SPEED:         0.52,     // LIVE, of the smaller screen dimension a second
+  NPC_SPARK_SIZE:        0.0160,     // LIVE, of the smaller dimension
+  /* AND BIGGER STILL ON A PROPER HIT, which is the difference between a
+     burst and a scatter. Force already moved the count and the throw and
+     neither of them showed; it moves the SIZE too now, which is the one
+     that does. */
+  NPC_SPARK_BIG:            1.90,    // LIVE, size multiplier at full force
+  /* THE HOT CORE. A share of a hard burst comes out in the car's own hot
+     light colour instead of the hazard pink, which is what makes a real
+     hit read as white hot rather than as more pink. It scales with the
+     SQUARE of the force, so a graze has none of it and only a proper hit
+     lights up. CAR_LIGHT_HOT is luminance 220 against the road edge's
+     246, so the edge is still the brightest thing on screen, and it is a
+     colour the particle pass already draws so it costs no extra fill. */
+  NPC_SPARK_HOT:            0.45,    // LIVE, share of a full force burst that is hot
+  NPC_SPARK_SPIN:           5.20,    // LIVE, radians a second, either way
+  NPC_SPARK_TIME:          0.42,     // LIVE, seconds they live
   NPC_SPARK_DRAG:           4.2,     // LIVE
   NPC_SPARK_GRAV:          0.55,     // LIVE, of the smaller dimension per second squared
   /* THE RATE CEILING, AND THREE RACERS LEANING ON EACH OTHER IS WHY IT
@@ -6990,6 +7055,10 @@ const TUNABLES = [
   { key: 'NPC_HORIZON_SPAN',   label: 'npcHorSp',step: 500, min: 500,  max: 40000, dp: 0, group: 31 },
   { key: 'NPC_PACE_TIME',      label: 'npcPcTm', step: 0.05,min: 0.05, max: 6,     dp: 2, group: 31 },
   { key: 'NPC_LANE_SPREAD',    label: 'npcLane', step: 0.02,min: 0,    max: 0.9,   dp: 2, group: 31 },
+  { key: 'NPC_YIELD',          label: 'npcYield',step: 0.01,min: 0.5,  max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_YIELD_REPAY',    label: 'npcRepay',step: 0.01,min: 1,    max: 1.4,   dp: 2, group: 31 },
+  { key: 'NPC_YIELD_DEBT',     label: 'npcOwed', step: 250, min: 0,    max: 30000, dp: 0, group: 31 },
+  { key: 'NPC_YIELD_CLEAR',    label: 'npcClear',step: 0.25,min: 0,    max: 20,    dp: 2, group: 31 },
   { key: 'NPC_LANE_HOLD',      label: 'npcLnHld',step: 0.25,min: 0.5,  max: 20,    dp: 2, group: 31 },
   { key: 'NPC_LANE_TIME',      label: 'npcLnTm', step: 0.1, min: 0.1,  max: 8,     dp: 2, group: 31 },
   { key: 'NPC_LOOK_SEGMENTS',  label: 'npcLook', step: 1,   min: 2,    max: 60,    dp: 0, group: 31 },
@@ -7009,6 +7078,9 @@ const TUNABLES = [
   { key: 'NPC_SPARK_MAX',      label: 'npcSprkX',step: 1,   min: 0,    max: 60,    dp: 0, group: 31 },
   { key: 'NPC_SPARK_SPEED',    label: 'npcSprkV',step: 0.02,min: 0.02, max: 2,     dp: 2, group: 31 },
   { key: 'NPC_SPARK_SIZE',     label: 'npcSprkR',step: 0.0005,min:0.0005,max:0.05, dp: 4, group: 31 },
+  { key: 'NPC_SPARK_BIG',      label: 'npcSprkB',step: 0.1, min: 1,    max: 6,     dp: 2, group: 31 },
+  { key: 'NPC_SPARK_HOT',      label: 'npcSprkW',step: 0.05,min: 0,    max: 1,     dp: 2, group: 31 },
+  { key: 'NPC_SPARK_SPIN',     label: 'npcSprkS',step: 0.2, min: 0,    max: 20,    dp: 2, group: 31 },
   { key: 'NPC_SPARK_TIME',     label: 'npcSprkT',step: 0.02,min: 0.05, max: 2,     dp: 2, group: 31 },
   { key: 'NPC_SPARK_DRAG',     label: 'npcSprkD',step: 0.2, min: 0,    max: 20,    dp: 1, group: 31 },
   { key: 'NPC_SPARK_GRAV',     label: 'npcSprkG',step: 0.05,min: 0,    max: 5,     dp: 2, group: 31 },
@@ -12015,6 +12087,35 @@ function update(dt) {
   const prevX = carX;
   carX += drift.lateralV * dt;
   carFrac = carX / localHalf;
+
+  /* Sideways speed against forward speed is an angle. The difference of
+     the two angles is the slip.
+
+     AND IT IS COMPUTED HERE, ABOVE racersUpdate, WHICH IT WAS NOT.
+     carYaw reads drift.headingAngle, and separatePlayer reads carYaw to
+     work out how much road the car is taking up: spanAlong and
+     spanAcross are both functions of it, and at twenty degrees of yaw
+     they are 1037 and 875 against 880 and 600 straight. This block used
+     to sit BELOW racersUpdate, so every contact test in the file was run
+     against the yaw the car had LAST frame.
+
+     WHICH IS WORST EXACTLY WHEN IT MATTERS. A car that is sideways is a
+     car mid flick, which is when the yaw is moving fastest and when the
+     footprint is widest, and it is also most of this game. Measured: the
+     deepest overlap left anywhere in eight daily runs was 570 units, a
+     whole car width, between the player and a racer that the solver
+     agreed was overlapping the moment it was asked by hand. It was never
+     asked, because a frame earlier the two cars did not overlap ALONG
+     the road and the test returned before it got to the width.
+
+     Nothing else moves: headingV, lateralV and speed are all final by
+     this line, so every later reader sees exactly what it saw before. */
+  drift.headingAngle = Math.atan(drift.headingV / speed);
+  drift.travelAngle = Math.atan(drift.lateralV / speed);
+  drift.slip = drift.headingAngle - drift.travelAngle;
+  drift.slipDeg = drift.slip * 180 / Math.PI;
+  drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
+
   /* AFTER the player has moved this frame and BEFORE carFrac is read by
      anything that decides. A gap measured against last frame's position
      would lag the pace law by a frame, and contact resolved before carX
@@ -12023,14 +12124,6 @@ function update(dt) {
   racersUpdate(dt);
   carFrac = carX / localHalf;
   ghostRecord(prevPos, prevX, dt);
-
-  // Sideways speed against forward speed is an angle. The difference of
-  // the two angles is the slip.
-  drift.headingAngle = Math.atan(drift.headingV / speed);
-  drift.travelAngle = Math.atan(drift.lateralV / speed);
-  drift.slip = drift.headingAngle - drift.travelAngle;
-  drift.slipDeg = drift.slip * 180 / Math.PI;
-  drift.slipNorm = clamp(Math.abs(drift.slipDeg) / FEEL.SLIP_MAX_DEG, 0, 1);
 
   /* The camera starts coming up the moment the wheels leave the road,
      which is the climb rather than the launch, so there is no step in it
@@ -14461,6 +14554,7 @@ function racersReset(base) {
       hv: 0, lv: 0, yaw: 0,
       speed: FEEL.SPEED * FEEL.NPC_PACE_LOW,
       sparkT: 0,              // seconds until this one may throw sparks again
+      owed: 0,                // world units given up to a lift, waiting to be run back
       wreck: 0,               // seconds left out of the running. See wreckRacer.
       recover: 0,             // and seconds of recovery pace after rejoining
       step: i - mid,          // its place in the pace spread, so the three differ
@@ -14527,6 +14621,89 @@ function racerForm(dt) {
   return racerFormNow;
 }
 
+/* IS THERE A CAR IN THE WAY, and this is what turns a wall into a queue.
+
+   THE LANES FIXED THREE RACERS AND NOT FOUR CARS. Three lanes across the
+   road hold three racers apart by construction, but the PLAYER is not in
+   the lane system and never will be: they drive wherever they like,
+   including straight down a lane. A racer whose lane is occupied has
+   nowhere to be, and on the daily it cannot push the player out of it
+   either, so the separator is asked for room that does not exist.
+
+   SO IT DROPS BACK INSTEAD OF FORCING IN, which is what a driver does.
+   Only while something is actually in front of it and overlapping its
+   own width, and only NPC_YIELD of its pace, so a car that is boxed in
+   slots into file and comes back out the moment the road opens.
+
+   THIS IS TRAFFIC AND NOT A BAND. It reads the car immediately ahead in
+   its own width, never the player's position in the race, and it only
+   ever SLOWS. Nothing here speeds a racer up for being behind. */
+/* THREE STATES AND NOT TWO, and the third one is what stops the loan
+   putting the pile-up back. BOXED_CLEAR is nothing in the way at all,
+   BOXED_HELD is something ahead in this car's width, BOXED_PINNED is
+   that AND no road left to be pushed into. Only PINNED lifts. HELD
+   neither lifts nor pays a loan back, and that is its whole job: a car
+   runs its debt back by finding a clear lane and using it, which is what
+   coming back through means, rather than by driving at the back of the
+   car in front and arriving abreast. Without this the repayment put four
+   abreast back on 128 frames of 48000 where the lift alone had it at
+   none. */
+const BOXED_CLEAR = 0, BOXED_HELD = 1, BOXED_PINNED = 2;
+function racerBoxed(r) {
+  const mySpanX = spanAcross(r.yaw), mySpanZ = spanAlong(r.yaw);
+  let worst = BOXED_CLEAR;
+  /* PINNED, which is the case an "is anything ahead" test cannot see. A
+     car level with another and already against NPC_EDGE has nowhere to
+     be pushed: measured, three cars abreast overlapped on 40 per cent of
+     those frames with a median of 301 units, and 64 per cent of them had
+     the outermost car at the wall. The road had run out, so no solver
+     was ever going to fix it and the car has to stop trying to be there.
+
+     Being at the wall alone is not enough: a racer holding an outer lane
+     cleanly is at the wall by design and must not crawl. It has to be at
+     the wall AND sharing width with somebody. */
+  const wall = racerWall(r);
+  const pinned = Math.abs(r.x) > wall * 0.97;
+  for (let i = -1; i < racers.length; i++) {
+    let ox, oy, oz;
+    if (i < 0) {
+      if (airborne) continue;
+      ox = carX; oy = carYaw(); oz = position;
+    } else {
+      const o = racers[i];
+      if (o === r || o.air || o.wreck > 0) continue;
+      ox = o.x; oy = o.yaw; oz = o.z;
+    }
+    const dz = oz - r.z;
+    const wide = Math.abs(ox - r.x) < (mySpanX + spanAcross(oy)) * 0.5;
+    if (!wide) continue;
+    /* ONLY WHEN THERE IS NOWHERE LEFT, and the first version also
+       yielded to anything merely IN FRONT, which is wrong and it cost
+       the field the race. Being behind another car is not a reason to
+       slow down, it is a reason to go round: a racer that lifts every
+       time somebody is ahead lifts constantly. Measured, that had them
+       boxed on 25.3 per cent of car frames against 14.9 with the yield
+       off, and the mean gap to the nearest racer went from 5.4 thousand
+       units to 13.6. The field was handicapping itself out of its own
+       race, which is the fault the author reported as them falling
+       behind and never catching up.
+
+       Pinned means at NPC_EDGE with somebody in its width and nowhere
+       to be pushed. That is the only case a solver cannot fix and the
+       only one worth losing ground over. */
+    if (pinned && Math.abs(dz) < (mySpanZ + spanAlong(oy)) * 0.9) return BOXED_PINNED;
+    /* AND THE GENEROUS TEST, WHICH ONLY EVER GATES THE REPAYMENT. It
+       looks a long way up the road and it is deliberately easy to
+       trigger, which is exactly why it must never be allowed to slow a
+       car: as a pace penalty this same test had them boxed on 25.3 per
+       cent of car frames and the field handicapped itself out of its own
+       race. Delaying a debt is free. Charging for one is not. */
+    if (dz > 0 && dz < (mySpanZ + spanAlong(oy)) * 0.5
+                     + FEEL.CAR_BODY_LENGTH * FEEL.NPC_YIELD_CLEAR) worst = BOXED_HELD;
+  }
+  return worst;
+}
+
 /* THE PACE, WHICH IS A FUNCTION OF FORM AND OF NOTHING POSITIONAL.
 
    There is no term here that speeds a racer up because the player is
@@ -14534,7 +14711,7 @@ function racerForm(dt) {
    before it, and it is why a good player is chased rather than tethered:
    the racers are quick because the player is driving well, not because
    the player got away. */
-function racerPace(r) {
+function racerPace(r, dt) {
   /* THE TOP OF THE RANGE IS THE PLAYER'S OWN PACE, NOT A CONSTANT, and
      that is what makes "never escapes" true rather than hoped for. A
      fixed top speed cannot follow a good player: whatever it is set to,
@@ -14559,6 +14736,25 @@ function racerPace(r) {
      pulls it to the player forever, and it cannot fire without a wreck
      having happened first. */
   if (r.recover > 0) want *= FEEL.NPC_WRECK_PACE;
+  /* And back off what is in front. See racerBoxed: traffic, not a band.
+     What the lift costs is BANKED and run back off once the road is
+     clear, so the squeeze costs a place and not a run. See
+     NPC_YIELD_REPAY: without the loan this was measurably the reason a
+     good driver got away. */
+  const box = racerBoxed(r);
+  if (box === BOXED_PINNED) {
+    const lost = want * (1 - FEEL.NPC_YIELD);
+    want -= lost;
+    r.owed = Math.min(r.owed + lost * FEEL.SPEED * dt, FEEL.NPC_YIELD_DEBT);
+  } else if (box === BOXED_CLEAR && r.owed > 0) {
+    /* Bounded twice: never more than NPC_YIELD_REPAY of its own pace,
+       and never more than it is actually owed, so the last frame of a
+       repayment settles up exactly rather than overshooting. */
+    const span = FEEL.SPEED * Math.max(0.0001, dt);
+    const extra = Math.min(want * (FEEL.NPC_YIELD_REPAY - 1), r.owed / span);
+    want += extra;
+    r.owed = Math.max(0, r.owed - extra * span);
+  }
   /* AND THE LEASH, WHICH ONLY EVER SLOWS. A racer this far ahead is
      about to leave the draw distance, and an empty road is what the
      third rule exists to prevent. It eases to holding station so it
@@ -14613,9 +14809,33 @@ function racerLane(r, i, dt) {
 function racerAim(r, i, dt, seg, half) {
   const at = Math.round((r.z + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH);
   const soon = segAt(at + Math.round(FEEL.NPC_LOOK_SEGMENTS)) || seg;
-  let aim = clamp(soon.curve * curveScale / FEEL.CURVE_HARD, -1, 1)
-          * FEEL.NPC_LINE_INSIDE * half
-          + racerLane(r, i, dt) * half;
+  /* THE LANE IS THE ANCHOR AND THE RACING LINE GETS WHAT IS LEFT, and
+     the order of those two is the whole of why the field used to pile
+     up.
+
+     IT USED TO BE A SUM: the racing line times NPC_LINE_INSIDE, PLUS the
+     lane. The racing line term is SHARED BY ALL THREE RACERS and reaches
+     0.70 of the half width, so in a corner it moved the entire field the
+     same way at once, and an outer lane on top of it asked for 1.16 of a
+     half width on a road that ends at 1. Everything past the edge was
+     clamped to the same place, so three cars that were aiming at three
+     different lanes arrived at one, and the separator was then asked to
+     push them apart with nowhere to push them to. Measured: three cars
+     abreast overlapped a neighbour by up to 942 units, which is more
+     than a whole car.
+
+     Now the lane is an absolute position across the road and the racing
+     line is scaled by the room that lane has left after its own body is
+     accounted for. An outer car holds its lane because it has no room to
+     give; the middle car takes the apex because it has plenty. The lanes
+     can no longer cross, whatever the corner does, and nothing is asked
+     of the separator that the geometry cannot supply. */
+  const laneAt = racerLane(r, i, dt);
+  const halfSpan = spanAcross(r.yaw) * 0.5 / half;
+  const room = Math.max(0, FEEL.NPC_EDGE - Math.abs(laneAt) - halfSpan);
+  const line = clamp(soon.curve * curveScale / FEEL.CURVE_HARD, -1, 1)
+             * FEEL.NPC_LINE_INSIDE;
+  let aim = (laneAt + line * room) * half;
 
   /* AND ROUND ANYTHING IN THE WAY, because a racer that drives through a
      blocker is not driving. The nearest hazard inside the lookahead
@@ -15017,16 +15237,24 @@ function racersSeparate() {
     }
     for (let i = 0; i < racers.length; i++) touched += separatePlayer(racers[i]);
   }
-  /* AND ONE MORE RACER PASS TO FINISH ON. The player pass runs last
+  /* AND ONE MORE OF EACH TO FINISH ON, IN THAT ORDER.
+
+     A racer pass alone used to be the tail: the player pass runs last
      inside the loop and it MOVES RACERS, so a racer shoved clear of the
-     player can land in another racer with nothing after it to notice.
-     Measured, that left racer pairs up to 33 units merged where the
-     player pairs were at zero. This is the cheapest possible fix: six
-     pair tests, no player involvement, so it cannot disturb the
-     guarantee. */
+     player could land in another one with nothing after it to notice.
+
+     BUT A RACER PASS CANNOT BE LAST EITHER, and that was the next
+     mistake. It moves racers without consulting the player, so on the
+     daily, where the player is immovable and the racer must take the
+     whole separation, the final sweep could push a car straight back
+     into the player. Measured: of the three abreast frames still
+     overlapping, 59 per cent had room to separate and had not been
+     separated. Racers, then the player, so whatever the racers do to
+     each other is checked against the one car that cannot move. */
   for (let i = 0; i < racers.length; i++) {
     for (let j = i + 1; j < racers.length; j++) separateRacers(racers[i], racers[j]);
   }
+  for (let i = 0; i < racers.length; i++) touched += separatePlayer(racers[i]);
   /* One knock per contact rather than one per pass, and one cooldown for
      the whole field: three cars leaning on the player at once is one
      event to the person holding the phone. */
@@ -15108,12 +15336,13 @@ function racersUpdate(dt) {
         r.lv = 0; r.hv = 0; r.yaw = 0;
         r.ride = -1; r.air = false; r.y = 0; r.vy = 0;
         r.dodge = -1;
+        r.owed = 0;             // a shunt cancels the loan; recovery pace covers it
         r.recover = FEEL.NPC_WRECK_CATCH;
       }
       continue;                      // a wreck does not drive
     }
     if (r.recover > 0) r.recover -= dt;
-    r.speed += (racerPace(r) - r.speed)
+    r.speed += (racerPace(r, dt) - r.speed)
              * (1 - Math.exp(-dt / Math.max(0.01, FEEL.NPC_PACE_TIME)));
     r.z += r.speed * dt;
 
@@ -15131,7 +15360,15 @@ function racersUpdate(dt) {
        speed pushing into it and nothing else. A racer cannot leave the
        road, because a rival the player watches fall off is a worse
        advertisement for the mechanic than no rival at all. */
-    const wall = half * FEEL.NPC_EDGE;
+    /* THE WALL FROM WHERE THE CAR IS NOW, NOT FROM WHERE IT STARTED THE
+       FRAME. `half` was read at the top of this iteration and r.z has
+       moved a hundred and fifty units since, so on a piece of road that
+       narrows the clamp was holding the car to the OLD width. Measured
+       over eight runs it let one racer sit at 1.02 of the local half
+       width for a single frame, which is two per cent outside the road
+       on a rule that is meant to be absolute. racerWall does the one
+       lookup that makes it exact. */
+    const wall = racerWall(r);
     if (Math.abs(r.x) > wall) {
       r.x = clamp(r.x, -wall, wall);
       if (r.lv * r.x > 0) r.lv = 0;
@@ -15307,11 +15544,20 @@ function drawContactSparks(first, last, baseIndex, w, h) {
       p.vx = Math.cos(a) * speed;
       // Biased upward, because a panel scraping a panel throws upward.
       p.vy = Math.sin(a) * speed - speed * 0.55;
-      p.r = s * FEEL.NPC_SPARK_SIZE * (0.4 + 0.6 * Math.random());
+      p.r = s * FEEL.NPC_SPARK_SIZE * (0.4 + 0.6 * Math.random())
+          * (1 + (FEEL.NPC_SPARK_BIG - 1) * force);
       p.rot = Math.random() * Math.PI;
-      p.spin = 0;
+      /* AND THEY TUMBLE NOW THEY ARE BIG ENOUGH TO SEE IT. At a pixel
+         and a half a square is a dot and rotation was wasted; at four to
+         nine it is the difference between chips of metal and confetti. */
+      p.spin = (Math.random() * 2 - 1) * FEEL.NPC_SPARK_SPIN;
       p.life = FEEL.NPC_SPARK_TIME * (0.55 + 0.45 * Math.random());
-      p.col = PART_FIRE;                 // sparks are the hot family
+      /* Hot on a real hit, pink on a graze. See NPC_SPARK_HOT: the share
+         goes with the SQUARE of the force so it is a threshold in feel
+         without being one in code. PART_FW + 3 is CAR_LIGHT_HOT, which
+         the draw pass already has a batch for. */
+      p.col = Math.random() < FEEL.NPC_SPARK_HOT * force * force
+            ? PART_FW + 3 : PART_FIRE;
       p.fuse = 0;
       p.drag = FEEL.NPC_SPARK_DRAG;
       p.grav = s * FEEL.NPC_SPARK_GRAV;
