@@ -1,4 +1,4 @@
-# NPC racers: agreed design, not yet built
+# NPC racers: agreed design, built on the random track
 
 Agreed 16 August 2026. **Built 20 August 2026, on the random track.** All four stages ship: they
 exist and race, the pace law, blocking, and contact. What follows is the agreed design, with the
