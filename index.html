@@ -4363,7 +4363,7 @@ const FEEL = {
      the twitchy one, on every one of the 28 days, and leaves better than
      a quarter of it standing in the worst case. */
   TRAIN_PINCH_HOLD:          26,     // LIVE, segments it holds at the tightest
-  TRAIN_JUMP_AT:           1030,     // LIVE, the ramp's segment, about 22 seconds in
+  TRAIN_JUMP_AT:           1190,     // LIVE, the ramp's segment, about 26 seconds in
   /* THE THREE BLOCKS, PLACED RATHER THAN SCHEDULED, exactly as the pinch
      and the jump above are. All three kinds exist on every real level
      and none of them appeared here, so the first one anybody ever met
@@ -4386,9 +4386,9 @@ const FEEL = {
      and the death test asks inOpening, so this is true by construction
      rather than by placement. Driving into one costs nothing and says
      so: see trainingSayHit. */
-  TRAIN_BLOCK_AT:          1360,     // LIVE, the static block's segment, about 30s in
-  TRAIN_SPLIT_AT:          1430,     // LIVE, the long centre one, about 31s in
-  TRAIN_MOVER_AT:          1710,     // LIVE, the mover's segment, about 38 seconds in
+  TRAIN_BLOCK_AT:          1520,     // LIVE, the static block's segment, about 34s in
+  TRAIN_SPLIT_AT:          1590,     // LIVE, the long centre one, about 35s in
+  TRAIN_MOVER_AT:          1870,     // LIVE, the mover's segment, about 42 seconds in
   /* HOW FAR AHEAD OF A MARK THE SCRIPT TAKES THE ROAD OVER.
 
      THE LEAD MUST EXCEED THE LONGEST PHRASE THE GRAMMAR CAN LAY PLUS
@@ -4463,8 +4463,29 @@ const FEEL = {
      THE GATE MOVES WITH IT. Training's single gate IS its finish line,
      so gateSegment is asked for training's own number rather than a
      real level's first checkpoint. Nothing else reads it here: training
-     has one gate, and it is this. */
-  TRAIN_SEGMENTS:          1780,     // LIVE, segments, 39.6 seconds
+     has one gate, and it is this.
+
+     ONE BEAT LONGER FROM 24 AUGUST, AND THE BEAT IS THE POINT. The run
+     teaches nine things now rather than eight: the first player of the
+     released game did not know that the throttle is automatic, and said
+     so. The line has to go directly after the edge lesson, because the
+     two are one idea read in order, and there was no room there: with
+     the extra plate squeezed into the old road the RECHARGE line fell
+     from 140 runs of 224 to 84, because a driver who scrapes early
+     recovers while the new plate is still being read and coachRoom then
+     refuses it. Putting the new line after the JUMP instead simply moved
+     the collision: the LANDING line went to zero on all eight policies.
+
+     So the road carries the beat rather than a lesson being crowded
+     out. One coaching beat is COACH_TIME plus TRAIN_SAY_HOLD, 3.55
+     seconds, which is 160 segments, and every mark after the pinch moved
+     by exactly that. 1780 to 1940, 39.6 seconds to 43.1.
+
+     DENSER RATHER THAN LONGER STILL HOLDS, which is the test that
+     matters: eight things in 39.6 seconds was one about every 4.95, and
+     nine in 43.1 is one about every 4.79. The run got longer and the
+     gaps got shorter. */
+  TRAIN_SEGMENTS:          1940,     // LIVE, segments, 43.1 seconds
   /* WHAT A HIT COSTS IN TRAINING, WHICH IS A SHAKE AND A SENTENCE. It
      may not cost the run, so the only thing left that can say "that
      was bad" is the screen moving. Level with a scrape rather than with
@@ -5520,6 +5541,33 @@ const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         /* The coaching plate. It exists to be a hole in
                            the picture, so a biome may not tint it. */
                         COACH_PLATE: 1,
+                        /* EVERY LIGHT A CAR HAS, AND THIS OVERTURNS A
+                           DECISION THAT IS WRITTEN DOWN. The note on
+                           CAR_RIM_DARK says the car's cosmetics are in
+                           COLOUR and not here, "so they turn with the
+                           world like every other part of the car. A rim
+                           that ignored the wheel would be the one object
+                           on screen that belongs to no biome."
+
+                           THE FIRST PLAYER OF THE RELEASED GAME LOST HIS
+                           CAR TO EXACTLY THAT. "I was a bit surprised
+                           that your car changes colour when you go from
+                           one section to the next... it can get confusing
+                           when you get used to a car and it suddenly
+                           changes yellow." Belonging to no biome is the
+                           POINT: the player's car should belong to the
+                           player, not to the place. The body still turns,
+                           because maximum hue separation is what keeps it
+                           findable and that measurement is unchanged; its
+                           LIGHTS do not, and they are the constant.
+
+                           CAR_HEAT is the glow and the light pool, which
+                           is the same idea at the size of a halo. Indexed
+                           by SLIP, so pinning it costs nothing about the
+                           drift heat cue. */
+                        CAR_LIGHT: 1, CAR_LIGHT_MARK: 1, CAR_LIGHT_AMBER: 1,
+                        CAR_LIGHT_COOL: 1, CAR_LIGHT_HOT: 1,
+                        CAR_HEAT_0: 1, CAR_HEAT_1: 1, CAR_HEAT_2: 1, CAR_HEAT_3: 1,
                         // Danger. Never green, never anywhere near the jump.
                         HAZARD_TOP: 1, HAZARD_SIDE: 1, HAZARD_LIP: 1,
                         HAZARD_GLOW: 1, HAZARD_DARK: 1, HAZARD_WARN: 1,
@@ -6552,7 +6600,38 @@ const COLOUR = {
      they are the only place those two palettes touch. Kept below
      EDGE_LIGHT in value so the road edges still own the top of the
      range. */
+  /* THE TAIL LIGHTS DO NOT TURN WITH THE BIOME, AND THEY USED TO.
+
+     THE FIRST PLAYER FEEDBACK ON THE RELEASED GAME WAS ABOUT THIS. "I
+     was a bit surprised that your car changes colour when you go from
+     one section to the next, it could be confusing, maybe an arrow could
+     be added to show which car is yours as it can get confusing when you
+     get used to a car and it suddenly changes yellow."
+
+     He is right and it is our own doing. The player's body colour is
+     derived per biome at the point of MAXIMUM HUE SEPARATION from the
+     palette, which is the correct rule for FINDABILITY and was measured
+     as such in every biome. Findable and IDENTIFIABLE are not the same
+     property and only the first was ever measured: the car is always
+     easy to see and never the same colour twice. Measured over the
+     twelve biomes the player's CAR_TOP hue visits 190, 30, 13, 196, 0,
+     100, 38, 292, 182, 52, 213 and 172 degrees, which is the whole
+     wheel, and the tail light went round with it.
+
+     THE BODY MUST KEEP TURNING, so the constant has to be something
+     else, and a light is the natural one: it is the brightest part of
+     any car, it faces the chase camera at every yaw and distance, it is
+     the part of their own car the player looks at most, and it is a
+     thing on a car rather than a marker floating over one. So the light
+     colours are pinned, here, and never enter the biome rotation. See
+     PALETTE_FIXED.
+
+     AND THE PLAYER IS THE ONLY ONE WITH WHITE LIGHTS. Every racer keeps
+     CAR_LIGHT, which is red, and every player car uses a colour that is
+     not. One sentence covers it in any biome and at any distance: the
+     white lights are yours. */
   CAR_LIGHT:    '#ff3a4f',
+  CAR_LIGHT_MARK: '#cfe4f2',    // the stock car's own, cool white and fixed
   CAR_LIGHT_GLOW: '255,58,79',
   CAR_LIGHT_HOT:'#ffd2d8',
   CAR_HIP:      '#2aa3c0',      // the flank between shoulder and sill
@@ -6577,9 +6656,15 @@ const COLOUR = {
      the biome at maximum hue separation and that is the whole reason the
      car stays findable against all twelve. A player may not override it.
 
-     In COLOUR, not PALETTE_FIXED, so they turn with the world like every
-     other part of the car. A rim that ignored the wheel would be the one
-     object on screen that belongs to no biome.
+     THE RIMS AND THE SEAMS ARE IN COLOUR AND THE LIGHTS ARE NOT, AND
+     THAT SPLIT IS NEW. This used to read "in COLOUR, not PALETTE_FIXED,
+     so they turn with the world like every other part of the car. A rim
+     that ignored the wheel would be the one object on screen that
+     belongs to no biome." It still holds for the rims and the seams,
+     which are trim. It does not hold for the LIGHTS: see PALETTE_FIXED,
+     where the tail light colours and the car's own glow now sit,
+     because the first player of the released game lost track of which
+     car was his and belonging to no biome is exactly what fixes it.
 
      ALL HELD UNDER THE ROAD EDGE. CAR_RIM was already brought down once
      for being level with it, so its alternates start from that lesson
@@ -14540,7 +14625,11 @@ function buildCarPaints() {
                          glassy ? 1 : FEEL.NPC_SAT,
                          glassy ? 1 : FEEL.NPC_VALUE);
     }
-    p.LIGHT = COLOUR.CAR_LIGHT;      // a tail light is red on every car
+    /* RED ON EVERY RACER AND ON NOTHING ELSE. It used to be "red on
+       every car", which was true of the player's too and is what the
+       identity rule now spends: the player's light is the one that is
+       not red. Fixed, because CAR_LIGHT is in PALETTE_FIXED. */
+    p.LIGHT = COLOUR.CAR_LIGHT;
     racerPaints.push(p);
   }
   /* THE GHOST IS THE PLAYER'S OWN COLOURS, at zero degrees, which is the
@@ -20191,11 +20280,15 @@ const TRAIL_STOPS = ['TRAIL_0', 'TRAIL_1', 'TRAIL_2', 'TRAIL_3', 'TRAIL_4'];
    thin blade.
    ================================================================== */
 const CARS = [
+  /* NO PLAYER CAR USES CAR_LIGHT, and that is the whole of the identity
+     rule rather than a palette preference: CAR_LIGHT is red, every racer
+     uses it, and the player's is therefore never red. These two were on
+     it and are on the cool white marker now. */
   { name: 'STOCK',      need: 0,  days: 0, wing: 1,
-    rim: 'CAR_RIM',      light: 'CAR_LIGHT',       seam: 'CAR_SEAM',
+    rim: 'CAR_RIM',      light: 'CAR_LIGHT_MARK',  seam: 'CAR_SEAM',
     trail: 'TRAIL_0' },
   { name: 'DUCKTAIL',   need: 3,  days: 0, wing: 2,
-    rim: 'CAR_RIM_DARK', light: 'CAR_LIGHT',       seam: 'CAR_SEAM',
+    rim: 'CAR_RIM_DARK', light: 'CAR_LIGHT_MARK',  seam: 'CAR_SEAM',
     trail: 'TRAIL_0' },
   { name: 'WIDEBODY',   need: 10, days: 0, wing: 3,
     rim: 'CAR_RIM',      light: 'CAR_LIGHT_AMBER', seam: 'CAR_SEAM_LIGHT',
@@ -24879,9 +24972,54 @@ function trainingSay(dt) {
     coachSay('SKIP AT ANY TIME', COLOUR.GATE, COACH_PLATE_STYLE, POINT_SKIP);
     trainStep = 2;
   } else if (trainStep === 2 && coachFree()) {
-    coachSay('THE EDGES WILL DAMAGE YOU', COLOUR.HAZARD_WARN,
-             COACH_BRAND_STYLE, POINT_EDGES);
+    /* ---- 3, THE EDGE, AND THE WORDS ARE THE SECOND ATTEMPT.
+
+       IT USED TO SAY "THE EDGES WILL DAMAGE YOU" AND IT TAUGHT THE WRONG
+       THING. The first player of the released game read it, played the
+       whole tutorial, and still asked: "Losing: is it when you touch the
+       side only once? It seems so but it's quite punitive and when I
+       died I didn't think I had touched a lot the railing."
+
+       The line was TRUE. It was also useless, for two reasons. DAMAGE
+       does not say you have a moment: it is a word that fits a health
+       system, and every health system a player has met takes a chunk on
+       contact. And nothing in it connected the edge to the BAR, which is
+       the thing actually draining in front of them and the thing whose
+       emptying ends the run. So a player who scraped, survived, scraped
+       again and eventually died concluded that one touch was fatal.
+
+       Both ideas are in it now and neither is implied. DRAIN is a word
+       that can only mean over time, and the second line names the
+       failure exactly. It is two lines rather than one and costs no
+       extra time: a coaching plate holds for COACH_TIME whether it
+       carries one line or two, which is what the welcome and the
+       recharge lines already do. */
+    coachSay('THE EDGES DRAIN YOUR BAR\nAN EMPTY BAR ENDS THE RUN',
+             COLOUR.HAZARD_WARN, COACH_BRAND_STYLE, POINT_EDGES);
     trainStep = 3;
+  } else if (trainStep === 3 && coachFree()) {
+    /* ---- 4, THE THROTTLE, AND IT IS THE MOST VALUABLE LINE IN THE RUN
+       BECAUSE NOTHING ANYWHERE ELSE SAYS IT.
+
+       The same player: "Acceleration: do you need to do anything to try
+       and get ahead of the other cars? When I played I let the game
+       accelerate for me, but it felt that I should have been able to
+       take more risk to try and get ahead. I must have missed something."
+
+       He had not missed anything. He played a racing game for a whole
+       session without knowing what his inputs were, because the game
+       never told him. Speed is automatic, there is nothing to press, and
+       the way to be quick is to stay off the edge, because scraping
+       costs SCRAPE_SPEED_FACTOR of it for as long as it lasts. That is
+       the entire skill model of the game and it was never stated.
+
+       IT SITS DIRECTLY AFTER THE EDGE LINE ON PURPOSE. The two are one
+       lesson read in order: the edge drains your bar, and the edge is
+       also what makes you slow. Said anywhere else it is a fact; said
+       here it is the reason the previous line matters. */
+    coachSay('SPEED IS AUTOMATIC\nSCRAPING SLOWS YOU DOWN', COLOUR.SCORE,
+             COACH_BRAND_STYLE, POINT_NONE);
+    trainStep = 4;
   }
 
   /* ---- 4, THE ONE CONDITIONAL LINE, on coming back on course after
@@ -24914,6 +25052,15 @@ function trainingSay(dt) {
      the jump's line that way, to a driver whose first clean recovery
      came late. Asked of the ROAD rather than of a constant, so moving
      any of the three moves this with it. */
+  /* THREE RATHER THAN FOUR, AND THE THROTTLE LINE IS WHY IT MATTERS.
+     Gated at four, so that the bar lesson could not interrupt the edge
+     and throttle pair, this fell from 140 runs of 224 to 84: the drivers
+     who scrape most are the ones whose first clean recovery lands while
+     the throttle line is still being read, and the room test then denies
+     them the lesson entirely. Let back in at three it interleaves, and
+     for an early scraper the three plates read as one lesson in the
+     right order anyway: the edges drain your bar, stay on course to
+     recharge it, and scraping is also what makes you slow. */
   if (trainStep >= 3 && !trainRecharged && coachRoom()
       && trainScraped && !scraping && coachFree()) {
     trainRecharged = true;

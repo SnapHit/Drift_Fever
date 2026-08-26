@@ -284,3 +284,43 @@ https://driftfever.com
 | 9. Street lamps and light pools | Real light sources at street level, and something for the road to reflect. | Cheap to moderate | Nothing over the drivable road. |
 | 10. Curved car silhouette | The object the player stares at for the whole run stops being faceted. | Moderate | Car findable against twelve hues. |
 | 11. Car reflected in the road | The strongest single image available. It is the reference photo. | Moderate to expensive | Nothing over the drivable road. |
+
+---
+
+## The player's car changes colour and he lost it, 24 August 2026
+
+The first feedback from a real player of the released game, verbatim: "I was a bit surprised that
+your car changes colour when you go from one section to the next, it could be confusing, maybe an
+arrow could be added to show which car is yours as it can get confusing when you get used to a car
+and it suddenly changes yellow."
+
+He is right and it is our own doing. The body colour is derived per biome at the point of MAXIMUM
+HUE SEPARATION from the palette, which is the correct rule for FINDABILITY and was measured as such
+in every biome after every visual change. **Findable and identifiable are not the same property and
+only the first was ever measured.** Measured over the twelve biomes the player's `CAR_TOP` hue visits
+190, 30, 13, 196, 0, 100, 38, 292, 182, 52, 213 and 172 degrees, which is the whole wheel, and the
+tail light went round with it. Nothing about the car was constant.
+
+**The body must keep turning, so the constant is the light.** Every tail light colour and the car's
+own glow ramp are in `PALETTE_FIXED` now, so no biome touches them. Two things follow: the player's
+car has a pale tail bar and sits in a warm amber pool of its own light in every one of the twelve
+biomes, and no player car uses `CAR_LIGHT`, which is red and is what every racer uses. One sentence
+covers it at any distance: the white lights are yours.
+
+**This overturns a decision that was written down**, and the note on `CAR_RIM_DARK` said it plainly:
+the car's cosmetics are in `COLOUR` and not in `PALETTE_FIXED` "so they turn with the world like every
+other part of the car. A rim that ignored the wheel would be the one object on screen that belongs to
+no biome." Belonging to no biome is the point. The car belongs to the player, not to the place. The
+rims and the seams are still trim and still turn; the lights do not.
+
+**Findability is unchanged, and that is measured rather than asserted.** The same body, at the same
+place on the same road, rendered in each of the four palettes and differenced against the road behind
+it: the player's paint stands out most in 11 of 12 biomes, is the most saturated in 12 and the highest
+contrast against the void in 12, which is exactly what it read before the change. The known answer,
+turning the racers' desaturation off, drops the first of those from 11 to 6, so the measurement can
+see the rule it checks.
+
+**No arrow.** It was his suggestion and it is worth saying why not: a permanent marker over the car
+is HUD in the world, which this game has kept out, and it answers "where is my car" when the question
+he actually asked was "which one is mine". A light on the car answers the second and adds nothing to
+the frame that is not a car.
