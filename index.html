@@ -4637,10 +4637,14 @@ const FEEL = {
   GHOST_STEP_SEGMENTS:        5,     // 1000 world units, about nine samples a second
   GHOST_MAX_SAMPLES:       4000,     // a bit over seven minutes, then it stops recording
   GHOST_ALPHA:             0.42,     // LIVE, it must never compete with the road
-  GHOST_HEIGHT:             320,     // world units to the roof
-  GHOST_CABIN_WIDE:        0.66,     // the roof, as a share of the footprint
-  GHOST_CABIN_LONG:        0.46,
-  GHOST_CABIN_BACK:        0.22,     // and set back, so it has a bonnet
+  GHOST_FADE:              0.20,     // LIVE, how far its paint is pulled toward the void
+  /* GHOST_HEIGHT, GHOST_CABIN_WIDE, GHOST_CABIN_LONG and
+     GHOST_CABIN_BACK were the two slab ghost's own geometry and went
+     with it. The ghost is the player's hull now, so its shape is
+     CAR_BODY_WIDTH, CAR_BODY_LENGTH, CAR_BODY_HEIGHT and CAR_STATIONS
+     like every other car in the file, and a second set of numbers
+     describing a second car shape would be a second thing to keep in
+     step for no gain. */
   GHOST_PASS_GAP:           900,     // world units of hysteresis, so a dead heat is not a strobe
   GHOST_PASS_COOLDOWN:      2.5,     // seconds between pass callouts
 
@@ -7596,10 +7600,7 @@ const TUNABLES = [
   { key: 'HUD_BAR_PIP_GAP',    label: 'barPipY', step: 0.002,min: 0,    max: 0.12,  dp: 3, group: 27 },
   { key: 'HUD_BAR_PIP_HEIGHT', label: 'barPipH', step: 0.5,  min: 1,    max: 12,    dp: 1, group: 27 },
   { key: 'GHOST_ALPHA',        label: 'ghostA',  step: 0.02, min: 0,    max: 1.0,   dp: 2, group: 26 },
-  { key: 'GHOST_HEIGHT',       label: 'ghostTop',step: 20,   min: 40,   max: 900,   dp: 0, group: 26 },
-  { key: 'GHOST_CABIN_WIDE',   label: 'ghostCw', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 26 },
-  { key: 'GHOST_CABIN_LONG',   label: 'ghostCl', step: 0.02, min: 0.2,  max: 1.0,   dp: 2, group: 26 },
-  { key: 'GHOST_CABIN_BACK',   label: 'ghostCb', step: 0.02, min: -0.5, max: 0.5,   dp: 2, group: 26 },
+  { key: 'GHOST_FADE',         label: 'ghostFd', step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 26 },
   { key: 'GHOST_PASS_GAP',     label: 'passGap', step: 100,  min: 0,    max: 6000,  dp: 0, group: 26 },
   { key: 'GHOST_PASS_COOLDOWN',label: 'passWait',step: 0.5,  min: 0,    max: 20,    dp: 1, group: 26 },
   { key: 'GHOST_STEP_SEGMENTS',label: 'ghostHz', step: 1,    min: 1,    max: 40,    dp: 0, group: 26 }
@@ -13653,13 +13654,11 @@ function drawRoad(w, h) {
      things that stand beside the road and are drawn after it. */
   spritePass(first, last, baseIndex, w, h);
   drawHazards(first, last, baseIndex);
-  // Last in the world and before the car, which render draws afterwards,
-  // so the ghost can never sit on top of the thing you are steering.
-  drawGhost(first, last, baseIndex);
-  /* AND THE RACERS WITH IT, for the same reason and in the same place:
-     they are things in the world, so the player's own car is drawn over
-     them by render and can never be hidden behind one. */
-  drawRacers(first, last, baseIndex, w, h);
+  /* Last in the world and before the car, which render draws afterwards,
+     so nothing here can ever sit on top of the thing you are steering.
+     The ghost and the racers go through one furthest first pass: see
+     drawWorldCars. */
+  drawWorldCars(first, last, baseIndex, w, h);
 }
 
 /* The warning, painted on the road surface a full second before the
@@ -14514,6 +14513,7 @@ function ghostPass() {
    correct ordering rather than an accident.  */
 const CAR_PAINT_KEYS = ['TOP', 'END', 'CABIN_TOP', 'GLASS', 'HIP', 'SILL'];
 let playerPaint = null;
+let ghostPaint = null;
 const racerPaints = [];
 function shiftColour(css, deg, sat, val) {
   const c = rgbOf(css);
@@ -14543,6 +14543,30 @@ function buildCarPaints() {
     p.LIGHT = COLOUR.CAR_LIGHT;      // a tail light is red on every car
     racerPaints.push(p);
   }
+  /* THE GHOST IS THE PLAYER'S OWN COLOURS, at zero degrees, which is the
+     one quarter of the hue wheel the three racers cannot occupy. See
+     drawGhostCar: it is what says THIS IS YOU rather than "a fourth
+     rival", and it survives every biome for free because the whole
+     scheme rotates together.
+
+     PULLED TOWARD THE BIOME'S OWN VOID BY GHOST_FADE, which is the
+     second half of the same idea. A recording should be quieter than the
+     thing recording it, and doing that in the PAINT rather than by
+     lowering the alpha keeps the body opaque enough to read as a shape
+     while dropping its contrast against the world. Alpha alone had to
+     carry the whole distinction once the openness went, and measured it
+     could not: at GHOST_ALPHA over a dark road the player's colours came
+     back at nearly full strength and the ghost read as a fourth car. */
+  ghostPaint = {};
+  const voidRgb = rgbOf(COLOUR.VOID);
+  for (const k of CAR_PAINT_KEYS) {
+    const c = rgbOf(COLOUR['CAR_' + k]);
+    const m = clamp(FEEL.GHOST_FADE, 0, 1);
+    ghostPaint[k] = 'rgb(' + Math.round(c[0] + (voidRgb[0] - c[0]) * m) + ','
+                           + Math.round(c[1] + (voidRgb[1] - c[1]) * m) + ','
+                           + Math.round(c[2] + (voidRgb[2] - c[2]) * m) + ')';
+  }
+  ghostPaint.LIGHT = COLOUR.CAR_LIGHT;   // unused: the ghost has no tail bar
 }
 
 /* ==================================================================
@@ -15619,8 +15643,6 @@ function ghostPoint(worldZ, worldX, worldY, first, last, baseIndex) {
   return ghostPt;
 }
 
-const ghostCorners = [0, 0, 0, 0, 0, 0, 0, 0];      // four x,y pairs, road plane
-const ghostRoof = [0, 0, 0, 0, 0, 0, 0, 0];
 /* THE GHOST DOES NOT COLLIDE, AND IT IS NOT IN THE SEPARATION PASS AT
    ALL. Decided when the racers reached the daily, where for the first
    time a translucent recording and three solid rivals are on the same
@@ -15635,74 +15657,59 @@ const ghostRoof = [0, 0, 0, 0, 0, 0, 0, 0];
    the comparison meaningless, and worse, the ghost exists ONLY on the
    daily, where the time is recorded.
 
-   SO THEY MUST READ AS DIFFERENT THINGS, and they already do, on three
-   axes at once and none of them is hue. The ghost is drawn at
-   GHOST_ALPHA as a footprint and a roof with DAYLIGHT BETWEEN THEM and
-   no sides, which is exactly the two slab look a solid body was built to
-   avoid: the gap says height without putting anything solid on the road.
-   A racer is the player's own hull, closed, opaque, with wheels and a
-   light bar. Translucent against opaque, open against closed, a shape
-   against a car. */
-function drawGhost(first, last, baseIndex) {
-  /* The state test belongs here as well as in ghostUpdate. The frame loop
-     returns early on a pause and on the hit stop without updating, so a
-     rival left frozen beside the wreck is one early return away at any
-     time. The invariant is that the ghost is only ever on screen while
-     the car is being driven, so it is asserted where the drawing happens. */
+   SO THEY MUST READ AS DIFFERENT THINGS, and the axes that carry it
+   have changed.
+
+   THEY USED TO BE THREE AND NONE OF THEM HUE: the ghost was drawn as a
+   footprint and a roof with DAYLIGHT BETWEEN THEM and no sides, so it
+   was translucent against opaque, OPEN against closed, and a shape
+   against a car. It is the player's own hull now, which spends two of
+   those three outright.
+
+   WHAT CARRIES IT INSTEAD, and it is deliberately not one thing:
+
+     ALPHA, which is all that survives of the old three. GHOST_ALPHA and
+     the road visible through the body.
+
+     THE PLAYER'S OWN COLOURS, which is a stronger cue than the one it
+     replaces and which no racer can ever have. The three racers are
+     rotations of the player's hue at 90, 180 and 270 degrees, so the
+     player's own hue is the one quarter of the wheel that is taken. A
+     ghost in it says THIS IS YOU rather than "a fourth rival", which is
+     exactly what it is, and it says it in every biome for free because
+     the whole scheme rotates together.
+
+     NO SHADOW AND NO BRAKE LIGHTS. Both of those are claims that a
+     physical object is present: a shadow is contact with the road and a
+     lit tail bar is a car reacting in front of you. A recording of a run
+     that already happened does neither. This is also the cheapest of the
+     three to read at distance, because the tail bar is the brightest
+     thing on any car and its absence is visible long after a hue
+     difference has collapsed into a few pixels.
+
+   IT STILL DOES NOT COLLIDE AND IS STILL NOT IN THE SEPARATION PASS.
+   Nothing below this line touches behaviour. */
+const ghostOpts = { shadow: false, light: false };
+function drawGhostCar(first, last, baseIndex, w, h) {
   if (!ghost.shown || state !== DRIVING) return;
-  const c = Math.cos(ghost.yawNow), sn = Math.sin(ghost.yawNow);
-  const hw = FEEL.CAR_BODY_WIDTH / 2, hl = FEEL.CAR_BODY_LENGTH / 2;
-  /* The roof is INSET, and it is what makes this read as a car rather
-     than as two slabs floating one above the other. A cabin narrower and
-     shorter than the footprint gives the silhouette its shoulders, which
-     is the whole of section 7's argument about detail living in the
-     shape and not in the shading. */
-  const rw = hw * FEEL.GHOST_CABIN_WIDE, rl = hl * FEEL.GHOST_CABIN_LONG;
-  const back = hl * FEEL.GHOST_CABIN_BACK;
-  const corners = [[-hw, -hl], [hw, -hl], [hw, hl], [-hw, hl]];
-  const cabin = [[-rw, -rl + back], [rw, -rl + back], [rw, rl + back], [-rw, rl + back]];
-  for (let i = 0; i < 4; i++) {
-    const lx = corners[i][0], lz = corners[i][1];
-    const wx = ghost.frac + lx * c - lz * sn;
-    const wz = ghost.pos + lx * sn + lz * c;
-    const p = ghostPoint(wz, wx, 0, first, last, baseIndex);
-    if (!p.ok) return;                       // any corner off the tables, skip the frame
-    ghostCorners[i * 2] = p.sx; ghostCorners[i * 2 + 1] = p.sy;
-    const cx2 = cabin[i][0], cz2 = cabin[i][1];
-    const qx = ghost.frac + cx2 * c - cz2 * sn;
-    const qz = ghost.pos + cx2 * sn + cz2 * c;
-    const q = ghostPoint(qz, qx, FEEL.GHOST_HEIGHT, first, last, baseIndex);
-    if (!q.ok) return;
-    ghostRoof[i * 2] = q.sx; ghostRoof[i * 2 + 1] = q.sy;
-  }
-  /* Footprint, then roof, then the roof outlined. Three operations, no
-     side walls: a filled box at this alpha reads as a smear where the
-     faces overlap, and the gap between two quads reads as height without
-     putting anything solid over the road.
-
-     AND EACH QUAD IS FILLED ONCE, WHICH IT WAS NOT. polygon() ends with
-     its own ctx.fill(); this called ctx.fill() again on the still open
-     path, so both quads were painted twice. Two fills of the same shape
-     at alpha a composite to 1 - (1 - a)^2, so the footprint was landing
-     at 0.376 against a stated 0.21 and the roof at 0.664 against 0.42:
-     the ghost was 58 per cent heavier on screen than the constant said.
-
-     That matters more than a tidy-up, because GHOST_ALPHA's own comment
-     is "it must never compete with the road" and it was being obeyed on
-     paper and broken in the picture. It is also the constant that keeps
-     the ghost readable as a record of a run rather than as something
-     solid in the way, which is the one thing it must never be mistaken
-     for. */
-  ctx.globalAlpha = FEEL.GHOST_ALPHA * 0.5;
-  ctx.fillStyle = COLOUR.GHOST;
-  polygon(ghostCorners[0], ghostCorners[1], ghostCorners[2], ghostCorners[3],
-          ghostCorners[4], ghostCorners[5], ghostCorners[6], ghostCorners[7]);
+  /* The same near cull the racers get, for the same reason: a body this
+     close to the lens is thrown across the whole frame by the
+     projection. The old two slab ghost had no such guard because two
+     flat quads degrade gracefully and a hull does not. */
+  const depth = ghost.pos - position + FEEL.CAMERA_DISTANCE;
+  if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) return;
+  const curveX = carCurveAt(depth, first, last, baseIndex, w);
+  if (!(curveX === curveX)) return;      // off the tables, skip the frame
+  /* AND THE WHOLE BODY COMPOSITES ONCE PER FACE. The note this replaces
+     recorded the two slab version painting each quad twice and landing
+     at 1 - (1 - a)^2 instead of a, which put the ghost 58 per cent
+     heavier on screen than the constant said. A hull has more faces, so
+     the same mistake would be worse; every face here is filled exactly
+     once by drawBox, drawHull and quadInCar, and the alpha is set once
+     around the lot rather than per call. */
   ctx.globalAlpha = FEEL.GHOST_ALPHA;
-  polygon(ghostRoof[0], ghostRoof[1], ghostRoof[2], ghostRoof[3],
-          ghostRoof[4], ghostRoof[5], ghostRoof[6], ghostRoof[7]);
-  ctx.strokeStyle = COLOUR.GHOST_EDGE;
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  drawCarBody(ghost.frac + curveX, 0, depth, ghost.yawNow,
+              ghostPaint || playerPaint, w, h, ghostOpts);
   ctx.globalAlpha = 1;
 }
 
@@ -15824,61 +15831,83 @@ function drawWrecks(first, last, baseIndex, w, h) {
   wreckN = 0;
 }
 
-function drawRacers(first, last, baseIndex, w, h) {
+/* AND THE GHOST IS SORTED WITH THEM NOW, which it was not and did not
+   need to be. Two flat translucent quads read the same whichever order
+   they land in, so the ghost was simply drawn before the racers and left
+   there. A HULL DOES NOT: a ghost twenty metres nearer than a racer,
+   painted first, is a solid car drawn on top of a translucent one that
+   is in front of it, which is the single most obvious way to make a
+   depth relationship look wrong. One furthest first pass over everything
+   in the world that is a car. */
+const ghostSlot = { z: 0, ghost: true };
+function drawWorldCars(first, last, baseIndex, w, h) {
   /* THE SPARKS AND THE WRECKS FIRE EVEN IF THE CARS DO NOT DRAW, and the
      order matters: an event recorded this frame has to be spent this
      frame or the array goes stale. */
   drawContactSparks(first, last, baseIndex, w, h);
   drawWrecks(first, last, baseIndex, w, h);
-  if (!racersOn() || state !== DRIVING) return;
+  if (state !== DRIVING) return;
   npcOrder.length = 0;
-  for (let i = 0; i < racers.length; i++) npcOrder.push(racers[i]);
+  /* racersOn is asked separately from ghost.shown, because they are not
+     the same question: training has a ghost and no racers. */
+  if (racersOn()) for (let i = 0; i < racers.length; i++) npcOrder.push(racers[i]);
+  if (ghost.shown) { ghostSlot.z = ghost.pos; npcOrder.push(ghostSlot); }
   npcOrder.sort((a, b) => b.z - a.z);
-  for (let k = 0; k < npcOrder.length; k++)
-    drawRacer(npcOrder[k], first, last, baseIndex, w, h);
+  for (let k = 0; k < npcOrder.length; k++) {
+    if (npcOrder[k] === ghostSlot) drawGhostCar(first, last, baseIndex, w, h);
+    else drawRacer(npcOrder[k], first, last, baseIndex, w, h);
+  }
 }
 
-function drawRacer(r, first, last, baseIndex, w, h) {
-  // Wrecked. The debris is the car for now. See wreckRacer.
-  if (r.wreck > 0) return;
-  /* Too close to the lens to have a shape. See NPC_NEAR_CULL. */
-  const depth = r.z - position + FEEL.CAMERA_DISTANCE;
-  if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) return;
+/* WHERE THE ROAD HAS WANDERED TO UNDER A CAR THAT IS NOT THE PLAYER'S.
+   The player's own car uses carCurveX, which the road walk captured at
+   the PLAYER'S segment. Anything else is somewhere else on the road, so
+   it needs the same quantity at its own distance, and that is what the
+   boundary tables already hold: bx is the centre line projected and bh
+   is the world to pixel scale, so dividing one by the other gives the
+   offset back in world units. Without this a car in a corner sits beside
+   its own road rather than on it.
 
-  /* WHERE THE ROAD HAS WANDERED TO UNDER THIS CAR. The player's own car
-     uses carCurveX, which the road walk captured at the PLAYER'S
-     segment. A racer is somewhere else on the road, so it needs the same
-     quantity at its own distance, and that is what the boundary tables
-     already hold: bx is the centre line projected and bh is the world to
-     pixel scale, so dividing one by the other gives the offset back in
-     world units. Without this a racer in a corner sits beside its own
-     road rather than on it. */
+   Returns NaN when the depth lands off the tables, which is the same
+   rule the ghost has always had and is why nothing can be drawn on road
+   that is not there. */
+function carCurveAt(depth, first, last, baseIndex, w) {
   const k = depth / FEEL.SEGMENT_LENGTH + (position / FEEL.SEGMENT_LENGTH - baseIndex);
   const i = Math.floor(k);
-  if (i < first || i + 1 > last || !bvis[i]) return;
+  if (i < first || i + 1 > last || !bvis[i]) return NaN;
   const halfPx = w / 2;
   const o0 = bh[i] !== 0 ? (bx[i] - halfPx) / bh[i] : 0;
   const o1 = bh[i + 1] !== 0 ? (bx[i + 1] - halfPx) / bh[i + 1] : 0;
-  const curveX = o0 + (o1 - o0) * (k - i);
+  return o0 + (o1 - o0) * (k - i);
+}
 
-  /* THE SAME TRANSFORM THE PLAYER'S CAR USES, pointed somewhere else.
-     carT is what every one of drawBox, drawHull and quadInCar reads, so
-     filling it in for a racer and calling them is the whole of drawing
-     the same model at another place on the road. worldZ is a DEPTH from
-     the camera, which for the player is the fixed CAMERA_DISTANCE and
-     for a racer is that plus however far up the road it is. */
+/* ONE BODY, DRAWN WHEREVER IT IS ASKED FOR, and every car in the game
+   that is not the player's now goes through it.
+
+   THE SAME TRANSFORM THE PLAYER'S CAR USES, pointed somewhere else.
+   carT is what every one of drawBox, drawHull and quadInCar reads, so
+   filling it in and calling them is the whole of drawing the same model
+   at another place on the road. worldZ is a DEPTH from the camera, which
+   for the player is the fixed CAMERA_DISTANCE and for anything else is
+   that plus however far up the road it is.
+
+   opts.shadow and opts.light are off for the ghost. See drawGhostCar: a
+   recording does not put a shadow on the road and does not have brake
+   lights, and both of those are cues about a physical object being
+   present rather than decoration. */
+function drawCarBody(worldX, worldY, depth, yaw, paint, w, h, opts) {
   const savedPaint = carPaint;
   const sx = carT.worldX, sy = carT.worldY, sz = carT.worldZ;
   const scy = carT.cosY, ssy = carT.sinY, scr = carT.cosR, ssr = carT.sinR;
   const scp = carT.cosP, ssp = carT.sinP, sml = carMesh.halfL;
 
-  carPaint = racerPaints[r.tint] || playerPaint;
-  carT.worldX = r.x + curveX;
-  carT.worldY = r.y;
+  carPaint = paint;
+  carT.worldX = worldX;
+  carT.worldY = worldY;
   carT.worldZ = depth;
-  carT.cosY = Math.cos(r.yaw); carT.sinY = Math.sin(r.yaw);
-  // No roll and no pitch: a racer's body does not lean, because nothing
-  // reads its lateral acceleration and an unlit lean would be noise.
+  carT.cosY = Math.cos(yaw); carT.sinY = Math.sin(yaw);
+  // No roll and no pitch: these bodies do not lean, because nothing
+  // reads their lateral acceleration and an unlit lean would be noise.
   carT.cosR = 1; carT.sinR = 0;
   carT.cosP = 1; carT.sinP = 0;
 
@@ -15890,7 +15919,7 @@ function drawRacer(r, first, last, baseIndex, w, h) {
   const baseHalf = FEEL.CAR_WHEELBASE / 2;
 
   // The contact shadow, so it sits on the road rather than above it.
-  if (r.y === 0) {
+  if (opts.shadow && worldY === 0) {
     drawBox(0, 1, 0, halfW * 0.96, 1, halfL * 0.96, 0, false,
             SHADOW_COLOURS, false, camX, w, h);
   }
@@ -15914,19 +15943,34 @@ function drawRacer(r, first, last, baseIndex, w, h) {
      passes exist so the car the player is steering reads at a glance,
      and three more of them on screen would be three more things
      competing with the road edge for the top of the value range. */
-  const tail = FEEL.CAR_STATIONS[0];
-  const lightY = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_LIGHT_Y * FEEL.CAR_BODY_HEIGHT;
-  const lightHalf = halfW * tail[2] * FEEL.CAR_LIGHT_HALF;
-  const lightT = FEEL.CAR_BODY_HEIGHT * FEEL.CAR_LIGHT_THICK;
-  const lightZ = tail[0] * halfL - 6;
-  ctx.fillStyle = carPaint.LIGHT;
-  quadInCar(-lightHalf, lightY - lightT, lightZ,
-            lightHalf, lightY + lightT, lightZ, camX, w, h);
+  if (opts.light) {
+    const tail = FEEL.CAR_STATIONS[0];
+    const lightY = FEEL.CAR_RIDE_HEIGHT + FEEL.CAR_LIGHT_Y * FEEL.CAR_BODY_HEIGHT;
+    const lightHalf = halfW * tail[2] * FEEL.CAR_LIGHT_HALF;
+    const lightT = FEEL.CAR_BODY_HEIGHT * FEEL.CAR_LIGHT_THICK;
+    const lightZ = tail[0] * halfL - 6;
+    ctx.fillStyle = carPaint.LIGHT;
+    quadInCar(-lightHalf, lightY - lightT, lightZ,
+              lightHalf, lightY + lightT, lightZ, camX, w, h);
+  }
 
   carPaint = savedPaint;
   carT.worldX = sx; carT.worldY = sy; carT.worldZ = sz;
   carT.cosY = scy; carT.sinY = ssy; carT.cosR = scr; carT.sinR = ssr;
   carT.cosP = scp; carT.sinP = ssp; carMesh.halfL = sml;
+}
+
+const RACER_OPTS = { shadow: true, light: true };
+function drawRacer(r, first, last, baseIndex, w, h) {
+  // Wrecked. The debris is the car for now. See wreckRacer.
+  if (r.wreck > 0) return;
+  /* Too close to the lens to have a shape. See NPC_NEAR_CULL. */
+  const depth = r.z - position + FEEL.CAMERA_DISTANCE;
+  if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) return;
+  const curveX = carCurveAt(depth, first, last, baseIndex, w);
+  if (!(curveX === curveX)) return;
+  drawCarBody(r.x + curveX, r.y, depth, r.yaw,
+              racerPaints[r.tint] || playerPaint, w, h, RACER_OPTS);
 }
 
 function drawHazardWarnings(first, last, baseIndex) {

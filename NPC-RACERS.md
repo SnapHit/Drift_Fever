@@ -210,11 +210,17 @@ findable car on screen.
   still excludes them, so a first-time player meets three opponents with no warning at the start of
   level two.
 - ~~What happens to the ghost once there are solid cars as well.~~ **It does not collide, decided
-  23 August 2026.** It is a recording, not a rival: the line it drives was set on a run where none of
+  23 August 2026, and it is the player's own hull from 24 August.** It is a recording, not a rival: the line it drives was set on a run where none of
   this happened, so a collision with it is a collision with a past that cannot react, and a ghost
   that could shove the player off their line would destroy the comparison it exists for. They read as
-  different things already — the ghost is a footprint and a roof with daylight between them and no
-  sides, a racer is a closed opaque hull with wheels and a light bar.
+  different things already. **The two slab shape went on 24 August**: the ghost is the player's own
+  hull now, drawn through the same `drawCarBody` the racers use. That spent two of the three axes
+  that were carrying the distinction, so two more replaced them: it is painted in the PLAYER'S OWN
+  colours, which is the one quarter of the hue wheel the three racers cannot occupy, and it has no
+  shadow and no tail bar, both of which are claims that a physical object is present. Measured across
+  all twelve biomes at three distances, the change a body makes to the pixels it covers is 21 to 25
+  for the ghost and 29 to 47 for a racer, non overlapping, and peak luminance is 107 against 187
+  because a racer's brightest pixel is its lit tail bar and the ghost has none.
 - ~~Whether a hazard should wreck them.~~ **It does, from 23 August 2026, and they come back.** Out
   for 1.6s, rejoining 5200 units behind the player, then 9 seconds of recovery pace which closes that
   to about 2600. They are never eliminated: three opponents that can be knocked out means a good
