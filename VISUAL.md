@@ -324,3 +324,41 @@ see the rule it checks.
 is HUD in the world, which this game has kept out, and it answers "where is my car" when the question
 he actually asked was "which one is mine". A light on the car answers the second and adds nothing to
 the frame that is not a car.
+
+---
+
+## The title screen in landscape, 24 August 2026
+
+Reported from a phone held sideways: the training button drawn on top of the new-tracks line, and the
+two lines under the wordmark drawn through each other. Portrait was fine.
+
+**The cause is that nothing on that screen is narrower in landscape.** Every size in the stack is a
+fraction of `s`, the SMALLER screen dimension, which is the same 390 whichever way a phone is held. So
+the stack is exactly as tall in landscape as in portrait and is simply asked to fit in half the height.
+Measured at 844 by 390 before the fix: `MUSIC IS ON` sixteen pixels through the `SKIP THE TRAINING`
+button, the music sentence seven pixels through the training caption, the track line four pixels
+through the unlock ladder. Every landscape viewport tested collided, from 640 by 360 to 1024 by 768.
+No phone portrait one did.
+
+**Landscape gets two columns**, on the argument `HUD_BAR_RATIO` already won for the HUD. The wordmark
+and the prompt stay centred and stay the hero; under them the information rows go left and the button
+groups go right, which uses the width the portrait layout leaves empty. The bottom row does not move.
+The wordmark is measured against the TALLER of the two columns, which is what makes them fit rather
+than hope to: the first attempt let it take everything the information rows had given up and the
+button column then ran 78 pixels into `RANDOM TRACK`.
+
+`TITLE_WIDE_RATIO` is 1.30 and not the HUD's 1.35 deliberately. The HUD asks whether a thin strip fits
+across the top, which needs width. This asks whether two columns fit under a wordmark, which is forced
+by a shortage of height. 4 by 3 is 1.333 and is a real landscape shape, being a Chromebook and a tablet
+held sideways, so the cutoff goes below it rather than above.
+
+**And a tablet held upright is the same bug without the landscape.** At 768 by 1024, `s` is 768 while
+the height is only 1024, so the portrait stack overflows by two pixels. The wordmark is already at its
+floor there, so the honest answer is one row fewer: the unlock ladder stands down. It is chosen rather
+than picked, being the only purely informational row on the screen, and it already disappears by itself
+once every car is earned. Same rule the fine print follows: take the room the screen can spare.
+
+Measured after, across eight viewports and all five full screen states: every one clear, tightest
+clearance 3 to 57 pixels and nearest approach to a screen edge 13 to 88. The death, pause, level
+complete and day complete screens were clear before and are untouched. Phone portrait layout is
+identical box for box.

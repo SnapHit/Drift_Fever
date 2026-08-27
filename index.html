@@ -2944,6 +2944,49 @@ const FEEL = {
   TITLE_GAP_FACTS:        0.072,     // of s, prompt down to the track line
   TITLE_FACT_SIZE:        0.029,     // of s
   TITLE_AIR:               0.10,     // of s, the least air above the bottom button
+  /* ------------------------------------------------------------------
+     THE LANDSCAPE TITLE. A SECOND ARRANGEMENT, NOT A SCALED FIRST ONE,
+     and the argument is the one HUD_BAR_RATIO already won.
+
+     The stack above is a PORTRAIT layout: wordmark, prompt, the two
+     fact rows, the music warning, then the buttons walking up from the
+     bottom, everything down one narrow column. That is the right shape
+     when height is what there is plenty of. Turn the handset and it is
+     exactly backwards: the vertical room roughly halves while the whole
+     width sits empty either side.
+
+     EVERY SIZE IN THE STACK IS A FRACTION OF s, THE SMALLER DIMENSION,
+     WHICH IS THE SAME 390 IN BOTH ORIENTATIONS ON A PHONE. So the stack
+     is the same height held either way and only the room it has to fit
+     in changes, which is why this went unnoticed: nothing about the
+     screen is narrower in landscape, it is simply asked to fit in half
+     the height. Measured before this existed, at 844 by 390: MUSIC IS ON
+     was drawn 16 pixels through the SKIP THE TRAINING button, the music
+     sentence 7 pixels through the training caption, and the track line 4
+     pixels through the unlock ladder. Every landscape viewport tested
+     collided, from 640 by 360 up to 1024 by 768, and no phone portrait
+     one did.
+
+     SO IN LANDSCAPE IT GOES TO TWO COLUMNS. The wordmark and the prompt
+     stay centred and stay the hero, because they are what the screen is
+     for. Under them the INFORMATION rows go left and the BUTTON groups
+     go right, which uses the width the portrait layout leaves empty and
+     takes the two out of each other's way. The bottom row does not move.
+
+     THE RATIO IS NOT THE HUD'S, AND THE DIFFERENCE IS DELIBERATE.
+     HUD_BAR_RATIO is 1.35 and asks whether a thin strip fits across the
+     top, which needs WIDTH. This asks whether two columns fit side by
+     side under a wordmark, which needs width and is forced by a shortage
+     of HEIGHT, and those are not the same question. 4 by 3 is 1.333 and
+     is a real landscape shape: it is a Chromebook, which this game
+     targets, and a tablet held sideways. Measured at 1024 by 768 the
+     portrait arrangement drew the music sentence five pixels through the
+     SKIP THE TRAINING button and the two column one clears everything,
+     so the cutoff goes below 4 by 3 rather than above it.
+     ------------------------------------------------------------------ */
+  TITLE_WIDE_RATIO:        1.30,     // LIVE, wider than this much of the height, two columns
+  TITLE_COL_X:             0.26,     // LIVE, of w, each column's centre in from its edge
+  TITLE_COL_WIDE:          0.44,     // LIVE, of w, the widest a column's type may set
   /* THE BLINK, and it is a blink and not a pulse. A sine fade reads as a
      web page breathing; a hard on and off reads as a cabinet asking for
      a coin, which is the whole point of the change. Lit for most of the
@@ -7573,6 +7616,9 @@ const TUNABLES = [
   { key: 'TITLE_BLINK_ON',     label: 'blinkOn', step: 0.02, min: 0.05, max: 1.0,   dp: 2, group: 20 },
   { key: 'TITLE_FACT_ALPHA',   label: 'ttlFctA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
   { key: 'TITLE_SUB_ALPHA',    label: 'ttlSubA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
+  { key: 'TITLE_WIDE_RATIO',   label: 'ttlWide', step: 0.05, min: 0.8,  max: 3,     dp: 2, group: 20 },
+  { key: 'TITLE_COL_X',        label: 'ttlColX', step: 0.01, min: 0.1,  max: 0.5,   dp: 2, group: 20 },
+  { key: 'TITLE_COL_WIDE',     label: 'ttlColW', step: 0.02, min: 0.2,  max: 0.9,   dp: 2, group: 20 },
   { key: 'TITLE_GAP_RESET',    label: 'ttlRstG', step: 0.004,min: 0,    max: 0.30,  dp: 3, group: 20 },
   { key: 'TITLE_RESET_SIZE',   label: 'ttlRstS', step: 0.002,min: 0.01, max: 0.12,  dp: 3, group: 20 },
   { key: 'TITLE_RESET_ALPHA',  label: 'ttlRstA', step: 0.02, min: 0,    max: 1,     dp: 2, group: 20 },
@@ -23446,8 +23492,47 @@ function drawOverlay(w, h) {
        measured against, or the mark grows into it on a short screen. */
     const resetSize = Math.round(s * FEEL.TITLE_RESET_SIZE);
     const resetBlock = s * FEEL.TITLE_GAP_RESET + resetSize;
+    /* TWO COLUMNS WHEN THE SCREEN IS WIDER THAN IT IS TALL ENOUGH FOR.
+       See TITLE_WIDE_RATIO. In that layout the information rows leave
+       the centre column and go beside the buttons, so the wordmark is
+       measured against the PROMPT ALONE and gets the rest, which is what
+       makes it the hero on a screen that is 390 pixels tall. */
+    const wide = w > h * FEEL.TITLE_WIDE_RATIO;
+    const infoBlock = s * FEEL.TITLE_GAP_FACTS + factSize + resetBlock + musBlock;
+    /* THE BUTTON GROUP IS MEASURED HERE TOO, BEFORE ANYTHING IS DRAWN,
+       and that is what makes the two columns fit rather than hope to.
+
+       The first landscape attempt let the wordmark take everything the
+       information rows had given up, which is right in principle and
+       wrong by 78 pixels: the button column then had nowhere to go and
+       ran into the RANDOM TRACK button. The wordmark is measured against
+       the TALLER OF THE TWO COLUMNS, so whichever one is worse is the
+       one it makes room for.
+
+       Every size here is the size the draw will use, asked of
+       fittedSize and canvasButton's own arithmetic rather than guessed,
+       which is the rule the rest of this group already follows. */
+    const gutter = s * 0.020;
+    const csize = Math.round(s * 0.026);
+    const csize2 = Math.round(s * 0.032);
+    const rsize = Math.round(s * 0.033);
+    const btnCx = wide ? w - w * FEEL.TITLE_COL_X : w / 2;
+    const btnW = wide ? w * FEEL.TITLE_COL_WIDE : w * 0.92;
+    let ladder = nextUnlockLine();
+    const lsizeOf = () => ladder
+      ? fittedSize('NEXT  ' + ladder, '700', csize, btnW) : 0;
+    const carH = carsUnlocked() > 1 ? csize2 * 2.2 : 0;
+    const routeCap = titleRouteCaption();
+    const routeCapSize = fittedSize(routeCap, '700', csize, btnW);
+    const routeH = trainingLevels() > 0
+      ? rsize * 2.2 + routeCapSize * 0.85 + routeCapSize * 0.62 : 0;
+    const btnBlockOf = () => {
+      const lh = ladder ? lsizeOf() * 0.85 + lsizeOf() * 0.62 : 0;
+      return s * FEEL.TITLE_GAP_FACTS + carH + lh
+           + (routeH ? gutter + routeH : 0);
+    };
     const below = s * FEEL.TITLE_GAP_PROMPT + promptSize / 2
-                + s * FEEL.TITLE_GAP_FACTS + factSize + resetBlock + musBlock;
+                + (wide ? Math.max(infoBlock, btnBlockOf()) : infoBlock);
     const top = Math.max(safeTop + s * 0.030, h * FEEL.TITLE_TOP);
     /* THE FINE PRINT TAKES ONLY THE ROOM THE SCREEN CAN SPARE.
 
@@ -23477,6 +23562,34 @@ function drawOverlay(w, h) {
     const aspect = brandInkAspect(BRAND.wordmark);
     const wmW = Math.min(w * FEEL.TITLE_WM_WIDTH, wmMaxH * aspect);
 
+    /* AND IF IT STILL WILL NOT FIT, THE LADDER STANDS DOWN.
+
+       The portrait layout stacks down one column and every size in it is
+       a fraction of s, the SMALLER dimension, so on a tablet held
+       upright s is 768 while the height is only 1024 and the stack is
+       simply too tall for the screen it is on. Measured at 768 by 1024
+       the music sentence was drawn two pixels through the unlock ladder.
+       The wordmark is already at its floor by then, so there is nothing
+       left to shrink and the honest answer is to carry one row fewer.
+
+       THE LADDER IS THE ROW, and it is chosen rather than picked. It is
+       the only thing on this screen that is purely informational: the
+       car button beside it already says which car is on, it disappears
+       by itself once every car is earned, and nothing on the screen
+       stops working without it. Everything else is either the hero, the
+       action, the reason to come back, or a warning about something the
+       game is about to do.
+
+       This is the same rule the fine print above already follows: take
+       the room the screen can spare and stand down where it cannot. */
+    if (!wide && ladder) {
+      const topBottom = top + wmW / aspect + below;
+      const lh = lsizeOf() * 0.85 + lsizeOf() * 0.62;
+      const groupH = carH + lh + (routeH ? gutter + routeH : 0);
+      const modeTop = bottomTop - s * 0.050 - rsize * 1.1;
+      if (topBottom + gutter > modeTop - groupH) ladder = null;
+    }
+
     let y;
     if (brandReady()) {
       y = top + drawBrandInk(BRAND.wordmark, w / 2, top + (wmW / aspect) / 2, wmW);
@@ -23499,10 +23612,20 @@ function drawOverlay(w, h) {
       text(go, w / 2, y, fittedSize(go, '800', promptSize, w * 0.9), '800');
     }
 
-    y += promptSize / 2 + s * FEEL.TITLE_GAP_FACTS;
+    /* WHERE THE INFORMATION ROWS GO, and it is the only thing the two
+       layouts disagree about. Portrait keeps them under the prompt down
+       the middle, exactly as they were. Landscape puts them in a column
+       of their own on the left, starting from the same line the button
+       column on the right starts from, so the two read as a pair rather
+       than as a stack that has been pushed sideways. */
+    const colTop = y + promptSize / 2;
+    const colX = wide ? w * FEEL.TITLE_COL_X : w / 2;
+    const colW = wide ? w * FEEL.TITLE_COL_WIDE : w * 0.92;
+
+    y = colTop + s * FEEL.TITLE_GAP_FACTS;
     ctx.globalAlpha = FEEL.TITLE_FACT_ALPHA;
     const facts = titleFactLine();
-    text(facts, w / 2, y, fittedSize(facts, '700', factSize, w * 0.92), '700',
+    text(facts, colX, y, fittedSize(facts, '700', factSize, colW), '700',
          'center', COLOUR.TITLE_DIM);
     ctx.globalAlpha = 1;
 
@@ -23513,7 +23636,7 @@ function drawOverlay(w, h) {
     y += s * FEEL.TITLE_GAP_RESET + resetSize / 2;
     ctx.globalAlpha = clamp(FEEL.TITLE_RESET_ALPHA, 0, 1);
     const reset = titleResetLine();
-    text(reset, w / 2, y, fittedSize(reset, '800', resetSize, w * 0.92), '800',
+    text(reset, colX, y, fittedSize(reset, '800', resetSize, colW), '800',
          'center', COLOUR.SCORE_BEST);
     ctx.globalAlpha = 1;
     y += resetSize / 2;
@@ -23547,14 +23670,14 @@ function drawOverlay(w, h) {
          the size and it is type rather than artwork. */
       const head = 'MUSIC IS ON';
       const big = Math.round(s * FEEL.TITLE_MUSIC_SIZE);
-      const room = w * 0.90 * (1 - FEEL.BRAND_TEXT_STROKE)
+      const room = colW * (1 - FEEL.BRAND_TEXT_STROKE)
                  - s * FEEL.BRAND_TEXT_SHADOW_X * 2;
-      brandText(head, w / 2, y, fittedSize(head, '900', big, room), 1);
+      brandText(head, colX, y, fittedSize(head, '900', big, room), 1);
       y += big * 0.62 + s * FEEL.TITLE_MUSIC_GAP;
       ctx.globalAlpha = FEEL.TITLE_MUSIC_ALPHA;
       const sub = 'the note button, bottom left, turns it off';
-      text(sub, w / 2, y,
-           fittedSize(sub, '700', Math.round(s * FEEL.TITLE_MUSIC_SUB), w * 0.94),
+      text(sub, colX, y,
+           fittedSize(sub, '700', Math.round(s * FEEL.TITLE_MUSIC_SUB), colW),
            '700', 'center', COLOUR.TEXT);
       ctx.globalAlpha = 1;
     }
@@ -23636,8 +23759,23 @@ function drawOverlay(w, h) {
        fittedSize are asked the same question that will be asked when
        they draw.
        ---------------------------------------------------------------- */
-    const gutter = s * 0.020;
-    const csize = Math.round(s * 0.026);
+    /* THE BUTTON GROUP WALKS UP FROM THE MODE ROW IN PORTRAIT AND DOWN
+       THE RIGHT COLUMN IN LANDSCAPE.
+
+       Upwards is right when the group hangs off the bottom edge and
+       there is height to spare above it. In landscape there is not: it
+       walks up into the information rows, which is exactly the collision
+       this session started from. So there it is anchored to the same
+       line the left column starts at and grows down into the width, and
+       the two columns sit beside each other with the bottom row below
+       both of them.
+
+       THE ORDER FLIPS WITH THE DIRECTION and it has to. Walking up, the
+       route sits nearest the mode row and the car above it. Walking
+       down, that would put the car nearest the wordmark and the route
+       nearest the buttons, which is the same reading order upside down,
+       so the pair is laid car first either way and only the anchor and
+       the sign change. */
     let stackTop = (by0 - s * 0.050) - bsize * 1.1;     // top of the mode row
 
     /* THE ROUTE, AND IT IS THE ONLY THING ADDED TO THIS SCREEN THIS
@@ -23655,16 +23793,40 @@ function drawOverlay(w, h) {
        alternative here is invisible: it is tapping the screen. So the
        line underneath names the default and how long it costs, and the
        pair reads as two routes rather than as one button. */
+    /* IN LANDSCAPE THE CAR ROW IS LAID FIRST AND THE ROUTE UNDER IT, so
+       the two are computed in the order they are drawn rather than in
+       the order the upward walk needs. wideY is the running cursor for
+       that column and is ignored entirely in portrait. */
+    const lsize = lsizeOf();
+    const ladderH = ladder ? lsize * 0.85 + lsize * 0.62 : 0;
+    let wideY = colTop + s * FEEL.TITLE_GAP_FACTS;
+    if (wide) {
+      if (carsUnlocked() > 1) {
+        canvasButton(carRect, 'CAR  ' + activeCar().name, btnCx,
+                     wideY + csize2 * 1.1, csize2, COLOUR.SCORE_BEST, btnW);
+        wideY = carRect.y + carRect.h;
+      } else {
+        carRect.live = false;
+      }
+      if (ladder) {
+        ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
+        text('NEXT  ' + ladder, btnCx, wideY + lsize * 0.85, lsize,
+             '700', 'center', COLOUR.TITLE_DIM);
+        ctx.globalAlpha = 1;
+        wideY += ladderH;
+      }
+    }
+
     if (trainingLevels() > 0) {
-      const rsize = Math.round(s * 0.033);
-      const cap = titleRouteCaption();
-      const capSize = fittedSize(cap, '700', csize, w * 0.92);
+      const cap = routeCap;
+      const capSize = routeCapSize;
       const capH = capSize * 0.85 + capSize * 0.62;     // baseline drop plus half a line
-      const routeY = stackTop - gutter - capH - rsize * 1.1;
-      canvasButton(routeRect, titleRouteLabel(), w / 2, routeY,
-                   rsize, COLOUR.GATE, w);
+      const routeY = wide ? wideY + gutter + rsize * 1.1
+                          : stackTop - gutter - capH - rsize * 1.1;
+      canvasButton(routeRect, titleRouteLabel(), btnCx, routeY,
+                   rsize, COLOUR.GATE, btnW);
       ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
-      text(cap, w / 2, routeRect.y + routeRect.h + capSize * 0.85, capSize,
+      text(cap, btnCx, routeRect.y + routeRect.h + capSize * 0.85, capSize,
            '700', 'center', COLOUR.TITLE_DIM);
       ctx.globalAlpha = 1;
       stackTop = routeRect.y;
@@ -23684,23 +23846,20 @@ function drawOverlay(w, h) {
        way of knowing there was another or what it wanted; this line
        disappears entirely once they are all earned rather than sitting
        there saying nothing. */
-    const ladder = nextUnlockLine();
-    const lsize = ladder
-      ? fittedSize('NEXT  ' + ladder, '700', csize, w * 0.92) : 0;
-    const ladderH = ladder ? lsize * 0.85 + lsize * 0.62 : 0;
-    const csize2 = Math.round(s * 0.032);
     /* IT SHARES ITS ROW WITH THE LADDER WHEN THERE IS NO CAR BUTTON,
        which is a first time player, so the screen does not gain a row
        for them either: on a cold profile that line is the only thing in
        this band and it is the one worth having there. */
     const carY = stackTop - gutter - ladderH - (carsUnlocked() > 1 ? csize2 * 1.1 : 0);
-    if (carsUnlocked() > 1) {
+    if (wide) {
+      // Already laid, at the top of the right column.
+    } else if (carsUnlocked() > 1) {
       canvasButton(carRect, 'CAR  ' + activeCar().name, w / 2, carY,
                    csize2, COLOUR.SCORE_BEST, w);
     } else {
       carRect.live = false;
     }
-    if (ladder) {
+    if (ladder && !wide) {
       ctx.globalAlpha = FEEL.TITLE_SUB_ALPHA;
       /* Off the button's own rect rather than off a fraction, so it
          clears whatever the longest car name happens to make it. */
