@@ -1941,8 +1941,109 @@ const FEEL = {
      be balanced against STEER_RATE by playing: a tighter turn feeds more
      sideways speed into the same grip and slides further. */
   GRIP_TIME:               0.40,     // LIVE
-  HEADING_SNAP_TIME:       0.06,
-  SLIP_MAX_DEG:              30,     // slip angle that counts as fully sideways
+  HEADING_SNAP_TIME:       0.06,     // LIVE, the nose swinging OUT
+  /* ------------------------------------------------------------------
+     AND IT DOES NOT COME BACK AT THE SAME SPEED, WHICH IS THE WHOLE OF
+     WHAT WAS MISSING.
+
+     A player on Reddit said "what are those goofy ass physics bro, this
+     is barely drifting" and the author agreed: the rear never visibly
+     steps out and it reads as cornering. Two hypotheses were put and
+     MEASURED before anything was touched, and neither of them survived.
+
+     IT IS NOT THAT THE ANGLE IS TOO SMALL. Over eight seeded runs the
+     DRAWN yaw has a median of 31 to 39 degrees depending on the driver,
+     a ninetieth percentile of 39.3 which is the arithmetic ceiling of
+     atan(STEER_RATE * ROAD_HALF_WIDTH_BASE / SPEED), and the car spends
+     71 to 83 per cent of a run past 15 degrees and 60 to 75 per cent
+     past 25. The slip angle runs a median of 22 to 27 and peaks near 100.
+
+     AND IT IS NOT THAT THE ANGLE DOES NOT SHOW. Projected at the size
+     the car actually draws, 28 pixels of body width, 30 degrees of yaw
+     displaces the rear of the body 20 pixels from the front, which is 74
+     per cent of a body width, and the silhouette goes from 31 pixels wide
+     to 44.
+
+     WHAT IS WRONG IS THAT IT NEVER HOLDS. Counting a drift as an event,
+     a stretch past 15 degrees held on ONE side: a run of 98 seconds
+     contains 134 to 141 of them, the median one lasts 0.28 to 0.63
+     seconds, the car changes which way it is yawed 55 to 68 times a
+     MINUTE, and the yaw slews at about 100 degrees a second all run. The
+     car is sideways nearly always and sideways the OTHER way about once
+     a second. That is not a drift, it is a wobble, and a still frame
+     cannot show it: the stills look exactly like drifting.
+
+     THE CAUSE IS THIS TIME CONSTANT. At 0.06 seconds the nose is a
+     near-direct readout of the button, so the yaw is the input with a
+     sixty millisecond filter on it and it collapses the moment the
+     driver lets go. A drift has a moment where the back lets go and then
+     HANGS THERE until it is caught.
+
+     SO THE NOSE SWINGS OUT AT HEADING_SNAP_TIME AND COMES BACK AT THIS.
+     Asymmetric, one extra constant, and the asymmetry is the mechanic:
+     the tail letting go is fast and the tail coming back is slow.
+
+     AND "COMING BACK" INCLUDES GOING THE OTHER WAY, which the first
+     version of this got wrong. It exempted a counter steer on the
+     argument that being unable to catch a slide would make the car
+     harder to drive. That argument is refuted two paragraphs down by
+     its own arithmetic, and the measurement refuted it too: exempting
+     reversals left the flip rate at 56 a minute against 55 before, which
+     is to say it fixed nothing, because the wobble IS the reversals. The
+     test is one comparison, whether this step is unwinding the angle,
+     and it does not care why.
+
+     IT CANNOT MAKE THE CAR HARDER TO PLACE, and that is arithmetic
+     rather than a hope. carX moves on drift.lateralV and on nothing
+     else; drift.headingV feeds the drawn yaw and the slip angle and
+     touches no position in the file. The line the car takes is
+     identical, so the counter steer that saves a slide is GRIP_TIME and
+     is untouched.
+
+     WHY 0.50, MEASURED. Swept against the good policy and a 0.70 human,
+     six seeded runs each. Episodes and their median length, flips a
+     minute, the mean multiplier, and the average yaw the car is drawn at
+     while the road is straight AND the stick is neutral, which is the
+     one thing this can genuinely break: a car sitting crooked with no
+     input is not drifting, it is broken.
+
+       hold   episodes   median   flips/min   mult    crab avg / peak
+       0.06    134/107   .28/.48s     55/61   8.1/9.7    0.1 /  3 deg
+       0.34     71/ 82   .65/.70s     31/48   9.8/10.2   1.4 / 16 deg
+       0.50     58/ 65   .85/.78s     24/36  10.4/10.6   3.6 / 22 deg
+       0.70     46/ 52  1.10/.87s     20/25  10.7/10.8   7.4 / 26 deg
+       1.00     37/ 42  1.42/1.17s    14/18  10.8/10.9  11.7 / 29 deg
+
+     0.50 halves the wobble and triples the length of a drift while the
+     average crab stays under four degrees. 0.70 is the next notch and it
+     is the one to push if it still reads as cornering on the phone; past
+     that the car is visibly crooked on straight road and 1.00 is too far.
+     Both constants are on the debug cycler as snapOut and hold.
+
+     WHAT THIS COSTS, AND IT IS THE SCORE. Slip feeds the multiplier, the
+     clock and 45 per cent of the racers' form, and holding the yaw out
+     raises slip whether or not the driver earned it. Points a second go
+     from 835 to 1092 for the good policy and 1059 to 1141 for the human,
+     and the mean multiplier from 8.1 to 10.4 of a possible 12. That last
+     number is the real cost: a multiplier sitting at 87 per cent of its
+     ceiling has no gradient left to grade anybody with.
+
+     THE LEVER FOR THAT IS SLIP_MAX_DEG AND IT IS DELIBERATELY NOT PULLED
+     HERE. It is on the cycler now. Measured at hold 0.50: 38 gives 9.8
+     and 10.0, 42 gives 9.2 and 9.4, 46 gives 8.6 and 8.8, so somewhere
+     near 44 restores the economy exactly. It is left at 30 because that
+     is a second design decision, because this file's own note above says
+     30 was ALREADY saturated before any of this, and because two coupled
+     changes in one session is how a feel problem becomes unattributable.
+
+     ONE THING IT FIXED FOR FREE. The note above records that the
+     multiplier could not tell a good driver from a mediocre one: 8.26
+     against 9.20, the wrong way round. Holding the yaw rewards
+     committing to a slide over sawing at it, and the gap closes from
+     1.63 to 0.23. It is still the wrong way round. It is much less so.
+     ------------------------------------------------------------------ */
+  HEADING_HOLD_TIME:       0.50,     // LIVE, seconds for the nose to come back
+  SLIP_MAX_DEG:              30,     // LIVE, slip angle that counts as fully sideways
   /* How far the car is drawn turned. LIVE, both of them.
 
      CAR_YAW_GAIN is the honest half: the nose points where the steering
@@ -7120,6 +7221,10 @@ const TUNABLES = [
   { key: 'TILT_DEADZONE_DEG',  label: 'dead',    step: 0.25, min: 0,    max: 12,    dp: 2, group: 1 },
   { key: 'STEER_RATE',         label: 'steer',   step: 0.1,  min: 0.6,  max: 5.0,   dp: 1, group: 2 },
   { key: 'GRIP_TIME',          label: 'grip',    step: 0.02, min: 0.04, max: 1.0,   dp: 2, group: 2 },
+  { key: 'HEADING_SNAP_TIME',  label: 'snapOut', step: 0.01, min: 0.01, max: 0.6,   dp: 2, group: 2 },
+  { key: 'HEADING_HOLD_TIME',  label: 'hold',    step: 0.02, min: 0.02, max: 1.2,   dp: 2, group: 2 },
+  // The lever for what the hold does to the score. See SLIP_MAX_DEG.
+  { key: 'SLIP_MAX_DEG',       label: 'slipMax', step: 1,    min: 8,    max: 70,    dp: 0, group: 2 },
   { key: 'ROAD_THICKNESS',     label: 'thick',   step: 20,   min: 0,    max: 1200,  dp: 0, group: 3 },
   { key: 'ROAD_FLARE',         label: 'flare',   step: 20,   min: 0,    max: 1400,  dp: 0, group: 3 },
   { key: 'ROAD_ABOVE_TERRAIN',label:'roadUp', step: 1,    min: 0,    max: 1,     dp: 0, group: 4 },
@@ -12293,8 +12398,19 @@ function update(dt) {
     // Nothing is pushing sideways on it, so it flies level.
     drift.lateralAccel = 0;
   } else {
-    // The nose comes round to where the driver is pointing.
-    drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME));
+    /* The nose comes round to where the driver is pointing, and it does
+       not come back at the same speed. See HEADING_HOLD_TIME.
+
+       THE TEST IS WHETHER THIS STEP IS UNWINDING THE ANGLE, and that is
+       one comparison: the step heads for intent, so it shrinks the angle
+       exactly when it pushes against the sign the angle already has. It
+       does not matter whether the driver is easing off or has gone the
+       other way. Both of those are the tail coming back, and the tail
+       coming back is the slow half. */
+    const unwinding = (intent - drift.headingV) * drift.headingV < 0;
+    const tau = Math.max(0.001, unwinding ? FEEL.HEADING_HOLD_TIME
+                                          : FEEL.HEADING_SNAP_TIME);
+    drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / tau));
     const gripTarget = intent - curve * FEEL.CENTRIFUGAL * rate;
     drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
     // The acceleration the model is actually applying sideways, straight
@@ -24386,8 +24502,29 @@ function clearDailyRecords() {
    old one drives the line it drove at the speed it drove, straight
    through ground it never had to pay for, and appears to do something
    the player now cannot. That is the staleness this constant exists to
-   clear, and the whole cost of clearing it is one day of records. */
-const ROAD_GEN = 12;
+   clear, and the whole cost of clearing it is one day of records.
+
+   13, THE ASYMMETRIC HEADING HOLD, and it is the same argument again
+   with the two halves swapped over.
+
+   THE ROAD DID NOT MOVE AND THE GHOST'S LINE DID NOT EITHER. carX runs
+   on drift.lateralV, which this change does not touch, and the ghost
+   stores where it was ACROSS the road and how long it took to get there.
+   Both are what they were, measured, on 140 roads over 28 days. So the
+   usual reason to bump this constant does not apply.
+
+   IT IS THE RECORD THAT IS STALE. Holding the yaw out raises the slip
+   angle, the slip angle is the multiplier, and a good run now scores
+   between 8 and 31 per cent more points a second than the same driving
+   did yesterday. A daily best set before this shipped would sit at the
+   top of a board nothing could be beaten off, and it would have been set
+   under different rules, which is exactly what 12 was bumped for.
+
+   The one thing that IS cosmetically stale is the ghost's stored yaw,
+   nine samples a second of carYaw taken under the old model. That would
+   have been worth nothing on its own. Next to the records it is not
+   worth arguing about, and the cost is one day. */
+const ROAD_GEN = 13;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
