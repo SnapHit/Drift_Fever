@@ -3800,6 +3800,39 @@ const FEEL = {
   CAR_WHEELBASE:            560,     // front axle to rear axle
   CAR_FRONT_STEER_DEG:       30,     // how far the front wheels turn at full lock
 
+  /* ------------------------------------------------------------------
+     THE YAW PIVOT, AND IT IS NOT THE MIDDLE OF THE CAR.
+
+     Car local z runs from -440 at the tail to +440 at the nose and zero
+     is the body's centre AND the midpoint of the wheelbase, so until
+     this constant existed the car yawed about its own centre: the nose
+     swung forward exactly as far as the tail swung back. That is a
+     pirouette. It measures as a large angle, which is why eleven
+     sessions of measuring the ANGLE found nothing wrong, and it does not
+     read as a drift, because in a drift the front holds the line the
+     driver is steering and THE BACK COMES ROUND.
+
+     Distance in world units FORWARD of the body centre. 0 is the old
+     behaviour exactly, byte for byte. 280 is the front axle.
+
+     WHAT IT DOES TO THE SHAPE, at the 39 degree drawn yaw the steering
+     arithmetic tops out at:
+
+       pivot     nose swings     tail swings
+           0         277 u           277 u      a pirouette
+         140         189 u           365 u
+         210         145 u           409 u
+         280         101 u           453 u      the front axle
+
+     WHAT IT COSTS, and it is one number: the drawn body's centre is no
+     longer the anchor the game tests. It sits PIVOT * sin(yaw) to the
+     side of it, up to 223 units at 280. Every test that asks where the
+     car is has to be told. See bodyOffsetX, and see the note on
+     rearWheelOffsets for the one that is hand rolled and would otherwise
+     have left the tyre marks behind the wheels that make them.
+     ------------------------------------------------------------------ */
+  CAR_YAW_PIVOT:            210,     // LIVE, world units forward of the body centre
+
   /* Body roll. It leans away from the direction it is being accelerated,
      which is what makes it read as having weight. Section 7 warns about
      overdoing motion on a phone held close to the face, so this is small
@@ -7225,6 +7258,8 @@ const TUNABLES = [
   { key: 'HEADING_HOLD_TIME',  label: 'hold',    step: 0.02, min: 0.02, max: 1.2,   dp: 2, group: 2 },
   // The lever for what the hold does to the score. See SLIP_MAX_DEG.
   { key: 'SLIP_MAX_DEG',       label: 'slipMax', step: 1,    min: 8,    max: 70,    dp: 0, group: 2 },
+  // 0 is the old pirouette, 280 is the front axle. See CAR_YAW_PIVOT.
+  { key: 'CAR_YAW_PIVOT',      label: 'pivot',   step: 10,   min: 0,    max: 440,   dp: 0, group: 2 },
   { key: 'ROAD_THICKNESS',     label: 'thick',   step: 20,   min: 0,    max: 1200,  dp: 0, group: 3 },
   { key: 'ROAD_FLARE',         label: 'flare',   step: 20,   min: 0,    max: 1400,  dp: 0, group: 3 },
   { key: 'ROAD_ABOVE_TERRAIN',label:'roadUp', step: 1,    min: 0,    max: 1,     dp: 0, group: 4 },
@@ -7370,7 +7405,10 @@ const TUNABLES = [
   { key: 'NPC_PACE_CURVE',     label: 'npcCurve',step: 0.05,min: 0.1,  max: 4,     dp: 2, group: 31 },
   { key: 'NPC_PACE_SPREAD',    label: 'npcSprd', step: 0.005,min: 0,   max: 0.3,   dp: 3, group: 31 },
   { key: 'NPC_FORM_TIME',      label: 'npcForm', step: 0.25,min: 0.25, max: 30,    dp: 2, group: 31 },
-  { key: 'NPC_FORM_POWER',     label: 'npcPow',  step: 0.25,min: 0.25, max: 12,    dp: 2, group: 31 },
+  // Shipped at 16 with a maximum of 12, so the live value could not be
+  // reached on the phone. Same bug TERRAIN_HEIGHT had. Audited the whole
+  // array afterwards: 574 entries and this was the only one left.
+  { key: 'NPC_FORM_POWER',     label: 'npcPow',  step: 0.25,min: 0.25, max: 32,    dp: 2, group: 31 },
   { key: 'NPC_FORM_MULT_REF',  label: 'npcMult', step: 0.25,min: 1.25, max: 12,    dp: 2, group: 31 },
   { key: 'NPC_FORM_SCRAPE',    label: 'npcScrp', step: 0.05,min: 0,    max: 1,     dp: 2, group: 31 },
   { key: 'NPC_HORIZON',        label: 'npcHoriz',step: 1000,min: 2000, max: 90000, dp: 0, group: 31 },
@@ -12992,11 +13030,24 @@ function carYaw() {
    swings apart and the two marks sweep away from each other. That
    divergence is the rotation, drawn. */
 const rearContact = { left: 0, right: 0 };
+/* THE ONE TRANSFORM IN THE FILE THAT IS ROLLED BY HAND, and therefore
+   the one that does not get CAR_YAW_PIVOT for free.
+
+   The wheels themselves are drawn through carToWorld, so they pivot. If
+   this did not, the marks would come out of thin air a body's width from
+   the tyres that make them, and they are the most looked at thing in the
+   frame. The pivot goes in exactly where carToWorld puts it: the rear
+   axle sits at local z of minus half a wheelbase, so its distance from
+   the pivot is that minus the pivot, and the lateral throw is that
+   distance times the sine.
+
+   Same term for the along-road position via bodyOffsetZ, so the marks
+   start where the axle is rather than a fifth of a car ahead of it. */
 function rearWheelOffsets(centreX) {
   const yaw = carYaw();
   const c = Math.cos(yaw), s = Math.sin(yaw);
   const trackHalf = FEEL.CAR_TRACK / 2;
-  const shared = -FEEL.CAR_WHEELBASE / 2 * s;
+  const shared = (-FEEL.CAR_WHEELBASE / 2 - FEEL.CAR_YAW_PIVOT) * s;
   rearContact.left = centreX - trackHalf * c + shared;
   rearContact.right = centreX + trackHalf * c + shared;
   return rearContact;
@@ -15544,10 +15595,26 @@ function racerWall(r) {
 /* Two racers. Symmetric, and silent: the shake and the sting are the
    PLAYER'S feedback and a scrape between two cars fifty metres up the
    road has no business moving the player's screen. */
+/* THE GAP BETWEEN TWO CARS IS MEASURED BETWEEN THE BODIES, NOT BETWEEN
+   THE ANCHORS. Once CAR_YAW_PIVOT is non zero the drawn body sits
+   bodyOffsetX to the side of the x this solver pushes, so comparing the
+   two x values compares two points that are no longer inside either car.
+   That is the exact shape of the bug that produced the overlapping cars
+   two sessions ago, when the box test was axis aligned while the cars
+   were sideways, and it would have come straight back.
+
+   THE OFFSET IS APPLIED TO THE COMPARISON AND NOT TO THE PUSH, which is
+   what makes it exact rather than a widened bound. The offset depends
+   only on yaw, so shifting an anchor shifts its body by the same amount:
+   solving for the bodies and then moving the anchors lands the bodies
+   exactly where the solver put them. Widening the span instead would
+   have worked too and would have been wrong in a way that matters, by
+   shoving apart two cars leaning the SAME way, which are not touching. */
 function separateRacers(a, b) {
   if (a.air || b.air || a.wreck > 0 || b.wreck > 0) return;
-  if (Math.abs(a.z - b.z) >= (spanAlong(a.yaw) + spanAlong(b.yaw)) * 0.5) return;
-  const dx = b.x - a.x;
+  const az = a.z + bodyOffsetZ(a.yaw), bz = b.z + bodyOffsetZ(b.yaw);
+  if (Math.abs(bz - az) >= (spanAlong(a.yaw) + spanAlong(b.yaw)) * 0.5) return;
+  const dx = (b.x + bodyOffsetX(b.yaw)) - (a.x + bodyOffsetX(a.yaw));
   const over = (spanAcross(a.yaw) + spanAcross(b.yaw)) * 0.5 - Math.abs(dx);
   if (over <= 0) return;
   const side = dx >= 0 ? 1 : -1;
@@ -15578,8 +15645,10 @@ function separateRacers(a, b) {
 function separatePlayer(r) {
   if (r.air || airborne || r.wreck > 0) return 0;
   const mine = carYaw();
-  if (Math.abs(r.z - position) >= (spanAlong(r.yaw) + spanAlong(mine)) * 0.5) return 0;
-  const dx = r.x - carX;
+  /* Bodies, not anchors. See the note on separateRacers. */
+  const mz = position + bodyOffsetZ(mine), rz = r.z + bodyOffsetZ(r.yaw);
+  if (Math.abs(rz - mz) >= (spanAlong(r.yaw) + spanAlong(mine)) * 0.5) return 0;
+  const dx = (r.x + bodyOffsetX(r.yaw)) - (carX + bodyOffsetX(mine));
   const over = (spanAcross(r.yaw) + spanAcross(mine)) * 0.5 - Math.abs(dx);
   if (over <= 0) return 0;
   const side = dx >= 0 ? 1 : -1;
@@ -15679,8 +15748,15 @@ function markContact(z, x, depth) {
 function squeezeOut(r, dt) {
   if (r.air || airborne || r.wreck > 0) { r.squeeze = 0; return 0; }
   const mine = carYaw();
-  const across = (spanAcross(r.yaw) + spanAcross(mine)) * 0.5 - Math.abs(r.x - carX);
-  const along = (spanAlong(r.yaw) + spanAlong(mine)) * 0.5 - Math.abs(r.z - position);
+  /* Bodies, not anchors, the same as the two lateral passes. This one
+     decides whether an overlap is STILL there after they have run, so
+     asking it about a different pair of points than they were solving
+     for would have it shedding cars that are already clear and leaving
+     the ones that are not. */
+  const across = (spanAcross(r.yaw) + spanAcross(mine)) * 0.5
+               - Math.abs((r.x + bodyOffsetX(r.yaw)) - (carX + bodyOffsetX(mine)));
+  const along = (spanAlong(r.yaw) + spanAlong(mine)) * 0.5
+              - Math.abs((r.z + bodyOffsetZ(r.yaw)) - (position + bodyOffsetZ(mine)));
   if (across <= FEEL.NPC_SQUEEZE_DEEP || along <= FEEL.NPC_SQUEEZE_DEEP) {
     r.squeeze = 0; return 0;
   }
@@ -16989,7 +17065,13 @@ function headlightPass(w, h) {
   const camX = cameraX;
   const yaw = carYaw();
   const sy = Math.sin(yaw), cy = Math.cos(yaw);
-  const baseX = carX + carCurveX, baseZ = FEEL.CAMERA_DISTANCE;
+  /* Off the body, not off the anchor. The pools are cast by lamps on the
+     nose and the nose is on the car, so once the car yaws about a point
+     ahead of its centre the pools have to come with it or they light the
+     road from a spot the car is no longer over. This is the second and
+     last hand rolled transform. */
+  const baseX = carX + carCurveX + bodyOffsetX(yaw);
+  const baseZ = FEEL.CAMERA_DISTANCE + bodyOffsetZ(yaw);
   const mid = FEEL.HEADLIGHT_REACH * FEEL.HEADLIGHT_AHEAD;
   const long = FEEL.HEADLIGHT_REACH * FEEL.HEADLIGHT_LONG;
   ctx.save();
@@ -20636,6 +20718,19 @@ const BOX_FACES = [
 /* Local to world. roll is applied about the forward axis first, so the
    body leans while the wheels stay flat on the road, then yaw, then the
    car's position. */
+/* THE YAW HAPPENS ABOUT CAR_YAW_PIVOT, NOT ABOUT THE ORIGIN.
+
+   Everything is expressed relative to the pivot point, rotated, and then
+   the pivot's OWN position is added back. Adding it back is what makes
+   this exact rather than approximately right: at zero yaw the pivot term
+   cancels completely, for any pitch and any roll, so CAR_YAW_PIVOT at 0
+   reproduces the old transform to the last bit and a car pointing
+   straight up the road draws where it always did.
+
+   The pivot is a point on the CAR, so it is subtracted in local z before
+   the pitch, and the position it is added back at is the pivot carried
+   through the pitch alone. Carrying it through the yaw as well would
+   simply undo the whole thing. */
 function carToWorld(out, lx, ly, lz, rolled) {
   let rx = lx, ry = ly;
   if (rolled) {
@@ -20643,15 +20738,45 @@ function carToWorld(out, lx, ly, lz, rolled) {
     rx = lx * carT.cosR - py * carT.sinR;
     ry = py * carT.cosR + lx * carT.sinR + FEEL.CAR_ROLL_PIVOT;
   }
+  const pv = FEEL.CAR_YAW_PIVOT;
+  const lzp = lz - pv;
   // Pitch about the car's own lateral axis. Flat while driving, and the
   // tumble once it has gone over the edge.
-  const pz = lz * carT.cosP - ry * carT.sinP;
-  const py2 = ry * carT.cosP + lz * carT.sinP;
+  const pz = lzp * carT.cosP - ry * carT.sinP;
+  const py2 = ry * carT.cosP + lzp * carT.sinP;
   out.wx = carT.worldX + rx * carT.cosY + pz * carT.sinY;
-  out.wy = carT.worldY + py2;
-  out.wz = carT.worldZ + pz * carT.cosY - rx * carT.sinY;
+  out.wy = carT.worldY + py2 + pv * carT.sinP;
+  out.wz = carT.worldZ + pz * carT.cosY - rx * carT.sinY + pv * carT.cosP;
   return out;
 }
+
+/* WHERE THE DRAWN BODY ACTUALLY SITS, relative to the anchor the game
+   tests. Straight out of carToWorld above with lx and lz both zero and
+   the pitch flat, which is every frame that is not a death tumble.
+
+   Any test that wants to know where the car IS, rather than where its
+   bookkeeping says it is, adds these. The separation solver does. The
+   scrape band and the hazard tests deliberately do not, and the reason
+   is measured and recorded at bodyOffsetZ. */
+function bodyOffsetX(yaw) { return -FEEL.CAR_YAW_PIVOT * Math.sin(yaw); }
+/* And along the road, which is much smaller: it goes as 1 - cos rather
+   than as sin, so at the 39 degree maximum it is 45 units against 132.
+   It is included anyway because the along-road test is a threshold on a
+   sum of two half lengths and a fifth of a car is not nothing.
+
+   WHY THE SCRAPE BAND AND THE HAZARD TESTS DO NOT USE THESE, MEASURED.
+   Both of them already test the car's CENTRELINE and have always been
+   blind to yaw: SCRAPE_START bakes in half a body width for a car
+   pointing dead straight, and hazardBand uses a flat CAR_BODY_WIDTH / 2.
+   So the drawn hull already crossed the scrape line on 4 to 5 per cent
+   of a run with the game calling it clear, and already reached 224 units
+   past what the hazard test allowed, before this constant existed.
+   Making them yaw aware is a real and defensible change and it is a
+   DIFFERENT one: it would widen the car by three quarters at full yaw,
+   move every hazard placement proof, and change the difficulty of the
+   whole game. It is not this session's change and it should not be
+   smuggled in as a side effect of one. The numbers are in the report. */
+function bodyOffsetZ(yaw) { return FEEL.CAR_YAW_PIVOT * (1 - Math.cos(yaw)); }
 
 const dirOut = { wx: 0, wy: 0, wz: 0 };
 function carDirToWorld(lx, ly, lz, rolled) {
@@ -24523,8 +24648,31 @@ function clearDailyRecords() {
    The one thing that IS cosmetically stale is the ghost's stored yaw,
    nine samples a second of carYaw taken under the old model. That would
    have been worth nothing on its own. Next to the records it is not
-   worth arguing about, and the cost is one day. */
-const ROAD_GEN = 13;
+   worth arguing about, and the cost is one day.
+
+   14, CAR_YAW_PIVOT, and this one is bumped on instruction with a
+   measurement that argues the other way, which is worth writing down
+   rather than quietly resolving.
+
+   THE DAILY'S RECORDS ARE IN FACT STILL COMPARABLE. The pivot moves no
+   physics at all: carX runs on lateralV and the drawn yaw is identical
+   at every pivot, measured, the same angles frame for frame on the same
+   seed. The one thing that did move is the separation solver, which now
+   measures the gap between the drawn bodies and therefore pushes harder,
+   and on the DAILY bumpShare is zero and the player is never pushed at
+   all. So a daily line, a daily time and a daily score are all exactly
+   what they were, and 140 roads over 28 days come out byte identical.
+
+   WHAT IS STALE IS THE GHOST, and only its attitude. It stores carYaw
+   nine times a second and replays it into a body that now swings about a
+   point 210 units further forward than the body that recorded it, so
+   yesterday's ghost is drawn at an angle it never actually held. Its
+   LINE is right, which is what the ghost is for.
+
+   That is thinner than the case for 12 or 13 and it is bumped anyway,
+   because it was asked for and because one day of records is a cheap
+   answer to a question nobody should have to ask twice. */
+const ROAD_GEN = 14;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
