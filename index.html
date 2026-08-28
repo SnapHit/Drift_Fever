@@ -6217,21 +6217,46 @@ function byteLuma(r, g, b) { return 0.2126 * r + 0.7152 * g + 0.0722 * b; }
    the hue of a near grey is arbitrary and averaging it in unweighted
    drags the anchor to somewhere nothing in the role actually sits. */
 let ROLE_BASE = null;
+/* THE ANCHOR IS READ EVEN WHEN THE ANCHOR IS PINNED, and the ordering
+   here is the whole of that.
+
+   This used to skip PALETTE_FIXED keys before doing anything, which is
+   right for the LUMINANCE RANGE, since a pinned colour must not stretch
+   the band the rest of the role is solved into. It was wrong for the
+   HUE ANCHOR, which is only a reference point: every other key in the
+   role is placed at the biome's hue plus its own OFFSET from the anchor,
+   so the anchor's hue has to be known whether or not the anchor itself
+   moves.
+
+   IT WAS LATENT UNTIL THE BODY WAS PINNED. The car role's anchor is
+   CAR_TOP, and pinning the six body keys pinned the anchor with them, so
+   acc.car.hue fell through to the zero default and every car-role colour
+   still rotating was placed at the biome hue plus its ABSOLUTE hue
+   rather than plus its offset. Measured before the fix, in the biome
+   that wants the car role at 190 degrees: the rim came out at 19, the
+   spoiler at 20, the smoke at 27 and the ghost edge at 22, all of them
+   about 170 degrees wrong, and the rim is precisely the thing the pin
+   was relying on to carry the separation the body used to.
+
+   Fixed here rather than by moving the car's anchor to an unpinned key,
+   because this way the next role that pins its anchor is safe too. */
 function buildRoleBase(base, voidRgb) {
   const acc = {};
   for (const k in base) {
-    if (PALETTE_FIXED[k]) continue;
     const c = rgbOf(base[k]), a = c[3];
     const r = a >= 1 ? c[0] : c[0] * a + voidRgb[0] * (1 - a);
     const g = a >= 1 ? c[1] : c[1] * a + voidRgb[1] * (1 - a);
     const bl = a >= 1 ? c[2] : c[2] * a + voidRgb[2] * (1 - a);
-    const L = byteLuma(r, g, bl);
     const hsl = rgbToHsl(r, g, bl);
     const nm = biomeRole(k);
     const o = acc[nm] || (acc[nm] = { lo: 1e9, hi: -1e9, x: 0, y: 0, w: 0 });
+    if (BIOME_ROLE_ANCHOR[nm] === k) o.hue = hsl[0];
+    // And only now the pinned ones drop out, because they must not widen
+    // the luminance band the rest of the role is solved into.
+    if (PALETTE_FIXED[k]) continue;
+    const L = byteLuma(r, g, bl);
     if (L < o.lo) o.lo = L;
     if (L > o.hi) o.hi = L;
-    if (BIOME_ROLE_ANCHOR[nm] === k) o.hue = hsl[0];
   }
   for (const nm in acc) if (acc[nm].hue === undefined) acc[nm].hue = 0;
   return acc;
