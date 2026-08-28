@@ -1933,7 +1933,7 @@ const FEEL = {
 
   /* The drift. GRIP_TIME is the whole mechanic: the car's actual sideways
      velocity chases what the steering is asking for, and lags it by this
-     long. HEADING_SNAP_TIME is how fast the nose comes round, and it must
+     long. HEADING_BUILD_TIME is how fast the nose comes round, and it must
      stay well under GRIP_TIME or there is no gap between where the car
      points and where it is going, which is to say no drift. The angle
      between those two is the slip angle, and it is the number 4.4 will
@@ -1941,7 +1941,71 @@ const FEEL = {
      be balanced against STEER_RATE by playing: a tighter turn feeds more
      sideways speed into the same grip and slides further. */
   GRIP_TIME:               0.40,     // LIVE
-  HEADING_SNAP_TIME:       0.06,     // LIVE, the nose swinging OUT
+  /* ------------------------------------------------------------------
+     THE TAIL COMES ROUND OVER THIS, AND IT USED TO BE 0.06.
+
+     At 0.06 the nose was at the drift angle inside two frames of the
+     driver touching the input, which reads as the body SNAPPING to an
+     angle rather than as the rear BREAKING AWAY. A slide has a moment in
+     the middle: turned in, tail starting to go, not yet sideways.
+
+     RENAMED FROM HEADING_SNAP_TIME, because a constant called SNAP that
+     takes a third of a second is a name that lies. HEADING_HOLD_TIME
+     became HEADING_EXIT_TIME for the same reason.
+
+     AND IT IS 0.30, NOT THE 0.50 THAT WAS ASKED FOR, because of the
+     paragraph directly above this one, which turns out to be exactly
+     right and is worth reading before this is raised again.
+
+     Heading chases the steering with this constant. Travel chases very
+     nearly the same target with GRIP_TIME. On straight road the two
+     targets are IDENTICAL, so the slip is the difference of two
+     exponentials with the same amplitude, and the one with the shorter
+     constant leads. Put this above GRIP_TIME and heading lags travel:
+     the car points LESS far round than it is travelling, which is
+     understeer, and it is the opposite of a drift.
+
+     AND 0.50 IS NOT AVAILABLE, WHICH IS ARITHMETIC RATHER THAN TASTE.
+     A build only delivers the angle it promises if the input is held for
+     at least that long, and it never had been measured. It is now:
+
+       driver                 median hold   75th    90th
+       LOOK, the racing line     0.18s      0.37s   0.70s
+       human 0.95                0.30s      0.60s   0.98s
+       human 0.70                0.42s      0.78s   1.30s
+
+     The median input is held between a fifth and four tenths of a
+     second. With a rate limit the arithmetic is exact, min(1, hold /
+     build), so a half second build hands a median corner between a third
+     and eight tenths of the angle the driver asked for. Measured, it
+     took the median drawn yaw from 63 degrees to 32 and points a second
+     from 1139 to 821. It does not produce a slow drift; it produces a
+     car that never gets round.
+
+     THE TWO ASKS FIGHT EACH OTHER AND THE NUMBERS SAY SO. A longer build
+     costs angle, and compensating with CAR_YAW_GAIN puts the PEAK past
+     broadside: at gain 2.0 the 99.9th percentile drawn yaw is 106
+     degrees, which is a spin and not a drift.
+
+       build  exit  gain   yaw med/90/peak   episodes  median  flips  pts/s
+        0.06  0.50  1.60      63 / 63 / 85       62     0.90s    32    1140
+        0.18  0.50  1.70      65 / 67 / 90       94     0.60s    59    1020
+        0.25  0.55  1.75      56 / 69 / 92       85     0.62s    54     989
+        0.30  0.60  2.00     63 / 79 / 106       83     0.75s    50    1054
+
+     0.20 with a gain of 1.75 is what shipped: three times the old build,
+     the median angle a little ABOVE where it was rather than below, and
+     the peak still short of broadside.
+     ------------------------------------------------------------------ */
+  HEADING_BUILD_TIME:      0.20,     // LIVE, straight to full lock, seconds
+  /* The airborne frame shift, which is NOT the tail coming round and so
+     does not follow it. Section 4's jump preserves the slip angle by
+     nudging heading and travel by the same amount with the same
+     constant, and how fast that responds is a separate feel question
+     from how fast a tail breaks away. It was HEADING_SNAP_TIME until the
+     build slowed down, and it keeps that constant's old value so nothing
+     about the air changed when the ground did. */
+  HEADING_AIR_TIME:        0.06,     // LIVE, air steering response
   /* ------------------------------------------------------------------
      AND IT DOES NOT COME BACK AT THE SAME SPEED, WHICH IS THE WHOLE OF
      WHAT WAS MISSING.
@@ -1979,7 +2043,7 @@ const FEEL = {
      driver lets go. A drift has a moment where the back lets go and then
      HANGS THERE until it is caught.
 
-     SO THE NOSE SWINGS OUT AT HEADING_SNAP_TIME AND COMES BACK AT THIS.
+     SO THE NOSE SWINGS OUT AT HEADING_BUILD_TIME AND COMES BACK AT THIS.
      Asymmetric, one extra constant, and the asymmetry is the mechanic:
      the tail letting go is fast and the tail coming back is slow.
 
@@ -2042,7 +2106,14 @@ const FEEL = {
      committing to a slide over sawing at it, and the gap closes from
      1.63 to 0.23. It is still the wrong way round. It is much less so.
      ------------------------------------------------------------------ */
-  HEADING_HOLD_TIME:       0.50,     // LIVE, seconds for the nose to come back
+  HEADING_EXIT_TIME:       0.50,     // LIVE, full lock back to straight
+  /* WHAT COUNTS AS LETTING GO rather than as steering the other way,
+     as a share of the angle the car currently has. Under this much
+     input the driver is asking for straight and the exit constant
+     applies; above it they are asking for the other side and the tail
+     has to be built again. At 0.5 a driver holding half their current
+     angle is still committed and does not get the quick exit. */
+  HEADING_RELEASE:          0.5,     // LIVE, share of the current angle
   SLIP_MAX_DEG:              30,     // LIVE, slip angle that counts as fully sideways
   /* How far the car is drawn turned. LIVE, both of them.
 
@@ -2128,7 +2199,7 @@ const FEEL = {
      removed because the ROAD was turning the car. This is the driver
      turning it, further.
      ------------------------------------------------------------------ */
-  CAR_YAW_GAIN:             1.6,     // LIVE, and it is an exaggeration
+  CAR_YAW_GAIN:            1.75,     // LIVE, and it is an exaggeration
   CAR_CURVE_YAW:              0,     // LIVE, radians per unit of road curvature
 
   /* CENTRIFUGAL is the fraction of full steering authority a curve of 1.0
@@ -7324,8 +7395,10 @@ const TUNABLES = [
   { key: 'TILT_DEADZONE_DEG',  label: 'dead',    step: 0.25, min: 0,    max: 12,    dp: 2, group: 1 },
   { key: 'STEER_RATE',         label: 'steer',   step: 0.1,  min: 0.6,  max: 5.0,   dp: 1, group: 2 },
   { key: 'GRIP_TIME',          label: 'grip',    step: 0.02, min: 0.04, max: 1.0,   dp: 2, group: 2 },
-  { key: 'HEADING_SNAP_TIME',  label: 'snapOut', step: 0.01, min: 0.01, max: 0.6,   dp: 2, group: 2 },
-  { key: 'HEADING_HOLD_TIME',  label: 'hold',    step: 0.02, min: 0.02, max: 1.2,   dp: 2, group: 2 },
+  { key: 'HEADING_BUILD_TIME', label: 'build',   step: 0.02, min: 0.02, max: 1.2,   dp: 2, group: 2 },
+  { key: 'HEADING_EXIT_TIME',  label: 'exit',    step: 0.02, min: 0.02, max: 1.2,   dp: 2, group: 2 },
+  { key: 'HEADING_RELEASE',    label: 'release', step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 2 },
+  { key: 'HEADING_AIR_TIME',   label: 'airSteer',step: 0.01, min: 0.01, max: 0.6,   dp: 2, group: 2 },
   // The lever for what the hold does to the score. See SLIP_MAX_DEG.
   { key: 'SLIP_MAX_DEG',       label: 'slipMax', step: 1,    min: 8,    max: 70,    dp: 0, group: 2 },
   // 0 is the old pirouette, 280 is the front axle. See CAR_YAW_PIVOT.
@@ -12500,25 +12573,54 @@ function update(dt) {
        the road again; they cannot straighten it out, and they cannot make
        it more sideways either. Whatever angle went up comes down. */
     const nudge = intent * FEEL.JUMP_AIR_STEER;
-    const k = 1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME);
+    const k = 1 - Math.exp(-dt / FEEL.HEADING_AIR_TIME);
     drift.headingV += (airHeadingV + nudge - drift.headingV) * k;
     drift.lateralV += (airLateralV + nudge - drift.lateralV) * k;
     // Nothing is pushing sideways on it, so it flies level.
     drift.lateralAccel = 0;
   } else {
-    /* The nose comes round to where the driver is pointing, and it does
-       not come back at the same speed. See HEADING_HOLD_TIME.
+    /* The tail comes round over HEADING_BUILD_TIME and goes back over
+       HEADING_EXIT_TIME, and the exit is the shorter of the two: a slide
+       takes longer to provoke than to catch, and that asymmetry is the
+       whole feel of the thing.
 
-       THE TEST IS WHETHER THIS STEP IS UNWINDING THE ANGLE, and that is
-       one comparison: the step heads for intent, so it shrinks the angle
-       exactly when it pushes against the sign the angle already has. It
-       does not matter whether the driver is easing off or has gone the
-       other way. Both of those are the tail coming back, and the tail
-       coming back is the slow half. */
+       THE TEST IS WHETHER THIS STEP IS UNWINDING THE ANGLE, which is one
+       comparison: the step heads for intent, so it shrinks the angle
+       exactly when it pushes against the sign the angle already has.
+
+       AND A REVERSAL IS NOT AN EXIT, which is the part that keeps the
+       wobble away. Letting go is the driver asking for straight, and
+       that is quick. Steering the other way is the driver asking for a
+       slide the OTHER way, and a slide has to be built whichever side it
+       is on, so it goes at the build constant. Without this gate the
+       exit constant applies to reversals too, and since a reversal is
+       what a wobble is made of, a quick exit is a licence to wag. See
+       the measurement on HEADING_EXIT_TIME. */
+    /* AND IT IS A RATE LIMIT, NOT A LAG, WHICH IS THE WHOLE REASON THIS
+       WORKS. An exponential lag delays AND ATTENUATES: it covers 63 per
+       cent of the gap in one time constant and crawls the rest, so with
+       the build at 0.30 the median drawn yaw fell from 58 degrees to 41
+       and the score with it, because a driver holding a corner for half
+       a second never got near the angle they asked for. Measured, and it
+       would have thrown away the two sessions spent getting the angle up
+       in the first place.
+
+       A rate limit delays without attenuating. The tail sweeps round at
+       a constant speed and STOPS at the angle the driver asked for, so
+       the build is visible on the way and costs nothing on arrival. It
+       is also what a tail actually does.
+
+       The constants are therefore honest seconds: BUILD is how long
+       straight to full lock and EXIT is how long back, rather than the
+       63 per cent an exponential would have meant. */
+    const releasing = Math.abs(intent) < Math.abs(drift.headingV) * FEEL.HEADING_RELEASE;
     const unwinding = (intent - drift.headingV) * drift.headingV < 0;
-    const tau = Math.max(0.001, unwinding ? FEEL.HEADING_HOLD_TIME
-                                          : FEEL.HEADING_SNAP_TIME);
-    drift.headingV += (intent - drift.headingV) * (1 - Math.exp(-dt / tau));
+    const span = (unwinding && releasing) ? FEEL.HEADING_EXIT_TIME
+                                          : FEEL.HEADING_BUILD_TIME;
+    const step = rate * dt / Math.max(0.001, span);
+    const want = intent - drift.headingV;
+    drift.headingV += Math.abs(want) <= step ? want
+                                             : (want < 0 ? -step : step);
     const gripTarget = intent - curve * FEEL.CENTRIFUGAL * rate;
     drift.lateralV += (gripTarget - drift.lateralV) * (1 - Math.exp(-dt / FEEL.GRIP_TIME));
     // The acceleration the model is actually applying sideways, straight
@@ -15935,7 +16037,14 @@ function racersUpdate(dt) {
   // one number, so they move together rather than three at a time.
   racerForm(dt);
   const rate = FEEL.STEER_RATE * FEEL.ROAD_HALF_WIDTH_BASE;
-  const kh = 1 - Math.exp(-dt / FEEL.HEADING_SNAP_TIME);
+  /* The racers' tails come round on the same constant the player's does.
+     Measured, they are drawn to 62.9 degrees at the ninetieth percentile
+     against the player's 62.8, so leaving them on the old fast constant
+     would have put three cars snapping to their angle beside one whose
+     tail takes a third of a second. They get the build only: they are
+     holding lanes rather than provoking slides, and there is no second
+     constant here to make asymmetric. */
+  const kh = 1 - Math.exp(-dt / FEEL.HEADING_BUILD_TIME);
   const kg = 1 - Math.exp(-dt / FEEL.GRIP_TIME);
   for (let i = 0; i < racers.length; i++) {
     const r = racers[i];
@@ -24792,8 +24901,28 @@ function clearDailyRecords() {
    would be driving the same line at the same speed with the player
    forty per cent more sideways than the recording of themselves, which
    is not a stale record, it is a car that looks like it is doing
-   something different. That is worth one day. */
-const ROAD_GEN = 15;
+   something different. That is worth one day.
+
+   16, THE TAIL BUILDING RATHER THAN SNAPPING. Same two reasons as 15 and
+   one new one.
+
+   The road is again untouched and the daily's records again survive on
+   their own terms: the heading constants move drift.headingV, carX moves
+   on drift.lateralV, and the reach across the road measures identical to
+   the unit at every time from a quarter of a second to a second and a
+   half. 140 roads over 28 days, byte identical.
+
+   The ghost is stale for the same reason it was at 15, twice over: it
+   stores carYaw, so yesterday's recording replays angles taken at a gain
+   of 1.6 that snapped to their value in two frames, beside a car at 1.75
+   whose tail takes a fifth of a second to arrive.
+
+   AND THE SCORE GENUINELY MOVED THIS TIME, which 14 and 15 did not. A
+   slower build cuts the transient half of the slip angle, so a good run
+   scores about a tenth less than it did yesterday and the multiplier
+   comes off its ceiling. A daily best set this morning was set under a
+   different economy. */
+const ROAD_GEN = 16;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
