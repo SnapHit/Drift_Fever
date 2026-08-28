@@ -5886,6 +5886,43 @@ const PALETTE_FIXED = { SCORE: 1, SCORE_BEST: 1, SCORE_RECORD: 1, SCORE_GLOW: 1,
                         CAR_LIGHT: 1, CAR_LIGHT_MARK: 1, CAR_LIGHT_AMBER: 1,
                         CAR_LIGHT_COOL: 1, CAR_LIGHT_HOT: 1,
                         CAR_HEAT_0: 1, CAR_HEAT_1: 1, CAR_HEAT_2: 1, CAR_HEAT_3: 1,
+                        /* AND THE BODY, WHICH FINISHES THE JOB THE LIGHTS
+                           WERE GIVEN AND COULD NOT DO.
+
+                           The paragraph above shipped the tail light as
+                           the fix for the player who lost his car, and
+                           left the body turning because maximum hue
+                           separation was what kept it findable. He played
+                           it and did not notice the light at all, and the
+                           measurement said so without either of us
+                           reading it that way: findability was 11 of 12
+                           before the lights were pinned and 11 of 12
+                           after, because the fix never touched the thing
+                           being complained about.
+
+                           SO THE BODY IS PINNED AND THE SEPARATION IS
+                           CARRIED SOMEWHERE ELSE. It had to be, because a
+                           fixed hue cannot be far from the biomes: the
+                           twelve records between them cover the wheel so
+                           densely that the best available hue, near 242,
+                           still sits within 24 degrees of something in
+                           some palette, and most sit within 10. Hue
+                           separation was never going to survive pinning
+                           and the note above was right to say so.
+
+                           WHAT CARRIES IT INSTEAD IS THE RIM. CAR_RIM and
+                           CAR_RIM_GLOW are NOT paint keys and are not in
+                           this list, so they still turn with the biome:
+                           the fill belongs to the player and the edge
+                           belongs to the place. That is the outline the
+                           body used to be.
+
+                           ONLY THE SIX PAINT KEYS ARE HERE. The rim, the
+                           spoiler, the seams, the tyres and the trail are
+                           left turning, which is also what keeps them
+                           available to the unlockable cars. */
+                        CAR_TOP: 1, CAR_END: 1, CAR_CABIN_TOP: 1,
+                        CAR_GLASS: 1, CAR_HIP: 1, CAR_SILL: 1,
                         // Danger. Never green, never anywhere near the jump.
                         HAZARD_TOP: 1, HAZARD_SIDE: 1, HAZARD_LIP: 1,
                         HAZARD_GLOW: 1, HAZARD_DARK: 1, HAZARD_WARN: 1,
@@ -6969,10 +7006,28 @@ const COLOUR = {
   CAR_SHADOW:   'rgba(0,0,0,0.5)',
   /* THE UNLOCKABLE COSMETICS. Every one of these is an ALTERNATE for a
      part that is not doing the finding: the rims, the light bar, the
-     panel seams and the cool end of the tyre marks. The BODY is not on
-     this list and never will be, because the body colour is derived from
-     the biome at maximum hue separation and that is the whole reason the
-     car stays findable against all twelve. A player may not override it.
+     panel seams and the cool end of the tyre marks.
+
+     THE BODY IS NOT ON THIS LIST AND THE REASON IT IS NOT HAS CHANGED.
+     This used to read "and never will be, because the body colour is
+     derived from the biome at maximum hue separation and that is the
+     whole reason the car stays findable against all twelve. A player may
+     not override it."
+
+     The body is no longer derived from anything. It is pinned in
+     PALETTE_FIXED, and findability is carried by saturation and contrast
+     against the void instead, measured at 12 of 12 rather than the 11 of
+     12 the rotating body managed. So the argument that the body could
+     never be a player's choice is spent: a fixed body IS available to
+     unlock, in a way it genuinely was not before.
+
+     IT IS STILL NOT ON THE LIST, because that is a design decision and
+     not a consequence, and nobody has taken it. What would have to be
+     shown first is that every offered body clears the same twelve biome
+     table this one does, which is a harder bar than the rims had to
+     clear: a rim is a few dozen pixels of trim and the body is the
+     silhouette. Recorded here so the next session does not read the old
+     paragraph and think the question is closed.
 
      THE RIMS AND THE SEAMS ARE IN COLOUR AND THE LIGHTS ARE NOT, AND
      THAT SPLIT IS NEW. This used to read "in COLOUR, not PALETTE_FIXED,

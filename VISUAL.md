@@ -302,7 +302,31 @@ only the first was ever measured.** Measured over the twelve biomes the player's
 tail light went round with it. Nothing about the car was constant.
 
 **The body must keep turning, so the constant is the light.** Every tail light colour and the car's
-own glow ramp are in `PALETTE_FIXED` now, so no biome touches them. Two things follow: the player's
+own glow ramp are in `PALETTE_FIXED` now, so no biome touches them.
+
+> **AND IT DID NOT WORK, RECORDED AFTER PLAYING IT.** The author played the pinned lights and did not
+> notice the pale bar at all. The measurement said so at the time and neither of us read it that way:
+> findability was 11 of 12 before the lights were pinned and 11 of 12 after, because the fix never
+> touched the thing being complained about. A tail bar a few pixels wide cannot carry an identity that
+> a whole body is contradicting. **The body is pinned now too**, and the paragraph below is kept
+> because its reasoning about findability was right even though its conclusion was not.
+>
+> **A fixed hue cannot be far from the biomes, and that is measured rather than argued.** The twelve
+> records between them cover the wheel so densely that the best available hue, near 242, still sits
+> within 24 degrees of something in some palette and most candidates sit within 10. So hue separation
+> was never going to survive pinning, exactly as the paragraph below says.
+>
+> **What carries the separation instead is saturation, contrast and the rim.** `CAR_RIM` and
+> `CAR_RIM_GLOW` are not paint keys and are not pinned, so the fill belongs to the player and the edge
+> belongs to the place. Measured across the twelve: the player is the most findable car in **12 of 12**
+> biomes, up from 11, the most saturated in 12 and the highest contrast in 12; the road edge stays
+> more saturated than the car on the mean in 12 of 12 and the car leaves the frame's peak luminance
+> alone in 12 of 12. The four cars are 99 RGB units and 90 degrees of hue apart at their closest, in
+> every biome.
+>
+> One consequence worth knowing: the note on the unlockable cosmetics said the body could **never** be
+> unlockable because it belonged to the biome. That reason is now spent, so a fixed body is available
+> to unlock in a way it genuinely was not before. Nobody has taken that decision. Two things follow: the player's
 car has a pale tail bar and sits in a warm amber pool of its own light in every one of the twelve
 biomes, and no player car uses `CAR_LIGHT`, which is red and is what every racer uses. One sentence
 covers it at any distance: the white lights are yours.
