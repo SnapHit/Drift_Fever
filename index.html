@@ -2061,8 +2061,74 @@ const FEEL = {
      Holding a line through any real corner already costs most of full
      lock, because centrifugal is 0.124 and a medium corner after the
      curve scale is 8.0, so CAR_YAW_GAIN alone yaws the car hard into
-     every bend. That is honest yaw, out of the driver's own input. */
-  CAR_YAW_GAIN:             1.0,     // LIVE
+     every bend. That is honest yaw, out of the driver's own input.
+
+     ------------------------------------------------------------------
+     AND IT IS 1.6 NOW, WHICH IS AN EXAGGERATION AND IS NAMED AS ONE.
+
+     THIS IS THE ANGLE LEVER AND IT IS THE ONLY ONE. The obvious
+     candidate was SLIP_MAX_DEG, on the reading that thirty degrees is a
+     brisk corner and forty five is a slide. It is not the angle. It
+     appears in exactly one live line, normalising slipNorm, and it
+     reaches carYaw nowhere. Measured by moving it: 30 to 44 changed the
+     median drawn yaw from 36.5 degrees to 37.0, which is noise.
+
+     WORSE, IT MOVES THE WRONG WAY. slipNorm is what every cue that says
+     "drifting" reads: the tyre marks, the smoke, the car glow, the
+     chain, the callouts, the clock. Raising SLIP_MAX_DEG divides all of
+     them. At 44 the multiplier falls from 10.4 to 9.1 and points a
+     second from 1121 to 956; at 55 slipNorm drops under CLOCK_MIN_SLIP
+     for most of a run and the score collapses to 393, a third of what it
+     was. So the constant that was supposed to make the car look more
+     sideways makes every drift cue fainter and the game harder, and
+     changes the angle by half a degree.
+
+     WHAT 1.6 COSTS, MEASURED, AND IT IS ALMOST NOTHING:
+
+       gain   drawn yaw med/90   tail throw   lived   mult   pts/s
+        1.0        37 / 39          411 u      79s    10.4    1121
+        1.4        52 / 55          532 u      89s    10.6    1146
+        1.6        59 / 63          578 u      93s    10.7    1146
+        1.8        66 / 71          613 u      94s    10.7    1137
+
+     Nothing moves but the picture, because the gain multiplies
+     headingAngle on its way to being DRAWN and drift.slipDeg is computed
+     from headingAngle and travelAngle directly, never from carYaw. Same
+     seed, same drive, physical slip identical to the decimal in every
+     arm. 1.8 was rejected on looking: it reads as the car having lost it
+     rather than as a drift.
+
+     THE HONEST ROUTES WERE PRICED AND THEY ARE EXPENSIVE. To reach the
+     same 52 degrees through the physics rather than the drawing:
+
+       STEER_RATE 3.2 to 5.6    survival 79s to 39s, slipNorm pinned at
+                                1.00 so the multiplier has no gradient
+                                left at all, and lateralReach moves
+       SPEED 9000 to 5200       survival 79s to 51s, the whole game 42
+                                per cent slower, slipNorm also pinned
+
+     Both halve the run and destroy the scoring gradient, which is the
+     problem this was meant to help.
+
+     AND IT IS NOT A CORRECTION FOR THE CAMERA, WHICH WAS THE FIRST
+     ARGUMENT FOR IT AND IT DID NOT SURVIVE. The camera looks down the
+     road from behind and above, so a yaw is seen at a slant and comes
+     out foreshortened, and the hope was that a gain above one was simply
+     putting back what the projection took out. Measured against the
+     road's own direction on screen, the projection keeps 90 to 97 per
+     cent of the angle between 10 and 70 degrees, with both fixed points
+     exact. A gain of 1.08 would compensate it. 1.6 does not compensate
+     anything; it exaggerates, deliberately, and the reason it is allowed
+     is that CAR_BODY_LENGTH is already set the same way, by how it looks
+     rather than by the ratio, and says so.
+
+     IT DOES NOT BREAK THE RULE ABOVE. Nothing may rotate the car that
+     the driver did not ask for, and the gain scales the driver's own
+     input and is exactly zero when they are neutral. CAR_CURVE_YAW was
+     removed because the ROAD was turning the car. This is the driver
+     turning it, further.
+     ------------------------------------------------------------------ */
+  CAR_YAW_GAIN:             1.6,     // LIVE, and it is an exaggeration
   CAR_CURVE_YAW:              0,     // LIVE, radians per unit of road curvature
 
   /* CENTRIFUGAL is the fraction of full steering authority a curve of 1.0
@@ -3826,10 +3892,14 @@ const FEEL = {
 
      WHAT IT COSTS, and it is one number: the drawn body's centre is no
      longer the anchor the game tests. It sits PIVOT * sin(yaw) to the
-     side of it, up to 223 units at 280. Every test that asks where the
-     car is has to be told. See bodyOffsetX, and see the note on
-     rearWheelOffsets for the one that is hand rolled and would otherwise
-     have left the tyre marks behind the wheels that make them.
+     side of it. At the shipped 210 that is 133 units at the 39 degrees
+     this table was measured at, and 187 at the 63 degrees the car
+     reaches now that CAR_YAW_GAIN is 1.6. An earlier version of this
+     line said 223 and that was simply wrong: 280 * sin(39) is 176.
+     Every test that asks where the car is has to be told. See
+     bodyOffsetX, and see the note on rearWheelOffsets for the two that
+     are hand rolled and would otherwise have left the tyre marks behind
+     the wheels that make them.
      ------------------------------------------------------------------ */
   CAR_YAW_PIVOT:            210,     // LIVE, world units forward of the body centre
 
@@ -12794,7 +12864,7 @@ function landImpact(q, tier, bad, localHalf) {
      landing writes straight into the same store a corner does and the
      stripe it leaves is the same stripe, laid hard. */
   if (!bad) {
-    const axleZ = position + FEEL.CAMERA_DISTANCE - FEEL.CAR_WHEELBASE / 2;
+    const axleZ = rearAxleZ();
     const idx = Math.floor(axleZ / FEEL.SEGMENT_LENGTH);
     const now = rearWheelOffsets(carX);
     const l = now.left, r = now.right;
@@ -13041,8 +13111,13 @@ const rearContact = { left: 0, right: 0 };
    the pivot is that minus the pivot, and the lateral throw is that
    distance times the sine.
 
-   Same term for the along-road position via bodyOffsetZ, so the marks
-   start where the axle is rather than a fifth of a car ahead of it. */
+   THE ALONG-ROAD HALF OF THIS WAS CLAIMED AND NOT DONE, and the comment
+   that claimed it stood for a session. rearAxleZ below is the fix and it
+   is the same arithmetic on the other axis. Left alone, layTyreMarks
+   kept using a flat minus half a wheelbase, which is right only at zero
+   yaw: at the 63 degree ninetieth percentile the axle is actually 268
+   units further up the road than that, which at a 200 unit segment is
+   over a segment of marks laid behind the wheels that made them. */
 function rearWheelOffsets(centreX) {
   const yaw = carYaw();
   const c = Math.cos(yaw), s = Math.sin(yaw);
@@ -13053,11 +13128,23 @@ function rearWheelOffsets(centreX) {
   return rearContact;
 }
 
+/* And where that axle sits ALONG the road, which is the same point out of
+   the same transform: carToWorld sends car local z to
+   (z - pivot) * cos(yaw) + pivot, and the rear axle's z is minus half a
+   wheelbase. At zero yaw it collapses to exactly the flat term this
+   replaces, so a car pointing straight lays its marks where it always
+   did. */
+function rearAxleZ() {
+  const c = Math.cos(carYaw());
+  return position + FEEL.CAMERA_DISTANCE
+       + (-FEEL.CAR_WHEELBASE / 2 - FEEL.CAR_YAW_PIVOT) * c + FEEL.CAR_YAW_PIVOT;
+}
+
 function layTyreMarks(carIndex, prevX) {
   const alpha = (drift.slipNorm - FEEL.TYRE_MARK_MIN_SLIP) / (1 - FEEL.TYRE_MARK_MIN_SLIP);
   // The marks come off the rear axle, which is behind the car's centre, so
   // they start where the wheels are rather than where the middle is.
-  const axleZ = position + FEEL.CAMERA_DISTANCE - FEEL.CAR_WHEELBASE / 2;
+  const axleZ = rearAxleZ();
   const axleIndex = Math.floor(axleZ / FEEL.SEGMENT_LENGTH);
   if (alpha <= 0) { lastMarkSeg = axleIndex; return; }
   // Stored as the raw slip intensity from zero to one. The renderer turns
@@ -15088,6 +15175,22 @@ function racerBoxed(r) {
       if (o === r || o.air || o.wreck > 0) continue;
       ox = o.x; oy = o.yaw; oz = o.z;
     }
+    /* THESE TWO STAY ON THE ANCHORS, AND IT IS DELIBERATE.
+
+       Every other span-using test in the file was moved onto the drawn
+       bodies when CAR_YAW_PIVOT arrived, and the obvious tidy is to move
+       this one too. It was tried and reverted, because it is not the
+       same kind of test. separatePlayer, separateRacers and squeezeOut
+       resolve OVERLAPS and have to agree with the picture. This decides
+       whether a racer believes it is pinned and should stop fighting for
+       a lane, which is a pace heuristic, and its thresholds were
+       calibrated against the anchor distance it has always read.
+
+       Measured: moving it onto the bodies took racer against racer
+       separation from a 99th percentile of 12 units to 202, reproducible
+       to the digit, because racers stopped believing they were pinned
+       and pressed into gaps that were not there. Consistency is not
+       worth a guarantee the author named. */
     const dz = oz - r.z;
     const wide = Math.abs(ox - r.x) < (mySpanX + spanAcross(oy)) * 0.5;
     if (!wide) continue;
@@ -24671,8 +24774,26 @@ function clearDailyRecords() {
 
    That is thinner than the case for 12 or 13 and it is bumped anyway,
    because it was asked for and because one day of records is a cheap
-   answer to a question nobody should have to ask twice. */
-const ROAD_GEN = 14;
+   answer to a question nobody should have to ask twice.
+
+   15, CAR_YAW_GAIN 1.0 to 1.6, and here the ghost argument is the
+   strongest it has been.
+
+   THE ROAD AND THE RECORDS ARE AGAIN UNTOUCHED, for the third time and
+   for the same reason: the gain multiplies headingAngle on its way to
+   being DRAWN, drift.slipDeg is computed from headingAngle and
+   travelAngle and never from carYaw, and on the daily bumpShare is zero
+   so the solver cannot move the player either. 140 roads over 28 days,
+   byte identical, and points a second inside noise of where they were.
+
+   BUT THE GHOST WOULD BE VISIBLY WRONG. It stores carYaw itself, nine
+   samples a second, so a ghost recorded before this replays angles taken
+   at a gain of 1.0 while the live car is drawn at 1.6. The two cars
+   would be driving the same line at the same speed with the player
+   forty per cent more sideways than the recording of themselves, which
+   is not a stale record, it is a car that looks like it is doing
+   something different. That is worth one day. */
+const ROAD_GEN = 15;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
