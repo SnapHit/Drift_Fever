@@ -14249,7 +14249,45 @@ function drawRoad(w, h) {
   /* Decide once which segments are drawn and which stripe they are on,
      then draw the whole road one colour at a time. Per segment this used
      to be five to seven fills; batched it is a fixed handful for the
-     entire road, which is what pays for the pylons and the glow. */
+     entire road, which is what pays for the pylons and the glow.
+
+     ------------------------------------------------------------------
+     AND THE LOOP BELOW IS ALREADY AN OCCLUSION TEST, WHICH CORRECTS
+     SOMETHING I TOLD THE AUTHOR.
+
+     Asked what elevation would cost, I answered that the real bill was
+     this draw pass: that batching by colour cannot express one segment
+     hiding another, so hills would force a per segment painter's order
+     and lose the batching that pays for the glow and the pylons.
+
+     That was wrong, and the hole in it is that batching only breaks
+     occlusion if the things drawn can OVERLAP. The rule three lines
+     down walks NEAR TO FAR and refuses any segment that does not sit
+     strictly higher on screen than everything nearer:
+
+         if (by[n + 1] >= by[n] || by[n + 1] >= maxy) continue;
+         ... maxy = by[n + 1];
+
+     That is Lou's occlusion rule verbatim, and it means the segments
+     that survive it cannot overlap each other, so the order they are
+     then painted in cannot matter. Batching is safe by construction.
+
+     MEASURED RATHER THAN REASONED. Running this exact rule over a
+     projected road with a crest injected into by: flat road occludes 0
+     segments of 200, a crest occludes 142 of them starting one segment
+     before the summit. Both halves matter, because a clip that rejected
+     everything would pass the second test alone.
+
+     AND EVERY OTHER PASS ALREADY HONOURS IT. bvis is read at 44 sites:
+     the walls, the underline, the edge glow, the pylons, the lamps, the
+     scenery, the hazards, the jumps, the racers and the ghost all check
+     it before drawing. Nothing had to be taught about occlusion.
+
+     So elevation costs nothing here. What it costs instead is the
+     PLANNING HORIZON, because past a crest this rule hides everything
+     until the road climbs back over the crest line, which truncates the
+     view rather than shortening it. See ROAD_SLOPE_MAX.
+     ------------------------------------------------------------------ */
   let maxy = h;
   let first = -1, last = -1;
   sightSeg = -1;
