@@ -3395,6 +3395,33 @@ const FEEL = {
   FINALE_BANNER_MOVE:      0.38,     // seconds it takes to settle into the headline
   FINALE_REVEAL_AFTER:     0.25,     // LIVE, seconds after the car settles
   FINALE_REVEAL_TIME:      0.55,
+  /* ------------------------------------------------------------------
+     THE COUNTDOWN AT THE START OF A REAL LEVEL.
+
+     THE ROAD IS ALREADY RUNNING AND THE COUNT IS OVER THE TOP OF IT.
+     Nothing is held, nothing waits, and the first tap of a run does what
+     it always did, because one input to restart is the rule this screen
+     is governed by and a count that has to be dismissed is a second
+     input. It is a flourish on a run that has already started, not a
+     gate in front of one.
+
+     WHICH ALSO SETTLES WHERE IT SITS. The slalom starts working inside
+     the first second, so a solid digit over the middle of the screen for
+     three seconds would hide the corner it exists to introduce. Each
+     digit is therefore a FLASH: it lands at full size, and is gone well
+     before its second is up, so the road is clear between the beats. And
+     it sits high, above the road's own action, on the sky.
+
+     NOT ON TRAINING. That run already opens by naming itself and a count
+     would be a third thing before a first time player drives.
+
+     NOT ON A CONTINUE. Armed in startRun, which continueRun does not
+     call except when the checkpoint is invalid, which is a fresh run. */
+  COUNTDOWN_FROM:             3,     // LIVE, how many digits, 3 2 1
+  COUNTDOWN_HOLD:          0.42,     // LIVE, seconds a digit is up, of its one second
+  COUNTDOWN_SIZE:          0.30,     // LIVE, of the smaller screen dimension
+  COUNTDOWN_Y:             0.30,     // LIVE, of screen height, above the road's work
+  COUNTDOWN_POP:           1.35,     // LIVE, the scale it lands at before settling
   /* THE OVER CAP. Each of these is ADDED to a term that was already at
      its own ceiling, so the world does something here it cannot do at a
      multiplier of twelve with the city fully awake. The first four are
@@ -8000,6 +8027,15 @@ const TUNABLES = [
      the FINALE block, so bCross, cHush, dGap and so on line up with the
      shape rather than with the variable names, and the afterglow is long
      enough that there is time to nudge a value and watch it change. */
+  /* THE COUNT, group 32, on its own line rather than at the end of the
+     finale's, which is already forty rows long. It is five values and
+     they are judged in the first three seconds of a real level, so the
+     line has to be readable at a glance with the road moving under it. */
+  { key: 'COUNTDOWN_FROM',     label: 'cntFrom', step: 1,    min: 0,    max: 9,     dp: 0, group: 32 },
+  { key: 'COUNTDOWN_HOLD',     label: 'cntHold', step: 0.02, min: 0.05, max: 1.00,  dp: 2, group: 32 },
+  { key: 'COUNTDOWN_SIZE',     label: 'cntSize', step: 0.01, min: 0.05, max: 0.80,  dp: 2, group: 32 },
+  { key: 'COUNTDOWN_Y',        label: 'cntY',    step: 0.01, min: 0.05, max: 0.90,  dp: 2, group: 32 },
+  { key: 'COUNTDOWN_POP',      label: 'cntPop',  step: 0.05, min: 1.00, max: 3.00,  dp: 2, group: 32 },
   { key: 'BRAND_TEXT_STROKE',  label: 'bTxtStk', step: 0.005,min: 0,    max: 0.4,   dp: 3, group: 28 },
   { key: 'BRAND_TEXT_SHADOW_X',label: 'bTxtSX',  step: 0.004,min: -0.2, max: 0.2,   dp: 3, group: 28 },
   { key: 'BRAND_TEXT_SHADOW_Y',label: 'bTxtSY',  step: 0.004,min: -0.2, max: 0.2,   dp: 3, group: 28 },
@@ -12515,6 +12551,12 @@ function startRun() {
      the bounds mid session and a track that changed length under the car
      would be worse than either bound. */
   refreshTrackLength();
+  /* THE COUNT, ARMED HERE AND NOWHERE ELSE, which is what keeps it off a
+     continue: continueRun does not call startRun unless the checkpoint
+     is invalid, and an invalid checkpoint is a fresh run. */
+  countdown = (mode === DAILY && !isTraining(level))
+    ? Math.max(0, Math.round(FEEL.COUNTDOWN_FROM)) : 0;
+  countdownSaid = -1;
   finishTime = 0;
   finishMargin = null;
   finishClean = false;
@@ -12652,6 +12694,26 @@ function startRun() {
    the beginner's wide road. skipOnRamp is what says so, and it is read by
    every place the on ramp is: the difficulty ramp, the phrase library's
    intensity and rest rate, and the clock. */
+/* THE COUNTDOWN. Seconds remaining, counted DOWN in real time, so the
+   digit on screen is Math.ceil of it and reaching zero is the go beat.
+   Nothing reads it but the draw and the sting. */
+let countdown = 0;
+let countdownSaid = -1;   // the last digit sounded, so a tick fires once
+/* One digit a second, and the tick fires on the CHANGE rather than on a
+   threshold, so a long frame that skips past a whole second cannot
+   silence one or sound it twice. */
+function updateCountdown(dt) {
+  if (countdown <= 0) return;
+  if (state !== DRIVING) { countdown = 0; return; }
+  countdown -= dt;
+  const now = Math.ceil(countdown);
+  if (now !== countdownSaid) {
+    countdownSaid = now;
+    audioSting(now > 0 ? STING_COUNT : STING_COUNT_GO);
+  }
+  if (countdown < 0) countdown = 0;
+}
+
 let continues = 0;        // this run, and the whole of the record split
 let skipOnRamp = false;
 let cpValid = false;
@@ -27610,6 +27672,33 @@ function modeLine() {
   return { line: line, colour: COLOUR.GATE };
 }
 
+/* THE COUNT, DRAWN AS A FLASH RATHER THAN AS A CAPTION.
+
+   Each digit lands at COUNTDOWN_POP of its size and settles to full over
+   the first part of its second, then fades out entirely before the
+   second is up. That is what keeps it off the slalom: the road is clear
+   between the beats rather than behind a solid number for three seconds.
+
+   IT SITS ON THE SKY. COUNTDOWN_Y is a share of screen height chosen to
+   land above the road's own work, so even at full opacity it is over the
+   city and not over the corner the player is reading. */
+function drawCountdown(w, h) {
+  if (countdown <= 0 || state !== DRIVING) return;
+  const n = Math.ceil(countdown);
+  if (n <= 0) return;
+  // How far through this digit's own second, 0 at its start.
+  const through = 1 - (countdown - (n - 1));
+  const hold = clamp(FEEL.COUNTDOWN_HOLD, 0.05, 1);
+  if (through > hold) return;
+  const t = through / hold;                  // 0 to 1 across the flash
+  const size = Math.min(w, h) * FEEL.COUNTDOWN_SIZE
+             * (1 + (FEEL.COUNTDOWN_POP - 1) * (1 - t) * (1 - t));
+  /* Full for the first half of the flash and then out, so it reads as a
+     beat landing rather than as a number dissolving. */
+  const alpha = t < 0.5 ? 1 : 1 - (t - 0.5) / 0.5;
+  brandText(String(n), w / 2, h * FEEL.COUNTDOWN_Y, Math.max(8, size), alpha);
+}
+
 function drawModeMark(w, h) {
   /* WHILE DRIVING ONLY. The death screen says all of this in its own
      records line, and drawing both put two lines of teal on top of each
@@ -28139,6 +28228,12 @@ function drawHud(w, h) {
        day it was created, which is the lesson 23 to 26 paid for. */
     tunerLine(29),
     tunerLine(30),
+    /* 31 IS THE RACERS AND IT WAS NEVER LISTED, which is the same fault
+       the note above 23 records: forty four rows that could be cycled to
+       and stepped, with nothing on screen saying which one was selected.
+       32 is the count, listed the day it was made. */
+    tunerLine(31),
+    tunerLine(32),
     'slip ' + drift.slipDeg.toFixed(0) + '°  edge ' + (scrapeRisk * 100).toFixed(0)
       + '%  ' + (seedPinned ? 'seed ' + lastSeed : 'seed free'),
     't ' + runTime.toFixed(0) + 's  live curve ' + curveScale.toFixed(2)
@@ -28316,6 +28411,11 @@ function render() {
   drawScore(w, h);
   drawModeMark(w, h);
   drawCallout(w, h);
+  /* Under the overlay, because a death or a level complete screen is a
+     louder thing than a count that is already over by then, and over the
+     callout, because the count is the only thing on screen during its
+     three seconds that the player has not asked for. */
+  drawCountdown(w, h);
   drawOverlay(w, h);
   drawPauseCover(w, h);
   /* Over the pause cover, because the gesture keeps running while the
@@ -29688,6 +29788,12 @@ function updateAudio(dt) {
 const STING_BEST  = { notes: [12, 19, 24, 31], step: 0.075, gain: 0.16, decay: 0.30 };
 const STING_GATE  = { notes: [12, 19, 24],     step: 0.070, gain: 0.13, decay: 0.24 };
 const STING_CLOSE = { notes: [24, 31],         step: 0.055, gain: 0.09, decay: 0.16 };
+/* THE COUNT. A flat tick on each digit and one note a fifth above it on
+   go, which is the smallest figure that reads as "now" rather than as a
+   fourth tick. Quiet, because it fires at the start of every real level
+   and anything that frequent has to sit under the road. */
+const STING_COUNT    = { notes: [12],     step: 0.05, gain: 0.08, decay: 0.12 };
+const STING_COUNT_GO = { notes: [19, 24], step: 0.05, gain: 0.13, decay: 0.22 };
 const STING_CHAIN = { notes: [19, 24, 28],     step: 0.065, gain: 0.12, decay: 0.22 };
 /* PASSING THE GHOST. Rising, because going past somebody is a rising
    thing, and quieter than the record break because it can happen more
@@ -30014,6 +30120,7 @@ function frame(now) {
   // nothing louder has already claimed it this frame.
   ghostUpdate(dt);
   updateBar(dt);
+  updateCountdown(dt);
   render();
   sampleFps(rawDt);
 }
