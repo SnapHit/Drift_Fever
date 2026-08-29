@@ -4075,6 +4075,66 @@ const FEEL = {
   CURVE_GENTLE:             1.6,
   CURVE_MEDIUM:             3.2,
   CURVE_HARD:               5.0,
+  /* ------------------------------------------------------------------
+     ELEVATION. Hills and troughs, and the amplitude is the whole design.
+
+     STORED AS A HEIGHT, NOT INTEGRATED FROM A SLOPE, and that is a
+     deliberate departure from how curve works. Curve is a second
+     derivative: the draw walk does x += dx, dx += curve, so a run of
+     constant curve bends further the longer it lasts. Doing the same
+     with a slope field would make the HEIGHT a function of the period
+     squared, and height is exactly the quantity the planning horizon
+     constrains, so the constraint would stop being enforceable by
+     reading a constant. A height field is the same picture with the
+     amplitude under direct control.
+
+     WHY 900. Past a crest the draw pass hides everything until the road
+     climbs back over the crest line, so a hill truncates the view rather
+     than shortening it. Measured over 200 segments of draw distance,
+     with the visible road converted to seconds at full speed:
+
+       crest height   visible road   the 3.5 second pillar
+                  0        4.44s     held
+                400        4.44s     held
+                800        4.44s     held
+               1200        4.44s     held
+               1800        3.42s     BROKEN
+               2500        2.49s     BROKEN
+               4000        1.36s     BROKEN
+
+     That table is a synthetic crest. Measured in the live game instead,
+     over a real run, as the depth of the furthest drawn boundary:
+
+       height   worst / 5th / median visible   frames under 3.5s
+            0        4.72 / 4.74 / 4.79 s            0.0 per cent
+         1200        3.54 / 4.03 / 4.79 s            0.0 per cent
+         1400        3.32 / 3.81 / 4.79 s            0.7 per cent
+         1800        2.90 / 3.48 / 4.79 s            5.1 per cent
+
+     THE PERIOD IS PART OF THE CONSTRAINT AND NOT DECORATION. The same
+     1200 at a period of 260 breaches the pillar on 1.0 per cent of
+     frames, at 340 on none, at 420 on none with less to look at: a
+     shorter hill is a steeper hill at the same height. 1200 over 340 is
+     the shipped pair, and the road deviates from flat by a median of 19
+     screen pixels and a peak of 71, which is a landform rather than a
+     corrugation.
+
+     At this amplitude the road does not occlude itself at all, so the
+     batched draw pass keeps every one of its assumptions and the frame
+     cost does not move. The occlusion machinery is there as headroom if
+     the horizon is ever spent deliberately.
+
+     TWO PERIODS, because one is a corrugation. The long one is the
+     landform and the short one stops it reading as a repeat. */
+  ROAD_HILL_HEIGHT:        1200,     // LIVE, world units, peak to trough
+  ROAD_HILL_PERIOD:         340,     // LIVE, segments per long hill
+  ROAD_HILL_SHORT:         0.37,     // LIVE, the second period as a share of the first
+  ROAD_HILL_MIX:           0.30,     // LIVE, how much of the short one is in the mix
+  /* Screen height over screen width, for sightClear only. A FIXED
+     reference on purpose: it decides what the generator lays, so the
+     live viewport would make the daily's road depend on the screen.
+     844 over 390, the phone this is played on. */
+  SIGHT_REF_ASPECT:        2.16,
   CURVE_SCALE:              2.5,     // LIVE, the reference the ramp is built around
 
   /* ----------------------------------------------------------------
@@ -7589,6 +7649,10 @@ const TUNABLES = [
   { key: 'CAR_HULL_BULGE',    label: 'bulge',  step: 0.01, min: 0,    max: 0.5,   dp: 2, group: 5 },
   { key: 'CAR_YAW_GAIN',       label: 'yaw',     step: 0.1,  min: 0,    max: 5.0,   dp: 1, group: 5 },
   { key: 'CAR_CURVE_YAW',      label: 'cyaw',    step: 0.004, min: 0,   max: 0.20,  dp: 3, group: 5 },
+  { key: 'ROAD_HILL_HEIGHT',   label: 'hillH',   step: 50,   min: 0,    max: 3000,  dp: 0, group: 3 },
+  { key: 'ROAD_HILL_PERIOD',   label: 'hillP',   step: 20,   min: 40,   max: 1200,  dp: 0, group: 3 },
+  { key: 'ROAD_HILL_SHORT',    label: 'hillS',   step: 0.02, min: 0.1,  max: 1,     dp: 2, group: 3 },
+  { key: 'ROAD_HILL_MIX',      label: 'hillM',   step: 0.05, min: 0,    max: 1,     dp: 2, group: 3 },
   { key: 'CURVE_SCALE',        label: 'curve',   step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
   { key: 'CURVE_SCALE_DEEP',   label: 'deep',    step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
   { key: 'BLOCKER_EVERY',      label: 'block',   step: 50,   min: 200,  max: 8000,  dp: 0, group: 8 },
@@ -10833,6 +10897,27 @@ function segAt(index) {
   return segments[index - segBase];
 }
 
+/* THE GROUND'S OWN HEIGHT AT A SEGMENT, in world units, relative to
+   nothing: only DIFFERENCES of it are ever used, so an offset is free.
+
+   A pure function of the segment index and the road's phase, which is
+   what keeps it deterministic without storing anything: the same index
+   on the same road is the same height on every device, and the daily's
+   whole premise survives untouched.
+
+   The phase is drawn once per road from the seeded stream, so two days
+   do not crest in the same place. */
+let hillPhase = 0;
+function segHeight(idx) {
+  const a = FEEL.ROAD_HILL_HEIGHT;
+  if (!(a > 0) || (mode === DAILY && isTraining(level))) return 0;
+  const p1 = Math.max(20, FEEL.ROAD_HILL_PERIOD);
+  const p2 = Math.max(8, p1 * FEEL.ROAD_HILL_SHORT);
+  const mix = clamp(FEEL.ROAD_HILL_MIX, 0, 1);
+  return a * ((1 - mix) * Math.sin(idx / p1 * Math.PI * 2 + hillPhase)
+            + mix * Math.sin(idx / p2 * Math.PI * 2 + hillPhase * 2.7));
+}
+
 function addSegment(curve, halfWidth) {
   // hw is this segment's road half width, so phrases can squeeze and open
   // the road. ma, ml and mr are the tyre marks it carries: darkness, and
@@ -11631,6 +11716,12 @@ function resetRoad(seed) {
   roadWidth = 1;
   restOwed = 0;
   lastDir = 1;
+  /* WHERE THIS ROAD'S HILLS SIT, drawn from the seeded stream so two
+     days do not crest in the same place, and drawn HERE so it is the
+     first thing the stream produces and cannot be moved by anything
+     added to a phrase later. Training gets no hills at all: its road is
+     a fixed artefact and a rolling one is a different road. */
+  hillPhase = isTraining(level) ? 0 : rng() * Math.PI * 2;
   /* THE OPENING IS A DEMONSTRATION, NOT A CORRIDOR.
 
      WHAT IT WAS AND WHY IT FAILED. 140 segments of dead straight, then
@@ -11768,6 +11859,57 @@ function lateralReach(seconds, curve) {
   return v * (seconds - FEEL.GRIP_TIME * (1 - Math.exp(-seconds / FEEL.GRIP_TIME)));
 }
 
+/* CAN A THING AT `at` BE SEEN FROM `warn` SEGMENTS BEFORE IT.
+
+   The render's occlusion rule is maxy: walking near to far, a segment is
+   drawn only if it sits strictly higher on screen than everything
+   nearer. This is that rule run at GENERATION time, from a viewpoint
+   `warn` segments back, over the height field alone.
+
+   It is the new clause the elevation work owes. Every hazard is declared
+   avoidable by comparing its gap against what lateralReach says the car
+   can cross in the warning time, and that proof silently assumes the
+   player can SEE the hazard for the whole warning. On a road with
+   crests that is no longer free.
+
+   AT THE SHIPPED AMPLITUDE IT NEVER FIRES, and that is the measured
+   result rather than a reason not to have it: 1200 over 340 keeps the
+   visible road above the planning horizon on every frame of a run, so
+   nothing is ever placed out of sight. The clause exists because the
+   amplitude is on the cycler, and the guarantee has to survive somebody
+   turning it up. */
+function sightClear(at, warn) {
+  if (!(FEEL.ROAD_HILL_HEIGHT > 0)) return true;
+  const eye = at - warn;
+  if (eye < 0) return true;
+  const g0 = segHeight(eye);
+  let maxy = Infinity;
+  for (let k = 1; k <= warn; k++) {
+    const dz = k * FEEL.SEGMENT_LENGTH;
+    /* Screen y grows downward, so higher on screen is SMALLER, and the
+       render's y is
+           horizonY + scale * camHeight * h / 2 - scale * dh * w / 2
+       with scale = CAMERA_DEPTH / dz. horizonY is common and drops out.
+       THE CAMERA HEIGHT TERM DOES NOT. An earlier version of this said
+       it "cancels in the comparison" and dropped it, which is wrong
+       because it carries the same 1/dz the height term does: without it
+       the rule became far too strict and refused every jump on the road,
+       including at an amplitude the renderer never occludes at all.
+
+       THE ASPECT IS A FIXED REFERENCE AND NOT THE LIVE VIEWPORT, which
+       matters more than it looks. This decides what the GENERATOR lays,
+       so reading the real w and h would make the daily's road depend on
+       the size of the screen it was first drawn on. The reference is the
+       phone in portrait that the audience plays on. */
+    const y = (camHeight * FEEL.SIGHT_REF_ASPECT
+             - (segHeight(eye + k) - g0)) / dz;
+    if (k === warn) return y < maxy;
+    if (y >= maxy) return false;
+    maxy = y;
+  }
+  return true;
+}
+
 /* The guarantee. Given a band the car must not be inside, in fractions of
    the local half width, return the worst crossing any starting position
    on the painted road can be forced into, or -1 if there is no gap wide
@@ -11849,6 +11991,11 @@ function hazardFits(from, to, xFrac, halfWorld, swingFrac) {
   // Alongside, the car only has to hold a lane, so this is the loose one.
   if (bodyCurve > FEEL.HAZARD_BODY_CURVE) return false;
 
+  /* AND IT HAS TO BE VISIBLE FOR ITS WHOLE WARNING RUN. See sightClear:
+     the avoidability proof spends the warning time crossing the road,
+     and time the player cannot see the hazard for is not time they can
+     use. Flat road always passes this. */
+  if (!sightClear(from, FEEL.HAZARD_WARN_SEGMENTS)) return false;
   const carHalf = (FEEL.CAR_BODY_WIDTH / 2) / minHw;
   const slack = FEEL.HAZARD_MIN_GAP / minHw;
   const half = (halfWorld + FEEL.HAZARD_CLIP) / minHw;   // the clip band counts as blocked
@@ -12132,6 +12279,13 @@ function jumpFits(from, to) {
   const lead = jumpLead();
   const a = from - lead, b = to + jumpRunout();
   if (pastFinish(b)) return false;               // nothing crosses the line
+  /* VISIBLE FOR THE WHOLE APPROACH, and a jump needs more of it than a
+     hazard does: JUMP_WARN_SEGMENTS is 72 against the hazard's 45, and
+     the landing zone beyond the ramp has to be in sight too or the
+     player is asked to commit to ground they cannot see. Both ends are
+     checked from the same viewpoint the approach starts at. */
+  if (!sightClear(from, lead)) return false;
+  if (!sightClear(b, lead + (b - from))) return false;
   for (let i = 0; i < hazards.length; i++) {
     const h = hazards[i];
     if (h.to + FEEL.HAZARD_WARN_SEGMENTS + 2 >= a
@@ -14218,6 +14372,10 @@ function drawRoad(w, h) {
   const carZ = position + FEEL.CAMERA_DISTANCE;
   const carIdx = Math.floor(carZ / seg);
   const carSegFrac = (carZ - carIdx * seg) / seg;
+  /* The ground under the car, interpolated across the segment it is on,
+     or the whole world would step once a segment. */
+  const carGroundY = segHeight(carIdx)
+    + (segHeight(carIdx + 1) - segHeight(carIdx)) * carSegFrac;
 
   /* One walk, recording every boundary between segments, because the road
      is now drawn in two passes over the same geometry and walking it twice
@@ -14231,7 +14389,13 @@ function drawRoad(w, h) {
     const dz = (baseIndex + k) * seg - position;
     const scale = CAMERA_DEPTH / dz;
     bx[k] = w / 2 + scale * (x - camX) * w / 2;
-    by[k] = horizonY + scale * camHeight * h / 2;
+    /* AND THE GROUND RISES AND FALLS. Relative to the height under the
+       CAR, so the car sits at zero on its own road whatever the road is
+       doing, camHeight never moves, and every other pass that projects
+       against camHeight keeps working untouched. The same subtraction
+       projectPoint already makes for a world height. */
+    by[k] = horizonY + scale * camHeight * h / 2
+          - scale * (segHeight(baseIndex + k) - carGroundY) * w / 2;
     bw[k] = scale * lastHw * w / 2;
     bz[k] = dz;
     // Thickness is a height, so it uses the horizontal scale, the same way
@@ -25229,8 +25393,18 @@ function clearDailyRecords() {
    TRAINING DID NOT, and that is checked by comparison with the previous
    build rather than by determinism, which is a different question:
    determinism is two passes of one build agreeing and it was perfect
-   while training was in fact moving. 28 of 28 byte identical now. */
-const ROAD_GEN = 17;
+   while training was in fact moving. 28 of 28 byte identical now.
+
+   18, ELEVATION. The road rises and falls now, and two things move the
+   seeded stream with it: hillPhase is drawn from it once per road, which
+   shifts every draw after it, and hazardFits and jumpFits each gained a
+   sightClear clause that can refuse a placement the old road accepted.
+   So the objects on every real level sit somewhere else.
+
+   Training is untouched: segHeight returns zero for it and its phase is
+   never drawn, so its road is the same road and its five placed objects
+   are on the same segments on every day. */
+const ROAD_GEN = 18;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
