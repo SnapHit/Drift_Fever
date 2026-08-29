@@ -3398,19 +3398,26 @@ const FEEL = {
   /* ------------------------------------------------------------------
      THE COUNTDOWN AT THE START OF A REAL LEVEL.
 
-     THE ROAD IS ALREADY RUNNING AND THE COUNT IS OVER THE TOP OF IT.
-     Nothing is held, nothing waits, and the first tap of a run does what
-     it always did, because one input to restart is the rule this screen
-     is governed by and a count that has to be dismissed is a second
-     input. It is a flourish on a run that has already started, not a
-     gate in front of one.
+     THE CAR IS HELD FOR THE COUNT AND THE RUN STARTS WHEN IT ENDS.
+     This is a correction of what shipped first, which ran the count over
+     a road that was already moving. That is not a countdown, it is a
+     caption over a race in progress, and it counts down to nothing.
 
-     WHICH ALSO SETTLES WHERE IT SITS. The slalom starts working inside
-     the first second, so a solid digit over the middle of the screen for
-     three seconds would hide the corner it exists to introduce. Each
-     digit is therefore a FLASH: it lands at full size, and is gone well
-     before its second is up, so the road is clear between the beats. And
-     it sits high, above the road's own action, on the sky.
+     THE ONE INPUT RULE SURVIVES IT, BY THE MECHANISM THAT ALREADY
+     EXISTS HERE. DEATH_INPUT_LOCK used to throw the reflex tap away and
+     now banks it, so the restart happens no earlier than the lock but
+     the press the player already made is the one that does it. The hold
+     works the same way: the count is not skippable, and every input
+     made during it is live rather than swallowed. Steering is read and
+     ramped for the whole count, so a player who is already holding left
+     when the count ends leaves the line with full lock, exactly as
+     holding a key through a set of lights should.
+
+     WHICH IS ALSO WHY THE DIGIT IS STILL A FLASH RATHER THAN A CAPTION.
+     The road is not moving under it now, but the slalom is right there
+     to be read, and three seconds of planning time is worth more than
+     three seconds of number. It sits high, on the sky, for the same
+     reason.
 
      NOT ON TRAINING. That run already opens by naming itself and a count
      would be a third thing before a first time player drives.
@@ -3418,7 +3425,13 @@ const FEEL = {
      NOT ON A CONTINUE. Armed in startRun, which continueRun does not
      call except when the checkpoint is invalid, which is a fresh run. */
   COUNTDOWN_FROM:             3,     // LIVE, how many digits, 3 2 1
-  COUNTDOWN_HOLD:          0.42,     // LIVE, seconds a digit is up, of its one second
+  /* SECONDS A DIGIT LASTS, AND THEREFORE HOW LONG THE CAR IS HELD:
+     FROM times STEP. A second a digit is the idiom and it is what ships,
+     but the whole hold is dead time in a game whose loop is crash, tap,
+     go, so the lever to shorten it is here and on the cycler rather than
+     buried in a division. */
+  COUNTDOWN_STEP:          1.00,     // LIVE, seconds each digit lasts
+  COUNTDOWN_HOLD:          0.42,     // LIVE, share of a digit's step the flash is up for
   COUNTDOWN_SIZE:          0.30,     // LIVE, of the smaller screen dimension
   COUNTDOWN_Y:             0.30,     // LIVE, of screen height, above the road's work
   COUNTDOWN_POP:           1.35,     // LIVE, the scale it lands at before settling
@@ -8029,9 +8042,11 @@ const TUNABLES = [
      enough that there is time to nudge a value and watch it change. */
   /* THE COUNT, group 32, on its own line rather than at the end of the
      finale's, which is already forty rows long. It is five values and
-     they are judged in the first three seconds of a real level, so the
-     line has to be readable at a glance with the road moving under it. */
+     they are judged in the first three seconds of a real level, with the
+     car standing still, which is the one moment in this game where there
+     is time to read a line of numbers at all. */
   { key: 'COUNTDOWN_FROM',     label: 'cntFrom', step: 1,    min: 0,    max: 9,     dp: 0, group: 32 },
+  { key: 'COUNTDOWN_STEP',     label: 'cntStep', step: 0.05, min: 0.20, max: 2.00,  dp: 2, group: 32 },
   { key: 'COUNTDOWN_HOLD',     label: 'cntHold', step: 0.02, min: 0.05, max: 1.00,  dp: 2, group: 32 },
   { key: 'COUNTDOWN_SIZE',     label: 'cntSize', step: 0.01, min: 0.05, max: 0.80,  dp: 2, group: 32 },
   { key: 'COUNTDOWN_Y',        label: 'cntY',    step: 0.01, min: 0.05, max: 0.90,  dp: 2, group: 32 },
@@ -12694,18 +12709,31 @@ function startRun() {
    the beginner's wide road. skipOnRamp is what says so, and it is read by
    every place the on ramp is: the difficulty ramp, the phrase library's
    intensity and rest rate, and the clock. */
-/* THE COUNTDOWN. Seconds remaining, counted DOWN in real time, so the
-   digit on screen is Math.ceil of it and reaching zero is the go beat.
-   Nothing reads it but the draw and the sting. */
+/* THE COUNTDOWN. DIGITS REMAINING, not seconds, which is why the tick
+   below divides by the step: at 3 the number on screen is Math.ceil of
+   it, the share of the way through a digit is its fraction, and both of
+   those stay true whatever a digit is worth in seconds. Reaching zero is
+   the go beat and the frame it happens on is the frame the car moves.
+
+   WHILE IT IS ABOVE ZERO THE WORLD IS HELD. countHolding is what says
+   so and every place that costs the player reads it. */
 let countdown = 0;
 let countdownSaid = -1;   // the last digit sounded, so a tick fires once
-/* One digit a second, and the tick fires on the CHANGE rather than on a
-   threshold, so a long frame that skips past a whole second cannot
-   silence one or sound it twice. */
+function countHolding() { return countdown > 0 && state === DRIVING; }
+
+/* THE TICK IS ON THE CHANGE OF DIGIT rather than on a threshold, so a
+   long frame that skips past a whole digit cannot silence one or sound
+   it twice.
+
+   CALLED FROM update AND NOWHERE ELSE, which is a deliberate change from
+   the frame loop calling it. The count is world time: it holds the world
+   still, so the thing that advances the world has to be the thing that
+   advances it, or a caller that steps update directly, which is every
+   harness this project owns, holds the car for ever. */
 function updateCountdown(dt) {
   if (countdown <= 0) return;
   if (state !== DRIVING) { countdown = 0; return; }
-  countdown -= dt;
+  countdown -= dt / Math.max(0.05, FEEL.COUNTDOWN_STEP);
   const now = Math.ceil(countdown);
   if (now !== countdownSaid) {
     countdownSaid = now;
@@ -12954,6 +12982,26 @@ function update(dt) {
      fractions, so the camera cannot change what is true, only what is
      shown. */
   cameraX = carX * FEEL.CAMERA_FOLLOW + lookCurve * FEEL.CAMERA_LOOK;
+
+  /* THE COUNT, AND THE HOLD IT PUTS ON EVERYTHING BELOW THIS LINE.
+
+     WHAT IS ABOVE IT AND KEEPS RUNNING: the shake decay and the camera,
+     because neither costs the player anything and both want to be
+     settled by the time the car is let go. The camera reaching its lean
+     during the count is the whole point of holding still in front of a
+     corner: section 4.3 is about planning time and three seconds of it
+     is worth more here than anywhere else in the run.
+
+     WHAT IS BELOW IT AND STOPS: the car, the road, the racers, the
+     hazards, the jump, the tyre marks and the collision pass. The other
+     four things that cost the player, the clock, the score, the ledger
+     and the bar, hold themselves on countHolding for the same reason.
+
+     THE GO FRAME IS NOT WASTED. The tick above may take the count to
+     zero, and when it does this return is not taken, so the frame the
+     count ends on is a frame the car moves. */
+  updateCountdown(dt);
+  if (countHolding()) return;
 
   if (state === DEAD) { updateFall(dt); return; }
   /* A finished run holds still. Nothing falls, nothing explodes and the
@@ -15415,6 +15463,9 @@ function ghostUpdate(dt) {
   ghost.shown = false;
   if (ghost.said > 0) ghost.said -= dt;
   if (!ghost.live || mode !== DAILY || state !== DRIVING) return;
+  /* The ghost waits on the line too. It walks on runTime, which is
+     frozen, so this is belt and braces rather than the mechanism. */
+  if (countHolding()) return;
   const t = runTime;
   /* THE CURSOR HAS TO BE ABLE TO GO BACKWARDS, and this is a bug fix.
 
@@ -25017,6 +25068,10 @@ function slipPay() {
 
 function updateClock(dt) {
   if (state !== DRIVING) return;
+  /* THE CLOCK DOES NOT RUN DURING THE COUNT. It is the one thing on
+     screen the player is racing, so a hold that spent it would be the
+     game taking three seconds off every real level to show a flourish. */
+  if (countHolding()) return;
   if (gateFlash > 0) gateFlash -= dt;
   if (clockPop > 0) clockPop -= dt;
   /* Nothing to survive during the on ramp. A new player has enough to
@@ -25162,6 +25217,8 @@ function finishRun() {
 function updateScore(dt) {
   if (multPop > 0) multPop -= dt;
   if (state !== DRIVING) return;
+  // Nothing is earned and nothing decays while the car is on the line.
+  if (countHolding()) return;
   if (carSegIndex >= nextGate) crossGate();
   const earn = multiplierEarn();
   const was = Math.floor(multiplier);
@@ -26594,6 +26651,10 @@ function chainTierFor(links) {
 }
 
 function updateSpectacle(dt) {
+  /* HELD WITH THE REST OF THE WORLD. Nothing here is running at the
+     start of a fresh run anyway, which is the only place a count
+     happens, so this is consistency rather than a fix. */
+  if (countHolding()) return;
   if (calloutLife > 0) calloutLife -= dt;
   if (calloutLock > 0) calloutLock -= dt;
   if (driftLife > 0) driftLife -= dt;
@@ -27674,10 +27735,15 @@ function modeLine() {
 
 /* THE COUNT, DRAWN AS A FLASH RATHER THAN AS A CAPTION.
 
-   Each digit lands at COUNTDOWN_POP of its size and settles to full over
-   the first part of its second, then fades out entirely before the
-   second is up. That is what keeps it off the slalom: the road is clear
-   between the beats rather than behind a solid number for three seconds.
+   Each digit lands at COUNTDOWN_POP of its size, settles to full over
+   the first COUNTDOWN_HOLD of its step and is gone before the step is
+   up, so there is a clear beat between the numbers.
+
+   THE CAR IS STOPPED UNDER IT NOW, so this is no longer about not
+   hiding a corner the player is already driving into. It is about what
+   the three seconds are FOR: the road ahead, sitting still, being read.
+   A number parked over the middle of the screen for the whole hold
+   would spend the one thing the hold is worth.
 
    IT SITS ON THE SKY. COUNTDOWN_Y is a share of screen height chosen to
    land above the road's own work, so even at full opacity it is over the
@@ -27686,7 +27752,7 @@ function drawCountdown(w, h) {
   if (countdown <= 0 || state !== DRIVING) return;
   const n = Math.ceil(countdown);
   if (n <= 0) return;
-  // How far through this digit's own second, 0 at its start.
+  // How far through this digit's own step, 0 at its start.
   const through = 1 - (countdown - (n - 1));
   const hold = clamp(FEEL.COUNTDOWN_HOLD, 0.05, 1);
   if (through > hold) return;
@@ -28150,6 +28216,7 @@ function drawSpectacleFlash(w, h) {
 
 let barShow = 0;
 function updateBar(dt) {
+  if (countHolding()) return;
   /* AND IT IS HELD UP WHILE A COACHING LINE IS POINTING AT IT, which is
      the tutorial's recharge line and nothing else in the game. The bar
      shows only while there is risk to see and then fades, so a line that
@@ -30120,7 +30187,6 @@ function frame(now) {
   // nothing louder has already claimed it this frame.
   ghostUpdate(dt);
   updateBar(dt);
-  updateCountdown(dt);
   render();
   sampleFps(rawDt);
 }
