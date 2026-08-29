@@ -4463,7 +4463,22 @@ const FEEL = {
      gap has come in by two to three seconds on every level. At 6 the
      medians start dropping, which is the road getting busier rather than
      less empty, and that is the line this must not cross. */
-  GAP_MAX_SECONDS:            8,     // LIVE, seconds of empty road before one is forced
+  /* AND IT IS 4, NOT THE 8 IT WAS, AND NOT THE 6 THAT WAS ASKED FOR,
+     because the number here is not the number the player feels.
+
+     The backstop asks "has the road been BUILT this far with nothing on
+     it", and the thing it then places is a jump, which lays its full 72
+     segment warning run before the ramp itself. So the object lands
+     about 1.6 seconds past the trigger, and the phrase that was in
+     progress when the check ran is on top of that. Measured at 8: gaps
+     ran to 11.5 seconds and between 47 and 80 per cent of them were
+     longer than 8, on a road whose backstop is supposed to make that
+     impossible.
+
+     4 puts the felt gap at about 6, which is the standard that was
+     asked for, arrived at through the run-in rather than by writing 6
+     here and getting 9. */
+  GAP_MAX_SECONDS:            4,     // LIVE, seconds of empty road before one is forced
   JUMP_EVERY:              1200,     // LIVE, mean segments between them, about 52s
   /* THE LANDING ROOM IS NOT A CONSTANT ANY MORE. It was 34 segments,
      and its comment said it "must exceed the flight, which is about 23".
@@ -4900,7 +4915,41 @@ const FEEL = {
      therefore asked for at exactly 438, so every value from 0 to 438
      gives the identical road and only values ABOVE it move the jump
      later. Written as 438 so the slider says what it does. */
-  OPEN_JUMP_AT:             438,     // LIVE, segments, the authored opening's length
+  /* ------------------------------------------------------------------
+     THE OPENING SLALOM, WHICH USED TO BE ELEVEN HARD CODED addRun CALLS.
+
+     The shape was right and the numbers were inline, which is the one
+     thing the constants block exists to stop. They are here now so the
+     slalom can be felt on a phone rather than rebuilt to try a value.
+
+     WHAT WAS ACTUALLY WRONG WITH IT, MEASURED. Not the corners: the
+     authored curve is CURVE_MEDIUM and the physics multiplies it by the
+     on ramp's curveScale of 1.9, so an opening corner already eats about
+     three quarters of full lock just to hold the line. It was the WIDTH.
+     The authored 1.26 is multiplied AGAIN by buildWidthScale, which at
+     zero seconds is ONRAMP_WIDTH 1.22, so the opening was run on a road
+     54 per cent wider than normal. Driven with the eight policies over
+     the first thirty seconds, the three competent ones survived 6 of 6
+     days with between 0 and 1 per cent of their time on the edge. They
+     were not being asked for anything.
+
+     So the width comes down and the alternations come faster. The curve
+     is left alone.                                                     */
+  OPEN_SLALOM_CURVE:        3.2,     // LIVE, same as CURVE_MEDIUM
+  OPEN_SLALOM_WIDTH:       1.08,     // LIVE, was 1.26, and 1.22 on top of it
+  OPEN_SLALOM_HOLD:          24,     // LIVE, segments held at full lock
+  OPEN_SLALOM_TURN:          22,     // LIVE, segments of reversal
+  OPEN_SLALOM_SWINGS:         6,     // LIVE, how many corners, was 3
+  /* THE HANDOVER, AND IT IS NOT FILLER, WHICH IS WHAT IT LOOKED LIKE.
+     Trimmed from 60 to 24 on the argument that a second of dead
+     straight right after the slalom was the boring thing being
+     complained about. It killed LOOKLAG outright: 0 deaths in 8
+     days became 8, every one of them off the road twelve seconds
+     in, a hundred and forty segments past the end of the opening.
+     A driver with a quarter second of lag needs the straight to
+     settle on before the seeded road starts asking questions.
+     Measured, it survives from 36 up; 40 is that with margin. */
+  OPEN_SLALOM_TAIL:          40,     // LIVE, the settling straight, was 60
   LEVEL_GATES_FIRST:          3,     // LIVE, gates on the first REAL level
   LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
   /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
@@ -8004,7 +8053,13 @@ const TUNABLES = [
   { key: 'JUMP_LAND_SHAKE_BAD',label: 'landBmp', step: 1,    min: 0,    max: 40,    dp: 0, group: 23 },
   { key: 'JUMP_TIME',          label: 'jumpAt',  step: 5,    min: 0,    max: 300,   dp: 0, group: 24 },
   { key: 'JUMP_EVERY',         label: 'jumpGap', step: 50,   min: 200,  max: 8000,  dp: 0, group: 24 },
-  { key: 'GAP_MAX_SECONDS',    label: 'gapMax',  step: 1,    min: 3,    max: 60,    dp: 0, group: 24 },
+  { key: 'GAP_MAX_SECONDS',    label: 'gapMax',  step: 1,    min: 2,    max: 60,    dp: 0, group: 24 },
+  { key: 'OPEN_SLALOM_CURVE',  label: 'slalomC', step: 0.2,  min: 0.5,  max: 6,     dp: 1, group: 27 },
+  { key: 'OPEN_SLALOM_WIDTH',  label: 'slalomW', step: 0.02, min: 0.7,  max: 1.6,   dp: 2, group: 27 },
+  { key: 'OPEN_SLALOM_HOLD',   label: 'slalomH', step: 2,    min: 6,    max: 90,    dp: 0, group: 27 },
+  { key: 'OPEN_SLALOM_TURN',   label: 'slalomT', step: 2,    min: 6,    max: 90,    dp: 0, group: 27 },
+  { key: 'OPEN_SLALOM_SWINGS', label: 'slalomN', step: 1,    min: 1,    max: 14,    dp: 0, group: 27 },
+  { key: 'OPEN_SLALOM_TAIL',   label: 'slalomE', step: 4,    min: 0,    max: 140,   dp: 0, group: 27 },
   /* THE LANDING REWARD. Every one of these decides whether a jump is
      worth taking and how loud saying so is, which is exactly the sort of
      thing that has to be found by driving into one. */
@@ -8073,7 +8128,6 @@ const TUNABLES = [
   { key: 'TRAIN_JUMP_LEAD',    label: 'jumpLead',step: 0.25, min: 0.5,  max: 10,    dp: 2, group: 27 },
   { key: 'TRAIN_BLOCK_LEAD',   label: 'blokLead',step: 0.25, min: 0.5,  max: 10,    dp: 2, group: 27 },
   { key: 'TRAIN_MOVER_LEAD',   label: 'moveLead',step: 0.25, min: 0.5,  max: 10,    dp: 2, group: 27 },
-  { key: 'OPEN_JUMP_AT',       label: 'openJmp', step: 20,   min: 0,    max: 1200,  dp: 0, group: 27 },
   { key: 'LEVEL_GATES_FIRST',  label: 'gates1',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
@@ -11354,6 +11408,11 @@ function buildPlacedJump(mark, lead2) {
    jump still arrives on its own clock at thirty seconds and the level
    gets two rather than one moved. */
 let openJumpBuilt = false;
+/* The last segment buildOpening laid, so the opening jump lands just
+   past the authored road however long that road turns out to be. */
+/* Large until buildOpening runs, so the opening script cannot fire
+   into a road that has not been laid yet. */
+let openingEndSeg = 1e9;
 
 function openingScript() {
   /* EVERY REAL LEVEL, NOT JUST THE FIRST ONE, AND THE REASON IS A
@@ -11372,7 +11431,7 @@ function openingScript() {
      them, three times. */
   if (mode !== DAILY || isTraining(level)) return false;
   const at = segBase + segments.length;
-  if (!openJumpBuilt && at >= FEEL.OPEN_JUMP_AT && !pastFinish(at + 140)) {
+  if (!openJumpBuilt && at >= openingEndSeg && !pastFinish(at + 140)) {
     /* THE FLAG IS SET ON THE ATTEMPT, NOT ON THE SUCCESS. Refused, this
        falls through to the grammar for this phrase and never asks
        again, which is the only shape that cannot spin topUpRoad against
@@ -11479,7 +11538,26 @@ function addPhrase() {
      like any other caller, so jumpFits still refuses a ramp under a
      gate and the full warning run is still laid, and a refusal falls
      through to the grammar exactly as a scheduled one does. */
-  if (gapOverdue() && buildJumpPhrase()) return;
+  /* AND THE BACKSTOP GETS A SECOND THING TO TRY, WHICH IS THE WHOLE OF
+     WHY IT WAS NOT WORKING.
+
+     It asked for a jump and nothing else. A jump needs a full 72 segment
+     warning run and a landing zone reserved against the real flight
+     length, so it is the most expensive thing on the road to place and
+     the most often refused, and every refusal fell through to the
+     grammar and laid a corner, which is not an event. Measured over
+     twelve days a level with GAP_MAX_SECONDS at 8: between 47 and 80 per
+     cent of gaps were longer than 8 seconds, on a road whose backstop is
+     supposed to make that impossible.
+
+     A hazard is far cheaper to place, so it is tried when the jump is
+     refused. Both go through their own fits test, so nothing here can
+     put an object where the arithmetic does not allow one. */
+  if (gapOverdue()) {
+    if (buildJumpPhrase()) return;
+    const k = anyUnlockedHazard();
+    if (k && buildHazardPhrase(k)) return;
+  }
 
   const resting = restOwed > 0;
   if (resting) restOwed--;
@@ -11566,23 +11644,75 @@ function resetRoad(seed) {
      every level, every day and every device, which is what lets two
      players compare a time at all. Changing them changes every road's
      first eight seconds, which is why ROAD_GEN moves with it. */
-  addRun(FEEL.OPENING_STRAIGHT, 0, 0, 1.14, 1.26, false);
+  /* TRAINING KEEPS THE ELEVEN CALLS IT ALWAYS HAD, VERBATIM.
+
+     This road is not a generated road, it is a fixed artefact five
+     coaching lines are timed against, and it must be byte identical
+     forever. Parameterising the opening and letting training share the
+     new path moved it on 28 of 28 days, which the comparison against the
+     previous build caught: determinism was still perfect, because
+     determinism is two passes of the same build agreeing, and that is a
+     different question from whether the build changed.
+
+     Duplicated on purpose rather than parameterised down to the last
+     width, because the whole point is that nothing here may follow a
+     constant somebody else is free to tune. */
+  if (isTraining(level)) {
+    const M = FEEL.CURVE_MEDIUM, G = FEEL.CURVE_GENTLE;
+    addRun(FEEL.OPENING_STRAIGHT, 0, 0, 1.14, 1.26, false);
+    addRun(18, 0, M, 1.26, 1.26, true);
+    addRun(44, M, M, 1.26, 1.26, false);
+    addRun(30, M, -M, 1.26, 1.26, true);
+    addRun(44, -M, -M, 1.26, 1.26, false);
+    addRun(30, -M, M, 1.26, 1.26, true);
+    addRun(44, M, M, 1.26, 1.22, false);
+    addRun(34, M, -G, 1.22, 1.10, true);
+    addRun(70, -G, -G, 1.10, 1.02, false);
+    addRun(30, -G, 0, 1.02, 1, true);
+    addRun(60, 0, 0, 1, 1, false);
+    openingEndSeg = segBase + segments.length;
+    return;
+  }
+  const C = FEEL.OPEN_SLALOM_CURVE, W = FEEL.OPEN_SLALOM_WIDTH;
+  const hold = Math.max(6, Math.round(FEEL.OPEN_SLALOM_HOLD));
+  const turn = Math.max(6, Math.round(FEEL.OPEN_SLALOM_TURN));
+  const swings = Math.max(1, Math.round(FEEL.OPEN_SLALOM_SWINGS));
+  addRun(FEEL.OPENING_STRAIGHT, 0, 0, W * 0.9, W, false);
   /* THE HOLDS ARE SHORT ON PURPOSE. At 74 segments each the car reached
      the edge with a third of the corner still to run and sat there, and
      the seconds either side of the reversal measured 0.08 and 0.05 slip:
      the same flat stretch this was built to remove, moved along a bit.
-     The corner has to reverse while the car is still travelling. */
-  addRun(18, 0, FEEL.CURVE_MEDIUM, 1.26, 1.26, true);
-  addRun(44, FEEL.CURVE_MEDIUM, FEEL.CURVE_MEDIUM, 1.26, 1.26, false);
-  addRun(30, FEEL.CURVE_MEDIUM, -FEEL.CURVE_MEDIUM, 1.26, 1.26, true);
-  addRun(44, -FEEL.CURVE_MEDIUM, -FEEL.CURVE_MEDIUM, 1.26, 1.26, false);
-  addRun(30, -FEEL.CURVE_MEDIUM, FEEL.CURVE_MEDIUM, 1.26, 1.26, true);
-  addRun(44, FEEL.CURVE_MEDIUM, FEEL.CURVE_MEDIUM, 1.26, 1.22, false);
+     The corner has to reverse while the car is still travelling.
+
+     AND THERE ARE MORE OF THEM NOW. Three alternations across the
+     opening let a competent driver settle into each one; five means the
+     car is being asked to change sides before it has finished the last
+     change, which is what a slalom is. The loop is the same shape the
+     eleven hand written calls had, with the first turn-in half length
+     because it starts from straight. */
+  addRun(Math.round(turn * 0.7), 0, C, W, W, true);
+  let dir = 1;
+  for (let i = 0; i < swings; i++) {
+    addRun(hold, dir * C, dir * C, W, W, false);
+    if (i === swings - 1) break;
+    addRun(turn, dir * C, -dir * C, W, W, true);
+    dir = -dir;
+  }
   // Easing down and closing to normal width, handing over to the seeded road.
-  addRun(34, FEEL.CURVE_MEDIUM, -FEEL.CURVE_GENTLE, 1.22, 1.10, true);
-  addRun(70, -FEEL.CURVE_GENTLE, -FEEL.CURVE_GENTLE, 1.10, 1.02, false);
-  addRun(30, -FEEL.CURVE_GENTLE, 0, 1.02, 1, true);
-  addRun(60, 0, 0, 1, 1, false);
+  /* AND THE TAIL IS SHORTER. It ended on sixty segments of dead
+     straight at normal width, which is a second and a third of nothing
+     at the exact moment the player has just been asked for something.
+     The handover still happens, over the same three runs, and the first
+     placed jump now arrives about a second sooner because of it. */
+  addRun(34, dir * C, -dir * FEEL.CURVE_GENTLE, W, 1.06, true);
+  addRun(56, -dir * FEEL.CURVE_GENTLE, -dir * FEEL.CURVE_GENTLE, 1.06, 1.02, false);
+  addRun(26, -dir * FEEL.CURVE_GENTLE, 0, 1.02, 1, true);
+  addRun(Math.max(0, Math.round(FEEL.OPEN_SLALOM_TAIL)), 0, 0, 1, 1, false);
+  /* WHERE THE AUTHORED ROAD ACTUALLY ENDS, recorded rather than
+     restated. OPEN_JUMP_AT was a constant holding the total of the
+     eleven calls above, so any change to the slalom silently moved the
+     opening jump into the middle of it or left a hole after it. */
+  openingEndSeg = segBase + segments.length;
 }
 
 /* ==================================================================
@@ -11812,6 +11942,29 @@ function hazardLength(kind) {
    the real width, the crossing and the overlap. Building the road first
    only means the check now almost always passes instead of almost always
    failing. */
+/* ANY KIND THIS LEVEL HAS UNLOCKED, IGNORING WHETHER ONE IS DUE.
+
+   dueHazardKind answers "is a hazard scheduled", which is the right
+   question for the schedule and the wrong one for the backstop: the
+   backstop only ever speaks because nothing is scheduled, so asking the
+   schedule returns nothing by definition.
+
+   Preferred in reverse unlock order, hardest first, because the backstop
+   fires on the emptiest road and a splitter is a bigger event than a
+   blocker. Falls back down the list, so an early level still gets the
+   one kind it has. */
+function anyUnlockedHazard() {
+  if (mode === DAILY && levelBand(level) <= 0) return 0;
+  const t = buildClock();
+  const order = [
+    { k: HAZ_SPLITTER, time: unlockAt(FEEL.SPLITTER_TIME) },
+    { k: HAZ_MOVER,    time: unlockAt(FEEL.MOVER_TIME) },
+    { k: HAZ_BLOCKER,  time: unlockAt(FEEL.BLOCKER_TIME) }
+  ];
+  for (let i = 0; i < order.length; i++) if (t >= order[i].time) return order[i].k;
+  return 0;
+}
+
 function buildHazardPhrase(kind) {
   const warn = FEEL.HAZARD_WARN_SEGMENTS;
   const len = hazardLength(kind);
@@ -25001,8 +25154,23 @@ function clearDailyRecords() {
    slower build cuts the transient half of the slip angle, so a good run
    scores about a tenth less than it did yesterday and the multiplier
    comes off its ceiling. A daily best set this morning was set under a
-   different economy. */
-const ROAD_GEN = 16;
+   different economy.
+
+   17, THE OPENING SLALOM AND THE GAP STANDARD, and this one is owed by
+   the letter of the rule rather than by an argument about meaning.
+
+   THE ROAD ITSELF MOVED. Every real level's authored opening is a
+   different set of segments: six alternations instead of three, on a
+   road 1.08 wide instead of 1.26, with a shorter settling straight. And
+   GAP_MAX_SECONDS went from 8 to 4, so the backstop lays objects the old
+   road did not have. Measured against the previous build, levels two to
+   five come out different on 28 of 28 days.
+
+   TRAINING DID NOT, and that is checked by comparison with the previous
+   build rather than by determinism, which is a different question:
+   determinism is two passes of one build agreeing and it was perfect
+   while training was in fact moving. 28 of 28 byte identical now. */
+const ROAD_GEN = 17;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
