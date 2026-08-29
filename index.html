@@ -11554,6 +11554,28 @@ function addPhrase() {
      refused. Both go through their own fits test, so nothing here can
      put an object where the arithmetic does not allow one. */
   if (gapOverdue()) {
+    /* THE JUMP IS ASKED FIRST, AND THE OTHER ORDER WAS BUILT AND
+       MEASURED BEFORE THIS ONE WAS KEPT.
+
+       A jump lays 78 segments of DEAD STRAIGHT run-in before the ramp,
+       and at a four second threshold the backstop fires often enough for
+       that to show: the share of a run spent drifting falls from 81 per
+       cent to 74 as the gaps close. A hazard's approach is 47 segments
+       and usually curved, so asking for one first fills the same gap
+       with road worth driving, and measured it put drifting back to 83.
+
+       IT WAS REVERTED BECAUSE IT SPENT SURVIVAL TO BUY IT. A jump is a
+       treat and a hazard can end a run, so swapping which one fills the
+       gaps changes what the road IS, not just how busy it is: survival
+       on levels three, four and five went 117, 133 and 136 seconds to
+       90, 103 and 123, about a fifth, on barely more objects. Density
+       must not become difficulty, and that is difficulty.
+
+       So the straightness stays as the price of the density, and the
+       hazard remains the fallback for when a jump will not fit. Making
+       the jump's own approach curve is the lever that would buy back the
+       drifting without buying difficulty, and it is a change to how
+       jumps are placed rather than to the backstop. */
     if (buildJumpPhrase()) return;
     const k = anyUnlockedHazard();
     if (k && buildHazardPhrase(k)) return;
