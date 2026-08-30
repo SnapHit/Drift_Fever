@@ -3426,11 +3426,12 @@ const FEEL = {
      call except when the checkpoint is invalid, which is a fresh run. */
   COUNTDOWN_FROM:             3,     // LIVE, how many digits, 3 2 1
   /* SECONDS A DIGIT LASTS, AND THEREFORE HOW LONG THE CAR IS HELD:
-     FROM times STEP. A second a digit is the idiom and it is what ships,
-     but the whole hold is dead time in a game whose loop is crash, tap,
-     go, so the lever to shorten it is here and on the cycler rather than
-     buried in a division. */
-  COUNTDOWN_STEP:          1.00,     // LIVE, seconds each digit lasts
+     FROM times STEP. A second a digit is the idiom, and it is not what
+     ships: measured, three seconds was ten per cent of a median attempt
+     and nearer twenty for somebody stuck on a level, paid again on every
+     retry in a game whose loop is crash, tap, go. At 0.70 the hold is
+     2.1 seconds, which still reads unmistakably as three, two, one. */
+  COUNTDOWN_STEP:          0.70,     // LIVE, seconds each digit lasts
   COUNTDOWN_HOLD:          0.42,     // LIVE, share of a digit's step the flash is up for
   COUNTDOWN_SIZE:          0.30,     // LIVE, of the smaller screen dimension
   COUNTDOWN_Y:             0.30,     // LIVE, of screen height, above the road's work
@@ -14428,6 +14429,33 @@ const carAheadSegs = Math.ceil(FEEL.CAMERA_DISTANCE / FEEL.SEGMENT_LENGTH) + 2;
 const bspan = new Uint16Array(MAX_BOUNDS);
 const bvis = new Uint8Array(MAX_BOUNDS);
 const blight = new Uint8Array(MAX_BOUNDS);
+/* WHICH ANCHOR SWALLOWED A SEGMENT, or -1 for a segment that is not
+   drawn for any other reason. This is the missing half of bspan and it
+   is what stops the far field flashing.
+
+   THE BUG IT FIXES, MEASURED. bvis says "this boundary is being drawn",
+   and the merge clears it on every segment it absorbs. Everything that
+   STANDS on the road was reading that flag to decide whether to draw
+   itself, so an object whose own segment happened to be absorbed this
+   frame simply vanished, and since the merge partition shifts as the
+   camera advances, it came back a frame or two later and went again.
+   Driven for twenty five seconds, the worst roadside light changed
+   state 53.7 times a second and the mean across 93 of them was 16.6.
+   The checkpoint gate ran at 17.7, a hazard at 17.4, the jumps at 19.
+   With SEG_MERGE_PX forced to zero every one of those numbers was
+   exactly zero, and with the road forced flat none of them moved, so
+   the coalescing was the whole cause and the elevation was not in it.
+
+   THE ANSWER IS NOT TO STOP MERGING, which is what pays for the frame.
+   It is that "my segment is not the anchor" and "I cannot be seen" are
+   two different statements and only bvis existed to hold them. An
+   absorbed segment is still on screen: it is inside its anchor's run,
+   which by construction spans less than SEG_MERGE_PX, one pixel. So
+   the anchor is recorded here and objects draw from it. */
+const banchor = new Int16Array(MAX_BOUNDS);
+/* How many boundaries the walk actually wrote this frame. Everything at
+   or beyond it is last frame's numbers. */
+let bcount = 0;
 
 /* Past these projected half widths the wide faint passes and the cliff
    are smaller than a pixel. Widths shrink monotonically with distance, so
@@ -14466,6 +14494,117 @@ let HEADLIGHT_GRAD = null;
 // of the half width. The shoulder is the scrape band, so the drawn edge of
 // the road really is the last place the car may be.
 const EDGE_OUT = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
+
+/* ==================================================================
+   WHERE A THING THAT STANDS ON THE ROAD IS DRAWN FROM.
+
+   Every object in this world is anchored to a road boundary: the gate
+   to nextGate, a hazard to its own segments, a pylon to every twelfth,
+   a racer to whatever boundary its depth lands on. Each of them used to
+   ask bvis, which answers a different question: bvis says "this
+   boundary is a drawn road anchor", and the far field merge clears it on
+   everything it absorbs. Ask the wrong question and the object blinks
+   out whenever the merge partition happens to move over it, which is
+   several times a second at mid distance.
+
+   segAnchor asks the right one: WHERE DO I DRAW THIS, or nowhere. It
+   returns the boundary an object at n should be drawn from, which is n
+   itself when n survived, the anchor that swallowed it when it was
+   merged, and -1 only when the segment is genuinely not on screen.
+
+   boundaryAt goes one better and interpolates ACROSS the run, because
+   several pylons can share one far field anchor and stacking them on
+   its near edge would thin the far field out. bspan says how many
+   segments the anchor swallowed, and the merge moved that anchor's far
+   boundary out to where its run ended, so a fraction of the way through
+   the run is a known position and not a guess.
+
+   THREE THINGS ALREADY DID THIS BY HAND and are left alone: drawRamp
+   and jumpChevrons snap back to a surviving anchor, and spritePass
+   walks bspan. They were each written after this same bug was found in
+   one place, which is the argument for a shared answer rather than a
+   fourth copy.
+   ================================================================== */
+function segAnchor(n, first, last) {
+  /* PAST last IS NOT PAST THE END, and that was worth measuring. last is
+     the furthest SURVIVING anchor, and the run it swallowed carries on
+     beyond it: the segments between it and the end of its run have an
+     index greater than last and are still inside the quad being drawn.
+     Rejecting them on the range test alone left the objects at the very
+     top of the draw distance blinking at the horizon after everything
+     nearer had been fixed. Measured: the gate still changed state 2.8
+     times a second, and zero once this read the anchor instead.
+
+     bcount is the far end that does exist. Beyond it the tables hold
+     whatever the last frame left there. */
+  if (n < first || n >= bcount) return -1;
+  if (n <= last && bvis[n]) return n;
+  const a = banchor[n];
+  return (a >= first && a <= last && bvis[a]) ? a : -1;
+}
+
+/* Filled by boundaryAt and read immediately. Module level and reused,
+   because this is called for every object in shot on every frame and
+   the rest of this file does not allocate in a draw pass either.
+
+   THERE ARE TWO QUESTIONS AND THEY ARE NOT THE SAME ONE, which is a
+   correction of the first version of this helper. "Where is the boundary
+   my object stands on" must answer NOTHING when the object is past the
+   end of the drawn road; "where is the far edge of the quad I am
+   drawing for segment n" must answer the road's own last boundary, which
+   is one index past the last drawn segment. Answering both from one
+   function let the hazard's striped front face draw a segment beyond the
+   road, with no body behind it, on every hazard as it came into view.
+   boundaryAt is the first question and boundaryFar is the second. */
+const bpt = { x: 0, y: 0, w: 0, h: 0 };
+function fillBoundary(a, u) {
+  if (u === 0) {
+    bpt.x = bx[a]; bpt.y = by[a]; bpt.w = bw[a]; bpt.h = bh[a];
+    return true;
+  }
+  /* A fraction of the way from the anchor to where its run ended, which
+     is exactly what boundary a + 1 holds: unmerged that is the segment's
+     own far boundary and u is 1, merged it is the end of the run. */
+  bpt.x = bx[a] + (bx[a + 1] - bx[a]) * u;
+  bpt.y = by[a] + (by[a + 1] - by[a]) * u;
+  bpt.w = bw[a] + (bw[a + 1] - bw[a]) * u;
+  bpt.h = bh[a] + (bh[a + 1] - bh[a]) * u;
+  return true;
+}
+
+// WHERE SEGMENT n IS DRAWN FROM, or false when it is not drawn at all.
+function boundaryAt(n, first, last) {
+  const a = segAnchor(n, first, last);
+  if (a < 0) return false;
+  return fillBoundary(a, a === n ? 0 : (n - a) / (bspan[a] || 1));
+}
+
+// THE FAR EDGE OF SEGMENT n's QUAD, which is boundary n + 1. Resolved
+// through n's own anchor, so the far edge of the last drawn segment is
+// the road's last boundary rather than nothing.
+function boundaryFar(n, first, last) {
+  const a = segAnchor(n, first, last);
+  if (a < 0) return false;
+  return fillBoundary(a, (n + 1 - a) / (bspan[a] || 1));
+}
+
+/* The same thing at a FRACTIONAL position, which is what anything moving
+   under its own steam needs: a car is never exactly on a boundary. Two
+   resolutions and a lerp, into the same object, so nothing is allocated
+   and the second read cannot clobber the first. */
+const bptB = { x: 0, y: 0, w: 0, h: 0 };
+function boundaryLerp(k, first, last) {
+  const i = Math.floor(k);
+  if (!boundaryAt(i, first, last)) return false;
+  bptB.x = bpt.x; bptB.y = bpt.y; bptB.w = bpt.w; bptB.h = bpt.h;
+  if (!boundaryFar(i, first, last)) return false;
+  const u = k - i;
+  bpt.x = bptB.x + (bpt.x - bptB.x) * u;
+  bpt.y = bptB.y + (bpt.y - bptB.y) * u;
+  bpt.w = bptB.w + (bpt.w - bptB.w) * u;
+  bpt.h = bptB.h + (bpt.h - bptB.h) * u;
+  return true;
+}
 
 function drawRoad(w, h) {
   const seg = FEEL.SEGMENT_LENGTH;
@@ -14564,13 +14703,22 @@ function drawRoad(w, h) {
      ------------------------------------------------------------------ */
   let maxy = h;
   let first = -1, last = -1;
+  /* How far the tables were written this frame. segAnchor reads it, so
+     an object beyond the walk cannot resolve against a stale anchor. */
+  bcount = count;
   sightSeg = -1;
   for (let n = 0; n < count; n++) {
     const s = segAt(baseIndex + n);
     bvis[n] = 0;
+    /* NOT DRAWN AND NOT MERGED EITHER, until something says otherwise.
+       A segment that fails the rule below is behind a crest or behind
+       the lens, and an object standing on it is genuinely out of sight
+       rather than absorbed into a neighbour. */
+    banchor[n] = -1;
     if (!s) break;
     if (bz[n] <= CAMERA_DEPTH || by[n + 1] >= by[n] || by[n + 1] >= maxy) continue;
     bvis[n] = 1;
+    banchor[n] = n;
     bspan[n] = 1;
     blight[n] = (Math.floor(s.index / FEEL.RUMBLE_SEGMENTS) & 1) === 0 ? 1 : 0;
     /* How far ahead the road is still on screen. Curves are faked by
@@ -14650,7 +14798,18 @@ function drawRoad(w, h) {
         const src = e + 1;
         bx[a + 1] = bx[src]; by[a + 1] = by[src]; bw[a + 1] = bw[src];
         bt[a + 1] = bt[src]; bf[a + 1] = bf[src]; bh[a + 1] = bh[src];
-        for (let k = a + 1; k <= e; k++) bvis[k] = 0;
+        /* ONLY WHAT WAS ACTUALLY ABSORBED GETS AN ANCHOR. The run can
+           step OVER a segment that was already invisible, because the
+           scan above skips those looking for the next candidate, so a
+           blanket stamp across a + 1 to e would hand an anchor to a
+           segment Lou's rule had hidden behind a crest, and the object
+           standing on it would then be drawn in front of the hill that
+           was hiding it. bvis[k] is still 1 here for exactly the
+           segments this run is swallowing. */
+        for (let k = a + 1; k <= e; k++) {
+          if (!bvis[k]) continue;
+          bvis[k] = 0; banchor[k] = a;
+        }
         // Recorded, not used here: see bspan.
         bspan[a] = e - a + 1;
       }
@@ -14755,17 +14914,21 @@ function atFinishGate() {
    ================================================================== */
 function drawFinishGate(first, last, baseIndex) {
   const n = nextGate - baseIndex;
-  if (n < first || n > last || !bvis[n]) return;
+  /* Through the merge, for the same reason the checkpoint is: this is
+     the structure the whole last stretch is driven at, and it used to
+     wink out whenever the far field partition landed on its segment. */
+  if (!boundaryAt(n, first, last)) return;
+  const gx = bpt.x, gy = bpt.y, gw = bpt.w, gh = bpt.h;
   const seg = segAt(nextGate);
   if (!seg) return;
   const out = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
   const post = FEEL.FINISH_POST / seg.hw;
-  const top = by[n] - bh[n] * FEEL.FINISH_HEIGHT;
-  const lx = bx[n] + bw[n] * (out + post * 0.5), rx = bx[n] - bw[n] * (out + post * 0.5);
-  const pw = Math.max(2, bw[n] * post);
-  const banner = (by[n] - top) * FEEL.FINISH_BANNER;
+  const top = gy - gh * FEEL.FINISH_HEIGHT;
+  const lx = gx + gw * (out + post * 0.5), rx = gx - gw * (out + post * 0.5);
+  const pw = Math.max(2, gw * post);
+  const banner = (gy - top) * FEEL.FINISH_BANNER;
 
-  bloomPosts(lx, rx, pw, top, by[n] - top, GATE_GLOW_FILL, COLOUR.GATE_POST);
+  bloomPosts(lx, rx, pw, top, gy - top, GATE_GLOW_FILL, COLOUR.GATE_POST);
 
   /* The banner across the top, in the score's own gold rather than the
      gate's cyan. Every checkpoint all day has been cyan; the one that
@@ -14785,7 +14948,7 @@ function drawFinishGate(first, last, baseIndex) {
   /* Light bars running down both posts, evenly spaced, so the height is
      legible at distance. A single tall rectangle at this scale reads as
      a wall; a ladder reads as a structure. */
-  const postH = by[n] - top;
+  const postH = gy - top;
   ctx.fillStyle = COLOUR.GATE;
   ctx.globalAlpha = 0.75;
   const bars = Math.max(1, Math.round(FEEL.FINISH_BARS));
@@ -14801,15 +14964,22 @@ function drawFinishGate(first, last, baseIndex) {
      marking in the game that spans the driving line, and it is allowed
      to because there is nothing to avoid on it and nothing after it. */
   const nn = Math.min(last, n + 6);
-  if (nn > n && bvis[n]) {
+  /* The far end of the band, resolved the same way as the near end, into
+     three numbers rather than an object: nothing in a draw pass in this
+     file allocates, and a band drawn every frame of the closing stretch
+     is a draw pass. */
+  let fx = 0, fy = 0, fw = 0;
+  const bandFar = nn > n && boundaryAt(nn, first, last);
+  if (bandFar) { fx = bpt.x; fy = bpt.y; fw = bpt.w; }
+  if (bandFar) {
     const bars2 = 8;
     ctx.beginPath();
     for (let k = 0; k < bars2; k += 2) {
       const f0 = -1 + 2 * k / bars2, f1 = -1 + 2 * (k + 1) / bars2;
-      ctx.moveTo(bx[n] + bw[n] * f0 * out, by[n]);
-      ctx.lineTo(bx[n] + bw[n] * f1 * out, by[n]);
-      ctx.lineTo(bx[nn] + bw[nn] * f1 * out, by[nn]);
-      ctx.lineTo(bx[nn] + bw[nn] * f0 * out, by[nn]);
+      ctx.moveTo(gx + gw * f0 * out, gy);
+      ctx.lineTo(gx + gw * f1 * out, gy);
+      ctx.lineTo(fx + fw * f1 * out, fy);
+      ctx.lineTo(fx + fw * f0 * out, fy);
       ctx.closePath();
     }
     ctx.globalAlpha = 0.85;
@@ -14834,19 +15004,23 @@ function drawFinishGate(first, last, baseIndex) {
 function drawGate(first, last, baseIndex) {
   if (atFinishGate()) { drawFinishGate(first, last, baseIndex); return; }
   const n = nextGate - baseIndex;
-  if (n < first || n > last || !bvis[n]) return;
+  /* Through the merge. A gate is one segment wide and it is the single
+     most conspicuous thing on the road, so an absorbed boundary took the
+     whole doorway off the screen for that frame. */
+  if (!boundaryAt(n, first, last)) return;
+  const gx = bpt.x, gy = bpt.y, gw = bpt.w, gh = bpt.h;
   const seg = segAt(nextGate);
   if (!seg) return;
   const out = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
   const post = FEEL.CHECKPOINT_POST / seg.hw;
-  const top = by[n] - bh[n] * FEEL.CHECKPOINT_HEIGHT;
-  const beam = Math.max(2, bh[n] * FEEL.CHECKPOINT_POST * 0.8);
-  const lx = bx[n] + bw[n] * (out + post * 0.5), rx = bx[n] - bw[n] * (out + post * 0.5);
-  const pw = Math.max(2, bw[n] * post);
+  const top = gy - gh * FEEL.CHECKPOINT_HEIGHT;
+  const beam = Math.max(2, gh * FEEL.CHECKPOINT_POST * 0.8);
+  const lx = gx + gw * (out + post * 0.5), rx = gx - gw * (out + post * 0.5);
+  const pw = Math.max(2, gw * post);
 
   // Wide and faint, medium, solid, then a near white core: the same
   // three pass bloom everything lit in this game uses.
-  bloomPosts(lx, rx, pw, top, by[n] - top, GATE_GLOW_FILL, COLOUR.GATE_POST);
+  bloomPosts(lx, rx, pw, top, gy - top, GATE_GLOW_FILL, COLOUR.GATE_POST);
   // The beam across, in the bright colour, so the eye reads a doorway.
   ctx.fillStyle = COLOUR.GATE;
   ctx.fillRect(Math.min(lx, rx) - pw / 2, top - beam / 2,
@@ -14859,7 +15033,7 @@ function drawGate(first, last, baseIndex) {
   const away = nextGate - carSegIndex;
   if (away > 0 && away < FEEL.GATE_SWEEP_SEGMENTS && state === DRIVING) {
     const u = 1 - away / FEEL.GATE_SWEEP_SEGMENTS;
-    const postH = by[n] - top;
+    const postH = gy - top;
     const band = Math.max(2, postH * FEEL.GATE_SWEEP_LENGTH);
     const y = top + (postH - band) * u;
     ctx.fillStyle = COLOUR.GATE;
@@ -15049,9 +15223,14 @@ function drawRamp(j, first, last, baseIndex) {
      here is known exactly rather than assumed. The wedge can overhang
      its own lip by at most one merge run, which is under a pixel, on a
      ramp that is a few pixels tall at that distance. */
-  let n0 = a;
-  while (n0 > first && !bvis[n0]) n0--;
-  if (!bvis[n0]) return;
+  /* THE SHARED ANSWER NOW. This was the first place the merge was found
+     deleting an object and it grew its own snap back; segAnchor is the
+     same walk with one thing added, which is that it can tell a segment
+     that was MERGED from one that is genuinely hidden behind a crest.
+     Snapping back from the second kind drew the ramp in front of the
+     hill that was hiding it. */
+  const n0 = segAnchor(a, first, last);
+  if (n0 < 0) return;
   rampL.length = 0; rampR.length = 0; rampY.length = 0; rampB.length = 0;
   for (let n = n0, world = n0; ; ) {
     const rise = bh[n] * jumpHeightAt(j, world + baseIndex);
@@ -15156,16 +15335,15 @@ function jumpChevrons(first, last, baseIndex, grow) {
          the merges happened to fall, so there was no guarantee at all,
          only luck. Snap back to the anchor that survived instead. It is
          at most SEG_MERGE_PX away up the screen, which is a pixel. */
-      while (n > first && !bvis[n]) n--;
-      if (!bvis[n]) continue;
+      n = segAnchor(n, first, last);
+      if (n < 0) continue;
       /* THE APEX IS UP THE ROAD NOW RATHER THAN UP THE SCREEN, which is
          the whole of laying it flat: the six points are the same six
          points, with the chevron's length spent along the road instead
          of into the sky. The head gets the same snap back to a surviving
          anchor the feet get, because the merge can absorb either end. */
-      let nh = n + FEEL.JUMP_ARROW_LENGTH;
-      if (nh > last) nh = last;
-      while (nh > n && !bvis[nh]) nh--;
+      let nh = segAnchor(Math.min(n + FEEL.JUMP_ARROW_LENGTH, last), first, last);
+      if (nh < n) nh = n;
       any = true;
       // The run grows toward the ramp, so it reads as leading somewhere
       // rather than as a row of identical markers.
@@ -16739,15 +16917,19 @@ function racersUpdate(dt) {
 const ghostPt = { sx: 0, sy: 0, ok: false };
 function ghostPoint(worldZ, worldX, worldY, first, last, baseIndex) {
   const k = (worldZ + FEEL.CAMERA_DISTANCE) / FEEL.SEGMENT_LENGTH - baseIndex;
-  const i = Math.floor(k);
   ghostPt.ok = false;
-  if (i < first || i + 1 > last || !bvis[i]) return ghostPt;
-  const f = k - i;
-  const bxk = bx[i] + (bx[i + 1] - bx[i]) * f;
-  const byk = by[i] + (by[i + 1] - by[i]) * f;
-  const bhk = bh[i] + (bh[i + 1] - bh[i]) * f;
-  ghostPt.sx = bxk + bhk * worldX;
-  ghostPt.sy = byk - bhk * worldY;
+  /* Through the merge, not around it: see segAnchor.
+
+     AND NOTHING CALLS THIS. Found while converting the anchored draws:
+     ghostPoint has no call sites anywhere in the file and had none
+     before this session either. The ghost goes through drawGhostCar and
+     carCurveAt with every other car, which is where its own blinking was
+     fixed. Left in place rather than deleted because two comments
+     elsewhere still explain the projection in terms of it, but it is
+     dead and it should go. */
+  if (!boundaryLerp(k, first, last)) return ghostPt;
+  ghostPt.sx = bpt.x + bpt.h * worldX;
+  ghostPt.sy = bpt.y - bpt.h * worldY;
   ghostPt.ok = true;
   return ghostPt;
 }
@@ -16852,14 +17034,9 @@ function drawContactSparks(first, last, baseIndex, w, h) {
     if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) continue;
     const k = depth / FEEL.SEGMENT_LENGTH
             + (position / FEEL.SEGMENT_LENGTH - baseIndex);
-    const i = Math.floor(k);
-    if (i < first || i + 1 > last || !bvis[i]) continue;
-    const f = k - i;
-    const bxk = bx[i] + (bx[i + 1] - bx[i]) * f;
-    const byk = by[i] + (by[i + 1] - by[i]) * f;
-    const bhk = bh[i] + (bh[i + 1] - bh[i]) * f;
-    const sx = bxk + bhk * contactX[c];
-    const sy = byk - bhk * FEEL.CAR_RIDE_HEIGHT;
+    if (!boundaryLerp(k, first, last)) continue;
+    const sx = bpt.x + bpt.h * contactX[c];
+    const sy = bpt.y - bpt.h * FEEL.CAR_RIDE_HEIGHT;
     const force = contactF[c];
     const n = Math.round(FEEL.NPC_SPARK_MIN
                        + (FEEL.NPC_SPARK_MAX - FEEL.NPC_SPARK_MIN) * force);
@@ -16908,14 +17085,9 @@ function drawWrecks(first, last, baseIndex, w, h) {
     if (depth < FEEL.CAR_BODY_LENGTH * FEEL.NPC_NEAR_CULL) continue;
     const k = depth / FEEL.SEGMENT_LENGTH
             + (position / FEEL.SEGMENT_LENGTH - baseIndex);
-    const i = Math.floor(k);
-    if (i < first || i + 1 > last || !bvis[i]) continue;
-    const f = k - i;
-    const bxk = bx[i] + (bx[i + 1] - bx[i]) * f;
-    const byk = by[i] + (by[i + 1] - by[i]) * f;
-    const bhk = bh[i] + (bh[i + 1] - bh[i]) * f;
-    const sx = bxk + bhk * wreckX[c];
-    const sy = byk - bhk * FEEL.CAR_BODY_HEIGHT * 0.5;
+    if (!boundaryLerp(k, first, last)) continue;
+    const sx = bpt.x + bpt.h * wreckX[c];
+    const sy = bpt.y - bpt.h * FEEL.CAR_BODY_HEIGHT * 0.5;
     const n = Math.round(FEEL.NPC_WRECK_PARTS);
     for (let q = 0; q < n; q++) {
       const p = takeParticle();
@@ -16983,10 +17155,15 @@ function drawWorldCars(first, last, baseIndex, w, h) {
 function carCurveAt(depth, first, last, baseIndex, w) {
   const k = depth / FEEL.SEGMENT_LENGTH + (position / FEEL.SEGMENT_LENGTH - baseIndex);
   const i = Math.floor(k);
-  if (i < first || i + 1 > last || !bvis[i]) return NaN;
   const halfPx = w / 2;
-  const o0 = bh[i] !== 0 ? (bx[i] - halfPx) / bh[i] : 0;
-  const o1 = bh[i + 1] !== 0 ? (bx[i + 1] - halfPx) / bh[i + 1] : 0;
+  /* THE TWO BOUNDARIES, EACH RESOLVED THROUGH THE MERGE, because this is
+     the one place a racer can be deleted from the frame and it was:
+     bvis[i] alone put every car on an absorbed boundary out of the
+     picture until the partition moved off it again. */
+  if (!boundaryAt(i, first, last)) return NaN;
+  const o0 = bpt.h !== 0 ? (bpt.x - halfPx) / bpt.h : 0;
+  if (!boundaryFar(i, first, last)) return NaN;
+  const o1 = bpt.h !== 0 ? (bpt.x - halfPx) / bpt.h : 0;
   return o0 + (o1 - o0) * (k - i);
 }
 
@@ -17098,7 +17275,13 @@ function drawHazardWarnings(first, last, baseIndex) {
       const tail = h.from - m * gap;          // the wide end, nearest the player
       const head = tail + alen;               // the point, further up the road
       const nt = tail - baseIndex, nh = head - baseIndex;
-      if (nt < first || nh > last || !bvis[nt] || !bvis[nh]) continue;
+      /* BOTH ENDS, EACH THROUGH THE MERGE. This was the strictest test
+         in the file: two boundaries had to survive coalescing or the
+         arrow was not drawn, so the run of them shimmered. */
+      if (!boundaryAt(nt, first, last)) continue;
+      const tx = bpt.x, ty = bpt.y, tw = bpt.w;
+      if (!boundaryAt(nh, first, last)) continue;
+      const hx = bpt.x, hy = bpt.y, hw2 = bpt.w;
       const st = segAt(tail);
       if (!st) continue;
       const wide = (FEEL.CAR_BODY_WIDTH * 0.55) / st.hw;
@@ -17107,9 +17290,9 @@ function drawHazardWarnings(first, last, baseIndex) {
         const lx = lanes[g];
         // An arrowhead pointing the way the car is going: wide across the
         // near end, coming to a point up the road.
-        ctx.moveTo(bx[nt] + bw[nt] * (lx - wide), by[nt]);
-        ctx.lineTo(bx[nt] + bw[nt] * (lx + wide), by[nt]);
-        ctx.lineTo(bx[nh] + bw[nh] * lx, by[nh]);
+        ctx.moveTo(tx + tw * (lx - wide), ty);
+        ctx.lineTo(tx + tw * (lx + wide), ty);
+        ctx.lineTo(hx + hw2 * lx, hy);
         ctx.closePath();
       }
     }
@@ -17153,7 +17336,10 @@ function hazardBarriers(first, last, baseIndex) {
     for (let m = 1; m <= count; m++) {
       const at = h.from - m * gap;
       const n = at - baseIndex;
-      if (n < first || n + 1 > last || !bvis[n] || !bvis[n + 1]) continue;
+      if (!boundaryAt(n, first, last)) continue;
+      const nx2 = bpt.x, ny = bpt.y, nw = bpt.w;
+      if (!boundaryFar(n, first, last)) continue;
+      const fy2 = bpt.y;
       const st = segAt(at);
       if (!st) continue;
       /* The blocked width, plus the clip shoulder, because the shoulder
@@ -17161,13 +17347,13 @@ function hazardBarriers(first, last, baseIndex) {
          whole of it is bad news. Fades toward the player so the run reads
          as approaching rather than as a fence. */
       const half = (h.half + FEEL.HAZARD_CLIP) / st.hw;
-      const thick = (by[n] - by[n + 1]) * FEEL.HAZARD_WARN_BAR_THICK;
+      const thick = (ny - fy2) * FEEL.HAZARD_WARN_BAR_THICK;
       any = true;
-      const l = bx[n] + bw[n] * (x - half), r = bx[n] + bw[n] * (x + half);
-      ctx.moveTo(l, by[n]);
-      ctx.lineTo(r, by[n]);
-      ctx.lineTo(r, by[n] - Math.max(1, thick));
-      ctx.lineTo(l, by[n] - Math.max(1, thick));
+      const l = nx2 + nw * (x - half), r = nx2 + nw * (x + half);
+      ctx.moveTo(l, ny);
+      ctx.lineTo(r, ny);
+      ctx.lineTo(r, ny - Math.max(1, thick));
+      ctx.lineTo(l, ny - Math.max(1, thick));
       ctx.closePath();
     }
   }
@@ -17193,22 +17379,41 @@ function hazardQuads(first, last, baseIndex, spread, top, parity) {
   for (let k = 0; k < hazards.length; k++) {
     const h = hazards[k];
     const x = hazardX(h);
+    /* ONE QUAD PER ANCHOR, NOT ONE PER WORLD SEGMENT. Out in the far
+       field the whole body can sit inside a single merged run, and
+       emitting a subpath for each of its segments would draw the same
+       sub pixel quad eight times. Path cost grows with the SQUARE of the
+       subpaths in a path, which is the whole reason the merge exists, so
+       a fix for the flashing that quietly multiplied the geometry would
+       be paying for it twice. */
+    let lastA = -1;
     for (let i = h.from; i <= h.to; i++) {
       const n = i - baseIndex;
-      if (n < first || n > last || !bvis[n]) continue;
       if (parity !== undefined && (i & 1) !== parity) continue;
+      const anchor = segAnchor(n, first, last);
+      if (anchor < 0 || anchor === lastA) continue;
+      // Both boundaries of this slice, through the merge.
+      if (!boundaryAt(n, first, last)) continue;
+      const ax = bpt.x, ay = bpt.y, aw = bpt.w, ah = bpt.h;
+      if (!boundaryFar(n, first, last)) continue;
+      const fx2 = bpt.x, fy2 = bpt.y, fw2 = bpt.w, fh2 = bpt.h;
       const seg = segAt(i);
       if (!seg) continue;
+      /* THE ANCHOR SLOT IS TAKEN ONLY ONCE THE SLICE IS ACTUALLY DRAWN.
+         Claiming it above the guards meant that a slice which then bailed
+         burned the anchor for every later segment of the same hazard, and
+         the body vanished while the striped front face stayed. */
+      lastA = anchor;
       any = true;
       const half = (h.half + spread) / seg.hw;
-      const rise = top ? bh[n] * FEEL.HAZARD_HEIGHT : 0;
-      const riseN = top ? bh[n + 1] * FEEL.HAZARD_HEIGHT : 0;
-      const y1 = by[n] - rise, y2 = by[n + 1] - 1 - riseN;
-      const l1 = bx[n] + bw[n] * (x - half), r1 = bx[n] + bw[n] * (x + half);
-      const l2 = bx[n + 1] + bw[n + 1] * (x - half), r2 = bx[n + 1] + bw[n + 1] * (x + half);
+      const rise = top ? ah * FEEL.HAZARD_HEIGHT : 0;
+      const riseN = top ? fh2 * FEEL.HAZARD_HEIGHT : 0;
+      const y1 = ay - rise, y2 = fy2 - 1 - riseN;
+      const l1 = ax + aw * (x - half), r1 = ax + aw * (x + half);
+      const l2 = fx2 + fw2 * (x - half), r2 = fx2 + fw2 * (x + half);
       if (top) {
         // The near face, from the road up to the top of the box.
-        ctx.moveTo(l1, by[n]); ctx.lineTo(r1, by[n]);
+        ctx.moveTo(l1, ay); ctx.lineTo(r1, ay);
         ctx.lineTo(r1, y1); ctx.lineTo(l1, y1);
       } else {
         ctx.moveTo(l1, y1); ctx.lineTo(r1, y1); ctx.lineTo(r2, y2); ctx.lineTo(l2, y2);
@@ -17231,13 +17436,14 @@ function drawHazardFronts(first, last, baseIndex) {
   for (let k = 0; k < hazards.length; k++) {
     const h = hazards[k];
     const n = h.from - baseIndex;
-    if (n < first || n > last || !bvis[n]) continue;
+    if (!boundaryAt(n, first, last)) continue;
+    const ax = bpt.x, ay = bpt.y, aw = bpt.w, ah = bpt.h;
     const seg = segAt(h.from);
     if (!seg) continue;
     const x = hazardX(h);
     const half = h.half / seg.hw;
-    const l = bx[n] + bw[n] * (x - half), r = bx[n] + bw[n] * (x + half);
-    const top = by[n] - bh[n] * FEEL.HAZARD_HEIGHT, bot = by[n];
+    const l = ax + aw * (x - half), r = ax + aw * (x + half);
+    const top = ay - ah * FEEL.HAZARD_HEIGHT, bot = ay;
     const wpx = r - l, hpx = bot - top;
     if (wpx < 3 || hpx < 3) continue;          // too small to read, skip the work
     ctx.save();
@@ -17302,17 +17508,23 @@ function drawHazards(first, last, baseIndex) {
   for (let k = 0; k < hazards.length; k++) {
     const h = hazards[k];
     const x = hazardX(h);
+    let lastA = -1;
     for (let i = h.from; i <= h.to; i++) {
       const n = i - baseIndex;
-      if (n < first || n > last || !bvis[n]) continue;
+      // One per anchor, for the reason written over hazardQuads.
+      const anchor = segAnchor(n, first, last);
+      if (anchor < 0 || anchor === lastA) continue;
+      if (!boundaryAt(n, first, last)) continue;
+      const ax = bpt.x, ay = bpt.y, aw = bpt.w, ah = bpt.h;
       const seg = segAt(i);
       if (!seg) continue;
+      lastA = anchor;      // taken once it is drawn, see hazardQuads
       any = true;
       const half = h.half / seg.hw;
-      const rise = bh[n] * FEEL.HAZARD_HEIGHT;
-      const y = by[n] - rise;
-      const t = Math.max(1.2, bh[n] * 90);
-      const l1 = bx[n] + bw[n] * (x - half), r1 = bx[n] + bw[n] * (x + half);
+      const rise = ah * FEEL.HAZARD_HEIGHT;
+      const y = ay - rise;
+      const t = Math.max(1.2, ah * 90);
+      const l1 = ax + aw * (x - half), r1 = ax + aw * (x + half);
       ctx.moveTo(l1, y - t); ctx.lineTo(r1, y - t);
       ctx.lineTo(r1, y + t); ctx.lineTo(l1, y + t);
       ctx.closePath();
@@ -17706,27 +17918,32 @@ function drawReflectors(first, last, baseIndex, spacing, scaleH, w) {
   const every = Math.max(1, Math.round(FEEL.REFLECTOR_EVERY));
   const far = FEEL.DRAW_DISTANCE_SEGMENTS * FEEL.SEGMENT_LENGTH;
   const cull = FEEL.REFLECTOR_CULL * far;
-  for (let n = first; n <= last; n++) {
-    if (!bvis[n]) continue;
-    if (bz[n] > cull) break;               // bz rises along the walk
-    const idx = baseIndex + n;
-    if (idx % spacing !== 0) continue;
-    if (((idx / spacing) % every) !== 0) continue;
+  // By marker, for the reason written over lampHeadPath.
+  const step = spacing * every;
+  for (let idx = Math.ceil((baseIndex + first) / step) * step;
+       idx <= baseIndex + last; idx += step) {
+    const n = idx - baseIndex;
+    // bz is never moved by the merge, so it is read at the pin's own
+    // segment whether or not that segment survived. It rises along the
+    // walk, so this is still a break.
+    if (bz[n] > cull) break;
+    if (!boundaryAt(n, first, last)) continue;
+    const px = bpt.x, py = bpt.y, pw2 = bpt.w;
     const major = ((idx / spacing) % FEEL.PYLON_MAJOR_EVERY) === 0;
     const hWorld = major ? FEEL.PYLON_MAJOR_HEIGHT : FEEL.PYLON_HEIGHT;
-    const rise = bw[n] * hWorld * scaleH;
-    const size = bw[n] * (major ? FEEL.PYLON_MAJOR_WIDTH : FEEL.PYLON_WIDTH)
+    const rise = pw2 * hWorld * scaleH;
+    const size = pw2 * (major ? FEEL.PYLON_MAJOR_WIDTH : FEEL.PYLON_WIDTH)
                * scaleH * FEEL.REFLECTOR_SIZE;
     if (size < FEEL.REFLECTOR_MIN_PX) continue;
-    const out = bw[n] * (EDGE_OUT + FEEL.PYLON_OUT);
-    const y = by[n] - rise * FEEL.REFLECTOR_HEIGHT;
+    const out = pw2 * (EDGE_OUT + FEEL.PYLON_OUT);
+    const y = py - rise * FEEL.REFLECTOR_HEIGHT;
     /* The majors take the warm pin and the minors the cool one, so the
        pattern along the verge is the same rhythm the posts already have
        rather than a second one laid over it. */
     const c = major ? 0 : 1;
     const a = REFLECT_XY[c];
     for (let s = -1; s <= 1; s += 2) {
-      const x = bx[n] + s * out;
+      const x = px + s * out;
       if (x < -size || x > w + size) continue;
       const at = REFLECT_N[c] * 3;
       if (at + 3 > a.length) break;
@@ -17790,25 +18007,36 @@ function drawLampHeads(first, last, baseIndex, spacing, scaleH) {
 function lampHeadPath(first, last, baseIndex, spacing, widen, scaleH) {
   const every = Math.max(1, Math.round(FEEL.PYLON_MAJOR_EVERY
                                        * Math.max(1, Math.round(FEEL.LAMP_EVERY))));
+  /* WALKED BY MARKER, NOT BY SEGMENT, AND THAT IS THE FIX FOR THE
+     FLASHING. Every one of these loops used to walk the drawn segments
+     and ask which of them happened to be a marker position. A marker
+     whose own segment had been absorbed by the far field merge was
+     therefore not drawn at all, and since the merge partition moves as
+     the camera advances, the posts blinked: measured at up to 53.7
+     changes of state a second on one post, 16.6 on average across 93 of
+     them. Walking the markers themselves and resolving each through
+     boundaryAt draws every one of them, every frame, from wherever its
+     segment ended up. It is also fewer iterations: sixteen markers
+     rather than a hundred and ninety segments. */
   ctx.beginPath();
-  for (let n = first; n <= last; n++) {
-    if (!bvis[n]) continue;
-    const idx = baseIndex + n;
-    if (idx % spacing !== 0) continue;
-    if (((idx / spacing) % every) !== 0) continue;
+  const step = spacing * every;
+  for (let idx = Math.ceil((baseIndex + first) / step) * step;
+       idx <= baseIndex + last; idx += step) {
+    if (!boundaryAt(idx - baseIndex, first, last)) continue;
+    const px = bpt.x, py = bpt.y, pw2 = bpt.w;
 
-    const rise = bw[n] * FEEL.PYLON_MAJOR_HEIGHT * scaleH;
+    const rise = pw2 * FEEL.PYLON_MAJOR_HEIGHT * scaleH;
     if (rise < FEEL.PYLON_MIN_PX) continue;
-    const hh = bw[n] * FEEL.LAMP_HEAD_HEIGHT * scaleH * 0.5;
+    const hh = pw2 * FEEL.LAMP_HEAD_HEIGHT * scaleH * 0.5;
     const hx = Math.max(FEEL.LAMP_HEAD_MIN_PX,
-                        bw[n] * FEEL.LAMP_HEAD_WIDTH * scaleH * 0.5) * widen;
+                        pw2 * FEEL.LAMP_HEAD_WIDTH * scaleH * 0.5) * widen;
     const hy = Math.max(FEEL.LAMP_HEAD_MIN_PX, hh) * widen;
     const side = lampSide(idx, spacing);
-    const out = side * bw[n] * (EDGE_OUT + FEEL.PYLON_OUT);
+    const out = side * pw2 * (EDGE_OUT + FEEL.PYLON_OUT);
     // Centred on the top of the post, so the head caps it rather than
     // floating above it.
-    const cy = by[n] - rise + hh;
-    ctx.rect(bx[n] + out - hx, cy - hy, hx * 2, hy * 2);
+    const cy = py - rise + hh;
+    ctx.rect(px + out - hx, cy - hy, hx * 2, hy * 2);
   }
 }
 
@@ -17893,19 +18121,21 @@ function lampPoolPass(first, last, baseIndex, spacing) {
   ctx.save();
   ctx.globalAlpha = FEEL.LAMP_POOL_ALPHA;
   ctx.fillStyle = LAMP_POOL_GRAD;
-  for (let n = first; n <= last; n++) {
-    if (!bvis[n]) continue;
-    const idx = baseIndex + n;
-    if (idx % spacing !== 0) continue;
-    if (((idx / spacing) % every) !== 0) continue;
-    const rx = Math.min(bw[n] * FEEL.LAMP_POOL_SIZE, bw[n] * room,
+  // By marker, for the reason written over lampHeadPath, and it has to
+  // be the same walk as the heads or a pool would light an empty verge.
+  const step = spacing * every;
+  for (let idx = Math.ceil((baseIndex + first) / step) * step;
+       idx <= baseIndex + last; idx += step) {
+    if (!boundaryAt(idx - baseIndex, first, last)) continue;
+    const px = bpt.x, py = bpt.y, pw2 = bpt.w;
+    const rx = Math.min(pw2 * FEEL.LAMP_POOL_SIZE, pw2 * room,
                         FEEL.LAMP_POOL_MAX_PX);
     if (rx < FEEL.LAMP_POOL_MIN_PX) continue;
     // The same side the head is on, or the light would be coming from
     // the wrong place, which is the one mistake a lighting pass cannot
     // survive.
     ctx.save();
-    ctx.translate(bx[n] + lampSide(idx, spacing) * bw[n] * outF, by[n]);
+    ctx.translate(px + lampSide(idx, spacing) * pw2 * outF, py);
     ctx.scale(rx, rx * FEEL.LAMP_POOL_SQUASH);
     ctx.beginPath();
     ctx.arc(0, 0, 1, 0, Math.PI * 2);
@@ -17960,20 +18190,25 @@ function reflectPass(first, last, baseIndex, spacing) {
   const outer = EDGE_OUT - lip;
   ctx.beginPath();
   let any = false;
-  for (let n = first; n <= last; n++) {
-    if (!bvis[n]) continue;
-    const idx = baseIndex + n;
-    if (idx % spacing !== 0) continue;
+  // By marker, for the reason written over lampHeadPath. The streak runs
+  // from the post back toward the player, so it needs both ends and each
+  // is resolved through the merge.
+  for (let idx = Math.ceil((baseIndex + first) / spacing) * spacing;
+       idx <= baseIndex + last; idx += spacing) {
+    const n = idx - baseIndex;
     const m = n - FEEL.REFLECT_SEGMENTS;
-    if (m < first || !bvis[m]) continue;
+    if (!boundaryAt(n, first, last)) continue;
+    const nx2 = bpt.x, ny2 = bpt.y, nw2 = bpt.w;
+    if (!boundaryAt(m, first, last)) continue;
+    const mx2 = bpt.x, my2 = bpt.y, mw2 = bpt.w;
 
     const major = ((idx / spacing) % FEEL.PYLON_MAJOR_EVERY) === 0;
     const wWorld = major ? FEEL.PYLON_MAJOR_WIDTH : FEEL.PYLON_WIDTH;
     const scaleH = 1 / FEEL.ROAD_HALF_WIDTH_BASE;
     // The post's own half width at each end, the near one widened.
-    const h0 = Math.max(FEEL.REFLECT_MIN_PX, bw[n] * wWorld * scaleH * 0.5);
+    const h0 = Math.max(FEEL.REFLECT_MIN_PX, nw2 * wWorld * scaleH * 0.5);
     const h1 = Math.max(FEEL.REFLECT_MIN_PX,
-                        bw[m] * wWorld * scaleH * 0.5 * FEEL.REFLECT_WIDEN);
+                        mw2 * wWorld * scaleH * 0.5 * FEEL.REFLECT_WIDEN);
     for (let side = -1; side <= 1; side += 2) {
       /* Both ends as a FRACTION of the local half width, so the clamp is
          in the same units the lip and the lane are quoted in and cannot
@@ -17989,15 +18224,15 @@ function reflectPass(first, last, baseIndex, spacing) {
          outrank, on a handful of pixels right where the eye is looking.
          The half width is converted into the same fractional units and
          subtracted before the clamp. */
-      const g0 = h0 / Math.max(1e-6, bw[n]);
-      const g1 = h1 / Math.max(1e-6, bw[m]);
+      const g0 = h0 / Math.max(1e-6, nw2);
+      const g1 = h1 / Math.max(1e-6, mw2);
       let f0 = clamp(EDGE_OUT + FEEL.PYLON_OUT, inner + g0, outer - g0);
       let f1 = clamp(EDGE_OUT + FEEL.PYLON_OUT - FEEL.REFLECT_INBOARD,
                      inner + g1, outer - g1);
       if (outer - g0 <= inner + g0 || outer - g1 <= inner + g1) continue;
       any = true;
-      const x0 = bx[n] + side * bw[n] * f0, y0 = by[n];
-      const x1 = bx[m] + side * bw[m] * f1, y1 = by[m];
+      const x0 = nx2 + side * nw2 * f0, y0 = ny2;
+      const x1 = mx2 + side * mw2 * f1, y1 = my2;
       ctx.moveTo(x0 - h0, y0); ctx.lineTo(x0 + h0, y0);
       ctx.lineTo(x1 + h1, y1); ctx.lineTo(x1 - h1, y1);
       ctx.closePath();
@@ -18013,28 +18248,30 @@ function reflectPass(first, last, baseIndex, spacing) {
 /* which: 0 ordinary posts, 1 marker posts, 2 both. */
 function pylonPath(first, last, baseIndex, spacing, widen, scaleH, which) {
   ctx.beginPath();
-  for (let n = first; n <= last; n++) {
-    if (!bvis[n]) continue;
-    const idx = baseIndex + n;
-    if (idx % spacing !== 0) continue;
+  // By marker, for the reason written over lampHeadPath. These are the
+  // posts themselves and they are what the player reported flashing.
+  for (let idx = Math.ceil((baseIndex + first) / spacing) * spacing;
+       idx <= baseIndex + last; idx += spacing) {
     const major = ((idx / spacing) % FEEL.PYLON_MAJOR_EVERY) === 0;
     if (which !== 2 && (which === 1) !== major) continue;
+    if (!boundaryAt(idx - baseIndex, first, last)) continue;
+    const px = bpt.x, py = bpt.y, pw2 = bpt.w;
 
     const hWorld = major ? FEEL.PYLON_MAJOR_HEIGHT : FEEL.PYLON_HEIGHT;
     const wWorld = (major ? FEEL.PYLON_MAJOR_WIDTH : FEEL.PYLON_WIDTH) * widen;
     // Heights use the horizontal scale, as everything standing up does.
-    const rise = bw[n] * hWorld * scaleH;
+    const rise = pw2 * hWorld * scaleH;
     if (rise < FEEL.PYLON_MIN_PX) continue;
-    const half = bw[n] * wWorld * scaleH * 0.5;
-    const out = bw[n] * (EDGE_OUT + FEEL.PYLON_OUT);
-    const base = by[n];
+    const half = pw2 * wWorld * scaleH * 0.5;
+    const out = pw2 * (EDGE_OUT + FEEL.PYLON_OUT);
+    const base = py;
     const top = base - rise;
 
-    ctx.moveTo(bx[n] - out - half, top); ctx.lineTo(bx[n] - out + half, top);
-    ctx.lineTo(bx[n] - out + half, base); ctx.lineTo(bx[n] - out - half, base);
+    ctx.moveTo(px - out - half, top); ctx.lineTo(px - out + half, top);
+    ctx.lineTo(px - out + half, base); ctx.lineTo(px - out - half, base);
     ctx.closePath();
-    ctx.moveTo(bx[n] + out - half, top); ctx.lineTo(bx[n] + out + half, top);
-    ctx.lineTo(bx[n] + out + half, base); ctx.lineTo(bx[n] + out - half, base);
+    ctx.moveTo(px + out - half, top); ctx.lineTo(px + out + half, top);
+    ctx.lineTo(px + out + half, base); ctx.lineTo(px + out - half, base);
     ctx.closePath();
   }
 }
