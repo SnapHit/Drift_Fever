@@ -4749,14 +4749,14 @@ const FEEL = {
 
      THE LENGTHS NO LONGER VARY BY DAY. They used to come off the seed,
      six to eight gates, and that was right when the day was one track.
-     Three tracks with three independent lengths puts the TOTAL, which is
+     A day of tracks with independent lengths puts the TOTAL, which is
      the thing that actually has to hold, on a random walk. The road
      still changes completely every day; only its length is fixed.
 
      THE LAST GATE IS THE FINISH. There is no extra structure after a
      count of checkpoints: gate N ends the run, which is why the pips and
      the countdown and the line are all the same number. */
-  LEVEL_COUNT:                5,     // LIVE, and read by everything
+  LEVEL_COUNT:                6,     // LIVE, and read by everything
   /* HOW MANY OF THEM ARE TRAINING, AND THIS IS THE WHOLE OF HOW THE
      TUTORIAL BECAME A SEPARATE THING WITHOUT A SECOND SYSTEM.
 
@@ -5089,7 +5089,20 @@ const FEEL = {
      settle on before the seeded road starts asking questions.
      Measured, it survives from 36 up; 40 is that with margin. */
   OPEN_SLALOM_TAIL:          40,     // LIVE, the settling straight, was 60
-  LEVEL_GATES_FIRST:          3,     // LIVE, gates on the first REAL level
+  /* TWO, NOT THREE, AND THE FIFTH REAL LEVEL IS WHY.
+
+     A fifth level has to come from somewhere. Taken at the top, the
+     ladder runs 3 4 5 6 7 gates and the day goes from 10:22 to 14:10,
+     which is 36% longer before anybody dies. Taken at the bottom, it
+     runs 2 3 4 5 6, the step stays exactly one gate, and the day is
+     11:23. Nothing gets longer: every level that exists today slides
+     down a rung and loses a gate, and the new one takes the top slot at
+     the length the hardest level already was.
+
+     THE 33 SECONDS COMES OFF THE CHEAPEST PLACE IN THE DAY. On the
+     first real level all eight driving policies survive today, which is
+     the definition of a level that is not asking anything yet. */
+  LEVEL_GATES_FIRST:          2,     // LIVE, gates on the first REAL level
   LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
   /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
      levelBand. Above one compresses the middle levels toward the easy
@@ -5130,7 +5143,7 @@ const FEEL = {
      ROAD_SQUEEZE 0.90 put level three where level three has always been,
      level four at 2.80 and 0.85, and the last level at 2.90 and 0.80,
      which is the pair the drivers were measured on. */
-  LEVEL_TOP_STEP:           0.5,     // LIVE, extra deep ramp per level above LEVEL_HARD_AT
+  LEVEL_TOP_STEP:           0.4,     // LIVE, extra deep ramp per level above LEVEL_HARD_AT
   /* The run out past the finish, laid in fixed size pieces so the
      slicing is a pure function of the segment index rather than of how
      far the camera had got. See topUpRoad. NOT live: changing it changes
@@ -10754,7 +10767,7 @@ function countdownLabel() {
 /* ==================================================================
    THE LEVELS.
 
-   Three tracks a day, played in order, escalating. Everything about them
+   A ladder of tracks a day, played in order, escalating. Everything about them
    is DERIVED from FEEL.LEVEL_COUNT so that changing it to two or four
    changes the game and not the code. Nothing below writes 3.
 
@@ -10984,7 +10997,7 @@ let lastSeed = PINNED_SEED;
    not be the opening road again. */
 function nextSeed(salt) {
   if (mode === DAILY) {
-    // The LEVEL's seed, not the day's. Three roads a day, each of them a
+    // The LEVEL's seed, not the day's. One road per level, each of them a
     // pure function of the local date and the level number.
     const base = levelSeedFor(todayStamp, level);
     lastSeed = salt ? (base ^ Math.imul(salt | 0, 0x9E3779B1)) >>> 0 : base;
@@ -15744,7 +15757,7 @@ function ghostBank() {
   if (ghostRec.n < 2) return false;          // too short to be a line
   const blob = ghostEncode();
   dailyGhostBytes = blob.length;
-  // The LEVEL's own line. Three ghosts is three stored blobs; the
+  // The LEVEL's own line. One ghost per level is one stored blob each; the
   // renderer still only ever has the one loaded.
   recFor(level).ghost = blob;
   storeSet('daily.ghost.' + clampLevel(level), blob);
@@ -21725,7 +21738,16 @@ const CARS = [
   { name: 'WIDEBODY',   need: 10, days: 0, wing: 3,
     rim: 'CAR_RIM',      light: 'CAR_LIGHT_AMBER', seam: 'CAR_SEAM_LIGHT',
     trail: 'TRAIL_0' },
-  { name: 'SLICKTOP',   need: 25, days: 0, wing: 0,
+  /* 24 AND NOT 25, AND A FIFTH LEVEL IS WHY. finishedEver counts real
+     levels, so a day is worth five of them now rather than four, and 25
+     landed exactly on five days: the same finish that credits the fifth
+     CLEAN day and unlocks GOLD CHAIN. Two cars unlocking on one finish
+     announces one of them, because the loop below takes the highest
+     indexed unlocked car rather than the new one. Moved DOWN rather
+     than up, because finishedEver is cumulative and stored: lowering a
+     threshold can only unlock something sooner, where raising one could
+     take a car off somebody who already has it. */
+  { name: 'SLICKTOP',   need: 24, days: 0, wing: 0,
     rim: 'CAR_RIM_DARK', light: 'CAR_LIGHT_COOL',  seam: 'CAR_SEAM_LIGHT',
     trail: 'TRAIL_ALT' },
   { name: 'NIGHT SHIFT', need: 0, days: 1, wing: 2,
@@ -21804,7 +21826,10 @@ function nextUnlockLine() {
     const days = Math.max(0, c.days - cleanDaysEver);
     /* The one still outstanding, and the LONGER one when both are, so
        the number shown is the one that actually gates it. */
-    if (days > 0 && (tracks === 0 || days * 5 >= tracks)) {
+    /* A CLEAN DAY IS WORTH A DAY'S WORTH OF TRACKS, and that was written
+       out as five when a day held four of them. It is derived now, so
+       the comparison keeps meaning what it says whatever the count is. */
+    if (days > 0 && (tracks === 0 || days * realLevelCount() >= tracks)) {
       return c.name + ' IN ' + days + (days === 1 ? ' CLEAN DAY' : ' CLEAN DAYS');
     }
     if (tracks > 0) {
@@ -23682,8 +23707,11 @@ function drawResult(w, h) {
   if (mode === ENDLESS) {
     canvasButton(dailyRect, "TODAY'S TRACK", w / 2, stack, size, COLOUR.GATE, w);
     ctx.globalAlpha = 0.55;
+    /* THE REAL LEVELS, for the same reason newTracksLine takes them:
+       levelCount includes the training run and this line is a promise
+       about what there is to drive. */
     const sub = 'track #' + trackNumber(todayStamp) + ', '
-              + levelCount() + ' levels, one road for everyone'
+              + realLevelCount() + ' levels, one road for everyone'
               + (ghost.live ? ', your ghost is waiting' : '')
               + (hasKeyboard ? '     press T' : '');
     text(sub, w / 2, stack - size * 1.5,
@@ -23979,7 +24007,7 @@ function drawFinish(w, h) {
 
      Finishing the day is the best moment in this game and it said
      nothing at all about there being more. It says it here, once, on the
-     one completion in five that ends a day, and never on the other four:
+     one completion that ends a day, and never on the ones before it:
      a player rolling from level two into level three is not deciding
      whether to return tomorrow, they are deciding whether to tap now,
      and telling them about tomorrow at that moment argues against the
@@ -24572,7 +24600,7 @@ function shareRun() {
   const daily = mode === DAILY;
   /* THE LEVEL IS PART OF WHICH TRACK IT WAS. A score off track 47 is a
      claim two people can settle only if they drove the same corners, and
-     the day is three roads now, so naming the track without the level
+     the day is a road per level now, so naming the track without it
      names a third of it. The glyph lands next session and will do this
      properly; this keeps the plain text honest until it does. */
   const lv = daily ? levelLabel(level) : '';
@@ -24830,7 +24858,12 @@ function titleFactLine() {
    the moment the player is deciding whether there is a reason to come
    back. */
 function newTracksLine(tomorrow) {
-  const n = levelCount();
+  /* THE REAL ONES, AND IT USED TO COUNT THE TRAINING RUN AS A TRACK.
+     levelCount includes it, so the line promised five new tracks when
+     four were real, and would have promised six now. Nothing else that
+     counts a day uses that number: the share card, the pips and the
+     level readout all take realLevelCount. */
+  const n = realLevelCount();
   const what = n === 1 ? 'A NEW TRACK' : n + ' NEW TRACKS';
   return what + (tomorrow ? ' TOMORROW, IN ' : ' IN ') + countdownLabel();
 }
@@ -25665,7 +25698,7 @@ function updateScore(dt) {
    ================================================================== */
 /* ONE ENTRY PER LEVEL, AND THE ARRAYS ARE SIZED FROM LEVEL_COUNT.
 
-   Three ghosts is three arrays, not three systems: the ghost that is
+   A ghost per level is an array each, not a system each: the ghost that is
    LOADED is still the single one the existing renderer draws, and these
    are the stored blobs it is loaded from when a level starts.
 
@@ -25930,6 +25963,12 @@ function clearDailyRecords() {
    never drawn, so its road is the same road and its five placed objects
    are on the same segments on every day.
 
+   20, A FIFTH REAL LEVEL. The gate ladder starts a rung lower so the
+   day does not grow, which shortens every level that already existed by
+   one gate, and a level's road is a function of its length. Every
+   stored time and every ghost is therefore against a road that no
+   longer exists.
+
    19, BIGGER HILLS AND TIGHTER CORNERS. The height field gained a third
    component, a long swell, and its amplitude went up with it, so every
    crest and trough is somewhere else and the sight line clause refuses a
@@ -25941,7 +25980,7 @@ function clearDailyRecords() {
    Training is untouched again, and for the same two reasons: it is flat
    by construction and its difficulty band is zero, so neither the swell
    nor the deep curve reaches it. */
-const ROAD_GEN = 19;
+const ROAD_GEN = 20;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
@@ -26096,7 +26135,7 @@ function skipTraining() {
    canContinue is false for the whole of it. Its clean bit is therefore
    free for anybody who finishes it at all, and a free bit inside the
    loudest thing the game records makes that thing quieter. A clean day
-   is the four levels that can actually be failed.
+   is the real levels, the ones that can actually be failed.
 
    The day is still every level that counts, so nothing else about
    dayDone changes: it is the loop bounds that moved, not the meaning. */
