@@ -1694,10 +1694,11 @@ const FEEL = {
      ever states a width, a height or a speed. It states a DISTANCE, on
      the card, and that is the one the signs now agree with.
 
-     SO THE UNIT IS THE KILOMETRE, one decimal, on every sign. The four
-     real levels are 8.5 to 17.5km, so every sign in the game reads
-     between 1.7 and 14.0km; only the training run dips under one, at
-     0.5. Metres would have meant four digits on every panel, and
+     SO THE UNIT IS THE KILOMETRE, one decimal, on every sign. The five
+     real levels are 5.5 to 17.5km, the shortest having lost a gate when
+     the fifth level was taken out of the bottom of the ladder, so the
+     shortest sign reading came down with it; only the training run dips
+     under one, at 0.5. Metres would have meant four digits on every panel, and
      switching between them, which a road sign does and this brief
      explicitly forbade. */
   WORLD_UNITS_PER_METRE:    100,     // LIVE, and it is not a free choice
@@ -4554,8 +4555,12 @@ const FEEL = {
      this with nothing on it.
 
      IT IS NOT THE RATE THAT IS WRONG, IT IS THE TAIL. Measured over 28
-     days on all four real levels, the road already carries one object
-     every 10.8 to 11.8 seconds on average. What it also carries is
+     days on the four real levels there were then, at the lengths they
+     had then, the road already carries one object every 10.8 to 11.8
+     seconds on average. The per level positions quoted below are from
+     that ladder: every one of those levels has since slid down a rung
+     and a fifth was added, so read them as the shape of the problem
+     rather than as where the holes are today. What it also carries is
      stretches of 17 to 22 seconds with nothing at all, and they are not
      in one place: level two's is at 20 seconds, level three's at 68 per
      cent of the way through, level four's at 56, level five's at 59.
@@ -4724,14 +4729,27 @@ const FEEL = {
      steps: it makes finishing impossible, so there is nothing to
      compare, and the ghost sets a pace rather than being a rival.
 
-     THE DAY IS THREE TRACKS, NOT ONE, and they are played in order.
+     THE DAY IS A LADDER OF TRACKS, NOT ONE, and they are played in
+     order. It was three when this was written and it is six now, one
+     training run and five real levels.
 
-     THE TOTAL IS THE DESIGN CONSTRAINT, not the level count. Handoff 2.5:
-     a daily works as an appointment at three to five minutes and becomes
-     homework at ten. At the current spacing of 33.3 seconds a gate, the
-     count below is 2, 4 and 5 gates, which is 57 + 123 + 157 = 337
-     seconds clean, five minutes thirty seven. If a length ever drifts
-     upward the fix is to shorten it, not to accept the total.
+     THE TOTAL IS THE DESIGN CONSTRAINT, not the level count. Handoff
+     2.5: a daily works as an appointment at three to five minutes and
+     becomes homework at ten. THE BUILD IS PAST THAT AND HAS BEEN FOR A
+     WHILE, and it is written down here rather than quietly left in the
+     arithmetic. At 33.3 seconds a gate the ladder below is 1, 2, 3, 4,
+     5 and 6 gates, which is 43.1 + 61.3 + 94.7 + 128.0 + 161.3 + 194.7
+     = 683.1 seconds clean, eleven minutes twenty three. It was 10:22 at
+     four real levels and 5:37 at the three this paragraph was written
+     for.
+
+     THE RULE STILL SAYS SHORTEN IT RATHER THAN ACCEPT IT, and the
+     cheapest place to do that is the same place the fifth level's
+     length came from: the bottom of the ladder. Dropping the training
+     run's own length, or taking LEVEL_GATES_FIRST to one, are the two
+     levers that do not touch the top of the game. The author has the
+     number and chose it knowingly; this note exists so nobody has to
+     rediscover that the total is the thing being spent.
 
      THREE, BECAUSE THREE CONFIGURATIONS ALREADY EXIST. The on ramp
      values, the mid values and the deep values. Level one is the on ramp
@@ -5140,10 +5158,18 @@ const FEEL = {
 
      THE PAIR BELOW IS SET FOR THE TOP OF THAT, which is why they read
      easier than the values that were measured: CURVE_SCALE_DEEP 2.7 and
-     ROAD_SQUEEZE 0.90 put level three where level three has always been,
-     level four at 2.80 and 0.85, and the last level at 2.90 and 0.80,
-     which is the pair the drivers were measured on. */
+     ROAD_SQUEEZE 0.90 put level three where level three has always
+     been. At five real levels and a step of 0.4 the ladder past the
+     band is 2.70, 2.78, 2.86 and 2.94 on roads of 0.90, 0.86, 0.82 and
+     0.78, and the top of it is measured: LOOK finishes it twice in
+     twelve days. */
   LEVEL_TOP_STEP:           0.4,     // LIVE, extra deep ramp per level above LEVEL_HARD_AT
+  /* THE FURTHEST ALONG THE DEEP RAMP ANY LEVEL MAY BE TAKEN, and it is
+     the furthest one that has been driven rather than a round number.
+     See levelHardD: without it, adding levels walks the top rung past
+     the cliff, and the cycler's own maximum of eight lands exactly on
+     it. 2.2 is the top level as it ships. */
+  LEVEL_TOP_MAX:            2.2,     // LIVE, and it is a measured ceiling
   /* The run out past the finish, laid in fixed size pieces so the
      slicing is a pure function of the segment index rather than of how
      far the camera had got. See topUpRoad. NOT live: changing it changes
@@ -5757,9 +5783,11 @@ const FEEL = {
 
      THE NUMBER HERE IS 2.7 AND NOT THE 2.9 THAT WAS MEASURED, because
      of LEVEL_TOP_STEP: this is where the ramp stands at LEVEL_HARD_AT,
-     and the last level carries it two steps further to exactly 2.90.
-     Level three keeps the 2.5 it has always had at its own cap and
-     climbs to 2.70 by the line. */
+     and every level above it carries the interpolation further. With
+     five real levels the last one is three steps of 0.4 past this, so
+     2.94, and LEVEL_TOP_MAX is what stops that walking any further as
+     levels are added. Level three keeps the 2.5 it has always had at
+     its own cap and climbs to 2.70 by the line. */
   CURVE_SCALE_DEEP:         2.7,     // where the curve scale ends up at LEVEL_HARD_AT
   /* 0.88 to 0.90 here and 0.80 at the top, for the same reason as
      above. On its own the squeeze barely registered, 0.7% of the run on
@@ -8342,6 +8370,7 @@ const TUNABLES = [
   { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
   { key: 'LEVEL_HARD_AT',      label: 'hardAt',  step: 1,    min: 2,    max: 8,     dp: 0, group: 27 },
   { key: 'LEVEL_TOP_STEP',     label: 'topStep', step: 0.1,  min: 0,    max: 2,     dp: 2, group: 27 },
+  { key: 'LEVEL_TOP_MAX',      label: 'topMax',  step: 0.1,  min: 1,    max: 3,     dp: 2, group: 27 },
   { key: 'FINISH_HEIGHT',      label: 'finTall', step: 100,  min: 400,  max: 8000,  dp: 0, group: 27 },
   { key: 'PIP_SIZE',           label: 'pip',     step: 0.001,min: 0.005,max: 0.06,  dp: 3, group: 27 },
   { key: 'PIP_GAP',            label: 'pipGap',  step: 0.001,min: 0,    max: 0.04,  dp: 3, group: 27 },
@@ -10621,6 +10650,22 @@ function nudgeTuning(dir) {
   if (t.key === 'BIOME_COUNT' || t.key === 'ROAD_ABOVE_TERRAIN') {
     buildBiomes(); applyBiome(biome);
   }
+  /* AND MOVING THE LADDER ON THE CYCLER CLEARS THE DAY, because it is
+     the one live knob that changes how LONG a level is.
+
+     The identity of a stored daily record is the date, ROAD_GEN and the
+     level index, and it does not include the level's length. Shipping a
+     new ladder bumps ROAD_GEN by hand and every record goes; nudging the
+     count here does not, so without this the day's bests, times and
+     ghosts would load onto roads of a different length, and a best
+     banked over the old longer level would be unbeatable for the rest of
+     the day. That is the exact failure the generation counter exists to
+     prevent, reached by the one path that never touches it. */
+  if (t.key === 'LEVEL_COUNT' || t.key === 'LEVEL_GATES_FIRST'
+      || t.key === 'LEVEL_GATES_LAST' || t.key === 'TRAINING_LEVELS') {
+    clearDailyRecords();
+    refreshTrackLength();
+  }
   markTuning();
   saveTuning();
 }
@@ -10862,13 +10907,13 @@ function levelBand(lvl) {
    training run is not a rung on it. It has its own count, which is one,
    and one gate is 28.0 seconds because the first gate is the finish.
 
-   THE DAY TOTAL, WHICH IS THE THING THAT HAD TO HOLD. It was 2 3 4 5 6
-   gates at a first gate of 0.70, so 56.7 90.0 123.3 156.7 190.0, total
-   616.7 seconds. It is now 1 3 4 5 6 at a first gate of 0.84, so 28.0
-   94.7 128.0 161.3 194.7, total 606.7. Ten seconds shorter, 1.6 per
-   cent, and the training run more than halves. The four real levels
-   still step by exactly one gate each, which is the property the
-   straight ramp existed for. */
+   THE DAY TOTAL, WHICH IS THE THING THAT HAD TO HOLD. With a fifth real
+   level the ladder is 1 2 3 4 5 6 gates, so 43.1 61.3 94.7 128.0 161.3
+   194.7, total 683.1 seconds. Taking the extra level off the TOP
+   instead would have been 3 4 5 6 7, which is 849.8 and 36 per cent
+   longer; taking it off the bottom costs 61.3, which is the level that
+   did not exist. The five real levels still step by exactly one gate
+   each, which is the property the straight ramp existed for. */
 function levelGatesFor(lvl) {
   const l = clampLevel(lvl);
   if (isTraining(l)) return Math.max(1, Math.round(FEEL.TRAINING_GATES));
@@ -10935,7 +10980,26 @@ function levelHardD() {
   const d = clamp(levelBand(level) * 2 - 1, 0, 1);
   if (d < 1) return d;
   const over = clampLevel(level) - Math.max(2, Math.round(FEEL.LEVEL_HARD_AT));
-  return 1 + Math.max(0, over) * Math.max(0, FEEL.LEVEL_TOP_STEP);
+  /* AND IT HAS A CEILING NOW, WHICH IT DID NOT WHEN IT WAS WRITTEN.
+
+     The step is PER LEVEL, so where the top rung lands depends on how
+     many levels there are, and nothing stopped it walking off the end.
+     LEVEL_COUNT is on the cycler with a maximum of eight: at eight the
+     top level would reach 1 + 5 * 0.4 = 3.0, which is a curve scale of
+     3.10 on a road at 0.70, and that is not a guess about what is too
+     far. It is the exact cell this project measured as a cliff, LOOK
+     finishing zero of eight on both top levels with the median run
+     collapsing.
+
+     So a constant advertised as LIVE and read by everything had a range
+     in which it made the game unfinishable. The cap is the furthest rung
+     that has actually been driven: at 2.2 the top level is a curve scale
+     of 2.94 on a road at 0.78, measured at two finishes in twelve, which
+     is hard. Levels past the cap share the top difficulty and differ in
+     length, which is what levels above LEVEL_HARD_AT did anyway before
+     the step existed. */
+  return Math.min(Math.max(1, FEEL.LEVEL_TOP_MAX),
+                  1 + Math.max(0, over) * Math.max(0, FEEL.LEVEL_TOP_STEP));
 }
 
 /* Gate k, one indexed, in segments. The first sits at seven tenths of a
@@ -16020,7 +16084,9 @@ let racerBump = 0;          // seconds until another contact may shake the scree
      drives ON the road, not something that changes it, so nothing in
      this whole file may touch the generator: no rng() call, no addRun,
      no topUpRoad, no hazard or jump placed or moved. Verified by the
-     road hash over 28 days on all five levels, before and after.
+     road hash over 28 days on every level, before and after, and re run
+     at each count change since: 168 of 168 roads identical across two
+     passes at six levels.
 
      THE OPPONENTS MAY NOT DIFFER. Same grid, same pace law, same driver,
      for everybody on a date. The grid is laid from a fixed offset off
@@ -26195,9 +26261,12 @@ function bankDaily(finished) {
        the display arrives rather than starting from zero. */
     const wasUnlocked = carsUnlocked();
     /* AND THE TRAINING RUN IS NOT A TRACK FINISHED, for the same reason
-       it is not part of the day, plus one of its own: it is 40 seconds
-       and the shortest real level is 95, so counting it would make the
-       warm up the cheapest way to earn every car in the game. The
+       it is not part of the day, plus one of its own: it is 43 seconds
+       and the shortest real level is 61, so counting it would make the
+       warm up a cheap way to earn every car in the game. That margin
+       was 2.4 times and is 1.4 now, because the first real level lost a
+       gate to the fifth one: it is still the right way round, and it is
+       the number to watch if the ladder ever shortens again. The
        once-per-day guard limits that to one a day rather than removing
        it. A player who has only ever done training has finished no
        tracks, which is true. */
