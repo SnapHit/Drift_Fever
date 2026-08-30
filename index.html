@@ -4167,10 +4167,48 @@ const FEEL = {
 
      TWO PERIODS, because one is a corrugation. The long one is the
      landform and the short one stops it reading as a repeat. */
-  ROAD_HILL_HEIGHT:        1200,     // LIVE, world units, peak to trough
+  /* BIGGER, AND THE PERIOD IS NOT THE WAY TO GET THERE.
+
+     The obvious move is to raise the height and lengthen the period to
+     keep the slope the same. Measured, that buys NOTHING: the projection
+     divides by distance, so 1500 over 425, 1800 over 510 and 2100 over
+     595 all put the same 20 pixels of hill on the screen that 1200 over
+     340 does. Taller and longer looks exactly like shorter and nearer.
+     What it does cost is the horizon, because a taller crest hides more
+     road whatever its slope: 1800 over 510 spent 1.4% of frames under
+     three and a half seconds where 1200 over 340 spent none.
+
+     WHAT WORKS IS A THIRD COMPONENT, AND A LONG ONE. Steepness is what
+     the planning horizon is spent on, and a swell several times the main
+     period carries height at a fraction of the steepness. Driven over
+     three days of each real level, sampled every third frame:
+
+       h    p   mix  swell   world range   hill px   under 3.5s   worst
+      1200 340 0.30  none          2393   20/48/71        0.0%    3.54s
+      1400 340 0.30  none          2791   24/57/88        0.5%    3.32s
+      1600 340 0.30  none          3190  28/65/100        3.5%    3.12s
+      1700 340 0.25  2.8/0.28      3198   22/52/87        0.1%    3.48s
+      1800 340 0.22  3.2/0.30      3567   22/52/83        0.3%    3.41s
+      2000 380 0.22  2.8/0.28      3749   22/51/88        0.9%    3.28s
+
+     So the swell buys a road half again as big in the world for a
+     tenth of the horizon cost of getting there with height alone. The
+     conservative rung ships: the world amplitude is up 34%, the peak
+     deviation on screen up 23%, and the worst visible road in three
+     days of driving is 3.48 seconds against 3.54 before, which is six
+     hundredths of a second and not a horizon anybody can feel. The next
+     rung up, 1800 with a 3.2 swell, is a 49% bigger road at 0.3% of
+     frames and a worst of 3.41s, and it is one cycler nudge away.
+
+     AND THE ROAD OCCLUDES ITSELF MORE, WHICH IS THE POINT OF HAVING THE
+     MACHINERY. Crests hide part of the road on 5.3% of frames against
+     2.1%, a median of 25 segments when they do. */
+  ROAD_HILL_HEIGHT:        1700,     // LIVE, world units, peak to trough
   ROAD_HILL_PERIOD:         340,     // LIVE, segments per long hill
   ROAD_HILL_SHORT:         0.37,     // LIVE, the second period as a share of the first
-  ROAD_HILL_MIX:           0.30,     // LIVE, how much of the short one is in the mix
+  ROAD_HILL_MIX:           0.25,     // LIVE, how much of the short one is in the mix
+  ROAD_HILL_LONG:           2.8,     // LIVE, the swell's period as a multiple of the first
+  ROAD_HILL_LONG_MIX:      0.28,     // LIVE, how much of the swell is in the mix
   /* Screen height over screen width, for sightClear only. A FIXED
      reference on purpose: it decides what the generator lays, so the
      live viewport would make the daily's road depend on the screen.
@@ -5081,6 +5119,18 @@ const FEEL = {
      because an even step is the thing that was asked for and 2 3 4 5 6
      gates is 33.3 seconds a level, every level. */
   LEVEL_HARD_AT:              3,     // LIVE, the level that reaches full difficulty
+  /* AND HOW FAR PAST IT EACH LEVEL ABOVE GOES. See levelHardD. Zero is
+     the old flat top, where levels three, four and five were the same
+     road at the same settings. At 0.5 the last level is one whole extra
+     step of the deep ramp past the level that used to be the ceiling,
+     and the level between them is half of one.
+
+     THE PAIR BELOW IS SET FOR THE TOP OF THAT, which is why they read
+     easier than the values that were measured: CURVE_SCALE_DEEP 2.7 and
+     ROAD_SQUEEZE 0.90 put level three where level three has always been,
+     level four at 2.80 and 0.85, and the last level at 2.90 and 0.80,
+     which is the pair the drivers were measured on. */
+  LEVEL_TOP_STEP:           0.5,     // LIVE, extra deep ramp per level above LEVEL_HARD_AT
   /* The run out past the finish, laid in fixed size pieces so the
      slicing is a pure function of the segment index rather than of how
      far the camera had got. See topUpRoad. NOT live: changing it changes
@@ -5666,15 +5716,43 @@ const FEEL = {
   ONRAMP_INTENSITY:           2,     // LIVE, hardest phrase the on ramp may use
   ONRAMP_REST:             0.22,     // LIVE, chance of a forced breath after a phrase
   RAMP_SECONDS:             100,     // LIVE, on ramp end to full difficulty
-  /* Equal to CURVE_SCALE, so the curve does not escalate past the on
-     ramp at all. It was 3.1, which pushed curvature 24% past anything the
-     camera was set up for and walked most of the drivable surface off the
-     side of the screen on every hard corner. Width, intensity and rest
-     frequency carry the deep game instead, and they are better levers in
-     this engine anyway. Raising this above CURVE_SCALE costs visible road
-     roughly in proportion: see the note above CAMERA_HEIGHT. */
-  CURVE_SCALE_DEEP:         2.5,     // where the curve scale ends up
-  ROAD_SQUEEZE:            0.88,     // road width multiplier at full difficulty
+  /* IT ESCALATES AGAIN, AND 3.1 IS STILL THE WALL.
+
+     This was pinned equal to CURVE_SCALE after 3.1 walked the drivable
+     surface off the side of the screen. That reading was right about
+     3.1 and wrong to conclude that the whole lever was unusable, and
+     the difference is that it is now MEASURED on the drivers rather
+     than looked at. Eight days a cell, LOOK on the top two levels:
+
+       2.5, as it was   level 4 finished 4 of 8, level 5 3 of 8
+       2.9              level 4 4 of 8, level 5 4 of 8, 0.9% of the
+                        run on the edge against 0.7%
+       3.1              level 4 0 of 8, level 5 0 of 8, and the median
+                        run fell from 161s to 127s
+
+     So 3.1 is a cliff and 2.9 is a corner. With the squeeze below it,
+     2.9 costs the competent driver a finish on each of the top two
+     levels and doubles the time it spends in the scrape band, while the
+     policies that die inside the on ramp never reach it at all and
+     their numbers do not move by a frame. That is the shape the whole
+     exercise was after: the good driver worked harder, the mediocre one
+     left alone.
+
+     THE COST IS VISIBLE ROAD, and it is real but small: the road centre
+     leaves the frame on 42.5% of sampled frames against 41.5%, and the
+     worst sight distance is unchanged at 0.53 seconds.
+
+     THE NUMBER HERE IS 2.7 AND NOT THE 2.9 THAT WAS MEASURED, because
+     of LEVEL_TOP_STEP: this is where the ramp stands at LEVEL_HARD_AT,
+     and the last level carries it two steps further to exactly 2.90.
+     Level three keeps the 2.5 it has always had at its own cap and
+     climbs to 2.70 by the line. */
+  CURVE_SCALE_DEEP:         2.7,     // where the curve scale ends up at LEVEL_HARD_AT
+  /* 0.88 to 0.90 here and 0.80 at the top, for the same reason as
+     above. On its own the squeeze barely registered, 0.7% of the run on
+     the edge against 0.9%; with the deep curve above it, it is the
+     difference between one lost finish and two. */
+  ROAD_SQUEEZE:            0.90,     // road width multiplier at LEVEL_HARD_AT
   DEEP_INTENSITY:             3,
   /* ==================================================================
      THE OPENING, AND IT USED TO BE ONE NUMBER DOING TWO JOBS.
@@ -7694,6 +7772,8 @@ const TUNABLES = [
   { key: 'ROAD_HILL_PERIOD',   label: 'hillP',   step: 20,   min: 40,   max: 1200,  dp: 0, group: 3 },
   { key: 'ROAD_HILL_SHORT',    label: 'hillS',   step: 0.02, min: 0.1,  max: 1,     dp: 2, group: 3 },
   { key: 'ROAD_HILL_MIX',      label: 'hillM',   step: 0.05, min: 0,    max: 1,     dp: 2, group: 3 },
+  { key: 'ROAD_HILL_LONG',     label: 'hillL',   step: 0.2,  min: 1.2,  max: 8,     dp: 1, group: 3 },
+  { key: 'ROAD_HILL_LONG_MIX', label: 'hillLM',  step: 0.05, min: 0,    max: 0.8,   dp: 2, group: 3 },
   { key: 'CURVE_SCALE',        label: 'curve',   step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
   { key: 'CURVE_SCALE_DEEP',   label: 'deep',    step: 0.1,  min: 0.2,  max: 6.0,   dp: 1, group: 6 },
   { key: 'BLOCKER_EVERY',      label: 'block',   step: 50,   min: 200,  max: 8000,  dp: 0, group: 8 },
@@ -8248,6 +8328,7 @@ const TUNABLES = [
   { key: 'LEVEL_GATES_LAST',   label: 'gatesN',  step: 1,    min: 1,    max: 30,    dp: 0, group: 27 },
   { key: 'LEVEL_RAMP_POWER',   label: 'lvlRamp', step: 0.1,  min: 0.2,  max: 4.0,   dp: 1, group: 27 },
   { key: 'LEVEL_HARD_AT',      label: 'hardAt',  step: 1,    min: 2,    max: 8,     dp: 0, group: 27 },
+  { key: 'LEVEL_TOP_STEP',     label: 'topStep', step: 0.1,  min: 0,    max: 2,     dp: 2, group: 27 },
   { key: 'FINISH_HEIGHT',      label: 'finTall', step: 100,  min: 400,  max: 8000,  dp: 0, group: 27 },
   { key: 'PIP_SIZE',           label: 'pip',     step: 0.001,min: 0.005,max: 0.06,  dp: 3, group: 27 },
   { key: 'PIP_GAP',            label: 'pipGap',  step: 0.001,min: 0,    max: 0.04,  dp: 3, group: 27 },
@@ -10817,7 +10898,32 @@ let level = 1;
    (1,0) and (1,1): the on ramp band held for a whole level, the mid
    values, and the game exactly as it was. */
 function levelHardP() { return clamp(levelBand(level) * 2, 0, 1); }
-function levelHardD() { return clamp(levelBand(level) * 2 - 1, 0, 1); }
+/* HOW FAR ALONG THE DEEP RAMP THIS LEVEL IS ALLOWED TO GET, AND IT CAN
+   NOW GO PAST THE END OF IT.
+
+   The band saturates at LEVEL_HARD_AT, which is three, and that was
+   deliberate: it is what stops five levels stretching the early curve
+   and moving the newcomer's wall. The cost of it is that levels three,
+   four and five are the SAME difficulty and differ only in length, so
+   the top of the ramp is flat.
+
+   LEVEL_TOP_STEP is the top of the ramp, and only the top. Every level
+   above LEVEL_HARD_AT carries the deep interpolation one step further
+   past its endpoint, so the curve keeps tightening and the road keeps
+   narrowing after the point where they used to stop. Levels one to
+   three are untouched to the bit, which is the property the note above
+   LEVEL_HARD_AT exists to protect.
+
+   THE ENDPOINTS ARE SET FOR THE TOP LEVEL, NOT FOR THE FIRST ONE PAST
+   THE BAND. CURVE_SCALE_DEEP and ROAD_SQUEEZE are where level three
+   lands; the last level lands one plus two steps further along the same
+   line, and that is where the measured pair sits. */
+function levelHardD() {
+  const d = clamp(levelBand(level) * 2 - 1, 0, 1);
+  if (d < 1) return d;
+  const over = clampLevel(level) - Math.max(2, Math.round(FEEL.LEVEL_HARD_AT));
+  return 1 + Math.max(0, over) * Math.max(0, FEEL.LEVEL_TOP_STEP);
+}
 
 /* Gate k, one indexed, in segments. The first sits at seven tenths of a
    spacing so the opening is not a full gate long, which is where it has
@@ -10965,9 +11071,24 @@ function segHeight(idx) {
   if (!(a > 0) || (mode === DAILY && isTraining(level))) return 0;
   const p1 = Math.max(20, FEEL.ROAD_HILL_PERIOD);
   const p2 = Math.max(8, p1 * FEEL.ROAD_HILL_SHORT);
-  const mix = clamp(FEEL.ROAD_HILL_MIX, 0, 1);
-  return a * ((1 - mix) * Math.sin(idx / p1 * Math.PI * 2 + hillPhase)
-            + mix * Math.sin(idx / p2 * Math.PI * 2 + hillPhase * 2.7));
+  /* THE THIRD ONE IS A SWELL, AND IT IS THE CHEAP HEIGHT.
+
+     Two sine waves is a shape that repeats, and a road that repeats
+     reads as a texture rather than as terrain. A third component fixes
+     that, but which one it is matters: the planning horizon is spent by
+     STEEPNESS, which is amplitude over period, so a LONG component buys
+     height at a fraction of the horizon cost of a short one. This one is
+     several times the main period, so it moves the whole road up and
+     down under the hills rather than adding bumps to them.
+
+     Its phase is a third multiple of the road's own, so the three do not
+     line up in the same place on two different days. */
+  const p3 = Math.max(30, p1 * FEEL.ROAD_HILL_LONG);
+  const lm = clamp(FEEL.ROAD_HILL_LONG_MIX, 0, 1);
+  const mix = clamp(FEEL.ROAD_HILL_MIX, 0, 1 - lm);
+  return a * ((1 - mix - lm) * Math.sin(idx / p1 * Math.PI * 2 + hillPhase)
+            + mix * Math.sin(idx / p2 * Math.PI * 2 + hillPhase * 2.7)
+            + lm * Math.sin(idx / p3 * Math.PI * 2 + hillPhase * 1.7));
 }
 
 function addSegment(curve, halfWidth) {
@@ -14376,6 +14497,37 @@ function drawSmoke() {
    So the ground stays exactly where the road puts it, and only the rise
    above the ground uses the horizontal scale. The wheels still touch the
    road to the pixel, and the car keeps its own proportions. */
+/* THE GROUND UNDER THE CAR, AND THE TERM projectPoint DOES NOT HAVE.
+
+   There are two vertical spaces in this renderer and they are not the
+   same space. The road's boundary table carries the elevation:
+
+       by[k] = horizonY + scale * camHeight * h / 2
+             - scale * (segHeight(baseIndex + k) - carGroundY) * w / 2
+
+   and projectPoint does not. They agree at exactly one depth, the
+   player's own, because carGroundY is sampled there and the term goes to
+   zero. Everything projected anywhere ELSE up the road was drawn on a
+   flat plane: measured on the shipped hills, a racer sat a median of 5.1
+   pixels and up to 17.8 off the road it was supposed to be on, which is
+   the crest it drives through and the trough it floats over.
+
+   NOT FIXED INSIDE projectPoint, AND THAT IS THE WHOLE JUDGEMENT. The
+   roadside scenery recovers its world height back OUT of by[] before it
+   projects, at "const wy = (cy - by[n]) / ch * -1" in sceneryPass, so
+   the elevation is already in the number it hands over. Adding the term
+   inside projectPoint would count it twice for every tree, sign and
+   house on the road, which is most of what this function draws. The
+   cars and the headlight pools ask for it explicitly instead. */
+let carGroundY = 0;
+function groundAtDepth(depth) {
+  const seg = FEEL.SEGMENT_LENGTH;
+  const z = position + depth;
+  const i = Math.floor(z / seg);
+  const f = (z - i * seg) / seg;
+  return segHeight(i) + (segHeight(i + 1) - segHeight(i)) * f - carGroundY;
+}
+
 function projectPoint(out, wx, wy, wz, camX, w, h) {
   const scale = CAMERA_DEPTH / wz;
   out.sx = w / 2 + scale * (wx - camX) * w / 2;
@@ -14622,8 +14774,12 @@ function drawRoad(w, h) {
   const carIdx = Math.floor(carZ / seg);
   const carSegFrac = (carZ - carIdx * seg) / seg;
   /* The ground under the car, interpolated across the segment it is on,
-     or the whole world would step once a segment. */
-  const carGroundY = segHeight(carIdx)
+     or the whole world would step once a segment.
+
+     MODULE LEVEL NOW, because it is the datum the whole vertical scheme
+     hangs on and things drawn OUTSIDE this function need it. See
+     groundAtDepth. */
+  carGroundY = segHeight(carIdx)
     + (segHeight(carIdx + 1) - segHeight(carIdx)) * carSegFrac;
 
   /* One walk, recording every boundary between segments, because the road
@@ -17189,7 +17345,12 @@ function drawCarBody(worldX, worldY, depth, yaw, paint, w, h, opts) {
 
   carPaint = paint;
   carT.worldX = worldX;
-  carT.worldY = worldY;
+  /* ON THE ROAD, NOT ON A PLANE. One term, and it reaches the whole car
+     because everything a car is made of goes through carT: the hull, the
+     wheels, the contact shadow and the tail bar. The player's own car
+     needs no such term and does not get one, because at its depth the
+     term is zero by construction. */
+  carT.worldY = worldY + groundAtDepth(depth);
   carT.worldZ = depth;
   carT.cosY = Math.cos(yaw); carT.sinY = Math.sin(yaw);
   // No roll and no pitch: these bodies do not lean, because nothing
@@ -18092,12 +18253,20 @@ function headlightPass(w, h) {
     const px = baseX + sy * mid + cy * lat;
     const pz = baseZ + cy * mid - sy * lat;
     if (pz <= 200) continue;
-    projectPoint(HEAD_PT[0], px, 0, pz, camX, w, h);
+    /* ON THE ROAD AT ITS OWN DEPTH. The pool is thrown thousands of
+       units up the road, so it needs the ground there and not the
+       ground under the car: without this it climbed the sky in a dip and
+       sank into the surface before a crest, by the same measured 17.8
+       pixels the racers did. Each of the three points takes the height
+       at its own depth, so the ellipse tilts with the road rather than
+       sliding up it. */
+    projectPoint(HEAD_PT[0], px, groundAtDepth(pz), pz, camX, w, h);
     // One step along the heading and one across it, projected, so the
     // ellipse inherits the perspective rather than assuming a squash.
-    projectPoint(HEAD_PT[1], px + sy * long, 0, pz + cy * long, camX, w, h);
-    projectPoint(HEAD_PT[2], px + cy * FEEL.HEADLIGHT_SPREAD, 0,
-                 pz - sy * FEEL.HEADLIGHT_SPREAD, camX, w, h);
+    const pzL = pz + cy * long, pzS = pz - sy * FEEL.HEADLIGHT_SPREAD;
+    projectPoint(HEAD_PT[1], px + sy * long, groundAtDepth(pzL), pzL, camX, w, h);
+    projectPoint(HEAD_PT[2], px + cy * FEEL.HEADLIGHT_SPREAD, groundAtDepth(pzS),
+                 pzS, camX, w, h);
     const ax = HEAD_PT[1].sx - HEAD_PT[0].sx, ay = HEAD_PT[1].sy - HEAD_PT[0].sy;
     const bx2 = HEAD_PT[2].sx - HEAD_PT[0].sx, by2 = HEAD_PT[2].sy - HEAD_PT[0].sy;
     if (Math.abs(ax) + Math.abs(ay) < FEEL.HEADLIGHT_MIN_PX) continue;
@@ -25759,8 +25928,20 @@ function clearDailyRecords() {
 
    Training is untouched: segHeight returns zero for it and its phase is
    never drawn, so its road is the same road and its five placed objects
-   are on the same segments on every day. */
-const ROAD_GEN = 18;
+   are on the same segments on every day.
+
+   19, BIGGER HILLS AND TIGHTER CORNERS. The height field gained a third
+   component, a long swell, and its amplitude went up with it, so every
+   crest and trough is somewhere else and the sight line clause refuses a
+   different set of candidates. The deep end of the difficulty ramp also
+   moved, and hazard placement reads curveScale as it is at the moment it
+   builds, so a tighter deep game lays a different road as well as
+   driving one.
+
+   Training is untouched again, and for the same two reasons: it is flat
+   by construction and its difficulty band is zero, so neither the swell
+   nor the deep curve reaches it. */
+const ROAD_GEN = 19;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
