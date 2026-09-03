@@ -8770,6 +8770,21 @@ window.addEventListener('keydown', function (e) {
     firstGesture(); shareRun(); return;
   }
   else if (k === 'Escape' || k === 'p' || k === 'P') { togglePause(); return; }
+  /* Q FOR THE TITLE SCREEN, and it is literally the key the player who
+     found this missing reached for. Escape was not available: it is the
+     key that opened this overlay and pressing it again closes it, which
+     is what pause has meant since it was added. Both cases, so caps lock
+     is not a dead key, and carved out of "any key starts a run" the same
+     way R, T, E, S, K, P and F are.
+
+     PAUSED ONLY, AND THAT IS DELIBERATE. A key that ends a run from
+     inside one is a key that ends a run by accident, and Q sits next to
+     W A S D on a keyboard nobody is looking at while they drive. Pausing
+     first is not a second input on the restart path: section 5 governs
+     getting back IN after a death and nothing on that path changes. */
+  else if ((k === 'q' || k === 'Q') && paused && state === DRIVING) {
+    firstGesture(); leaveRun(); return;
+  }
   /* K SKIPS THE TRAINING RUN, and it is not optional. Section 6 says
      many sessions on a school Chromebook are keyboard only, and a DOM
      button in the corner is a target a keyboard cannot reach at all, so
@@ -8845,7 +8860,8 @@ canvas.addEventListener('pointerdown', function (e) {
      The mode button is tested FIRST, or the resume eats it: it is the
      only thing on that screen that is not "tap to resume". */
   if (paused) {
-    if (hitMode(e)) { firstGesture(); switchMode(); }
+    if (hitHome(e)) { firstGesture(); leaveRun(); }
+    else if (hitMode(e)) { firstGesture(); switchMode(); }
     else setPaused(false);
     return;
   }
@@ -29238,67 +29254,223 @@ function hintArrow(tipX, tipY, reach, dirX, dirY, colour, width) {
 
    PAUSE. It is already a deliberate action, it is already off the
    restart path, and it already obscures the view, so nothing is being
-   given up. Section 12 forbids menus and this is not one: it is a single
-   button on a screen that already exists, and nothing is ever asked of
+   given up. Section 12 forbids menus and this is not one: it is two
+   buttons on a screen that already exists, and nothing is ever asked of
    a player who does not press pause.
+
+   AND THE SECOND ROUTE IS THE WAY BACK TO THE TITLE, WHICH DID NOT
+   EXIST AT ALL. A player on itch: "how do you see your scores again?
+   how do you come back to choose another car? I tried Escape, Q and all
+   other keys." He was right and there was nothing to find. Once a run
+   started the only way back to the title screen was reloading the page,
+   and everything built to bring somebody back tomorrow lives there: the
+   car ladder and what the next one costs, the countdown to tomorrow's
+   tracks, the cumulative tracks finished, the random track, the training
+   run, the share card, and the best score. All of it was behind a door
+   that only opened on page load.
+
+   THE SAME THREE PLACES, AND THE SAME ANSWER. Not the death screen,
+   which is section 5's one action restart. Not the title screen alone,
+   which is the thing being reached. Pause, beside the mode switch that
+   is already there, because a player who wants out of a run has already
+   pressed it.
    ================================================================== */
 const modeRect = { x: 0, y: 0, w: 0, h: 0, live: false };
+/* Its own rect rather than a flag on the mode button: the two do
+   different things and the hit test has to tell them apart. */
+const homeRect = { x: 0, y: 0, w: 0, h: 0, live: false };
 
 function drawPauseCover(w, h) {
   modeRect.live = false;
+  homeRect.live = false;
   if (!paused) return;
   ctx.fillStyle = COLOUR.PAUSE_COVER;
   ctx.fillRect(0, 0, w, h);
   const s = Math.min(w, h);
-  text('PAUSED', w / 2, h * 0.44, Math.round(s * 0.11), '800');
-  text('tap to resume', w / 2, h * 0.53, Math.round(s * 0.045), '600');
 
-  /* Anchored to the bottom edge, exactly where RESTART sits on the death
-     screen and where TODAY'S TRACK sits on the title screen. Three canvas
-     buttons, one place: a player who has met one already knows the next. */
-  const daily = mode === DAILY;
-  const label = daily ? 'SWITCH TO A RANDOM TRACK' : "SWITCH TO TODAY'S TRACK";
+  /* THE BUTTONS ARE LAID FIRST AND THE WORDS FIT ABOVE THEM, which is
+     the other way round from how this screen used to work and is what
+     the second row costs.
+
+     PAUSED at 0.44 of the height and the resume line at 0.53 were fine
+     over one button and are not over two. MEASURED, on a phone held
+     sideways: at 844x390 the old fractions put "tap to resume" across
+     194 to 219 and this row's caption across 192 to 209, so the second
+     button would have been captioned through the sentence above it.
+     Same at 740x360 and at 667x375. Portrait was never at risk and is
+     unchanged, which is why the words keep their old fractions whenever
+     there is room for them.
+
+     A caption drawn through the thing under it has happened three times
+     in this file already and the title screen carries the note about it.
+     This would have been the fourth, so nothing here is a fraction of a
+     row: the stack walks up from the bottom edge asking each row for
+     exactly what it needs, and the words take what is left.
+
+     BOTH BUTTONS GO THROUGH canvasButton. The hand rolled one this
+     replaces was the only button in the game that did not, and it was
+     the only one without the 0.92 width clamp, so its longest label ran
+     off the edge of a narrow screen. */
   const size = Math.round(s * 0.038);
-  ctx.font = '800 ' + size + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const bw = ctx.measureText(label).width + size * 2.2;
-  const bh = size * 2.2;
+  const capSize = Math.round(s * 0.030);
+  const gutter = size * 0.75;
   const by0 = h - safeBottom - FEEL.DEATH_BOTTOM;
-  modeRect.x = w / 2 - bw / 2;
-  modeRect.y = by0 - bh / 2;
-  modeRect.w = bw;
-  modeRect.h = bh;
-  modeRect.live = true;
+  const daily = mode === DAILY;
 
+  /* THE MODE SWITCH DOES NOT MOVE. It has been on this line since it was
+     added and it is the same line RESTART sits on on the death screen,
+     so the new row stacks ABOVE it exactly as TODAY'S TRACK stacks above
+     RESTART there. */
+  const bh = canvasButton(modeRect,
+                          daily ? 'SWITCH TO A RANDOM TRACK' : "SWITCH TO TODAY'S TRACK",
+                          w / 2, by0, size, daily ? COLOUR.SCORE : COLOUR.GATE, w);
   // It starts a fresh run, so say so. Switching mid run cannot mean
   // anything else: the road under the car belongs to the mode it is in.
+  let top = modeRect.y - capSize * 0.9;
   ctx.globalAlpha = 0.6;
-  text('starts a new run', w / 2, by0 - bh * 0.95,
-       Math.round(s * 0.030), '700');
+  text('starts a new run', w / 2, top, capSize, '700');
   ctx.globalAlpha = 1;
 
-  ctx.globalAlpha = 0.9;
-  ctx.fillStyle = COLOUR.BAR_TRACK;
-  roundRect(modeRect.x, modeRect.y, bw, bh, bh * 0.3);
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = daily ? COLOUR.SCORE : COLOUR.GATE;
-  ctx.stroke();
+  /* THE WAY BACK, in the game's own white rather than in either mode's
+     colour, because it is not a third mode: it is the door out of both
+     of them. Its caption says what it costs in the same three words the
+     screen already uses for the button under it, and carries the key for
+     the half of this audience that has no touchscreen. */
+  const homeY = top - capSize * 0.9 - gutter - bh / 2;
+  canvasButton(homeRect, 'TITLE SCREEN', w / 2, homeY, size, COLOUR.TEXT, w);
+  const hcap = 'ends this run' + (hasKeyboard ? '     press Q' : '');
+  top = homeRect.y - capSize * 0.9;
+  ctx.globalAlpha = 0.6;
+  text(hcap, w / 2, top, fittedSize(hcap, '700', capSize, w * 0.92), '700');
   ctx.globalAlpha = 1;
-  text(label, w / 2, by0, size, '800', 'center', daily ? COLOUR.SCORE : COLOUR.GATE);
+
+  const resumeSize = Math.round(s * 0.045);
+  const pausedSize = Math.round(s * 0.11);
+  const resumeY = Math.min(h * 0.53, top - capSize * 0.9 - gutter - resumeSize / 2);
+  const pausedY = Math.max(pausedSize * 0.75,
+                           Math.min(h * 0.44, resumeY - resumeSize * 0.6 - pausedSize * 0.7));
+  text('PAUSED', w / 2, pausedY, pausedSize, '800');
+  text('tap to resume', w / 2, resumeY, resumeSize, '600');
 }
 
-function hitMode(e) {
-  if (!modeRect.live || !paused) return false;
-  const r = canvas.getBoundingClientRect();
-  const x = e.clientX - r.left, y = e.clientY - r.top;
-  return x >= modeRect.x && x <= modeRect.x + modeRect.w
-      && y >= modeRect.y && y <= modeRect.y + modeRect.h;
-}
+/* Both through hitRect, which is what every other canvas button in this
+   file is tested with. The hand rolled test that was here recomputed the
+   same arithmetic beside the one that owns it. */
+function hitMode(e) { return modeRect.live && paused && hitRect(modeRect, e); }
+function hitHome(e) { return homeRect.live && paused && hitRect(homeRect, e); }
 
 function switchMode() {
   mode = mode === DAILY ? ENDLESS : DAILY;
   setPaused(false);
   startRun();
+}
+
+/* ------------------------------------------------------------------
+   LEAVING A RUN, AND EXACTLY WHAT IT COSTS.
+
+   IT IS A CRASH THAT SKIPS THE CRASH. The three things crash() does that
+   write anything are called here, in the same order, with the same
+   arguments, so a run left at gate four banks precisely what a run that
+   died at gate four banks and not one thing more:
+
+     bankScore(false)  the score, only if it beat the best AND no
+                       continue was used, and the distance only if it
+                       beat the furthest. Both of those can only ever go
+                       UP, so neither is worth gaming.
+     ghostBank()       the line, as the ghost, exactly as a crash keeps
+                       it. The ghost is the last run and that is the
+                       whole rule; making this an exception would make it
+                       the last run except when it is not.
+     onRunEnded()      the share card, built off the result exactly as
+                       a crash builds it. The tilt hint survives too,
+                       for the same reason it survives a crash: nothing
+                       here calls stopTiltHint, and the only two
+                       things that do are reaching the line and
+                       actually using tilt.
+
+   AND NOTHING ELSE IS REACHABLE FROM HERE. done, clean, finishedEver and
+   the clean day are all written by bankDaily and all of them are behind
+   `if (finished)`. false is passed explicitly, which is the same false
+   crash passes by leaving the argument out. So a run cannot be laundered
+   into a completion by walking out of it, and a day cannot be made clean
+   by a level nobody drove to the end.
+
+   THE CHECKPOINT GOES WITH THE RUN. canContinue is `cpValid && state ===
+   DEAD`, and this route never enters DEAD, so a checkpoint kept here
+   would be one nothing could ever spend. It is dropped, and the next run
+   on this level starts from the top, which is what RESTART does after a
+   death for exactly the same reason. What leaving costs over dying is
+   therefore one thing and it is worth saying out loud: the continue.
+
+   THE COUNTDOWN IS NOT A SECOND COUNTDOWN. It belongs to a run and not
+   to a level, which is why restarting after a death has always re-armed
+   it. Coming back to a level from the title goes through startRun, so
+   what it gets is the first countdown of the next run rather than a
+   second one of the last. Nothing here touches it.
+   ------------------------------------------------------------------ */
+function leaveRun() {
+  if (state !== DRIVING) return;
+  runDistance = Math.round(position / 100);   // world units are centimetres
+  bankScore(false);
+  ghostBank();
+  onRunEnded();
+  setPaused(false);
+  cpValid = false;
+  continues = 0;
+  settleForTitle();
+  state = TITLE;
+}
+
+/* The picture the title screen is drawn over. The ROAD is left exactly
+   where it was: it is a real road the player has just driven, and
+   rebuilding one here would be a second answer to a question the boot
+   already answers at the bottom of this file. What is put back is the
+   CAR, upright and still on the centre line, with the smoke, the debris,
+   the shake, the racers and the callouts cleared, because a car frozen
+   sideways in mid air behind the wordmark reads as a game that has
+   fallen over rather than as a title screen.
+
+   The score, the clock and the bar are not touched, because nothing on
+   the title screen draws them. */
+function settleForTitle() {
+  carX = 0;
+  carFrac = 0;
+  carY = 0;
+  carVY = 0;
+  carPitch = 0;
+  carFallV = 0;
+  carCurveX = 0;
+  airborne = false;
+  airTime = 0;
+  landSlow = 0;
+  landSlowTo = 1;
+  airHeadingV = 0;
+  airLateralV = 0;
+  camLift = 0;
+  coastSpeed = 0;
+  drift.headingV = 0;
+  drift.lateralV = 0;
+  drift.headingAngle = 0;
+  drift.travelAngle = 0;
+  drift.slip = 0;
+  drift.slipDeg = 0;
+  drift.slipNorm = 0;
+  drift.lateralAccel = 0;
+  steering.value = 0;
+  scraping = false;
+  onRough = false;
+  scrapeSide = 0;
+  scrapeMeter = 0;
+  scrapeRisk = 0;
+  shake = 0;
+  calloutLife = 0;
+  driftLife = 0;
+  resetSpectacle();
+  clearDebris();
+  racersReset(0);
+  for (let i = 0; i < smoke.length; i++) smoke[i].life = 0;
+  smokeCount = 0;
+  smokeAcc = 0;
 }
 
 
