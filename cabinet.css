@@ -1,12 +1,21 @@
-/* THE ARCADE CABINET, PORTED FROM snap-hit.online.
+/* THE ARCADE CABINET, PORTED FROM snap-hit.online, SECOND PORT.
 
    The cabinet rules below are the author's own, lifted verbatim from
-   reference/snaphit-index.html where they are inline in the head, and
+   _reference/snaphit-index.html where they are inline in the head, and
    not reinterpreted. An earlier version of this file was written to a
    written description because the site could not be reached from the
    build environment; that version is gone and this is the real one.
 
-   reference/ is source material. Nothing here loads from it, links to
+   THIS IS THE SECOND PORT. snap-hit's cabinet was redeployed and the
+   changes came back here rather than being reconciled by hand. What
+   moved, in this file: the marquee stopped being a wordmark and became
+   a lit link carrying the game's name, the bottom link stopped being an
+   underlined caption and became an arcade button, the coin door hides
+   below 600px, and four vertical gaps tightened so the whole machine
+   fits one phone screen. Nothing about the phone, the screen, the
+   attract panel or the deck drawing changed at all.
+
+   _reference/ is source material. Nothing here loads from it, links to
    it or depends on it at runtime.
 
    Shared by all seven content pages and linked, not copied. Seven copies
@@ -118,10 +127,11 @@ th { color: var(--gold); font-weight: 600; white-space: nowrap; }
   :root{ --pw:min(26vh, 380px); }
 }
 
-/* The wordmark in the marquee. */
-.wm{display:block;height:auto;color:var(--amber);overflow:visible}
-.wm-marq{width:54%;margin:0 auto;color:var(--amber);
-  filter:drop-shadow(0 0 4px rgba(255,148,36,.85)) drop-shadow(0 0 15px rgba(255,148,36,.42))}
+/* THE MARQUEE NO LONGER CARRIES A WORDMARK. On snap-hit the marquee was
+   the studio's mark repeated above every machine, which made sense on a
+   shelf of four. One cabinet in an article wants the game's name, and
+   .wm / .wm-marq went out with the SVG they styled. The studio mark is
+   still on the machine: it is printed on the deck, below. */
 
 /* THE CABINET IS CENTRED IN THE ARTICLE. On snap-hit it sits in a flex
    column rack that does the centring; here it is one object dropped into
@@ -133,7 +143,7 @@ th { color: var(--gold); font-weight: 600; white-space: nowrap; }
 /* ---------- cabinet ---------- */
 .cab{width:calc(var(--pw) * var(--cabx));max-width:100%}
 .cab-body{
-  position:relative;padding:0 0 calc(var(--ph) * .04);
+  position:relative;padding:0 0 calc(var(--ph) * .022);
   border-radius:calc(var(--pw) * .1) calc(var(--pw) * .1) calc(var(--pw) * .03) calc(var(--pw) * .03);
   background:linear-gradient(180deg,#2a5b8c 0%,#1d4370 38%,#122c4d 74%,#0b1e38 100%);
   box-shadow:
@@ -176,8 +186,8 @@ th { color: var(--gold); font-weight: 600; white-space: nowrap; }
     linear-gradient(180deg, rgba(255,255,255,.10) 0 1.5%, transparent 6%);
 }
 .marquee{
-  position:relative;margin:calc(var(--pw) * .07) calc(var(--pw) * .07) 0;
-  padding:calc(var(--pw) * .048) 0;border-radius:calc(var(--pw) * .045);
+  position:relative;margin:calc(var(--pw) * .045) calc(var(--pw) * .07) 0;
+  padding:calc(var(--pw) * .040) 0;border-radius:calc(var(--pw) * .045);
   text-align:center;
   background:linear-gradient(180deg,#1b1006 0%,#2a1708 55%,#150c04 100%);
   box-shadow:inset 0 0 0 1px rgba(255,148,36,.5),0 0 26px -6px rgba(255,148,36,.55);
@@ -193,8 +203,25 @@ th { color: var(--gold); font-weight: 600; white-space: nowrap; }
   0%{opacity:.10} 38%{opacity:.62} 44%{opacity:0} 47%{opacity:.85}
   51%{opacity:.06} 55%{opacity:.7} 72%{opacity:.34} 100%{opacity:.10}
 }
+/* The name is the sign AND the way out to the real game. It has to read as
+   lit tube, not as a hyperlink: no underline, no link colour. Sized from the
+   phone like everything else and held on one line, so the longest name still
+   sits inside the panel at 320px. */
+.marq{
+  position:relative;z-index:1;display:block;text-decoration:none;
+  font:900 calc(var(--pw) * .10)/1 "Arial Black",Impact,system-ui,sans-serif;
+  letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
+  color:#ffe9c9;
+  text-shadow:0 0 5px rgba(255,148,36,.9),0 0 16px rgba(255,148,36,.5);
+  transition:color .18s ease,text-shadow .18s ease;
+}
+.marq:hover,.marq:focus-visible{
+  color:#fff;
+  text-shadow:0 0 7px rgba(255,214,150,1),0 0 22px rgba(255,148,36,.75);
+}
+.marq:focus-visible{outline:2px solid var(--amber);outline-offset:6px}
 .aperture{
-  position:relative;margin:calc(var(--pw) * .07) auto 0;width:calc(var(--pw) * var(--apx));
+  position:relative;margin:calc(var(--pw) * .045) auto 0;width:calc(var(--pw) * var(--apx));
   max-width:calc(100% - var(--pw) * .14);
   padding:calc(var(--pw) * .09) 0;border-radius:calc(var(--pw) * .05);
   background:#01040a;
@@ -328,15 +355,17 @@ body.zoomed .shrink{display:grid}
 
 /* The control panel: a printed overlay with real parts standing on it. */
 .deck{
-  position:relative;margin:calc(var(--pw) * .075) calc(var(--pw) * .035) 0;
-  padding:calc(var(--pw) * .022) calc(var(--pw) * .028);
+  position:relative;margin:calc(var(--pw) * .045) calc(var(--pw) * .035) 0;
+  padding:calc(var(--pw) * .010) calc(var(--pw) * .028);
   border-radius:calc(var(--pw) * .05);
   background:linear-gradient(180deg,#101f31 0%,#0a1725 60%,#060e18 100%);
   box-shadow:inset 0 3px 9px rgba(0,0,0,.7),0 2px 0 rgba(0,0,0,.5);
 }
 .panel{display:block;width:100%;height:auto}
 
-/* coin door, because nothing says arcade faster */
+/* coin door, because nothing says arcade faster. It is also the least
+   meaningful thing on the machine, so on a phone it is what gets cut to put
+   the whole cabinet on one screen. */
 .coin{
   position:relative;margin:calc(var(--pw) * .05) calc(var(--pw) * .17) 0;
   height:calc(var(--pw) * .115);border-radius:calc(var(--pw) * .02);
@@ -353,11 +382,46 @@ body.zoomed .shrink{display:grid}
   border-radius:calc(var(--pw) * .01);background:linear-gradient(180deg,#1b2b3d,#0b1420);
   box-shadow:inset 0 0 0 1px rgba(150,180,210,.4);
 }
+@media (max-width:599px){ .coin{display:none} }
 
-.cab .visit{
-  display:block;margin:18px auto 0;width:max-content;
-  font:800 11px/1 system-ui,sans-serif;letter-spacing:.18em;
-  color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,148,36,.45);
-  padding-bottom:5px;
+/* The arcade button. On snap-hit this is the studio card's own button and
+   the cabinet's bottom link borrows it; there is no studio card here, so
+   the base class comes across with it rather than being folded in. Kept
+   separate because the overrides below only make sense read against it. */
+.op-btn{
+  display:inline-flex;align-items:center;gap:9px;margin-top:18px;
+  padding:11px 17px;border-radius:999px;text-decoration:none;
+  background:radial-gradient(circle at 34% 26%,#ffd9a2,#ff9424 58%,#a04d06);
+  color:#2a1402;font:800 11px/1 system-ui,sans-serif;letter-spacing:.16em;
+  box-shadow:0 0 0 1px rgba(255,214,150,.6),0 6px 18px -6px rgba(255,148,36,.8),
+             inset 0 1px 0 rgba(255,255,255,.5);
 }
-.cab .visit:hover{color:var(--amber-lit);border-bottom-color:var(--amber-lit)}
+.op-btn svg{width:13px;height:13px;fill:currentColor}
+.op-btn:hover{filter:brightness(1.08)}
+
+/* The quieter of the two routes out: the arcade button centred under the
+   machine. The marquee is the loud one, and this stays below it.
+
+   position:relative IS LOAD BEARING and is the whole reason this read as
+   switched off. .cab-body is positioned, so its 0 40px 80px -30px
+   rgba(0,0,0,.95) drop shadow paints over anything in flow beneath it, and
+   the button sits 13px under that edge. Measured: a flat rgb(255,0,0) test
+   fill rendered rgb(172,12,13) there, a third of the brightness eaten by a
+   shadow nobody could see. Lifting it into the positioned layer is what
+   turns it on; the warmer fill below is the smaller half of the change.
+
+   The fill keeps #ff9424 across the face instead of falling away to
+   #a04d06, and the outer amber shadow puts it in the same light as the
+   marquee and the cabinet outline. Size is deliberately unchanged so the
+   cabinet still fits a 412x915 screen. */
+.cab .visit{
+  position:relative;z-index:1;
+  display:flex;margin:13px auto 0;width:max-content;
+  background:radial-gradient(circle at 34% 26%,#ffd9a2,#ff9424 62%,#d06a0c);
+  color:#1c0c00;
+  box-shadow:0 0 0 1px rgba(255,214,150,.65),
+             0 0 18px -4px rgba(255,148,36,.6),
+             0 0 40px -16px rgba(255,148,36,.45),
+             inset 0 1px 0 rgba(255,255,255,.55);
+}
+.cab .visit:hover,.cab .visit:focus-visible{filter:brightness(1.06)}
