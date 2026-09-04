@@ -425,3 +425,84 @@ body.zoomed .shrink{display:grid}
              inset 0 1px 0 rgba(255,255,255,.55);
 }
 .cab .visit:hover,.cab .visit:focus-visible{filter:brightness(1.06)}
+
+/* ==================================================================
+   WITH THE SCRIPT SWITCHED OFF, WHICH IS THE ONE CASE WHERE THIS LINK
+   IS THE WHOLE EXPERIENCE.
+
+   Every page carries a noscript block inside its empty cabinet article,
+   and it had no rules at all: it rendered as a bare cyan main-column
+   link floating between the intro and the next heading, with nothing
+   around it to say what it was. It worked and it looked like a mistake.
+   A managed Chromebook with scripting restricted is a plausible reader
+   here and they get one link and no machine.
+
+   SO IT IS DRESSED AS THE CABINET IT IS STANDING IN FOR: the deck's own
+   panel materials round it and the arcade button off .cab .visit, at
+   the same size, in the same light. Somebody who sees this and then
+   sees the real thing on another device should recognise the button.
+
+   THE LINE OF CONTEXT IS IN THIS FILE RATHER THAN IN THE SEVEN PAGES,
+   and that is a deliberate trade. The pages' markup does not move, which
+   is what keeps them seven copies of nothing and this file the only
+   place the cabinet lives. The cost is that a sentence in a stylesheet
+   is generated content: screen readers do announce it, but it is not
+   selectable and it will not be found by a search. The link itself, the
+   part that has to work, is real markup in the page and always was. If
+   the sentence should be real text instead, it is one line inside each
+   noscript block and it belongs there rather than here.
+   ================================================================== */
+.cab-under{
+  position:relative;
+  /* IT IS NOT A PHONE, SO IT DOES NOT TAKE THE PHONE'S WIDTH. .cab is
+     sized from --pw, which is 26.5vh once the screen is wider than it is
+     tall, and on a phone held sideways that is 103px: the machine is
+     that narrow because it is a machine, and a paragraph is not. So the
+     panel takes the larger of the cabinet's width and a readable one,
+     and is re-centred on the cabinet's own centre line. Measured at
+     844x390 it goes from 167px, which wrapped the button's own label,
+     to 304. Every other size is already wider than the floor and does
+     not move at all. */
+  width:max(100%, 19rem);
+  max-width:calc(100vw - 2.3rem);
+  margin:0 0 0 50%;
+  transform:translateX(-50%);
+  padding:clamp(18px, calc(var(--pw) * .10), 34px) clamp(14px, calc(var(--pw) * .07), 26px)
+          clamp(20px, calc(var(--pw) * .11), 36px);
+  border-radius:clamp(10px, calc(var(--pw) * .05), 18px);
+  text-align:center;
+  background:linear-gradient(180deg,#101f31 0%,#0a1725 60%,#060e18 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(55,208,245,.35),
+    inset 0 3px 9px rgba(0,0,0,.7),
+    0 0 0 1.5px rgba(255,148,36,.55),
+    0 0 26px -8px rgba(255,148,36,.4);
+}
+.cab-under::before{
+  content:"Drift Fever is ours, and it opens on its own page.";
+  display:block;
+  margin:0 auto clamp(14px, calc(var(--pw) * .075), 26px);
+  max-width:26em;
+  font:600 15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);
+}
+/* The same button as the one under the machine, and the same rules
+   about it: the fill stays #ff9424 across the face rather than falling
+   away, and it is lifted into the positioned layer so nothing paints
+   over it. */
+.cab-under a{
+  position:relative;z-index:1;
+  display:inline-flex;align-items:center;gap:9px;
+  padding:11px 17px;border-radius:999px;text-decoration:none;
+  background:radial-gradient(circle at 34% 26%,#ffd9a2,#ff9424 62%,#d06a0c);
+  color:#1c0c00;font:800 11px/1 system-ui,sans-serif;letter-spacing:.16em;
+  box-shadow:0 0 0 1px rgba(255,214,150,.65),
+             0 0 18px -4px rgba(255,148,36,.6),
+             0 0 40px -16px rgba(255,148,36,.45),
+             inset 0 1px 0 rgba(255,255,255,.55);
+}
+/* main a is cyan and underlined, which is right for a link in a
+   sentence and wrong for a button, so both are overridden here rather
+   than left to specificity. */
+.cab-under a:hover,.cab-under a:focus-visible{color:#1c0c00;filter:brightness(1.06)}
+.cab-under a:focus-visible{outline:2px solid var(--amber-lit);outline-offset:4px}

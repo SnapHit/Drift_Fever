@@ -2411,7 +2411,61 @@ const FEEL = {
      those are things to look at on a phone rather than argue about. */
   SEG_MERGE_PX:             1.0,     // LIVE
   PATH_CHUNK_SUBPATHS:       64,     // LIVE
-  CHECKPOINT_EVERY:        1500,     // LIVE, segments between gates, about 33 seconds
+  /* ------------------------------------------------------------------
+     1300 FROM 1500, AND THIS IS THE LEVER THAT BROUGHT THE DAY UNDER TEN
+     MINUTES.
+
+     THE TOTAL WAS 11:23 AND THE RULE SAYS SHORTEN IT. Handoff 2.5: a
+     daily is an appointment at three to five minutes and homework at
+     ten. The block above LEVEL_COUNT named the two cheap levers, the
+     training run's length and LEVEL_GATES_FIRST, and PRICED NEITHER.
+     Priced now, and neither reaches it:
+
+       training deleted outright            10:40   still over
+       LEVEL_GATES_FIRST to one             10:16   still over
+       both, training cut to 26.7 seconds   10:00.0 exactly on the line
+       CHECKPOINT_EVERY 1300                 9:57.8 under, on its own
+
+     WHAT THE OTHER TWO COST, MEASURED. Training driven on six days at
+     each length: 43.1 seconds says eleven lines, 31.1 says eight, and
+     26.7 says five. The 26.7 needed to make the pair reach ten minutes
+     loses six lessons of eleven, and one of the six is SPEED IS
+     AUTOMATIC, which exists because the first player of the released
+     game did not know the throttle was. LEVEL_GATES_FIRST to one gives
+     a ladder of 1, 2, 4, 5, 6 gates, so the step stops being one gate,
+     which is the property the fifth level was taken from the bottom to
+     preserve; it makes the first real level 28 seconds, shorter than the
+     training run before it; and because deepProgress normalises against
+     finishClock, it leaves that level ending at a curve scale of 2.09
+     where every other configuration ends at 2.19.
+
+     WHAT THIS ONE COSTS. Every level shortens by the same 13.3 per cent
+     and the ladder keeps its shape: the step is still one gate, the
+     first real level is still 53.2 seconds and still longer than
+     training, and EVERY LEVEL STILL ENDS AT EXACTLY THE DIFFICULTY IT
+     ENDED AT BEFORE, because deepProgress reaches 1 at the line whatever
+     the line is. Measured at seven points through levels two, three and
+     six: the endpoints are identical to six figures and the only
+     deviation is in the first third, where the on ramp is a fixed number
+     of SECONDS and therefore a larger share of a shorter level. Level
+     six at 15 per cent goes from 2.44 to 2.15 and has converged by 30
+     per cent.
+
+     THE CLOCK IS THE ONE THING THAT DOES GET GENTLER, and it is small.
+     A gate is worth CLOCK_CHECKPOINT whatever the spacing, so a shorter
+     cycle hands back time the drain has less room to spend. Measured
+     over 108 gate cycles with a fixed hand: the swing goes from 17.62
+     seconds to 15.53 and the low point from 8.38 to 10.47. It is not the
+     failure the comment beside CLOCK_CHECKPOINT warns about, which is a
+     clock pinned at its ceiling saying nothing: that is 2.2 per cent of
+     frames before and 1.1 after. CLOCK_CHECKPOINT is deliberately NOT
+     touched, because 13 recovers only half a second of that low point
+     and a second constant moved to chase two seconds is tuning by
+     arithmetic rather than by playing. If the clock feels slack on a
+     phone, 13 is the one line.
+
+     THE TOP LEVEL IS 2:49 RATHER THAN 3:15, at the same difficulty. */
+  CHECKPOINT_EVERY:        1300,     // LIVE, segments between gates, about 29 seconds
   /* WHERE THE FIRST GATE SITS, AS A SHARE OF THAT SPACING, and it was an
      inline 0.7 in gateSegment until the training run needed it. CLAUDE.md
      is explicit that nothing tunable may live inline in the game logic
@@ -4735,21 +4789,26 @@ const FEEL = {
 
      THE TOTAL IS THE DESIGN CONSTRAINT, not the level count. Handoff
      2.5: a daily works as an appointment at three to five minutes and
-     becomes homework at ten. THE BUILD IS PAST THAT AND HAS BEEN FOR A
-     WHILE, and it is written down here rather than quietly left in the
-     arithmetic. At 33.3 seconds a gate the ladder below is 1, 2, 3, 4,
-     5 and 6 gates, which is 43.1 + 61.3 + 94.7 + 128.0 + 161.3 + 194.7
-     = 683.1 seconds clean, eleven minutes twenty three. It was 10:22 at
-     four real levels and 5:37 at the three this paragraph was written
-     for.
+     becomes homework at ten. IT WAS PAST THAT AND IS NOT ANY MORE. At
+     33.3 seconds a gate the ladder below was 1, 2, 3, 4, 5 and 6 gates,
+     which is 43.1 + 61.3 + 94.7 + 128.0 + 161.3 + 194.7 = 683.1 seconds
+     clean, eleven minutes twenty three. It was 10:22 at four real levels
+     and 5:37 at the three this paragraph was written for.
 
-     THE RULE STILL SAYS SHORTEN IT RATHER THAN ACCEPT IT, and the
-     cheapest place to do that is the same place the fifth level's
-     length came from: the bottom of the ladder. Dropping the training
-     run's own length, or taking LEVEL_GATES_FIRST to one, are the two
-     levers that do not touch the top of the game. The author has the
-     number and chose it knowingly; this note exists so nobody has to
-     rediscover that the total is the thing being spent.
+     IT IS 597.8 SECONDS NOW, NINE FIFTY EIGHT, and the gate spacing is
+     where it came from rather than the bottom of the ladder. This
+     paragraph used to name the training run's length and
+     LEVEL_GATES_FIRST as the two cheap levers and price neither; both
+     are priced in the block beside CHECKPOINT_EVERY, and neither of them
+     reaches ten minutes even together. The ladder below is unchanged:
+     still 1, 2, 3, 4, 5 and 6 gates, still one gate a rung, and every
+     level still ends at the difficulty it ended at before. What moved is
+     what a gate is worth in road, and it moved for every level at once.
+
+     A RETURNING PLAYER NEVER SEES THE TRAINING RUN, so the recurring day
+     is the five real levels alone: 554.7 seconds, nine fifteen. The
+     683.1 above was always the FIRST day and the number to hold is the
+     larger one, which is why it is the one quoted.
 
      THREE, BECAUSE THREE CONFIGURATIONS ALREADY EXIST. The on ramp
      values, the mid values and the deep values. Level one is the on ramp
@@ -5110,16 +5169,24 @@ const FEEL = {
   /* TWO, NOT THREE, AND THE FIFTH REAL LEVEL IS WHY.
 
      A fifth level has to come from somewhere. Taken at the top, the
-     ladder runs 3 4 5 6 7 gates and the day goes from 10:22 to 14:10,
+     ladder ran 3 4 5 6 7 gates and the day went from 10:22 to 14:10,
      which is 36% longer before anybody dies. Taken at the bottom, it
-     runs 2 3 4 5 6, the step stays exactly one gate, and the day is
-     11:23. Nothing gets longer: every level that exists today slides
-     down a rung and loses a gate, and the new one takes the top slot at
-     the length the hardest level already was.
+     runs 2 3 4 5 6, the step stays exactly one gate, and the day was
+     11:23. Nothing got longer: every level that existed slid down a rung
+     and lost a gate, and the new one took the top slot at the length the
+     hardest level already was.
 
-     THE 33 SECONDS COMES OFF THE CHEAPEST PLACE IN THE DAY. On the
-     first real level all eight driving policies survive today, which is
-     the definition of a level that is not asking anything yet. */
+     THE 33 SECONDS CAME OFF THE CHEAPEST PLACE IN THE DAY. On the first
+     real level all eight driving policies survive, which is the
+     definition of a level that is not asking anything yet.
+
+     AND IT STAYS AT TWO, WHICH WAS RE-DECIDED RATHER THAN LEFT ALONE.
+     Taking it to one was the obvious lever for the day being too long
+     and it is the wrong one: it does not reach ten minutes on its own,
+     it breaks the one gate step this block exists to defend, and it
+     makes the first real level 28 seconds, shorter than the training run
+     in front of it. See CHECKPOINT_EVERY, which is where the length came
+     from instead. */
   LEVEL_GATES_FIRST:          2,     // LIVE, gates on the first REAL level
   LEVEL_GATES_LAST:           6,     // LIVE, gates on the last level
   /* THE SHAPE OF THE RAMP BETWEEN THEM, and it is not linear. See
@@ -10924,12 +10991,20 @@ function levelBand(lvl) {
    and one gate is 28.0 seconds because the first gate is the finish.
 
    THE DAY TOTAL, WHICH IS THE THING THAT HAD TO HOLD. With a fifth real
-   level the ladder is 1 2 3 4 5 6 gates, so 43.1 61.3 94.7 128.0 161.3
-   194.7, total 683.1 seconds. Taking the extra level off the TOP
-   instead would have been 3 4 5 6 7, which is 849.8 and 36 per cent
-   longer; taking it off the bottom costs 61.3, which is the level that
-   did not exist. The five real levels still step by exactly one gate
-   each, which is the property the straight ramp existed for. */
+   level the ladder is 1 2 3 4 5 6 gates. Taking the extra level off the
+   TOP instead would have been 3 4 5 6 7, which is 36 per cent longer;
+   taking it off the bottom cost the length of one first real level,
+   which is the level that did not exist. The five real levels still step
+   by exactly one gate each, which is the property the straight ramp
+   existed for.
+
+   THE SECONDS ARE NOT WRITTEN HERE ANY MORE, and that is deliberate.
+   They were 43.1 61.3 94.7 128.0 161.3 194.7 for 683.1, and every one of
+   those six numbers is CHECKPOINT_EVERY times a gate count, so moving
+   the spacing to bring the day under ten minutes falsified all of them
+   at once. The gate counts are the thing this function decides and they
+   have not changed; the seconds live beside the constant that sets them.
+   They are 43.1 53.2 82.0 110.9 139.8 168.7 for 597.8 today. */
 function levelGatesFor(lvl) {
   const l = clampLevel(lvl);
   if (isTraining(l)) return Math.max(1, Math.round(FEEL.TRAINING_GATES));
@@ -26062,7 +26137,22 @@ function clearDailyRecords() {
    Training is untouched again, and for the same two reasons: it is flat
    by construction and its difficulty band is zero, so neither the swell
    nor the deep curve reaches it. */
-const ROAD_GEN = 20;
+/* 21 FROM 20, AND THE GATE SPACING IS WHY. CHECKPOINT_EVERY moved from
+   1500 to 1300, so every level's finish line moved with it: a stored
+   time is a time to a line that is no longer there, and a stored ghost
+   is a line recorded over a longer track that would run past the new
+   one. Both are invalid and loadDaily discards the whole day on a gen
+   mismatch, which is exactly the right outcome.
+
+   AND IT SETTLES THE OTHER QUESTION THIS SESSION ASKED. Today's stored
+   level bests were set under the old rule, where a run that died
+   partway could take one. There is no need for a surgical rule to find
+   them: the bump clears every daily record on the first load after
+   deploy, bests, times, done bits, clean bits and ghosts alike, so the
+   first day under the new rule starts from nothing on every device. The
+   all time BEST SCORE and the cumulative counts are not daily records
+   and are not touched by any of this. */
+const ROAD_GEN = 21;
 
 (function loadDaily() {
   const day = parseInt(storeGet('daily.day'), 10);
@@ -26235,20 +26325,39 @@ function levelsDone() {
   return n;
 }
 
-/* Which of two clean runs is the better one.
+/* WHETHER THIS RUN TAKES THE LEVEL'S RECORD, AND THE ANSWER NOW STARTS
+   WITH THE LINE.
 
-   A FINISH BEATS AN UNFINISHED RUN WHATEVER THE SCORES. Score stays
-   primary between two runs of the same kind, and that is the right way
-   round: this game is about drifting, so the higher score wins. But a
-   run that reached the line and one that died at gate four are not
-   comparable at all, and letting a big score on a dead run hold the
-   record would keep a ghost that runs out halfway and a time that does
-   not exist. */
+   IT USED TO BE OPEN TO A RUN THAT DIED. The rule was that a finish
+   beats an unfinished run and that two runs of the same kind are ranked
+   on score, which sounds right and left a hole: with no clean finish
+   recorded yet, two UNFINISHED runs were also "the same kind", so the
+   biggest score anybody had died with held the record. Measured on a
+   real run that never reached the line: L2.best went from 0 to 17130.
+
+   SO A RECORD NEEDS A CLEAN FINISH, the same way a clean day does, and
+   for the reason this project keeps arriving at: a record has to be hard
+   to take or it means nothing. Everything else about the daily was
+   already built on it. The clean day needs every level finished with no
+   continue. The completion time only exists past the line. The share
+   card's day time only accumulates there. The score was the one
+   currency in that box being filled by a different rule, so a player
+   reading TODAY on the completion screen could be looking at a number
+   nobody finished for.
+
+   TWO GUARDS AND NOTHING ELSE, because with the line required there is
+   no second kind of run left to rank against. `finished` and `continues
+   === 0` together mean clean, which is exactly the bit dayClean counts,
+   and past them the comparison is the plain one: a bigger score wins.
+   The old function's first branch had one job, choosing between kinds,
+   and there is only one kind now.
+
+   WHAT THIS IS NOT. BEST SCORE, the all time record, is a different
+   number written by bankScore a few lines further down, past its own
+   `continues > 0` guard and outside this function entirely. It is open
+   to any clean run, finished or not, and nothing here touches it. */
 function dailyBeatsRecord(finished, score) {
-  /* Against the CLEAN record, not against the done bit. done can now be
-     set by a continued run, which takes no record, so comparing against
-     it would let a continued finish lock out every later clean one. */
-  if (finished !== dailyClean) return finished;   // a finish always wins
+  if (!finished) return false;                    // the line, first
   return score > dailyBest;
 }
 
@@ -26345,7 +26454,11 @@ function bankDaily(finished) {
   if (continues > 0) return false;              // not a lap
   if (!dailyBeatsRecord(!!finished, banked)) return false;
   r.best = banked;
-  r.time = finished ? finishTime : 0;
+  /* NOT `finished ? finishTime : 0` ANY MORE. Nothing unfinished reaches
+     this line, so the time is always a real time, and best and time are
+     now written together or not at all. A stored record with a score and
+     no time was the shape of the hole this closed. */
+  r.time = finishTime;
   dailyBest = r.best;
   dailyTime = r.time;
   storeSet('daily.day', String(todayStamp));
