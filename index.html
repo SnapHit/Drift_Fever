@@ -2788,7 +2788,6 @@ const FEEL = {
      sky. */
   CITY_HALO_ALPHA:         0.30,     // LIVE, at full city glow
   HEAT_HORIZON:            0.55,     // LIVE, a second pass of the horizon band at this alpha
-  HEAT_MUSIC:              0.85,     // LIVE, how much of the music's heat the multiplier may drive
 
   /* Breaking the stored best, live, mid run. One comparison a frame and
      it is the strongest moment this game has: it makes the previous run
@@ -2997,6 +2996,11 @@ const FEEL = {
      them, and a short decay keeps it a tick rather than a tone. */
   CHAIN_GAIN:              0.10,     // LIVE
   CHAIN_DECAY:             0.13,     // seconds
+  /* THE PITCH THE STINGS AND THE BLIP ARE BUILT ON. It was the
+     procedural station's, TRACKS[track].root; the station is gone and
+     the stings are not, so it lives here rather than inline in four
+     functions. It cannot know the recorded tracks' key and does not. */
+  SFX_ROOT:                  55,     // LIVE, Hz. See semis and audioSting.
 
   /* Close calls. Section 4.4's philosophy applied to obstacles rather
      than to the road edge: the risky line is the rewarding one. The
@@ -3589,25 +3593,22 @@ const FEEL = {
   CARD_BLOB_TIMEOUT:       2500,     // milliseconds
 
   /* ----------------------------------------------------------------
-     Audio. Everything here is synthesised: oscillators and one generated
-     noise buffer. Nothing is fetched, nothing is decoded, and there is no
-     sample data in the file, because section 6's audience is behind a
-     content filter and a single blocked request is a broken game.
-
-     It is off until a station is picked, and it is off again on the next
-     load. Section 5 says audio defaults off and stays off across sessions,
-     so the chosen station is deliberately NOT persisted: these are shared
-     classroom machines and the next person to open the page gets silence.
+     Audio. THE EFFECTS are synthesised: oscillators and one generated
+     noise buffer, nothing fetched and nothing decoded. THE MUSIC is four
+     recorded tracks and is the file's one exception to that, argued out
+     beside TUNES. Both are on by default and both are one tap from off,
+     and the choice IS persisted, which reverses what this paragraph
+     used to say: see the block above sfxOn.
      ---------------------------------------------------------------- */
-  /* The finish fanfare. On the effects bus, because music is off by
-     default and this has to land for somebody with it disabled. */
+  /* The finish fanfare. On the effects bus, so it lands for somebody
+     with the music off or with none reachable. */
   FANFARE_STEP:           0.085,     // LIVE, seconds between notes
   FANFARE_GAIN:            0.19,     // LIVE, above a sting and below the master
   FANFARE_TAIL:            1.60,     // LIVE, seconds the last note rings out
   AUDIO_MASTER:            0.55,     // the whole graph, never near 1
   AUDIO_FADE_TIME:         0.08,     // seconds, the follow on every live level
-  AUDIO_START_TIME:        0.35,     // seconds to fade the graph in on a station change
-  /* The very first start is slower than a station change, because it is
+  AUDIO_START_TIME:        0.35,     // seconds to fade the graph in on a switch
+  /* The very first start is slower than a later switch, because it is
      the one nobody asked for. A game that comes up at full level in a
      quiet room gets closed before the player finds the mute. */
   AUDIO_FIRST_FADE:         1.2,     // seconds, silence to full on the first gesture
@@ -3633,24 +3634,18 @@ const FEEL = {
      SKID_GAIN_MAX is NOT a level and must not be read as one. It is a
      gain applied before two filters that throw most of the energy away,
      so it compensates for them and the number that matters is what comes
-     out. Measured at the master output at full slip: at 0.30 the skid was
-     0.016 RMS against the music's 0.046, so the sound carrying the core
-     mechanic was three times quieter than the backing track despite the
-     two constants looking comparable. 1.10 only brought it to parity, so
-     this is 1.60, which measures 0.075 RMS against the music's 0.049, a
-     lead of about four decibels. The worst case the graph can produce,
-     full slip plus a scrape plus a crash on top, peaks at 0.40 of full
-     scale, so there are eight decibels of headroom left. There is
-     no clipping and no distortion: the path is linear, so a louder skid
-     is a louder skid and not a harsher one.
+     out. The worst case the graph can produce, full slip plus a scrape
+     plus a crash on top, peaks at 0.40 of full scale, so there are eight
+     decibels of headroom. The path is linear, so a louder skid is a
+     louder skid and not a harsher one.
 
-     RE BALANCED IN SESSION FORTY, AGAINST THE RECORDED TRACKS. Those
-     numbers were the skid against the PROCEDURAL arp, and putting the
-     skid four decibels ahead of it was right: two textures, and the one
-     carrying the mechanic should lead. It is wrong against four original
-     tracks, which are the feature and not texture.
+     RE BALANCED IN SESSION FORTY, AGAINST THE RECORDED TRACKS. It was
+     1.60, four decibels ahead of the procedural arp, which was right
+     while both were texture and the one carrying the mechanic should
+     lead. It is wrong against four original tracks, which are the
+     feature. The arp is not in the file at all now.
 
-     Measured again the same way, at the master, with the car ACTUALLY
+     Measured at the master with the car ACTUALLY
      drifting rather than with slipNorm pinned by hand, because the skid
      reads a bite computed off the live state and a pinned slip does not
      produce one. Scaled to full slip, at 0.85 the skid comes out about
@@ -3659,11 +3654,9 @@ const FEEL = {
      the music TRAILED the skid.
 
      THE ONE NUMBER THAT COULD NOT BE MEASURED HERE is the source level
-     of the four m4a files, because this browser has no AAC decoder. The
-     stand in used for these measurements is a sine and the real figure
-     above assumes a fairly ordinary master. Both constants are on the
-     cycler for exactly that reason: the last of this has to be found by
-     playing it.
+     of the four m4a files: the stand in was a sine and the figure above
+     assumes an ordinary master. Both constants are on the cycler for
+     that reason, and the last of it has to be found by playing it.
 
      Note that bite scales this by slip, and a typical fast lap sits near
      0.65 slip rather than 1.0, so the sustained level in play is roughly
@@ -3699,26 +3692,11 @@ const FEEL = {
   CRASH_FREQ_TO:            110,     // Hz it lands on
   CRASH_TIME:              0.90,     // seconds of tail
 
-  /* The music. Driving, arpeggiated, and built in layers rather than as
-     one part, so the intensity can rise smoothly with what the car is
-     doing instead of switching between arrangements. MUSIC_HEAT_TIME is
-     what keeps that smooth: the heat follows slip and scrape through a
-     long lag, so a flick does not make the music stutter. */
-  MUSIC_GAIN:              0.34,
-  MUSIC_BPM:                148,     // high tempo, per the brief
-  MUSIC_STEPS:               16,     // steps in a bar, so these are sixteenths
-  MUSIC_LOOKAHEAD:         0.14,     // seconds of notes scheduled in front
-  MUSIC_HEAT_TIME:         0.90,     // seconds of lag on the intensity
-  MUSIC_BASS_GAIN:         0.30,
-  MUSIC_ARP_GAIN:          0.20,
-  MUSIC_OCTAVE_GAIN:       0.13,     // the layer that only arrives under pressure
-  MUSIC_HAT_GAIN:          0.09,
-  MUSIC_ARP_CUTOFF_LOW:     700,     // Hz at rest, dull
-  MUSIC_ARP_CUTOFF_HIGH:   4200,     // Hz on the edge, open
-  MUSIC_NOTE_DECAY:        0.16,     // seconds
-  MUSIC_BASS_DECAY:        0.20,
-  MUSIC_HAT_DECAY:        0.045,
-  MUSIC_ATTACK:           0.006,     // seconds. Short, but not zero, or it clicks.
+  /* THE PROCEDURAL ARP IS GONE. Sixteen constants stood here driving
+     four oscillator voices, and they were the fallback for a track that
+     would not load. Silence is the better answer: an arp standing in
+     for the four recorded tracks is a different game, not a smaller
+     one. MUSIC_DUCK survives because it was never the arp's. */
   MUSIC_DUCK:              0.35,     // how far the music drops under a crash
   /* ----------------------------------------------------------------
      THE FOUR RECORDED TRACKS, AND WHY THEY ARE ALLOWED TO EXIST.
@@ -3743,11 +3721,11 @@ const FEEL = {
      Chromebook. An HTMLAudioElement streams it, and
      createMediaElementSource puts it back inside the Web Audio graph so
      the existing ducking and the filter still apply. */
-  /* THE RECORDED TRACK'S OWN LEVEL, and it is deliberately NOT
-     MUSIC_GAIN. That belongs to the procedural arp, which is four thin
-     oscillator voices and is tuned for a completely different kind of
-     sound; sharing a constant between a synth patch and a finished
-     stereo master would mean neither could be set right.
+  /* THE RECORDED TRACK'S OWN LEVEL, and it is now the only music level
+     in the file. It used to be set against MUSIC_GAIN, which belonged to
+     the procedural arp and was tuned for four thin oscillator voices
+     rather than for a finished stereo master; that constant is gone and
+     this one is unchanged, because it was never derived from it.
 
      MEASURED AT THE MASTER OUTPUT, which is the only comparison that
      means anything here, for the reason written out beside
@@ -3772,6 +3750,15 @@ const FEEL = {
      wait before trying a failed fetch again. The retry backoff doubles,
      so a genuinely dead file stops costing anything within a few runs
      and a momentary network drop costs one. */
+  /* HOW LONG NETWORK_NO_SOURCE IS ALLOWED TO BE A LIE. Chromium reports
+     networkState 3 for a moment between src being set and the resource
+     selection algorithm getting going, so the check that reads it as
+     "there is nothing there" reads it that way about a file about to
+     load perfectly. It never showed while the live track was started
+     seconds ahead of the check and shows the instant a failure hands
+     over from inside the update. Measured with one blocked file: tracks
+     two, three and four were all marked bad on the following frame. */
+  TUNE_SOURCE_GRACE:       0.50,     // seconds before NO_SOURCE is believed
   TUNE_RETRY_PLAY:          2.5,     // seconds between re asking play()
   TUNE_RETRY_AFTER:         4.0,     // seconds before a failed fetch is retried
   TUNE_RETRIES:               4,     // and how many times, backing off each time
@@ -8133,7 +8120,6 @@ const TUNABLES = [
   { key: 'SIGN_GLOW_INFLATE',  label: 'signGW',  step: 0.2,  min: 0,    max: 8,     dp: 1, group: 21 },
   { key: 'SIGN_GLOW_ALPHA',    label: 'signGA',  step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
   { key: 'SIGN_ALPHA',         label: 'signA',   step: 0.02, min: 0,    max: 1,     dp: 2, group: 21 },
-  { key: 'HEAT_MUSIC',         label: 'hMusic',  step: 0.05, min: 0,    max: 1.0,   dp: 2, group: 13 },
   { key: 'CHECKPOINT_FLASH',   label: 'gateFx',  step: 0.02, min: 0,    max: 1.5,   dp: 2, group: 14 },
   { key: 'CALLOUT_TIME',       label: 'callFor', step: 0.05, min: 0.3,  max: 4.0,   dp: 2, group: 14 },
   { key: 'CALLOUT_GAP',        label: 'callGap', step: 0.1,  min: 0,    max: 8.0,   dp: 1, group: 14 },
@@ -25103,7 +25089,10 @@ function drawOverlay(w, h) {
        now has to be measured against. Two lines and the gap between
        them, and only when it is actually drawn. */
     const musSize = Math.round(s * FEEL.TITLE_MUSIC_SIZE);
-    const musBlock = musicOn
+    /* THE SAME CONDITION THE LINE IS DRAWN ON, and it has to be:
+       reserving space for a block that is not drawn moves the
+       wordmark for nothing. */
+    const musBlock = musicReachable()
       ? s * FEEL.TITLE_GAP_MUSIC + musSize * 0.62 + s * FEEL.TITLE_MUSIC_GAP
         + Math.round(s * FEEL.TITLE_MUSIC_SUB)
       : 0;
@@ -25273,11 +25262,11 @@ function drawOverlay(w, h) {
        once the player has muted, because at that point it is telling
        them about something that will not happen.
 
-       NOT dropped when the FETCH fails, which it was at first. A failed
-       fetch falls back to the procedural track, so music still plays and
-       the warning is still true; hiding it there would be warning people
-       only when the music is the good kind. */
-    if (musicOn) {
+       AND DROPPED WHEN THERE IS NO MUSIC TO WARN ABOUT. It used to
+       stay up through a failed fetch, because that fell back to the
+       procedural track and the warning stayed true. There is no
+       fallback now, so it reads the same one answer the button does. */
+    if (musicReachable()) {
       y += s * FEEL.TITLE_GAP_MUSIC;
       /* IN THE WORDMARK'S OWN TREATMENT. Gold on an orange outline, the
          same three draws DRIFT FEVER is built from, because this is the
@@ -29590,56 +29579,27 @@ function settleForTitle() {
 /* ==================================================================
    AUDIO
 
-   Synthesised in full: three oscillators, one generated noise buffer,
-   and a fixed graph of filters and gains. No fetch, no decodeAudioData,
-   no sample data anywhere in this file. Section 6 again: one blocked
-   request is a broken game for this audience.
+   THE EFFECTS ARE SYNTHESISED IN FULL: two oscillators, one generated
+   noise buffer, and a fixed graph of filters and gains. No fetch, no
+   decodeAudioData, no sample data anywhere in this file. The MUSIC is
+   four recorded tracks and is the one exception; see TUNES.
 
-   The graph is built once, on the gesture that picks a station, and then
-   never grows. Nothing is created or destroyed per note, per skid or per
+   The graph is built once, on the first gesture, and then never grows. Nothing is created or destroyed per note, per skid or per
    crash: notes are a frequency step and an envelope on a voice that is
    already running, and the skid is a single looping noise source whose
    filter is steered. That is what keeps the per frame cost flat, and it
    is also what makes the skid sound like a tyre rather than like a sound
    effect being retriggered.
 
-   ON by default, which overrules sections 5 and 6. That was a deliberate
-   call and not an oversight, and it comes with the mitigations that make
-   it survivable for a classroom:
+   ON by default, which overrules sections 5 and 6. A deliberate call,
+   with the mitigations that make it survivable for a classroom: nothing
+   is built or heard until the first gesture, which the browser enforces
+   anyway; the first start fades from silence over AUDIO_FIRST_FADE; the
+   mute pad is on screen and one tap away from the very first frame; and
+   the choice is stored, so anyone who mutes once is never surprised
+   again on any later visit.
 
-     nothing is built or heard until the first gesture, which is what the
-     browser enforces anyway, so the graph is created inside that gesture
-     and starts unlocked rather than fighting the policy;
-
-     the first start fades from silence over AUDIO_FIRST_FADE rather than
-     arriving at level;
-
-     the mute pad is on screen and one tap away from the very first frame,
-     not behind a start screen or a menu;
-
-     and the choice is stored, so anyone who mutes once is never surprised
-     again on any later visit.
-
-   The dial still exists, but it now picks between tracks rather than
-   between silence and sound.
    ================================================================== */
-
-/* Three states, cycled by one button, in this order. The dial that used
-   to sit on the splash screen is gone: it was a menu on the way into a
-   game whose whole pitch is that there is nothing between you and the
-   road, and one button says the same thing in less space.
-
-   TYRES rather than NEON is the default, and that is the classroom
-   argument from section 6 taken seriously. The skid is quiet, textural
-   and is most of what makes the drift read; music is unmistakably a game
-   from across a room and is what gets somebody caught. Anyone who wants
-   music is one tap away and their choice is remembered. */
-const TRACKS = [
-  { id: 'neon',
-    // A natural minor run, and a saw.
-    wave: 'sawtooth', root: 55, tempo: 1,
-    arp: [0, 3, 7, 10, 12, 10, 7, 3], bass: [0, 0, 7, 0, 10, 0, 7, 5] }
-];
 
 /* ==================================================================
    THE RECORDED MUSIC.
@@ -29687,9 +29647,18 @@ const tune = {
   wired: false,           // are the elements inside the audio graph yet
   playing: false,
   failed: false,          // not using recorded music RIGHT NOW, see tuneFailed
+  /* WHICH TRACKS HAVE REFUSED THIS ROUND, and it is the whole of how
+     one bad file is told apart from no music at all: the next unmarked
+     one is asked for at once. Cleared by a revive. */
+  bad: [],
+  /* AND RUNNING OUT, the only state that turns the button off: every
+     track asked for and none of them answered. Cleared when one
+     actually produces a sample, never when one is merely asked for. */
+  gone: false,
   begun: false,           // has this track ever actually produced a sample
   waited: 0,              // seconds since play() was asked for, while not begun
   frozen: 0,              // seconds playback has been stopped AFTER beginning
+  since: 0,               // seconds since the live side was given this track
   tries: 0,               // how many times a failure has been retried
   retryIn: 0,             // seconds until the next retry is allowed
   nameLife: 0,            // seconds left on the on screen title
@@ -29715,9 +29684,8 @@ function tuneWake() {
        running from a filesystem outright: the attribute forces a CORS
        check, and file:// cannot satisfy one, so every track failed with
        "Cross origin requests are only supported for protocol schemes"
-       and the game fell back to the procedural music for anybody opening
-       the HTML directly. Section 1 says this runs from a filesystem, a
-       static host or a phone, and it does.
+       for anybody opening the HTML directly. Section 1 says this runs
+       from a filesystem, a static host or a phone, and it does.
 
        Nothing is lost. The attribute exists so that a CROSS origin
        media element can still be read by Web Audio, and these are same
@@ -29726,7 +29694,11 @@ function tuneWake() {
     /* Muted at the ELEMENT is wrong: it would mute the graph tap as
        well. The gain nodes are the volume and these stay at one. */
     el.volume = 1;
-    el.addEventListener('error', function () { tuneFailed('error event'); });
+    /* THE ELEMENT IS PASSED, and it was not: both shared one handler
+       that named no side, so an error on the PREFETCHING element was
+       recorded against the PLAYING one. Measured with one blocked file,
+       track two played perfectly and was marked bad anyway. */
+    el.addEventListener('error', function () { tuneFailed('error event', el); });
     /* THE ELEMENT'S OWN "I AM READY" SIGNAL, and it is what makes a
        revive stick. play() asked for on an element whose load() was
        called a microsecond earlier does not always take, so rather than
@@ -29773,11 +29745,9 @@ function tuneWake() {
    twelve of them. A track that is still DOWNLOADING also has a
    currentTime that is not advancing, so the detector could not tell "on
    its way" from "never coming", and twelve seconds into a first run it
-   threw away a perfectly healthy file and handed over to the procedural
-   track for the rest of the session. Toggling the music button rebuilt
-   it by which time the download had finished, which is exactly the
-   symptom reported: the wrong music on a first run, the right music
-   after a toggle.
+   threw away a perfectly healthy file for the rest of the session.
+   Toggling the music button rebuilt it by which time the download had
+   finished, which is exactly the symptom reported.
 
    WAITING IS NOT FAILING. The two states are told apart by the ELEMENT'S
    OWN SIGNALS now, not inferred from a clock:
@@ -29799,17 +29769,87 @@ const NET_NO_SOURCE = 3;          // HTMLMediaElement.NETWORK_NO_SOURCE
    music back. Each new run retries, after a backoff that doubles, up to
    TUNE_RETRIES times, so a genuinely dead fetch stops costing anything
    quickly and a hiccup costs one run. */
-function tuneFailed(reason) {
-  if (tune.failed) return;
-  tune.failed = true;
+/* THE NEXT TRACK THAT HAS NOT ALREADY REFUSED, or -1. Forward from the
+   one that failed, so a bad track three hands to four, not back to one. */
+/* WHICH TRACK AN ELEMENT IS HOLDING, off the file it was given rather
+   than off tune.loaded, which names only the side loaded LAST. */
+function tuneIndexOfEl(el) {
+  if (!el || !el.dataset) return -1;
+  for (let i = 0; i < TUNES.length; i++) if (TUNES[i].file === el.dataset.tune) return i;
+  return -1;
+}
+
+function tuneNextGood(from) {
+  for (let n = 1; n <= TUNES.length; n++) {
+    const i = tuneWrap(from + n);
+    if (tune.bad.indexOf(i) < 0) return i;
+  }
+  return -1;
+}
+
+/* ONE TRACK FAILING AND THE MUSIC FAILING ARE DIFFERENT THINGS, and
+   this treated them as one: a single flag, then a backoff before asking
+   for THE SAME FILE again, so four goes later it gave up having never
+   once asked for track two. Survivable behind an arp, not survivable
+   when the alternative is silence.
+
+   SO A FAILURE HANDS OVER: the track that refused is marked and the
+   next unmarked one is asked for AT ONCE, with no backoff, because a
+   different file is not a retry and the point of having four is that
+   three can still be the music.
+
+   RUNNING OUT is the other outcome and the only one the player sees.
+   The backoff and TUNE_RETRIES then do what they were always for. */
+function tuneFailed(reason, el) {
+  const which = tuneIndexOfEl(el);
+  const at = which >= 0 ? which : (tune.index >= 0 ? tune.index : Math.max(0, tune.loaded));
+  if (tune.bad.indexOf(at) < 0) tune.bad.push(at);
+  tune.reason = reason || 'error';
+  /* A PREFETCH FAILING IS NOT THE MUSIC FAILING. The idle element holds
+     the track AFTER this one and says nothing about what is coming out
+     of the speaker, so the playing track carries on to its own end and
+     only the queue behind it is rebuilt. */
+  if (el && tune.playing && tune.el[tune.live] !== el) {
+    const after = tuneNextGood(tune.index);
+    tune.pending = after;
+    return;
+  }
   tune.playing = false;
   tune.begun = false;
-  tune.reason = reason || 'error';
-  tune.retryIn = FEEL.TUNE_RETRY_AFTER * Math.pow(2, tune.tries);
+  tune.failed = true;
   for (let i = 0; i < 2; i++) {
     const el = tune.el[i];
     if (el) { try { el.pause(); } catch (e) {} }
+    tune.want[i] = 0; tune.lvl[i] = 0;
   }
+  tune.pending = -1;
+  if (tuneNextGood(at) < 0) {
+    tune.gone = true;
+    tune.retryIn = FEEL.TUNE_RETRY_AFTER * Math.pow(2, tune.tries);
+    return;
+  }
+  tuneHandover();
+}
+
+/* THE HANDOVER, ASKED FOR AGAIN EVERY FRAME IT COULD NOT BE DONE. A
+   track can refuse before there is anywhere to play the next one: the
+   elements are made at the title screen and the graph waits for a
+   gesture, so the first failure of a session usually finds tune.wired
+   false. Doing this only at the moment of failure left that case
+   waiting for a backoff AND a new run, measured as track one refusing
+   and track two never being asked for at all.
+
+   IT IS NOT A RETRY and does not wait out the backoff: retryIn governs
+   asking the same set again, and this is a file nothing has tried. */
+function tuneHandover() {
+  if (!tune.failed || tune.gone || !musicOn || !tune.wired) return false;
+  const at = tune.index >= 0 ? tune.index : Math.max(0, tune.loaded);
+  const next = tuneNextGood(at);
+  if (next < 0) { tune.gone = true; return false; }
+  tune.failed = false;
+  tune.pending = -1;
+  tunePlay(next, FEEL.TUNE_FADE_IN);
+  return true;
 }
 
 /* The way back in. Everything about the pair is thrown away and rebuilt,
@@ -29818,6 +29858,13 @@ function tuneFailed(reason) {
    elements themselves are kept and only their sources are re set, which
    is what load() with a fresh src does. */
 function tuneRevive() {
+  /* ONLY ONCE THE MUSIC HAS RUN OUT, which is what keeps this and
+     tuneHandover from fighting. A revive throws away what has been
+     learned about which tracks refuse; doing that with untried tracks
+     left meant a bad track one was cleared from the marks and asked for
+     again rather than handing over. Traced: load 0, fail 0, load 0.
+     Moving through the list is the handover's job. */
+  if (!tune.gone) return false;
   if (!tune.failed || !musicOn) return false;
   if (tune.tries >= FEEL.TUNE_RETRIES) return false;
   if (tune.retryIn > 0) return false;
@@ -29825,6 +29872,10 @@ function tuneRevive() {
   if (!tune.wired && audio) tuneWire(audio);
   tune.tries++;
   tune.failed = false;
+  /* EVERY TRACK IS WORTH ASKING FOR AGAIN: the marks were about a
+     moment rather than about the files. tune.gone is deliberately NOT
+     cleared here, so the button stays off until one actually plays. */
+  tune.bad.length = 0;
   tune.begun = false;
   tune.waited = 0;
   tune.frozen = 0;
@@ -29876,7 +29927,7 @@ function tuneLoad(side, index) {
   if (el.dataset && el.dataset.tune === t.file) { tune.loaded = index; return; }
   if (el.dataset) el.dataset.tune = t.file;
   el.src = t.file;
-  try { el.load(); } catch (e) { tuneFailed(); }
+  try { el.load(); } catch (e) { tuneFailed('load threw', el); }
   tune.loaded = index;
 }
 
@@ -29892,9 +29943,8 @@ function tuneWire(a) {
      revive path looked like it worked and was silent, which is the worst
      kind of broken. */
   /* THERE WAS A LOWPASS HERE AND IT IS GONE. Its cutoff opened with the
-     drift multiplier, the same lever the procedural arp uses, on the
-     reasoning that a finished mix cannot grow a layer so brightness had
-     to be the response instead. Played, it did not read as the music
+     drift multiplier, on the reasoning that a finished mix cannot grow
+     a layer so brightness had to be the response instead. Played, it did not read as the music
      responding to the driving. It read as the tracks being broken, which
      is the worst possible reading of an effect: it costs the player
      confidence in the whole thing rather than merely adding nothing.
@@ -29962,6 +30012,7 @@ function tunePlay(index, fade) {
   tune.begun = false;
   tune.waited = 0;
   tune.frozen = 0;
+  tune.since = 0;
   tune.lastTime = -1;
   tune.nameText = TUNES[index].name;
   tune.nameLife = FEEL.TUNE_NAME_TIME;
@@ -29999,15 +30050,14 @@ function tuneStop() {
   }
 }
 
-// Is a recorded track actually making sound right now? The procedural
-// music runs only when the answer is no AND the fetch has failed.
-function tuneAudible() {
-  if (!tune.playing || tune.failed || !tune.wired) return false;
-  const el = tune.el[tune.live];
-  return !!(el && !el.paused && el.currentTime > 0);
-}
+let tuneLastLit = true;   // what the note button is currently showing
 
 function tuneUpdate(dt) {
+  /* THE BUTTON IS REPAINTED FROM HERE, because what it shows changes
+     with nobody pressing anything. Guarded on the value having moved,
+     so it is a comparison a frame and not a DOM write a frame. */
+  const lit = musicReachable();
+  if (lit !== tuneLastLit) { tuneLastLit = lit; paintSound(); }
   if (tune.nameLife > 0) tune.nameLife -= dt;
   if (tune.retryIn > 0) tune.retryIn = Math.max(0, tune.retryIn - dt);
   /* THE ENVELOPE, ON FRAME TIME. Linear and rate limited rather than a
@@ -30026,6 +30076,12 @@ function tuneUpdate(dt) {
     tuneLoad(idle, tune.pending);
     tune.pending = -1;
   }
+  /* The handover the failure could not do, now that there may be a
+     graph to do it into. Cheap: four comparisons when nothing failed,
+     and it RETURNS when it did one: a track that was asked for on this
+     very line has not had a frame to answer and there is nothing below
+     here that can fairly judge it yet. */
+  if (tune.failed && tuneHandover()) return;
   if (!tune.wired || tune.failed) return;
   if (!tune.playing) return;
   const el = tune.el[tune.live];
@@ -30034,11 +30090,16 @@ function tuneUpdate(dt) {
   /* THE ONLY THING HERE THAT ENDS IN A FAILURE. The browser has looked
      for the media and found nothing there, which is what a blocked or
      missing file looks like when no error event is raised. */
-  if (el.networkState === NET_NO_SOURCE) { tuneFailed('no source'); return; }
+  tune.since += dt;
+  if (el.networkState === NET_NO_SOURCE && tune.since > FEEL.TUNE_SOURCE_GRACE) {
+    tuneFailed('no source', el); return;
+  }
 
   const moved = el.currentTime !== tune.lastTime;
   if (moved) { tune.lastTime = el.currentTime; }
-  if (el.currentTime > 0) tune.begun = true;
+  // The only line that turns the button back on: a sample has been
+  // produced, so there is something to hear. Asking is not enough.
+  if (el.currentTime > 0) { tune.begun = true; tune.gone = false; }
 
   if (!tune.begun) {
     /* STILL ARRIVING, and that is all it is. No clock runs out here.
@@ -30080,24 +30141,20 @@ function tuneUpdate(dt) {
     tunePlay(tune.index + 1, FEEL.TUNE_CROSSFADE);
   }
 }
-let track = 0;            // only one for now, and the list is here so that
-                          // adding a second is a data change and not a
-                          // rewrite. Nothing selects between them yet.
-
 /* Two switches rather than one cycle, because they are two decisions and
    they default differently.
 
    SOUND is the tyres, the scrape and the crash, and it is on. The skid is
    quiet, textural and is most of what makes the drift read at all.
 
-   MUSIC IS NOW ON, and it used to be off. The old comment here argued
-   that an arpeggio at 148bpm is what gets somebody caught in a
-   classroom, and that argument was right about the arpeggio. It is the
-   author's call to reverse it for four original tracks, and what makes
-   it defensible is not the music being better: it is that THE TITLE
-   SCREEN SAYS SO BEFORE A NOTE PLAYS, the mute is already on screen and
-   one tap away when it does, the title screen itself is silent, and a
-   mute is remembered forever.
+   MUSIC IS NOW ON, and it used to be off. The old argument was that an
+   arpeggio at 148bpm is what gets somebody caught in a classroom, and
+   it was right about the arpeggio, which is no longer in the file. It
+   is the author's call to reverse it for four original tracks, and what
+   makes it defensible is not the music being better: THE TITLE SCREEN
+   SAYS SO BEFORE A NOTE PLAYS, the mute is on screen and one tap away
+   when it does, the title screen itself is silent, and a mute is
+   remembered forever.
 
    A STORED VALUE ALWAYS WINS OVER THE DEFAULT, IN BOTH DIRECTIONS, and
    that is the half of this that matters most now the default is on:
@@ -30110,10 +30167,19 @@ let sfxOn = storeGet('sfx') !== '0';
 let musicOn = storeGet('music') !== '0';
 function anySound() { return sfxOn || musicOn; }
 
+/* IS THERE MUSIC, WHICH IS NOT IS MUSIC WANTED. musicOn is the stored
+   preference; this is what can actually be heard, and it is the ONE
+   answer the note button and the title screen's line both read. It does
+   not go false on a slow track, because buffering is a wait and
+   tune.gone needs every track to have refused. The preference is
+   untouched by it, so a session whose network dropped the audio still
+   leaves music on at home. */
+function musicReachable() { return musicOn && !tune.gone; }
+
 let audio = null;         // the graph, once there is one, and never before one
 
-/* Equal temperament from a root, so the note tables above are semitone
-   offsets and a station is a scale plus a waveform rather than a tune. */
+/* Equal temperament from a root, so the sting and blip ladders below
+   are semitone offsets rather than frequencies. */
 function semis(root, n) { return root * Math.pow(2, n / 12); }
 
 function buildAudio() {
@@ -30184,38 +30250,16 @@ function buildAudio() {
   const crashGain = gain(0);
   crashSrc.connect(crashLow); crashLow.connect(crashGain); crashGain.connect(bus);
 
-  // --- Music. Four mono voices, each one persistent. ---
-  const musicGain = gain(0);
-  musicGain.connect(bus);
-
-  const bassOsc = node('Oscillator');
-  bassOsc.type = 'square';
-  const bassLow = filter('lowpass', 260, 0.8);
-  const bassGain = gain(0);
-  bassOsc.connect(bassLow); bassLow.connect(bassGain); bassGain.connect(musicGain);
-
-  const arpOsc = node('Oscillator');
-  const arpLow = filter('lowpass', FEEL.MUSIC_ARP_CUTOFF_LOW, 3.5);
-  const arpGain = gain(0);
-  arpOsc.connect(arpLow); arpLow.connect(arpGain); arpGain.connect(musicGain);
-
-  const octOsc = node('Oscillator');
-  octOsc.type = 'triangle';
-  const octGain = gain(0);
-  const octLevel = gain(0);        // the layer's own level, driven by heat
-  octOsc.connect(octGain); octGain.connect(octLevel); octLevel.connect(musicGain);
-
-  const hatSrc = loopNoise();
-  const hatHigh = filter('highpass', 7000, 0.9);
-  const hatGain = gain(0);
-  const hatLevel = gain(0);
-  hatSrc.connect(hatHigh); hatHigh.connect(hatGain);
-  hatGain.connect(hatLevel); hatLevel.connect(musicGain);
+  /* --- NO MUSIC IS BUILT HERE ANY MORE. Four oscillator voices and
+     their own sub bus stood here and were the fallback. The recorded
+     tracks are two media elements wired straight onto the BUS by
+     tuneWire, so the master, the pause sweep and the crash duck all
+     still reach them with nothing in between. --- */
 
   /* --- The sting. One voice for every earned moment in the game.
-     It hangs off the BUS rather than off musicGain, because these are
-     responses to what the player did and they have to be there for
-     somebody who has never turned the music on. It is a mono voice like
+     It hangs off the BUS, because these are responses to what the
+     player did and they have to be there for somebody who has the
+     music off. It is a mono voice like
      everything else here: started once, never rebuilt, and a sting is a
      handful of scheduled frequency changes on it. --- */
   const stingOsc = node('Oscillator');
@@ -30225,9 +30269,9 @@ function buildAudio() {
 
   /* --- The chain blip. Its own voice rather than the sting's, because a
      chain link and a close call can land on the same frame and a shared
-     voice would cut one of them off mid note. On the BUS, not on the
-     music, because music is off by default and this is the reward for
-     playing well. --- */
+     voice would cut one of them off mid note. On the BUS, so it is there
+     for a player with the music off: this is the reward for playing
+     well, not part of the music. --- */
   const chainOsc = node('Oscillator');
   chainOsc.type = 'square';
   const chainLow = filter('lowpass', 2600, 0.9);
@@ -30235,23 +30279,17 @@ function buildAudio() {
   chainOsc.connect(chainLow); chainLow.connect(chainGain); chainGain.connect(bus);
 
   const t0 = ac.currentTime;
-  skidSrc.start(t0); scrapeSrc.start(t0); crashSrc.start(t0); hatSrc.start(t0);
-  wobble.start(t0); bassOsc.start(t0);
-  arpOsc.start(t0); octOsc.start(t0); stingOsc.start(t0); chainOsc.start(t0);
+  skidSrc.start(t0); scrapeSrc.start(t0); crashSrc.start(t0);
+  wobble.start(t0); stingOsc.start(t0); chainOsc.start(t0);
 
   const built = {
     ac: ac, master: master, pauseFilter: pauseFilter, bus: bus,
     skidBand: skidBand, skidGain: skidGain,
     scrapeA: scrapeA, scrapeGain: scrapeGain,
     crashLow: crashLow, crashGain: crashGain,
-    musicGain: musicGain,
-    bassOsc: bassOsc, bassGain: bassGain,
-    arpOsc: arpOsc, arpLow: arpLow, arpGain: arpGain,
-    octOsc: octOsc, octGain: octGain, octLevel: octLevel,
-    hatGain: hatGain, hatLevel: hatLevel,
     stingOsc: stingOsc, stingGain: stingGain,
     chainOsc: chainOsc, chainGain: chainGain,
-    step: 0, nextNote: 0, heat: 0, crashUntil: 0
+    crashUntil: 0
   };
   // The recorded tracks join the same bus, so the master, the pause
   // sweep and the crash duck all apply to them without a second path.
@@ -30353,8 +30391,11 @@ const ICON = {
 function paintSound() {
   soundBtn.innerHTML = sfxOn ? ICON.speakerOn : ICON.speakerOff;
   soundBtn.classList.toggle('on', sfxOn);
-  musicBtn.innerHTML = musicOn ? ICON.noteOn : ICON.noteOff;
-  musicBtn.classList.toggle('on', musicOn);
+  // Off when there is nothing to hear, whatever the preference says: a
+  // lit control over silence says the game is working when it is not.
+  const lit = musicReachable();
+  musicBtn.innerHTML = lit ? ICON.noteOn : ICON.noteOff;
+  musicBtn.classList.toggle('on', lit);
 }
 
 /* fade is the time to reach level, which is longer for the first start
@@ -30383,11 +30424,7 @@ function applyAudio(fade) {
   }
   if (!audio) return;
   resumeAudio();
-  audio.step = 0;
-  audio.nextNote = audio.ac.currentTime + 0.06;
-  const t = TRACKS[track];
-  audio.arpOsc.type = t.wave;
-  audio.octOsc.type = t.wave === 'square' ? 'square' : 'triangle';
+  // The arp's step counter and waveform were reset here. No scheduler.
   ramp(audio.master.gain, FEEL.AUDIO_MASTER, fade || FEEL.AUDIO_START_TIME);
 }
 
@@ -30508,9 +30545,15 @@ padSwitch(musicBtn, function () {
   if (musicOn) {
     /* A DELIBERATE PRESS CLEARS THE BACKOFF. Somebody asking for the
        music back is a better signal than any timer, so it tries again
-       now rather than waiting out a retry window. */
+       now rather than waiting out a retry window.
+
+       AND IT CLEARS RUNNING OUT, which is what makes the tap visible:
+       every track is asked for again so the button lights, and if there
+       is still nothing there it goes back off a moment later. A button
+       that stays dark on a press is one that appears not to work. */
     tune.retryIn = 0; tune.tries = 0;
-    tuneWake(); tuneRevive(); tuneStart();
+    tune.bad.length = 0; tune.gone = false; tune.failed = false;
+    tuneWake(); tuneStart();
   }
 });
 paintSound();
@@ -30526,24 +30569,12 @@ function resumeAudio() {
 
 function audioOn() { return audio !== null && sfxOn; }
 
-/* One envelope on a voice that is already running. cancel then hold the
-   current value first, or retriggering mid decay steps and clicks. */
-function pluck(g, peak, decay, when) {
-  const p = g.gain;
-  p.cancelScheduledValues(when);
-  p.setValueAtTime(p.value, when);
-  p.linearRampToValueAtTime(peak, when + FEEL.MUSIC_ATTACK);
-  p.exponentialRampToValueAtTime(0.0001, when + FEEL.MUSIC_ATTACK + decay);
-}
-
-/* The sequencer. Notes are scheduled a short way in front of the clock
-   rather than on the frame they fall, so a long frame cannot make the
-   music stumble. Nothing here allocates. */
+/* THE MUSIC, WHICH IS NOW ONLY THE RECORDED TRACKS. A sixteenth note
+   sequencer stood here and pluck() above it, both the fallback. What is
+   left is the two things that ever touched a recorded track's gain. */
 function updateMusic() {
-  const s = TRACKS[track];
   const a = audio;
   if (!musicOn) {
-    ramp(a.musicGain.gain, 0, FEEL.AUDIO_FADE_TIME);
     if (tune.playing) tuneStop();
     return;
   }
@@ -30555,55 +30586,13 @@ function updateMusic() {
      `duck` is a crash, which is a discrete event and not a style of
      driving, and it is here so the music stops fighting the crash sound.
      `tune.lvl` is the crossfade envelope between one track and the next.
-     That is the whole list. a.heat is deliberately not consulted: see
-     tuneWire for why the filter that used to read it was taken out. */
+     That is the whole list, and there is nothing else left to consult:
+     see tuneWire for why the filter that read the driving came out. */
   if (tune.playing) {
     for (let i = 0; i < 2; i++) {
       if (!tune.g[i]) continue;
       ramp(tune.g[i].gain, FEEL.TUNE_GAIN * duck * tune.lvl[i], FEEL.AUDIO_FADE_TIME);
     }
-  }
-
-  /* AND THE PROCEDURAL TRACK IS THE FALLBACK, not a companion. It runs
-     when the fetch has FAILED, and it stays quiet while a recorded track
-     is on its way: a run that starts before the download lands is a
-     quiet run, per the brief, not one with two pieces of music in it. */
-  if (!tune.failed) {
-    ramp(a.musicGain.gain, 0, FEEL.AUDIO_FADE_TIME);
-    return;
-  }
-  ramp(a.musicGain.gain, FEEL.MUSIC_GAIN * duck, FEEL.AUDIO_FADE_TIME);
-  // The layers that arrive under pressure. Levels, not switches.
-  ramp(a.octLevel.gain, FEEL.MUSIC_OCTAVE_GAIN * a.heat, FEEL.AUDIO_FADE_TIME);
-  ramp(a.hatLevel.gain, FEEL.MUSIC_HAT_GAIN * (0.35 + 0.65 * a.heat), FEEL.AUDIO_FADE_TIME);
-  ramp(a.arpLow.frequency,
-       FEEL.MUSIC_ARP_CUTOFF_LOW
-       + (FEEL.MUSIC_ARP_CUTOFF_HIGH - FEEL.MUSIC_ARP_CUTOFF_LOW) * a.heat,
-       FEEL.AUDIO_FADE_TIME);
-
-  const stepTime = 60 / (FEEL.MUSIC_BPM * s.tempo) / (FEEL.MUSIC_STEPS / 4);
-  const until = a.ac.currentTime + FEEL.MUSIC_LOOKAHEAD;
-  // A long stall must not leave the scheduler pouring out a backlog.
-  if (a.nextNote < a.ac.currentTime) a.nextNote = a.ac.currentTime;
-  while (a.nextNote < until) {
-    const t = a.nextNote;
-    const n = a.step;
-    // Bass on every other sixteenth, which is the eighth note pulse.
-    if ((n & 1) === 0) {
-      const b = s.bass[(n >> 1) % s.bass.length];
-      a.bassOsc.frequency.setValueAtTime(semis(s.root, b), t);
-      pluck(a.bassGain, FEEL.MUSIC_BASS_GAIN, FEEL.MUSIC_BASS_DECAY, t);
-    }
-    // The arp runs the whole sixteenth grid. That is the drive.
-    const note = s.arp[n % s.arp.length];
-    a.arpOsc.frequency.setValueAtTime(semis(s.root * 4, note), t);
-    pluck(a.arpGain, FEEL.MUSIC_ARP_GAIN, FEEL.MUSIC_NOTE_DECAY, t);
-    a.octOsc.frequency.setValueAtTime(semis(s.root * 8, note), t);
-    pluck(a.octGain, 1, FEEL.MUSIC_NOTE_DECAY, t);
-    // Offbeat hats, so the grid has something on the back of it.
-    if ((n & 1) === 1) pluck(a.hatGain, 1, FEEL.MUSIC_HAT_DECAY, t);
-    a.step = (n + 1) % 64;
-    a.nextNote += stepTime;
   }
 }
 
@@ -30626,17 +30615,9 @@ function updateAudio(dt) {
   const driving = state === DRIVING && !paused;
   const slip = driving ? drift.slipNorm : 0;
 
-  /* The heat the music reads. Slip and the spent budget both count, and
-     it lags hard, so the arrangement swells rather than flickering.
-
-     The multiplier is the third term, so the octave layer and the hats
-     come up with the rest of the world rather than on their own schedule.
-     It goes in by MAXIMUM rather than by sum, the same discipline the
-     shake uses, so three loud things at once are as loud as the loudest
-     and the arrangement cannot pile up. */
-  const want = Math.max(slip, driving ? scrapeRisk : 0,
-                        driving ? worldHeat * FEEL.HEAT_MUSIC : 0);
-  a.heat += (want - a.heat) * (1 - Math.exp(-dt / FEEL.MUSIC_HEAT_TIME));
+  /* A LAGGED HEAT WAS COMPUTED HERE and nothing reads it. It was the
+     arp's, and the recorded tracks are a finished mix that deliberately
+     reads none of it: see tuneWire, since the lowpass came out. */
 
   // The skid. Level, band and Q, all off the one slip value.
   const bite = clamp((slip - FEEL.SKID_MIN_SLIP) / (1 - FEEL.SKID_MIN_SLIP), 0, 1);
@@ -30657,9 +30638,9 @@ function updateAudio(dt) {
 /* The stings. Three moments, three shapes, one voice.
 
    Each is a short rising figure scheduled on the sting oscillator that is
-   already running. Nothing is built here, nothing allocates, and the note
-   tables are semitone offsets from the music's own root so a sting always
-   belongs to the same key the arpeggio is in.
+   already running. Nothing is built here and nothing allocates. The note
+   tables are semitone offsets from SFX_ROOT, which is the effects bus's
+   own pitch: the recorded tracks' key is not knowable from here.
 
    They are all responses. There is no sting anywhere in this game that
    fires because time passed. */
@@ -30696,7 +30677,7 @@ const STING_LAND_BIG = { notes: [12, 19, 24, 31], step: 0.048, gain: 0.15, decay
 
 function audioSting(sting) {
   if (!audioOn()) return;
-  const a = audio, root = TRACKS[track].root;
+  const a = audio, root = FEEL.SFX_ROOT;
   const p = a.stingGain.gain;
   const t = a.ac.currentTime;
   p.cancelScheduledValues(t);
@@ -30766,7 +30747,7 @@ const FANFARE_LADDER = [0, 7, 12, 16, 19, 24, 28, 31, 36, 40, 43, 48];
    hush is actually a hush. */
 function audioFinishHit() {
   if (!audioOn()) return;
-  const a = audio, root = TRACKS[track].root;
+  const a = audio, root = FEEL.SFX_ROOT;
   const p = a.stingGain.gain;
   const t = a.ac.currentTime;
   p.cancelScheduledValues(t);
@@ -30785,7 +30766,7 @@ function audioFinishHit() {
    is what carries the afterglow. */
 function audioFanfareWave(n, total, level) {
   if (!audioOn()) return;
-  const a = audio, root = TRACKS[track].root;
+  const a = audio, root = FEEL.SFX_ROOT;
   const p = a.stingGain.gain;
   const t = a.ac.currentTime;
   const last = n >= total - 1;
@@ -30818,7 +30799,7 @@ function audioChain(link) {
   if (!audioOn()) return;
   const a = audio, t = a.ac.currentTime;
   const n = CHAIN_LADDER[Math.min(link - 1, CHAIN_LADDER.length - 1)];
-  a.chainOsc.frequency.setValueAtTime(semis(TRACKS[track].root * 8, n), t);
+  a.chainOsc.frequency.setValueAtTime(semis(FEEL.SFX_ROOT * 8, n), t);
   const p = a.chainGain.gain;
   p.cancelScheduledValues(t);
   p.setValueAtTime(FEEL.CHAIN_GAIN, t);
