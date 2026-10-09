@@ -1,0 +1,3923 @@
+{
+ "commit": "cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de",
+ "source": "vendor/original/index.html",
+ "scriptStartLine": 826,
+ "roots": [
+  "startRun",
+  "continueRun",
+  "startOrRestart",
+  "spendRestartWanted",
+  "startDaily",
+  "startEndless",
+  "startNextLevel",
+  "leaveRun",
+  "switchMode",
+  "skipTraining",
+  "setPaused",
+  "togglePause",
+  "update",
+  "updateScore",
+  "updateClock",
+  "updateSpectacle",
+  "ghostUpdate",
+  "updateBar",
+  "steering",
+  "updateSteering",
+  "held",
+  "clearHeldInput",
+  "rollDayIfNeeded",
+  "loadRunsEver",
+  "loadFinishedEver",
+  "loadTrainedEver",
+  "recFor",
+  "dayTotals",
+  "pickCar",
+  "nextCar",
+  "carsUnlocked",
+  "carUnlocked",
+  "activeCar",
+  "localDayStamp",
+  "dailySeedFor",
+  "levelSeedFor",
+  "trackNumber",
+  "levelGatesFor",
+  "isTraining",
+  "segAt",
+  "segHeight",
+  "topUpRoad",
+  "resetRoad",
+  "updateDifficulty",
+  "refreshTrackLength",
+  "gateSegment",
+  "canContinue",
+  "countHolding",
+  "finaleActive",
+  "finaleRunning",
+  "finaleReveal"
+ ],
+ "taken": [
+  {
+   "name": "FEEL",
+   "kind": "const",
+   "line": 847,
+   "endLine": 5944,
+   "via": "startRun"
+  },
+  {
+   "name": "BIOME_PALETTE",
+   "kind": "const",
+   "line": 6466,
+   "endLine": 6528,
+   "via": "buildBiomes"
+  },
+  {
+   "name": "BIOMES",
+   "kind": "let",
+   "line": 6641,
+   "endLine": 6641,
+   "via": "applyBiome"
+  },
+  {
+   "name": "BIOME_HUE",
+   "kind": "let",
+   "line": 6642,
+   "endLine": 6642,
+   "via": "buildBiomes"
+  },
+  {
+   "name": "biomeHue",
+   "kind": "function",
+   "line": 6702,
+   "endLine": 6702,
+   "via": "applyBiome"
+  },
+  {
+   "name": "hueGap",
+   "kind": "function",
+   "line": 6703,
+   "endLine": 6706,
+   "via": "biomeOrder"
+  },
+  {
+   "name": "biomeBag",
+   "kind": "const",
+   "line": 6726,
+   "endLine": 6726,
+   "via": "startRun"
+  },
+  {
+   "name": "biomeRecent",
+   "kind": "const",
+   "line": 6727,
+   "endLine": 6727,
+   "via": "startRun"
+  },
+  {
+   "name": "lastBiomeHue",
+   "kind": "let",
+   "line": 6728,
+   "endLine": 6728,
+   "via": "startRun"
+  },
+  {
+   "name": "biomeRngState",
+   "kind": "let",
+   "line": 6730,
+   "endLine": 6730,
+   "via": "biomeSeed"
+  },
+  {
+   "name": "biomeSeed",
+   "kind": "function",
+   "line": 6731,
+   "endLine": 6731,
+   "via": "startRun"
+  },
+  {
+   "name": "biomeRandom",
+   "kind": "function",
+   "line": 6732,
+   "endLine": 6737,
+   "via": "biomeOrder"
+  },
+  {
+   "name": "biomeOrder",
+   "kind": "function",
+   "line": 6743,
+   "endLine": 6773,
+   "via": "refillBiomeBag"
+  },
+  {
+   "name": "refillBiomeBag",
+   "kind": "function",
+   "line": 6780,
+   "endLine": 6789,
+   "via": "nextBiome"
+  },
+  {
+   "name": "nextBiome",
+   "kind": "function",
+   "line": 6790,
+   "endLine": 6801,
+   "via": "crossGate"
+  },
+  {
+   "name": "biome",
+   "kind": "let",
+   "line": 6803,
+   "endLine": 6803,
+   "via": "applyBiome"
+  },
+  {
+   "name": "STORAGE_PREFIX",
+   "kind": "const",
+   "line": 7768,
+   "endLine": 7768,
+   "via": "storeGet"
+  },
+  {
+   "name": "CAMERA_DEPTH",
+   "kind": "let",
+   "line": 7775,
+   "endLine": 7775,
+   "via": "recomputeCamera"
+  },
+  {
+   "name": "camHeight",
+   "kind": "let",
+   "line": 7780,
+   "endLine": 7780,
+   "via": "recomputeCamera"
+  },
+  {
+   "name": "lookCurve",
+   "kind": "let",
+   "line": 7781,
+   "endLine": 7781,
+   "via": "update"
+  },
+  {
+   "name": "cameraX",
+   "kind": "let",
+   "line": 7782,
+   "endLine": 7782,
+   "via": "update"
+  },
+  {
+   "name": "clamp",
+   "kind": "function",
+   "line": 8464,
+   "endLine": 8464,
+   "via": "update"
+  },
+  {
+   "name": "steering",
+   "kind": "const",
+   "line": 8700,
+   "endLine": 8700,
+   "via": "<root>"
+  },
+  {
+   "name": "held",
+   "kind": "const",
+   "line": 8702,
+   "endLine": 8702,
+   "via": "<root>"
+  },
+  {
+   "name": "touchSides",
+   "kind": "const",
+   "line": 8703,
+   "endLine": 8703,
+   "via": "clearHeldInput"
+  },
+  {
+   "name": "digitalTarget",
+   "kind": "function",
+   "line": 8705,
+   "endLine": 8709,
+   "via": "updateSteering"
+  },
+  {
+   "name": "updateSteering",
+   "kind": "function",
+   "line": 8711,
+   "endLine": 8721,
+   "via": "<root>"
+  },
+  {
+   "name": "clearHeldInput",
+   "kind": "function",
+   "line": 8723,
+   "endLine": 8726,
+   "via": "<root>"
+  },
+  {
+   "name": "tilt",
+   "kind": "const",
+   "line": 9140,
+   "endLine": 9149,
+   "via": "updateSteering"
+  },
+  {
+   "name": "runTime",
+   "kind": "let",
+   "line": 10337,
+   "endLine": 10337,
+   "via": "startRun"
+  },
+  {
+   "name": "titleTime",
+   "kind": "let",
+   "line": 10338,
+   "endLine": 10338,
+   "via": "update"
+  },
+  {
+   "name": "runsEver",
+   "kind": "let",
+   "line": 10361,
+   "endLine": 10361,
+   "via": "loadRunsEver"
+  },
+  {
+   "name": "finishedEver",
+   "kind": "let",
+   "line": 10365,
+   "endLine": 10365,
+   "via": "loadFinishedEver"
+  },
+  {
+   "name": "loadFinishedEver",
+   "kind": "function",
+   "line": 10366,
+   "endLine": 10369,
+   "via": "<root>"
+  },
+  {
+   "name": "trainedEver",
+   "kind": "let",
+   "line": 10385,
+   "endLine": 10385,
+   "via": "loadTrainedEver"
+  },
+  {
+   "name": "loadTrainedEver",
+   "kind": "function",
+   "line": 10386,
+   "endLine": 10388,
+   "via": "<root>"
+  },
+  {
+   "name": "markTrained",
+   "kind": "function",
+   "line": 10389,
+   "endLine": 10393,
+   "via": "skipTraining"
+  },
+  {
+   "name": "loadRunsEver",
+   "kind": "function",
+   "line": 10395,
+   "endLine": 10398,
+   "via": "<root>"
+  },
+  {
+   "name": "countRun",
+   "kind": "function",
+   "line": 10400,
+   "endLine": 10403,
+   "via": "startRun"
+  },
+  {
+   "name": "firstRunEase",
+   "kind": "function",
+   "line": 10413,
+   "endLine": 10413,
+   "via": "updateDifficulty"
+  },
+  {
+   "name": "openingSeconds",
+   "kind": "function",
+   "line": 10426,
+   "endLine": 10444,
+   "via": "inOpening"
+  },
+  {
+   "name": "inOpening",
+   "kind": "function",
+   "line": 10446,
+   "endLine": 10470,
+   "via": "update"
+  },
+  {
+   "name": "wasInOpening",
+   "kind": "let",
+   "line": 10487,
+   "endLine": 10487,
+   "via": "startRun"
+  },
+  {
+   "name": "openingHandover",
+   "kind": "function",
+   "line": 10488,
+   "endLine": 10492,
+   "via": "update"
+  },
+  {
+   "name": "unlockAt",
+   "kind": "function",
+   "line": 10504,
+   "endLine": 10504,
+   "via": "dueHazardKind"
+  },
+  {
+   "name": "onRunEnded",
+   "kind": "function",
+   "line": 10520,
+   "endLine": 10522,
+   "via": "leaveRun"
+  },
+  {
+   "name": "roadClock",
+   "kind": "function",
+   "line": 10547,
+   "endLine": 10550,
+   "via": "liveClock"
+  },
+  {
+   "name": "buildClock",
+   "kind": "function",
+   "line": 10551,
+   "endLine": 10551,
+   "via": "buildWidthScale"
+  },
+  {
+   "name": "liveClock",
+   "kind": "function",
+   "line": 10552,
+   "endLine": 10552,
+   "via": "updateDifficulty"
+  },
+  {
+   "name": "onRampProgress",
+   "kind": "function",
+   "line": 10557,
+   "endLine": 10563,
+   "via": "updateDifficulty"
+  },
+  {
+   "name": "deepProgress",
+   "kind": "function",
+   "line": 10576,
+   "endLine": 10582,
+   "via": "updateDifficulty"
+  },
+  {
+   "name": "curveScale",
+   "kind": "let",
+   "line": 10587,
+   "endLine": 10587,
+   "via": "update"
+  },
+  {
+   "name": "widthScale",
+   "kind": "let",
+   "line": 10588,
+   "endLine": 10588,
+   "via": "updateDifficulty"
+  },
+  {
+   "name": "updateDifficulty",
+   "kind": "function",
+   "line": 10590,
+   "endLine": 10606,
+   "via": "<root>"
+  },
+  {
+   "name": "maxIntensity",
+   "kind": "function",
+   "line": 10612,
+   "endLine": 10630,
+   "via": "addPhrase"
+  },
+  {
+   "name": "restChance",
+   "kind": "function",
+   "line": 10632,
+   "endLine": 10641,
+   "via": "addPhrase"
+  },
+  {
+   "name": "ENDLESS",
+   "kind": "const",
+   "line": 10778,
+   "endLine": 10778,
+   "via": "startEndless"
+  },
+  {
+   "name": "DAILY",
+   "kind": "const",
+   "line": 10778,
+   "endLine": 10778,
+   "via": "startRun"
+  },
+  {
+   "name": "mode",
+   "kind": "let",
+   "line": 10795,
+   "endLine": 10795,
+   "via": "startRun"
+  },
+  {
+   "name": "dailySeedFor",
+   "kind": "function",
+   "line": 10807,
+   "endLine": 10812,
+   "via": "<root>"
+  },
+  {
+   "name": "todayStamp",
+   "kind": "let",
+   "line": 10814,
+   "endLine": 10814,
+   "via": "startRun"
+  },
+  {
+   "name": "DAILY_EPOCH",
+   "kind": "const",
+   "line": 10832,
+   "endLine": 10832,
+   "via": "trackNumber"
+  },
+  {
+   "name": "stampDate",
+   "kind": "function",
+   "line": 10836,
+   "endLine": 10840,
+   "via": "trackNumber"
+  },
+  {
+   "name": "trackNumber",
+   "kind": "function",
+   "line": 10842,
+   "endLine": 10845,
+   "via": "<root>"
+  },
+  {
+   "name": "levelCount",
+   "kind": "function",
+   "line": 10892,
+   "endLine": 10892,
+   "via": "startNextLevel"
+  },
+  {
+   "name": "clampLevel",
+   "kind": "function",
+   "line": 10893,
+   "endLine": 10893,
+   "via": "startRun"
+  },
+  {
+   "name": "trainingLevels",
+   "kind": "function",
+   "line": 10918,
+   "endLine": 10920,
+   "via": "isTraining"
+  },
+  {
+   "name": "isTraining",
+   "kind": "function",
+   "line": 10921,
+   "endLine": 10921,
+   "via": "<root>"
+  },
+  {
+   "name": "firstRealLevel",
+   "kind": "function",
+   "line": 10922,
+   "endLine": 10922,
+   "via": "skipTraining"
+  },
+  {
+   "name": "realLevelCount",
+   "kind": "function",
+   "line": 10923,
+   "endLine": 10923,
+   "via": "dayTotals"
+  },
+  {
+   "name": "levelBand",
+   "kind": "function",
+   "line": 10953,
+   "endLine": 10959,
+   "via": "updateClock"
+  },
+  {
+   "name": "levelGatesFor",
+   "kind": "function",
+   "line": 10994,
+   "endLine": 11002,
+   "via": "<root>"
+  },
+  {
+   "name": "levelSeedFor",
+   "kind": "function",
+   "line": 11009,
+   "endLine": 11014,
+   "via": "<root>"
+  },
+  {
+   "name": "level",
+   "kind": "let",
+   "line": 11019,
+   "endLine": 11019,
+   "via": "startRun"
+  },
+  {
+   "name": "levelHardP",
+   "kind": "function",
+   "line": 11035,
+   "endLine": 11035,
+   "via": "updateDifficulty"
+  },
+  {
+   "name": "levelHardD",
+   "kind": "function",
+   "line": 11056,
+   "endLine": 11080,
+   "via": "updateDifficulty"
+  },
+  {
+   "name": "gateSegment",
+   "kind": "function",
+   "line": 11085,
+   "endLine": 11100,
+   "via": "<root>"
+  },
+  {
+   "name": "dailyGates",
+   "kind": "let",
+   "line": 11102,
+   "endLine": 11102,
+   "via": "refreshTrackLength"
+  },
+  {
+   "name": "finishSeg",
+   "kind": "let",
+   "line": 11103,
+   "endLine": 11103,
+   "via": "refreshTrackLength"
+  },
+  {
+   "name": "refreshTrackLength",
+   "kind": "function",
+   "line": 11104,
+   "endLine": 11107,
+   "via": "<root>"
+  },
+  {
+   "name": "finishClock",
+   "kind": "function",
+   "line": 11111,
+   "endLine": 11111,
+   "via": "deepProgress"
+  },
+  {
+   "name": "rollDayIfNeeded",
+   "kind": "function",
+   "line": 11116,
+   "endLine": 11125,
+   "via": "<root>"
+  },
+  {
+   "name": "seedPinned",
+   "kind": "let",
+   "line": 11130,
+   "endLine": 11130,
+   "via": "nextSeed"
+  },
+  {
+   "name": "PINNED_SEED",
+   "kind": "const",
+   "line": 11131,
+   "endLine": 11131,
+   "via": "nextSeed"
+  },
+  {
+   "name": "lastSeed",
+   "kind": "let",
+   "line": 11132,
+   "endLine": 11132,
+   "via": "nextSeed"
+  },
+  {
+   "name": "nextSeed",
+   "kind": "function",
+   "line": 11139,
+   "endLine": 11149,
+   "via": "<root>"
+  },
+  {
+   "name": "segments",
+   "kind": "let",
+   "line": 11205,
+   "endLine": 11205,
+   "via": "segAt"
+  },
+  {
+   "name": "segBase",
+   "kind": "let",
+   "line": 11206,
+   "endLine": 11206,
+   "via": "segAt"
+  },
+  {
+   "name": "segAt",
+   "kind": "function",
+   "line": 11208,
+   "endLine": 11210,
+   "via": "<root>"
+  },
+  {
+   "name": "hillPhase",
+   "kind": "let",
+   "line": 11222,
+   "endLine": 11222,
+   "via": "segHeight"
+  },
+  {
+   "name": "segHeight",
+   "kind": "function",
+   "line": 11223,
+   "endLine": 11246,
+   "via": "<root>"
+  },
+  {
+   "name": "addSegment",
+   "kind": "function",
+   "line": 11248,
+   "endLine": 11282,
+   "via": "addRun"
+  },
+  {
+   "name": "rngState",
+   "kind": "let",
+   "line": 11289,
+   "endLine": 11289,
+   "via": "resetRoad"
+  },
+  {
+   "name": "rng",
+   "kind": "function",
+   "line": 11290,
+   "endLine": 11295,
+   "via": "resetRoad"
+  },
+  {
+   "name": "vary",
+   "kind": "function",
+   "line": 11296,
+   "endLine": 11296,
+   "via": "PHRASES"
+  },
+  {
+   "name": "lastDir",
+   "kind": "let",
+   "line": 11299,
+   "endLine": 11299,
+   "via": "resetRoad"
+  },
+  {
+   "name": "pickDir",
+   "kind": "function",
+   "line": 11300,
+   "endLine": 11303,
+   "via": "buildHazardPhrase"
+  },
+  {
+   "name": "roadWidth",
+   "kind": "let",
+   "line": 11320,
+   "endLine": 11320,
+   "via": "topUpRoad"
+  },
+  {
+   "name": "buildWidthScale",
+   "kind": "function",
+   "line": 11329,
+   "endLine": 11336,
+   "via": "addRun"
+  },
+  {
+   "name": "addRun",
+   "kind": "function",
+   "line": 11338,
+   "endLine": 11369,
+   "via": "topUpRoad"
+  },
+  {
+   "name": "NARROW",
+   "kind": "const",
+   "line": 11371,
+   "endLine": 11373,
+   "via": "PHRASES"
+  },
+  {
+   "name": "PHRASES",
+   "kind": "const",
+   "line": 11375,
+   "endLine": 11558,
+   "via": "addPhrase"
+  },
+  {
+   "name": "restOwed",
+   "kind": "let",
+   "line": 11562,
+   "endLine": 11562,
+   "via": "resetRoad"
+  },
+  {
+   "name": "phraseWeight",
+   "kind": "function",
+   "line": 11564,
+   "endLine": 11567,
+   "via": "addPhrase"
+  },
+  {
+   "name": "trainPinchBuilt",
+   "kind": "let",
+   "line": 11604,
+   "endLine": 11604,
+   "via": "resetRoad"
+  },
+  {
+   "name": "trainJumpBuilt",
+   "kind": "let",
+   "line": 11604,
+   "endLine": 11604,
+   "via": "resetRoad"
+  },
+  {
+   "name": "trainBlockBuilt",
+   "kind": "let",
+   "line": 11605,
+   "endLine": 11605,
+   "via": "resetRoad"
+  },
+  {
+   "name": "trainSplitBuilt",
+   "kind": "let",
+   "line": 11605,
+   "endLine": 11605,
+   "via": "resetRoad"
+  },
+  {
+   "name": "trainMoverBuilt",
+   "kind": "let",
+   "line": 11605,
+   "endLine": 11605,
+   "via": "resetRoad"
+  },
+  {
+   "name": "trainLineFree",
+   "kind": "let",
+   "line": 11622,
+   "endLine": 11622,
+   "via": "resetRoad"
+  },
+  {
+   "name": "trainPlaced",
+   "kind": "let",
+   "line": 11622,
+   "endLine": 11622,
+   "via": "resetRoad"
+  },
+  {
+   "name": "trainBeat",
+   "kind": "function",
+   "line": 11624,
+   "endLine": 11627,
+   "via": "buildTrainPinch"
+  },
+  {
+   "name": "buildTrainPinch",
+   "kind": "function",
+   "line": 11628,
+   "endLine": 11654,
+   "via": "trainingScript"
+  },
+  {
+   "name": "buildTrainHazard",
+   "kind": "function",
+   "line": 11688,
+   "endLine": 11725,
+   "via": "trainingScript"
+  },
+  {
+   "name": "trainFiller",
+   "kind": "function",
+   "line": 11745,
+   "endLine": 11752,
+   "via": "buildTrainPinch"
+  },
+  {
+   "name": "buildPlacedJump",
+   "kind": "function",
+   "line": 11770,
+   "endLine": 11808,
+   "via": "trainingScript"
+  },
+  {
+   "name": "openJumpBuilt",
+   "kind": "let",
+   "line": 11822,
+   "endLine": 11822,
+   "via": "resetRoad"
+  },
+  {
+   "name": "openingEndSeg",
+   "kind": "let",
+   "line": 11827,
+   "endLine": 11827,
+   "via": "resetRoad"
+  },
+  {
+   "name": "openingScript",
+   "kind": "function",
+   "line": 11829,
+   "endLine": 11855,
+   "via": "addPhrase"
+  },
+  {
+   "name": "trainingScript",
+   "kind": "function",
+   "line": 11857,
+   "endLine": 11895,
+   "via": "addPhrase"
+  },
+  {
+   "name": "gapOverdue",
+   "kind": "function",
+   "line": 11906,
+   "endLine": 11911,
+   "via": "addPhrase"
+  },
+  {
+   "name": "lastEventSeg",
+   "kind": "function",
+   "line": 11919,
+   "endLine": 11928,
+   "via": "gapOverdue"
+  },
+  {
+   "name": "addPhrase",
+   "kind": "function",
+   "line": 11930,
+   "endLine": 12022,
+   "via": "topUpRoad"
+  },
+  {
+   "name": "resetRoad",
+   "kind": "function",
+   "line": 12024,
+   "endLine": 12156,
+   "via": "<root>"
+  },
+  {
+   "name": "HAZ_BLOCKER",
+   "kind": "const",
+   "line": 12170,
+   "endLine": 12170,
+   "via": "resetRoad"
+  },
+  {
+   "name": "HAZ_SPLITTER",
+   "kind": "const",
+   "line": 12170,
+   "endLine": 12170,
+   "via": "resetRoad"
+  },
+  {
+   "name": "HAZ_MOVER",
+   "kind": "const",
+   "line": 12170,
+   "endLine": 12170,
+   "via": "resetRoad"
+  },
+  {
+   "name": "hazards",
+   "kind": "let",
+   "line": 12171,
+   "endLine": 12171,
+   "via": "topUpRoad"
+  },
+  {
+   "name": "hazardDue",
+   "kind": "const",
+   "line": 12173,
+   "endLine": 12173,
+   "via": "resetRoad"
+  },
+  {
+   "name": "lateralReach",
+   "kind": "function",
+   "line": 12182,
+   "endLine": 12187,
+   "via": "hazardFits"
+  },
+  {
+   "name": "sightClear",
+   "kind": "function",
+   "line": 12208,
+   "endLine": 12238,
+   "via": "jumpFits"
+  },
+  {
+   "name": "worstCrossing",
+   "kind": "function",
+   "line": 12248,
+   "endLine": 12274,
+   "via": "hazardFits"
+  },
+  {
+   "name": "hazardFits",
+   "kind": "function",
+   "line": 12288,
+   "endLine": 12362,
+   "via": "addHazard"
+  },
+  {
+   "name": "lastPlacedSeg",
+   "kind": "let",
+   "line": 12368,
+   "endLine": 12368,
+   "via": "resetRoad"
+  },
+  {
+   "name": "addHazard",
+   "kind": "function",
+   "line": 12375,
+   "endLine": 12388,
+   "via": "buildHazardPhrase"
+  },
+  {
+   "name": "hazardX",
+   "kind": "function",
+   "line": 12393,
+   "endLine": 12401,
+   "via": "hazardBand"
+  },
+  {
+   "name": "dueHazardKind",
+   "kind": "function",
+   "line": 12405,
+   "endLine": 12424,
+   "via": "addPhrase"
+  },
+  {
+   "name": "hazardLength",
+   "kind": "function",
+   "line": 12426,
+   "endLine": 12430,
+   "via": "buildHazardPhrase"
+  },
+  {
+   "name": "anyUnlockedHazard",
+   "kind": "function",
+   "line": 12452,
+   "endLine": 12462,
+   "via": "addPhrase"
+  },
+  {
+   "name": "buildHazardPhrase",
+   "kind": "function",
+   "line": 12464,
+   "endLine": 12499,
+   "via": "addPhrase"
+  },
+  {
+   "name": "jumps",
+   "kind": "let",
+   "line": 12515,
+   "endLine": 12515,
+   "via": "topUpRoad"
+  },
+  {
+   "name": "jumpDue",
+   "kind": "let",
+   "line": 12516,
+   "endLine": 12516,
+   "via": "resetRoad"
+  },
+  {
+   "name": "jumpUnlocked",
+   "kind": "function",
+   "line": 12527,
+   "endLine": 12530,
+   "via": "addPhrase"
+  },
+  {
+   "name": "jumpFlightSegments",
+   "kind": "function",
+   "line": 12560,
+   "endLine": 12564,
+   "via": "roughTail"
+  },
+  {
+   "name": "jumpRunout",
+   "kind": "function",
+   "line": 12572,
+   "endLine": 12574,
+   "via": "buildJumpPhrase"
+  },
+  {
+   "name": "roughTail",
+   "kind": "function",
+   "line": 12583,
+   "endLine": 12585,
+   "via": "roughBand"
+  },
+  {
+   "name": "jumpLead",
+   "kind": "function",
+   "line": 12593,
+   "endLine": 12593,
+   "via": "buildJumpPhrase"
+  },
+  {
+   "name": "jumpFits",
+   "kind": "function",
+   "line": 12605,
+   "endLine": 12631,
+   "via": "buildJumpPhrase"
+  },
+  {
+   "name": "buildJumpPhrase",
+   "kind": "function",
+   "line": 12635,
+   "endLine": 12657,
+   "via": "addPhrase"
+  },
+  {
+   "name": "pastFinish",
+   "kind": "function",
+   "line": 12663,
+   "endLine": 12665,
+   "via": "topUpRoad"
+  },
+  {
+   "name": "topUpRoad",
+   "kind": "function",
+   "line": 12667,
+   "endLine": 12707,
+   "via": "<root>"
+  },
+  {
+   "name": "TITLE",
+   "kind": "const",
+   "line": 12721,
+   "endLine": 12721,
+   "via": "startOrRestart"
+  },
+  {
+   "name": "DRIVING",
+   "kind": "const",
+   "line": 12721,
+   "endLine": 12721,
+   "via": "startRun"
+  },
+  {
+   "name": "DEAD",
+   "kind": "const",
+   "line": 12721,
+   "endLine": 12721,
+   "via": "startOrRestart"
+  },
+  {
+   "name": "FINISHED",
+   "kind": "const",
+   "line": 12721,
+   "endLine": 12721,
+   "via": "startOrRestart"
+  },
+  {
+   "name": "state",
+   "kind": "let",
+   "line": 12722,
+   "endLine": 12722,
+   "via": "startRun"
+  },
+  {
+   "name": "paused",
+   "kind": "let",
+   "line": 12734,
+   "endLine": 12734,
+   "via": "<root>"
+  },
+  {
+   "name": "setPaused",
+   "kind": "function",
+   "line": 12736,
+   "endLine": 12741,
+   "via": "<root>"
+  },
+  {
+   "name": "togglePause",
+   "kind": "function",
+   "line": 12743,
+   "endLine": 12746,
+   "via": "<root>"
+  },
+  {
+   "name": "position",
+   "kind": "let",
+   "line": 12748,
+   "endLine": 12748,
+   "via": "startRun"
+  },
+  {
+   "name": "carX",
+   "kind": "let",
+   "line": 12754,
+   "endLine": 12754,
+   "via": "startRun"
+  },
+  {
+   "name": "carFrac",
+   "kind": "let",
+   "line": 12755,
+   "endLine": 12755,
+   "via": "startRun"
+  },
+  {
+   "name": "scraping",
+   "kind": "let",
+   "line": 12756,
+   "endLine": 12756,
+   "via": "startRun"
+  },
+  {
+   "name": "onRough",
+   "kind": "let",
+   "line": 12757,
+   "endLine": 12757,
+   "via": "startRun"
+  },
+  {
+   "name": "scrapeSide",
+   "kind": "let",
+   "line": 12758,
+   "endLine": 12758,
+   "via": "startRun"
+  },
+  {
+   "name": "scrapeMeter",
+   "kind": "let",
+   "line": 12759,
+   "endLine": 12759,
+   "via": "startRun"
+  },
+  {
+   "name": "scrapeRisk",
+   "kind": "let",
+   "line": 12760,
+   "endLine": 12760,
+   "via": "startRun"
+  },
+  {
+   "name": "shake",
+   "kind": "let",
+   "line": 12761,
+   "endLine": 12761,
+   "via": "startRun"
+  },
+  {
+   "name": "shakeX",
+   "kind": "let",
+   "line": 12762,
+   "endLine": 12762,
+   "via": "update"
+  },
+  {
+   "name": "shakeY",
+   "kind": "let",
+   "line": 12762,
+   "endLine": 12762,
+   "via": "update"
+  },
+  {
+   "name": "deadFor",
+   "kind": "let",
+   "line": 12763,
+   "endLine": 12763,
+   "via": "<root>"
+  },
+  {
+   "name": "restartWanted",
+   "kind": "let",
+   "line": 12767,
+   "endLine": 12767,
+   "via": "startRun"
+  },
+  {
+   "name": "lastMarkSeg",
+   "kind": "let",
+   "line": 12768,
+   "endLine": 12768,
+   "via": "startRun"
+  },
+  {
+   "name": "carSegIndex",
+   "kind": "let",
+   "line": 12769,
+   "endLine": 12769,
+   "via": "startRun"
+  },
+  {
+   "name": "prevCarIndex",
+   "kind": "let",
+   "line": 12770,
+   "endLine": 12770,
+   "via": "startRun"
+  },
+  {
+   "name": "carCurve",
+   "kind": "let",
+   "line": 12771,
+   "endLine": 12771,
+   "via": "update"
+  },
+  {
+   "name": "maxCurveSeen",
+   "kind": "let",
+   "line": 12772,
+   "endLine": 12772,
+   "via": "addSegment"
+  },
+  {
+   "name": "carY",
+   "kind": "let",
+   "line": 12773,
+   "endLine": 12773,
+   "via": "startRun"
+  },
+  {
+   "name": "airborne",
+   "kind": "let",
+   "line": 12777,
+   "endLine": 12777,
+   "via": "startRun"
+  },
+  {
+   "name": "carVY",
+   "kind": "let",
+   "line": 12778,
+   "endLine": 12778,
+   "via": "startRun"
+  },
+  {
+   "name": "airTime",
+   "kind": "let",
+   "line": 12779,
+   "endLine": 12779,
+   "via": "startRun"
+  },
+  {
+   "name": "landSlow",
+   "kind": "let",
+   "line": 12780,
+   "endLine": 12780,
+   "via": "startRun"
+  },
+  {
+   "name": "landSlowTo",
+   "kind": "let",
+   "line": 12781,
+   "endLine": 12781,
+   "via": "startRun"
+  },
+  {
+   "name": "airHeadingV",
+   "kind": "let",
+   "line": 12784,
+   "endLine": 12784,
+   "via": "startRun"
+  },
+  {
+   "name": "airLateralV",
+   "kind": "let",
+   "line": 12785,
+   "endLine": 12785,
+   "via": "startRun"
+  },
+  {
+   "name": "camLift",
+   "kind": "let",
+   "line": 12791,
+   "endLine": 12791,
+   "via": "startRun"
+  },
+  {
+   "name": "carFallV",
+   "kind": "let",
+   "line": 12792,
+   "endLine": 12792,
+   "via": "startRun"
+  },
+  {
+   "name": "carPitch",
+   "kind": "let",
+   "line": 12793,
+   "endLine": 12793,
+   "via": "startRun"
+  },
+  {
+   "name": "coastSpeed",
+   "kind": "let",
+   "line": 12794,
+   "endLine": 12794,
+   "via": "startRun"
+  },
+  {
+   "name": "drift",
+   "kind": "const",
+   "line": 12804,
+   "endLine": 12813,
+   "via": "startRun"
+  },
+  {
+   "name": "startRun",
+   "kind": "function",
+   "line": 12818,
+   "endLine": 12964,
+   "via": "<root>"
+  },
+  {
+   "name": "countdown",
+   "kind": "let",
+   "line": 12996,
+   "endLine": 12996,
+   "via": "startRun"
+  },
+  {
+   "name": "countdownSaid",
+   "kind": "let",
+   "line": 12997,
+   "endLine": 12997,
+   "via": "startRun"
+  },
+  {
+   "name": "countHolding",
+   "kind": "function",
+   "line": 12998,
+   "endLine": 12998,
+   "via": "<root>"
+  },
+  {
+   "name": "updateCountdown",
+   "kind": "function",
+   "line": 13009,
+   "endLine": 13019,
+   "via": "update"
+  },
+  {
+   "name": "continues",
+   "kind": "let",
+   "line": 13021,
+   "endLine": 13021,
+   "via": "startRun"
+  },
+  {
+   "name": "skipOnRamp",
+   "kind": "let",
+   "line": 13022,
+   "endLine": 13022,
+   "via": "startRun"
+  },
+  {
+   "name": "cpValid",
+   "kind": "let",
+   "line": 13023,
+   "endLine": 13023,
+   "via": "startRun"
+  },
+  {
+   "name": "cpSeg",
+   "kind": "let",
+   "line": 13024,
+   "endLine": 13024,
+   "via": "continueRun"
+  },
+  {
+   "name": "cpTime",
+   "kind": "let",
+   "line": 13024,
+   "endLine": 13024,
+   "via": "continueRun"
+  },
+  {
+   "name": "cpBanked",
+   "kind": "let",
+   "line": 13024,
+   "endLine": 13024,
+   "via": "continueRun"
+  },
+  {
+   "name": "cpClock",
+   "kind": "let",
+   "line": 13024,
+   "endLine": 13024,
+   "via": "continueRun"
+  },
+  {
+   "name": "cpBiome",
+   "kind": "let",
+   "line": 13024,
+   "endLine": 13024,
+   "via": "continueRun"
+  },
+  {
+   "name": "cpGates",
+   "kind": "let",
+   "line": 13024,
+   "endLine": 13024,
+   "via": "continueRun"
+  },
+  {
+   "name": "resumeFlash",
+   "kind": "let",
+   "line": 13025,
+   "endLine": 13025,
+   "via": "startRun"
+  },
+  {
+   "name": "saveCheckpoint",
+   "kind": "function",
+   "line": 13027,
+   "endLine": 13035,
+   "via": "crossGate"
+  },
+  {
+   "name": "canContinue",
+   "kind": "function",
+   "line": 13037,
+   "endLine": 13037,
+   "via": "<root>"
+  },
+  {
+   "name": "resumeRoad",
+   "kind": "function",
+   "line": 13047,
+   "endLine": 13081,
+   "via": "continueRun"
+  },
+  {
+   "name": "continueRun",
+   "kind": "function",
+   "line": 13083,
+   "endLine": 13182,
+   "via": "<root>"
+  },
+  {
+   "name": "startOrRestart",
+   "kind": "function",
+   "line": 13184,
+   "endLine": 13231,
+   "via": "<root>"
+  },
+  {
+   "name": "spendRestartWanted",
+   "kind": "function",
+   "line": 13236,
+   "endLine": 13241,
+   "via": "<root>"
+  },
+  {
+   "name": "update",
+   "kind": "function",
+   "line": 13243,
+   "endLine": 13567,
+   "via": "<root>"
+  },
+  {
+   "name": "roughBand",
+   "kind": "function",
+   "line": 13579,
+   "endLine": 13595,
+   "via": "update"
+  },
+  {
+   "name": "rampRide",
+   "kind": "function",
+   "line": 13606,
+   "endLine": 13651,
+   "via": "update"
+  },
+  {
+   "name": "landQuality",
+   "kind": "function",
+   "line": 13662,
+   "endLine": 13667,
+   "via": "land"
+  },
+  {
+   "name": "land",
+   "kind": "function",
+   "line": 13669,
+   "endLine": 13713,
+   "via": "update"
+  },
+  {
+   "name": "sayLanding",
+   "kind": "function",
+   "line": 13802,
+   "endLine": 13808,
+   "via": "land"
+  },
+  {
+   "name": "lookAheadCurve",
+   "kind": "function",
+   "line": 13818,
+   "endLine": 13833,
+   "via": "update"
+  },
+  {
+   "name": "hazardSide",
+   "kind": "let",
+   "line": 13843,
+   "endLine": 13843,
+   "via": "startRun"
+  },
+  {
+   "name": "hazardBand",
+   "kind": "function",
+   "line": 13844,
+   "endLine": 13873,
+   "via": "update"
+  },
+  {
+   "name": "OFF_ROAD",
+   "kind": "const",
+   "line": 13895,
+   "endLine": 13895,
+   "via": "crash"
+  },
+  {
+   "name": "HIT_OBJECT",
+   "kind": "const",
+   "line": 13895,
+   "endLine": 13895,
+   "via": "update"
+  },
+  {
+   "name": "RAN_OUT",
+   "kind": "const",
+   "line": 13895,
+   "endLine": 13895,
+   "via": "updateClock"
+  },
+  {
+   "name": "deathKind",
+   "kind": "let",
+   "line": 13896,
+   "endLine": 13896,
+   "via": "updateFall"
+  },
+  {
+   "name": "crash",
+   "kind": "function",
+   "line": 13898,
+   "endLine": 13935,
+   "via": "update"
+  },
+  {
+   "name": "updateFall",
+   "kind": "function",
+   "line": 13942,
+   "endLine": 13961,
+   "via": "update"
+  },
+  {
+   "name": "carYaw",
+   "kind": "function",
+   "line": 13990,
+   "endLine": 13993,
+   "via": "ghostRecord"
+  },
+  {
+   "name": "rearContact",
+   "kind": "const",
+   "line": 13999,
+   "endLine": 13999,
+   "via": "rearWheelOffsets"
+  },
+  {
+   "name": "rearWheelOffsets",
+   "kind": "function",
+   "line": 14018,
+   "endLine": 14026,
+   "via": "layTyreMarks"
+  },
+  {
+   "name": "rearAxleZ",
+   "kind": "function",
+   "line": 14034,
+   "endLine": 14038,
+   "via": "layTyreMarks"
+  },
+  {
+   "name": "layTyreMarks",
+   "kind": "function",
+   "line": 14040,
+   "endLine": 14072,
+   "via": "update"
+  },
+  {
+   "name": "smoke",
+   "kind": "const",
+   "line": 14078,
+   "endLine": 14078,
+   "via": "startRun"
+  },
+  {
+   "name": "smokeCount",
+   "kind": "let",
+   "line": 14079,
+   "endLine": 14079,
+   "via": "startRun"
+  },
+  {
+   "name": "smokeAcc",
+   "kind": "let",
+   "line": 14081,
+   "endLine": 14081,
+   "via": "startRun"
+  },
+  {
+   "name": "carCurveX",
+   "kind": "let",
+   "line": 14708,
+   "endLine": 14708,
+   "via": "startRun"
+  },
+  {
+   "name": "sightSeg",
+   "kind": "let",
+   "line": 14723,
+   "endLine": 14723,
+   "via": "lookAheadCurve"
+  },
+  {
+   "name": "carAheadSegs",
+   "kind": "const",
+   "line": 14728,
+   "endLine": 14728,
+   "via": "lookAheadCurve"
+  },
+  {
+   "name": "EDGE_OUT",
+   "kind": "const",
+   "line": 14802,
+   "endLine": 14802,
+   "via": "updateFall"
+  },
+  {
+   "name": "atFinishGate",
+   "kind": "function",
+   "line": 15206,
+   "endLine": 15208,
+   "via": "finaleApproach"
+  },
+  {
+   "name": "jumpHeightAt",
+   "kind": "function",
+   "line": 15410,
+   "endLine": 15413,
+   "via": "rampRide"
+  },
+  {
+   "name": "GHOST_ALPHABET",
+   "kind": "const",
+   "line": 15747,
+   "endLine": 15747,
+   "via": "ghostEncode"
+  },
+  {
+   "name": "GHOST_INDEX",
+   "kind": "const",
+   "line": 15748,
+   "endLine": 15752,
+   "via": "ghostDecode"
+  },
+  {
+   "name": "ghostStep",
+   "kind": "function",
+   "line": 15754,
+   "endLine": 15754,
+   "via": "ghostUpdate"
+  },
+  {
+   "name": "ghostRec",
+   "kind": "const",
+   "line": 15759,
+   "endLine": 15759,
+   "via": "ghostStartRecording"
+  },
+  {
+   "name": "ghost",
+   "kind": "const",
+   "line": 15760,
+   "endLine": 15769,
+   "via": "startRun"
+  },
+  {
+   "name": "ghostClear",
+   "kind": "function",
+   "line": 15771,
+   "endLine": 15774,
+   "via": "rollDayIfNeeded"
+  },
+  {
+   "name": "ghostEncode",
+   "kind": "function",
+   "line": 15776,
+   "endLine": 15789,
+   "via": "ghostBank"
+  },
+  {
+   "name": "ghostDecode",
+   "kind": "function",
+   "line": 15791,
+   "endLine": 15813,
+   "via": "syncLevelRecord"
+  },
+  {
+   "name": "ghostRecord",
+   "kind": "function",
+   "line": 15837,
+   "endLine": 15856,
+   "via": "update"
+  },
+  {
+   "name": "ghostStartRecording",
+   "kind": "function",
+   "line": 15858,
+   "endLine": 15867,
+   "via": "startRun"
+  },
+  {
+   "name": "ghostRewind",
+   "kind": "function",
+   "line": 15878,
+   "endLine": 15891,
+   "via": "continueRun"
+  },
+  {
+   "name": "ghostBank",
+   "kind": "function",
+   "line": 15896,
+   "endLine": 15907,
+   "via": "leaveRun"
+  },
+  {
+   "name": "ghostSpline",
+   "kind": "function",
+   "line": 15932,
+   "endLine": 15946,
+   "via": "ghostUpdate"
+  },
+  {
+   "name": "ghostUpdate",
+   "kind": "function",
+   "line": 15950,
+   "endLine": 15991,
+   "via": "<root>"
+  },
+  {
+   "name": "ghostPass",
+   "kind": "function",
+   "line": 15999,
+   "endLine": 16016,
+   "via": "ghostUpdate"
+  },
+  {
+   "name": "racers",
+   "kind": "const",
+   "line": 16150,
+   "endLine": 16150,
+   "via": "racersReset"
+  },
+  {
+   "name": "racerBump",
+   "kind": "let",
+   "line": 16151,
+   "endLine": 16151,
+   "via": "racersReset"
+  },
+  {
+   "name": "racersOn",
+   "kind": "function",
+   "line": 16183,
+   "endLine": 16187,
+   "via": "racersReset"
+  },
+  {
+   "name": "racersReset",
+   "kind": "function",
+   "line": 16196,
+   "endLine": 16239,
+   "via": "startRun"
+  },
+  {
+   "name": "racerFormNow",
+   "kind": "let",
+   "line": 16275,
+   "endLine": 16275,
+   "via": "racersReset"
+  },
+  {
+   "name": "racerClean",
+   "kind": "let",
+   "line": 16276,
+   "endLine": 16276,
+   "via": "racersReset"
+  },
+  {
+   "name": "racerForm",
+   "kind": "function",
+   "line": 16277,
+   "endLine": 16285,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "BOXED_CLEAR",
+   "kind": "const",
+   "line": 16314,
+   "endLine": 16314,
+   "via": "racerPace"
+  },
+  {
+   "name": "BOXED_HELD",
+   "kind": "const",
+   "line": 16314,
+   "endLine": 16314,
+   "via": "racerBoxed"
+  },
+  {
+   "name": "BOXED_PINNED",
+   "kind": "const",
+   "line": 16314,
+   "endLine": 16314,
+   "via": "racerPace"
+  },
+  {
+   "name": "racerBoxed",
+   "kind": "function",
+   "line": 16315,
+   "endLine": 16384,
+   "via": "racerPace"
+  },
+  {
+   "name": "racerPace",
+   "kind": "function",
+   "line": 16393,
+   "endLine": 16484,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "playerPace",
+   "kind": "function",
+   "line": 16489,
+   "endLine": 16493,
+   "via": "racerPace"
+  },
+  {
+   "name": "racerLane",
+   "kind": "function",
+   "line": 16506,
+   "endLine": 16516,
+   "via": "racerAim"
+  },
+  {
+   "name": "racerAim",
+   "kind": "function",
+   "line": 16522,
+   "endLine": 16592,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "racerRamp",
+   "kind": "function",
+   "line": 16607,
+   "endLine": 16640,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "racerHitsHazard",
+   "kind": "function",
+   "line": 16649,
+   "endLine": 16665,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "wreckRacer",
+   "kind": "function",
+   "line": 16676,
+   "endLine": 16682,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "wreckZ",
+   "kind": "const",
+   "line": 16686,
+   "endLine": 16686,
+   "via": "markWreck"
+  },
+  {
+   "name": "wreckX",
+   "kind": "const",
+   "line": 16687,
+   "endLine": 16687,
+   "via": "markWreck"
+  },
+  {
+   "name": "wreckN",
+   "kind": "let",
+   "line": 16688,
+   "endLine": 16688,
+   "via": "racersReset"
+  },
+  {
+   "name": "markWreck",
+   "kind": "function",
+   "line": 16689,
+   "endLine": 16692,
+   "via": "wreckRacer"
+  },
+  {
+   "name": "spanAcross",
+   "kind": "function",
+   "line": 16806,
+   "endLine": 16809,
+   "via": "racerAim"
+  },
+  {
+   "name": "spanAlong",
+   "kind": "function",
+   "line": 16810,
+   "endLine": 16813,
+   "via": "racerBoxed"
+  },
+  {
+   "name": "bumpShare",
+   "kind": "function",
+   "line": 16840,
+   "endLine": 16842,
+   "via": "separatePlayer"
+  },
+  {
+   "name": "carIndex",
+   "kind": "function",
+   "line": 16847,
+   "endLine": 16849,
+   "via": "separatePlayer"
+  },
+  {
+   "name": "localHalfNow",
+   "kind": "function",
+   "line": 16850,
+   "endLine": 16853,
+   "via": "separatePlayer"
+  },
+  {
+   "name": "racerWall",
+   "kind": "function",
+   "line": 16855,
+   "endLine": 16858,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "separateRacers",
+   "kind": "function",
+   "line": 16878,
+   "endLine": 16907,
+   "via": "racersSeparate"
+  },
+  {
+   "name": "separatePlayer",
+   "kind": "function",
+   "line": 16910,
+   "endLine": 16971,
+   "via": "racersSeparate"
+  },
+  {
+   "name": "contactZ",
+   "kind": "const",
+   "line": 16980,
+   "endLine": 16980,
+   "via": "markContact"
+  },
+  {
+   "name": "contactX",
+   "kind": "const",
+   "line": 16981,
+   "endLine": 16981,
+   "via": "markContact"
+  },
+  {
+   "name": "contactF",
+   "kind": "const",
+   "line": 16982,
+   "endLine": 16982,
+   "via": "markContact"
+  },
+  {
+   "name": "contactN",
+   "kind": "let",
+   "line": 16983,
+   "endLine": 16983,
+   "via": "racersReset"
+  },
+  {
+   "name": "markContact",
+   "kind": "function",
+   "line": 16984,
+   "endLine": 16989,
+   "via": "separateRacers"
+  },
+  {
+   "name": "squeezeOut",
+   "kind": "function",
+   "line": 17013,
+   "endLine": 17044,
+   "via": "racersSeparate"
+  },
+  {
+   "name": "racersSeparate",
+   "kind": "function",
+   "line": 17046,
+   "endLine": 17088,
+   "via": "racersUpdate"
+  },
+  {
+   "name": "racersUpdate",
+   "kind": "function",
+   "line": 17093,
+   "endLine": 17221,
+   "via": "update"
+  },
+  {
+   "name": "terrainHash",
+   "kind": "function",
+   "line": 18860,
+   "endLine": 18864,
+   "via": "worldFor"
+  },
+  {
+   "name": "sceneryClump",
+   "kind": "function",
+   "line": 18872,
+   "endLine": 18882,
+   "via": "worldFor"
+  },
+  {
+   "name": "SPR_GANTRY_0",
+   "kind": "const",
+   "line": 20809,
+   "endLine": 20809,
+   "via": "signFor"
+  },
+  {
+   "name": "SPR_MARKER_0",
+   "kind": "const",
+   "line": 20810,
+   "endLine": 20810,
+   "via": "signFor"
+  },
+  {
+   "name": "SPR_POST",
+   "kind": "const",
+   "line": 20811,
+   "endLine": 20811,
+   "via": "signFor"
+  },
+  {
+   "name": "SPR_TREE_0",
+   "kind": "const",
+   "line": 20812,
+   "endLine": 20812,
+   "via": "worldFor"
+  },
+  {
+   "name": "SPR_TREE_N",
+   "kind": "const",
+   "line": 20813,
+   "endLine": 20813,
+   "via": "worldFor"
+  },
+  {
+   "name": "SPR_HOUSE_0",
+   "kind": "const",
+   "line": 20814,
+   "endLine": 20814,
+   "via": "worldFor"
+  },
+  {
+   "name": "SPR_HOUSE_N",
+   "kind": "const",
+   "line": 20815,
+   "endLine": 20815,
+   "via": "worldFor"
+  },
+  {
+   "name": "SPR_MAST_OFF",
+   "kind": "const",
+   "line": 20816,
+   "endLine": 20816,
+   "via": "landmarkFor"
+  },
+  {
+   "name": "SPR_TOWER",
+   "kind": "const",
+   "line": 20818,
+   "endLine": 20818,
+   "via": "landmarkFor"
+  },
+  {
+   "name": "signToFinish",
+   "kind": "function",
+   "line": 21128,
+   "endLine": 21128,
+   "via": "signCycle"
+  },
+  {
+   "name": "signCycle",
+   "kind": "function",
+   "line": 21129,
+   "endLine": 21132,
+   "via": "signFor"
+  },
+  {
+   "name": "signPhase",
+   "kind": "function",
+   "line": 21143,
+   "endLine": 21148,
+   "via": "signFor"
+  },
+  {
+   "name": "signShareAt",
+   "kind": "function",
+   "line": 21169,
+   "endLine": 21172,
+   "via": "signFor"
+  },
+  {
+   "name": "signFor",
+   "kind": "function",
+   "line": 21216,
+   "endLine": 21234,
+   "via": "addSegment"
+  },
+  {
+   "name": "worldFor",
+   "kind": "function",
+   "line": 21267,
+   "endLine": 21290,
+   "via": "addSegment"
+  },
+  {
+   "name": "landmarkFor",
+   "kind": "function",
+   "line": 21297,
+   "endLine": 21307,
+   "via": "worldFor"
+  },
+  {
+   "name": "CARS",
+   "kind": "const",
+   "line": 21870,
+   "endLine": 21902,
+   "via": "nextCar"
+  },
+  {
+   "name": "cleanDaysEver",
+   "kind": "let",
+   "line": 21908,
+   "endLine": 21912,
+   "via": "carUnlocked"
+  },
+  {
+   "name": "carPick",
+   "kind": "let",
+   "line": 21913,
+   "endLine": 21917,
+   "via": "pickCar"
+  },
+  {
+   "name": "carJustUnlocked",
+   "kind": "let",
+   "line": 21921,
+   "endLine": 21921,
+   "via": "startRun"
+  },
+  {
+   "name": "carUnlocked",
+   "kind": "function",
+   "line": 21923,
+   "endLine": 21927,
+   "via": "<root>"
+  },
+  {
+   "name": "carsUnlocked",
+   "kind": "function",
+   "line": 21928,
+   "endLine": 21932,
+   "via": "<root>"
+  },
+  {
+   "name": "activeCar",
+   "kind": "function",
+   "line": 21938,
+   "endLine": 21941,
+   "via": "<root>"
+  },
+  {
+   "name": "nextCar",
+   "kind": "function",
+   "line": 21944,
+   "endLine": 21951,
+   "via": "<root>"
+  },
+  {
+   "name": "pickCar",
+   "kind": "function",
+   "line": 21985,
+   "endLine": 21991,
+   "via": "<root>"
+  },
+  {
+   "name": "bodyOffsetX",
+   "kind": "function",
+   "line": 22117,
+   "endLine": 22117,
+   "via": "separateRacers"
+  },
+  {
+   "name": "bodyOffsetZ",
+   "kind": "function",
+   "line": 22135,
+   "endLine": 22135,
+   "via": "separateRacers"
+  },
+  {
+   "name": "dayTotals",
+   "kind": "function",
+   "line": 24456,
+   "endLine": 24469,
+   "via": "<root>"
+  },
+  {
+   "name": "startDaily",
+   "kind": "function",
+   "line": 25537,
+   "endLine": 25542,
+   "via": "<root>"
+  },
+  {
+   "name": "startNextLevel",
+   "kind": "function",
+   "line": 25548,
+   "endLine": 25552,
+   "via": "<root>"
+  },
+  {
+   "name": "startEndless",
+   "kind": "function",
+   "line": 25554,
+   "endLine": 25557,
+   "via": "<root>"
+  },
+  {
+   "name": "score",
+   "kind": "let",
+   "line": 25569,
+   "endLine": 25569,
+   "via": "startRun"
+  },
+  {
+   "name": "multiplier",
+   "kind": "let",
+   "line": 25570,
+   "endLine": 25570,
+   "via": "startRun"
+  },
+  {
+   "name": "multPop",
+   "kind": "let",
+   "line": 25571,
+   "endLine": 25571,
+   "via": "startRun"
+  },
+  {
+   "name": "banked",
+   "kind": "let",
+   "line": 25574,
+   "endLine": 25574,
+   "via": "startRun"
+  },
+  {
+   "name": "clock",
+   "kind": "let",
+   "line": 25575,
+   "endLine": 25575,
+   "via": "startRun"
+  },
+  {
+   "name": "nextGate",
+   "kind": "let",
+   "line": 25576,
+   "endLine": 25576,
+   "via": "startRun"
+  },
+  {
+   "name": "gateFlash",
+   "kind": "let",
+   "line": 25577,
+   "endLine": 25577,
+   "via": "startRun"
+  },
+  {
+   "name": "clockPop",
+   "kind": "let",
+   "line": 25578,
+   "endLine": 25578,
+   "via": "startRun"
+  },
+  {
+   "name": "runBestMult",
+   "kind": "let",
+   "line": 25586,
+   "endLine": 25586,
+   "via": "startRun"
+  },
+  {
+   "name": "gatesPassed",
+   "kind": "let",
+   "line": 25587,
+   "endLine": 25587,
+   "via": "startRun"
+  },
+  {
+   "name": "runDistance",
+   "kind": "let",
+   "line": 25588,
+   "endLine": 25588,
+   "via": "startRun"
+  },
+  {
+   "name": "bestScore",
+   "kind": "let",
+   "line": 25589,
+   "endLine": 25593,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "furthest",
+   "kind": "let",
+   "line": 25597,
+   "endLine": 25601,
+   "via": "bankScore"
+  },
+  {
+   "name": "multiplierEarn",
+   "kind": "function",
+   "line": 25637,
+   "endLine": 25642,
+   "via": "updateScore"
+  },
+  {
+   "name": "slipPay",
+   "kind": "function",
+   "line": 25648,
+   "endLine": 25652,
+   "via": "updateClock"
+  },
+  {
+   "name": "updateClock",
+   "kind": "function",
+   "line": 25654,
+   "endLine": 25686,
+   "via": "<root>"
+  },
+  {
+   "name": "crossGate",
+   "kind": "function",
+   "line": 25690,
+   "endLine": 25736,
+   "via": "updateScore"
+  },
+  {
+   "name": "finishTime",
+   "kind": "let",
+   "line": 25755,
+   "endLine": 25755,
+   "via": "startRun"
+  },
+  {
+   "name": "finishMargin",
+   "kind": "let",
+   "line": 25756,
+   "endLine": 25756,
+   "via": "startRun"
+  },
+  {
+   "name": "finishClean",
+   "kind": "let",
+   "line": 25757,
+   "endLine": 25757,
+   "via": "startRun"
+  },
+  {
+   "name": "finishRecord",
+   "kind": "let",
+   "line": 25758,
+   "endLine": 25758,
+   "via": "startRun"
+  },
+  {
+   "name": "finishX",
+   "kind": "let",
+   "line": 25761,
+   "endLine": 25761,
+   "via": "updateFinishRoll"
+  },
+  {
+   "name": "finishRun",
+   "kind": "function",
+   "line": 25763,
+   "endLine": 25800,
+   "via": "crossGate"
+  },
+  {
+   "name": "updateScore",
+   "kind": "function",
+   "line": 25802,
+   "endLine": 25824,
+   "via": "<root>"
+  },
+  {
+   "name": "levelRec",
+   "kind": "const",
+   "line": 25858,
+   "endLine": 25858,
+   "via": "recFor"
+  },
+  {
+   "name": "dailyGhostBytes",
+   "kind": "let",
+   "line": 25859,
+   "endLine": 25859,
+   "via": "syncLevelRecord"
+  },
+  {
+   "name": "recFor",
+   "kind": "function",
+   "line": 25861,
+   "endLine": 25866,
+   "via": "<root>"
+  },
+  {
+   "name": "dailyBest",
+   "kind": "let",
+   "line": 25871,
+   "endLine": 25871,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "dailyTime",
+   "kind": "let",
+   "line": 25872,
+   "endLine": 25872,
+   "via": "syncLevelRecord"
+  },
+  {
+   "name": "dailyDone",
+   "kind": "let",
+   "line": 25873,
+   "endLine": 25873,
+   "via": "syncLevelRecord"
+  },
+  {
+   "name": "dailyClean",
+   "kind": "let",
+   "line": 25874,
+   "endLine": 25874,
+   "via": "syncLevelRecord"
+  },
+  {
+   "name": "syncLevelRecord",
+   "kind": "function",
+   "line": 25876,
+   "endLine": 25885,
+   "via": "startRun"
+  },
+  {
+   "name": "clearDailyRecords",
+   "kind": "function",
+   "line": 25887,
+   "endLine": 25903,
+   "via": "rollDayIfNeeded"
+  },
+  {
+   "name": "ROAD_GEN",
+   "kind": "const",
+   "line": 26144,
+   "endLine": 26144,
+   "via": "clearDailyRecords"
+  },
+  {
+   "name": "nextLevel",
+   "kind": "function",
+   "line": 26186,
+   "endLine": 26190,
+   "via": "startDaily"
+  },
+  {
+   "name": "canSkipTraining",
+   "kind": "function",
+   "line": 26273,
+   "endLine": 26275,
+   "via": "skipTraining"
+  },
+  {
+   "name": "skipTraining",
+   "kind": "function",
+   "line": 26276,
+   "endLine": 26281,
+   "via": "<root>"
+  },
+  {
+   "name": "dayClean",
+   "kind": "function",
+   "line": 26307,
+   "endLine": 26310,
+   "via": "bankDaily"
+  },
+  {
+   "name": "dailyBeatsRecord",
+   "kind": "function",
+   "line": 26348,
+   "endLine": 26351,
+   "via": "bankDaily"
+  },
+  {
+   "name": "bankDaily",
+   "kind": "function",
+   "line": 26355,
+   "endLine": 26463,
+   "via": "bankScore"
+  },
+  {
+   "name": "bankScore",
+   "kind": "function",
+   "line": 26465,
+   "endLine": 26489,
+   "via": "leaveRun"
+  },
+  {
+   "name": "worldHeat",
+   "kind": "let",
+   "line": 26529,
+   "endLine": 26529,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "heatPulse",
+   "kind": "let",
+   "line": 26530,
+   "endLine": 26530,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "cityGlow",
+   "kind": "let",
+   "line": 26542,
+   "endLine": 26542,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "cityPulse",
+   "kind": "let",
+   "line": 26543,
+   "endLine": 26543,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "cityPhase",
+   "kind": "let",
+   "line": 26544,
+   "endLine": 26544,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "updateCity",
+   "kind": "function",
+   "line": 26568,
+   "endLine": 26599,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "CALL_CLOSE",
+   "kind": "const",
+   "line": 26619,
+   "endLine": 26620,
+   "via": "resolveCloseCalls"
+  },
+  {
+   "name": "CALL_CHAIN",
+   "kind": "const",
+   "line": 26619,
+   "endLine": 26620,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "CALL_GATE",
+   "kind": "const",
+   "line": 26619,
+   "endLine": 26620,
+   "via": "crossGate"
+  },
+  {
+   "name": "CALL_BEST",
+   "kind": "const",
+   "line": 26619,
+   "endLine": 26620,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "CALL_COACH",
+   "kind": "const",
+   "line": 26619,
+   "endLine": 26620,
+   "via": "sayCoach"
+  },
+  {
+   "name": "calloutText",
+   "kind": "let",
+   "line": 26621,
+   "endLine": 26621,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "calloutColour",
+   "kind": "let",
+   "line": 26622,
+   "endLine": 26622,
+   "via": "sayCallout"
+  },
+  {
+   "name": "calloutPri",
+   "kind": "let",
+   "line": 26623,
+   "endLine": 26623,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "calloutLife",
+   "kind": "let",
+   "line": 26624,
+   "endLine": 26624,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "calloutFull",
+   "kind": "let",
+   "line": 26625,
+   "endLine": 26625,
+   "via": "sayCallout"
+  },
+  {
+   "name": "calloutCoach",
+   "kind": "let",
+   "line": 26626,
+   "endLine": 26626,
+   "via": "updateBar"
+  },
+  {
+   "name": "COACH_PLATE_STYLE",
+   "kind": "const",
+   "line": 26640,
+   "endLine": 26640,
+   "via": "trainingSayHit"
+  },
+  {
+   "name": "COACH_BRAND_STYLE",
+   "kind": "const",
+   "line": 26640,
+   "endLine": 26640,
+   "via": "trainingSay"
+  },
+  {
+   "name": "POINT_NONE",
+   "kind": "const",
+   "line": 26641,
+   "endLine": 26641,
+   "via": "trainingSayHit"
+  },
+  {
+   "name": "POINT_SKIP",
+   "kind": "const",
+   "line": 26641,
+   "endLine": 26641,
+   "via": "trainingSay"
+  },
+  {
+   "name": "POINT_EDGES",
+   "kind": "const",
+   "line": 26641,
+   "endLine": 26641,
+   "via": "trainingSay"
+  },
+  {
+   "name": "POINT_BAR",
+   "kind": "const",
+   "line": 26641,
+   "endLine": 26641,
+   "via": "updateBar"
+  },
+  {
+   "name": "calloutStyle",
+   "kind": "let",
+   "line": 26642,
+   "endLine": 26642,
+   "via": "sayCallout"
+  },
+  {
+   "name": "calloutPoint",
+   "kind": "let",
+   "line": 26643,
+   "endLine": 26643,
+   "via": "updateBar"
+  },
+  {
+   "name": "calloutSide",
+   "kind": "let",
+   "line": 26644,
+   "endLine": 26644,
+   "via": "sayCallout"
+  },
+  {
+   "name": "calloutLock",
+   "kind": "let",
+   "line": 26645,
+   "endLine": 26645,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "driftText",
+   "kind": "let",
+   "line": 26647,
+   "endLine": 26647,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "driftColour",
+   "kind": "let",
+   "line": 26648,
+   "endLine": 26648,
+   "via": "sayDrift"
+  },
+  {
+   "name": "driftSize",
+   "kind": "let",
+   "line": 26649,
+   "endLine": 26649,
+   "via": "sayDrift"
+  },
+  {
+   "name": "driftLife",
+   "kind": "let",
+   "line": 26650,
+   "endLine": 26650,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "driftSide",
+   "kind": "let",
+   "line": 26651,
+   "endLine": 26651,
+   "via": "sayDrift"
+  },
+  {
+   "name": "driftLock",
+   "kind": "let",
+   "line": 26652,
+   "endLine": 26652,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "driftGap",
+   "kind": "let",
+   "line": 26653,
+   "endLine": 26653,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "calloutAwaySide",
+   "kind": "function",
+   "line": 26657,
+   "endLine": 26657,
+   "via": "sayCallout"
+  },
+  {
+   "name": "sayCallout",
+   "kind": "function",
+   "line": 26659,
+   "endLine": 26677,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "sayCoach",
+   "kind": "function",
+   "line": 26706,
+   "endLine": 26719,
+   "via": "trainingSayHit"
+  },
+  {
+   "name": "sayDrift",
+   "kind": "function",
+   "line": 26721,
+   "endLine": 26730,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "trainStep",
+   "kind": "let",
+   "line": 26782,
+   "endLine": 26782,
+   "via": "trainingReset"
+  },
+  {
+   "name": "trainJumpSaid",
+   "kind": "let",
+   "line": 26783,
+   "endLine": 26783,
+   "via": "trainingReset"
+  },
+  {
+   "name": "trainLandSaid",
+   "kind": "let",
+   "line": 26784,
+   "endLine": 26784,
+   "via": "trainingReset"
+  },
+  {
+   "name": "trainBlockSaid",
+   "kind": "let",
+   "line": 26785,
+   "endLine": 26785,
+   "via": "trainingReset"
+  },
+  {
+   "name": "trainMoveSaid",
+   "kind": "let",
+   "line": 26786,
+   "endLine": 26786,
+   "via": "trainingReset"
+  },
+  {
+   "name": "trainHitSaid",
+   "kind": "let",
+   "line": 26787,
+   "endLine": 26787,
+   "via": "trainingReset"
+  },
+  {
+   "name": "trainRecharged",
+   "kind": "let",
+   "line": 26788,
+   "endLine": 26788,
+   "via": "trainingReset"
+  },
+  {
+   "name": "trainScraped",
+   "kind": "let",
+   "line": 26789,
+   "endLine": 26789,
+   "via": "trainingReset"
+  },
+  {
+   "name": "coachQuiet",
+   "kind": "let",
+   "line": 26809,
+   "endLine": 26809,
+   "via": "trainingReset"
+  },
+  {
+   "name": "coachQueue",
+   "kind": "let",
+   "line": 26810,
+   "endLine": 26810,
+   "via": "trainingReset"
+  },
+  {
+   "name": "coachDropped",
+   "kind": "let",
+   "line": 26811,
+   "endLine": 26811,
+   "via": "trainingReset"
+  },
+  {
+   "name": "coachFree",
+   "kind": "function",
+   "line": 26813,
+   "endLine": 26813,
+   "via": "trainingSay"
+  },
+  {
+   "name": "coachSay",
+   "kind": "function",
+   "line": 26815,
+   "endLine": 26823,
+   "via": "trainingSay"
+  },
+  {
+   "name": "coachHold",
+   "kind": "function",
+   "line": 26829,
+   "endLine": 26829,
+   "via": "trainingSayHit"
+  },
+  {
+   "name": "rechargeDwell",
+   "kind": "function",
+   "line": 26839,
+   "endLine": 26839,
+   "via": "trainingSay"
+  },
+  {
+   "name": "coachPump",
+   "kind": "function",
+   "line": 26841,
+   "endLine": 26851,
+   "via": "trainingSay"
+  },
+  {
+   "name": "trainingReset",
+   "kind": "function",
+   "line": 26853,
+   "endLine": 26865,
+   "via": "startRun"
+  },
+  {
+   "name": "trainingOn",
+   "kind": "function",
+   "line": 26867,
+   "endLine": 26869,
+   "via": "trainingSayHit"
+  },
+  {
+   "name": "comingUp",
+   "kind": "function",
+   "line": 26875,
+   "endLine": 26878,
+   "via": "trainingSay"
+  },
+  {
+   "name": "trainingSay",
+   "kind": "function",
+   "line": 26880,
+   "endLine": 27045,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "coachRoom",
+   "kind": "function",
+   "line": 27065,
+   "endLine": 27082,
+   "via": "trainingSay"
+  },
+  {
+   "name": "jumpDueWithin",
+   "kind": "function",
+   "line": 27085,
+   "endLine": 27090,
+   "via": "coachRoom"
+  },
+  {
+   "name": "hazardComing",
+   "kind": "function",
+   "line": 27094,
+   "endLine": 27099,
+   "via": "trainingSay"
+  },
+  {
+   "name": "trainingSayHit",
+   "kind": "function",
+   "line": 27128,
+   "endLine": 27135,
+   "via": "update"
+  },
+  {
+   "name": "trainingSayLanding",
+   "kind": "function",
+   "line": 27142,
+   "endLine": 27155,
+   "via": "land"
+  },
+  {
+   "name": "bestKnown",
+   "kind": "let",
+   "line": 27160,
+   "endLine": 27160,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "beatBest",
+   "kind": "let",
+   "line": 27161,
+   "endLine": 27161,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "beatFlash",
+   "kind": "let",
+   "line": 27162,
+   "endLine": 27162,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "beatDaily",
+   "kind": "let",
+   "line": 27184,
+   "endLine": 27184,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "DRIFT_TIERS",
+   "kind": "const",
+   "line": 27202,
+   "endLine": 27209,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "chainTime",
+   "kind": "let",
+   "line": 27210,
+   "endLine": 27210,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "chainLapse",
+   "kind": "let",
+   "line": 27211,
+   "endLine": 27211,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "chainLinks",
+   "kind": "let",
+   "line": 27212,
+   "endLine": 27212,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "chainTier",
+   "kind": "let",
+   "line": 27213,
+   "endLine": 27213,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "chainSaidAt",
+   "kind": "let",
+   "line": 27214,
+   "endLine": 27214,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "chainBestSaid",
+   "kind": "let",
+   "line": 27215,
+   "endLine": 27215,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "driftWordN",
+   "kind": "let",
+   "line": 27216,
+   "endLine": 27216,
+   "via": "driftWord"
+  },
+  {
+   "name": "runBestChain",
+   "kind": "let",
+   "line": 27217,
+   "endLine": 27217,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "driftWord",
+   "kind": "function",
+   "line": 27219,
+   "endLine": 27222,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "gateFlash2",
+   "kind": "let",
+   "line": 27224,
+   "endLine": 27224,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "wasScraping",
+   "kind": "let",
+   "line": 27225,
+   "endLine": 27225,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "edgeClear",
+   "kind": "let",
+   "line": 27226,
+   "endLine": 27226,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "landFlare",
+   "kind": "let",
+   "line": 27232,
+   "endLine": 27232,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "resetSpectacle",
+   "kind": "function",
+   "line": 27234,
+   "endLine": 27271,
+   "via": "startRun"
+  },
+  {
+   "name": "breakChain",
+   "kind": "function",
+   "line": 27279,
+   "endLine": 27286,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "chainTierFor",
+   "kind": "function",
+   "line": 27290,
+   "endLine": 27295,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "updateSpectacle",
+   "kind": "function",
+   "line": 27297,
+   "endLine": 27448,
+   "via": "<root>"
+  },
+  {
+   "name": "hitStop",
+   "kind": "let",
+   "line": 27505,
+   "endLine": 27505,
+   "via": "<root>"
+  },
+  {
+   "name": "explodeFlash",
+   "kind": "let",
+   "line": 27506,
+   "endLine": 27506,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "finaleT",
+   "kind": "let",
+   "line": 27703,
+   "endLine": 27703,
+   "via": "finaleActive"
+  },
+  {
+   "name": "finaleLevel",
+   "kind": "let",
+   "line": 27704,
+   "endLine": 27704,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleGlow",
+   "kind": "let",
+   "line": 27705,
+   "endLine": 27705,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "finaleFree",
+   "kind": "let",
+   "line": 27706,
+   "endLine": 27706,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleSky",
+   "kind": "let",
+   "line": 27707,
+   "endLine": 27707,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleStrobe",
+   "kind": "let",
+   "line": 27708,
+   "endLine": 27708,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleFlash",
+   "kind": "let",
+   "line": 27709,
+   "endLine": 27709,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleWavesFired",
+   "kind": "let",
+   "line": 27710,
+   "endLine": 27710,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleShellsFired",
+   "kind": "let",
+   "line": 27711,
+   "endLine": 27711,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleHueDue",
+   "kind": "let",
+   "line": 27712,
+   "endLine": 27712,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleHueN",
+   "kind": "let",
+   "line": 27713,
+   "endLine": 27713,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleFirstToday",
+   "kind": "let",
+   "line": 27714,
+   "endLine": 27714,
+   "via": "finishRun"
+  },
+  {
+   "name": "finaleSpin",
+   "kind": "let",
+   "line": 27718,
+   "endLine": 27718,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleSwing",
+   "kind": "let",
+   "line": 27719,
+   "endLine": 27719,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleDriving",
+   "kind": "let",
+   "line": 27720,
+   "endLine": 27720,
+   "via": "resetSpectacle"
+  },
+  {
+   "name": "finaleActive",
+   "kind": "function",
+   "line": 27722,
+   "endLine": 27722,
+   "via": "<root>"
+  },
+  {
+   "name": "finaleLevelFor",
+   "kind": "function",
+   "line": 27732,
+   "endLine": 27743,
+   "via": "startFinale"
+  },
+  {
+   "name": "finaleScale",
+   "kind": "let",
+   "line": 27765,
+   "endLine": 27765,
+   "via": "finaleDriftEnd"
+  },
+  {
+   "name": "finaleScaleFor",
+   "kind": "function",
+   "line": 27766,
+   "endLine": 27770,
+   "via": "startFinale"
+  },
+  {
+   "name": "finaleWaveCount",
+   "kind": "function",
+   "line": 27772,
+   "endLine": 27776,
+   "via": "updateFinale"
+  },
+  {
+   "name": "finaleHushEnd",
+   "kind": "function",
+   "line": 27782,
+   "endLine": 27782,
+   "via": "updateFinishRoll"
+  },
+  {
+   "name": "finaleWaveAt",
+   "kind": "function",
+   "line": 27783,
+   "endLine": 27783,
+   "via": "updateFinale"
+  },
+  {
+   "name": "finaleLastWave",
+   "kind": "function",
+   "line": 27784,
+   "endLine": 27784,
+   "via": "finaleDriftEnd"
+  },
+  {
+   "name": "finaleDriftEnd",
+   "kind": "function",
+   "line": 27785,
+   "endLine": 27785,
+   "via": "updateFinishRoll"
+  },
+  {
+   "name": "finaleSettleEnd",
+   "kind": "function",
+   "line": 27786,
+   "endLine": 27786,
+   "via": "finaleRevealAt"
+  },
+  {
+   "name": "finaleRevealAt",
+   "kind": "function",
+   "line": 27787,
+   "endLine": 27787,
+   "via": "finaleReveal"
+  },
+  {
+   "name": "finaleLitEnd",
+   "kind": "function",
+   "line": 27788,
+   "endLine": 27788,
+   "via": "finaleEnvelope"
+  },
+  {
+   "name": "finaleEnd",
+   "kind": "function",
+   "line": 27794,
+   "endLine": 27794,
+   "via": "finaleRunning"
+  },
+  {
+   "name": "startFinale",
+   "kind": "function",
+   "line": 27796,
+   "endLine": 27816,
+   "via": "finishRun"
+  },
+  {
+   "name": "skipFinale",
+   "kind": "function",
+   "line": 27824,
+   "endLine": 27839,
+   "via": "startOrRestart"
+  },
+  {
+   "name": "finaleRunning",
+   "kind": "function",
+   "line": 27842,
+   "endLine": 27844,
+   "via": "<root>"
+  },
+  {
+   "name": "finaleReveal",
+   "kind": "function",
+   "line": 27848,
+   "endLine": 27852,
+   "via": "<root>"
+  },
+  {
+   "name": "finaleApproach",
+   "kind": "function",
+   "line": 27875,
+   "endLine": 27880,
+   "via": "updateFinale"
+  },
+  {
+   "name": "finaleEnvelope",
+   "kind": "function",
+   "line": 27885,
+   "endLine": 27900,
+   "via": "updateFinale"
+  },
+  {
+   "name": "finaleBiome0",
+   "kind": "let",
+   "line": 27915,
+   "endLine": 27915,
+   "via": "updateFinale"
+  },
+  {
+   "name": "finaleHue",
+   "kind": "function",
+   "line": 27916,
+   "endLine": 27920,
+   "via": "updateFinale"
+  },
+  {
+   "name": "finaleRestoreHue",
+   "kind": "function",
+   "line": 27921,
+   "endLine": 27923,
+   "via": "skipFinale"
+  },
+  {
+   "name": "finaleWave",
+   "kind": "function",
+   "line": 27936,
+   "endLine": 27940,
+   "via": "updateFinale"
+  },
+  {
+   "name": "updateFinale",
+   "kind": "function",
+   "line": 27942,
+   "endLine": 28032,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "updateFinishRoll",
+   "kind": "function",
+   "line": 28051,
+   "endLine": 28117,
+   "via": "update"
+  },
+  {
+   "name": "resolveCloseCalls",
+   "kind": "function",
+   "line": 28233,
+   "endLine": 28243,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "barShow",
+   "kind": "let",
+   "line": 28861,
+   "endLine": 28861,
+   "via": "startRun"
+  },
+  {
+   "name": "updateBar",
+   "kind": "function",
+   "line": 28862,
+   "endLine": 28877,
+   "via": "<root>"
+  },
+  {
+   "name": "switchMode",
+   "kind": "function",
+   "line": 29464,
+   "endLine": 29468,
+   "via": "<root>"
+  },
+  {
+   "name": "leaveRun",
+   "kind": "function",
+   "line": 29513,
+   "endLine": 29524,
+   "via": "<root>"
+  },
+  {
+   "name": "settleForTitle",
+   "kind": "function",
+   "line": 29537,
+   "endLine": 29576,
+   "via": "leaveRun"
+  },
+  {
+   "name": "STING_BEST",
+   "kind": "const",
+   "line": 30647,
+   "endLine": 30647,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "STING_GATE",
+   "kind": "const",
+   "line": 30648,
+   "endLine": 30648,
+   "via": "crossGate"
+  },
+  {
+   "name": "STING_CLOSE",
+   "kind": "const",
+   "line": 30649,
+   "endLine": 30649,
+   "via": "resolveCloseCalls"
+  },
+  {
+   "name": "STING_COUNT",
+   "kind": "const",
+   "line": 30654,
+   "endLine": 30654,
+   "via": "updateCountdown"
+  },
+  {
+   "name": "STING_COUNT_GO",
+   "kind": "const",
+   "line": 30655,
+   "endLine": 30655,
+   "via": "updateCountdown"
+  },
+  {
+   "name": "STING_CHAIN",
+   "kind": "const",
+   "line": 30656,
+   "endLine": 30656,
+   "via": "updateSpectacle"
+  },
+  {
+   "name": "STING_GHOST",
+   "kind": "const",
+   "line": 30662,
+   "endLine": 30662,
+   "via": "ghostPass"
+  },
+  {
+   "name": "STING_BUMP",
+   "kind": "const",
+   "line": 30668,
+   "endLine": 30668,
+   "via": "wreckRacer"
+  },
+  {
+   "name": "STING_JUMP",
+   "kind": "const",
+   "line": 30671,
+   "endLine": 30671,
+   "via": "rampRide"
+  },
+  {
+   "name": "bootTotal",
+   "kind": "function",
+   "line": 30844,
+   "endLine": 30847,
+   "via": "bootFlash"
+  },
+  {
+   "name": "bootFlash",
+   "kind": "let",
+   "line": 30848,
+   "endLine": 30848,
+   "via": "update"
+  },
+  {
+   "name": "bootShown",
+   "kind": "let",
+   "line": 30879,
+   "endLine": 30879,
+   "via": "update"
+  }
+ ],
+ "cut": [
+  {
+   "name": "endTiltCal",
+   "kind": "function",
+   "line": 9630,
+   "via": "startRun",
+   "reason": "device orientation input",
+   "as": "hook"
+  },
+  {
+   "name": "tuneStart",
+   "kind": "function",
+   "line": 29975,
+   "via": "startRun",
+   "reason": "music, an <audio> element",
+   "as": "hook"
+  },
+  {
+   "name": "calibrateTilt",
+   "kind": "function",
+   "line": 9527,
+   "via": "startRun",
+   "reason": "device orientation input",
+   "as": "hook"
+  },
+  {
+   "name": "pauseBtn",
+   "kind": "const",
+   "line": 9974,
+   "via": "setPaused",
+   "reason": "DOM button",
+   "as": "value"
+  },
+  {
+   "name": "ICON",
+   "kind": "const",
+   "line": 30313,
+   "via": "setPaused",
+   "reason": "SVG icon markup",
+   "as": "value"
+  },
+  {
+   "name": "tuneWake",
+   "kind": "function",
+   "line": 29673,
+   "via": "update",
+   "reason": "music, an <audio> element",
+   "as": "hook"
+  },
+  {
+   "name": "updateSmoke",
+   "kind": "function",
+   "line": 14107,
+   "via": "update",
+   "reason": "tyre smoke particles, screen space",
+   "as": "hook"
+  },
+  {
+   "name": "addShake",
+   "kind": "function",
+   "line": 26519,
+   "via": "update",
+   "reason": "camera shake is drawn, never read by the physics",
+   "as": "hook"
+  },
+  {
+   "name": "updateDebris",
+   "kind": "function",
+   "line": 27588,
+   "via": "updateSpectacle",
+   "reason": "debris and firework particles, screen space",
+   "as": "hook"
+  },
+  {
+   "name": "audioSting",
+   "kind": "function",
+   "line": 30678,
+   "via": "updateSpectacle",
+   "reason": "sound effect",
+   "as": "hook"
+  },
+  {
+   "name": "COLOUR",
+   "kind": "const",
+   "line": 6822,
+   "via": "updateSpectacle",
+   "reason": "palette; colour roles stand in for colours",
+   "as": "value"
+  },
+  {
+   "name": "audioChain",
+   "kind": "function",
+   "line": 30798,
+   "via": "updateSpectacle",
+   "reason": "sound effect",
+   "as": "hook"
+  },
+  {
+   "name": "scoreHeatColour",
+   "kind": "function",
+   "line": 23459,
+   "via": "updateSpectacle",
+   "reason": "a colour picked off a ramp for the callout; the renderer colours its own text",
+   "as": "hook"
+  },
+  {
+   "name": "rebuildDerivedColours",
+   "kind": "function",
+   "line": 22591,
+   "via": "pickCar",
+   "reason": "palette ramps and cached fills",
+   "as": "hook"
+  },
+  {
+   "name": "clearSmoke",
+   "kind": "function",
+   "line": 14087,
+   "via": "skipFinale",
+   "reason": "tyre smoke particles, screen space",
+   "as": "hook"
+  },
+  {
+   "name": "buildShareCardSoon",
+   "kind": "function",
+   "line": 24700,
+   "via": "onRunEnded",
+   "reason": "the share card is drawn to an offscreen canvas",
+   "as": "hook"
+  },
+  {
+   "name": "audioLanding",
+   "kind": "function",
+   "line": 30706,
+   "via": "land",
+   "reason": "sound effect",
+   "as": "hook"
+  },
+  {
+   "name": "audioCrash",
+   "kind": "function",
+   "line": 30812,
+   "via": "crash",
+   "reason": "sound effect",
+   "as": "hook"
+  },
+  {
+   "name": "finaleShells",
+   "kind": "function",
+   "line": 27930,
+   "via": "updateFinale",
+   "reason": "fireworks",
+   "as": "hook"
+  },
+  {
+   "name": "stopTiltHint",
+   "kind": "function",
+   "line": 9862,
+   "via": "finishRun",
+   "reason": "tilt hint UI and its memory",
+   "as": "hook"
+  },
+  {
+   "name": "audioFanfareWave",
+   "kind": "function",
+   "line": 30767,
+   "via": "finaleWave",
+   "reason": "sound effect",
+   "as": "hook"
+  },
+  {
+   "name": "audioFinishHit",
+   "kind": "function",
+   "line": 30748,
+   "via": "startFinale",
+   "reason": "sound effect",
+   "as": "hook"
+  }
+ ],
+ "replaced": [
+  {
+   "name": "localDayStamp",
+   "kind": "function",
+   "line": 10798,
+   "endLine": 10801,
+   "via": "<root>",
+   "reason": "the clock becomes a hook, so a host or a test can pick the day"
+  },
+  {
+   "name": "recomputeCamera",
+   "kind": "function",
+   "line": 8454,
+   "endLine": 8458,
+   "via": "<root>",
+   "reason": "the camera depth and height the sight line clause reads are simulation inputs; the gradients that move with them are the renderer"
+  },
+  {
+   "name": "clearDebris",
+   "kind": "function",
+   "line": 27514,
+   "endLine": 27519,
+   "via": "startRun",
+   "reason": "the hit stop and the flash timer are simulation state; the debris pool is the renderer"
+  },
+  {
+   "name": "applyBiome",
+   "kind": "function",
+   "line": 6804,
+   "endLine": 6820,
+   "via": "startRun",
+   "reason": "the biome index and the hue memory are simulation state; the palette swap and the resize are the renderer"
+  },
+  {
+   "name": "storeGet",
+   "kind": "function",
+   "line": 8466,
+   "endLine": 8469,
+   "via": "loadRunsEver",
+   "reason": "localStorage becomes a hook; the prefix is kept"
+  },
+  {
+   "name": "storeSet",
+   "kind": "function",
+   "line": 8470,
+   "endLine": 8473,
+   "via": "pickCar",
+   "reason": "localStorage becomes a hook; the prefix is kept"
+  },
+  {
+   "name": "buildBiomes",
+   "kind": "function",
+   "line": 6643,
+   "endLine": 6697,
+   "via": "applyBiome",
+   "reason": "only the biome count and the ground hue per biome are simulation inputs: the shuffle keeps hues apart. The palettes themselves are the renderer"
+  },
+  {
+   "name": "landImpact",
+   "kind": "function",
+   "line": 13726,
+   "endLine": 13785,
+   "via": "land",
+   "reason": "the touchdown is made of parts: grit and smoke are the renderer, the tyre marks it lays into the road and the world flare it starts are simulation state the renderer reads back"
+  },
+  {
+   "name": "explode",
+   "kind": "function",
+   "line": 27544,
+   "endLine": 27586,
+   "via": "crash",
+   "reason": "the hit stop and the flash timer are simulation state; the debris is the renderer"
+  }
+ ],
+ "statements": [
+  {
+   "line": 11108,
+   "label": "refreshTrackLength();"
+  },
+  {
+   "line": 14082,
+   "label": "for (let i = 0; i < FEEL.SMOKE_MAX; i++) { smoke.push({ x: 0, y: 0, "
+  },
+  {
+   "line": 26146,
+   "label": "(function loadDaily() { const day = parseInt(storeGet('daily.day'), "
+  }
+ ],
+ "rewrites": [
+  [
+   "Math\\.random\\(\\)",
+   "H.random()"
+  ]
+ ],
+ "bytes": 596435,
+ "counts": {
+  "taken": 512,
+  "cut": 22,
+  "replaced": 9,
+  "statements": 3
+ }
+}
