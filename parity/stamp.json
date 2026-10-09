@@ -1,0 +1,21 @@
+{
+ "pass": true,
+ "when": "2026-10-09T10:29:12.870Z",
+ "commit": "cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de",
+ "chromium": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36",
+ "tz": "Australia/Sydney",
+ "days": [
+  20261001,
+  20261028
+ ],
+ "summary": "PASS: 196 roads and 878 drives (3496807 frames) over 28 days x 6 levels x 5 tapes plus endless, identical on both sides; 305 finishes, 1805 off road, 189 hits, 0 ran out, 310 continues, 1427 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok; 96s",
+ "files": {
+  "sim/drift-fever-sim.js": "0e08c3dd0f6b01abacf55fc78baa1919c0c44fa01dc932a1351a06cc2b14786e",
+  "vendor/original/index.html": "c62a50ca543bb453056800bc8acba6bd4642f2a6874defe655495ab1b2d52bbe",
+  "parity/probe.cjs": "b3bc2be2c73679f1f5ad707f77334d95c7b889ee7de5ec9321b17076d683052a",
+  "parity/tapes.cjs": "9204a4f9483970eab960cba0e7f66539554a3b82e5c5c6bf8fc7d23f5d4063c2",
+  "parity/orchestrate.js": "94c702f3b08f2fd6c75e9fa6dce4929cf2e77f0beb1edd141747fe40dc046262",
+  "parity/browser.js": "61244f9af68bfe6928a756370385276ac7385976f114a8b4c978257457f2f678",
+  "parity/module-page.html": "c0da506af7a5dd6342250a949036c630270a052e4aea85f7d9e0692cf7d2e158"
+ }
+}
