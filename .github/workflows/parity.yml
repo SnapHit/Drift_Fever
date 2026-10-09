@@ -1,0 +1,29 @@
+# The parity test, live, on every push. It drives Drift_Fever's index.html
+# and the vendored module in the same headless Chromium and fails the job
+# if a single frame or a single road differs. The committed stamp is then
+# checked against the files, which is what the deploy build checks too.
+name: parity
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run parity
+      - run: npm run parity:check
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: parity-report
+          path: parity/out/report.json
