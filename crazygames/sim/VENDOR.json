@@ -1,6 +1,6 @@
 {
  "commit": "cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de",
- "source": "vendor/original/index.html",
+ "source": "index.html at cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de, from the repository history",
  "scriptStartLine": 826,
  "roots": [
   "startRun",
