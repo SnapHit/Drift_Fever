@@ -36,7 +36,11 @@ pin or the test without a fresh passing stamp does not deploy. To run the
 test live on every push, copy `crazygames/ci/parity.yml` to
 `/.github/workflows/crazygames-parity.yml` in its own commit.
 
-## 2. Keeping the preview private, Cloudflare Access
+## 2. Keeping the preview private, Cloudflare Access (not used)
+
+Skipped by the author's decision on 16 October 2026: the preview is public
+and unlisted. The steps stay here in case that changes.
+
 
 1. Cloudflare dashboard, Zero Trust, Access, Applications, Add an
    application, Self-hosted.

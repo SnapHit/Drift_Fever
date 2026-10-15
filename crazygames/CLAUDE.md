@@ -134,8 +134,8 @@ repository with its root directory set to `crazygames/`. Its
 is `npm ci && npm run build` and the deploy command `npx wrangler deploy`.
 Every push to `main` deploys the live site from the repository root and
 the preview from here, with no credentials in the repository or in any
-session. The preview URL is the Worker's `workers.dev` address, kept
-private with Cloudflare Access (one time PIN to the author's email).
+session. The preview URL is the Worker's `workers.dev` address. It is public and
+unlisted, by the author's decision on 16 October 2026: no Cloudflare Access.
 `SETUP.md` has the exact steps, for the parts only the author can do.
 
 The live site never serves this folder: the root `.assetsignore` is an
