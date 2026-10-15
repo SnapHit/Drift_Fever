@@ -28,7 +28,8 @@ until it is resolved.
 BRIEF.md                 the brief, verbatim, the source of truth
 CLAUDE.md                this file
 vendor/original/COMMIT   the commit of the root index.html the simulation is vendored from
-tools/original.js        reads that index.html out of the repository history
+vendor/original/index.html  a byte copy of index.html at that commit, for shallow deploy clones
+tools/original.js        reads the original: history when reachable, checked against the copy
 tools/vendor.js          slices the simulation out of the original, mechanically
 tools/vendor.config.js   the renderer boundary: roots, the cut set, replacements
 sim/drift-fever-sim.js   GENERATED: createSim(hooks). Do not edit
@@ -48,6 +49,7 @@ ci/parity.yml            the live parity test for GitHub Actions; see SETUP.md
 npm ci                                   once; Chromium: npx playwright install chromium
 npm run vendor                           regenerate sim/ from vendor/original
 npm run vendor:report                    the closure, the cut set, what was left behind
+npm run vendor:pin                       rewrite vendor/original/index.html from the history at COMMIT
 npm run parity                           the full parity test, 28 days, ~minutes
 npm run parity:quick                     3 days, ~15 seconds, for iterating
 npm run parity -- --stamp                full run, and on a pass write stamp.json and REPORT.md
@@ -61,20 +63,25 @@ npm run build                            parity:check, then dist/
 The parity test runs both sides in one headless Chromium on purpose:
 Node's Math library differs from Chromium's in the last bit of `sin` and
 `exp`, and the comparison is exact. `PLAYWRIGHT_BROWSERS_PATH` or
-`PARITY_CHROMIUM` points it at a browser; otherwise Playwright's own. It
-reads the original out of git, so a shallow clone needs
-`git fetch --unshallow` first.
+`PARITY_CHROMIUM` points it at a browser; otherwise Playwright's own.
+
+The original is read from git when the history has the pinned commit, and
+the copy in `vendor/original/index.html` must then match it byte for byte
+or everything stops. In a shallow clone (Cloudflare's deploy build clones
+shallow, which is why the copy exists) the copy is used, and
+`parity:check` still compares its sha256 with the one the last passing run
+recorded from the history.
 
 ## Re-vendoring, when the game changes
 
 1. Write the commit hash of the root `index.html` to vendor from into
-   `vendor/original/COMMIT`. Nothing is copied.
+   `vendor/original/COMMIT`, then `npm run vendor:pin` to refresh the copy.
 2. `npm run vendor:report`. Read the whole report: anything new under
    "browser globals still reachable" or "taken declarations referencing
    suspect names" is a boundary decision, made in `tools/vendor.config.js`.
 3. `npm run vendor`, then `npm run parity:quick`, then diagnose and fix the
    config until it passes, then `npm run parity -- --stamp`.
-4. Commit the pin, the config, the generated module, the stamp and the
+4. Commit the pin, the copy, the config, the generated module, the stamp and the
    report together, with the commit hash in the message.
 
 The boundary is decided one name at a time, in the config, with a reason.

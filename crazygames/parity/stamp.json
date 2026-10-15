@@ -1,13 +1,13 @@
 {
  "pass": true,
- "when": "2026-10-15T06:18:35.143Z",
+ "when": "2026-10-15T22:12:27.979Z",
  "commit": "cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de",
  "chromium": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36",
  "tz": "Australia/Sydney",
  "days": 28,
  "from": 20261001,
  "to": 20261028,
- "summary": "PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads and the real frame, identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok; 188s",
+ "summary": "PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads and the real frame, identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok; 268s",
  "files": {
   "sim/drift-fever-sim.js": "73657f46640ce7a939b4afadd788d433abefa176b4c75307818e68f26448585b",
   "vendor/original/COMMIT": "ba39f838dfbdeebb40f1f3d9b84d4fdc5b0030170882b7e9f2f1b006c484d543",
@@ -18,7 +18,7 @@
   "parity/browser.js": "cb6096a7bacd434845982aaadf436ce43d56f2ca9730280e71e69b40190e2e26",
   "parity/module-page.html": "b1d7903c62ecd91e568ff10df1b206c2bc65469b7e6902859211fddbfb270112",
   "parity/run.js": "a5966bcee5912eaaef1db9395657babdde7188bbd506b58e3aa71dd6ac351746",
-  "tools/original.js": "a4cfbc00c8d89c5a7772e3e81c3193e7711b67942f650af15e89d2af2340b114",
+  "tools/original.js": "6385caf52921e2f808485c8ff840e458bd2bf3298713b88b04e07fbc373c9bc9",
   "index.html@cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de": "c62a50ca543bb453056800bc8acba6bd4642f2a6874defe655495ab1b2d52bbe"
  }
 }

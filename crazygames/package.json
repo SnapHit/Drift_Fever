@@ -7,6 +7,7 @@
   "scripts": {
     "vendor": "node tools/vendor.js",
     "vendor:report": "node tools/vendor.js --report",
+    "vendor:pin": "node tools/original.js --pin",
     "parity": "node parity/run.js",
     "parity:quick": "node parity/run.js --quick",
     "parity:stamp": "node parity/run.js --stamp",
