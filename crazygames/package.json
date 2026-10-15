@@ -1,0 +1,23 @@
+{
+  "name": "drift-fever-crazygames",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Drift Fever, CrazyGames edition. One simulation, two renderers.",
+  "type": "module",
+  "scripts": {
+    "vendor": "node tools/vendor.js",
+    "vendor:report": "node tools/vendor.js --report",
+    "parity": "node parity/run.js",
+    "parity:quick": "node parity/run.js --quick",
+    "parity:stamp": "node parity/run.js --stamp",
+    "parity:check": "node parity/run.js --check",
+    "build": "node parity/run.js --check && node tools/build-site.js",
+    "build:site": "node tools/build-site.js"
+  },
+  "devDependencies": {
+    "acorn": "^8.19.0",
+    "acorn-walk": "^8.3.5",
+    "playwright": "^1.55.0",
+    "wrangler": "^4.149.0"
+  }
+}
