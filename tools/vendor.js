@@ -1,6 +1,7 @@
 /* VENDOR THE SIMULATION.
 
-   Reads the pinned Drift_Fever index.html under vendor/original, finds the
+   Reads Drift_Fever's index.html at the commit pinned in
+   vendor/original/COMMIT, out of this repository's own history, finds the
    game script, and slices out the simulation as the closure of a set of
    roots over the top level declaration graph, stopping at a cut set the
    renderer owns. Everything is mechanical and repeatable: re-vendoring is
@@ -16,16 +17,12 @@
            node tools/vendor.js --report   list the closure and its boundary */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
 import config from './vendor.config.js';
+import { root, commit, originalHtml } from './original.js';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '..');
-const srcPath = path.join(root, 'vendor', 'original', 'index.html');
-const commit = fs.readFileSync(path.join(root, 'vendor', 'original', 'COMMIT'), 'utf8').trim();
-const html = fs.readFileSync(srcPath, 'utf8');
+const html = originalHtml();
 
 /* The game script is the largest <script> in the file. */
 const scripts = [];
@@ -175,7 +172,7 @@ function rewrite(src) {
 }
 const pieces = [];
 const emitted = new Set();
-const manifest = { commit, source: 'vendor/original/index.html', scriptStartLine: lineOf(0), roots: config.roots,
+const manifest = { commit, source: 'index.html at ' + commit + ', from the repository history', scriptStartLine: lineOf(0), roots: config.roots,
                    taken: [], cut: [], replaced: [], statements: [], rewrites: config.rewrites };
 // source order, so const/let initialisation order is the original's
 const inOrder = decls.filter(d => (inClosure.has(d.name) && !boundary.has(d.name)) || taken.includes(d));

@@ -1,13 +1,15 @@
 # The parity test
 
 `npm run parity` proves that `sim/drift-fever-sim.js` is the simulation in
-`vendor/original/index.html`, by running both on the same roads and the
-same input tapes and comparing every frame.
+Drift_Fever's `index.html` at the commit pinned in `vendor/original/COMMIT`,
+read out of this repository's own history, by running both on the same
+roads and the same input tapes and comparing every frame.
 
 ## How it works
 
-- `browser.js` serves the original page and a host page for the module
-  from one local http server and opens both in one headless Chromium. One
+- `browser.js` serves the original page (`git show <commit>:index.html`,
+  via `tools/original.js`) and a host page for the module from one local
+  http server and opens both in one headless Chromium. One
   engine on both sides, because Node's Math library differs from
   Chromium's in the last bit of `sin` and `exp`, and a two minute drive
   turns that into a different trace. The comparison is exact.

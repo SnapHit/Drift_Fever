@@ -28,6 +28,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { serveOriginal, openBrowser, runWorkerJobs } from './browser.js';
 import * as J from './jobs.js';
+import { commit as ORIGINAL_COMMIT, originalHtml } from '../tools/original.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -35,10 +36,16 @@ const args = process.argv.slice(2);
 const flag = n => args.includes(n);
 const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : d; };
 
-const STAMPED = ['sim/drift-fever-sim.js', 'vendor/original/index.html', 'parity/probe.cjs', 'parity/tapes.cjs', 'parity/jobs.js',
-                 'parity/orchestrate.js', 'parity/browser.js', 'parity/module-page.html', 'parity/run.js'];
+const STAMPED = ['sim/drift-fever-sim.js', 'vendor/original/COMMIT', 'parity/probe.cjs', 'parity/tapes.cjs', 'parity/jobs.js',
+                 'parity/orchestrate.js', 'parity/browser.js', 'parity/module-page.html', 'parity/run.js', 'tools/original.js'];
 function sha(p) { return crypto.createHash('sha256').update(fs.readFileSync(path.join(root, p))).digest('hex'); }
-function fileHashes() { const o = {}; for (const p of STAMPED) o[p] = sha(p); return o; }
+function fileHashes() {
+  const o = {};
+  for (const p of STAMPED) o[p] = sha(p);
+  // the original itself, as read from the repository history at the pinned commit
+  o['index.html@' + ORIGINAL_COMMIT] = crypto.createHash('sha256').update(originalHtml()).digest('hex');
+  return o;
+}
 
 if (flag('--check')) {
   const stampPath = path.join(root, 'parity', 'stamp.json');
@@ -130,7 +137,7 @@ function compareSides(name, jobs, A, B, mustMatch) {
   }
   return out;
 }
-const report = { commit: fs.readFileSync(path.join(root, 'vendor', 'original', 'COMMIT'), 'utf8').trim(), tz: TZ, days, levels: LEVELS, tapes: TAPES, elapsedSeconds: elapsed, groups: {}, knownAnswers: {}, failures, coverage };
+const report = { commit: ORIGINAL_COMMIT, tz: TZ, days, levels: LEVELS, tapes: TAPES, elapsedSeconds: elapsed, groups: {}, knownAnswers: {}, failures, coverage };
 for (const g of groups) {
   const A = done[g.name + '|original'], B = done[g.name + '|module'];
   if (A.errors.length) failures.push(`${g.name}: original page errors: ${A.errors.join(' | ')}`);

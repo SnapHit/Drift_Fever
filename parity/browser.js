@@ -1,5 +1,5 @@
-/* THE ORIGINAL, in a real browser. Serves vendor/original over http so
-   localStorage behaves, loads one page per worker with the frame loop
+/* THE ORIGINAL, in a real browser. Serves index.html at the pinned commit
+   over http so localStorage behaves, loads one page per worker with the frame loop
    disarmed (requestAnimationFrame is a no-op before the script runs, so
    the probe is the only thing that ever advances the world), Math.random
    replaced by the same seeded generator the module gets, and the clock
@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { originalHtml } from '../tools/original.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -27,17 +28,18 @@ function findChromium() {
 }
 
 export async function serveOriginal() {
+  const original = originalHtml();     // index.html at the pinned commit, from git
   const files = {
-    '/': [path.join(root, 'vendor', 'original', 'index.html'), 'text/html; charset=utf-8'],
-    '/module/': [path.join(here, 'module-page.html'), 'text/html; charset=utf-8'],
-    '/sim/drift-fever-sim.js': [path.join(root, 'sim', 'drift-fever-sim.js'), 'text/javascript; charset=utf-8'],
+    '/': [() => original, 'text/html; charset=utf-8'],
+    '/module/': [() => fs.readFileSync(path.join(here, 'module-page.html')), 'text/html; charset=utf-8'],
+    '/sim/drift-fever-sim.js': [() => fs.readFileSync(path.join(root, 'sim', 'drift-fever-sim.js')), 'text/javascript; charset=utf-8'],
   };
   const server = http.createServer((req, res) => {
     const u = req.url.split('?')[0];
     const f = files[u === '/index.html' ? '/' : u];
     if (!f) { res.writeHead(404); res.end(); return; }
     res.writeHead(200, { 'content-type': f[1], 'cache-control': 'no-store' });
-    res.end(fs.readFileSync(f[0]));
+    res.end(f[0]());
   });
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   return { server, url: 'http://127.0.0.1:' + server.address().port + '/' };
