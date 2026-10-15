@@ -6,6 +6,8 @@ This repo holds one browser game: **Drift Fever**, a single self-contained HTML 
 
 It was called Tailflick until session ten. Nothing should still say so.
 
+**`crazygames/` is a separate build with its own `CLAUDE.md`**: the CrazyGames edition, deployed by a second Worker and never served from driftfever.com. Changes to the game itself happen in `index.html` first; that folder vendors them afterwards.
+
 **Read `BRIEF.md` in full before writing any code.** It is the design brief and it is the source of truth. Section 11 is the build order and it is not optional. Section 12 lists things not to do.
 
 ## Hard constraints, which apply to every change
