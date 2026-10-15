@@ -1,21 +1,22 @@
 {
  "pass": true,
- "when": "2026-10-09T10:29:12.870Z",
+ "when": "2026-10-15T05:55:22.296Z",
  "commit": "cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de",
  "chromium": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36",
  "tz": "Australia/Sydney",
- "days": [
-  20261001,
-  20261028
- ],
- "summary": "PASS: 196 roads and 878 drives (3496807 frames) over 28 days x 6 levels x 5 tapes plus endless, identical on both sides; 305 finishes, 1805 off road, 189 hits, 0 ran out, 310 continues, 1427 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok; 96s",
+ "days": 28,
+ "from": 20261001,
+ "to": 20261028,
+ "summary": "PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads and the real frame, identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok; 177s",
  "files": {
-  "sim/drift-fever-sim.js": "0e08c3dd0f6b01abacf55fc78baa1919c0c44fa01dc932a1351a06cc2b14786e",
+  "sim/drift-fever-sim.js": "73657f46640ce7a939b4afadd788d433abefa176b4c75307818e68f26448585b",
   "vendor/original/index.html": "c62a50ca543bb453056800bc8acba6bd4642f2a6874defe655495ab1b2d52bbe",
-  "parity/probe.cjs": "b3bc2be2c73679f1f5ad707f77334d95c7b889ee7de5ec9321b17076d683052a",
-  "parity/tapes.cjs": "9204a4f9483970eab960cba0e7f66539554a3b82e5c5c6bf8fc7d23f5d4063c2",
-  "parity/orchestrate.js": "94c702f3b08f2fd6c75e9fa6dce4929cf2e77f0beb1edd141747fe40dc046262",
-  "parity/browser.js": "61244f9af68bfe6928a756370385276ac7385976f114a8b4c978257457f2f678",
-  "parity/module-page.html": "c0da506af7a5dd6342250a949036c630270a052e4aea85f7d9e0692cf7d2e158"
+  "parity/probe.cjs": "014564f995e10e880778ffcd5e255ff85103b786aa4fd7c0eb8e1049dd37aaa4",
+  "parity/tapes.cjs": "4636c8fd78998dfbdc1514e42166a4e852202729bae1b4af41774b1128d3759c",
+  "parity/jobs.js": "aff69c1b9834edd201e6183093cc0658d3cd249ccdcd87089e295168ce623c4e",
+  "parity/orchestrate.js": "1488c5743211e19de6e858502edec9696b1fe0c9864bdc3c5dc5b240ad18a44a",
+  "parity/browser.js": "2f076a2dbef6bf6f559771a65aec95cd0ebbf9539c494e86e5e865581ed5b586",
+  "parity/module-page.html": "b1d7903c62ecd91e568ff10df1b206c2bc65469b7e6902859211fddbfb270112",
+  "parity/run.js": "a5966bcee5912eaaef1db9395657babdde7188bbd506b58e3aa71dd6ac351746"
  }
 }

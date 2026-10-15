@@ -16,7 +16,7 @@ if (at < 0) { console.error('no job ' + key + ' in group ' + group.name); proces
 const jobs = group.jobs.slice(0, at + 1);
 const { server, url } = await serveOriginal();
 const browser = await openBrowser();
-const base = { timezoneId: process.env.TZ, viewport: J.VIEW };
+const base = { timezoneId: process.env.TZ, viewport: J.VIEW, sentinelDay: J.SENTINEL_DAY };
 async function both(js) {
   const [a, b] = await Promise.all([runWorkerJobs(browser, url, js, { ...base, side: 'original' }), runWorkerJobs(browser, url, js, { ...base, side: 'module' })]);
   return [a.results[a.results.length - 1], b.results[b.results.length - 1], a, b];

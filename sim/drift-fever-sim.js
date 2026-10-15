@@ -11,7 +11,17 @@
      random()              a 0..1 uniform, where the original used Math.random
      storeGet(k)/storeSet(k, v)   persistent memory, prefixed keys
      applyBiome(i)         the biome index changed
-     and one per cut symbol, named after it, for effects. */
+     and one per cut symbol, named after it, for effects.
+
+   What the host owes the simulation, besides steering:
+     held.keyLeft/keyRight/touchLeft/touchRight, or tilt.active and
+       tilt.value, every frame; step(dt) ramps them into steering.value
+     step(dt) once per frame, then read whatever it draws
+     endBoot() when its splash is over, so the title screen wakes the music
+     wreckN = 0 and contactN = 0 after reading the spark and wreck ledgers
+       each frame; the original's draw passes drain them and nothing else
+       does, so left alone they fill at six and drop every later mark
+     todayStamp is rolled by startRun from now(); nothing else reads a clock */
 export function createSim(hooks) {
   'use strict';
   const H = Object.assign({}, hooks || {});
@@ -36,14 +46,13 @@ export function createSim(hooks) {
   function audioChain(...a) { return H.audioChain ? H.audioChain(...a) : undefined; }   // L30798, sound effect
   function scoreHeatColour(...a) { return H.scoreHeatColour ? H.scoreHeatColour(...a) : undefined; }   // L23459, a colour picked off a ramp for the callout; the renderer colours its own text
   function rebuildDerivedColours(...a) { return H.rebuildDerivedColours ? H.rebuildDerivedColours(...a) : undefined; }   // L22591, palette ramps and cached fills
+  function audioCrash(...a) { return H.audioCrash ? H.audioCrash(...a) : undefined; }   // L30812, sound effect
   function clearSmoke(...a) { return H.clearSmoke ? H.clearSmoke(...a) : undefined; }   // L14087, tyre smoke particles, screen space
   function buildShareCardSoon(...a) { return H.buildShareCardSoon ? H.buildShareCardSoon(...a) : undefined; }   // L24700, the share card is drawn to an offscreen canvas
   function audioLanding(...a) { return H.audioLanding ? H.audioLanding(...a) : undefined; }   // L30706, sound effect
-  function audioCrash(...a) { return H.audioCrash ? H.audioCrash(...a) : undefined; }   // L30812, sound effect
   function finaleShells(...a) { return H.finaleShells ? H.finaleShells(...a) : undefined; }   // L27930, fireworks
-  function stopTiltHint(...a) { return H.stopTiltHint ? H.stopTiltHint(...a) : undefined; }   // L9862, tilt hint UI and its memory
-  function audioFanfareWave(...a) { return H.audioFanfareWave ? H.audioFanfareWave(...a) : undefined; }   // L30767, sound effect
   function audioFinishHit(...a) { return H.audioFinishHit ? H.audioFinishHit(...a) : undefined; }   // L30748, sound effect
+  function audioFanfareWave(...a) { return H.audioFanfareWave ? H.audioFanfareWave(...a) : undefined; }   // L30767, sound effect
 
   /* ---- replaced bodies ---- */
   /* L10798 REPLACED: the clock becomes a hook, so a host or a test can pick the day */
@@ -86,6 +95,20 @@ export function createSim(hooks) {
     catch (e) { /* no memory is fine, the game still plays */ }
   }
 
+  /* L27544 REPLACED: the hit stop and the flash timer are simulation state; the debris is the renderer */
+  function explode() {
+    addShake(FEEL.EXPLODE_SHAKE_PX);
+    hitStop = FEEL.HIT_STOP_TIME;
+    explodeFlash = FEEL.EXPLODE_FLASH_TIME;
+    if (H.explode) H.explode();
+  }
+
+  /* L9862 REPLACED: the hint is UI, but finishing a run is what remembers that it need never show again, and that memory lives in the store with the records */
+  function stopTiltHint(remember) {
+    if (H.stopTiltHint) H.stopTiltHint(remember);
+    if (remember) storeSet('tilthint', '1');
+  }
+
   /* L6643 REPLACED: only the biome count and the ground hue per biome are simulation inputs: the shuffle keeps hues apart. The palettes themselves are the renderer */
   function buildBiomes() {
     const n = clamp(Math.round(FEEL.BIOME_COUNT), 1, BIOME_PALETTE.length);
@@ -120,14 +143,6 @@ export function createSim(hooks) {
       lastMarkSeg = idx;
     }
     if (tier === 2) landFlare = FEEL.JUMP_LAND_FLARE * q;
-  }
-
-  /* L27544 REPLACED: the hit stop and the flash timer are simulation state; the debris is the renderer */
-  function explode() {
-    addShake(FEEL.EXPLODE_SHAKE_PX);
-    hitStop = FEEL.HIT_STOP_TIME;
-    explodeFlash = FEEL.EXPLODE_FLASH_TIME;
-    if (H.explode) H.explode();
   }
 
   /* ---- the simulation, in source order ---- */
@@ -9205,6 +9220,11 @@ export function createSim(hooks) {
     startRun();
   }
 
+  /* L25559 */ function startMode(m) {
+    mode = m;
+    startRun();
+  }
+
   /* L25569 */ let score = 0;
 
   /* L25570 */ let multiplier = 1;
@@ -9486,6 +9506,19 @@ export function createSim(hooks) {
     const from = trainedEver ? firstRealLevel() : 1;
     for (let i = from; i <= levelCount(); i++) if (!recFor(i).done) return i;
     return levelCount();
+  }
+
+  /* L26212 */ function titleRouteLevel() {
+    if (!trainedEver) return firstRealLevel();
+    for (let i = 1; i <= trainingLevels(); i++) if (!recFor(i).done) return i;
+    return 1;
+  }
+
+  /* L26238 */ function startTitleRoute() {
+    mode = DAILY;
+    rollDayIfNeeded();
+    level = clampLevel(titleRouteLevel());
+    startRun();
   }
 
   /* L26273 */ function canSkipTraining() {
@@ -10786,12 +10819,22 @@ export function createSim(hooks) {
       deadFor += dt;
       return;
     }
+    // the one steering value, ramped from held keys and touch or copied from
+    // tilt, exactly where frame() does it. The host writes held.* or tilt.*
+    updateSteering(dt);
     update(dt);
     updateScore(dt);
     updateClock(dt);
     updateSpectacle(dt);
     ghostUpdate(dt);
     updateBar(dt);
+  }
+  /* The host calls this when its own splash has ended: the original's boot
+     chrome is DOM and is not vendored, and update() wakes the music on the
+     title screen only once both of these say the splash is over. */
+  function endBoot() {
+    bootFlash = 0;
+    bootShown = false;
   }
   function boot() {
     // the boot statement's simulation half, L30990 to L30998 of the original
@@ -11362,6 +11405,7 @@ export function createSim(hooks) {
   "startDaily": startDaily,
   "startNextLevel": startNextLevel,
   "startEndless": startEndless,
+  "startMode": startMode,
   "multiplierEarn": multiplierEarn,
   "slipPay": slipPay,
   "updateClock": updateClock,
@@ -11372,6 +11416,8 @@ export function createSim(hooks) {
   "syncLevelRecord": syncLevelRecord,
   "clearDailyRecords": clearDailyRecords,
   "nextLevel": nextLevel,
+  "titleRouteLevel": titleRouteLevel,
+  "startTitleRoute": startTitleRoute,
   "canSkipTraining": canSkipTraining,
   "skipTraining": skipTraining,
   "dayClean": dayClean,
@@ -11442,24 +11488,25 @@ export function createSim(hooks) {
   "audioChain": audioChain,
   "scoreHeatColour": scoreHeatColour,
   "rebuildDerivedColours": rebuildDerivedColours,
+  "audioCrash": audioCrash,
   "clearSmoke": clearSmoke,
   "buildShareCardSoon": buildShareCardSoon,
   "audioLanding": audioLanding,
-  "audioCrash": audioCrash,
   "finaleShells": finaleShells,
-  "stopTiltHint": stopTiltHint,
-  "audioFanfareWave": audioFanfareWave,
   "audioFinishHit": audioFinishHit,
+  "audioFanfareWave": audioFanfareWave,
   "localDayStamp": localDayStamp,
   "recomputeCamera": recomputeCamera,
   "clearDebris": clearDebris,
   "applyBiome": applyBiome,
   "storeGet": storeGet,
   "storeSet": storeSet,
+  "explode": explode,
+  "stopTiltHint": stopTiltHint,
   "buildBiomes": buildBiomes,
   "landImpact": landImpact,
-  "explode": explode,
   "step": step,
+  "endBoot": endBoot,
   "boot": boot
   };
   function get(name) { const a = __vars[name]; if (!a) throw new Error('no such state: ' + name); return a[0](); }

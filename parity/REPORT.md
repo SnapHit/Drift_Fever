@@ -2,32 +2,37 @@
 
 Original: SnapHit/Drift_Fever at cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de. Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36. Time zone Australia/Sydney. Days 20261001 to 20261028.
 
-PASS: 196 roads and 878 drives (3496807 frames) over 28 days x 6 levels x 5 tapes plus endless, identical on both sides; 305 finishes, 1805 off road, 189 hits, 0 ran out, 310 continues, 1427 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok; 96s
+PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads and the real frame, identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok; 177s
 
 ## Known answers
 
-- K1_days_differ: pass (L1: 28/28 distinct roads, 28/28 distinct driver drives, 28/28 distinct centre drives, 28/28 distinct hug drives, 28/28 distinct swing drives, 28/28 distinct chaos drives; L2: 28/28 distinct roads, 28/28 distinct driver drives, 28/28 distinct centre drives, 28/28 distinct hug drives, 28/28 distinct swing drives, 28/28 distinct chaos drives; L3: 28/28 distinct roads, 28/28 distinct driver drives, 28/28 distinct centre drives, 28/28 distinct hug drives, 28/28 distinct swing drives, 28/28 distinct chaos drives; L4: 28/28 distinct roads, 28/28 distinct driver drives, 28/28 distinct centre drives, 28/28 distinct hug drives, 28/28 distinct swing drives, 28/28 distinct chaos drives; L5: 28/28 distinct roads, 28/28 distinct driver drives, 28/28 distinct centre drives, 28/28 distinct hug drives, 28/28 distinct swing drives, 28/28 distinct chaos drives; L6: 28/28 distinct roads, 28/28 distinct driver drives, 28/28 distinct centre drives, 28/28 distinct hug drives, 28/28 distinct swing drives, 28/28 distinct chaos drives)
-- K2_perturbation_fails: pass physics HEADING_BUILD_TIME 0.20 to 0.21: first mismatch at frame 126 of 3935/3935; generator CHECKPOINT_EVERY 1300 to 1301: hash 27995950 vs 1489758450, segments 2831/2831, hazards 2/2, jumps 5/5
+- K1_days_differ: pass (L1: 28/28 distinct roads, 28/28 driver, 28/28 keys, 28/28 centre, 28/28 hug, 28/28 swing, 28/28 chaos; L2: 28/28 distinct roads, 28/28 driver, 28/28 keys, 28/28 centre, 28/28 hug, 28/28 swing, 28/28 chaos; L3: 28/28 distinct roads, 28/28 driver, 28/28 keys, 28/28 centre, 28/28 hug, 28/28 swing, 28/28 chaos; L4: 28/28 distinct roads, 28/28 driver, 28/28 keys, 28/28 centre, 28/28 hug, 28/28 swing, 28/28 chaos; L5: 28/28 distinct roads, 28/28 driver, 28/28 keys, 28/28 centre, 28/28 hug, 28/28 swing, 28/28 chaos; L6: 28/28 distinct roads, 28/28 driver, 28/28 keys, 28/28 centre, 28/28 hug, 28/28 swing, 28/28 chaos)
+- K2_perturbation_fails: pass physics HEADING_BUILD_TIME 0.20 to 0.21: first mismatch at frame 126 of 3934/3934; generator CHECKPOINT_EVERY 1300 to 1301: hash 27995950 vs 1489758450, segments 2831/2831, hazards 2/2, jumps 5/5
 - K3_viewport_independent: pass
-- K4_day_took: pass
+- K4_day_rolled: pass (both sides boot on 20000101; every job reports the day rolled from, equal on both sides, and the first job of every group rolled from the sentinel)
 - K5_frame_loop_dead: pass
+- K6_real_frame: pass
+- K7_every_ending_reached: pass {"offRoad":1920,"hits":240,"ranOut":6,"finishes":469,"continues":386,"nextLevel":168}
 
 ## Coverage
 
-| group | jobs | frames | finishes | deaths | continues |
-|---|---|---|---|---|---|
-| level 1 | 168 | 502209 | 112 | 0 | 0 |
-| level 2 | 168 | 471310 | 24 | 88 | 21 |
-| level 3 | 168 | 521190 | 0 | 112 | 56 |
-| level 4 | 168 | 559356 | 0 | 112 | 58 |
-| level 5 | 168 | 621596 | 0 | 112 | 58 |
-| level 6 | 168 | 671883 | 0 | 114 | 61 |
-| endless | 56 | 106794 | 0 | 28 | 55 |
-| routes | 6 | 25200 | 0 | 2 | 0 |
-| fresh player, eased ramp | 4 | 17269 | 3 | 1 | 1 |
+| group | jobs | frames | finishes | next levels | deaths | continues |
+|---|---|---|---|---|---|---|
+| level 1 | 196 | 590176 | 168 | 28 | 0 | 0 |
+| level 2 | 196 | 578682 | 80 | 28 | 328 | 22 |
+| level 3 | 196 | 683256 | 56 | 28 | 395 | 59 |
+| level 4 | 196 | 773223 | 56 | 28 | 400 | 66 |
+| level 5 | 196 | 885380 | 55 | 28 | 410 | 76 |
+| level 6 | 196 | 992773 | 47 | 26 | 449 | 100 |
+| endless | 84 | 174694 | 0 | 0 | 168 | 59 |
+| routes | 6 | 25200 | 0 | 0 | 0 | 0 |
+| records across reloads | 18 | 23922 | 4 | 2 | 6 | 0 |
+| ran out of time | 3 | 8877 | 0 | 0 | 6 | 3 |
+| fresh player, eased ramp | 4 | 17270 | 3 | 0 | 4 | 1 |
+| real frame | 3 | 4500 | 0 | 0 | 0 | 0 |
 
-## Hooks fired on the module side
+## Hooks fired on the module side, level 6
 
 ```
-{"recomputeCamera":1,"endTiltCal":436,"tuneStart":415,"clearDebris":436,"applyBiome":893,"calibrateTilt":436,"audioSting":3299,"updateSmoke":383619,"updateDebris":421773,"audioChain":7389,"scoreHeatColour":2965,"addShake":50063,"landImpact":363,"audioLanding":363,"stopTiltHint":52,"buildShareCardSoon":380,"audioFinishHit":52,"finaleShells":132,"audioFanfareWave":132,"audioCrash":328,"explode":29,"rebuildDerivedColours":3}
+{"recomputeCamera":1,"endTiltCal":550,"tuneStart":444,"clearDebris":550,"applyBiome":1426,"calibrateTilt":550,"audioSting":12436,"updateSmoke":854228,"updateDebris":939511,"audioChain":17243,"scoreHeatColour":5475,"addShake":72435,"landImpact":1015,"audioLanding":1015,"stopTiltHint":47,"buildShareCardSoon":496,"audioFinishHit":47,"finaleShells":184,"audioFanfareWave":184,"audioCrash":449,"explode":47,"rebuildDerivedColours":3}
 ```

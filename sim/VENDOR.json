@@ -53,7 +53,15 @@
   "countHolding",
   "finaleActive",
   "finaleRunning",
-  "finaleReveal"
+  "finaleReveal",
+  "startTitleRoute",
+  "startMode",
+  "titleRouteLevel",
+  "nextLevel",
+  "crash",
+  "finishRun",
+  "skipFinale",
+  "canSkipTraining"
  ],
  "taken": [
   {
@@ -1622,14 +1630,14 @@
    "kind": "let",
    "line": 13896,
    "endLine": 13896,
-   "via": "updateFall"
+   "via": "crash"
   },
   {
    "name": "crash",
    "kind": "function",
    "line": 13898,
    "endLine": 13935,
-   "via": "update"
+   "via": "<root>"
   },
   {
    "name": "updateFall",
@@ -2339,6 +2347,13 @@
    "via": "<root>"
   },
   {
+   "name": "startMode",
+   "kind": "function",
+   "line": 25559,
+   "endLine": 25562,
+   "via": "<root>"
+  },
+  {
    "name": "score",
    "kind": "let",
    "line": 25569,
@@ -2490,14 +2505,14 @@
    "kind": "let",
    "line": 25761,
    "endLine": 25761,
-   "via": "updateFinishRoll"
+   "via": "finishRun"
   },
   {
    "name": "finishRun",
    "kind": "function",
    "line": 25763,
    "endLine": 25800,
-   "via": "crossGate"
+   "via": "<root>"
   },
   {
    "name": "updateScore",
@@ -2539,7 +2554,7 @@
    "kind": "let",
    "line": 25872,
    "endLine": 25872,
-   "via": "syncLevelRecord"
+   "via": "finishRun"
   },
   {
    "name": "dailyDone",
@@ -2553,7 +2568,7 @@
    "kind": "let",
    "line": 25874,
    "endLine": 25874,
-   "via": "syncLevelRecord"
+   "via": "finishRun"
   },
   {
    "name": "syncLevelRecord",
@@ -2581,14 +2596,28 @@
    "kind": "function",
    "line": 26186,
    "endLine": 26190,
-   "via": "startDaily"
+   "via": "<root>"
+  },
+  {
+   "name": "titleRouteLevel",
+   "kind": "function",
+   "line": 26212,
+   "endLine": 26216,
+   "via": "<root>"
+  },
+  {
+   "name": "startTitleRoute",
+   "kind": "function",
+   "line": 26238,
+   "endLine": 26243,
+   "via": "<root>"
   },
   {
    "name": "canSkipTraining",
    "kind": "function",
    "line": 26273,
    "endLine": 26275,
-   "via": "skipTraining"
+   "via": "<root>"
   },
   {
    "name": "skipTraining",
@@ -3260,28 +3289,28 @@
    "kind": "let",
    "line": 27706,
    "endLine": 27706,
-   "via": "resetSpectacle"
+   "via": "skipFinale"
   },
   {
    "name": "finaleSky",
    "kind": "let",
    "line": 27707,
    "endLine": 27707,
-   "via": "resetSpectacle"
+   "via": "skipFinale"
   },
   {
    "name": "finaleStrobe",
    "kind": "let",
    "line": 27708,
    "endLine": 27708,
-   "via": "resetSpectacle"
+   "via": "skipFinale"
   },
   {
    "name": "finaleFlash",
    "kind": "let",
    "line": 27709,
    "endLine": 27709,
-   "via": "resetSpectacle"
+   "via": "skipFinale"
   },
   {
    "name": "finaleWavesFired",
@@ -3323,7 +3352,7 @@
    "kind": "let",
    "line": 27718,
    "endLine": 27718,
-   "via": "resetSpectacle"
+   "via": "skipFinale"
   },
   {
    "name": "finaleSwing",
@@ -3337,7 +3366,7 @@
    "kind": "let",
    "line": 27720,
    "endLine": 27720,
-   "via": "resetSpectacle"
+   "via": "skipFinale"
   },
   {
    "name": "finaleActive",
@@ -3358,7 +3387,7 @@
    "kind": "let",
    "line": 27765,
    "endLine": 27765,
-   "via": "finaleDriftEnd"
+   "via": "startFinale"
   },
   {
    "name": "finaleScaleFor",
@@ -3442,7 +3471,7 @@
    "kind": "function",
    "line": 27824,
    "endLine": 27839,
-   "via": "startOrRestart"
+   "via": "<root>"
   },
   {
    "name": "finaleRunning",
@@ -3631,14 +3660,14 @@
    "kind": "let",
    "line": 30848,
    "endLine": 30848,
-   "via": "update"
+   "via": "<root>"
   },
   {
    "name": "bootShown",
    "kind": "let",
    "line": 30879,
    "endLine": 30879,
-   "via": "update"
+   "via": "<root>"
   }
  ],
  "cut": [
@@ -3755,6 +3784,14 @@
    "as": "hook"
   },
   {
+   "name": "audioCrash",
+   "kind": "function",
+   "line": 30812,
+   "via": "crash",
+   "reason": "sound effect",
+   "as": "hook"
+  },
+  {
    "name": "clearSmoke",
    "kind": "function",
    "line": 14087,
@@ -3779,14 +3816,6 @@
    "as": "hook"
   },
   {
-   "name": "audioCrash",
-   "kind": "function",
-   "line": 30812,
-   "via": "crash",
-   "reason": "sound effect",
-   "as": "hook"
-  },
-  {
    "name": "finaleShells",
    "kind": "function",
    "line": 27930,
@@ -3795,11 +3824,11 @@
    "as": "hook"
   },
   {
-   "name": "stopTiltHint",
+   "name": "audioFinishHit",
    "kind": "function",
-   "line": 9862,
-   "via": "finishRun",
-   "reason": "tilt hint UI and its memory",
+   "line": 30748,
+   "via": "startFinale",
+   "reason": "sound effect",
    "as": "hook"
   },
   {
@@ -3807,14 +3836,6 @@
    "kind": "function",
    "line": 30767,
    "via": "finaleWave",
-   "reason": "sound effect",
-   "as": "hook"
-  },
-  {
-   "name": "audioFinishHit",
-   "kind": "function",
-   "line": 30748,
-   "via": "startFinale",
    "reason": "sound effect",
    "as": "hook"
   }
@@ -3869,6 +3890,22 @@
    "reason": "localStorage becomes a hook; the prefix is kept"
   },
   {
+   "name": "explode",
+   "kind": "function",
+   "line": 27544,
+   "endLine": 27586,
+   "via": "crash",
+   "reason": "the hit stop and the flash timer are simulation state; the debris is the renderer"
+  },
+  {
+   "name": "stopTiltHint",
+   "kind": "function",
+   "line": 9862,
+   "endLine": 9866,
+   "via": "finishRun",
+   "reason": "the hint is UI, but finishing a run is what remembers that it need never show again, and that memory lives in the store with the records"
+  },
+  {
    "name": "buildBiomes",
    "kind": "function",
    "line": 6643,
@@ -3883,14 +3920,6 @@
    "endLine": 13785,
    "via": "land",
    "reason": "the touchdown is made of parts: grit and smoke are the renderer, the tyre marks it lays into the road and the world flare it starts are simulation state the renderer reads back"
-  },
-  {
-   "name": "explode",
-   "kind": "function",
-   "line": 27544,
-   "endLine": 27586,
-   "via": "crash",
-   "reason": "the hit stop and the flash timer are simulation state; the debris is the renderer"
   }
  ],
  "statements": [
@@ -3913,11 +3942,11 @@
    "H.random()"
   ]
  ],
- "bytes": 596435,
+ "bytes": 598232,
  "counts": {
-  "taken": 512,
-  "cut": 22,
-  "replaced": 9,
+  "taken": 515,
+  "cut": 21,
+  "replaced": 10,
   "statements": 3
  }
 }

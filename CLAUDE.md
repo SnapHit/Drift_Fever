@@ -51,6 +51,7 @@ npm run parity -- --stamp                full run, and on a pass write stamp.jso
 npm run parity:check                     no browser: is the stamp current for these files
 node parity/diagnose.js --group "level 2" --key "drive L2 20261001 centre" --quick
                                          where do the two sides part, and on which fields
+node parity/render-feedback.js --days 1  does drawing feed back into the original's simulation (slow)
 npm run build                            parity:check, then dist/
 ```
 

@@ -25,7 +25,9 @@ export default {
     'localDayStamp', 'dailySeedFor', 'levelSeedFor', 'trackNumber', 'levelGatesFor', 'isTraining',
     // things the renderer and the harness read about the road
     'segAt', 'segHeight', 'topUpRoad', 'resetRoad', 'updateDifficulty', 'refreshTrackLength',
-    'gateSegment', 'canContinue', 'countHolding', 'finaleActive', 'finaleRunning', 'finaleReveal'
+    'gateSegment', 'canContinue', 'countHolding', 'finaleActive', 'finaleRunning', 'finaleReveal',
+    // the title screen's routing rule, and the ends of a run by name
+    'startTitleRoute', 'startMode', 'titleRouteLevel', 'nextLevel', 'crash', 'finishRun', 'skipFinale', 'canSkipTraining'
   ],
   cut: {
     // audio
@@ -54,7 +56,6 @@ export default {
     // tilt is an input source; the simulation reads steering.value only
     calibrateTilt:   { as: 'hook', reason: 'device orientation input' },
     endTiltCal:      { as: 'hook', reason: 'device orientation input' },
-    stopTiltHint:    { as: 'hook', reason: 'tilt hint UI and its memory' },
     // DOM handles
     pauseBtn:        { as: 'value', init: '{ innerHTML: "", classList: { toggle() {} } }', reason: 'DOM button' },
     ICON:            { as: 'value', init: '{}', reason: 'SVG icon markup' },
@@ -83,6 +84,11 @@ function applyBiome(i) {
   biome = ((i % BIOMES.length) + BIOMES.length) % BIOMES.length;
   lastBiomeHue = biomeHue(biome);
   if (H.applyBiome) H.applyBiome(biome);
+}` },
+    stopTiltHint: { reason: 'the hint is UI, but finishing a run is what remembers that it need never show again, and that memory lives in the store with the records', src: `
+function stopTiltHint(remember) {
+  if (H.stopTiltHint) H.stopTiltHint(remember);
+  if (remember) storeSet('tilthint', '1');
 }` },
     recomputeCamera: { reason: 'the camera depth and height the sight line clause reads are simulation inputs; the gradients that move with them are the renderer', src: `
 function recomputeCamera() {
@@ -163,12 +169,22 @@ function step(dt) {
     deadFor += dt;
     return;
   }
+  // the one steering value, ramped from held keys and touch or copied from
+  // tilt, exactly where frame() does it. The host writes held.* or tilt.*
+  updateSteering(dt);
   update(dt);
   updateScore(dt);
   updateClock(dt);
   updateSpectacle(dt);
   ghostUpdate(dt);
   updateBar(dt);
+}
+/* The host calls this when its own splash has ended: the original's boot
+   chrome is DOM and is not vendored, and update() wakes the music on the
+   title screen only once both of these say the splash is over. */
+function endBoot() {
+  bootFlash = 0;
+  bootShown = false;
 }
 function boot() {
   // the boot statement's simulation half, L30990 to L30998 of the original

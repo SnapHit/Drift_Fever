@@ -69,7 +69,9 @@ const ADAPTER = `
   /* The frame loop is rebound to nothing. requestAnimationFrame was stubbed
      before the script ran, but Playwright's clock installs its own, so the
      loop has to be cut at the function as well. The callback already in
-     flight resolves the global name and finds this. */
+     flight resolves the global name and finds this. The real frame is kept
+     for realFrame jobs, which call it by hand with their own timestamps. */
+  window.__frame = frame;
   frame = function () {};
 })();`;
 
@@ -90,21 +92,25 @@ export async function runWorkerJobs(browser, url, jobs, opts) {
   const setDay = original
     ? async day => { const y = Math.floor(day / 10000), m = Math.floor(day / 100) % 100, d = day % 100; await page.clock.setFixedTime(new Date(y, m - 1, d, 12, 0, 0, 0)); }
     : async day => { await page.evaluate(d => window.__setDay(d), day); };
+  const inject = async () => {
+    if (original) await page.evaluate(ADAPTER);
+    await page.addScriptTag({ content: fs.readFileSync(path.join(here, 'tapes.cjs'), 'utf8') });
+    await page.addScriptTag({ content: fs.readFileSync(path.join(here, 'probe.cjs'), 'utf8') });
+  };
   if (original) {
     /* The clock first, then the stub: Playwright's clock installs its own
        requestAnimationFrame as an init script of its own, and the stub has
-       to land after it or the first frames run before the probe gets in. */
-    await setDay(jobs[0].day);
+       to land after it or the first frames run before the probe gets in.
+       Both sides boot on the sentinel day, so the first startRun of every
+       group rolls the day on both. */
+    await setDay(opts.sentinelDay);
     await page.addInitScript(INIT);
     await page.goto(url, { waitUntil: 'load' });
-    await page.evaluate(ADAPTER);
   } else {
     await page.goto(url + 'module/', { waitUntil: 'load' });
     await page.waitForFunction(() => window.__ready === true);
-    await setDay(jobs[0].day);
   }
-  await page.addScriptTag({ content: fs.readFileSync(path.join(here, 'tapes.cjs'), 'utf8') });
-  await page.addScriptTag({ content: fs.readFileSync(path.join(here, 'probe.cjs'), 'utf8') });
+  await inject();
   const info = await page.evaluate(() => ({ ua: navigator.userAgent, w: innerWidth, h: innerHeight,
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone, probe: window.parityProbe.VERSION, state: window.__S.get('state'),
     commit: window.__commit || null }));
@@ -121,6 +127,14 @@ export async function runWorkerJobs(browser, url, jobs, opts) {
   let day = null;
   for (const job of jobs) {
     if (job.day !== day) { await setDay(job.day); day = job.day; }
+    if (job.kind === 'reload') {
+      /* The page comes back with its storage, the module is made again over
+         its store, and the probe goes back in. */
+      if (original) { await page.reload({ waitUntil: 'load' }); await inject(); }
+      else await page.evaluate(() => window.__recreate());
+      results.push({ ok: true, reloaded: true, todayStamp: await page.evaluate(() => window.__S.get('todayStamp')), hashes: [], frames: 0, events: [] });
+      continue;
+    }
     const r = await page.evaluate(j => window.parityProbe.runJob(window.__S, j), job);
     results.push(r);
   }
