@@ -1,0 +1,287 @@
+{
+ "viewports": {
+  "390x844": {
+   "drives": 4,
+   "frames": 900,
+   "checks": {
+    "car centre vs road frame (half widths)": {
+     "n": 900,
+     "fail": 0,
+     "worst": 0.0005,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "hug",
+      "frames": 400
+     },
+     "worstDetail": {
+      "n": 138,
+      "frac": 0.10657258029130999,
+      "simFrac": 0.10710677978645167,
+      "state": 1
+     }
+    },
+    "car centre along the road vs position (units)": {
+     "n": 900,
+     "fail": 0,
+     "worst": 2.2331,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "hug",
+      "frames": 400
+     },
+     "worstDetail": {
+      "n": 284
+     }
+    },
+    "car height above drawn road vs carY (units)": {
+     "n": 900,
+     "fail": 0,
+     "worst": 6.4786,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 5,
+      "tape": "hug",
+      "frames": 400
+     },
+     "worstDetail": {
+      "n": 236,
+      "drawn": -6.478608636543754,
+      "carY": 0,
+      "airborne": false
+     }
+    },
+    "rear wheel vs road frame (half widths)": {
+     "n": 1786,
+     "fail": 0,
+     "worst": 0.001,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 306,
+      "wheel": 3,
+      "frac": 0.12968928541822344,
+      "sim": 0.13066800344660012
+     }
+    },
+    "rear wheel on screen vs the lips (px)": {
+     "n": 1786,
+     "fail": 0,
+     "worst": 0.2889,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 5,
+      "tape": "hug",
+      "frames": 400
+     },
+     "worstDetail": {
+      "n": 236,
+      "wheel": 2,
+      "sx": 276.33606461753516,
+      "sy": 498.81147426027684,
+      "expectSx": 276.2093031173145,
+      "expectSy": 499.071098069702,
+      "span": 468.2772100747434
+     }
+    },
+    "racer centre vs road frame (half widths)": {
+     "n": 2700,
+     "fail": 0,
+     "worst": 0.0013,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 124,
+      "racer": 2,
+      "frac": 0.5080784868686532,
+      "sim": 0.5124678485562397
+     }
+    },
+    "racer along the road vs z (units)": {
+     "n": 2700,
+     "fail": 0,
+     "worst": 0.3808,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "hug",
+      "frames": 400
+     },
+     "worstDetail": {
+      "n": 312,
+      "racer": 0
+     }
+    },
+    "contact: gap between the drawn cars (units, 0 is touching)": {
+     "n": 6,
+     "fail": 0,
+     "worst": 0,
+     "worstDrive": null,
+     "worstDetail": null
+    }
+   },
+   "counts": {
+    "contacts": 6,
+    "edge scraping frames": 98
+   },
+   "fails": [],
+   "errors": []
+  },
+  "1280x720": {
+   "drives": 1,
+   "frames": 250,
+   "checks": {
+    "car centre vs road frame (half widths)": {
+     "n": 250,
+     "fail": 0,
+     "worst": 0.0001,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 304,
+      "frac": 0.1454127797810787,
+      "simFrac": 0.14527377396814076,
+      "state": 1
+     }
+    },
+    "car centre along the road vs position (units)": {
+     "n": 250,
+     "fail": 0,
+     "worst": 0.0521,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 206
+     }
+    },
+    "car height above drawn road vs carY (units)": {
+     "n": 250,
+     "fail": 0,
+     "worst": 2.0029,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 268,
+      "drawn": -2.0028728046472963,
+      "carY": 0,
+      "airborne": false
+     }
+    },
+    "rear wheel vs road frame (half widths)": {
+     "n": 500,
+     "fail": 0,
+     "worst": 0.001,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 306,
+      "wheel": 3,
+      "frac": 0.12968928541822344,
+      "sim": 0.13066800344660012
+     }
+    },
+    "rear wheel on screen vs the lips (px)": {
+     "n": 500,
+     "fail": 0,
+     "worst": 0.4196,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 310,
+      "wheel": 3,
+      "sx": 662.8954312876249,
+      "sy": 536.9161657652012,
+      "expectSx": 663.1968771382844,
+      "expectSy": 537.2081113968665,
+      "span": 1096.8123437004488
+     }
+    },
+    "racer centre vs road frame (half widths)": {
+     "n": 750,
+     "fail": 0,
+     "worst": 0.0013,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 124,
+      "racer": 2,
+      "frac": 0.5080784868686532,
+      "sim": 0.5124678485562397
+     }
+    },
+    "racer along the road vs z (units)": {
+     "n": 750,
+     "fail": 0,
+     "worst": 0.237,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "driver",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 314,
+      "racer": 2
+     }
+    },
+    "contact: gap between the drawn cars (units, 0 is touching)": {
+     "n": 3,
+     "fail": 0,
+     "worst": 0,
+     "worstDrive": null,
+     "worstDetail": null
+    }
+   },
+   "counts": {
+    "contacts": 3
+   },
+   "fails": [],
+   "errors": []
+  }
+ },
+ "knownAnswer": {
+  "offset": 0.05,
+  "caught": true,
+  "wheelFails": 400,
+  "centreFails": 200,
+  "pxFails": 400,
+  "worstPx": 7.2993,
+  "frames": 200
+ },
+ "started": "2026-10-16T05:36:20.731Z",
+ "pass": true,
+ "finished": "2026-10-16T05:39:44.962Z"
+}

@@ -221,7 +221,11 @@ export function createWorld(SIM, canvas, opts) {
       for (let i = Math.floor(lastCarS / L); i < carIdx; i++) { const s = segAt(i); if (s) absHeading += s.curve * cs * K; }
     }
     lastCarS = carS; lastSeed = seed; lastState = st;
-    // Forward from the car: the car sits at fraction carFrac of segment carIdx, heading 0.
+    /* Forward from the car: the car sits at fraction carFrac of segment
+       carIdx, heading 0. In three.js a camera looks down its own -Z, so the
+       road runs toward -Z, +X is the player's right and a positive heading
+       is a turn to the right: forward is (sin th, -cos th), right is
+       (cos th, sin th). */
     const segCar = segAt(carIdx);
     const cCar = segCar ? segCar.curve * cs * K : 0;
     // boundary carIdx + 1 is (1 - carFrac) of a segment ahead
@@ -230,14 +234,14 @@ export function createWorld(SIM, canvas, opts) {
     {
       const d = (1 - carFrac);
       const thMid = th + cCar * d / 2;
-      x += Math.sin(thMid) * L * d; z += Math.cos(thMid) * L * d; th += cCar * d;
+      x += Math.sin(thMid) * L * d; z -= Math.cos(thMid) * L * d; th += cCar * d;
       ahead.push([x, z, th]);
       for (let i = carIdx + 1; i <= carIdx + W.DRAW_SEGMENTS + 2; i++) {
         const s = segAt(i);
         if (!s) break;
         const c = s.curve * cs * K;
         const thMid2 = th + c / 2;
-        x += Math.sin(thMid2) * L; z += Math.cos(thMid2) * L; th += c;
+        x += Math.sin(thMid2) * L; z -= Math.cos(thMid2) * L; th += c;
         ahead.push([x, z, th]);
       }
     }
@@ -247,13 +251,13 @@ export function createWorld(SIM, canvas, opts) {
       let bx = 0, bz = 0, bth = 0;
       const d = carFrac;
       const thMid = bth - cCar * d / 2;
-      bx -= Math.sin(thMid) * L * d; bz -= Math.cos(thMid) * L * d; bth -= cCar * d;
+      bx -= Math.sin(thMid) * L * d; bz += Math.cos(thMid) * L * d; bth -= cCar * d;
       back.push([bx, bz, bth]);
       for (let i = carIdx - 1; i >= bFirst; i--) {
         const s = segAt(i);
         const c = s ? s.curve * cs * K : 0;
         const thMid2 = bth - c / 2;
-        bx -= Math.sin(thMid2) * L; bz -= Math.cos(thMid2) * L; bth -= c;
+        bx -= Math.sin(thMid2) * L; bz += Math.cos(thMid2) * L; bth -= c;
         back.push([bx, bz, bth]);
       }
     }
@@ -275,7 +279,7 @@ export function createWorld(SIM, canvas, opts) {
     const th = bH[n] + (bH[n1] - bH[n]) * f;
     const px = bX[n] + (bX[n1] - bX[n]) * f, pz = bZ[n] + (bZ[n1] - bZ[n]) * f, py = bY[n] + (bY[n1] - bY[n]) * f;
     const cx = Math.cos(th), sx = Math.sin(th);
-    out.x = px + cx * x; out.z = pz - sx * x; out.y = py + y;
+    out.x = px + cx * x; out.z = pz + sx * x; out.y = py + y;
     return out;
   }
   function headingAt(s) { const k = Math.floor(s / L); const f = (s - k * L) / L; let n = k - bFirst; if (n < 0) n = 0; else if (n > bCount - 2) n = bCount - 2; return bH[n] + (bH[n + 1] - bH[n]) * f; }
@@ -292,16 +296,18 @@ export function createWorld(SIM, canvas, opts) {
     geo.setAttribute('position', pa); geo.setAttribute('color', ca);
     const mesh = new THREE.Mesh(geo, material);
     mesh.frustumCulled = false;
-    const strip = { mesh, pos, col, n: 0, max: maxQuads, pa, ca, geo };
-    strip.begin = () => { strip.n = 0; };
+    const strip = { mesh, pos, col, n: 0, max: maxQuads, pa, ca, geo, tags: new Array(maxQuads).fill(null), tag: null };
+    strip.begin = () => { strip.n = 0; strip.tag = null; };
     strip.quad = (a, b, c, d, colour) => {
       if (strip.n >= strip.max) return;
+      strip.tags[strip.n] = strip.tag;
       const o = strip.n * 18;
       const p = strip.pos, q = strip.col;
-      // a b c d anticlockwise seen from the side the face shows: for a flat
-      // quad that is near left, near right, far right, far left seen from above
-      p[o] = a.x; p[o + 1] = a.y; p[o + 2] = a.z; p[o + 3] = c.x; p[o + 4] = c.y; p[o + 5] = c.z; p[o + 6] = b.x; p[o + 7] = b.y; p[o + 8] = b.z;
-      p[o + 9] = a.x; p[o + 10] = a.y; p[o + 11] = a.z; p[o + 12] = d.x; p[o + 13] = d.y; p[o + 14] = d.z; p[o + 15] = c.x; p[o + 16] = c.y; p[o + 17] = c.z;
+      // a b c d is near left, near right, far right, far left for a flat quad
+      // seen from above, with the road running toward -Z: anticlockwise from
+      // above, so the face shows upward. Triangles a b c and a c d.
+      p[o] = a.x; p[o + 1] = a.y; p[o + 2] = a.z; p[o + 3] = b.x; p[o + 4] = b.y; p[o + 5] = b.z; p[o + 6] = c.x; p[o + 7] = c.y; p[o + 8] = c.z;
+      p[o + 9] = a.x; p[o + 10] = a.y; p[o + 11] = a.z; p[o + 12] = c.x; p[o + 13] = c.y; p[o + 14] = c.z; p[o + 15] = d.x; p[o + 16] = d.y; p[o + 17] = d.z;
       for (let i = 0; i < 6; i++) { q[o + i * 3] = colour.r; q[o + i * 3 + 1] = colour.g; q[o + i * 3 + 2] = colour.b; }
       strip.n++;
     };
@@ -340,7 +346,7 @@ export function createWorld(SIM, canvas, opts) {
     const cx = Math.cos(th), sx = Math.sin(th);
     roadPoint(P, s, x, 0);
     const baseY = P.y;
-    const corner = (out, dx, ds, y) => { out.x = P.x + cx * dx + sx * ds; out.z = P.z - sx * dx + cx * ds; out.y = baseY + y; return out; };
+    const corner = (out, dx, ds, y) => { out.x = P.x + cx * dx + sx * ds; out.z = P.z + sx * dx - cx * ds; out.y = baseY + y; return out; };
     // bottom corners a b c d (near left, near right, far right, far left), top e f g h
     corner(A, -hx, -hs, y0); corner(B, hx, -hs, y0); corner(C, hx, hs, y0); corner(D, -hx, hs, y0);
     corner(E, -hx, -hs, y1); corner(F, hx, -hs, y1); corner(G, hx, hs, y1); corner(Hh, -hx, hs, y1);
@@ -358,32 +364,33 @@ export function createWorld(SIM, canvas, opts) {
     const mat = (css) => new THREE.MeshLambertMaterial({ color: cssColour(css), transparent: alpha < 1, opacity: alpha, depthWrite: alpha >= 1 });
     const body = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, bh, hl * 2), mat(bodyCss));
     body.position.set(0, ride + bh / 2, 0);
+    // the nose points down -Z, the way the camera looks; the tail and its light bar are at +Z
     const cabin = new THREE.Mesh(new THREE.BoxGeometry(hw * 2 * W.CAR_CABIN_WIDTH, bh * W.CAR_CABIN_HEIGHT, hl * 2 * W.CAR_CABIN_LENGTH), mat(topCss));
-    cabin.position.set(0, ride + bh + bh * W.CAR_CABIN_HEIGHT / 2, -hl * 2 * W.CAR_CABIN_BACK);
+    cabin.position.set(0, ride + bh + bh * W.CAR_CABIN_HEIGHT / 2, hl * 2 * W.CAR_CABIN_BACK);
     const wr = FEEL.CAR_WHEEL_DIAMETER / 2, ww = FEEL.CAR_WHEEL_WIDTH;
     const wheelGeo = new THREE.BoxGeometry(ww, wr * 2, wr * 2);
     const wheelMat = mat(COLOUR().CAR_TYRE || '#0a0f14');
-    const wheels = [];
-    for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
+    const wheels = [];   // front left, front right, rear left, rear right
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
       const m = new THREE.Mesh(wheelGeo, wheelMat);
       m.position.set(sx * FEEL.CAR_TRACK / 2, wr, sz * FEEL.CAR_WHEELBASE / 2);
       g.add(m); wheels.push(m);
     }
     const light = new THREE.Mesh(new THREE.BoxGeometry(hw * 2 * W.CAR_LIGHT_HALF, bh * W.CAR_LIGHT_THICK * 2, 30), new THREE.MeshBasicMaterial({ color: cssColour(lightCss), transparent: alpha < 1, opacity: alpha }));
-    light.position.set(0, ride + bh * W.CAR_LIGHT_Y, -hl - 10);
+    light.position.set(0, ride + bh * W.CAR_LIGHT_Y, hl + 10);
     const sideL = new THREE.Mesh(new THREE.BoxGeometry(hw * 2 + 8, bh * 0.35, hl * 2 * 0.9), mat(sideCss));
     sideL.position.set(0, ride + bh * 0.2, 0);
     g.add(body, cabin, light, sideL);
-    /* The yaw pivot is CAR_YAW_PIVOT ahead of the car's centre, as the
-       original's carToWorld has it: the body is offset back by the pivot
-       inside a group that rotates, and the group sits at the pivot. */
-    const pivot = new THREE.Group();
-    g.position.z = -FEEL.CAR_YAW_PIVOT;
-    pivot.add(g);
-    pivot.userData.wheels = wheels; pivot.userData.body = g;
-    pivot.visible = false;
-    scene.add(pivot);
-    return pivot;
+    /* The group's origin is the body's centre. The yaw pivot is
+       CAR_YAW_PIVOT ahead of it in the original's carToWorld, and placeCar
+       puts the centre where that pivot puts it: at the simulation's own
+       bodyOffsetX and bodyOffsetZ off the car's position, in road
+       coordinates, so a yawed car on a bend sits exactly where the
+       simulation's contact tests say its body is. */
+    g.userData.wheels = wheels; g.userData.body = g;
+    g.visible = false;
+    scene.add(g);
+    return g;
   }
   let player = null, ghost = null;
   const racers = [];
@@ -395,22 +402,35 @@ export function createWorld(SIM, canvas, opts) {
     ghost = makeCar(Cl.GHOST, Cl.GHOST_EDGE, Cl.GHOST, Cl.GHOST_EDGE, W.GHOST_ALPHA);
     for (let i = 0; i < 3; i++) racers.push(makeCar(Cl[RACER[i][0]], Cl[RACER[i][1]], Cl[RACER[i][2]], Cl.NPC_LIGHT, 1));
   }
-  const Q = new THREE.Quaternion(), EUL = new THREE.Euler();
-  /* Place a car: the pivot at (s, x, y) on the road, yawed, pitched and
-     rolled, and aligned to the road's slope under it. */
-  const UP = new THREE.Vector3(0, 1, 0), T1 = new THREE.Vector3(), T2 = new THREE.Vector3();
+  const Q = new THREE.Quaternion(), Q2 = new THREE.Quaternion();
+  const AX = new THREE.Vector3(1, 0, 0), AY = new THREE.Vector3(0, 1, 0), AZ = new THREE.Vector3(0, 0, 1);
+  /* Place a car: the pivot at (s, x, y) on the road, the road's heading,
+     then the road's slope about the road's own lateral axis, then the
+     drift yaw about the car's vertical, then the tumble pitch about the
+     car's own lateral axis and the roll about its length. Composed one
+     rotation at a time because no Euler order says all of that. */
+  const T1 = new THREE.Vector3(), T2 = new THREE.Vector3();
   function placeCar(car, s, x, y, yaw, pitch, roll, steer) {
     car.visible = true;
-    roadPoint(P, s + FEEL.CAR_YAW_PIVOT, x, y);
+    const sb = s + SIM.bodyOffsetZ(yaw), xb = x + SIM.bodyOffsetX(yaw);
+    roadPoint(P, sb, xb, y);
     car.position.copy(P);
-    const th = headingAt(s);
+    const th = headingAt(sb);
     // the slope of the road under the car, from the heights a segment either side
-    roadPoint(T1, s + L, 0, 0); roadPoint(T2, s - L, 0, 0);
+    roadPoint(T1, sb + L, 0, 0); roadPoint(T2, sb - L, 0, 0);
     const slope = Math.atan2(T1.y - T2.y, 2 * L);
-    EUL.set(-slope + pitch, th + yaw, roll, 'YXZ');
-    car.rotation.copy(EUL);
+    /* With the nose down -Z, a positive turn about Y swings it to -X, so
+       headings and the drift yaw go in negated; a positive turn about X
+       lifts the nose, so an uphill slope and the nose up pitch go in as
+       they are. */
+    Q.setFromAxisAngle(AY, -th);
+    Q.multiply(Q2.setFromAxisAngle(AX, slope));
+    Q.multiply(Q2.setFromAxisAngle(AY, -yaw));
+    if (pitch) Q.multiply(Q2.setFromAxisAngle(AX, pitch));
+    if (roll) Q.multiply(Q2.setFromAxisAngle(AZ, roll));
+    car.quaternion.copy(Q);
     const wheels = car.userData.wheels;
-    wheels[0].rotation.y = steer || 0; wheels[1].rotation.y = steer || 0;
+    wheels[0].rotation.y = -(steer || 0); wheels[1].rotation.y = -(steer || 0);
   }
 
   /* ---- particles ----
@@ -549,9 +569,12 @@ export function createWorld(SIM, canvas, opts) {
       }
     },
   };
+  const lastContacts = [];
   function contactSparks() {
     // the contact ledger, drained as the original's drawContactSparks drained it
     const n = SIM.contactN;
+    lastContacts.length = 0;
+    for (let c = 0; c < n; c++) lastContacts.push({ z: SIM.contactZ[c], x: SIM.contactX[c], f: SIM.contactF[c] });
     if (n && sparks) {
       const Cl = COLOUR();
       for (let c = 0; c < n; c++) {
@@ -640,9 +663,8 @@ export function createWorld(SIM, canvas, opts) {
     camera.updateProjectionMatrix();
     const lift = SIM.camLift * Math.max(0, SIM.carY) * W.CAM_LIFT;
     const camX = SIM.cameraX * W.CAM_FOLLOW_X;
-    camera.position.set(camX, carGroundY + rig.height + lift, -rig.back);
-    // three.js cameras look down their own -Z; the road runs up +Z, so the rig is turned round and pitched down
-    camera.rotation.set(-rig.pitch * Math.PI / 180, Math.PI, 0, 'YXZ');
+    camera.position.set(camX, carGroundY + rig.height + lift, rig.back);
+    camera.rotation.set(-rig.pitch * Math.PI / 180, 0, 0, 'YXZ');
     const sx = SIM.shakeX || 0, sy = SIM.shakeY || 0;
     if (sx || sy) camera.setViewOffset(w, h, -sx, -sy, w, h); else if (camera.view && camera.view.enabled) camera.clearViewOffset();
 
@@ -668,6 +690,7 @@ export function createWorld(SIM, canvas, opts) {
     frameNo++;
   }
   let frameDt = 1 / 60;
+  let probeOffset = 0;
 
   function drawRoad() {
     road.begin(); walls.begin(); marks.begin();
@@ -681,17 +704,19 @@ export function createWorld(SIM, canvas, opts) {
       const light = (Math.floor(idx / FEEL.RUMBLE_SEGMENTS) & 1) === 0;
       const hw0 = bW[n], hw1 = bW[n + 1];
       const s0 = idx * L, s1 = (idx + 1) * L;
-      const bandQuad = (a0, a1, colour) => {
+      const bandQuad = (a0, a1, colour, band) => {
         roadPoint(A, s0, a0 * hw0, 0); roadPoint(B, s0, a1 * hw0, 0); roadPoint(C, s1, a1 * hw1, 0); roadPoint(D, s1, a0 * hw1, 0);
+        road.tag = { kind: band, seg: idx, a0, a1 };
         road.quad(A, B, C, D, colour);
+        road.tag = null;
       };
       const surf = light ? CC.roadLight : CC.roadDark;
       const shoulder = light ? CC.shoulderLight : CC.shoulderDark;
       const edge = light ? CC.edgeLight : edgeHot;
-      bandQuad(-1, 1, surf);
-      bandQuad(-(EO - lip), -1, shoulder); bandQuad(1, EO - lip, shoulder);
-      bandQuad(-EO, -(EO - lip), edge); bandQuad(EO - lip, EO, edge);
-      if ((idx % (W.LANE_ON + W.LANE_OFF)) < W.LANE_ON) bandQuad(-W.LANE_HALF, W.LANE_HALF, CC.lane);
+      bandQuad(-1, 1, surf, 'surface');
+      bandQuad(-(EO - lip), -1, shoulder, 'shoulder'); bandQuad(1, EO - lip, shoulder, 'shoulder');
+      bandQuad(-EO, -(EO - lip), edge, 'lip'); bandQuad(EO - lip, EO, edge, 'lip');
+      if ((idx % (W.LANE_ON + W.LANE_OFF)) < W.LANE_ON) bandQuad(-W.LANE_HALF, W.LANE_HALF, CC.lane, 'lane');
       // the slab's sides, flared out at the bottom
       for (const side of [-1, 1]) {
         roadPoint(A, s0, side * EO * hw0, 0); roadPoint(B, s0, side * (EO * hw0 + W.SLAB_FLARE), -W.SLAB_DEPTH);
@@ -832,14 +857,18 @@ export function createWorld(SIM, canvas, opts) {
       if (idx % FEEL.PYLON_SPACING === 0) {
         const major = (idx / FEEL.PYLON_SPACING) % FEEL.PYLON_MAJOR_EVERY === 0;
         const hgt = major ? FEEL.PYLON_MAJOR_HEIGHT : FEEL.PYLON_HEIGHT, wid = (major ? FEEL.PYLON_MAJOR_WIDTH : FEEL.PYLON_WIDTH) / 2;
+        blocks.tag = { kind: 'pylon', seg: idx };
         for (const side of [-1, 1]) box(blocks, idx * L, side * (EO + W.PYLON_OUT) * bW[n] + side * wid, 0, hgt, wid, wid, 0, major ? CC.pylonMajor : CC.pylon, CC.pylon);
+        blocks.tag = null;
       }
       // signs and landmarks, from the segment's own slots
       const sg = segAt(idx);
       if (sg) {
+        blocks.tag = { kind: 'scenery', seg: idx };
         if (sg.sgn) spriteBlock(sg.sgn - 1, idx * L, sg.sgnX, bW[n]);
         if (sg.sg2) spriteBlock(sg.sg2 - 1, idx * L, sg.sg2X, bW[n]);
         if (sg.sg3) spriteBlock(sg.sg3 - 1, idx * L, sg.sg3X, bW[n]);
+        blocks.tag = null;
       }
     }
     // hazards
@@ -848,11 +877,14 @@ export function createWorld(SIM, canvas, opts) {
       const s0 = hz.from * L, s1 = (hz.to + 1) * L;
       const hw = hwAt(s0);
       const x = SIM.hazardX(hz) * hw;
+      blocks.tag = { kind: 'hazard', hazard: hz };
       box(blocks, (s0 + s1) / 2, x, 0, W.HAZARD_HEIGHT, hz.half, (s1 - s0) / 2, 0, CC.hazardTop, CC.hazardSide, CC.hazardLip);
+      blocks.tag = null;
     }
     // jumps: the ramp wedge
     for (const j of SIM.jumps) {
       if (j.to + 1 < first || j.from > last) continue;
+      blocks.tag = { kind: 'jump', jump: j };
       const hw = hwAt(j.from * L);
       const half = FEEL.JUMP_RAMP_HALF * hw;
       const s0 = j.from * L, s1 = (j.to + 1) * L;
@@ -875,6 +907,7 @@ export function createWorld(SIM, canvas, opts) {
       blocks.quad(A, B, C, D, CC.jumpSide);
       roadPoint(A, s1 - 40, -half, top + 30); roadPoint(B, s1 - 40, half, top + 30); roadPoint(C, s1, half, top + 30); roadPoint(D, s1, -half, top + 30);
       blocks.quad(A, B, C, D, CC.jumpLip);
+      blocks.tag = null;
     }
     // gates: the next one and every one after it in range, the finish gate when it is the finish
     if (SIM.state !== SIM.TITLE || true) {
@@ -885,6 +918,7 @@ export function createWorld(SIM, canvas, opts) {
       while (g <= last && count < 6) {
         if (g >= first) {
           const isFinish = finish && g === SIM.finishSeg;
+          blocks.tag = { kind: isFinish ? 'finish' : 'gate', seg: g };
           const hw = hwAt(g * L);
           if (isFinish) {
             const hgt = W.FINISH_HEIGHT, pw = W.FINISH_POST / 2;
@@ -902,6 +936,7 @@ export function createWorld(SIM, canvas, opts) {
             }
           }
         }
+        blocks.tag = null;
         if (finish && g >= SIM.finishSeg) break;
         g += FEEL.CHECKPOINT_EVERY;
         count++;
@@ -913,10 +948,10 @@ export function createWorld(SIM, canvas, opts) {
     city.begin();
     for (const b of skyline) {
       const ang = b.angle - absHeading;
-      const bx = Math.sin(ang) * b.dist, bz = Math.cos(ang) * b.dist;
+      const bx = Math.sin(ang) * b.dist, bz = -Math.cos(ang) * b.dist;
       const hx = b.w / 2;
       const cx = Math.cos(ang), sx = Math.sin(ang);
-      const corner = (out, dx, ds, y) => { out.x = bx + cx * dx + sx * ds; out.z = bz - sx * dx + cx * ds; out.y = carGroundY - 4000 + y; return out; };
+      const corner = (out, dx, ds, y) => { out.x = bx + cx * dx + sx * ds; out.z = bz + sx * dx - cx * ds; out.y = carGroundY - 4000 + y; return out; };
       corner(A, -hx, -hx, 0); corner(B, hx, -hx, 0); corner(C, hx, hx, 0); corner(D, -hx, hx, 0);
       corner(E, -hx, -hx, b.h); corner(F, hx, -hx, b.h); corner(G, hx, hx, b.h); corner(Hh, -hx, hx, b.h);
       const lit = col.copy(CC.skyline).lerp(CC.skylineLit, 0.25 + 0.75 * Math.min(1, SIM.cityGlow || 0));
@@ -936,7 +971,10 @@ export function createWorld(SIM, canvas, opts) {
       const yaw = SIM.carYaw();
       const roll = Math.max(-1, Math.min(1, SIM.drift.lateralAccel / FEEL.CAR_ROLL_REFERENCE)) * FEEL.CAR_ROLL_DEG * Math.PI / 180;
       const steer = SIM.steering.value * FEEL.CAR_FRONT_STEER_DEG * Math.PI / 180;
-      placeCar(player, carS, SIM.carX, SIM.carY, yaw, SIM.carPitch, roll, steer);
+      /* probeOffset is the screen agreement probe's known answer: a drawn
+         car shifted sideways by a share of the half width, which the probe
+         must catch. Zero in play. */
+      placeCar(player, carS, SIM.carX + probeOffset * hwAt(carS), SIM.carY, yaw, SIM.carPitch, roll, steer);
       void onTitle;
     }
     // the racers
@@ -966,7 +1004,17 @@ export function createWorld(SIM, canvas, opts) {
     ready, render, hooks, camera, scene, renderer,
     setFrameDt(dt) { frameDt = dt; },
     info() { return { backend, tier, pixelRatio: renderer.getPixelRatio(), ms: lastRenderMs, frame: frameNo, drawSegments: W.DRAW_SEGMENTS }; },
-    probe: { project, projectRoad, roadPoint: (s, x, y) => roadPoint(new THREE.Vector3(), s, x, y), headingAt, hwAt, table: () => ({ first: bFirst, count: bCount, idx: bIdx, x: bX, z: bZ, y: bY, h: bH, w: bW, ok: bOk, carIdx, carFrac, carGroundY, carS, absHeading }), cars: () => ({ player, racers, ghost }), view },
+    probe: {
+      project, projectRoad, roadPoint: (s, x, y) => roadPoint(new THREE.Vector3(), s, x, y), headingAt, hwAt,
+      table: () => ({ first: bFirst, count: bCount, idx: bIdx, x: bX, z: bZ, y: bY, h: bH, w: bW, ok: bOk, carIdx, carFrac, carGroundY, carS, absHeading }),
+      cars: () => ({ player, racers, ghost }), view, lastContacts,
+      strips: { road, marks, paint, walls, terrain, blocks, city },
+      setOffset(v) { probeOffset = v || 0; },
+      worldPos(obj) { obj.updateWorldMatrix(true, false); const v = new THREE.Vector3(); obj.getWorldPosition(v); return { x: v.x, y: v.y, z: v.z }; },
+      cameraPos() { return { x: camera.position.x, y: camera.position.y, z: camera.position.z }; },
+      frustum() { camera.updateMatrixWorld(); const f = new THREE.Frustum(); f.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)); return p => f.containsPoint(new THREE.Vector3(p.x, p.y, p.z)); },
+      rig: () => (view.h > view.w ? W.PORTRAIT : W.LANDSCAPE),
+    },
     tier: () => tier,
     setTier(t) { if (W.TIERS[t]) { tier = t; applyTier(); } },
   };
