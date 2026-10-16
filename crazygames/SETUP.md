@@ -32,9 +32,9 @@ allowlist.
 The deploy build does not run the browser parity test itself, because the
 Workers build image is not guaranteed to have Chromium. It checks the
 committed stamp instead: a push that changes the module, the original's
-pin or the test without a fresh passing stamp does not deploy. To run the
-test live on every push, copy `crazygames/ci/parity.yml` to
-`/.github/workflows/crazygames-parity.yml` in its own commit.
+pin or the test without a fresh passing stamp does not deploy. The test also
+runs live in GitHub Actions, `/.github/workflows/crazygames-parity.yml`,
+enabled 16 October 2026.
 
 ## 2. Keeping the preview private, Cloudflare Access (not used)
 

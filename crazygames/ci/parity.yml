@@ -1,18 +1,13 @@
-# The parity test, live, on every push. It drives Drift_Fever's index.html
-# and the vendored module in the same headless Chromium and fails the job
-# if a single frame or a single road differs. The committed stamp is then
-# checked against the files, which is what the deploy build checks too.
-#
-# NOT ENABLED WHERE IT SITS. GitHub reads workflows only from
-# /.github/workflows at the repository root, which is outside crazygames/.
-# To enable it, copy this file to /.github/workflows/crazygames-parity.yml
-# in its own commit. fetch-depth 0 matters: the test reads the original out
-# of the repository history at the pinned commit.
+# ENABLED. The live workflow is /.github/workflows/crazygames-parity.yml;
+# edit that one. This copy is kept for reference only and GitHub never
+# reads it.
 name: crazygames parity
 on:
   push:
-    branches: [main]
+    branches: [main, 'crazygames-*']
+    paths: ['crazygames/**', '.github/workflows/crazygames-parity.yml']
   pull_request:
+    paths: ['crazygames/**', '.github/workflows/crazygames-parity.yml']
 jobs:
   parity:
     runs-on: ubuntu-latest

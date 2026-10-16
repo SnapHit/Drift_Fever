@@ -40,7 +40,7 @@ parity/REPORT.md         the last passing run's summary
 public/                  the preview page; the renderer arrives here in stage 2
 tools/build-site.js      assembles dist/, the web root the preview Worker serves
 wrangler.jsonc           the preview Worker. dist/ is the assets directory
-ci/parity.yml            the live parity test for GitHub Actions; see SETUP.md
+ci/parity.yml            reference copy; the live one is /.github/workflows/crazygames-parity.yml
 ```
 
 ## Commands
@@ -145,8 +145,9 @@ is a 404 and that is checked after a deploy.
 The deploy build checks the parity stamp rather than running the browser
 test, because the Workers build image is not guaranteed to have Chromium: a
 push that changes the module, the original's pin or the test without a
-fresh passing stamp does not deploy. `ci/parity.yml` runs the test live in
-GitHub Actions once copied to the repository's `.github/workflows/`.
+fresh passing stamp does not deploy. GitHub Actions runs the full test live
+(`/.github/workflows/crazygames-parity.yml`, enabled 16 October 2026) on
+every push to `main` or a `crazygames-*` branch that touches this folder.
 
 ## Status
 
