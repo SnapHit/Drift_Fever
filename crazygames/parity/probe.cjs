@@ -16,7 +16,7 @@
    before a job starts, and the probe records the day it rolled from. */
 (function (root) {
   'use strict';
-  const VERSION = 9;
+  const VERSION = 10;
 
   /* FNV-1a over the eight bytes of each number, so 0.1 and 0.1000001 hash
      apart and -0 and 0 hash apart. Strings and booleans mix too. */
@@ -131,14 +131,45 @@
     if (job.realFrame) { let n = 0; return function () { inner(n++ === 0 ? 0 : 17 / 1000); }; }
     return function () { inner(1 / 60); };
   }
-  function applyInput(S, tape, v) {
+  /* INPUT THROUGH THE PAGE'S OWN HANDLERS, for the jobs that ask for it.
+     'keys' sends keydown and keyup for the arrow keys to the window,
+     'pointer' presses the left or right half of the game canvas, and a
+     tap is the Enter key. The original page and the shipped page carry
+     the same handlers, so both sides are driven the same way and the
+     comparison covers the input wiring as well as the simulation. */
+  const pressed = { left: false, right: false };
+  function keyEvent(type, key) { root.dispatchEvent(new KeyboardEvent(type, { key: key, bubbles: true, cancelable: true })); }
+  function pointerEvent(type, id, side) {
+    const canvas = root.document.getElementById('game');
+    const w = root.innerWidth || 390, h = root.innerHeight || 844;
+    canvas.dispatchEvent(new PointerEvent(type, { pointerId: id, clientX: side < 0 ? w * 0.25 : w * 0.75, clientY: h * 0.6, bubbles: true, cancelable: true, isPrimary: id === 1, pointerType: 'touch' }));
+  }
+  function setPressed(via, left, right) {
+    if (via === 'keys') {
+      if (left !== pressed.left) keyEvent(left ? 'keydown' : 'keyup', 'ArrowLeft');
+      if (right !== pressed.right) keyEvent(right ? 'keydown' : 'keyup', 'ArrowRight');
+    } else {
+      if (left !== pressed.left) pointerEvent(left ? 'pointerdown' : 'pointerup', 1, -1);
+      if (right !== pressed.right) pointerEvent(right ? 'pointerdown' : 'pointerup', 2, 1);
+    }
+    pressed.left = left; pressed.right = right;
+  }
+  function applyInput(S, tape, v, job) {
     v = v < -1 ? -1 : (v > 1 ? 1 : v);
-    if (tape.kind === 'digital') { const held = S.get('held'); held.keyLeft = v < -0.15; held.keyRight = v > 0.15; }
+    if (tape.kind === 'digital') {
+      if (job && job.inputVia) { setPressed(job.inputVia, v < -0.15, v > 0.15); return; }
+      const held = S.get('held'); held.keyLeft = v < -0.15; held.keyRight = v > 0.15;
+    }
     else { const tilt = S.get('tilt'); tilt.active = true; tilt.value = v; }
   }
-  function releaseInput(S) {
+  function releaseInput(S, job) {
+    if (job && job.inputVia) setPressed(job.inputVia, false, false);
     const held = S.get('held'); held.keyLeft = held.keyRight = held.touchLeft = held.touchRight = false;
     const tilt = S.get('tilt'); tilt.value = 0;
+  }
+  function tap(S, job) {
+    if (job && job.inputVia) { keyEvent('keydown', 'Enter'); keyEvent('keyup', 'Enter'); return; }
+    S.fn.startOrRestart();
   }
 
   /* Into a run, through startRun, which is the path that rolls the day.
@@ -154,7 +185,8 @@
     S.set('level', job.level);
     S.set('seedPinned', false);
     const tilt = S.get('tilt'); tilt.seenSensor = true; tilt.rawDeg = null; tilt.zeroDeg = null; tilt.active = false; tilt.value = 0;
-    releaseInput(S);
+    pressed.left = pressed.right = false;
+    releaseInput(S, job);
     if (job.perturb) for (const k in job.perturb) S.get('FEEL')[k] = job.perturb[k];
     const rolledFrom = S.get('todayStamp');
     S.fn.startRun();
@@ -227,10 +259,10 @@
     for (; n < job.maxFrames; n++) {
       const st = S.get('state');
       if (st === DRIVING) {
-        applyInput(S, tape, steer(n, S));
+        applyInput(S, tape, steer(n, S), job);
         tappedThisDeath = false;
       } else if (st === DEAD) {
-        releaseInput(S);
+        releaseInput(S, job);
         if (!tappedThisDeath && restartsLeft > 0) {
           const due = tape.restart === 'reflex' ? true : S.get('deadFor') >= FEEL.DEATH_INPUT_LOCK + tape.restartDelay;
           if (due) {
@@ -240,11 +272,11 @@
                module's hooks did not, which is the one place the two
                streams part. */
             S.seedRandom((job.seed ^ Math.imul(n + 1, 2654435761)) >>> 0);
-            S.fn.startOrRestart(); tappedThisDeath = true; restartsLeft--; events.push([n, 'tap', S.get('state'), S.get('continues')]);
+            tap(S, job); tappedThisDeath = true; restartsLeft--; events.push([n, 'tap', S.get('state'), S.get('continues')]);
           }
         } else if (restartsLeft <= 0 && S.get('deadFor') > 2) break;
       } else if (st === FINISHED) {
-        releaseInput(S);
+        releaseInput(S, job);
         finishedFrames++;
         if (tape.afterFinish === 'next' && !nextTapped) {
           /* The whole day is one input at a time: once the finale has run
@@ -252,7 +284,7 @@
              the opening of it. */
           if (!S.fn.finaleRunning() && S.get('deadFor') >= FEEL.DEATH_INPUT_LOCK + 0.5) {
             S.seedRandom((job.seed ^ Math.imul(n + 7, 2654435761)) >>> 0);
-            S.fn.startOrRestart(); nextTapped = true; events.push([n, 'next', S.get('level'), S.get('mode')]);
+            tap(S, job); nextTapped = true; events.push([n, 'next', S.get('level'), S.get('mode')]);
           }
         } else if (finishedFrames > job.finishFrames) break;
       }

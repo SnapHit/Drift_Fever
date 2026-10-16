@@ -11,6 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { originalHtml } from '../tools/original.js';
+import { resolvePublic } from '../tools/serve.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -27,6 +28,7 @@ function findChromium() {
   return undefined;   // playwright's own download
 }
 
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.mp3': 'audio/mpeg' };
 export async function serveOriginal() {
   const original = originalHtml();     // index.html at the pinned commit, from git
   const files = {
@@ -36,6 +38,15 @@ export async function serveOriginal() {
   };
   const server = http.createServer((req, res) => {
     const u = req.url.split('?')[0];
+    /* The shipped page, from its sources, under /page/: the same files
+       the build copies to dist/, served the way the Worker would. */
+    if (u.startsWith('/page/')) {
+      const p = resolvePublic(u.slice(5));
+      if (!p || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'content-type': TYPES[path.extname(p)] || 'application/octet-stream', 'cache-control': 'no-store' });
+      res.end(fs.readFileSync(p));
+      return;
+    }
     const f = files[u === '/index.html' ? '/' : u];
     if (!f) { res.writeHead(404); res.end(); return; }
     res.writeHead(200, { 'content-type': f[1], 'cache-control': 'no-store' });
@@ -83,15 +94,20 @@ export async function openBrowser(opts) {
 }
 
 /* One worker: a fresh context (fresh storage), one page, the probe injected,
-   its jobs run day by day with the clock pinned to each. */
+   its jobs run day by day with the clock pinned to each. Three sides: the
+   original page, the module's host page, and the shipped greybox page,
+   which is driven exactly as the original is (real clock, stubbed frame
+   loop, seeded Math.random, its own frame called by hand). */
 export async function runWorkerJobs(browser, url, jobs, opts) {
-  const original = opts.side !== 'module';
+  const side = opts.side === 'module' ? 'module' : opts.side === 'page' ? 'page' : 'original';
+  const original = side === 'original';
+  const real = side !== 'module';
   const context = await browser.newContext({ viewport: opts.viewport, timezoneId: opts.timezoneId, deviceScaleFactor: 1 });
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error' && !/404/.test(m.text())) errors.push('console: ' + m.text()); });
-  const setDay = original
+  const setDay = real
     ? async day => { const y = Math.floor(day / 10000), m = Math.floor(day / 100) % 100, d = day % 100; await page.clock.setFixedTime(new Date(y, m - 1, d, 12, 0, 0, 0)); }
     : async day => { await page.evaluate(d => window.__setDay(d), day); };
   const inject = async () => {
@@ -99,7 +115,12 @@ export async function runWorkerJobs(browser, url, jobs, opts) {
     await page.addScriptTag({ content: fs.readFileSync(path.join(here, 'tapes.cjs'), 'utf8') });
     await page.addScriptTag({ content: fs.readFileSync(path.join(here, 'probe.cjs'), 'utf8') });
   };
-  if (original) {
+  const open = async () => {
+    if (original) await page.goto(url, { waitUntil: 'load' });
+    else if (side === 'page') { await page.goto(url + 'page/', { waitUntil: 'load', timeout: 180000 }); await page.waitForFunction(() => window.__ready === true, null, { timeout: 180000 }); }
+    else { await page.goto(url + 'module/', { waitUntil: 'load' }); await page.waitForFunction(() => window.__ready === true); }
+  };
+  if (real) {
     /* The clock first, then the stub: Playwright's clock installs its own
        requestAnimationFrame as an init script of its own, and the stub has
        to land after it or the first frames run before the probe gets in.
@@ -107,16 +128,16 @@ export async function runWorkerJobs(browser, url, jobs, opts) {
        group rolls the day on both. */
     await setDay(opts.sentinelDay);
     await page.addInitScript(INIT);
-    await page.goto(url, { waitUntil: 'load' });
-  } else {
-    await page.goto(url + 'module/', { waitUntil: 'load' });
-    await page.waitForFunction(() => window.__ready === true);
+    /* The known answer for the shipped page: the renderer is told to write
+       one simulation field it should only read. See game.js. */
+    if (opts.parityBreak) await page.addInitScript('window.__parityBreak = ' + JSON.stringify(opts.parityBreak) + ';');
   }
+  await open();
   await inject();
   const info = await page.evaluate(() => ({ ua: navigator.userAgent, w: innerWidth, h: innerHeight,
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone, probe: window.parityProbe.VERSION, state: window.__S.get('state'),
     commit: window.__commit || null }));
-  if (original) {
+  if (real) {
     /* The loop must be dead: the probe is the only thing that may advance
        the world. titleTime is the one clock that runs on the title screen. */
     const t0 = await page.evaluate(() => window.__S.get('titleTime'));
@@ -124,6 +145,7 @@ export async function runWorkerJobs(browser, url, jobs, opts) {
     const t1 = await page.evaluate(() => window.__S.get('titleTime'));
     info.frameLoopStopped = t0 === t1 && t1 === 0;
     info.titleTimeAtStart = t1;
+    if (side === 'page') info.world = await page.evaluate(() => window.__S.world.info());
   }
   const results = [];
   let day = null;
@@ -132,7 +154,7 @@ export async function runWorkerJobs(browser, url, jobs, opts) {
     if (job.kind === 'reload') {
       /* The page comes back with its storage, the module is made again over
          its store, and the probe goes back in. */
-      if (original) { await page.reload({ waitUntil: 'load' }); await inject(); }
+      if (real) { await open(); await inject(); }
       else await page.evaluate(() => window.__recreate());
       results.push({ ok: true, reloaded: true, todayStamp: await page.evaluate(() => window.__S.get('todayStamp')), hashes: [], frames: 0, events: [] });
       continue;
@@ -141,7 +163,7 @@ export async function runWorkerJobs(browser, url, jobs, opts) {
     results.push(r);
   }
   const extra = {};
-  if (!original) { extra.hookCalls = await page.evaluate(() => window.__hookCalls); extra.names = await page.evaluate(() => window.__names); }
+  if (side === 'module') { extra.hookCalls = await page.evaluate(() => window.__hookCalls); extra.names = await page.evaluate(() => window.__names); }
   if (opts.auditNames) extra.present = await page.evaluate(names => names.filter(n => { try { window.__S.get(n); return true; } catch (e) { return false; } }), opts.auditNames);
   await context.close();
   return { results, errors, info, ...extra };

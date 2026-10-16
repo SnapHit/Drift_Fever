@@ -17,6 +17,13 @@
      K6  the original advanced by its own frame(t), drawing every frame,
          matches the module's step(dt)
      K7  every death kind occurs at least once, including running out of time
+     K8  the shipped greybox page, driven through its own frame function
+         with the 3D renderer attached and its input through its own
+         handlers, matches the original driven through its own frame(),
+         frame for frame; and a renderer that writes one simulation field
+         it should only read is caught
+     K9  the shipped page gives the same drive at a phone viewport and at
+         the small one the test runs it at
 
    --quick        3 days instead of 28, never stamped
    --days N       how many days from --from (default 28 from 20261001)
@@ -37,7 +44,9 @@ const flag = n => args.includes(n);
 const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : d; };
 
 const STAMPED = ['sim/drift-fever-sim.js', 'vendor/original/COMMIT', 'parity/probe.cjs', 'parity/tapes.cjs', 'parity/jobs.js',
-                 'parity/orchestrate.js', 'parity/browser.js', 'parity/module-page.html', 'parity/run.js', 'tools/original.js'];
+                 'parity/orchestrate.js', 'parity/browser.js', 'parity/module-page.html', 'parity/run.js', 'tools/original.js', 'tools/serve.js',
+                 // the shipped page, which K8 and K9 cover
+                 'public/index.html', 'public/game.js', 'public/chrome.js', 'public/world.js', 'public/chrome.css', 'public/vendor/three.webgpu.min.js'];
 function sha(p) { return crypto.createHash('sha256').update(fs.readFileSync(path.join(root, p))).digest('hex'); }
 function fileHashes() {
   const o = {};
@@ -73,6 +82,9 @@ const groups = J.buildGroups(days);
 const viewportJobs = J.viewportJobs(days);
 const perturbJobs = J.perturbJobs(days).physics;
 const perturbRoadJobs = J.perturbJobs(days).generator;
+const pageGroups = J.pageGroups(days, QUICK);
+const pageBreakJobs = J.pageBreakJobs(days);
+const pageViewportJobs = J.pageViewportJobs(days);
 
 /* ---- run ---- */
 const { server, url } = await serveOriginal();
@@ -90,8 +102,20 @@ tasks.push({ name: 'perturb physics', side: 'original', run: () => runWorkerJobs
 tasks.push({ name: 'perturb physics', side: 'module', run: () => runWorkerJobs(browser, url, perturbJobs, { ...base, side: 'module' }) });
 tasks.push({ name: 'perturb generator', side: 'original', run: () => runWorkerJobs(browser, url, perturbRoadJobs.map(j => ({ ...j, perturb: undefined })), { ...base, side: 'original' }) });
 tasks.push({ name: 'perturb generator', side: 'module', run: () => runWorkerJobs(browser, url, perturbRoadJobs, { ...base, side: 'module' }) });
-// the slow one first, so it does not tail the run
-tasks.sort((a, b) => (a.name === 'real frame' ? -1 : 0) - (b.name === 'real frame' ? -1 : 0));
+/* The shipped page against the original, both drawing every frame at the
+   small viewport, and the two known answers. */
+const pageBase = { ...base, viewport: J.PAGE_VIEW };
+for (const g of pageGroups) {
+  tasks.push({ name: g.name, side: 'original', run: () => runWorkerJobs(browser, url, g.jobs, { ...pageBase, side: 'original' }) });
+  tasks.push({ name: g.name, side: 'page', run: () => runWorkerJobs(browser, url, g.jobs, { ...pageBase, side: 'page' }) });
+}
+tasks.push({ name: 'page break', side: 'original', run: () => runWorkerJobs(browser, url, pageBreakJobs, { ...pageBase, side: 'original' }) });
+tasks.push({ name: 'page break', side: 'page', run: () => runWorkerJobs(browser, url, pageBreakJobs, { ...pageBase, side: 'page', parityBreak: J.PAGE_BREAK_FIELD }) });
+tasks.push({ name: 'page viewport', side: 'page', run: () => runWorkerJobs(browser, url, pageViewportJobs, { ...pageBase, side: 'page' }) });
+tasks.push({ name: 'page viewport', side: 'page-phone', run: () => runWorkerJobs(browser, url, pageViewportJobs, { ...base, side: 'page' }) });
+// the slow ones first, so they do not tail the run
+const slow = n => (n === 'real frame' || n.startsWith('page')) ? -1 : 0;
+tasks.sort((a, b) => slow(a.name) - slow(b.name));
 
 const done = {};
 let next = 0, active = 0;
@@ -205,11 +229,45 @@ report.knownAnswers.K5_frame_loop_dead = { pass: !failures.some(f => f.includes(
   report.knownAnswers.K7_every_ending_reached = { pass, offRoad: d[0], hits: d[1], ranOut: d[2], finishes: coverage.finishes, continues: coverage.continues, nextLevel: coverage.nextLevel };
   if (!pass) failures.push('K7: an ending was never reached: ' + JSON.stringify(report.knownAnswers.K7_every_ending_reached));
 }
+/* K8: the shipped page. Every page group must match the original frame
+   for frame, with no page errors, and the renderer that writes a
+   simulation field must be caught. */
+{
+  const rows = [];
+  for (const g of pageGroups) {
+    const A = done[g.name + '|original'], B = done[g.name + '|page'];
+    if (A.errors.length) failures.push(`${g.name}: original page errors: ${A.errors.join(' | ')}`);
+    if (B.errors.length) failures.push(`${g.name}: shipped page errors: ${B.errors.join(' | ')}`);
+    if (A.info.frameLoopStopped !== true) failures.push(`${g.name}: K5 the original's frame loop was still running`);
+    if (B.info.frameLoopStopped !== true) failures.push(`${g.name}: K5 the shipped page's frame loop was still running`);
+    const r = compareSides(g.name, g.jobs, A, B, true);
+    rows.push(...r);
+    report.groups[g.name] = { rows: r.map(x => ({ key: x.key, kind: x.kind, same: x.same, detail: x.detail, frames: x.a.frames, events: x.a.events, inputVia: g.jobs.find(j => j.key === x.key) && g.jobs.find(j => j.key === x.key).inputVia || null })), info: A.info, pageInfo: B.info };
+  }
+  const brk = compareSides('page break', pageBreakJobs, done['page break|original'], done['page break|page'], false)[0];
+  const caught = !!(brk && !brk.same);
+  const drives = rows.filter(r => r.kind === 'drive' || r.kind === 'routes');
+  const viaKeys = drives.filter(r => pageGroups[0].jobs.some(j => j.key === r.key && j.inputVia === 'keys'));
+  const viaPointer = drives.filter(r => pageGroups[0].jobs.some(j => j.key === r.key && j.inputVia === 'pointer'));
+  const pass = rows.length > 0 && rows.every(r => r.same) && caught && viaKeys.length > 0 && viaPointer.length > 0
+            && !failures.some(f => f.startsWith('page') && !f.startsWith('page break'));
+  report.knownAnswers.K8_shipped_page = { pass, jobs: rows.length, identical: rows.filter(r => r.same).length, frames: drives.reduce((s, r) => s + r.a.frames, 0),
+    byKeyEvents: viaKeys.map(r => r.key + ' ' + r.detail), byPointerEvents: viaPointer.map(r => r.key + ' ' + r.detail),
+    breakField: J.PAGE_BREAK_FIELD, breakCaught: caught, breakDetail: brk && brk.detail, world: done['page|page'].info.world, viewport: J.PAGE_VIEW };
+  if (!pass) failures.push('K8: the shipped page differs from the original, or the renderer write was not caught: ' + JSON.stringify({ identical: report.knownAnswers.K8_shipped_page.identical, jobs: rows.length, breakCaught: caught }));
+}
+/* K9: the shipped page at the phone viewport against the small one. */
+{
+  const rows = compareSides('page viewport', pageViewportJobs, done['page viewport|page'], done['page viewport|page-phone'], false);
+  const pass = rows.length === pageViewportJobs.length && rows.every(r => r.same);
+  report.knownAnswers.K9_page_viewport_independent = { pass, viewports: [J.PAGE_VIEW, VIEW], rows: rows.map(r => ({ key: r.key, same: r.same, detail: r.detail })) };
+  if (!pass) failures.push('K9: the shipped page gave different results at ' + JSON.stringify(VIEW) + ': ' + rows.map(r => r.key + ' ' + r.detail).join('; '));
+}
 report.pass = failures.length === 0;
 const ka = report.knownAnswers;
-report.summary = `${report.pass ? 'PASS' : 'FAIL'}: ${coverage.roads} roads and ${coverage.drives} drives (${coverage.frames} frames) over ${days.length} days x ${LEVELS.length} levels x ${TAPES.length} tapes, plus endless, routes, records across ${coverage.reloads} reloads and the real frame, identical on both sides; ` +
+report.summary = `${report.pass ? 'PASS' : 'FAIL'}: ${coverage.roads} roads and ${coverage.drives} drives (${coverage.frames} frames) over ${days.length} days x ${LEVELS.length} levels x ${TAPES.length} tapes, plus endless, routes, records across ${coverage.reloads} reloads, the real frame and the shipped page (${ka.K8_shipped_page.jobs} jobs, ${ka.K8_shipped_page.frames} frames drawn), identical on both sides; ` +
   `${coverage.finishes} finishes, ${coverage.nextLevel} next levels, ${coverage.deaths[0] || 0} off road, ${coverage.deaths[1] || 0} hits, ${coverage.deaths[2] || 0} ran out, ${coverage.continues} continues, ${coverage.taps} taps; ` +
-  ['K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7'].map((k, i) => k + ' ' + (Object.values(ka)[i].pass ? 'ok' : 'FAIL')).join(', ') + `; ${Math.round(elapsed)}s`;
+  ['K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7', 'K8', 'K9'].map((k, i) => k + ' ' + (Object.values(ka)[i].pass ? 'ok' : 'FAIL')).join(', ') + `; ${Math.round(elapsed)}s`;
 
 fs.mkdirSync(path.join(root, 'parity', 'out'), { recursive: true });
 fs.writeFileSync(path.join(root, 'parity', 'out', 'report.json'), JSON.stringify(report, null, 1));
@@ -220,6 +278,10 @@ console.log('  K2 generator: ' + JSON.stringify(ka.K2_perturbation_fails.generat
 console.log('  K3: ' + ka.K3_viewport_independent.rows.map(r => r.key + ' ' + (r.same ? 'same' : 'DIFF')).join('; '));
 console.log('  K6: ' + ka.K6_real_frame.rows.map(r => r.key + ' ' + r.detail).join('; '));
 console.log('  K7: ' + JSON.stringify(ka.K7_every_ending_reached));
+console.log('  K8: ' + JSON.stringify({ jobs: ka.K8_shipped_page.jobs, identical: ka.K8_shipped_page.identical, frames: ka.K8_shipped_page.frames, breakCaught: ka.K8_shipped_page.breakCaught, breakDetail: ka.K8_shipped_page.breakDetail, world: ka.K8_shipped_page.world }));
+console.log('  K8 by key events: ' + ka.K8_shipped_page.byKeyEvents.join('; '));
+console.log('  K8 by pointer events: ' + ka.K8_shipped_page.byPointerEvents.join('; '));
+console.log('  K9: ' + ka.K9_page_viewport_independent.rows.map(r => r.key + ' ' + (r.same ? 'same' : 'DIFF')).join('; '));
 if (failures.length) { console.log('\nFAILURES:'); for (const f of failures) console.log('  ' + f); }
 
 if (flag('--stamp') && report.pass && !QUICK && DAYS === 28) {
@@ -229,7 +291,7 @@ if (flag('--stamp') && report.pass && !QUICK && DAYS === 28) {
     report.summary, '', '## Known answers', '',
     ...Object.entries(ka).map(([k, v]) => `- ${k}: ${v.pass ? 'pass' : 'FAIL'}` + (v.detail ? ' (' + (Array.isArray(v.detail) ? v.detail.join('; ') : v.detail) + ')' : '') + (v.physics ? ` physics ${v.physics.note}: ${v.physics.detail}; generator ${v.generator.note}: ${v.generator.detail}` : '') + (v.note ? ' (' + v.note + ')' : '') + (k.startsWith('K7') ? ' ' + JSON.stringify({ offRoad: v.offRoad, hits: v.hits, ranOut: v.ranOut, finishes: v.finishes, continues: v.continues, nextLevel: v.nextLevel }) : '')),
     '', '## Coverage', '', '| group | jobs | frames | finishes | next levels | deaths | continues |', '|---|---|---|---|---|---|---|',
-    ...groups.map(g => { const rows = report.groups[g.name].rows; const ev = rows.flatMap(r => r.events || []); return `| ${g.name} | ${rows.length} | ${rows.reduce((s, r) => s + (r.frames || 0), 0)} | ${ev.filter(e => e[1] === 'state' && e[3] === 3).length} | ${ev.filter(e => e[1] === 'next').length} | ${ev.filter(e => e[1] === 'state' && e[3] === 2).length} | ${rows.reduce((s, r) => s + (r.end ? r.end.continues : 0), 0)} |`; }),
+    ...groups.concat(pageGroups).map(g => { const rows = report.groups[g.name].rows; const ev = rows.flatMap(r => r.events || []); return `| ${g.name} | ${rows.length} | ${rows.reduce((s, r) => s + (r.frames || 0), 0)} | ${ev.filter(e => e[1] === 'state' && e[3] === 3).length} | ${ev.filter(e => e[1] === 'next').length} | ${ev.filter(e => e[1] === 'state' && e[3] === 2).length} | ${rows.reduce((s, r) => s + (r.end ? r.end.continues : 0), 0)} |`; }),
     '', '## Hooks fired on the module side, level 6', '', '```', JSON.stringify(report.groups['level 6'].hookCalls), '```', ''];
   fs.writeFileSync(path.join(root, 'parity', 'REPORT.md'), md.join('\n'));
   console.log('stamped parity/stamp.json and wrote parity/REPORT.md');

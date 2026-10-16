@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-au">
+<head>
+<meta charset="utf-8">
+<title>Drift Fever</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Drift Fever, a browser drift game. CrazyGames edition, stage 2 greybox preview.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#e2521c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<!--ICON-->
+<link rel="stylesheet" href="chrome.css">
+<style>
+  /* The 3D world sits under the original's canvas, which is now a
+     transparent overlay. Both fill the viewport; nothing else changes
+     in the original's stylesheet. */
+  #world { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+  #game { position: relative; z-index: 1; background: transparent; }
+</style>
+</head>
+<body>
+<canvas id="world"></canvas>
+<!--CHROME-->
+<script type="importmap">{ "imports": { "three": "./vendor/three.webgpu.min.js" } }</script>
+<script type="module" src="game.js"></script>
+</body>
+</html>

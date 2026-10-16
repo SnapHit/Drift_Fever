@@ -109,3 +109,56 @@ export function perturbJobs(days) {
     generator: [road(days[0], 2, { perturb: { CHECKPOINT_EVERY: 1301 }, note: 'CHECKPOINT_EVERY 1300 to 1301' })],
   };
 }
+
+/* THE SHIPPED PAGE. Stage 2: the greybox page, driven through its own
+   frame function with the renderer attached, against the original driven
+   through its own frame(), on the same days, levels and tapes. Every job
+   is a real frame job (integer millisecond timestamps 17 apart on both
+   sides), shorter than the module's, because both sides draw every frame
+   in a headless browser. Some drive the input through the page's own
+   handlers: arrow keys, the two halves of the canvas, the Enter key for a
+   tap. A records sequence reloads the page between runs. */
+export const PAGE_VIEW = { width: 120, height: 260 };   // phone proportions, small because the headless GPU is a software rasteriser and the cost is per pixel
+export function pageGroups(days, quick) {
+  const d0 = days[0], d1 = days[1] || days[0];
+  const real = (job, frames, extra) => ({ ...job, realFrame: true, maxFrames: frames, key: 'page ' + job.key, ...extra });
+  const jobs = [];
+  if (quick) {
+    jobs.push(real(drive(d0, 2, 'driver'), 900));
+    jobs.push(real(drive(d0, 5, 'hug'), 900));
+    jobs.push(real(drive(d0, 3, 'keys'), 600, { inputVia: 'keys', key: 'page drive L3 ' + d0 + ' keys by events' }));
+    jobs.push(real(drive(d0, 2, 'keys'), 600, { inputVia: 'pointer', key: 'page drive L2 ' + d0 + ' keys by pointer' }));
+  } else {
+    /* Sized for a two core runner: both sides draw every frame and the
+       page's frames cost tens of milliseconds in a software rasteriser. */
+    for (const level of LEVELS) { jobs.push(real(drive(d0, level, 'driver'), 1000)); jobs.push(real(drive(d0, level, 'hug'), 800)); jobs.push(real(drive(d0, level, 'chaos'), 500)); }
+    jobs.push(real(drive(d1, 4, 'keys'), 1000, { inputVia: 'keys', key: 'page drive L4 ' + d1 + ' keys by events' }));
+    jobs.push(real(drive(d1, 2, 'keys'), 1000, { inputVia: 'pointer', key: 'page drive L2 ' + d1 + ' keys by pointer' }));
+    jobs.push(real(drive(d1, 3, 'centre'), 800));
+    jobs.push(real(drive(d1, 5, 'swing'), 600));
+    jobs.push(real({ kind: 'drive', key: `drive endless ${d1} centre`, day: d1, level: 2, mode: 'ENDLESS', runsEver: 10, seed: seedOf(d1, 0, 'centre'), tape: 'centre', finishFrames: FINISH_FRAMES }, 800));
+    jobs.push({ kind: 'routes', key: `page routes ${d1}`, day: d1, runsEver: 10, seed: seedOf(d1, 9, 'centre'), maxFrames: 4200, script: ROUTES, realFrame: true });
+  }
+  const groups = [{ name: 'page', jobs }];
+  {
+    /* Records across a reload of the shipped page: training finished, the
+       page reloaded with its localStorage, the records and the ghost read
+       back, then a run against that ghost. */
+    const rec = [];
+    rec.push(real(drive(d0, 1, 'driver', { key: `records L1 ${d0} driver` }), quick ? 1200 : 3000));
+    rec.push({ kind: 'reload', key: `page reload ${d0}`, day: d0 });
+    rec.push({ kind: 'snapshot', key: `page snapshot ${d0}`, day: d0 });
+    rec.push(real(drive(d0, 2, 'centre', { key: `records L2 ${d0} centre` }), quick ? 600 : 900));
+    groups.push({ name: 'page records', jobs: rec });
+  }
+  return groups;
+}
+/* The known answer: the renderer writes a field it should only read. */
+export const PAGE_BREAK_FIELD = 'carPitch';
+export function pageBreakJobs(days) {
+  return [{ ...drive(days[0], 2, 'centre'), realFrame: true, maxFrames: 240, key: 'page break L2 ' + days[0] + ' centre' }];
+}
+/* The page at two viewports: its layout changes, its simulation must not. */
+export function pageViewportJobs(days) {
+  return [{ ...drive(days[0], 3, 'driver'), realFrame: true, maxFrames: 600, key: 'page viewport L3 ' + days[0] + ' driver' }];
+}

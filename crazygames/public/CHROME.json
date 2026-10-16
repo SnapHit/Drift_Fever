@@ -1,0 +1,3374 @@
+{
+ "commit": "cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de",
+ "source": "index.html at cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de, from the repository history",
+ "roots": [
+  "frame",
+  "render",
+  "resize"
+ ],
+ "hooks": [
+  "endTiltCal",
+  "tuneStart",
+  "calibrateTilt",
+  "tuneWake",
+  "audioSting",
+  "audioChain",
+  "scoreHeatColour",
+  "rebuildDerivedColours",
+  "audioCrash",
+  "buildShareCardSoon",
+  "audioLanding",
+  "audioFinishHit",
+  "audioFanfareWave"
+ ],
+ "worldHooks": [
+  "drawSkyline",
+  "drawGrid",
+  "drawRoad",
+  "drawSmoke",
+  "drawCar",
+  "drawCarReflection",
+  "drawDebris",
+  "spawnSmoke",
+  "updateSmoke",
+  "clearSmoke",
+  "updateDebris",
+  "finaleShells",
+  "fireworkLaunch",
+  "fireworkBurst",
+  "addShake"
+ ],
+ "taken": [
+  {
+   "name": "srgbLuma",
+   "kind": "function",
+   "line": 6022,
+   "endLine": 6028,
+   "via": "recolour",
+   "simRefs": 0
+  },
+  {
+   "name": "rgbToHsl",
+   "kind": "function",
+   "line": 6030,
+   "endLine": 6043,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "hslToRgb",
+   "kind": "function",
+   "line": 6045,
+   "endLine": 6058,
+   "via": "roleColour",
+   "simRefs": 0
+  },
+  {
+   "name": "hex2",
+   "kind": "function",
+   "line": 6060,
+   "endLine": 6060,
+   "via": "roleColour",
+   "simRefs": 0
+  },
+  {
+   "name": "mixTriple",
+   "kind": "function",
+   "line": 6086,
+   "endLine": 6091,
+   "via": "resize",
+   "simRefs": 1
+  },
+  {
+   "name": "recolour",
+   "kind": "function",
+   "line": 6115,
+   "endLine": 6145,
+   "via": "rotateHue",
+   "simRefs": 2
+  },
+  {
+   "name": "rotateHue",
+   "kind": "function",
+   "line": 6148,
+   "endLine": 6150,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "PALETTE_FIXED",
+   "kind": "const",
+   "line": 6177,
+   "endLine": 6256,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "BIOME_ROLE_RULES",
+   "kind": "const",
+   "line": 6293,
+   "endLine": 6320,
+   "via": "biomeRole",
+   "simRefs": 0
+  },
+  {
+   "name": "biomeRole",
+   "kind": "function",
+   "line": 6321,
+   "endLine": 6329,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "BIOME_ROLE_BAND_DEFAULT",
+   "kind": "const",
+   "line": 6407,
+   "endLine": 6417,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "BIOME_ROLE_BAND_ROAD_ABOVE",
+   "kind": "const",
+   "line": 6418,
+   "endLine": 6422,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "BIOME_ROLE_BAND",
+   "kind": "let",
+   "line": 6423,
+   "endLine": 6423,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "BIOME_ROLE_ANCHOR",
+   "kind": "const",
+   "line": 6436,
+   "endLine": 6440,
+   "via": "buildRoleBase",
+   "simRefs": 0
+  },
+  {
+   "name": "byteLuma",
+   "kind": "function",
+   "line": 6533,
+   "endLine": 6533,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "ROLE_BASE",
+   "kind": "let",
+   "line": 6542,
+   "endLine": 6542,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "buildRoleBase",
+   "kind": "function",
+   "line": 6566,
+   "endLine": 6586,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "roleColour",
+   "kind": "function",
+   "line": 6593,
+   "endLine": 6614,
+   "via": "<extra>",
+   "simRefs": 1
+  },
+  {
+   "name": "terrainGreenHue",
+   "kind": "function",
+   "line": 6631,
+   "endLine": 6638,
+   "via": "<extra>",
+   "simRefs": 4
+  },
+  {
+   "name": "PALETTE_BASE",
+   "kind": "let",
+   "line": 6640,
+   "endLine": 6640,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "COLOUR",
+   "kind": "const",
+   "line": 6822,
+   "endLine": 7459,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "BRAND",
+   "kind": "const",
+   "line": 7505,
+   "endLine": 7533,
+   "via": "<stmt@7545>",
+   "simRefs": 0
+  },
+  {
+   "name": "brandPath",
+   "kind": "function",
+   "line": 7542,
+   "endLine": 7544,
+   "via": "<stmt@7545>",
+   "simRefs": 0
+  },
+  {
+   "name": "brandReady",
+   "kind": "function",
+   "line": 7547,
+   "endLine": 7547,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "drawBrand",
+   "kind": "function",
+   "line": 7554,
+   "endLine": 7584,
+   "via": "drawBrandInk",
+   "simRefs": 0
+  },
+  {
+   "name": "brandInkAspect",
+   "kind": "function",
+   "line": 7601,
+   "endLine": 7603,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "brandBitmap",
+   "kind": "function",
+   "line": 7628,
+   "endLine": 7644,
+   "via": "drawBrandInk",
+   "simRefs": 0
+  },
+  {
+   "name": "brandText",
+   "kind": "function",
+   "line": 7662,
+   "endLine": 7682,
+   "via": "drawCountdown",
+   "simRefs": 3
+  },
+  {
+   "name": "drawBrandInk",
+   "kind": "function",
+   "line": 7686,
+   "endLine": 7706,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "RAMP_STEPS",
+   "kind": "const",
+   "line": 7719,
+   "endLine": 7719,
+   "via": "rampBetween",
+   "simRefs": 0
+  },
+  {
+   "name": "rgbOf",
+   "kind": "function",
+   "line": 7723,
+   "endLine": 7731,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "rampBetween",
+   "kind": "function",
+   "line": 7732,
+   "endLine": 7745,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "rampAt",
+   "kind": "function",
+   "line": 7746,
+   "endLine": 7750,
+   "via": "scoreHeatColour",
+   "simRefs": 0
+  },
+  {
+   "name": "SCORE_RAMP",
+   "kind": "const",
+   "line": 7753,
+   "endLine": 7753,
+   "via": "scoreHeatColour",
+   "simRefs": 0
+  },
+  {
+   "name": "SCORE_RECORD_RAMP",
+   "kind": "const",
+   "line": 7754,
+   "endLine": 7754,
+   "via": "scoreHeatColour",
+   "simRefs": 0
+  },
+  {
+   "name": "EDGE_HOT_RAMP",
+   "kind": "let",
+   "line": 7758,
+   "endLine": 7758,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "SKYLINE_HOT_RAMP",
+   "kind": "let",
+   "line": 7762,
+   "endLine": 7762,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "GRID_HOT_RAMP",
+   "kind": "let",
+   "line": 7766,
+   "endLine": 7766,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "horizonY",
+   "kind": "let",
+   "line": 7776,
+   "endLine": 7776,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "TUNABLES",
+   "kind": "const",
+   "line": 7787,
+   "endLine": 8450,
+   "via": "<stmt@8452>",
+   "simRefs": 0
+  },
+  {
+   "name": "TUNABLE_DEFAULTS",
+   "kind": "const",
+   "line": 8451,
+   "endLine": 8451,
+   "via": "<stmt@8452>",
+   "simRefs": 0
+  },
+  {
+   "name": "canvas",
+   "kind": "const",
+   "line": 8479,
+   "endLine": 8479,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "view",
+   "kind": "const",
+   "line": 8481,
+   "endLine": 8481,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "hazeGradient",
+   "kind": "let",
+   "line": 8482,
+   "endLine": 8482,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "skyGradient",
+   "kind": "let",
+   "line": 8483,
+   "endLine": 8483,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "groundGradient",
+   "kind": "let",
+   "line": 8484,
+   "endLine": 8484,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "horizonGradient",
+   "kind": "let",
+   "line": 8485,
+   "endLine": 8485,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "wetSheenGradient",
+   "kind": "let",
+   "line": 8486,
+   "endLine": 8486,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "safeTop",
+   "kind": "let",
+   "line": 8487,
+   "endLine": 8487,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "safeBottom",
+   "kind": "let",
+   "line": 8488,
+   "endLine": 8488,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "padsTop",
+   "kind": "let",
+   "line": 8489,
+   "endLine": 8489,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "fineBand",
+   "kind": "let",
+   "line": 8490,
+   "endLine": 8490,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "scrapeGradientLeft",
+   "kind": "let",
+   "line": 8491,
+   "endLine": 8491,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "scrapeGradientRight",
+   "kind": "let",
+   "line": 8492,
+   "endLine": 8492,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "scrapeOutGradientLeft",
+   "kind": "let",
+   "line": 8493,
+   "endLine": 8493,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "scrapeOutGradientRight",
+   "kind": "let",
+   "line": 8494,
+   "endLine": 8494,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "scrapeBandWidth",
+   "kind": "let",
+   "line": 8495,
+   "endLine": 8495,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "resize",
+   "kind": "function",
+   "line": 8497,
+   "endLine": 8681,
+   "via": "<root>",
+   "simRefs": 17
+  },
+  {
+   "name": "pointerSide",
+   "kind": "function",
+   "line": 8897,
+   "endLine": 8899,
+   "via": "<stmt@8910>",
+   "simRefs": 0
+  },
+  {
+   "name": "applyTouchSides",
+   "kind": "function",
+   "line": 8901,
+   "endLine": 8908,
+   "via": "<stmt@8910>",
+   "simRefs": 3
+  },
+  {
+   "name": "releasePointer",
+   "kind": "function",
+   "line": 8984,
+   "endLine": 8987,
+   "via": "<stmt@8988>",
+   "simRefs": 1
+  },
+  {
+   "name": "tiltBtn",
+   "kind": "const",
+   "line": 9151,
+   "endLine": 9151,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "flipBtn",
+   "kind": "const",
+   "line": 9152,
+   "endLine": 9152,
+   "via": "<stmt@9814>",
+   "simRefs": 0
+  },
+  {
+   "name": "noteEl",
+   "kind": "const",
+   "line": 9153,
+   "endLine": 9153,
+   "via": "frame",
+   "simRefs": 0
+  },
+  {
+   "name": "noteTimer",
+   "kind": "let",
+   "line": 9154,
+   "endLine": 9154,
+   "via": "frame",
+   "simRefs": 0
+  },
+  {
+   "name": "showNote",
+   "kind": "function",
+   "line": 9156,
+   "endLine": 9160,
+   "via": "<stmt@9845>",
+   "simRefs": 0
+  },
+  {
+   "name": "inCrossOriginFrame",
+   "kind": "function",
+   "line": 9162,
+   "endLine": 9166,
+   "via": "detectTiltSupport",
+   "simRefs": 0
+  },
+  {
+   "name": "detectTiltSupport",
+   "kind": "function",
+   "line": 9168,
+   "endLine": 9176,
+   "via": "<stmt@9959>",
+   "simRefs": 0
+  },
+  {
+   "name": "orientationAngle",
+   "kind": "function",
+   "line": 9178,
+   "endLine": 9183,
+   "via": "onOrientationChanged",
+   "simRefs": 0
+  },
+  {
+   "name": "ORIENT_COS",
+   "kind": "const",
+   "line": 9187,
+   "endLine": 9187,
+   "via": "tiltReading",
+   "simRefs": 0
+  },
+  {
+   "name": "ORIENT_SIN",
+   "kind": "const",
+   "line": 9188,
+   "endLine": 9188,
+   "via": "tiltReading",
+   "simRefs": 0
+  },
+  {
+   "name": "tiltReading",
+   "kind": "function",
+   "line": 9200,
+   "endLine": 9207,
+   "via": "tiltSteer",
+   "simRefs": 1
+  },
+  {
+   "name": "TILT_FLIP_KEY",
+   "kind": "const",
+   "line": 9258,
+   "endLine": 9258,
+   "via": "setTiltFlipped",
+   "simRefs": 0
+  },
+  {
+   "name": "tiltFlipped",
+   "kind": "let",
+   "line": 9259,
+   "endLine": 9264,
+   "via": "endFlipPress",
+   "simRefs": 1
+  },
+  {
+   "name": "tiltFlipChosen",
+   "kind": "let",
+   "line": 9265,
+   "endLine": 9268,
+   "via": "startTiltCal",
+   "simRefs": 1
+  },
+  {
+   "name": "tiltSign",
+   "kind": "function",
+   "line": 9270,
+   "endLine": 9270,
+   "via": "tiltSteer",
+   "simRefs": 1
+  },
+  {
+   "name": "tiltSteer",
+   "kind": "function",
+   "line": 9272,
+   "endLine": 9283,
+   "via": "updateTilt",
+   "simRefs": 5
+  },
+  {
+   "name": "onDeviceOrientation",
+   "kind": "function",
+   "line": 9285,
+   "endLine": 9291,
+   "via": "onTiltPermission",
+   "simRefs": 4
+  },
+  {
+   "name": "lastOrientation",
+   "kind": "let",
+   "line": 9302,
+   "endLine": 9302,
+   "via": "onOrientationChanged",
+   "simRefs": 0
+  },
+  {
+   "name": "onOrientationChanged",
+   "kind": "function",
+   "line": 9303,
+   "endLine": 9310,
+   "via": "<stmt@8686>",
+   "simRefs": 3
+  },
+  {
+   "name": "calibrateTilt",
+   "kind": "function",
+   "line": 9527,
+   "endLine": 9532,
+   "via": "<simulation hook>",
+   "simRefs": 3
+  },
+  {
+   "name": "CAL_OFF",
+   "kind": "const",
+   "line": 9578,
+   "endLine": 9578,
+   "via": "endTiltCal",
+   "simRefs": 0
+  },
+  {
+   "name": "CAL_SETTLE",
+   "kind": "const",
+   "line": 9578,
+   "endLine": 9578,
+   "via": "updateTiltCal",
+   "simRefs": 0
+  },
+  {
+   "name": "CAL_READ",
+   "kind": "const",
+   "line": 9578,
+   "endLine": 9578,
+   "via": "updateTiltCal",
+   "simRefs": 0
+  },
+  {
+   "name": "CAL_DONE",
+   "kind": "const",
+   "line": 9578,
+   "endLine": 9578,
+   "via": "endTiltCal",
+   "simRefs": 0
+  },
+  {
+   "name": "tiltCal",
+   "kind": "const",
+   "line": 9579,
+   "endLine": 9589,
+   "via": "endTiltCal",
+   "simRefs": 0
+  },
+  {
+   "name": "tiltCalRunning",
+   "kind": "function",
+   "line": 9591,
+   "endLine": 9591,
+   "via": "endTiltCal",
+   "simRefs": 0
+  },
+  {
+   "name": "tiltCalOnScreen",
+   "kind": "function",
+   "line": 9594,
+   "endLine": 9594,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "startTiltCal",
+   "kind": "function",
+   "line": 9599,
+   "endLine": 9624,
+   "via": "updateFlipHold",
+   "simRefs": 7
+  },
+  {
+   "name": "endTiltCal",
+   "kind": "function",
+   "line": 9630,
+   "endLine": 9639,
+   "via": "<simulation hook>",
+   "simRefs": 0
+  },
+  {
+   "name": "tiltCalSign",
+   "kind": "function",
+   "line": 9648,
+   "endLine": 9648,
+   "via": "settleTiltCal",
+   "simRefs": 1
+  },
+  {
+   "name": "settleTiltCal",
+   "kind": "function",
+   "line": 9650,
+   "endLine": 9658,
+   "via": "updateTiltCal",
+   "simRefs": 3
+  },
+  {
+   "name": "updateTiltCal",
+   "kind": "function",
+   "line": 9660,
+   "endLine": 9701,
+   "via": "frame",
+   "simRefs": 13
+  },
+  {
+   "name": "updateTilt",
+   "kind": "function",
+   "line": 9703,
+   "endLine": 9729,
+   "via": "frame",
+   "simRefs": 14
+  },
+  {
+   "name": "onTiltPermission",
+   "kind": "function",
+   "line": 9731,
+   "endLine": 9757,
+   "via": "requestTilt",
+   "simRefs": 9
+  },
+  {
+   "name": "requestTilt",
+   "kind": "function",
+   "line": 9759,
+   "endLine": 9767,
+   "via": "<stmt@9845>",
+   "simRefs": 0
+  },
+  {
+   "name": "disableTilt",
+   "kind": "function",
+   "line": 9769,
+   "endLine": 9774,
+   "via": "<stmt@9845>",
+   "simRefs": 2
+  },
+  {
+   "name": "padsEl",
+   "kind": "const",
+   "line": 9779,
+   "endLine": 9779,
+   "via": "syncFlipBtn",
+   "simRefs": 0
+  },
+  {
+   "name": "syncFlipBtn",
+   "kind": "function",
+   "line": 9780,
+   "endLine": 9789,
+   "via": "<stmt@30444>",
+   "simRefs": 2
+  },
+  {
+   "name": "setTiltFlipped",
+   "kind": "function",
+   "line": 9796,
+   "endLine": 9804,
+   "via": "endFlipPress",
+   "simRefs": 1
+  },
+  {
+   "name": "flipHeld",
+   "kind": "let",
+   "line": 9812,
+   "endLine": 9812,
+   "via": "<stmt@9814>",
+   "simRefs": 0
+  },
+  {
+   "name": "flipFired",
+   "kind": "let",
+   "line": 9813,
+   "endLine": 9813,
+   "via": "<stmt@9814>",
+   "simRefs": 0
+  },
+  {
+   "name": "endFlipPress",
+   "kind": "function",
+   "line": 9821,
+   "endLine": 9827,
+   "via": "<stmt@9828>",
+   "simRefs": 0
+  },
+  {
+   "name": "updateFlipHold",
+   "kind": "function",
+   "line": 9834,
+   "endLine": 9840,
+   "via": "frame",
+   "simRefs": 1
+  },
+  {
+   "name": "tiltHintLeft",
+   "kind": "let",
+   "line": 9861,
+   "endLine": 9861,
+   "via": "<extra>",
+   "simRefs": 0
+  },
+  {
+   "name": "updateTiltHint",
+   "kind": "function",
+   "line": 9867,
+   "endLine": 9876,
+   "via": "frame",
+   "simRefs": 4
+  },
+  {
+   "name": "tiltHintAlpha",
+   "kind": "function",
+   "line": 9882,
+   "endLine": 9889,
+   "via": "drawTiltHint",
+   "simRefs": 11
+  },
+  {
+   "name": "tiltPad",
+   "kind": "const",
+   "line": 9897,
+   "endLine": 9897,
+   "via": "drawTiltHint",
+   "simRefs": 0
+  },
+  {
+   "name": "measureTiltPad",
+   "kind": "function",
+   "line": 9898,
+   "endLine": 9911,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "skipPad",
+   "kind": "const",
+   "line": 9923,
+   "endLine": 9923,
+   "via": "measureSkipPad",
+   "simRefs": 0
+  },
+  {
+   "name": "measureSkipPad",
+   "kind": "function",
+   "line": 9930,
+   "endLine": 9943,
+   "via": "syncSkip",
+   "simRefs": 0
+  },
+  {
+   "name": "wantsTilt",
+   "kind": "let",
+   "line": 9947,
+   "endLine": 9947,
+   "via": "firstGesture",
+   "simRefs": 1
+  },
+  {
+   "name": "gestureUsed",
+   "kind": "let",
+   "line": 9948,
+   "endLine": 9948,
+   "via": "firstGesture",
+   "simRefs": 0
+  },
+  {
+   "name": "firstGesture",
+   "kind": "function",
+   "line": 9949,
+   "endLine": 9957,
+   "via": "<stmt@8730>",
+   "simRefs": 1
+  },
+  {
+   "name": "pauseBtn",
+   "kind": "const",
+   "line": 9974,
+   "endLine": 9974,
+   "via": "<stmt@10003>",
+   "simRefs": 0
+  },
+  {
+   "name": "tunerEl",
+   "kind": "const",
+   "line": 9975,
+   "endLine": 9975,
+   "via": "<stmt@11175>",
+   "simRefs": 0
+  },
+  {
+   "name": "skipBtn",
+   "kind": "const",
+   "line": 9976,
+   "endLine": 9976,
+   "via": "<stmt@9992>",
+   "simRefs": 0
+  },
+  {
+   "name": "debugAllowed",
+   "kind": "const",
+   "line": 10015,
+   "endLine": 10020,
+   "via": "<stmt@8730>",
+   "simRefs": 0
+  },
+  {
+   "name": "showDebug",
+   "kind": "let",
+   "line": 10021,
+   "endLine": 10021,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "fpsFrames",
+   "kind": "let",
+   "line": 10022,
+   "endLine": 10022,
+   "via": "sampleFps",
+   "simRefs": 0
+  },
+  {
+   "name": "fpsElapsed",
+   "kind": "let",
+   "line": 10022,
+   "endLine": 10022,
+   "via": "sampleFps",
+   "simRefs": 0
+  },
+  {
+   "name": "fpsWorst",
+   "kind": "let",
+   "line": 10022,
+   "endLine": 10022,
+   "via": "sampleFps",
+   "simRefs": 0
+  },
+  {
+   "name": "fpsShown",
+   "kind": "let",
+   "line": 10022,
+   "endLine": 10022,
+   "via": "sampleFps",
+   "simRefs": 0
+  },
+  {
+   "name": "fpsWorstShown",
+   "kind": "let",
+   "line": 10022,
+   "endLine": 10022,
+   "via": "sampleFps",
+   "simRefs": 0
+  },
+  {
+   "name": "probeAllowed",
+   "kind": "const",
+   "line": 10044,
+   "endLine": 10047,
+   "via": "probeStart",
+   "simRefs": 0
+  },
+  {
+   "name": "PROBE_WHAT",
+   "kind": "const",
+   "line": 10053,
+   "endLine": 10055,
+   "via": "probeTick",
+   "simRefs": 0
+  },
+  {
+   "name": "probeBox",
+   "kind": "let",
+   "line": 10057,
+   "endLine": 10057,
+   "via": "probeStart",
+   "simRefs": 0
+  },
+  {
+   "name": "probeStart",
+   "kind": "function",
+   "line": 10058,
+   "endLine": 10070,
+   "via": "<stmt@10144>",
+   "simRefs": 0
+  },
+  {
+   "name": "probeVisible",
+   "kind": "function",
+   "line": 10072,
+   "endLine": 10075,
+   "via": "probeTick",
+   "simRefs": 0
+  },
+  {
+   "name": "probeTick",
+   "kind": "function",
+   "line": 10077,
+   "endLine": 10136,
+   "via": "probeStart",
+   "simRefs": 0
+  },
+  {
+   "name": "escapeProbe",
+   "kind": "function",
+   "line": 10138,
+   "endLine": 10142,
+   "via": "probeTick",
+   "simRefs": 0
+  },
+  {
+   "name": "hudTop",
+   "kind": "let",
+   "line": 10148,
+   "endLine": 10148,
+   "via": "drawHud",
+   "simRefs": 0
+  },
+  {
+   "name": "setDebug",
+   "kind": "function",
+   "line": 10157,
+   "endLine": 10163,
+   "via": "<stmt@8730>",
+   "simRefs": 0
+  },
+  {
+   "name": "sampleFps",
+   "kind": "function",
+   "line": 10164,
+   "endLine": 10173,
+   "via": "frame",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneIndex",
+   "kind": "let",
+   "line": 10186,
+   "endLine": 10186,
+   "via": "selectTuning",
+   "simRefs": 0
+  },
+  {
+   "name": "tunerLine",
+   "kind": "function",
+   "line": 10188,
+   "endLine": 10308,
+   "via": "drawHud",
+   "simRefs": 90
+  },
+  {
+   "name": "deadShare",
+   "kind": "function",
+   "line": 10310,
+   "endLine": 10312,
+   "via": "tunerLine",
+   "simRefs": 2
+  },
+  {
+   "name": "REVERSAL_FACTOR",
+   "kind": "const",
+   "line": 10324,
+   "endLine": 10324,
+   "via": "worstOvershoot",
+   "simRefs": 0
+  },
+  {
+   "name": "worstOvershoot",
+   "kind": "function",
+   "line": 10325,
+   "endLine": 10330,
+   "via": "tunerLine",
+   "simRefs": 6
+  },
+  {
+   "name": "tunerDirty",
+   "kind": "function",
+   "line": 10643,
+   "endLine": 10648,
+   "via": "drawHud",
+   "simRefs": 1
+  },
+  {
+   "name": "markTuning",
+   "kind": "function",
+   "line": 10650,
+   "endLine": 10652,
+   "via": "<stmt@11194>",
+   "simRefs": 1
+  },
+  {
+   "name": "TUNE_KEY",
+   "kind": "const",
+   "line": 10685,
+   "endLine": 10685,
+   "via": "loadTuning",
+   "simRefs": 0
+  },
+  {
+   "name": "saveTuning",
+   "kind": "function",
+   "line": 10687,
+   "endLine": 10691,
+   "via": "nudgeTuning",
+   "simRefs": 2
+  },
+  {
+   "name": "loadTuning",
+   "kind": "function",
+   "line": 10693,
+   "endLine": 10711,
+   "via": "<stmt@11193>",
+   "simRefs": 4
+  },
+  {
+   "name": "nudgeTuning",
+   "kind": "function",
+   "line": 10713,
+   "endLine": 10740,
+   "via": "<stmt@8730>",
+   "simRefs": 8
+  },
+  {
+   "name": "selectTuning",
+   "kind": "function",
+   "line": 10742,
+   "endLine": 10744,
+   "via": "<stmt@8730>",
+   "simRefs": 0
+  },
+  {
+   "name": "resetTuning",
+   "kind": "function",
+   "line": 10746,
+   "endLine": 10752,
+   "via": "<stmt@8730>",
+   "simRefs": 3
+  },
+  {
+   "name": "dailySeed",
+   "kind": "function",
+   "line": 10815,
+   "endLine": 10815,
+   "via": "drawHud",
+   "simRefs": 2
+  },
+  {
+   "name": "untilNextTrack",
+   "kind": "function",
+   "line": 10849,
+   "endLine": 10853,
+   "via": "countdownLabel",
+   "simRefs": 0
+  },
+  {
+   "name": "countdownLabel",
+   "kind": "function",
+   "line": 10858,
+   "endLine": 10865,
+   "via": "newTracksLine",
+   "simRefs": 0
+  },
+  {
+   "name": "realLevelNumber",
+   "kind": "function",
+   "line": 10926,
+   "endLine": 10926,
+   "via": "levelLabel",
+   "simRefs": 2
+  },
+  {
+   "name": "toggleSeed",
+   "kind": "function",
+   "line": 11151,
+   "endLine": 11158,
+   "via": "<stmt@11175>",
+   "simRefs": 6
+  },
+  {
+   "name": "repeat",
+   "kind": "const",
+   "line": 11162,
+   "endLine": 11162,
+   "via": "<stmt@11175>",
+   "simRefs": 0
+  },
+  {
+   "name": "REPEAT_DELAY",
+   "kind": "const",
+   "line": 11163,
+   "endLine": 11163,
+   "via": "updateRepeat",
+   "simRefs": 0
+  },
+  {
+   "name": "REPEAT_INTERVAL",
+   "kind": "const",
+   "line": 11163,
+   "endLine": 11163,
+   "via": "updateRepeat",
+   "simRefs": 0
+  },
+  {
+   "name": "updateRepeat",
+   "kind": "function",
+   "line": 11165,
+   "endLine": 11171,
+   "via": "frame",
+   "simRefs": 0
+  },
+  {
+   "name": "stopRepeat",
+   "kind": "function",
+   "line": 11173,
+   "endLine": 11173,
+   "via": "<stmt@11188>",
+   "simRefs": 0
+  },
+  {
+   "name": "SMOKE_FILL",
+   "kind": "let",
+   "line": 14077,
+   "endLine": 14077,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "MAX_BOUNDS",
+   "kind": "const",
+   "line": 14713,
+   "endLine": 14713,
+   "via": "drawCoachPoint",
+   "simRefs": 0
+  },
+  {
+   "name": "bx",
+   "kind": "const",
+   "line": 14714,
+   "endLine": 14714,
+   "via": "drawCoachPoint",
+   "simRefs": 0
+  },
+  {
+   "name": "by",
+   "kind": "const",
+   "line": 14715,
+   "endLine": 14715,
+   "via": "drawCoachPoint",
+   "simRefs": 0
+  },
+  {
+   "name": "bw",
+   "kind": "const",
+   "line": 14716,
+   "endLine": 14716,
+   "via": "drawCoachPoint",
+   "simRefs": 0
+  },
+  {
+   "name": "EDGE_GLOW_FILL",
+   "kind": "let",
+   "line": 14772,
+   "endLine": 14772,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "EMISSIVE_CORE_FILL",
+   "kind": "let",
+   "line": 14773,
+   "endLine": 14773,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_LIGHT_RAMP",
+   "kind": "let",
+   "line": 14776,
+   "endLine": 14776,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_LIGHT_DIR",
+   "kind": "const",
+   "line": 14777,
+   "endLine": 14777,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "REFLECTOR_WARM_FILL",
+   "kind": "let",
+   "line": 14778,
+   "endLine": 14778,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "REFLECTOR_COOL_FILL",
+   "kind": "let",
+   "line": 14779,
+   "endLine": 14779,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "SCN_WINDOW_WARM_FILL",
+   "kind": "let",
+   "line": 14780,
+   "endLine": 14780,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "SCN_WINDOW_COOL_FILL",
+   "kind": "let",
+   "line": 14781,
+   "endLine": 14781,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "SLAB_BOTTOM_GLOW_FILL",
+   "kind": "let",
+   "line": 14782,
+   "endLine": 14782,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "PYLON_GLOW_FILL",
+   "kind": "let",
+   "line": 14783,
+   "endLine": 14783,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "SIGN_FILL",
+   "kind": "let",
+   "line": 14790,
+   "endLine": 14790,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_RIM_FILL",
+   "kind": "let",
+   "line": 14795,
+   "endLine": 14795,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_LIGHT_FILL",
+   "kind": "let",
+   "line": 14796,
+   "endLine": 14796,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "LAMP_POOL_GRAD",
+   "kind": "let",
+   "line": 14797,
+   "endLine": 14797,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "HEADLIGHT_GRAD",
+   "kind": "let",
+   "line": 14798,
+   "endLine": 14798,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "JUMP_GLOW_FILL",
+   "kind": "let",
+   "line": 15407,
+   "endLine": 15407,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "JUMP_DECK_RAMP",
+   "kind": "let",
+   "line": 15408,
+   "endLine": 15408,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "HAZARD_GLOW_FILL",
+   "kind": "let",
+   "line": 17787,
+   "endLine": 17787,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "GATE_GLOW_FILL",
+   "kind": "let",
+   "line": 17788,
+   "endLine": 17788,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "TONE_CACHE",
+   "kind": "const",
+   "line": 18665,
+   "endLine": 18665,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "DEPTH_LUT_SIZE",
+   "kind": "const",
+   "line": 18687,
+   "endLine": 18687,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "DEPTH_LUT",
+   "kind": "const",
+   "line": 18688,
+   "endLine": 18689,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "TRAIL_RAMP",
+   "kind": "const",
+   "line": 21836,
+   "endLine": 21836,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "TRAIL_STOPS",
+   "kind": "const",
+   "line": 21837,
+   "endLine": 21837,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "nextUnlockLine",
+   "kind": "function",
+   "line": 21964,
+   "endLine": 21983,
+   "via": "drawOverlay",
+   "simRefs": 6
+  },
+  {
+   "name": "WING_COLOURS",
+   "kind": "const",
+   "line": 22448,
+   "endLine": 22449,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_RIM_GLOW_FILL",
+   "kind": "let",
+   "line": 22450,
+   "endLine": 22450,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_LIGHT_GLOW_FILL",
+   "kind": "let",
+   "line": 22451,
+   "endLine": 22451,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_GLOW_RAMP",
+   "kind": "const",
+   "line": 22496,
+   "endLine": 22496,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_SEAM_RAMP",
+   "kind": "const",
+   "line": 22501,
+   "endLine": 22501,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_HEAT_STOPS",
+   "kind": "const",
+   "line": 22502,
+   "endLine": 22502,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "BODY_COLOURS",
+   "kind": "const",
+   "line": 22509,
+   "endLine": 22509,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CABIN_COLOURS",
+   "kind": "const",
+   "line": 22512,
+   "endLine": 22512,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "WHEEL_COLOURS",
+   "kind": "const",
+   "line": 22513,
+   "endLine": 22513,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "SHADOW_COLOURS",
+   "kind": "const",
+   "line": 22514,
+   "endLine": 22514,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "CAR_POOL_GRADS",
+   "kind": "const",
+   "line": 22520,
+   "endLine": 22520,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "stopBuf",
+   "kind": "const",
+   "line": 22532,
+   "endLine": 22532,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "stopRampInto",
+   "kind": "function",
+   "line": 22533,
+   "endLine": 22546,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "setFaces",
+   "kind": "function",
+   "line": 22547,
+   "endLine": 22547,
+   "via": "rebuildDerivedColours",
+   "simRefs": 0
+  },
+  {
+   "name": "SIGN_AVOID",
+   "kind": "const",
+   "line": 22564,
+   "endLine": 22564,
+   "via": "signHueShift",
+   "simRefs": 0
+  },
+  {
+   "name": "signHueShift",
+   "kind": "function",
+   "line": 22565,
+   "endLine": 22582,
+   "via": "rebuildDerivedColours",
+   "simRefs": 2
+  },
+  {
+   "name": "GROUND_BAND",
+   "kind": "let",
+   "line": 22588,
+   "endLine": 22588,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "rebuildDerivedColours",
+   "kind": "function",
+   "line": 22591,
+   "endLine": 22695,
+   "via": "<simulation hook>",
+   "simRefs": 4
+  },
+  {
+   "name": "drawScrapeFlash",
+   "kind": "function",
+   "line": 22948,
+   "endLine": 22968,
+   "via": "render",
+   "simRefs": 9
+  },
+  {
+   "name": "text",
+   "kind": "function",
+   "line": 22970,
+   "endLine": 22978,
+   "via": "drawModeMark",
+   "simRefs": 0
+  },
+  {
+   "name": "bootEl",
+   "kind": "const",
+   "line": 23006,
+   "endLine": 23006,
+   "via": "endBootChrome",
+   "simRefs": 0
+  },
+  {
+   "name": "bootMark",
+   "kind": "const",
+   "line": 23009,
+   "endLine": 23009,
+   "via": "syncBoot",
+   "simRefs": 0
+  },
+  {
+   "name": "creditEl",
+   "kind": "const",
+   "line": 23010,
+   "endLine": 23010,
+   "via": "syncCredit",
+   "simRefs": 0
+  },
+  {
+   "name": "lockupAspect",
+   "kind": "function",
+   "line": 23012,
+   "endLine": 23016,
+   "via": "LOCKUP_ASPECT",
+   "simRefs": 0
+  },
+  {
+   "name": "LOCKUP_ASPECT",
+   "kind": "const",
+   "line": 23017,
+   "endLine": 23017,
+   "via": "drawCredit",
+   "simRefs": 0
+  },
+  {
+   "name": "creditKey",
+   "kind": "let",
+   "line": 23023,
+   "endLine": 23023,
+   "via": "placeCredit",
+   "simRefs": 0
+  },
+  {
+   "name": "creditWant",
+   "kind": "let",
+   "line": 23024,
+   "endLine": 23024,
+   "via": "syncCredit",
+   "simRefs": 0
+  },
+  {
+   "name": "creditShown",
+   "kind": "let",
+   "line": 23030,
+   "endLine": 23030,
+   "via": "syncCredit",
+   "simRefs": 0
+  },
+  {
+   "name": "placeCredit",
+   "kind": "function",
+   "line": 23036,
+   "endLine": 23048,
+   "via": "drawCredit",
+   "simRefs": 1
+  },
+  {
+   "name": "syncCredit",
+   "kind": "function",
+   "line": 23064,
+   "endLine": 23070,
+   "via": "render",
+   "simRefs": 1
+  },
+  {
+   "name": "moreEl",
+   "kind": "const",
+   "line": 23110,
+   "endLine": 23110,
+   "via": "<stmt@23113>",
+   "simRefs": 0
+  },
+  {
+   "name": "framed",
+   "kind": "let",
+   "line": 23111,
+   "endLine": 23111,
+   "via": "<stmt@23112>",
+   "simRefs": 0
+  },
+  {
+   "name": "moreShown",
+   "kind": "let",
+   "line": 23119,
+   "endLine": 23119,
+   "via": "syncMore",
+   "simRefs": 0
+  },
+  {
+   "name": "skipShown",
+   "kind": "let",
+   "line": 23148,
+   "endLine": 23148,
+   "via": "syncSkip",
+   "simRefs": 0
+  },
+  {
+   "name": "skipTopPx",
+   "kind": "let",
+   "line": 23149,
+   "endLine": 23149,
+   "via": "syncSkip",
+   "simRefs": 0
+  },
+  {
+   "name": "syncSkip",
+   "kind": "function",
+   "line": 23150,
+   "endLine": 23177,
+   "via": "render",
+   "simRefs": 3
+  },
+  {
+   "name": "creditPlate",
+   "kind": "let",
+   "line": 23192,
+   "endLine": 23192,
+   "via": "drawCredit",
+   "simRefs": 0
+  },
+  {
+   "name": "creditPlateKey",
+   "kind": "let",
+   "line": 23193,
+   "endLine": 23193,
+   "via": "drawCredit",
+   "simRefs": 0
+  },
+  {
+   "name": "drawCredit",
+   "kind": "function",
+   "line": 23195,
+   "endLine": 23229,
+   "via": "drawResult",
+   "simRefs": 7
+  },
+  {
+   "name": "fittedSize",
+   "kind": "function",
+   "line": 23233,
+   "endLine": 23237,
+   "via": "drawModeMark",
+   "simRefs": 0
+  },
+  {
+   "name": "MONO",
+   "kind": "const",
+   "line": 23264,
+   "endLine": 23264,
+   "via": "drawClock",
+   "simRefs": 0
+  },
+  {
+   "name": "timeLabel",
+   "kind": "function",
+   "line": 23269,
+   "endLine": 23274,
+   "via": "shareRun",
+   "simRefs": 0
+  },
+  {
+   "name": "arcadeNumber",
+   "kind": "function",
+   "line": 23279,
+   "endLine": 23289,
+   "via": "drawScore",
+   "simRefs": 0
+  },
+  {
+   "name": "hudIsBar",
+   "kind": "function",
+   "line": 23295,
+   "endLine": 23297,
+   "via": "drawScore",
+   "simRefs": 1
+  },
+  {
+   "name": "drawScore",
+   "kind": "function",
+   "line": 23299,
+   "endLine": 23333,
+   "via": "render",
+   "simRefs": 19
+  },
+  {
+   "name": "drawHudBar",
+   "kind": "function",
+   "line": 23351,
+   "endLine": 23428,
+   "via": "drawScore",
+   "simRefs": 26
+  },
+  {
+   "name": "drawPipStrip",
+   "kind": "function",
+   "line": 23433,
+   "endLine": 23453,
+   "via": "drawHudBar",
+   "simRefs": 9
+  },
+  {
+   "name": "scoreHeatColour",
+   "kind": "function",
+   "line": 23459,
+   "endLine": 23461,
+   "via": "<simulation hook>",
+   "simRefs": 0
+  },
+  {
+   "name": "drawClock",
+   "kind": "function",
+   "line": 23475,
+   "endLine": 23584,
+   "via": "drawScore",
+   "simRefs": 24
+  },
+  {
+   "name": "roundRect",
+   "kind": "function",
+   "line": 23586,
+   "endLine": 23594,
+   "via": "drawClock",
+   "simRefs": 0
+  },
+  {
+   "name": "restartRect",
+   "kind": "const",
+   "line": 23618,
+   "endLine": 23618,
+   "via": "hitRestart",
+   "simRefs": 0
+  },
+  {
+   "name": "deathCauseLine",
+   "kind": "function",
+   "line": 23628,
+   "endLine": 23632,
+   "via": "drawResult",
+   "simRefs": 4
+  },
+  {
+   "name": "nearMissLine",
+   "kind": "function",
+   "line": 23646,
+   "endLine": 23661,
+   "via": "drawResult",
+   "simRefs": 21
+  },
+  {
+   "name": "drawResult",
+   "kind": "function",
+   "line": 23663,
+   "endLine": 23871,
+   "via": "drawOverlay",
+   "simRefs": 38
+  },
+  {
+   "name": "timeLabel",
+   "kind": "function",
+   "line": 23887,
+   "endLine": 23890,
+   "via": "shareRun",
+   "simRefs": 0
+  },
+  {
+   "name": "rollsForward",
+   "kind": "function",
+   "line": 23907,
+   "endLine": 23914,
+   "via": "finishPrompt",
+   "simRefs": 6
+  },
+  {
+   "name": "tapOrKey",
+   "kind": "function",
+   "line": 23921,
+   "endLine": 23921,
+   "via": "deathPrompt",
+   "simRefs": 0
+  },
+  {
+   "name": "finishPrompt",
+   "kind": "function",
+   "line": 23922,
+   "endLine": 23948,
+   "via": "drawFinish",
+   "simRefs": 4
+  },
+  {
+   "name": "deathPrompt",
+   "kind": "function",
+   "line": 23949,
+   "endLine": 23958,
+   "via": "drawResult",
+   "simRefs": 0
+  },
+  {
+   "name": "drawFinish",
+   "kind": "function",
+   "line": 23960,
+   "endLine": 24262,
+   "via": "drawOverlay",
+   "simRefs": 49
+  },
+  {
+   "name": "hitRestart",
+   "kind": "function",
+   "line": 24269,
+   "endLine": 24275,
+   "via": "<stmt@8910>",
+   "simRefs": 2
+  },
+  {
+   "name": "dailyRect",
+   "kind": "const",
+   "line": 24313,
+   "endLine": 24313,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "routeRect",
+   "kind": "const",
+   "line": 24318,
+   "endLine": 24318,
+   "via": "<stmt@8730>",
+   "simRefs": 0
+  },
+  {
+   "name": "altRect",
+   "kind": "const",
+   "line": 24319,
+   "endLine": 24319,
+   "via": "<stmt@8910>",
+   "simRefs": 0
+  },
+  {
+   "name": "carRect",
+   "kind": "const",
+   "line": 24325,
+   "endLine": 24325,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "hasKeyboard",
+   "kind": "const",
+   "line": 24330,
+   "endLine": 24331,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "canvasButton",
+   "kind": "function",
+   "line": 24337,
+   "endLine": 24356,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "hitRect",
+   "kind": "function",
+   "line": 24358,
+   "endLine": 24362,
+   "via": "hitHome",
+   "simRefs": 0
+  },
+  {
+   "name": "CARD_INK",
+   "kind": "const",
+   "line": 24421,
+   "endLine": 24421,
+   "via": "buildShareCard",
+   "simRefs": 0
+  },
+  {
+   "name": "CARD_AMBER",
+   "kind": "const",
+   "line": 24422,
+   "endLine": 24422,
+   "via": "buildShareCard",
+   "simRefs": 0
+  },
+  {
+   "name": "CARD_CREAM",
+   "kind": "const",
+   "line": 24423,
+   "endLine": 24423,
+   "via": "buildShareCard",
+   "simRefs": 0
+  },
+  {
+   "name": "CARD_GOLD",
+   "kind": "const",
+   "line": 24424,
+   "endLine": 24424,
+   "via": "buildShareCard",
+   "simRefs": 0
+  },
+  {
+   "name": "CARD_DIM",
+   "kind": "const",
+   "line": 24425,
+   "endLine": 24425,
+   "via": "buildShareCard",
+   "simRefs": 0
+  },
+  {
+   "name": "cardRound",
+   "kind": "function",
+   "line": 24427,
+   "endLine": 24435,
+   "via": "buildShareCard",
+   "simRefs": 0
+  },
+  {
+   "name": "cardText",
+   "kind": "function",
+   "line": 24439,
+   "endLine": 24445,
+   "via": "buildShareCard",
+   "simRefs": 0
+  },
+  {
+   "name": "buildShareCard",
+   "kind": "function",
+   "line": 24471,
+   "endLine": 24655,
+   "via": "startShareCardBuild",
+   "simRefs": 15
+  },
+  {
+   "name": "shareCard",
+   "kind": "const",
+   "line": 24676,
+   "endLine": 24676,
+   "via": "buildShareCardSoon",
+   "simRefs": 0
+  },
+  {
+   "name": "shareCardKey",
+   "kind": "function",
+   "line": 24678,
+   "endLine": 24682,
+   "via": "buildShareCardSoon",
+   "simRefs": 6
+  },
+  {
+   "name": "buildShareCardSoon",
+   "kind": "function",
+   "line": 24700,
+   "endLine": 24709,
+   "via": "<simulation hook>",
+   "simRefs": 0
+  },
+  {
+   "name": "startShareCardBuild",
+   "kind": "function",
+   "line": 24711,
+   "endLine": 24740,
+   "via": "buildShareCardSoon",
+   "simRefs": 1
+  },
+  {
+   "name": "shareRun",
+   "kind": "function",
+   "line": 24742,
+   "endLine": 24846,
+   "via": "<stmt@8730>",
+   "simRefs": 19
+  },
+  {
+   "name": "copyTextOnly",
+   "kind": "function",
+   "line": 24848,
+   "endLine": 24858,
+   "via": "shareRun",
+   "simRefs": 0
+  },
+  {
+   "name": "shareRect",
+   "kind": "const",
+   "line": 24860,
+   "endLine": 24860,
+   "via": "hitShare",
+   "simRefs": 0
+  },
+  {
+   "name": "hitShare",
+   "kind": "function",
+   "line": 24861,
+   "endLine": 24869,
+   "via": "<stmt@8910>",
+   "simRefs": 6
+  },
+  {
+   "name": "drawShareButton",
+   "kind": "function",
+   "line": 24879,
+   "endLine": 24928,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "titleFactLine",
+   "kind": "function",
+   "line": 24948,
+   "endLine": 24977,
+   "via": "drawOverlay",
+   "simRefs": 12
+  },
+  {
+   "name": "newTracksLine",
+   "kind": "function",
+   "line": 25003,
+   "endLine": 25012,
+   "via": "titleResetLine",
+   "simRefs": 1
+  },
+  {
+   "name": "titleResetLine",
+   "kind": "function",
+   "line": 25013,
+   "endLine": 25013,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "titleBlinkLit",
+   "kind": "function",
+   "line": 25019,
+   "endLine": 25023,
+   "via": "drawOverlay",
+   "simRefs": 3
+  },
+  {
+   "name": "drawOverlay",
+   "kind": "function",
+   "line": 25068,
+   "endLine": 25496,
+   "via": "render",
+   "simRefs": 60
+  },
+  {
+   "name": "hitCar",
+   "kind": "function",
+   "line": 25501,
+   "endLine": 25507,
+   "via": "<stmt@8910>",
+   "simRefs": 2
+  },
+  {
+   "name": "hitRoute",
+   "kind": "function",
+   "line": 25511,
+   "endLine": 25514,
+   "via": "<stmt@8910>",
+   "simRefs": 2
+  },
+  {
+   "name": "hitDaily",
+   "kind": "function",
+   "line": 25516,
+   "endLine": 25520,
+   "via": "<stmt@8910>",
+   "simRefs": 4
+  },
+  {
+   "name": "hitAlt",
+   "kind": "function",
+   "line": 25526,
+   "endLine": 25531,
+   "via": "<stmt@8910>",
+   "simRefs": 6
+  },
+  {
+   "name": "scoreTop",
+   "kind": "let",
+   "line": 25581,
+   "endLine": 25581,
+   "via": "drawScore",
+   "simRefs": 0
+  },
+  {
+   "name": "scoreSize",
+   "kind": "let",
+   "line": 25581,
+   "endLine": 25581,
+   "via": "drawScore",
+   "simRefs": 0
+  },
+  {
+   "name": "hudBottom",
+   "kind": "let",
+   "line": 25581,
+   "endLine": 25581,
+   "via": "drawModeMark",
+   "simRefs": 0
+  },
+  {
+   "name": "modeBottom",
+   "kind": "let",
+   "line": 25585,
+   "endLine": 25585,
+   "via": "drawModeMark",
+   "simRefs": 0
+  },
+  {
+   "name": "titleRouteLabel",
+   "kind": "function",
+   "line": 26217,
+   "endLine": 26219,
+   "via": "drawOverlay",
+   "simRefs": 1
+  },
+  {
+   "name": "levelSeconds",
+   "kind": "function",
+   "line": 26223,
+   "endLine": 26226,
+   "via": "titleRouteCaption",
+   "simRefs": 4
+  },
+  {
+   "name": "titleRouteCaption",
+   "kind": "function",
+   "line": 26229,
+   "endLine": 26237,
+   "via": "drawOverlay",
+   "simRefs": 2
+  },
+  {
+   "name": "dayDone",
+   "kind": "function",
+   "line": 26303,
+   "endLine": 26306,
+   "via": "<stmt@8730>",
+   "simRefs": 3
+  },
+  {
+   "name": "scoreBeaten",
+   "kind": "function",
+   "line": 27185,
+   "endLine": 27185,
+   "via": "scoreHeatColour",
+   "simRefs": 2
+  },
+  {
+   "name": "finaleBadge",
+   "kind": "function",
+   "line": 27747,
+   "endLine": 27756,
+   "via": "drawFinish",
+   "simRefs": 8
+  },
+  {
+   "name": "finaleBanner",
+   "kind": "function",
+   "line": 27856,
+   "endLine": 27860,
+   "via": "drawFinish",
+   "simRefs": 5
+  },
+  {
+   "name": "finaleSettleT",
+   "kind": "function",
+   "line": 27865,
+   "endLine": 27869,
+   "via": "drawFinish",
+   "simRefs": 5
+  },
+  {
+   "name": "modeSecondLine",
+   "kind": "function",
+   "line": 28267,
+   "endLine": 28272,
+   "via": "drawModeMark",
+   "simRefs": 4
+  },
+  {
+   "name": "drawPips",
+   "kind": "function",
+   "line": 28292,
+   "endLine": 28324,
+   "via": "drawModeMark",
+   "simRefs": 10
+  },
+  {
+   "name": "levelLabel",
+   "kind": "function",
+   "line": 28344,
+   "endLine": 28361,
+   "via": "shareRun",
+   "simRefs": 3
+  },
+  {
+   "name": "modeLine",
+   "kind": "function",
+   "line": 28363,
+   "endLine": 28378,
+   "via": "drawModeMark",
+   "simRefs": 9
+  },
+  {
+   "name": "drawCountdown",
+   "kind": "function",
+   "line": 28395,
+   "endLine": 28410,
+   "via": "render",
+   "simRefs": 10
+  },
+  {
+   "name": "drawModeMark",
+   "kind": "function",
+   "line": 28412,
+   "endLine": 28471,
+   "via": "render",
+   "simRefs": 16
+  },
+  {
+   "name": "ghostGapLabel",
+   "kind": "function",
+   "line": 28478,
+   "endLine": 28485,
+   "via": "modeLine",
+   "simRefs": 6
+  },
+  {
+   "name": "drawCallout",
+   "kind": "function",
+   "line": 28511,
+   "endLine": 28517,
+   "via": "render",
+   "simRefs": 16
+  },
+  {
+   "name": "drawLane",
+   "kind": "function",
+   "line": 28525,
+   "endLine": 28719,
+   "via": "drawCallout",
+   "simRefs": 38
+  },
+  {
+   "name": "drawCoachPoint",
+   "kind": "function",
+   "line": 28739,
+   "endLine": 28808,
+   "via": "drawLane",
+   "simRefs": 23
+  },
+  {
+   "name": "drawSpectacleFlash",
+   "kind": "function",
+   "line": 28813,
+   "endLine": 28859,
+   "via": "render",
+   "simRefs": 22
+  },
+  {
+   "name": "drawBar",
+   "kind": "function",
+   "line": 28879,
+   "endLine": 28895,
+   "via": "render",
+   "simRefs": 7
+  },
+  {
+   "name": "drawHud",
+   "kind": "function",
+   "line": 28899,
+   "endLine": 29022,
+   "via": "render",
+   "simRefs": 22
+  },
+  {
+   "name": "drawTiltCal",
+   "kind": "function",
+   "line": 29165,
+   "endLine": 29206,
+   "via": "render",
+   "simRefs": 2
+  },
+  {
+   "name": "drawTuneName",
+   "kind": "function",
+   "line": 29216,
+   "endLine": 29228,
+   "via": "render",
+   "simRefs": 6
+  },
+  {
+   "name": "drawTiltHint",
+   "kind": "function",
+   "line": 29251,
+   "endLine": 29302,
+   "via": "render",
+   "simRefs": 9
+  },
+  {
+   "name": "hintArrow",
+   "kind": "function",
+   "line": 29323,
+   "endLine": 29338,
+   "via": "drawTiltHint",
+   "simRefs": 0
+  },
+  {
+   "name": "modeRect",
+   "kind": "const",
+   "line": 29380,
+   "endLine": 29380,
+   "via": "drawPauseCover",
+   "simRefs": 0
+  },
+  {
+   "name": "homeRect",
+   "kind": "const",
+   "line": 29383,
+   "endLine": 29383,
+   "via": "drawPauseCover",
+   "simRefs": 0
+  },
+  {
+   "name": "drawPauseCover",
+   "kind": "function",
+   "line": 29385,
+   "endLine": 29456,
+   "via": "render",
+   "simRefs": 4
+  },
+  {
+   "name": "hitMode",
+   "kind": "function",
+   "line": 29461,
+   "endLine": 29461,
+   "via": "<stmt@8910>",
+   "simRefs": 1
+  },
+  {
+   "name": "hitHome",
+   "kind": "function",
+   "line": 29462,
+   "endLine": 29462,
+   "via": "<stmt@8910>",
+   "simRefs": 1
+  },
+  {
+   "name": "TUNES",
+   "kind": "const",
+   "line": 29616,
+   "endLine": 29621,
+   "via": "tunePlay",
+   "simRefs": 0
+  },
+  {
+   "name": "tune",
+   "kind": "const",
+   "line": 29631,
+   "endLine": 29667,
+   "via": "tuneStart",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneWake",
+   "kind": "function",
+   "line": 29673,
+   "endLine": 29738,
+   "via": "<simulation hook>",
+   "simRefs": 0
+  },
+  {
+   "name": "NET_NO_SOURCE",
+   "kind": "const",
+   "line": 29764,
+   "endLine": 29764,
+   "via": "tuneUpdate",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneIndexOfEl",
+   "kind": "function",
+   "line": 29776,
+   "endLine": 29780,
+   "via": "tuneFailed",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneNextGood",
+   "kind": "function",
+   "line": 29782,
+   "endLine": 29788,
+   "via": "tuneFailed",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneFailed",
+   "kind": "function",
+   "line": 29803,
+   "endLine": 29832,
+   "via": "tuneWake",
+   "simRefs": 1
+  },
+  {
+   "name": "tuneHandover",
+   "kind": "function",
+   "line": 29844,
+   "endLine": 29853,
+   "via": "tuneFailed",
+   "simRefs": 1
+  },
+  {
+   "name": "tuneRevive",
+   "kind": "function",
+   "line": 29860,
+   "endLine": 29890,
+   "via": "tuneStart",
+   "simRefs": 1
+  },
+  {
+   "name": "tuneWrap",
+   "kind": "function",
+   "line": 29909,
+   "endLine": 29911,
+   "via": "tunePlay",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneLoad",
+   "kind": "function",
+   "line": 29915,
+   "endLine": 29932,
+   "via": "tuneWake",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneWire",
+   "kind": "function",
+   "line": 29937,
+   "endLine": 29967,
+   "via": "tuneWake",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneStart",
+   "kind": "function",
+   "line": 29975,
+   "endLine": 29990,
+   "via": "<simulation hook>",
+   "simRefs": 1
+  },
+  {
+   "name": "tunePlay",
+   "kind": "function",
+   "line": 29992,
+   "endLine": 30041,
+   "via": "tuneStart",
+   "simRefs": 1
+  },
+  {
+   "name": "tuneStop",
+   "kind": "function",
+   "line": 30043,
+   "endLine": 30051,
+   "via": "updateMusic",
+   "simRefs": 1
+  },
+  {
+   "name": "tuneLastLit",
+   "kind": "let",
+   "line": 30053,
+   "endLine": 30053,
+   "via": "tuneUpdate",
+   "simRefs": 0
+  },
+  {
+   "name": "tuneUpdate",
+   "kind": "function",
+   "line": 30055,
+   "endLine": 30143,
+   "via": "updateAudio",
+   "simRefs": 6
+  },
+  {
+   "name": "sfxOn",
+   "kind": "let",
+   "line": 30166,
+   "endLine": 30166,
+   "via": "<stmt@30538>",
+   "simRefs": 1
+  },
+  {
+   "name": "musicOn",
+   "kind": "let",
+   "line": 30167,
+   "endLine": 30167,
+   "via": "tuneStart",
+   "simRefs": 1
+  },
+  {
+   "name": "anySound",
+   "kind": "function",
+   "line": 30168,
+   "endLine": 30168,
+   "via": "startAudio",
+   "simRefs": 0
+  },
+  {
+   "name": "musicReachable",
+   "kind": "function",
+   "line": 30177,
+   "endLine": 30177,
+   "via": "drawOverlay",
+   "simRefs": 0
+  },
+  {
+   "name": "audio",
+   "kind": "let",
+   "line": 30179,
+   "endLine": 30179,
+   "via": "tuneWake",
+   "simRefs": 0
+  },
+  {
+   "name": "semis",
+   "kind": "function",
+   "line": 30183,
+   "endLine": 30183,
+   "via": "audioSting",
+   "simRefs": 0
+  },
+  {
+   "name": "buildAudio",
+   "kind": "function",
+   "line": 30185,
+   "endLine": 30298,
+   "via": "applyAudio",
+   "simRefs": 12
+  },
+  {
+   "name": "ramp",
+   "kind": "function",
+   "line": 30303,
+   "endLine": 30305,
+   "via": "audioCrash",
+   "simRefs": 0
+  },
+  {
+   "name": "ICON",
+   "kind": "const",
+   "line": 30313,
+   "endLine": 30387,
+   "via": "<stmt@30441>",
+   "simRefs": 0
+  },
+  {
+   "name": "paintSound",
+   "kind": "function",
+   "line": 30391,
+   "endLine": 30399,
+   "via": "<stmt@30559>",
+   "simRefs": 0
+  },
+  {
+   "name": "applyAudio",
+   "kind": "function",
+   "line": 30405,
+   "endLine": 30429,
+   "via": "padSwitch",
+   "simRefs": 5
+  },
+  {
+   "name": "startAudio",
+   "kind": "function",
+   "line": 30434,
+   "endLine": 30437,
+   "via": "firstGesture",
+   "simRefs": 1
+  },
+  {
+   "name": "fullReady",
+   "kind": "var",
+   "line": 30460,
+   "endLine": 30460,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "fullBtn",
+   "kind": "const",
+   "line": 30461,
+   "endLine": 30461,
+   "via": "<stmt@30492>",
+   "simRefs": 0
+  },
+  {
+   "name": "fullRoot",
+   "kind": "const",
+   "line": 30462,
+   "endLine": 30462,
+   "via": "toggleFullscreen",
+   "simRefs": 0
+  },
+  {
+   "name": "standalone",
+   "kind": "function",
+   "line": 30463,
+   "endLine": 30467,
+   "via": "canFullscreen",
+   "simRefs": 0
+  },
+  {
+   "name": "canFullscreen",
+   "kind": "const",
+   "line": 30468,
+   "endLine": 30470,
+   "via": "syncFullButton",
+   "simRefs": 0
+  },
+  {
+   "name": "isFullscreen",
+   "kind": "function",
+   "line": 30472,
+   "endLine": 30474,
+   "via": "toggleFullscreen",
+   "simRefs": 0
+  },
+  {
+   "name": "paintFull",
+   "kind": "function",
+   "line": 30475,
+   "endLine": 30478,
+   "via": "<stmt@30522>",
+   "simRefs": 0
+  },
+  {
+   "name": "toggleFullscreen",
+   "kind": "function",
+   "line": 30479,
+   "endLine": 30491,
+   "via": "<stmt@30493>",
+   "simRefs": 0
+  },
+  {
+   "name": "onFullscreenChange",
+   "kind": "function",
+   "line": 30502,
+   "endLine": 30508,
+   "via": "<stmt@30509>",
+   "simRefs": 0
+  },
+  {
+   "name": "syncFullButton",
+   "kind": "function",
+   "line": 30517,
+   "endLine": 30521,
+   "via": "resize",
+   "simRefs": 0
+  },
+  {
+   "name": "soundBtn",
+   "kind": "const",
+   "line": 30526,
+   "endLine": 30526,
+   "via": "<stmt@30538>",
+   "simRefs": 0
+  },
+  {
+   "name": "musicBtn",
+   "kind": "const",
+   "line": 30527,
+   "endLine": 30527,
+   "via": "<stmt@30539>",
+   "simRefs": 0
+  },
+  {
+   "name": "padSwitch",
+   "kind": "function",
+   "line": 30528,
+   "endLine": 30537,
+   "via": "<stmt@30538>",
+   "simRefs": 0
+  },
+  {
+   "name": "resumeAudio",
+   "kind": "function",
+   "line": 30565,
+   "endLine": 30568,
+   "via": "<stmt@8882>",
+   "simRefs": 0
+  },
+  {
+   "name": "audioOn",
+   "kind": "function",
+   "line": 30570,
+   "endLine": 30570,
+   "via": "audioSting",
+   "simRefs": 0
+  },
+  {
+   "name": "updateMusic",
+   "kind": "function",
+   "line": 30575,
+   "endLine": 30597,
+   "via": "updateAudio",
+   "simRefs": 3
+  },
+  {
+   "name": "updateAudio",
+   "kind": "function",
+   "line": 30601,
+   "endLine": 30636,
+   "via": "frame",
+   "simRefs": 25
+  },
+  {
+   "name": "STING_LAND",
+   "kind": "const",
+   "line": 30672,
+   "endLine": 30672,
+   "via": "audioLanding",
+   "simRefs": 0
+  },
+  {
+   "name": "STING_LAND_BIG",
+   "kind": "const",
+   "line": 30676,
+   "endLine": 30676,
+   "via": "audioLanding",
+   "simRefs": 0
+  },
+  {
+   "name": "audioSting",
+   "kind": "function",
+   "line": 30678,
+   "endLine": 30691,
+   "via": "<simulation hook>",
+   "simRefs": 1
+  },
+  {
+   "name": "audioLanding",
+   "kind": "function",
+   "line": 30706,
+   "endLine": 30725,
+   "via": "<simulation hook>",
+   "simRefs": 5
+  },
+  {
+   "name": "FANFARE_LADDER",
+   "kind": "const",
+   "line": 30744,
+   "endLine": 30744,
+   "via": "audioFanfareWave",
+   "simRefs": 0
+  },
+  {
+   "name": "audioFinishHit",
+   "kind": "function",
+   "line": 30748,
+   "endLine": 30761,
+   "via": "<simulation hook>",
+   "simRefs": 4
+  },
+  {
+   "name": "audioFanfareWave",
+   "kind": "function",
+   "line": 30767,
+   "endLine": 30786,
+   "via": "<simulation hook>",
+   "simRefs": 5
+  },
+  {
+   "name": "CHAIN_LADDER",
+   "kind": "const",
+   "line": 30796,
+   "endLine": 30796,
+   "via": "audioChain",
+   "simRefs": 0
+  },
+  {
+   "name": "audioChain",
+   "kind": "function",
+   "line": 30798,
+   "endLine": 30807,
+   "via": "<simulation hook>",
+   "simRefs": 3
+  },
+  {
+   "name": "audioCrash",
+   "kind": "function",
+   "line": 30812,
+   "endLine": 30833,
+   "via": "<simulation hook>",
+   "simRefs": 6
+  },
+  {
+   "name": "skipBoot",
+   "kind": "function",
+   "line": 30850,
+   "endLine": 30850,
+   "via": "<stmt@8730>",
+   "simRefs": 1
+  },
+  {
+   "name": "bootChromeHidden",
+   "kind": "let",
+   "line": 30853,
+   "endLine": 30853,
+   "via": "endBootChrome",
+   "simRefs": 0
+  },
+  {
+   "name": "endBootChrome",
+   "kind": "function",
+   "line": 30854,
+   "endLine": 30864,
+   "via": "frame",
+   "simRefs": 2
+  },
+  {
+   "name": "bootMarkAlpha",
+   "kind": "function",
+   "line": 30900,
+   "endLine": 30904,
+   "via": "syncBoot",
+   "simRefs": 5
+  },
+  {
+   "name": "bootFieldAlpha",
+   "kind": "function",
+   "line": 30906,
+   "endLine": 30909,
+   "via": "syncBoot",
+   "simRefs": 4
+  },
+  {
+   "name": "syncBoot",
+   "kind": "function",
+   "line": 30911,
+   "endLine": 30918,
+   "via": "render",
+   "simRefs": 3
+  },
+  {
+   "name": "lastTime",
+   "kind": "let",
+   "line": 30920,
+   "endLine": 30920,
+   "via": "frame",
+   "simRefs": 0
+  },
+  {
+   "name": "frame",
+   "kind": "function",
+   "line": 30922,
+   "endLine": 30984,
+   "via": "<root>",
+   "simRefs": 18
+  }
+ ],
+ "cut": [
+  {
+   "name": "buildCarPaints",
+   "kind": "function",
+   "line": 16070,
+   "via": "<extra>",
+   "reason": "car paints for the Canvas 2D car",
+   "as": "noop"
+  },
+  {
+   "name": "spriteBuildAtlas",
+   "kind": "function",
+   "line": 20956,
+   "via": "resize",
+   "reason": "sprite atlas for the Canvas 2D scenery",
+   "as": "noop"
+  },
+  {
+   "name": "measureChrome",
+   "kind": "function",
+   "line": 10149,
+   "via": "resize",
+   "reason": "the debug readout is the world overlay now",
+   "as": "noop"
+  },
+  {
+   "name": "buildDepthLut",
+   "kind": "function",
+   "line": 18706,
+   "via": "rebuildDerivedColours",
+   "reason": "depth shading table for the Canvas 2D world",
+   "as": "noop"
+  }
+ ],
+ "replaced": [
+  {
+   "name": "ctx",
+   "kind": "const",
+   "line": 8480,
+   "endLine": 8480,
+   "via": "render",
+   "reason": "the overlay canvas is transparent over the 3D canvas, so it keeps its alpha"
+  },
+  {
+   "name": "syncMore",
+   "kind": "function",
+   "line": 23131,
+   "endLine": 23137,
+   "via": "render",
+   "reason": "the fine print is not in this build, so the reconcile has nothing to show or hide; the one line guard is the framed case the original already has"
+  },
+  {
+   "name": "render",
+   "kind": "function",
+   "line": 29024,
+   "endLine": 29149,
+   "via": "<root>",
+   "reason": "the world is the 3D canvas underneath; the overlay passes are the original's, in its order"
+  }
+ ],
+ "statements": [
+  {
+   "line": 827,
+   "label": "'use strict';"
+  },
+  {
+   "line": 7545,
+   "label": "BRAND.wordmark.path = brandPath(BRAND.wordmark);"
+  },
+  {
+   "line": 7546,
+   "label": "BRAND.icon.path = brandPath(BRAND.icon);"
+  },
+  {
+   "line": 8452,
+   "label": "TUNABLES.forEach(function (t) { TUNABLE_DEFAULTS[t.key] = FEEL[t.key];"
+  },
+  {
+   "line": 8682,
+   "label": "window.addEventListener('resize', resize);"
+  },
+  {
+   "line": 8683,
+   "label": "window.addEventListener('orientationchange', resize);"
+  },
+  {
+   "line": 8686,
+   "label": "window.addEventListener('resize', function () { if (typeof onOrienta"
+  },
+  {
+   "line": 8730,
+   "label": "window.addEventListener('keydown', function (e) { if (e.repeat) { re"
+  },
+  {
+   "line": 8875,
+   "label": "window.addEventListener('keyup', function (e) { const k = e.key; i"
+  },
+  {
+   "line": 8881,
+   "label": "window.addEventListener('blur', clearHeldInput);"
+  },
+  {
+   "line": 8882,
+   "label": "document.addEventListener('visibilitychange', function () { if (docu"
+  },
+  {
+   "line": 8910,
+   "label": "canvas.addEventListener('pointerdown', function (e) { e.preventDefau"
+  },
+  {
+   "line": 8978,
+   "label": "canvas.addEventListener('pointermove', function (e) { if (!touchSide"
+  },
+  {
+   "line": 8988,
+   "label": "canvas.addEventListener('pointerup', releasePointer);"
+  },
+  {
+   "line": 8989,
+   "label": "canvas.addEventListener('pointercancel', releasePointer);"
+  },
+  {
+   "line": 8990,
+   "label": "canvas.addEventListener('contextmenu', function (e) { e.preventDefault"
+  },
+  {
+   "line": 9311,
+   "label": "window.addEventListener('orientationchange', onOrientationChanged);"
+  },
+  {
+   "line": 9312,
+   "label": "if (window.screen && window.screen.orientation && typeof window.sc"
+  },
+  {
+   "line": 9814,
+   "label": "flipBtn.addEventListener('pointerdown', function (e) { e.stopPropaga"
+  },
+  {
+   "line": 9828,
+   "label": "flipBtn.addEventListener('pointerup', function (e) { e.stopPropagation"
+  },
+  {
+   "line": 9829,
+   "label": "flipBtn.addEventListener('pointercancel', function (e) { e.stopPropaga"
+  },
+  {
+   "line": 9832,
+   "label": "flipBtn.addEventListener('click', function (e) { e.stopPropagation(); "
+  },
+  {
+   "line": 9842,
+   "label": "tiltBtn.addEventListener('pointerdown', function (e) { e.stopPropaga"
+  },
+  {
+   "line": 9845,
+   "label": "tiltBtn.addEventListener('click', function (e) { e.stopPropagation()"
+  },
+  {
+   "line": 9959,
+   "label": "tilt.supported = detectTiltSupport();"
+  },
+  {
+   "line": 9960,
+   "label": "tiltBtn.hidden = !tilt.supported;"
+  },
+  {
+   "line": 9961,
+   "label": "measureTiltPad();"
+  },
+  {
+   "line": 9964,
+   "label": "if (tilt.supported && storeGet('tilthint') !== '1') { tiltHintLeft ="
+  },
+  {
+   "line": 9992,
+   "label": "skipBtn.addEventListener('pointerdown', function (e) { e.stopPropagati"
+  },
+  {
+   "line": 9993,
+   "label": "skipBtn.addEventListener('click', function (e) { e.stopPropagation()"
+  },
+  {
+   "line": 10003,
+   "label": "pauseBtn.addEventListener('pointerdown', function (e) { e.stopPropagat"
+  },
+  {
+   "line": 10004,
+   "label": "pauseBtn.addEventListener('click', function (e) { e.stopPropagation("
+  },
+  {
+   "line": 10144,
+   "label": "probeStart();"
+  },
+  {
+   "line": 11175,
+   "label": "tunerEl.addEventListener('pointerdown', function (e) { const act = e"
+  },
+  {
+   "line": 11188,
+   "label": "tunerEl.addEventListener('pointerup', stopRepeat);"
+  },
+  {
+   "line": 11189,
+   "label": "tunerEl.addEventListener('pointercancel', stopRepeat);"
+  },
+  {
+   "line": 11190,
+   "label": "tunerEl.addEventListener('pointerleave', stopRepeat);"
+  },
+  {
+   "line": 11191,
+   "label": "window.addEventListener('blur', stopRepeat);"
+  },
+  {
+   "line": 11193,
+   "label": "loadTuning();"
+  },
+  {
+   "line": 11194,
+   "label": "markTuning();"
+  },
+  {
+   "line": 22696,
+   "label": "rebuildDerivedColours();"
+  },
+  {
+   "line": 23112,
+   "label": "try { framed = window.self !== window.top; } catch (e) { framed = true"
+  },
+  {
+   "line": 23113,
+   "label": "if (framed && moreEl && moreEl.parentNode) moreEl.parentNode.removeChi"
+  },
+  {
+   "line": 30441,
+   "label": "pauseBtn.innerHTML = ICON.pause;"
+  },
+  {
+   "line": 30442,
+   "label": "tiltBtn.innerHTML = ICON.tilt;"
+  },
+  {
+   "line": 30443,
+   "label": "flipBtn.innerHTML = ICON.flip;"
+  },
+  {
+   "line": 30444,
+   "label": "syncFlipBtn();"
+  },
+  {
+   "line": 30492,
+   "label": "fullBtn.addEventListener('pointerdown', function (e) { e.stopPropagati"
+  },
+  {
+   "line": 30493,
+   "label": "fullBtn.addEventListener('click', function (e) { e.stopPropagation()"
+  },
+  {
+   "line": 30509,
+   "label": "document.addEventListener('fullscreenchange', onFullscreenChange);"
+  },
+  {
+   "line": 30510,
+   "label": "document.addEventListener('webkitfullscreenchange', onFullscreenChange"
+  },
+  {
+   "line": 30522,
+   "label": "paintFull();"
+  },
+  {
+   "line": 30523,
+   "label": "fullReady = true;"
+  },
+  {
+   "line": 30524,
+   "label": "syncFullButton();"
+  },
+  {
+   "line": 30538,
+   "label": "padSwitch(soundBtn, function () { sfxOn = !sfxOn; });"
+  },
+  {
+   "line": 30539,
+   "label": "padSwitch(musicBtn, function () { musicOn = !musicOn; /* Unmuting "
+  },
+  {
+   "line": 30559,
+   "label": "paintSound();"
+  }
+ ],
+ "simRefs": 1076,
+ "bytes": 415977,
+ "counts": {
+  "taken": 379,
+  "cut": 4,
+  "replaced": 3,
+  "statements": 57,
+  "simRefs": 1076
+ }
+}
