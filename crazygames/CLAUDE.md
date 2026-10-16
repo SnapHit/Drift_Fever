@@ -153,5 +153,6 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
 
 - Stage 1: done. The simulation is vendored and parity is proven; see
   `parity/REPORT.md`.
-- Stage 2 is next: the greybox renderer. It consumes `createSim(hooks)` and
+- Stage 2, the greybox renderer: in progress on the `crazygames-stage-2`
+  branch. `STAGE-2.md` is its brief. It consumes `createSim(hooks)` and
   never feeds back into it.
