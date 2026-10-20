@@ -1,0 +1,127 @@
+{
+ "started": "2026-10-16T20:41:25.119Z",
+ "note": "headless Chromium, software WebGL 2 (SwiftShader); submit times are not a GPU measurement",
+ "runs": [
+  {
+   "throttle": 1,
+   "level": 2,
+   "tape": "driver",
+   "frames": 400,
+   "events": 0,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 0,
+     "submit": 9,
+     "total": 9
+    },
+    "frame": 400,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 370,
+    "p50": 41,
+    "p95": 73,
+    "p99": 101,
+    "worst": 805,
+    "mean": 43.3
+   },
+   "jsWithoutSubmit": {
+    "n": 370,
+    "p50": 2,
+    "p95": 4,
+    "p99": 10,
+    "worst": 27,
+    "mean": 1.98
+   },
+   "sceneUpdate": {
+    "n": 370,
+    "p50": 1,
+    "p95": 3,
+    "p99": 7,
+    "worst": 11,
+    "mean": 1.27
+   },
+   "submit": {
+    "n": 370,
+    "p50": 39,
+    "p95": 71,
+    "p99": 98,
+    "worst": 802,
+    "mean": 41.32
+   },
+   "firstFrames": {
+    "worst": 306,
+    "mean": 20.77
+   }
+  },
+  {
+   "throttle": 4,
+   "level": 2,
+   "tape": "driver",
+   "frames": 400,
+   "events": 0,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 1,
+     "submit": 53,
+     "total": 54
+    },
+    "frame": 400,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 370,
+    "p50": 62,
+    "p95": 94,
+    "p99": 148,
+    "worst": 1206,
+    "mean": 64.11
+   },
+   "jsWithoutSubmit": {
+    "n": 370,
+    "p50": 6,
+    "p95": 13,
+    "p99": 23,
+    "worst": 26,
+    "mean": 6.17
+   },
+   "sceneUpdate": {
+    "n": 370,
+    "p50": 4,
+    "p95": 11,
+    "p99": 16,
+    "worst": 20,
+    "mean": 4.18
+   },
+   "submit": {
+    "n": 370,
+    "p50": 56,
+    "p95": 90,
+    "p99": 138,
+    "worst": 1183,
+    "mean": 57.94
+   },
+   "firstFrames": {
+    "worst": 506,
+    "mean": 28.67
+   }
+  }
+ ],
+ "errors": [],
+ "summary": {
+  "budgetMs": 16.7,
+  "jsWithoutSubmitWorstAtTopThrottle": 26,
+  "jsWithoutSubmitP95AtTopThrottle": 13,
+  "sceneUpdateP95AtTopThrottle": 11,
+  "frameP95AtTopThrottle": 94,
+  "frameWorstAtTopThrottle": 1206,
+  "jsHoldsBudgetAtTopThrottle": true
+ },
+ "finished": "2026-10-16T20:42:10.357Z"
+}

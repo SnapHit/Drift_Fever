@@ -8,8 +8,9 @@ roads and the same input tapes and comparing every frame.
 ## How it works
 
 - `browser.js` serves the original page (`git show <commit>:index.html`,
-  via `tools/original.js`) and a host page for the module from one local
-  http server and opens both in one headless Chromium. One
+  via `tools/original.js`), a host page for the module and, under
+  `/page/`, the shipped greybox page from its sources, from one local
+  http server, and opens them in one headless Chromium. One
   engine on both sides, because Node's Math library differs from
   Chromium's in the last bit of `sin` and `exp`, and a two minute drive
   turns that into a different trace. The comparison is exact.
@@ -79,6 +80,19 @@ roads and the same input tapes and comparing every frame.
   frame order, and the module's, against the real thing.
 - K7 every ending is reached at least once: off road, a hit, running out
   of time, a finish, a continue and a next level.
+- K8 the shipped greybox page (`public/`), driven through its own frame
+  function with the 3D renderer attached, matches the original driven
+  through its own `frame()` frame for frame, on real frame jobs across
+  the six levels, endless, the routes script and a reload; two of the
+  jobs put the input in through the page's own handlers (arrow key
+  events, pointer events on the two halves of the canvas, Enter for a
+  tap), on both sides. The known answer: a page whose renderer writes
+  one simulation field it should only read (`carPitch`, set by
+  `window.__parityBreak` before load) must fail the comparison. Both
+  pages run at a small viewport (120x260) because the headless GPU is a
+  software rasteriser and its cost is per pixel.
+- K9 the shipped page gives the same drive at 390x844 as at the small
+  viewport.
 
 The comparison is against the untuned original: no `?debug=1`, no stored
 tuning, `seedPinned` false.

@@ -37,8 +37,22 @@ sim/VENDOR.json          GENERATED: what was taken, cut and replaced, with lines
 parity/                  the parity test. README.md explains it
 parity/stamp.json        the last passing run, with the hashes of what it covered
 parity/REPORT.md         the last passing run's summary
-public/                  the preview page; the renderer arrives here in stage 2
-tools/build-site.js      assembles dist/, the web root the preview Worker serves
+tools/chrome.js          slices the chrome out of the original, mechanically: overlays, input, audio, the frame
+tools/chrome.config.js   the world boundary: the Canvas 2D world is cut, render() is replaced
+tools/page.template.html the shipped page, around the original's markup
+tools/vendor-three.js    bundles the pinned three.js into public/vendor/
+tools/serve.js           the dev server: public/ at the root, sim/ and the music beside it
+public/index.html        GENERATED: the shipped page. Do not edit
+public/chrome.js         GENERATED: createChrome(SIM, WORLD, DOM), the original's chrome verbatim. Do not edit
+public/chrome.css        GENERATED: the original's stylesheet. Do not edit
+public/CHROME.json       GENERATED: what was taken, cut and replaced, with lines
+public/game.js           the host: makes the simulation, the world and the chrome, wires the hooks
+public/world.js          the 3D world: three.js, plain shapes, every tunable in WORLD at the top
+public/vendor/           three.js, pinned and bundled locally, with its licence
+probes/                  the stage 2 measurements: screen agreement, visibility, frame budget, the review set
+review/stage-2/          the stage 2 report, its numbers and the screenshot set
+ASSETS.md                every asset, with source and licence
+tools/build-site.js      assembles dist/, the web root the preview Worker serves: the game at /, status at /status/
 wrangler.jsonc           the preview Worker. dist/ is the assets directory
 ci/parity.yml            reference copy; the live one is /.github/workflows/crazygames-parity.yml
 ```
@@ -57,8 +71,23 @@ npm run parity:check                     no browser: is the stamp current for th
 node parity/diagnose.js --group "level 2" --key "drive L2 20261001 centre" --quick
                                          where do the two sides part, and on which fields
 node parity/render-feedback.js --days 1  does drawing feed back into the original's simulation (slow)
-npm run build                            parity:check, then dist/
+npm run chrome                           regenerate public/chrome.js, chrome.css and index.html from vendor/original
+npm run chrome:report                    the chrome closure, its cut set, the simulation names it writes
+npm run vendor:three                     rebuild public/vendor/three.webgpu.min.js from the pinned package
+npm run serve                            the greybox page at http://127.0.0.1:8787/
+npm run probe:screen                     stage 2 "Done" 2: what is drawn against the simulation's numbers
+npm run probe:visibility                 stage 2 "Done" 3: road visible ahead, hazards and jumps against the original
+npm run probe:perf                       stage 2 "Done" 4: JavaScript time per frame under CPU throttling
+npm run probe:shots                      the review set, greybox and live game side by side
+npm run build                            parity:check, then dist/ (prints the initial download, fails above 20MB)
 ```
+
+The parity test now also drives the shipped page (`public/`) through its
+own frame function with the 3D renderer attached, by key and pointer
+events as well as by the tapes (K8), and checks it is viewport
+independent (K9). Any change under `public/` makes the stamp stale, so a
+change to the renderer ends with `npm run parity -- --stamp` and a commit
+of the stamp, exactly as a change to the module does.
 
 The parity test runs both sides in one headless Chromium on purpose:
 Node's Math library differs from Chromium's in the last bit of `sin` and
@@ -153,6 +182,7 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
 
 - Stage 1: done. The simulation is vendored and parity is proven; see
   `parity/REPORT.md`.
-- Stage 2, the greybox renderer: in progress on the `crazygames-stage-2`
-  branch. `STAGE-2.md` is its brief. It consumes `createSim(hooks)` and
-  never feeds back into it.
+- Stage 2, the greybox renderer: built on the `crazygames-stage-2`
+  branch; `review/stage-2/REPORT.md` has the measurements. `STAGE-2.md`
+  is its brief. It consumes `createSim(hooks)` and never feeds back into
+  it, and the parity test's K8 is what says so.

@@ -1,0 +1,219 @@
+{
+ "frames": {
+  "drive": {
+   "countdown": 26,
+   "drift": 182,
+   "jump": 1277,
+   "hazard": 1345,
+   "gate": 1513,
+   "finish": null,
+   "card": null,
+   "slip": 1,
+   "carY": 4248.739999968584
+  },
+  "racers": {
+   "contact": 459
+  },
+  "wreck": {
+   "wreck": null
+  }
+ },
+ "jobs": {
+  "drive": {
+   "day": 20261001,
+   "level": 3,
+   "mode": "DAILY",
+   "seed": 628091063,
+   "tape": "driver",
+   "maxFrames": 4200,
+   "finishFrames": 700
+  },
+  "racers": {
+   "day": 20261001,
+   "level": 5,
+   "mode": "DAILY",
+   "seed": 628091086,
+   "tape": "hug",
+   "maxFrames": 2200
+  },
+  "wreck": {
+   "day": 20261001,
+   "level": 6,
+   "mode": "DAILY",
+   "seed": 628091099,
+   "tape": "chaos",
+   "maxFrames": 1500
+  }
+ },
+ "shots": [
+  {
+   "file": "01-title-390x844.jpg",
+   "scene": "01-title",
+   "viewport": "390x844",
+   "job": null,
+   "frame": 0,
+   "bytes": 86027,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "02-countdown-390x844.jpg",
+   "scene": "02-countdown",
+   "viewport": "390x844",
+   "job": "drive",
+   "frame": 26,
+   "bytes": 29899,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "03-deep-drift-390x844.jpg",
+   "scene": "03-deep-drift",
+   "viewport": "390x844",
+   "job": "drive",
+   "frame": 182,
+   "bytes": 69300,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "04-jump-in-the-air-390x844.jpg",
+   "scene": "04-jump-in-the-air",
+   "viewport": "390x844",
+   "job": "drive",
+   "frame": 1277,
+   "bytes": 75230,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "05-hazard-approach-390x844.jpg",
+   "scene": "05-hazard-approach",
+   "viewport": "390x844",
+   "job": "drive",
+   "frame": 1345,
+   "bytes": 77159,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "06-contact-with-a-racer-390x844.jpg",
+   "scene": "06-contact-with-a-racer",
+   "viewport": "390x844",
+   "job": "racers",
+   "frame": 459,
+   "bytes": 68586,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "08-gate-390x844.jpg",
+   "scene": "08-gate",
+   "viewport": "390x844",
+   "job": "drive",
+   "frame": 1513,
+   "bytes": 74288,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "01-title-1280x720.jpg",
+   "scene": "01-title",
+   "viewport": "1280x720",
+   "job": null,
+   "frame": 0,
+   "bytes": 151388,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "02-countdown-1280x720.jpg",
+   "scene": "02-countdown",
+   "viewport": "1280x720",
+   "job": "drive",
+   "frame": 26,
+   "bytes": 68645,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "03-deep-drift-1280x720.jpg",
+   "scene": "03-deep-drift",
+   "viewport": "1280x720",
+   "job": "drive",
+   "frame": 182,
+   "bytes": 156282,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "04-jump-in-the-air-1280x720.jpg",
+   "scene": "04-jump-in-the-air",
+   "viewport": "1280x720",
+   "job": "drive",
+   "frame": 1277,
+   "bytes": 174908,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "05-hazard-approach-1280x720.jpg",
+   "scene": "05-hazard-approach",
+   "viewport": "1280x720",
+   "job": "drive",
+   "frame": 1345,
+   "bytes": 167726,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "06-contact-with-a-racer-1280x720.jpg",
+   "scene": "06-contact-with-a-racer",
+   "viewport": "1280x720",
+   "job": "racers",
+   "frame": 459,
+   "bytes": 153272,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "08-gate-1280x720.jpg",
+   "scene": "08-gate",
+   "viewport": "1280x720",
+   "job": "drive",
+   "frame": 1513,
+   "bytes": 155387,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  }
+ ],
+ "totalBytes": 1508097
+}

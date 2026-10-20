@@ -31,8 +31,13 @@ export const WORLD = {
      solved from those three numbers, then judged by the stage 2
      measurements: seconds of road visible ahead at top speed, and no
      hazard or jump seen later than the original's reference camera. */
-  PORTRAIT:  { fov: 100, back: 6600, height: 4450, pitch: 23.2 },   // vertical field of view, units behind the car, above its ground, degrees down
-  LANDSCAPE: { fov: 62,  back: 5200, height: 3000, pitch: 16.0 },
+  /* Measured over the visibility probe's drives (probes/visibility.js):
+     the rig solved for the original's layout (height 4450 in portrait) saw
+     less road than the original past crests on 4 of 114 frames; this one,
+     higher and steeper, never did. The horizon sits at 27 per cent of the
+     height in portrait and 14 in landscape, the car at 64 and 78. */
+  PORTRAIT:  { fov: 100, back: 5594, height: 6038, pitch: 28.7 },   // vertical field of view, units behind the car, above its ground, degrees down
+  LANDSCAPE: { fov: 66,  back: 5600, height: 5600, pitch: 25.0 },
   CAM_NEAR:             120,
   CAM_FAR:           140000,
   CAM_FOLLOW_X:        1.00,     // share of the simulation's cameraX (already carX times CAMERA_FOLLOW) the camera copies
@@ -192,7 +197,7 @@ export function createWorld(SIM, canvas, opts) {
   const MAXB = W.DRAW_SEGMENTS + W.BEHIND_SEGMENTS + 4;
   const bX = new Float64Array(MAXB), bZ = new Float64Array(MAXB), bH = new Float64Array(MAXB), bY = new Float64Array(MAXB), bW = new Float64Array(MAXB), bIdx = new Int32Array(MAXB), bOk = new Uint8Array(MAXB);
   let bFirst = 0, bCount = 0, carIdx = 0, carFrac = 0, carGroundY = 0, carS = 0, absHeading = 0, lastCarS = -1, lastSeed = null, lastState = -1;
-  function segHeight(i) { return SIM.segHeight(i); }
+  function segHeight(i) { return SIM.segHeight(i) + (i === probeBump.seg ? probeBump.dy : 0); }
   /* The simulation trims the road behind the camera's segment, about
      twenty segments behind the car, and the rig looks further back than
      that at the bottom of the screen. Segments are remembered as they go
@@ -648,11 +653,22 @@ export function createWorld(SIM, canvas, opts) {
   let frameNo = 0;
   function render(w, h) {
     const t0 = performance.now();
+    update(w, h);
+    const t1 = performance.now();
+    renderer.render(scene, camera);
+    const t2 = performance.now();
+    lastRenderMs = { scene: t1 - t0, submit: t2 - t1, total: t2 - t0 };
+    frameNo++;
+  }
+  /* Everything but the submission: the tables, the camera, the strips, the cars, the particles. */
+  function update(w, h) {
     if (w !== view.w || h !== view.h) { view.w = w; view.h = h; applyTier(); }
     const Cl = COLOUR();
     if (Cl && Cl.ROAD_LIGHT !== paletteKey) { paletteKey = Cl.ROAD_LIGHT; readColours(); if (!player) { buildCars(); buildPools(); } }
     if (!player) { buildCars(); buildPools(); readColours(); }
+    const tt = profile ? performance.now() : 0;
     buildTable();
+    if (profile) profile.table += performance.now() - tt;
     const dt = Math.min(FEEL.MAX_FRAME_DELTA, frameDt);
 
     /* the camera: straight behind the car on the frame's Z axis, not on
@@ -676,59 +692,82 @@ export function createWorld(SIM, canvas, opts) {
     scene.background.copy(CC.skyLow).lerp(CC.horizonGlow, 0.35 * Math.min(1, (SIM.worldHeat || 0) + (SIM.finaleSky || 0)));
     hemi.color.copy(CC.skyLow).lerp(new THREE.Color(0xffffff), 0.7); hemi.groundColor.copy(CC.void).lerp(CC.groundMid, 0.6);
 
+    const tm = profile ? performance.now() : 0;
     drawRoad();
+    if (profile) profile.road += performance.now() - tm;
+    const t2 = profile ? performance.now() : 0;
     drawTerrain();
+    if (profile) profile.terrain += performance.now() - t2;
+    const t3 = profile ? performance.now() : 0;
     drawPaint();
+    if (profile) profile.paint += performance.now() - t3;
+    const t4 = profile ? performance.now() : 0;
     drawBlocks();
+    if (profile) profile.blocks += performance.now() - t4;
+    const t5 = profile ? performance.now() : 0;
     drawCars();
     contactSparks();
     stepPool(smoke, dt); stepPool(debris, dt); stepPool(sparks, dt); stepPool(fireworks, dt);
-    const t1 = performance.now();
-    renderer.render(scene, camera);
-    const t2 = performance.now();
-    lastRenderMs = { scene: t1 - t0, submit: t2 - t1, total: t2 - t0 };
-    frameNo++;
+    camera.updateMatrixWorld();
+    if (profile) { profile.rest += performance.now() - t5; profile.frames++; }
   }
+  let profile = null;
   let frameDt = 1 / 60;
   let probeOffset = 0;
+  /* probeBump is the visibility probe's known answer: a fake crest, this
+     many units added to the drawn road at one segment, which must hide
+     what is behind it. Zero in play. */
+  let probeBump = { seg: -1, dy: 0 };
+  let raycastLast = null;
 
+  /* The road and the terrain are built from cross sections: every boundary
+     in the table gets its stations across the road computed once, and the
+     quads between consecutive boundaries read them. */
+  const STATIONS = 12;   // per boundary: terrain far, terrain mid, slab foot, lip out, lip in, edge, lane left, lane right, edge, lip in, lip out, slab foot, terrain mid, terrain far
+  const XS = new Float64Array(MAXB * 16), YS = new Float64Array(MAXB * 16), ZS = new Float64Array(MAXB * 16);
+  const SP = new THREE.Vector3();
+  function stationsFor(n, EO, lip) {
+    const idx = bIdx[n], s0 = idx * L, hw = bW[n];
+    const o = n * 16;
+    const ripple = Math.sin(idx * 0.21) * W.TERRAIN_RIPPLE;
+    const put = (k, x, y) => { roadPoint(SP, s0, x, y); XS[o + k] = SP.x; YS[o + k] = SP.y; ZS[o + k] = SP.z; };
+    const near = EO * hw + W.SLAB_FLARE, mid = (EO + W.TERRAIN_NEAR * 3) * hw, far = W.TERRAIN_REACH * hw;
+    const yNear = -W.SLAB_DEPTH, yMid = -W.SLAB_DEPTH - W.TERRAIN_DROP * 0.35 + ripple * 0.5, yFar = -W.SLAB_DEPTH - W.TERRAIN_DROP + ripple;
+    put(0, -far, yFar); put(1, -mid, yMid); put(2, -near, yNear);
+    put(3, -EO * hw, 0); put(4, -(EO - lip) * hw, 0); put(5, -hw, 0); put(6, -W.LANE_HALF * hw, 0);
+    put(7, W.LANE_HALF * hw, 0); put(8, hw, 0); put(9, (EO - lip) * hw, 0); put(10, EO * hw, 0);
+    put(11, near, yNear); put(12, mid, yMid); put(13, far, yFar);
+  }
+  const st = (out, n, k) => { const o = n * 16 + k; out.x = XS[o]; out.y = YS[o]; out.z = ZS[o]; return out; };
   function drawRoad() {
-    road.begin(); walls.begin(); marks.begin();
+    road.begin(); walls.begin(); marks.begin(); terrain.begin();
     const lip = W.LIP, EO = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
     const heat = SIM.worldHeat || 0;
     const edgeHot = col2.copy(CC.edgeDark).lerp(CC.edgeLight, Math.min(1, heat * FEEL.HEAT_EDGE_LIFT));
-    const flare = SIM.landFlare || 0;
+    for (let n = 0; n < bCount; n++) stationsFor(n, EO, lip);
     for (let n = 0; n + 1 < bCount; n++) {
       if (!bOk[n]) continue;
       const idx = bIdx[n];
       const light = (Math.floor(idx / FEEL.RUMBLE_SEGMENTS) & 1) === 0;
-      const hw0 = bW[n], hw1 = bW[n + 1];
-      const s0 = idx * L, s1 = (idx + 1) * L;
-      const bandQuad = (a0, a1, colour, band) => {
-        roadPoint(A, s0, a0 * hw0, 0); roadPoint(B, s0, a1 * hw0, 0); roadPoint(C, s1, a1 * hw1, 0); roadPoint(D, s1, a0 * hw1, 0);
-        road.tag = { kind: band, seg: idx, a0, a1 };
-        road.quad(A, B, C, D, colour);
-        road.tag = null;
-      };
       const surf = light ? CC.roadLight : CC.roadDark;
       const shoulder = light ? CC.shoulderLight : CC.shoulderDark;
       const edge = light ? CC.edgeLight : edgeHot;
-      bandQuad(-1, 1, surf, 'surface');
-      bandQuad(-(EO - lip), -1, shoulder, 'shoulder'); bandQuad(1, EO - lip, shoulder, 'shoulder');
-      bandQuad(-EO, -(EO - lip), edge, 'lip'); bandQuad(EO - lip, EO, edge, 'lip');
-      if ((idx % (W.LANE_ON + W.LANE_OFF)) < W.LANE_ON) bandQuad(-W.LANE_HALF, W.LANE_HALF, CC.lane, 'lane');
+      const q = (strip, ka, kb, colour, tag) => { st(A, n, ka); st(B, n, kb); st(C, n + 1, kb); st(D, n + 1, ka); strip.tag = tag || null; strip.quad(A, B, C, D, colour); strip.tag = null; };
+      q(road, 5, 8, surf, { kind: 'surface', seg: idx, a0: -1, a1: 1 });
+      q(road, 4, 5, shoulder, { kind: 'shoulder', seg: idx, a0: -(EO - lip), a1: -1 }); q(road, 8, 9, shoulder, { kind: 'shoulder', seg: idx, a0: 1, a1: EO - lip });
+      q(road, 3, 4, edge, { kind: 'lip', seg: idx, a0: -EO, a1: -(EO - lip) }); q(road, 9, 10, edge, { kind: 'lip', seg: idx, a0: EO - lip, a1: EO });
+      if ((idx % (W.LANE_ON + W.LANE_OFF)) < W.LANE_ON) q(road, 6, 7, CC.lane, { kind: 'lane', seg: idx });
       // the slab's sides, flared out at the bottom
-      for (const side of [-1, 1]) {
-        roadPoint(A, s0, side * EO * hw0, 0); roadPoint(B, s0, side * (EO * hw0 + W.SLAB_FLARE), -W.SLAB_DEPTH);
-        roadPoint(C, s1, side * (EO * hw1 + W.SLAB_FLARE), -W.SLAB_DEPTH); roadPoint(D, s1, side * EO * hw1, 0);
-        walls.quad(A, B, C, D, CC.wall);
-      }
+      q(walls, 2, 3, CC.wall); q(walls, 10, 11, CC.wall);
+      // the terrain, two bands a side, stations left to right so the faces show upward
+      q(terrain, 1, 2, (idx & 1) ? CC.groundNear : CC.groundMid); q(terrain, 0, 1, (idx & 1) ? CC.groundMid : CC.groundFar);
+      q(terrain, 11, 12, (idx & 1) ? CC.groundNear : CC.groundMid); q(terrain, 12, 13, (idx & 1) ? CC.groundMid : CC.groundFar);
       // tyre marks ride the segment
       const sg = segAt(idx);
       if (sg && sg.ma > 0) {
         const a = Math.min(1, sg.ma);
         const mc = col.copy(surf).lerp(CC.trail, a * FEEL.TYRE_MARK_MAX_ALPHA);
-        const half = W.TYRE_MARK_HALF;
+        const half = W.TYRE_MARK_HALF, hw0 = bW[n], hw1 = bW[n + 1], s0 = idx * L, s1 = (idx + 1) * L;
         for (const [m0, m1] of [[sg.ml0, sg.ml1], [sg.mr0, sg.mr1]]) {
           roadPoint(A, s0, (m0 - half) * hw0, W.TYRE_MARK_LIFT); roadPoint(B, s0, (m0 + half) * hw0, W.TYRE_MARK_LIFT);
           roadPoint(C, s1, (m1 + half) * hw1, W.TYRE_MARK_LIFT); roadPoint(D, s1, (m1 - half) * hw1, W.TYRE_MARK_LIFT);
@@ -736,32 +775,10 @@ export function createWorld(SIM, canvas, opts) {
         }
       }
     }
-    void flare;
-    road.end(); walls.end(); marks.end();
+    road.end(); walls.end(); marks.end(); terrain.end();
   }
 
-  function drawTerrain() {
-    terrain.begin();
-    const EO = 1 + FEEL.RUMBLE_WIDTH_FRACTION;
-    for (let n = 0; n + 1 < bCount; n++) {
-      if (!bOk[n]) continue;
-      const idx = bIdx[n];
-      const s0 = idx * L, s1 = (idx + 1) * L;
-      const hw0 = bW[n], hw1 = bW[n + 1];
-      const ripple0 = Math.sin(idx * 0.21) * W.TERRAIN_RIPPLE, ripple1 = Math.sin((idx + 1) * 0.21) * W.TERRAIN_RIPPLE;
-      for (const side of [-1, 1]) {
-        const near0 = side * (EO * hw0 + W.SLAB_FLARE), near1 = side * (EO * hw1 + W.SLAB_FLARE);
-        const mid0 = side * (EO + W.TERRAIN_NEAR * 3) * hw0, mid1 = side * (EO + W.TERRAIN_NEAR * 3) * hw1;
-        const far0 = side * W.TERRAIN_REACH * hw0, far1 = side * W.TERRAIN_REACH * hw1;
-        const yNear = -W.SLAB_DEPTH, yMid = -W.SLAB_DEPTH - W.TERRAIN_DROP * 0.35 + ripple0 * 0.5, yFar = -W.SLAB_DEPTH - W.TERRAIN_DROP + ripple0;
-        roadPoint(A, s0, near0, yNear); roadPoint(B, s0, mid0, yMid); roadPoint(C, s1, mid1, yMid + (ripple1 - ripple0) * 0.5); roadPoint(D, s1, near1, yNear);
-        terrain.quad(A, B, C, D, (idx & 1) ? CC.groundNear : CC.groundMid);
-        roadPoint(A, s0, mid0, yMid); roadPoint(B, s0, far0, yFar); roadPoint(C, s1, far1, yFar + (ripple1 - ripple0)); roadPoint(D, s1, mid1, yMid + (ripple1 - ripple0) * 0.5);
-        terrain.quad(A, B, C, D, (idx & 1) ? CC.groundMid : CC.groundFar);
-      }
-    }
-    terrain.end();
-  }
+  function drawTerrain() { /* built with the road, from the same cross sections */ }
 
   function drawPaint() {
     paint.begin();
@@ -835,7 +852,8 @@ export function createWorld(SIM, canvas, opts) {
       const postW = 110;
       box(blocks, s, -span / 2, 0, high, postW, postW, 0, CC.metal, CC.metalShade);
       box(blocks, s, span / 2, 0, high, postW, postW, 0, CC.metal, CC.metalShade);
-      box(blocks, s, 0, high - 520, high, span / 2 + postW, 120, 0, CC.sign, CC.signShade);
+      // the plate is thin, because from a high camera a deep beam hides the road behind it
+      box(blocks, s, 0, high - 300, high, span / 2 + postW, 90, 0, CC.sign, CC.signShade);
       return;
     }
     if (id <= 7) { const wd = FEEL.SIGN_MARKER_WIDE, hi = FEEL.SIGN_MARKER_HIGH; box(blocks, s, x, 0, hi * 0.45, 40, 40, 0, CC.metal, CC.metalShade); box(blocks, s, x, hi * 0.45, hi, wd / 2, 60, 0, CC.sign, CC.signShade); return; }
@@ -1010,10 +1028,36 @@ export function createWorld(SIM, canvas, opts) {
       cars: () => ({ player, racers, ghost }), view, lastContacts,
       strips: { road, marks, paint, walls, terrain, blocks, city },
       setOffset(v) { probeOffset = v || 0; },
+      setBump(seg, dy) { probeBump = { seg: seg === undefined ? -1 : seg, dy: dy || 0 }; },
+      /* The nearest thing the world draws along a line, as a distance, or
+         Infinity: the road, its walls, the terrain, the blocks. */
+      raycast(from, to, which) {
+        const f = new THREE.Vector3(from.x, from.y, from.z), t = new THREE.Vector3(to.x, to.y, to.z);
+        const dir = t.clone().sub(f); const len = dir.length(); dir.normalize();
+        const rc = new THREE.Raycaster(f, dir, 0, len);
+        const all = { road, walls, terrain, blocks };
+        const names = which || ['road', 'walls', 'terrain', 'blocks'];
+        const meshes = names.map(n => all[n].mesh);
+        for (const m of meshes) { m.geometry.computeBoundingSphere(); }
+        const hits = rc.intersectObjects(meshes, false);
+        if (!hits.length) return Infinity;
+        const h = hits[0];
+        const strip = names.find(n => all[n].mesh === h.object);
+        const q = Math.floor(h.faceIndex / 2);
+        const tag = all[strip].tags[q];
+        raycastLast = { distance: h.distance, strip, tag: tag ? tag.kind : null, seg: tag ? tag.seg : null };
+        return h.distance;
+      },
+      lastHit() { return raycastLast; },
+      /* Rebuild the frame tables and strips for the simulation's state as
+         it stands, without the frame function: for sweeps. */
+      rebuild(w, h) { update(w || view.w || 390, h || view.h || 844); },
+      profile(on) { profile = on ? { road: 0, terrain: 0, paint: 0, blocks: 0, rest: 0, frames: 0, table: 0 } : null; return profile; },
       worldPos(obj) { obj.updateWorldMatrix(true, false); const v = new THREE.Vector3(); obj.getWorldPosition(v); return { x: v.x, y: v.y, z: v.z }; },
       cameraPos() { return { x: camera.position.x, y: camera.position.y, z: camera.position.z }; },
       frustum() { camera.updateMatrixWorld(); const f = new THREE.Frustum(); f.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)); return p => f.containsPoint(new THREE.Vector3(p.x, p.y, p.z)); },
       rig: () => (view.h > view.w ? W.PORTRAIT : W.LANDSCAPE),
+      W,
     },
     tier: () => tier,
     setTier(t) { if (W.TIERS[t]) { tier = t; applyTier(); } },

@@ -1,0 +1,178 @@
+{
+ "started": "2026-10-16T05:46:51.627Z",
+ "knownAnswers": {
+  "A replica vs original bvis 390x844": {
+   "frames": 200,
+   "cells": 40000,
+   "mismatches": 0,
+   "first": null,
+   "pass": true,
+   "errors": []
+  },
+  "A replica vs original bvis 1280x720": {
+   "frames": 200,
+   "cells": 40000,
+   "mismatches": 0,
+   "first": null,
+   "pass": true,
+   "errors": []
+  }
+ },
+ "run": {
+  "390x844": {
+   "frames": 74,
+   "contiguousRun": {
+    "worstSeconds": 2.49,
+    "p05Seconds": 2.78,
+    "medianSeconds": 4.44,
+    "maxSeconds": 4.49,
+    "under35": 15
+   },
+   "furthestVisible": {
+    "worstSeconds": 3.31,
+    "p05Seconds": 3.71,
+    "medianSeconds": 4.49,
+    "maxSeconds": 4.49,
+    "under35": 2
+   },
+   "originalContiguousRun": {
+    "worstSeconds": 2.53,
+    "p05Seconds": 2.91,
+    "medianSeconds": 3.96,
+    "maxSeconds": 3.98,
+    "under35": 13
+   },
+   "originalFurthestVisible": {
+    "worstSeconds": 3.04,
+    "p05Seconds": 3.44,
+    "medianSeconds": 3.96,
+    "maxSeconds": 3.98,
+    "under35": 5
+   },
+   "worstFrame": {
+    "day": 20261001,
+    "level": 2,
+    "n": 250,
+    "segs": 112,
+    "furthest": 202,
+    "oSegs": 179,
+    "oFurthest": 179
+   },
+   "framesShorterThanOriginal": 4,
+   "worstShortfallSeconds": 1.49,
+   "framesFurthestShorterThanOriginal": 0,
+   "reasons": {
+    "occluded": 34,
+    "draw distance": 40
+   },
+   "knownAnswerB": {
+    "at": 310,
+    "without": 181,
+    "withCrest": 30,
+    "reason": "occluded",
+    "caught": true
+   },
+   "errors": []
+  },
+  "1280x720": {
+   "frames": 74,
+   "contiguousRun": {
+    "worstSeconds": 1.76,
+    "p05Seconds": 1.91,
+    "medianSeconds": 3.84,
+    "maxSeconds": 4.49,
+    "under35": 28
+   },
+   "furthestVisible": {
+    "worstSeconds": 2.47,
+    "p05Seconds": 2.98,
+    "medianSeconds": 4.47,
+    "maxSeconds": 4.49,
+    "under35": 11
+   },
+   "originalContiguousRun": {
+    "worstSeconds": 0.76,
+    "p05Seconds": 0.84,
+    "medianSeconds": 1.82,
+    "maxSeconds": 3.98,
+    "under35": 65
+   },
+   "originalFurthestVisible": {
+    "worstSeconds": 0.91,
+    "p05Seconds": 1.09,
+    "medianSeconds": 3.22,
+    "maxSeconds": 3.98,
+    "under35": 42
+   },
+   "worstFrame": {
+    "day": 20261001,
+    "level": 2,
+    "n": 290,
+    "segs": 79,
+    "furthest": 180,
+    "oSegs": 49,
+    "oFurthest": 49
+   },
+   "framesShorterThanOriginal": 0,
+   "worstShortfallSeconds": 0,
+   "framesFurthestShorterThanOriginal": 0,
+   "reasons": {
+    "occluded": 47,
+    "draw distance": 27
+   },
+   "knownAnswerB": {
+    "at": 310,
+    "without": 170,
+    "withCrest": 30,
+    "reason": "occluded",
+    "caught": true
+   },
+   "errors": []
+  }
+ },
+ "targets": {
+  "total": 35,
+  "hazards": 16,
+  "jumps": 19,
+  "neverSeenHere": 0,
+  "neverSeenByOriginal": 0,
+  "laterThanOriginal": 1,
+  "worstLaterSegments": 24,
+  "worstLaterSeconds": 0.53,
+  "leadOverOriginalSegments": {
+   "min": -24,
+   "p05": 25,
+   "median": 38,
+   "max": 92
+  },
+  "minLeadSecondsAheadHere": 2.2,
+  "minLeadSecondsAheadOriginal": 0.53,
+  "later": [
+   {
+    "day": 20261001,
+    "level": 6,
+    "kind": "jump",
+    "from": 4202,
+    "to": 4210,
+    "mine": 4057,
+    "orig": 4033
+   }
+  ],
+  "knownAnswerC": {
+   "target": {
+    "kind": "blocker",
+    "from": 983,
+    "to": 987,
+    "x": 0.29534163180738693,
+    "half": 420,
+    "swing": 0
+   },
+   "before": 780,
+   "withCrest": 926,
+   "caught": true
+  },
+  "errors": []
+ },
+ "pass": false,
+ "finished": "2026-10-16T05:47:47.026Z"
+}
