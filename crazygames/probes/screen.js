@@ -67,13 +67,13 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
   const jobs = jobsFor(J.VIEW).filter(j => j.tape === 'driver').slice(0, 1).map(j => ({ ...j, maxFrames: 400 }));
   const r = await runSet(J.VIEW, jobs, 0.05);
   const f = fold(r.per);
-  const wheel = f.checks['rear wheel vs road frame (half widths)'], centre = f.checks['car centre vs road frame (half widths)'], px = f.checks['rear wheel on screen vs the lips (px)'];
+  const wheel = f.checks['rear wheel vs road frame (units)'], centre = f.checks['car centre vs road frame (units)'], px = f.checks['rear wheel on screen vs the lips (px)'];
   results.knownAnswer = { offset: 0.05, caught: !!(wheel && wheel.fail > 0 && centre && centre.fail > 0 && px && px.fail > 0), wheelFails: wheel && wheel.fail, centreFails: centre && centre.fail, pxFails: px && px.fail, worstPx: px && px.worst, frames: f.frames };
 }
 await env.close();
 const main = results.viewports['390x844'];
 const anyFail = Object.values(results.viewports).some(v => Object.values(v.checks).some(c => c.fail > 0) || v.errors.length);
-results.pass = !anyFail && results.knownAnswer.caught && Object.keys(main.counts).every(k => !/with|but|inside|clear|no drawn|not drawn/.test(k) || main.counts[k] === 0);
+results.pass = !anyFail && results.knownAnswer.caught && Object.values(results.viewports).every(v => Object.keys(v.counts).every(k => !/ with | but |inside|clear|no drawn|not drawn/.test(k) || v.counts[k] === 0));
 results.finished = new Date().toISOString();
 L.writeJson(path.join(L.root, 'review', 'stage-2', 'screen.json'), results);
 console.log('\nscreen agreement: ' + (results.pass ? 'PASS' : 'FAIL'));

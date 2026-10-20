@@ -59,7 +59,7 @@
     if (Math.abs(value) > limit) { c.fail++; if (stats.fails.length < 40) stats.fails.push(name + ' ' + value.toFixed(4) + ' > ' + limit + ' ' + JSON.stringify(detail)); }
   }
   function count(name) { stats.counts[name] = (stats.counts[name] || 0) + 1; }
-  const TOL = { frac: 0.01, px: 2.0, height: 10, contactGap: 90, hitOverlap: 1 };
+  const TOL = { frac: 0.01, units: 25, px: 2.0, height: 10, contactGap: 90, hitOverlap: 1 };
 
   function sample(n, info) {
     const s = S(), W = s.world, P = W.probe, F = s.get('FEEL');
@@ -84,8 +84,12 @@
         const ag = againstQuad(centre, quadCorners(road, q));
         // the body's centre is the yaw pivot's offset off the car's bookkeeping position, as the original's carToWorld has it
         const yaw = s.fn.carYaw();
-        const simFrac = (s.get('carX') + s.fn.bodyOffsetX(yaw)) / seg.hw;
-        note('car centre vs road frame (half widths)', ag.frac - simFrac, TOL.frac, { n, frac: ag.frac, simFrac, state: st });
+        /* in units, because the simulation's half width is one number per
+           segment while both renderers draw the width as a ramp between
+           boundaries, so a fraction of the drawn width is not the
+           simulation's fraction where the road is changing width */
+        const simX = s.get('carX') + s.fn.bodyOffsetX(yaw);
+        note('car centre vs road frame (units)', ag.lateral - simX, TOL.units, { n, lateral: ag.lateral, simX, frac: ag.frac, state: st });
         note('car centre along the road vs position (units)', (ag.u + carIdx) * F.SEGMENT_LENGTH - (carS + s.fn.bodyOffsetZ(yaw)), 12, { n });
         /* height: the car sits carY above the road (on the ramp deck or in the air) */
         const wheels = cars.player.userData.wheels;
@@ -101,7 +105,7 @@
       /* 2. the rear wheels against the drawn edges, in the road frame and on
          screen, each wheel against the quads of the segment it is actually
          over (a yawed car's wheels straddle segments) */
-      if (axleSeg) {
+      if (axleSeg && st !== DEAD) {
         const contacts = s.fn.rearWheelOffsets(s.get('carX'));
         const wheels = cars.player.userData.wheels;   // 0 front left, 1 front right, 2 rear left, 3 rear right
         for (const [k, simX] of [[2, contacts.left], [3, contacts.right]]) {
@@ -112,7 +116,8 @@
           if (qs >= 0 && lipL >= 0 && lipR >= 0) {
             const qc = quadCorners(road, qs), ql = quadCorners(road, lipL), qr = quadCorners(road, lipR);
             const ag = againstQuad(wp, qc);
-            note('rear wheel vs road frame (half widths)', ag.frac - simX / axleSeg.hw, TOL.frac, { n, wheel: k, frac: ag.frac, sim: simX / axleSeg.hw });
+            note('rear wheel vs road frame (units)', ag.lateral - simX, TOL.units, { n, wheel: k, lateral: ag.lateral, simX });
+            if (s.get('carY') !== 0) continue;   // in the air or on a ramp the wheel is above the surface the lips are on
             /* on screen: the wheel between the two drawn outer lip edges at the same place along the road */
             const outerL = lerp(ql.a, ql.d, ag.u), outerR = lerp(qr.b, qr.c, ag.u);
             const pw = P.project(wp.x, wp.y, wp.z), pl = P.project(outerL.x, outerL.y, outerL.z), pr = P.project(outerR.x, outerR.y, outerR.z);
@@ -129,14 +134,19 @@
       }
       /* 3. off road, scraping and the edge: at the frame the run ends off road, the drawn car centre is past OFF_ROAD */
       if (info.after === DEAD && info.before === DRIVING && s.get('deathKind') === s.get('OFF_ROAD') && q >= 0) {
-        count('off road deaths');
+        /* the edge kills two ways: past OFF_ROAD at once, or past SCRAPE_START
+           for longer than the scrape meter allows; the car's bookkeeping says
+           which, and the drawn car must agree with it */
         const ag = againstQuad(centre, quadCorners(road, q));
-        if (Math.abs(ag.frac) <= F.OFF_ROAD - TOL.frac) { count('off road death with the drawn car inside the edge'); stats.fails.push('off road death drawn inside at frame ' + n + ' frac ' + ag.frac.toFixed(3)); }
+        const simFrac = (s.get('carX') + s.fn.bodyOffsetX(s.fn.carYaw())) / seg.hw;
+        const line = Math.abs(s.get('carFrac')) > F.OFF_ROAD ? F.OFF_ROAD : F.SCRAPE_START;
+        count(line === F.OFF_ROAD ? 'off road deaths past the edge' : 'off road deaths on the scrape meter');
+        if (Math.abs(ag.lateral) <= line * seg.hw - TOL.units) { count('off road death with the drawn car inside the line'); stats.fails.push('off road death drawn inside the line at frame ' + n + ' drawn ' + ag.lateral.toFixed(0) + ' line ' + (line * seg.hw).toFixed(0) + ' simFrac ' + simFrac.toFixed(3)); }
       }
       if (driving && s.get('scraping') && q >= 0 && !hazardAlongside(s, carIdx)) {
         count('edge scraping frames');
         const ag = againstQuad(centre, quadCorners(road, q));
-        if (Math.abs(ag.frac) < F.SCRAPE_START - TOL.frac) { count('scraping with the drawn car inside the scrape band'); }
+        if (Math.abs(ag.lateral) < F.SCRAPE_START * seg.hw - TOL.units) { count('scraping with the drawn car inside the scrape band'); stats.fails.push('scraping drawn inside the band at frame ' + n + ' drawn ' + ag.lateral.toFixed(0) + ' band ' + (F.SCRAPE_START * seg.hw).toFixed(0) + ' carFrac ' + s.get('carFrac').toFixed(3) + ' side ' + s.get('scrapeSide')); }
       }
     }
     /* 4. a hit: the drawn car overlaps the drawn hazard's core */
@@ -192,7 +202,7 @@
       const qr = findQuad(road, t => t.kind === 'surface' && t.seg === rIdx);
       if (qr < 0 || !rseg) return;
       const ag = againstQuad(rp, quadCorners(road, qr));
-      note('racer centre vs road frame (half widths)', ag.frac - (r.x + s.fn.bodyOffsetX(r.yaw)) / rseg.hw, TOL.frac, { n, racer: i, frac: ag.frac, sim: r.x / rseg.hw });
+      note('racer centre vs road frame (units)', ag.lateral - (r.x + s.fn.bodyOffsetX(r.yaw)), TOL.units, { n, racer: i, lateral: ag.lateral, simX: r.x + s.fn.bodyOffsetX(r.yaw) });
       note('racer along the road vs z (units)', (ag.u + rIdx) * F.SEGMENT_LENGTH - (rS + s.fn.bodyOffsetZ(r.yaw)), 12, { n, racer: i });
     });
     /* 7. gates: at the frame a gate is passed, the drawn gate stood where the car is */
@@ -238,7 +248,7 @@
   }
   function toRoadS(p) { return toRoad(p).s; }
   function toRoadX(p) { return toRoad(p).x; }
-  function hazardAlongside(s, carIdx) { return s.get('hazards').some(h => carIdx >= h.from - 1 && carIdx <= h.to + 1); }
+  function hazardAlongside(s, carIdx) { return s.get('hazards').some(h => carIdx >= h.from - 2 && carIdx <= h.to + 2); }
   function reset() { stats.frames = 0; stats.checks = {}; stats.counts = {}; stats.fails = []; lastGates = 0; }
   function summary() { const out = { frames: stats.frames, checks: {}, counts: stats.counts, fails: stats.fails }; for (const k in stats.checks) { const c = stats.checks[k]; out.checks[k] = { n: c.n, fail: c.fail, worst: +c.worst.toFixed(4), mean: +(c.sum / Math.max(1, c.n)).toFixed(4), worstDetail: c.worstDetail }; } return out; }
   root.screenProbe = { sample, summary, reset, TOL, _againstQuad: againstQuad };

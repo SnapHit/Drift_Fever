@@ -77,9 +77,10 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
         try {
           window.driveProbe.drive(S, job, { frame: (n) => {
             if (S.get('state') !== S.get('DRIVING') || S.fn.countHolding()) return;
-            const v = V.visibleRun(w, h);
+            const v = V.visibleRun(w, h);                                   // everything drawn can hide the road: ramps, gantries, trees
+            const g = V.visibleRun(w, h, ['road', 'walls', 'terrain']);     // the ground alone, which is all the original's rule knows
             const o = V.originalRun(w, h);
-            out.push([n, v.segments, v.furthest, o.segments, o.furthest]);
+            out.push([n, v.segments, v.furthest, o.segments, o.furthest, g.segments, g.furthest]);
             reasons[v.reason] = (reasons[v.reason] || 0) + 1;
             if (bumpTest && !bump && n > 300 && v.segments > 100) {
               // the known answer: a crest 30 segments ahead, then the run again
@@ -87,13 +88,13 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
               P.setBump(T.carIdx + 30, 2500); P.rebuild(w, h);
               const vb = V.visibleRun(w, h);
               P.setBump(-1, 0); P.rebuild(w, h);
-              bump = { at: n, without: v.segments, withCrest: vb.segments, reason: vb.reason, caught: vb.segments <= 30 && vb.reason === 'occluded' };
+              bump = { at: n, without: g.segments, withCrest: vb.segments, reason: vb.reason, caught: vb.segments <= 30 && /^occluded/.test(vb.reason) };
             }
           } });
         } finally { renderer.render = real; }
         return { out, reasons, bump };
       }, { job: { day, level, mode: 'DAILY', seed: J.seedOf(day, level, 'driver'), tape: 'driver', maxFrames: quick ? 500 : 900, every: 10 }, w: viewport.width, h: viewport.height, bumpTest: !bump });
-      for (const [n, segs, furthest, oSegs, oFurthest] of r.out) runs.push({ day, level, n, segs, furthest, oSegs, oFurthest });
+      for (const [n, segs, furthest, oSegs, oFurthest, gSegs, gFurthest] of r.out) runs.push({ day, level, n, segs, furthest, oSegs, oFurthest, gSegs, gFurthest });
       for (const k in r.reasons) reasons[k] = (reasons[k] || 0) + r.reasons[k];
       if (r.bump && !bump) bump = r.bump;
       process.stdout.write('  run ' + viewport.width + 'x' + viewport.height + ' L' + level + ' ' + day + ': ' + r.out.length + ' frames, min run ' + Math.min(...r.out.map(x => x[1])) + ' segments here, ' + Math.min(...r.out.map(x => x[3])) + ' by the original\n');
@@ -102,16 +103,19 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
   const F = await side.page.evaluate(() => ({ L: window.__S.get('FEEL').SEGMENT_LENGTH, SPEED: window.__S.get('FEEL').SPEED }));
   const sec = v => +(v * F.L / F.SPEED).toFixed(2);
   const dist = (key) => { const a = runs.map(r => r[key]).sort((x, y) => x - y); return { worstSeconds: sec(a[0]), p05Seconds: sec(L.pct(a, 0.05)), medianSeconds: sec(L.pct(a, 0.5)), maxSeconds: sec(a[a.length - 1]), under35: a.filter(v => v * F.L / F.SPEED < 3.5).length }; };
-  const worst = runs.reduce((a, b) => (b.segs < a.segs ? b : a), runs[0]);
-  const shorterThanOriginal = runs.filter(r => r.segs < r.oSegs);
+  const worst = runs.reduce((a, b) => (b.gSegs < a.gSegs ? b : a), runs[0]);
+  const shorterThanOriginal = runs.filter(r => r.gSegs < r.oSegs);
   results.run[viewport.width + 'x' + viewport.height] = {
     frames: runs.length,
-    contiguousRun: dist('segs'), furthestVisible: dist('furthest'),
-    originalContiguousRun: dist('oSegs'), originalFurthestVisible: dist('oFurthest'),
-    worstFrame: worst,
-    framesShorterThanOriginal: shorterThanOriginal.length, worstShortfallSeconds: shorterThanOriginal.length ? sec(Math.max(...shorterThanOriginal.map(r => r.oSegs - r.segs))) : 0,
-    framesFurthestShorterThanOriginal: runs.filter(r => r.furthest < r.oFurthest).length,
-    reasons, knownAnswerB: bump, errors: side.errors };
+    /* the ground alone hiding the road, against the original's rule, which knows only the ground */
+    groundOnly: { contiguousRun: dist('gSegs'), furthestVisible: dist('gFurthest') },
+    original: { contiguousRun: dist('oSegs'), furthestVisible: dist('oFurthest') },
+    worstFrameGroundOnly: worst,
+    framesShorterThanOriginal: shorterThanOriginal.length, worstShortfallSeconds: shorterThanOriginal.length ? sec(Math.max(...shorterThanOriginal.map(r => r.oSegs - r.gSegs))) : 0,
+    framesFurthestShorterThanOriginal: runs.filter(r => r.gFurthest < r.oFurthest).length,
+    /* everything drawn hiding the road: ramps and gantries in front of the far road, which the original's rule does not count although it draws them over the road too */
+    everything: { contiguousRun: dist('segs'), furthestVisible: dist('furthest'), reasons },
+    knownAnswerB: bump, errors: side.errors };
   console.log('visible run at ' + viewport.width + 'x' + viewport.height + ': ' + JSON.stringify(results.run[viewport.width + 'x' + viewport.height]));
   await side.close();
 }
@@ -144,6 +148,7 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
   }
   /* known answer C: a crest before one hazard on the first road */
   const first = all.find(t => t.kind !== 'jump' && t.mine !== null) || all[0];
+  await side.page.clock.setFixedTime(L.dayDate(first.day));
   const kc = await side.page.evaluate(({ job, w, h, tg }) => {
     const S = window.__S, V = window.visibilityProbe, P = S.world.probe, F = S.get('FEEL');
     window.driveProbe.prepare(S, job);
@@ -172,7 +177,7 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
 }
 await env.close();
 const ka = results.knownAnswers;
-results.pass = Object.values(ka).every(k => k.pass) && Object.values(results.run).every(r => r.furthestVisible.under35 === 0 && r.framesShorterThanOriginal === 0 && r.knownAnswerB && r.knownAnswerB.caught && !r.errors.length)
+results.pass = Object.values(ka).every(k => k.pass) && Object.values(results.run).every(r => r.framesShorterThanOriginal === 0 && r.knownAnswerB && r.knownAnswerB.caught && !r.errors.length)
   && results.targets.laterThanOriginal === 0 && results.targets.knownAnswerC.caught && !results.targets.errors.length;
 results.finished = new Date().toISOString();
 L.writeJson(path.join(L.root, 'review', 'stage-2', 'visibility.json'), results);

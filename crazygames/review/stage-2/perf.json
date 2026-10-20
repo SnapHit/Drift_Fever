@@ -1,67 +1,12 @@
 {
- "started": "2026-10-16T20:41:25.119Z",
+ "started": "2026-10-20T06:10:05.730Z",
  "note": "headless Chromium, software WebGL 2 (SwiftShader); submit times are not a GPU measurement",
  "runs": [
   {
    "throttle": 1,
    "level": 2,
    "tape": "driver",
-   "frames": 400,
-   "events": 0,
-   "info": {
-    "backend": "webgl2",
-    "tier": "low",
-    "pixelRatio": 1,
-    "ms": {
-     "scene": 0,
-     "submit": 9,
-     "total": 9
-    },
-    "frame": 400,
-    "drawSegments": 200
-   },
-   "frame": {
-    "n": 370,
-    "p50": 41,
-    "p95": 73,
-    "p99": 101,
-    "worst": 805,
-    "mean": 43.3
-   },
-   "jsWithoutSubmit": {
-    "n": 370,
-    "p50": 2,
-    "p95": 4,
-    "p99": 10,
-    "worst": 27,
-    "mean": 1.98
-   },
-   "sceneUpdate": {
-    "n": 370,
-    "p50": 1,
-    "p95": 3,
-    "p99": 7,
-    "worst": 11,
-    "mean": 1.27
-   },
-   "submit": {
-    "n": 370,
-    "p50": 39,
-    "p95": 71,
-    "p99": 98,
-    "worst": 802,
-    "mean": 41.32
-   },
-   "firstFrames": {
-    "worst": 306,
-    "mean": 20.77
-   }
-  },
-  {
-   "throttle": 4,
-   "level": 2,
-   "tape": "driver",
-   "frames": 400,
+   "frames": 700,
    "events": 0,
    "info": {
     "backend": "webgl2",
@@ -69,59 +14,499 @@
     "pixelRatio": 1,
     "ms": {
      "scene": 1,
-     "submit": 53,
-     "total": 54
+     "submit": 0,
+     "total": 1
     },
-    "frame": 400,
+    "frame": 700,
     "drawSegments": 200
    },
    "frame": {
-    "n": 370,
-    "p50": 62,
-    "p95": 94,
-    "p99": 148,
-    "worst": 1206,
-    "mean": 64.11
+    "n": 670,
+    "p50": 40,
+    "p95": 89,
+    "p99": 111,
+    "worst": 756,
+    "mean": 42.29
    },
    "jsWithoutSubmit": {
-    "n": 370,
-    "p50": 6,
-    "p95": 13,
-    "p99": 23,
-    "worst": 26,
-    "mean": 6.17
+    "n": 670,
+    "p50": 1,
+    "p95": 3,
+    "p99": 6,
+    "worst": 7,
+    "mean": 1.4
    },
    "sceneUpdate": {
-    "n": 370,
-    "p50": 4,
-    "p95": 11,
-    "p99": 16,
-    "worst": 20,
-    "mean": 4.18
+    "n": 670,
+    "p50": 1,
+    "p95": 2,
+    "p99": 4,
+    "worst": 6,
+    "mean": 0.94
    },
    "submit": {
-    "n": 370,
-    "p50": 56,
-    "p95": 90,
-    "p99": 138,
-    "worst": 1183,
-    "mean": 57.94
+    "n": 670,
+    "p50": 38,
+    "p95": 85,
+    "p99": 109,
+    "worst": 755,
+    "mean": 40.89
    },
    "firstFrames": {
-    "worst": 506,
-    "mean": 28.67
+    "worst": 170,
+    "mean": 12.23
+   }
+  },
+  {
+   "throttle": 1,
+   "level": 5,
+   "tape": "hug",
+   "frames": 600,
+   "events": 0,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 0,
+     "submit": 39,
+     "total": 39
+    },
+    "frame": 1300,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 570,
+    "p50": 42,
+    "p95": 79,
+    "p99": 96,
+    "worst": 135,
+    "mean": 42.27
+   },
+   "jsWithoutSubmit": {
+    "n": 570,
+    "p50": 1,
+    "p95": 2,
+    "p99": 4,
+    "worst": 7,
+    "mean": 1.22
+   },
+   "sceneUpdate": {
+    "n": 570,
+    "p50": 1,
+    "p95": 2,
+    "p99": 2,
+    "worst": 6,
+    "mean": 0.79
+   },
+   "submit": {
+    "n": 570,
+    "p50": 40,
+    "p95": 77,
+    "p99": 95,
+    "worst": 134,
+    "mean": 41.05
+   },
+   "firstFrames": {
+    "worst": 4,
+    "mean": 1.43
+   }
+  },
+  {
+   "throttle": 1,
+   "level": 6,
+   "tape": "chaos",
+   "frames": 500,
+   "events": 3,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 1,
+     "submit": 31,
+     "total": 32
+    },
+    "frame": 1800,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 470,
+    "p50": 36,
+    "p95": 74,
+    "p99": 89,
+    "worst": 122,
+    "mean": 37.84
+   },
+   "jsWithoutSubmit": {
+    "n": 470,
+    "p50": 1,
+    "p95": 2,
+    "p99": 3,
+    "worst": 7,
+    "mean": 1.13
+   },
+   "sceneUpdate": {
+    "n": 470,
+    "p50": 1,
+    "p95": 1,
+    "p99": 2,
+    "worst": 5,
+    "mean": 0.77
+   },
+   "submit": {
+    "n": 470,
+    "p50": 35,
+    "p95": 73,
+    "p99": 88,
+    "worst": 119,
+    "mean": 36.71
+   },
+   "firstFrames": {
+    "worst": 5,
+    "mean": 1.97
+   }
+  },
+  {
+   "throttle": 4,
+   "level": 2,
+   "tape": "driver",
+   "frames": 700,
+   "events": 0,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 3,
+     "submit": 87,
+     "total": 90
+    },
+    "frame": 700,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 670,
+    "p50": 63,
+    "p95": 115,
+    "p99": 166,
+    "worst": 1323,
+    "mean": 65.77
+   },
+   "jsWithoutSubmit": {
+    "n": 670,
+    "p50": 4,
+    "p95": 11,
+    "p99": 15,
+    "worst": 27,
+    "mean": 4.88
+   },
+   "sceneUpdate": {
+    "n": 670,
+    "p50": 3,
+    "p95": 8,
+    "p99": 11,
+    "worst": 21,
+    "mean": 3.24
+   },
+   "submit": {
+    "n": 670,
+    "p50": 57,
+    "p95": 110,
+    "p99": 161,
+    "worst": 1320,
+    "mean": 60.89
+   },
+   "firstFrames": {
+    "worst": 457,
+    "mean": 27.3
+   }
+  },
+  {
+   "throttle": 4,
+   "level": 5,
+   "tape": "hug",
+   "frames": 600,
+   "events": 0,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 3,
+     "submit": 53,
+     "total": 56
+    },
+    "frame": 1300,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 570,
+    "p50": 67,
+    "p95": 115,
+    "p99": 162,
+    "worst": 197,
+    "mean": 68.91
+   },
+   "jsWithoutSubmit": {
+    "n": 570,
+    "p50": 4,
+    "p95": 11,
+    "p99": 14,
+    "worst": 20,
+    "mean": 4.71
+   },
+   "sceneUpdate": {
+    "n": 570,
+    "p50": 3,
+    "p95": 9,
+    "p99": 12,
+    "worst": 18,
+    "mean": 3.22
+   },
+   "submit": {
+    "n": 570,
+    "p50": 62,
+    "p95": 113,
+    "p99": 159,
+    "worst": 195,
+    "mean": 64.2
+   },
+   "firstFrames": {
+    "worst": 27,
+    "mean": 6.53
+   }
+  },
+  {
+   "throttle": 4,
+   "level": 6,
+   "tape": "chaos",
+   "frames": 500,
+   "events": 3,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 3,
+     "submit": 63,
+     "total": 66
+    },
+    "frame": 1800,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 470,
+    "p50": 67,
+    "p95": 107,
+    "p99": 145,
+    "worst": 174,
+    "mean": 67.09
+   },
+   "jsWithoutSubmit": {
+    "n": 470,
+    "p50": 4,
+    "p95": 10,
+    "p99": 14,
+    "worst": 25,
+    "mean": 4.4
+   },
+   "sceneUpdate": {
+    "n": 470,
+    "p50": 3,
+    "p95": 8,
+    "p99": 11,
+    "worst": 13,
+    "mean": 2.97
+   },
+   "submit": {
+    "n": 470,
+    "p50": 62,
+    "p95": 101,
+    "p99": 143,
+    "worst": 167,
+    "mean": 62.69
+   },
+   "firstFrames": {
+    "worst": 57,
+    "mean": 7.37
+   }
+  },
+  {
+   "throttle": 6,
+   "level": 2,
+   "tape": "driver",
+   "frames": 700,
+   "events": 0,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 2,
+     "submit": 94,
+     "total": 96
+    },
+    "frame": 700,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 670,
+    "p50": 71,
+    "p95": 123,
+    "p99": 181,
+    "worst": 1345,
+    "mean": 74.67
+   },
+   "jsWithoutSubmit": {
+    "n": 670,
+    "p50": 7,
+    "p95": 15,
+    "p99": 18,
+    "worst": 23,
+    "mean": 7.49
+   },
+   "sceneUpdate": {
+    "n": 670,
+    "p50": 5,
+    "p95": 11,
+    "p99": 15,
+    "worst": 19,
+    "mean": 4.99
+   },
+   "submit": {
+    "n": 670,
+    "p50": 64,
+    "p95": 114,
+    "p99": 171,
+    "worst": 1330,
+    "mean": 67.19
+   },
+   "firstFrames": {
+    "worst": 656,
+    "mean": 42.4
+   }
+  },
+  {
+   "throttle": 6,
+   "level": 5,
+   "tape": "hug",
+   "frames": 600,
+   "events": 0,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 5,
+     "submit": 74,
+     "total": 79
+    },
+    "frame": 1300,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 570,
+    "p50": 72,
+    "p95": 121,
+    "p99": 171,
+    "worst": 245,
+    "mean": 74.26
+   },
+   "jsWithoutSubmit": {
+    "n": 570,
+    "p50": 7,
+    "p95": 14,
+    "p99": 22,
+    "worst": 27,
+    "mean": 7.54
+   },
+   "sceneUpdate": {
+    "n": 570,
+    "p50": 5,
+    "p95": 10,
+    "p99": 14,
+    "worst": 21,
+    "mean": 4.93
+   },
+   "submit": {
+    "n": 570,
+    "p50": 65,
+    "p95": 114,
+    "p99": 158,
+    "worst": 240,
+    "mean": 66.73
+   },
+   "firstFrames": {
+    "worst": 36,
+    "mean": 8.73
+   }
+  },
+  {
+   "throttle": 6,
+   "level": 6,
+   "tape": "chaos",
+   "frames": 500,
+   "events": 3,
+   "info": {
+    "backend": "webgl2",
+    "tier": "low",
+    "pixelRatio": 1,
+    "ms": {
+     "scene": 4,
+     "submit": 116,
+     "total": 120
+    },
+    "frame": 1800,
+    "drawSegments": 200
+   },
+   "frame": {
+    "n": 470,
+    "p50": 70,
+    "p95": 122,
+    "p99": 149,
+    "worst": 198,
+    "mean": 72.38
+   },
+   "jsWithoutSubmit": {
+    "n": 470,
+    "p50": 7,
+    "p95": 15,
+    "p99": 22,
+    "worst": 46,
+    "mean": 7.15
+   },
+   "sceneUpdate": {
+    "n": 470,
+    "p50": 5,
+    "p95": 11,
+    "p99": 16,
+    "worst": 21,
+    "mean": 4.73
+   },
+   "submit": {
+    "n": 470,
+    "p50": 63,
+    "p95": 115,
+    "p99": 144,
+    "worst": 191,
+    "mean": 65.23
+   },
+   "firstFrames": {
+    "worst": 41,
+    "mean": 8.47
    }
   }
  ],
  "errors": [],
  "summary": {
   "budgetMs": 16.7,
-  "jsWithoutSubmitWorstAtTopThrottle": 26,
-  "jsWithoutSubmitP95AtTopThrottle": 13,
+  "jsWithoutSubmitWorstAtTopThrottle": 46,
+  "jsWithoutSubmitP95AtTopThrottle": 15,
   "sceneUpdateP95AtTopThrottle": 11,
-  "frameP95AtTopThrottle": 94,
-  "frameWorstAtTopThrottle": 1206,
+  "frameP95AtTopThrottle": 123,
+  "frameWorstAtTopThrottle": 1345,
   "jsHoldsBudgetAtTopThrottle": true
  },
- "finished": "2026-10-16T20:42:10.357Z"
+ "finished": "2026-10-20T06:15:41.599Z"
 }
