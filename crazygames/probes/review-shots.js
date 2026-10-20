@@ -22,12 +22,12 @@ const env = await L.start();
 const jobs = {
   drive: { day: days[0], level: 3, mode: 'DAILY', seed: J.seedOf(days[0], 3, 'driver'), tape: 'driver', maxFrames: 4200, finishFrames: 700 },
   racers: { day: days[0], level: 5, mode: 'DAILY', seed: J.seedOf(days[0], 5, 'hug'), tape: 'hug', maxFrames: 2200 },
-  finish: { day: days[0], level: 1, mode: 'DAILY', seed: J.seedOf(days[0], 1, 'driver'), tape: 'driver', maxFrames: 3600, finishFrames: 700 },
+  finish: { day: days[0], level: 1, mode: 'DAILY', seed: J.seedOf(days[0], 1, 'centre'), tape: 'centre', maxFrames: 3600, finishFrames: 700 },   // centre stays on the completion screen; driver taps into the next level
   wreck: null,   // chosen by the scout: the first tape that dies to a hazard
 };
-const wreckCandidates = [[6, 'hug', 3000], [4, 'chaos', 2500], [5, 'swing', 2500], [6, 'chaos', 3000], [3, 'hug', 3000]].map(([level, tape, maxFrames]) => ({ day: days[0], level, mode: 'DAILY', seed: J.seedOf(days[0], level, tape), tape, maxFrames }));
+const wreckCandidates = [[3, 'centre', 3000], [6, 'hug', 3000], [4, 'chaos', 2500]].map(([level, tape, maxFrames]) => ({ day: days[0], level, mode: 'DAILY', seed: J.seedOf(days[0], level, tape), tape, maxFrames }));
 const scout = await L.openSide(env, 'page', J.VIEW, days[0]);
-const found = await scout.page.evaluate(({ jobs }) => {
+const found = await scout.page.evaluate(({ jobs, wreckCandidates }) => {
   const S = window.__S, F = S.get('FEEL');
   const renderer = S.world.renderer; renderer.render = () => {};
   const out = {};

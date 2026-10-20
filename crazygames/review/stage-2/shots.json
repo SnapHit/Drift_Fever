@@ -6,16 +6,26 @@
    "jump": 1277,
    "hazard": 1345,
    "gate": 1513,
-   "finish": null,
-   "card": null,
    "slip": 1,
    "carY": 4248.739999968584
+  },
+  "finish": {
+   "finish": 2552,
+   "card": 2952
   },
   "racers": {
    "contact": 459
   },
   "wreck": {
-   "wreck": null
+   "wreck": 2576,
+   "job": {
+    "day": 20261001,
+    "level": 3,
+    "mode": "DAILY",
+    "seed": 628091069,
+    "tape": "centre",
+    "maxFrames": 3000
+   }
   }
  },
  "jobs": {
@@ -36,13 +46,22 @@
    "tape": "hug",
    "maxFrames": 2200
   },
+  "finish": {
+   "day": 20261001,
+   "level": 1,
+   "mode": "DAILY",
+   "seed": 628091055,
+   "tape": "centre",
+   "maxFrames": 3600,
+   "finishFrames": 700
+  },
   "wreck": {
    "day": 20261001,
-   "level": 6,
+   "level": 3,
    "mode": "DAILY",
-   "seed": 628091099,
-   "tape": "chaos",
-   "maxFrames": 1500
+   "seed": 628091069,
+   "tape": "centre",
+   "maxFrames": 3000
   }
  },
  "shots": [
@@ -119,12 +138,48 @@
    }
   },
   {
+   "file": "07-wreck-390x844.jpg",
+   "scene": "07-wreck",
+   "viewport": "390x844",
+   "job": "wreck",
+   "frame": 2576,
+   "bytes": 73135,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
    "file": "08-gate-390x844.jpg",
    "scene": "08-gate",
    "viewport": "390x844",
    "job": "drive",
    "frame": 1513,
    "bytes": 74288,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "09-finish-390x844.jpg",
+   "scene": "09-finish",
+   "viewport": "390x844",
+   "job": "finish",
+   "frame": 2552,
+   "bytes": 62297,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "10-run-card-390x844.jpg",
+   "scene": "10-run-card",
+   "viewport": "390x844",
+   "job": "finish",
+   "frame": 2952,
+   "bytes": 89847,
    "errors": {
     "page": [],
     "original": []
@@ -203,6 +258,18 @@
    }
   },
   {
+   "file": "07-wreck-1280x720.jpg",
+   "scene": "07-wreck",
+   "viewport": "1280x720",
+   "job": "wreck",
+   "frame": 2576,
+   "bytes": 142799,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
    "file": "08-gate-1280x720.jpg",
    "scene": "08-gate",
    "viewport": "1280x720",
@@ -213,7 +280,31 @@
     "page": [],
     "original": []
    }
+  },
+  {
+   "file": "09-finish-1280x720.jpg",
+   "scene": "09-finish",
+   "viewport": "1280x720",
+   "job": "finish",
+   "frame": 2552,
+   "bytes": 128723,
+   "errors": {
+    "page": [],
+    "original": []
+   }
+  },
+  {
+   "file": "10-run-card-1280x720.jpg",
+   "scene": "10-run-card",
+   "viewport": "1280x720",
+   "job": "finish",
+   "frame": 2952,
+   "bytes": 196720,
+   "errors": {
+    "page": [],
+    "original": []
+   }
   }
  ],
- "totalBytes": 1508097
+ "totalBytes": 2201618
 }
