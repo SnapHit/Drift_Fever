@@ -11,9 +11,14 @@
    B. For every hazard and jump on 28 days of every level, the first car
       position at which it is drawn, on screen and unoccluded, against
       the first position at which the original's own drawRoad rule draws
-      it with the reference camera, swept a segment at a time. The count
-      of targets this renderer shows later than the original, and the
-      worst lateness.
+      it with the reference camera, swept a segment at a time. Like for
+      like, only the ground hides a target (the original's rule knows no
+      other occluder): the count of targets this renderer shows later
+      than the original, and the worst lateness. Also counted, with
+      everything the world draws as an occluder: targets a nearer ramp,
+      gantry or hazard stands in front of. The original draws those in
+      front too, back to front, but its rule cannot say so, so that count
+      is reported and not a pass condition.
       Known answer A: the replica of the original's rule agrees with the
       original page's own bvis table on every segment of every frame of a
       drawn drive. Known answer C: the fake crest before a target makes
@@ -23,18 +28,27 @@
    measured, and a software rasteriser costs forty milliseconds a frame);
    everything else is the shipped page as it runs.
 
-   node probes/visibility.js [--quick]   writes review/stage-2/visibility.json */
+   node probes/visibility.js [--quick] [--targets-only]
+   writes review/stage-2/visibility.json; --targets-only reruns part B
+   and keeps part A from the file on disk */
+import fs from 'node:fs';
 import path from 'node:path';
 import * as L from './lib.js';
 import * as J from '../parity/jobs.js';
 
 const quick = process.argv.includes('--quick');
+const targetsOnly = process.argv.includes('--targets-only');
 const days = J.dayList(20261001, 28);
 const env = await L.start();
+const OUT = path.join(L.root, 'review', 'stage-2', 'visibility.json');
 const results = { started: new Date().toISOString(), knownAnswers: {}, run: {}, targets: null };
+if (targetsOnly) {
+  const prev = JSON.parse(fs.readFileSync(OUT, 'utf8'));
+  results.knownAnswers = prev.knownAnswers; results.run = prev.run; results.partAFrom = prev.started;
+}
 
 /* ---- known answer A: the replica against the original page ---- */
-for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
+for (const viewport of targetsOnly ? [] : [J.VIEW, J.VIEW_WIDE]) {
   const side = await L.openSide(env, 'original', viewport, days[0]);
   await side.page.addScriptTag({ path: path.join(L.here, 'visibility-inpage.js') });
   const r = await side.page.evaluate(({ job, w, h }) => {
@@ -59,7 +73,7 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
 }
 
 /* ---- A: the visible run on drives ---- */
-for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
+for (const viewport of targetsOnly ? [] : [J.VIEW, J.VIEW_WIDE]) {
   const side = await L.openSide(env, 'page', viewport, days[0]);
   await side.page.addScriptTag({ path: path.join(L.here, 'visibility-inpage.js') });
   const runs = [], reasons = {};
@@ -137,13 +151,14 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
         const out = [];
         for (const tg of targets) {
           const r = V.sweep(tg, Math.max(0, tg.from - 212), w, h, F.CAMERA_HEIGHT);
-          out.push({ kind: tg.kind, from: tg.from, to: tg.to, x: tg.x, half: tg.half, swing: tg.swing, mine: r.mine, orig: r.orig });
+          out.push({ kind: tg.kind, from: tg.from, to: tg.to, x: tg.x, half: tg.half, swing: tg.swing, mine: r.mine, mineAll: r.mineAll, orig: r.orig });
         }
         return out;
       }, { job: { day, level, mode: 'DAILY', seed: J.seedOf(day, level, 'road') }, w: J.VIEW.width, h: J.VIEW.height });
       for (const t of r) all.push({ day, level, ...t });
       const later = r.filter(t => t.mine !== null && t.orig !== null && t.mine > t.orig).length;
-      process.stdout.write('  targets L' + level + ' ' + day + ': ' + r.length + ' targets, ' + later + ' later than the original, ' + r.filter(t => t.mine === null).length + ' never seen here, ' + r.filter(t => t.orig === null).length + ' never by the original\n');
+      const laterAll = r.filter(t => t.mineAll === null || (t.orig !== null && t.mineAll > t.orig)).length;
+      process.stdout.write('  targets L' + level + ' ' + day + ': ' + r.length + ' targets, ' + later + ' later than the original, ' + laterAll + ' later counting everything drawn, ' + r.filter(t => t.mine === null).length + ' never seen here, ' + r.filter(t => t.orig === null).length + ' never by the original\n');
     }
   }
   /* known answer C: a crest before one hazard on the first road */
@@ -161,6 +176,7 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
   const F = await side.page.evaluate(() => ({ L: window.__S.get('FEEL').SEGMENT_LENGTH, SPEED: window.__S.get('FEEL').SPEED }));
   const both = all.filter(t => t.mine !== null && t.orig !== null);
   const later = both.filter(t => t.mine > t.orig);
+  const laterAll = all.filter(t => t.orig !== null && (t.mineAll === null || t.mineAll > t.orig));
   const lead = both.map(t => t.orig - t.mine).sort((a, b) => a - b);
   results.targets = {
     total: all.length, hazards: all.filter(t => t.kind !== 'jump').length, jumps: all.filter(t => t.kind === 'jump').length,
@@ -170,9 +186,11 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
     leadOverOriginalSegments: { min: lead[0], p05: L.pct(lead, 0.05), median: L.pct(lead, 0.5), max: lead[lead.length - 1] },
     minLeadSecondsAheadHere: +(Math.min(...both.map(t => (t.kind === 'jump' ? t.to + 1 : t.from) - t.mine)) * F.L / F.SPEED).toFixed(2),
     minLeadSecondsAheadOriginal: +(Math.min(...both.map(t => (t.kind === 'jump' ? t.to + 1 : t.from) - t.orig)) * F.L / F.SPEED).toFixed(2),
-    later: later.slice(0, 40), knownAnswerC: kc, errors: side.errors,
+    later: later.slice(0, 40),
+    countingEverythingDrawn: { laterThanOriginal: laterAll.length, worstLaterSegments: laterAll.length ? Math.max(...laterAll.map(t => (t.mineAll === null ? t.from : t.mineAll) - t.orig)) : 0, later: laterAll.slice(0, 40) },
+    knownAnswerC: kc, errors: side.errors,
   };
-  console.log('targets: ' + JSON.stringify({ ...results.targets, later: results.targets.later.length }));
+  console.log('targets: ' + JSON.stringify({ ...results.targets, later: results.targets.later.length, countingEverythingDrawn: { ...results.targets.countingEverythingDrawn, later: laterAll.length } }));
   await side.close();
 }
 await env.close();
@@ -180,6 +198,6 @@ const ka = results.knownAnswers;
 results.pass = Object.values(ka).every(k => k.pass) && Object.values(results.run).every(r => r.framesShorterThanOriginal === 0 && r.knownAnswerB && r.knownAnswerB.caught && !r.errors.length)
   && results.targets.laterThanOriginal === 0 && results.targets.knownAnswerC.caught && !results.targets.errors.length;
 results.finished = new Date().toISOString();
-L.writeJson(path.join(L.root, 'review', 'stage-2', 'visibility.json'), results);
+L.writeJson(OUT, results);
 console.log('\nvisibility: ' + (results.pass ? 'PASS' : 'FAIL'));
 process.exit(results.pass ? 0 : 1);

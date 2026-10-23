@@ -179,27 +179,35 @@
     return [...hz.values(), ...jp.values()].sort((a, b) => a.from - b.from);
   }
   /* The sweep for one target: the first car segment, from `start` up to
-     the target, at which it is visible here and by the original's rule. */
+     the target, at which it is visible here and by the original's rule.
+     `mine` counts only the ground as an occluder, which is the only
+     occluder the original's rule knows, so the two are like for like;
+     `mineAll` counts everything the world draws (a nearer ramp, gantry
+     or hazard standing in the line of sight hides the target), which the
+     original's rule cannot test. */
   function sweep(target, start, w, h, camHeight) {
     const s = S(), F = s.get('FEEL');
     // a fresh road, because the simulation trims behind the camera and the
     // sweep walks forward from well before the target
     s.fn.startRun();
-    let mine = null, orig = null;
+    let mine = null, mineAll = null, orig = null;
     const xFrac = target.kind === 'jump' ? 0 : target.x;
     const at = target.kind === 'jump' ? target.to + 1 : target.from;
+    const GROUND = ['road'];
     for (let p = start; p <= target.from; p += 2) {
       const position = placeAt(p, w, h);
       const generated = s.fn.segAt(at);
       if (orig === null && generated) { const t = originalTable(position, w, h, camHeight, 0); if (originalSees(t, at, xFrac)) orig = p; }
-      if (mine === null && generated && targetVisible(target, w, h)) mine = p;
-      if (mine !== null && orig !== null) break;
+      if (generated && mineAll === null && targetVisible(target, w, h)) { mineAll = p; if (mine === null) mine = p; }
+      if (generated && mine === null && targetVisible(target, w, h, GROUND)) mine = p;
+      if (mine !== null && mineAll !== null && orig !== null) break;
     }
     // refine each to the segment, one step back
     const refine = (p, test) => { if (p === null || p <= start) return p; placeAt(p - 1, w, h); return test(p - 1) ? p - 1 : p; };
-    mine = refine(mine, () => s.fn.segAt(at) && targetVisible(target, w, h));
+    mine = refine(mine, () => s.fn.segAt(at) && targetVisible(target, w, h, GROUND));
+    mineAll = refine(mineAll, () => s.fn.segAt(at) && targetVisible(target, w, h));
     orig = refine(orig, q => { const t = originalTable(q * F.SEGMENT_LENGTH - F.CAMERA_DISTANCE, w, h, camHeight, 0); return !!s.fn.segAt(at) && originalSees(t, at, xFrac); });
-    return { mine, orig };
+    return { mine, mineAll, orig };
   }
   root.visibilityProbe = { originalTable, originalSees, visibleRun, originalRun, targetVisible, placeAt, listTargets, sweep, pointVisible };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
