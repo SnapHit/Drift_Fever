@@ -78,7 +78,7 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
           window.driveProbe.drive(S, job, { frame: (n) => {
             if (S.get('state') !== S.get('DRIVING') || S.fn.countHolding()) return;
             const v = V.visibleRun(w, h);                                   // everything drawn can hide the road: ramps, gantries, trees
-            const g = V.visibleRun(w, h, ['road', 'walls', 'terrain']);     // the ground alone, which is all the original's rule knows
+            const g = V.visibleRun(w, h, ['road']);     // the road surface alone, which is all the original's rule knows
             const o = V.originalRun(w, h);
             out.push([n, v.segments, v.furthest, o.segments, o.furthest, g.segments, g.furthest]);
             reasons[v.reason] = (reasons[v.reason] || 0) + 1;
