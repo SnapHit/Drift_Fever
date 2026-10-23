@@ -7,6 +7,12 @@
    (the parity test says the two sides are identical frame for frame, so
    the frame numbers carry across). JPEG, so the set stays under 5MB.
 
+   Each side reports the simulation's state at the shot frame, and the two
+   must match exactly, and the scene must show what it is named for (the
+   car in the air for the jump, a hit for the wreck, and so on). Known
+   answer: the original driven one frame further than the page must be
+   caught as a mismatch.
+
    node probes/review-shots.js   writes review/stage-2/shots/*.jpg and shots.json */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -86,28 +92,64 @@ const scenes = [
 ].filter(s => s.frame !== null && s.frame >= 0 && (!s.job || jobs[s.job]));
 
 /* ---- shoot: both sides to the frame, then screenshot ---- */
-async function shoot(side, viewport, scene) {
+/* What the simulation says at the frame, the same on both sides. */
+const FINGERPRINT = () => {
+  const S = window.__S, d = S.get('drift');
+  const hz = S.get('hazards'), idx = S.get('carSegIndex');
+  const ahead = hz.filter(h => h.from > idx).map(h => h.from - idx);
+  return { state: S.get('state'), deathKind: S.get('deathKind'), level: S.get('level'), gatesPassed: S.get('gatesPassed'), countdown: S.get('countdown'), position: S.get('position'), carX: S.get('carX'), carY: S.get('carY'), airborne: S.get('airborne'), slipNorm: d.slipNorm, hazardAhead: ahead.length ? Math.min(...ahead) : null, names: { DRIVING: S.get('DRIVING'), DEAD: S.get('DEAD'), FINISHED: S.get('FINISHED'), HIT_OBJECT: S.get('HIT_OBJECT') } };
+};
+/* Does the frame show what the scene is named for. */
+function showsScene(scene, fp, contacts) {
+  const N = fp.names;
+  switch (scene.name.slice(3)) {
+    case 'title': return fp.state !== N.DRIVING && fp.state !== N.DEAD && fp.state !== N.FINISHED;
+    case 'countdown': return fp.state === N.DRIVING && fp.countdown > 0;
+    case 'deep-drift': return fp.state === N.DRIVING && fp.slipNorm >= 0.5 && fp.carY === 0;
+    case 'jump-in-the-air': return fp.airborne === true && fp.carY > 0;
+    case 'hazard-approach': return fp.state === N.DRIVING && fp.hazardAhead !== null && fp.hazardAhead <= 32;
+    case 'contact-with-a-racer': return contacts > 0;
+    case 'wreck': return fp.state === N.DEAD && fp.deathKind === N.HIT_OBJECT;
+    case 'gate': return fp.state === N.DRIVING;
+    case 'finish': case 'run-card': return fp.state === N.FINISHED;
+  }
+  return false;
+}
+async function shoot(side, viewport, scene, opts) {
   const s = await L.openSide(env, side, viewport, days[0]);
+  const frame = scene.frame + ((opts && opts.extraFrames) || 0);
+  let contacts = 0;
   if (scene.job) {
     /* The greybox skips its GPU submission on the way to the frame (its
        scene is rebuilt from the simulation every frame, so only the last
        one needs drawing); the original draws every frame, as it must. */
-    await s.page.evaluate(({ job, frame, page }) => {
+    contacts = await s.page.evaluate(({ job, frame, page }) => {
       const S = window.__S;
-      let real = null;
-      if (page) { real = S.world.renderer.render; S.world.renderer.render = () => {}; }
+      let real = null, restored = !page;
+      const frameFn = S.fn.__frame;
+      if (page) {
+        /* the last step is drawn by the page's own frame, both layers (the
+           ground under the road, the depth cleared between), as in play */
+        real = S.world.renderer.render; S.world.renderer.render = () => {};
+        let c = 0;
+        S.fn.__frame = t => { if (c++ === frame) { S.world.renderer.render = real; restored = true; } frameFn(t); };
+      }
       window.driveProbe.drive(S, { ...job, maxFrames: frame + 1 }, {});
-      if (page) { S.world.renderer.render = real; S.world.renderer.render(S.world.scene, S.world.camera); }
-    }, { job: jobs[scene.job], frame: scene.frame, page: side === 'page' });
+      if (page) S.fn.__frame = frameFn;
+      if (!restored) throw new Error('the drive ended before frame ' + frame);
+      return page ? S.world.probe.lastContacts.length : 0;
+    }, { job: jobs[scene.job], frame, page: side === 'page' });
   } else {
     // the title screen, with the boot splash over: the page's own frame, called by hand
     await s.page.evaluate(() => { const S = window.__S; S.set('lastTime', 0); let t = 0; for (let i = 0; i < 150; i++) { t += 17; S.fn.__frame(t); } });
   }
-  const png = await s.page.screenshot({ type: 'png' });
+  const fp = await s.page.evaluate(FINGERPRINT);
+  const png = opts && opts.noShot ? null : await s.page.screenshot({ type: 'png' });
   const errors = s.errors.slice();
   await s.close();
-  return { png, errors };
+  return { png, errors, fp, contacts };
 }
+const sameFrame = (a, b) => { const k = ['state', 'deathKind', 'level', 'gatesPassed', 'countdown', 'position', 'carX', 'carY', 'airborne', 'slipNorm', 'hazardAhead']; const diff = k.filter(n => a[n] !== b[n]); return { same: diff.length === 0, diff }; };
 const index = [];
 const composer = await env.browser.newPage({ viewport: { width: 100, height: 100 } });
 let totalBytes = 0;
@@ -130,11 +172,24 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
     const buf = Buffer.from(jpg, 'base64');
     fs.writeFileSync(path.join(outDir, file), buf);
     totalBytes += buf.length;
-    index.push({ file, scene: scene.name, viewport: viewport.width + 'x' + viewport.height, job: scene.job, frame: scene.frame, bytes: buf.length, errors: { page: a.errors, original: b.errors } });
-    console.log('  ' + file + ' ' + buf.length + ' bytes');
+    const match = sameFrame(a.fp, b.fp), shows = showsScene(scene, a.fp, a.contacts);
+    index.push({ file, scene: scene.name, viewport: viewport.width + 'x' + viewport.height, job: scene.job, frame: scene.frame, bytes: buf.length, sameState: match.same, differs: match.diff, showsScene: shows, state: { state: a.fp.state, carY: a.fp.carY, slipNorm: a.fp.slipNorm, hazardAhead: a.fp.hazardAhead, gatesPassed: a.fp.gatesPassed, contacts: a.contacts }, errors: { page: a.errors, original: b.errors } });
+    console.log('  ' + file + ' ' + buf.length + ' bytes, same state ' + match.same + (match.same ? '' : ' ' + match.diff.join(',')) + ', shows the scene ' + shows);
   }
 }
 await composer.close();
+/* The known answer: the drift scene with the original one frame further on must not match. */
+let knownAnswer;
+{
+  const scene = scenes.find(x => x.name === '03-deep-drift');
+  const a = await shoot('page', J.VIEW, scene, { noShot: true }), b = await shoot('original', J.VIEW, scene, { noShot: true, extraFrames: 1 });
+  const m = sameFrame(a.fp, b.fp);
+  knownAnswer = { scene: scene.name, frame: scene.frame, originalExtraFrames: 1, caught: !m.same, differs: m.diff };
+  console.log('known answer (original one frame on): ' + JSON.stringify(knownAnswer));
+}
 await env.close();
-fs.writeFileSync(path.join(L.root, 'review', 'stage-2', 'shots.json'), JSON.stringify({ frames: found, jobs, shots: index, totalBytes }, null, 1));
-console.log('review set: ' + index.length + ' images, ' + (totalBytes / 1048576).toFixed(2) + ' MB');
+const expected = 10 * 2;
+const pass = index.length === expected && index.every(x => x.sameState && x.showsScene && !x.errors.page.length && !x.errors.original.length) && totalBytes < 5 * 1048576 && knownAnswer.caught;
+fs.writeFileSync(path.join(L.root, 'review', 'stage-2', 'shots.json'), JSON.stringify({ frames: found, jobs, shots: index, totalBytes, expected, knownAnswer, pass }, null, 1));
+console.log('review set: ' + index.length + ' of ' + expected + ' images, ' + (totalBytes / 1048576).toFixed(2) + ' MB, same state ' + index.filter(x => x.sameState).length + ', shows the scene ' + index.filter(x => x.showsScene).length + ': ' + (pass ? 'PASS' : 'FAIL'));
+process.exit(pass ? 0 : 1);

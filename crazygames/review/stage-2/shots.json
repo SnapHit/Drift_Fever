@@ -71,7 +71,18 @@
    "viewport": "390x844",
    "job": null,
    "frame": 0,
-   "bytes": 86027,
+   "bytes": 86055,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 0,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -84,6 +95,17 @@
    "job": "drive",
    "frame": 26,
    "bytes": 29899,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -95,7 +117,18 @@
    "viewport": "390x844",
    "job": "drive",
    "frame": 182,
-   "bytes": 69300,
+   "bytes": 69602,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 1,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -107,7 +140,18 @@
    "viewport": "390x844",
    "job": "drive",
    "frame": 1277,
-   "bytes": 75230,
+   "bytes": 75345,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 4248.739999968584,
+    "slipNorm": 0.00011930758336314292,
+    "hazardAhead": 81,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -119,7 +163,18 @@
    "viewport": "390x844",
    "job": "drive",
    "frame": 1345,
-   "bytes": 77159,
+   "bytes": 77671,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 0.43743999242893356,
+    "hazardAhead": 29,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -131,7 +186,18 @@
    "viewport": "390x844",
    "job": "racers",
    "frame": 459,
-   "bytes": 68586,
+   "bytes": 68755,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 0.914692845921056,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 1
+   },
    "errors": {
     "page": [],
     "original": []
@@ -143,7 +209,18 @@
    "viewport": "390x844",
    "job": "wreck",
    "frame": 2576,
-   "bytes": 73135,
+   "bytes": 73293,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 2,
+    "carY": 0,
+    "slipNorm": 0.6127381670511916,
+    "hazardAhead": null,
+    "gatesPassed": 1,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -155,7 +232,18 @@
    "viewport": "390x844",
    "job": "drive",
    "frame": 1513,
-   "bytes": 74288,
+   "bytes": 74477,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 1,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -167,7 +255,18 @@
    "viewport": "390x844",
    "job": "finish",
    "frame": 2552,
-   "bytes": 62297,
+   "bytes": 63430,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 3,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 1,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -179,7 +278,18 @@
    "viewport": "390x844",
    "job": "finish",
    "frame": 2952,
-   "bytes": 89847,
+   "bytes": 89936,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 3,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 1,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -191,7 +301,18 @@
    "viewport": "1280x720",
    "job": null,
    "frame": 0,
-   "bytes": 151388,
+   "bytes": 151729,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 0,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -204,6 +325,17 @@
    "job": "drive",
    "frame": 26,
    "bytes": 68645,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -215,7 +347,18 @@
    "viewport": "1280x720",
    "job": "drive",
    "frame": 182,
-   "bytes": 156282,
+   "bytes": 156852,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 1,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -227,7 +370,18 @@
    "viewport": "1280x720",
    "job": "drive",
    "frame": 1277,
-   "bytes": 174908,
+   "bytes": 175466,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 4248.739999968584,
+    "slipNorm": 0.00011930758336314292,
+    "hazardAhead": 81,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -239,7 +393,18 @@
    "viewport": "1280x720",
    "job": "drive",
    "frame": 1345,
-   "bytes": 167726,
+   "bytes": 168688,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 0.43743999242893356,
+    "hazardAhead": 29,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -251,7 +416,18 @@
    "viewport": "1280x720",
    "job": "racers",
    "frame": 459,
-   "bytes": 153272,
+   "bytes": 153914,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 0.914692845921056,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 1
+   },
    "errors": {
     "page": [],
     "original": []
@@ -263,7 +439,18 @@
    "viewport": "1280x720",
    "job": "wreck",
    "frame": 2576,
-   "bytes": 142799,
+   "bytes": 143238,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 2,
+    "carY": 0,
+    "slipNorm": 0.6127381670511916,
+    "hazardAhead": null,
+    "gatesPassed": 1,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -275,7 +462,18 @@
    "viewport": "1280x720",
    "job": "drive",
    "frame": 1513,
-   "bytes": 155387,
+   "bytes": 155953,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 1,
+    "carY": 0,
+    "slipNorm": 1,
+    "hazardAhead": null,
+    "gatesPassed": 0,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -287,7 +485,18 @@
    "viewport": "1280x720",
    "job": "finish",
    "frame": 2552,
-   "bytes": 128723,
+   "bytes": 130005,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 3,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 1,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
@@ -299,12 +508,35 @@
    "viewport": "1280x720",
    "job": "finish",
    "frame": 2952,
-   "bytes": 196720,
+   "bytes": 197267,
+   "sameState": true,
+   "differs": [],
+   "showsScene": true,
+   "state": {
+    "state": 3,
+    "carY": 0,
+    "slipNorm": 0,
+    "hazardAhead": null,
+    "gatesPassed": 1,
+    "contacts": 0
+   },
    "errors": {
     "page": [],
     "original": []
    }
   }
  ],
- "totalBytes": 2201618
+ "totalBytes": 2210220,
+ "expected": 20,
+ "knownAnswer": {
+  "scene": "03-deep-drift",
+  "frame": 182,
+  "originalExtraFrames": 1,
+  "caught": true,
+  "differs": [
+   "position",
+   "carX"
+  ]
+ },
+ "pass": true
 }
