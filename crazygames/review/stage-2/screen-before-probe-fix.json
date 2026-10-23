@@ -1,0 +1,367 @@
+{
+ "viewports": {
+  "390x844": {
+   "drives": 36,
+   "frames": 13809,
+   "checks": {
+    "car centre vs road frame (units)": {
+     "n": 13809,
+     "fail": 0,
+     "worst": 1.5421,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 3,
+      "tape": "hug",
+      "frames": 800
+     },
+     "worstDetail": {
+      "n": 398,
+      "lateral": 4275.201458905982,
+      "simX": 4276.7435218866385,
+      "frac": 1.4107342123493387,
+      "state": 1
+     }
+    },
+    "car centre along the road vs position (units)": {
+     "n": 13809,
+     "fail": 0,
+     "worst": 4.2834,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 3,
+      "tape": "hug",
+      "frames": 800
+     },
+     "worstDetail": {
+      "n": 436
+     }
+    },
+    "car height above drawn road vs carY (units)": {
+     "n": 13719,
+     "fail": 0,
+     "worst": 7.5969,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 6,
+      "tape": "chaos",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 428,
+      "drawn": -7.596940432040469,
+      "carY": 0,
+      "airborne": false
+     }
+    },
+    "rear wheel vs road frame (units)": {
+     "n": 27104,
+     "fail": 0,
+     "worst": 4.6239,
+     "worstDrive": {
+      "day": 20261002,
+      "level": 5,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 898,
+      "wheel": 2,
+      "lateral": -544.6674075472921,
+      "simX": -549.2913388405398
+     }
+    },
+    "rear wheel on screen vs the lips (px)": {
+     "n": 26404,
+     "fail": 4,
+     "worst": 2.2337,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 1,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 842,
+      "wheel": 3,
+      "sx": 224.08594796342027,
+      "sy": 529.275616984917,
+      "expectSx": 226.31957536922377,
+      "expectSy": 529.2634835753656,
+      "span": 345.05394564795944
+     }
+    },
+    "racer centre vs road frame (units)": {
+     "n": 34527,
+     "fail": 0,
+     "worst": 0.8267,
+     "worstDrive": {
+      "day": 20261002,
+      "level": 2,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 962,
+      "racer": 2,
+      "lateral": 217.61984321418836,
+      "simX": 218.44649913772975
+     }
+    },
+    "racer along the road vs z (units)": {
+     "n": 34527,
+     "fail": 0,
+     "worst": 1.08,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 2,
+      "tape": "hug",
+      "frames": 800
+     },
+     "worstDetail": {
+      "n": 448,
+      "racer": 0
+     }
+    },
+    "contact: gap between the drawn cars (units, 0 is touching)": {
+     "n": 220,
+     "fail": 0,
+     "worst": 0,
+     "worstDrive": null,
+     "worstDetail": null
+    },
+    "ramp deck half width drawn vs JUMP_RAMP_HALF (units)": {
+     "n": 50,
+     "fail": 0,
+     "worst": 0.0001,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 3,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 800,
+      "half": 1662.1614990234375,
+      "expectHalf": 1662.1614444444444
+     }
+    }
+   },
+   "counts": {
+    "edge scraping frames": 2221,
+    "scraping with the drawn car inside the scrape band": 17,
+    "contacts": 220,
+    "ramp riding frames": 50,
+    "airborne frames": 290,
+    "off road deaths past the edge": 9,
+    "off road death with the drawn car inside the line": 8
+   },
+   "fails": [
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.1473 > 2 {\"n\":838,\"wheel\":3,\"sx\":223.42619672527735,\"sy\":529.2513616987352,\"expectSx\":225.57343543569797,\"expectSy\":529.2350786035418,\"span\":315.6505588891248}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.2337 > 2 {\"n\":842,\"wheel\":3,\"sx\":224.08594796342027,\"sy\":529.275616984917,\"expectSx\":226.31957536922377,\"expectSy\":529.2634835753656,\"span\":345.05394564795944}",
+    "L1 20261001 chaos: scraping drawn inside the band at frame 180 drawn 3042 band 3076 carFrac 0.899 side 1",
+    "L2 20261001 chaos: scraping drawn inside the band at frame 224 drawn 2575 band 2637 carFrac 0.904 side 1",
+    "L3 20261001 chaos: off road death drawn inside the line at frame 340 drawn -4377 line 4546 simFrac -1.444",
+    "L4 20261001 chaos: scraping drawn inside the band at frame 172 drawn -2516 band 2637 carFrac -0.881 side -1",
+    "L4 20261001 chaos: off road death drawn inside the line at frame 348 drawn -4441 line 4546 simFrac -1.465",
+    "L5 20261001 chaos: scraping drawn inside the band at frame 290 drawn 2565 band 2637 carFrac 0.898 side 1",
+    "L5 20261001 chaos: scraping drawn inside the band at frame 332 drawn 2580 band 2637 carFrac 0.907 side 1",
+    "L5 20261001 chaos: scraping drawn inside the band at frame 334 drawn 2548 band 2637 carFrac 0.880 side 1",
+    "L6 20261001 chaos: scraping drawn inside the band at frame 284 drawn 2526 band 2637 carFrac 0.876 side 1",
+    "L6 20261001 chaos: scraping drawn inside the band at frame 388 drawn -2565 band 2637 carFrac -0.884 side -1",
+    "L6 20261001 chaos: off road death drawn inside the line at frame 429 drawn -4379 line 4546 simFrac -1.445",
+    "L1 20261002 driver: rear wheel on screen vs the lips (px) 2.1426 > 2 {\"n\":838,\"wheel\":2,\"sx\":166.60563186677484,\"sy\":529.2515906124625,\"expectSx\":164.46307810789605,\"expectSy\":529.2353426309768,\"span\":315.6503812786813}",
+    "L1 20261002 driver: rear wheel on screen vs the lips (px) 2.2289 > 2 {\"n\":842,\"wheel\":2,\"sx\":165.94716301973062,\"sy\":529.2757906453837,\"expectSx\":163.71834439111962,\"expectSy\":529.2636831400818,\"span\":345.0537622317268}",
+    "L2 20261002 chaos: off road death drawn inside the line at frame 431 drawn 4412 line 4546 simFrac 1.456",
+    "L3 20261002 chaos: scraping drawn inside the band at frame 276 drawn 2591 band 2637 carFrac 0.914 side 1",
+    "L3 20261002 chaos: off road death drawn inside the line at frame 359 drawn -4406 line 4546 simFrac -1.454",
+    "L4 20261002 chaos: scraping drawn inside the band at frame 196 drawn -2545 band 2637 carFrac -0.871 side -1",
+    "L4 20261002 chaos: scraping drawn inside the band at frame 352 drawn 2610 band 2637 carFrac 0.910 side 1",
+    "L4 20261002 chaos: scraping drawn inside the band at frame 354 drawn 2519 band 2637 carFrac 0.892 side 1",
+    "L4 20261002 chaos: scraping drawn inside the band at frame 356 drawn 2484 band 2637 carFrac 0.874 side 1",
+    "L4 20261002 chaos: scraping drawn inside the band at frame 380 drawn 2452 band 2637 carFrac 0.874 side 1",
+    "L4 20261002 chaos: scraping drawn inside the band at frame 382 drawn 2555 band 2637 carFrac 0.913 side 1",
+    "L4 20261002 chaos: off road death drawn inside the line at frame 400 drawn 4408 line 4546 simFrac 1.455",
+    "L5 20261002 chaos: off road death drawn inside the line at frame 433 drawn 4386 line 4546 simFrac 1.447",
+    "L6 20261002 chaos: scraping drawn inside the band at frame 294 drawn -2563 band 2637 carFrac -0.885 side -1",
+    "L6 20261002 chaos: scraping drawn inside the band at frame 330 drawn -2553 band 2637 carFrac -0.911 side -1",
+    "L6 20261002 chaos: off road death drawn inside the line at frame 347 drawn -4518 line 4546 simFrac -1.491"
+   ],
+   "errors": []
+  },
+  "1280x720": {
+   "drives": 6,
+   "frames": 3000,
+   "checks": {
+    "car centre vs road frame (units)": {
+     "n": 3000,
+     "fail": 0,
+     "worst": 1.1986,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 1,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 798,
+      "lateral": -334.27501863318065,
+      "simX": -333.0764049518516,
+      "frac": -0.19214299485112274,
+      "state": 1
+     }
+    },
+    "car centre along the road vs position (units)": {
+     "n": 3000,
+     "fail": 0,
+     "worst": 0.1478,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 4,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 888
+     }
+    },
+    "car height above drawn road vs carY (units)": {
+     "n": 3000,
+     "fail": 0,
+     "worst": 2.875,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 4,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 250,
+      "drawn": -2.8750180143783837,
+      "carY": 0,
+      "airborne": false
+     }
+    },
+    "rear wheel vs road frame (units)": {
+     "n": 5998,
+     "fail": 0,
+     "worst": 4.52,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 4,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 902,
+      "wheel": 3,
+      "lateral": 553.6938351763885,
+      "simX": 558.2138489372021
+     }
+    },
+    "rear wheel on screen vs the lips (px)": {
+     "n": 5648,
+     "fail": 8,
+     "worst": 3.657,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 1,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 842,
+      "wheel": 3,
+      "sx": 687.6220403730327,
+      "sy": 544.0737759466067,
+      "expectSx": 691.2789626204564,
+      "expectSy": 544.0545066101619,
+      "span": 564.9848853165133
+     }
+    },
+    "racer centre vs road frame (units)": {
+     "n": 7500,
+     "fail": 0,
+     "worst": 0.789,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 4,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 898,
+      "racer": 0,
+      "lateral": 130.00997470358857,
+      "simX": 129.22092730834862
+     }
+    },
+    "racer along the road vs z (units)": {
+     "n": 7500,
+     "fail": 0,
+     "worst": 0.2912,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 5,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 964,
+      "racer": 1
+     }
+    },
+    "contact: gap between the drawn cars (units, 0 is touching)": {
+     "n": 65,
+     "fail": 0,
+     "worst": 0,
+     "worstDrive": null,
+     "worstDetail": null
+    },
+    "ramp deck half width drawn vs JUMP_RAMP_HALF (units)": {
+     "n": 25,
+     "fail": 0,
+     "worst": 0.0001,
+     "worstDrive": {
+      "day": 20261001,
+      "level": 3,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 800,
+      "half": 1662.1614990234375,
+      "expectHalf": 1662.1614444444444
+     }
+    }
+   },
+   "counts": {
+    "contacts": 65,
+    "ramp riding frames": 25,
+    "airborne frames": 145
+   },
+   "fails": [
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.7274 > 2 {\"n\":834,\"wheel\":3,\"sx\":684.5735015457162,\"sy\":544.015053529827,\"expectSx\":687.3007619220125,\"expectSy\":543.9900457410697,\"span\":471.70500669539877}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.4498 > 2 {\"n\":836,\"wheel\":3,\"sx\":685.6427205514257,\"sy\":544.0246774198785,\"expectSx\":688.092443795067,\"expectSy\":544.0044103138555,\"span\":493.50581670524787}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 3.5155 > 2 {\"n\":838,\"wheel\":3,\"sx\":686.5415361556979,\"sy\":544.0352557143966,\"expectSx\":690.0569408677286,\"expectSy\":544.0093965347971,\"span\":516.8458744766644}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.8033 > 2 {\"n\":840,\"wheel\":3,\"sx\":687.2242395332382,\"sy\":544.0540792628084,\"expectSx\":690.0274935204513,\"expectSy\":544.0364348526402,\"span\":540.9901383459862}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 3.6570 > 2 {\"n\":842,\"wheel\":3,\"sx\":687.6220403730327,\"sy\":544.0737759466067,\"expectSx\":691.2789626204564,\"expectSy\":544.0545066101619,\"span\":564.9848853165133}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.6429 > 2 {\"n\":844,\"wheel\":3,\"sx\":687.7018427339765,\"sy\":544.0973928486102,\"expectSx\":690.3446829543827,\"expectSy\":544.0862861286698,\"span\":587.9773206256748}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.6812 > 2 {\"n\":846,\"wheel\":3,\"sx\":688.7787090199845,\"sy\":548.509321955093,\"expectSx\":691.4598672964771,\"expectSy\":548.5025366240365,\"span\":609.5515037868381}",
+    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.7598 > 2 {\"n\":848,\"wheel\":3,\"sx\":688.7036922908446,\"sy\":551.2293668365095,\"expectSx\":691.463481865543,\"expectSy\":551.2252585779121,\"span\":629.7143790061581}"
+   ],
+   "errors": []
+  }
+ },
+ "knownAnswer": {
+  "offset": 0.05,
+  "caught": true,
+  "wheelFails": 400,
+  "centreFails": 200,
+  "pxFails": 400,
+  "worstPx": 8.4912,
+  "frames": 200
+ },
+ "started": "2026-10-23T18:58:08.802Z",
+ "pass": false,
+ "finished": "2026-10-23T20:07:28.217Z"
+}

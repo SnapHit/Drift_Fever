@@ -124,8 +124,12 @@
             const EO = 1 + F.RUMBLE_WIDTH_FRACTION;
             /* where the simulation puts the wheel, as a point on the drawn
                cross section between the two outer lip edges, projected: a
-               fraction along a line is not kept by perspective, a point is */
-            const expectFrac = (simX / axleSeg.hw + EO) / (2 * EO);
+               fraction along a line is not kept by perspective, a point is.
+               The fraction is of the drawn half width at the wheel (ag.hw),
+               not the axle segment's hw: where the road changes width the
+               drawn width ramps between boundaries and the wheel can be over
+               the next segment, and simX is in units. */
+            const expectFrac = (simX / ag.hw + EO) / (2 * EO);
             const e3 = lerp(outerL, outerR, expectFrac);
             const pe = P.project(e3.x, e3.y, e3.z);
             note('rear wheel on screen vs the lips (px)', Math.hypot(pw.sx - pe.sx, pw.sy - pe.sy), TOL.px, { n, wheel: k, sx: pw.sx, sy: pw.sy, expectSx: pe.sx, expectSy: pe.sy, span: pr.sx - pl.sx });
@@ -137,16 +141,27 @@
         /* the edge kills two ways: past OFF_ROAD at once, or past SCRAPE_START
            for longer than the scrape meter allows; the car's bookkeeping says
            which, and the drawn car must agree with it */
-        const ag = againstQuad(centre, quadCorners(road, q));
-        const simFrac = (s.get('carX') + s.fn.bodyOffsetX(s.fn.carYaw())) / seg.hw;
+        const ref = drawnRef(centre, q);
         const line = Math.abs(s.get('carFrac')) > F.OFF_ROAD ? F.OFF_ROAD : F.SCRAPE_START;
         count(line === F.OFF_ROAD ? 'off road deaths past the edge' : 'off road deaths on the scrape meter');
-        if (Math.abs(ag.lateral) <= line * seg.hw - TOL.units) { count('off road death with the drawn car inside the line'); stats.fails.push('off road death drawn inside the line at frame ' + n + ' drawn ' + ag.lateral.toFixed(0) + ' line ' + (line * seg.hw).toFixed(0) + ' simFrac ' + simFrac.toFixed(3)); }
+        if (Math.abs(ref.x) <= line * ref.hw - TOL.units) { count('off road death with the drawn car inside the line'); stats.fails.push('off road death drawn inside the line at frame ' + n + ' drawn ' + ref.x.toFixed(0) + ' line ' + (line * ref.hw).toFixed(0) + ' carFrac ' + s.get('carFrac').toFixed(3)); }
       }
       if (driving && s.get('scraping') && q >= 0 && !hazardAlongside(s, carIdx)) {
         count('edge scraping frames');
+        const ref = drawnRef(centre, q);
+        if (Math.abs(ref.x) < F.SCRAPE_START * ref.hw - TOL.units) { count('scraping with the drawn car inside the scrape band'); stats.fails.push('scraping drawn inside the band at frame ' + n + ' drawn ' + ref.x.toFixed(0) + ' band ' + (F.SCRAPE_START * ref.hw).toFixed(0) + ' carFrac ' + s.get('carFrac').toFixed(3) + ' side ' + s.get('scrapeSide')); }
+      }
+      /* The edge rules are the simulation's, on carFrac: carX, the car's
+         bookkeeping point, over the half width of the segment it stood on
+         (localHalf, which is carX / carFrac exactly). The drawn body centre
+         is bodyOffsetX(yaw) off carX, up to two hundred units inward on a
+         car yawed at the edge, so the point held against the line is the
+         drawn centre less that same offset, and the line is in the
+         simulation's own half width. */
+      function drawnRef(centre, q) {
         const ag = againstQuad(centre, quadCorners(road, q));
-        if (Math.abs(ag.lateral) < F.SCRAPE_START * seg.hw - TOL.units) { count('scraping with the drawn car inside the scrape band'); stats.fails.push('scraping drawn inside the band at frame ' + n + ' drawn ' + ag.lateral.toFixed(0) + ' band ' + (F.SCRAPE_START * seg.hw).toFixed(0) + ' carFrac ' + s.get('carFrac').toFixed(3) + ' side ' + s.get('scrapeSide')); }
+        const cf = s.get('carFrac'), cx = s.get('carX');
+        return { x: ag.lateral - s.fn.bodyOffsetX(s.fn.carYaw()), hw: cf ? cx / cf : seg.hw };
       }
     }
     /* 4. a hit: the drawn car overlaps the drawn hazard's core */

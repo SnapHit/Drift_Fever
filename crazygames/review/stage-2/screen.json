@@ -4,20 +4,21 @@
    "drives": 36,
    "frames": 13809,
    "checks": {
-    "car centre vs road frame (half widths)": {
+    "car centre vs road frame (units)": {
      "n": 13809,
      "fail": 0,
-     "worst": 0.0093,
+     "worst": 1.5421,
      "worstDrive": {
       "day": 20261001,
-      "level": 1,
-      "tape": "chaos",
-      "frames": 500
+      "level": 3,
+      "tape": "hug",
+      "frames": 800
      },
      "worstDetail": {
-      "n": 370,
-      "frac": -1.128132238862372,
-      "simFrac": -1.1188570155588076,
+      "n": 398,
+      "lateral": 4275.201458905982,
+      "simX": 4276.7435218866385,
+      "frac": 1.4107342123493387,
       "state": 1
      }
     },
@@ -52,47 +53,10 @@
       "airborne": false
      }
     },
-    "rear wheel vs road frame (half widths)": {
-     "n": 27276,
-     "fail": 91,
-     "worst": 0.0389,
-     "worstDrive": {
-      "day": 20261001,
-      "level": 4,
-      "tape": "chaos",
-      "frames": 500
-     },
-     "worstDetail": {
-      "n": 366,
-      "wheel": 2,
-      "frac": -2.2821730021967586,
-      "sim": -2.2432320021626064
-     }
-    },
-    "rear wheel on screen vs the lips (px)": {
-     "n": 27276,
-     "fail": 786,
-     "worst": 153.5777,
-     "worstDrive": {
-      "day": 20261001,
-      "level": 3,
-      "tape": "driver",
-      "frames": 1000
-     },
-     "worstDetail": {
-      "n": 836,
-      "wheel": 2,
-      "sx": 177.2410655906684,
-      "sy": 442.4100336660602,
-      "expectSx": 181.5951241205281,
-      "expectSy": 595.9259697572991,
-      "span": 374.73194576877864
-     }
-    },
-    "racer centre vs road frame (half widths)": {
-     "n": 34527,
-     "fail": 2,
-     "worst": 0.0164,
+    "rear wheel vs road frame (units)": {
+     "n": 27104,
+     "fail": 0,
+     "worst": 4.6239,
      "worstDrive": {
       "day": 20261002,
       "level": 5,
@@ -100,10 +64,47 @@
       "frames": 1000
      },
      "worstDetail": {
-      "n": 982,
-      "racer": 0,
-      "frac": 0.7273855612714024,
-      "sim": 0.7128692656794394
+      "n": 898,
+      "wheel": 2,
+      "lateral": -544.6674075472921,
+      "simX": -549.2913388405398
+     }
+    },
+    "rear wheel on screen vs the lips (px)": {
+     "n": 26404,
+     "fail": 0,
+     "worst": 0.3532,
+     "worstDrive": {
+      "day": 20261002,
+      "level": 6,
+      "tape": "chaos",
+      "frames": 500
+     },
+     "worstDetail": {
+      "n": 342,
+      "wheel": 2,
+      "sx": 112.04927568492955,
+      "sy": 548.3070107201439,
+      "expectSx": 112.19962555762228,
+      "expectSy": 548.6266572726106,
+      "span": 469.7699509875503
+     }
+    },
+    "racer centre vs road frame (units)": {
+     "n": 34527,
+     "fail": 0,
+     "worst": 0.8267,
+     "worstDrive": {
+      "day": 20261002,
+      "level": 2,
+      "tape": "driver",
+      "frames": 1000
+     },
+     "worstDetail": {
+      "n": 962,
+      "racer": 2,
+      "lateral": 217.61984321418836,
+      "simX": 218.44649913772975
      }
     },
     "racer along the road vs z (units)": {
@@ -150,82 +151,19 @@
     "contacts": 220,
     "ramp riding frames": 50,
     "airborne frames": 290,
-    "scraping with the drawn car inside the scrape band": 15,
-    "off road deaths": 9,
-    "off road death with the drawn car inside the edge": 7
+    "off road deaths past the edge": 9
    },
-   "fails": [
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0116 > 0.01 {\"n\":830,\"wheel\":3,\"frac\":0.32016638049656776,\"sim\":0.33176086003240424}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0123 > 0.01 {\"n\":832,\"wheel\":3,\"frac\":0.32894871648278023,\"sim\":0.3412497306000674}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0191 > 0.01 {\"n\":834,\"wheel\":3,\"frac\":0.3343603850512751,\"sim\":0.35347933068952186}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0164 > 0.01 {\"n\":836,\"wheel\":3,\"frac\":0.33629807458110483,\"sim\":0.3527108478157062}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0225 > 0.01 {\"n\":838,\"wheel\":3,\"frac\":0.33496050458685267,\"sim\":0.3574468110435334}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.1473 > 2 {\"n\":838,\"wheel\":3,\"sx\":223.42619672527735,\"sy\":529.2513616987352,\"expectSx\":225.57343543569797,\"expectSy\":529.2350786035418,\"span\":315.6505588891248}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0171 > 0.01 {\"n\":840,\"wheel\":3,\"frac\":0.33073576231705304,\"sim\":0.34786269351283117}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0214 > 0.01 {\"n\":842,\"wheel\":3,\"frac\":0.323669855506574,\"sim\":0.3450587752820492}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.2337 > 2 {\"n\":842,\"wheel\":3,\"sx\":224.08594796342027,\"sy\":529.275616984917,\"expectSx\":226.31957536922377,\"expectSy\":529.2634835753656,\"span\":345.05394564795944}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0148 > 0.01 {\"n\":844,\"wheel\":3,\"frac\":0.31410519711857043,\"sim\":0.32895424677495694}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0145 > 0.01 {\"n\":846,\"wheel\":3,\"frac\":0.3095739847169876,\"sim\":0.32409894673474926}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0145 > 0.01 {\"n\":848,\"wheel\":3,\"frac\":0.29834041839255465,\"sim\":0.3128086269872998}",
-    "L1 20261001 chaos: rear wheel vs road frame (half widths) -0.0109 > 0.01 {\"n\":366,\"wheel\":3,\"frac\":-1.0132843841814512,\"sim\":-1.0024145205148078}",
-    "L1 20261001 chaos: rear wheel vs road frame (half widths) -0.0114 > 0.01 {\"n\":368,\"wheel\":3,\"frac\":-1.0134709582684476,\"sim\":-1.002051208059227}",
-    "L1 20261001 chaos: rear wheel vs road frame (half widths) -0.0112 > 0.01 {\"n\":374,\"wheel\":3,\"frac\":-1.0120984601702188,\"sim\":-1.000920591638494}",
-    "L1 20261001 chaos: rear wheel vs road frame (half widths) -0.0103 > 0.01 {\"n\":376,\"wheel\":3,\"frac\":-1.0097783357282581,\"sim\":-0.9994952349525927}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 5.7202 > 2 {\"n\":800,\"wheel\":2,\"sx\":180.10209081268093,\"sy\":546.4895093041708,\"expectSx\":180.26510405698156,\"expectSy\":552.2073559550284,\"span\":420.429090404955}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 5.7202 > 2 {\"n\":800,\"wheel\":3,\"sx\":209.89924947507316,\"sy\":546.4887951243726,\"expectSx\":209.73622174280837,\"expectSy\":552.2066382435239,\"span\":420.4282906941205}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 12.0237 > 2 {\"n\":802,\"wheel\":2,\"sx\":179.94869052392704,\"sy\":541.092906268459,\"expectSx\":180.2923088106119,\"expectSy\":553.1117202604511,\"span\":419.61137525658216}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 12.0237 > 2 {\"n\":802,\"wheel\":3,\"sx\":210.05309724151843,\"sy\":541.0920295036115,\"expectSx\":209.70943878561297,\"expectSy\":553.1108344472726,\"span\":419.61039124689665}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 18.3947 > 2 {\"n\":804,\"wheel\":2,\"sx\":179.80869418966014,\"sy\":536.162929278757,\"expectSx\":180.333156312061,\"expectSy\":554.5501559941224,\"span\":418.3548693003356}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 18.3947 > 2 {\"n\":804,\"wheel\":3,\"sx\":210.1933869578357,\"sy\":536.1619611838541,\"expectSx\":209.6688541765221,\"expectSy\":554.549172615303,\"span\":418.35378130408554}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 24.8144 > 2 {\"n\":806,\"wheel\":2,\"sx\":179.67841721274644,\"sy\":531.5708406132262,\"expectSx\":180.38675785315556,\"expectSy\":556.3751574260822,\"span\":416.78049647853845}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 24.8144 > 2 {\"n\":806,\"wheel\":3,\"sx\":210.32381763177767,\"sy\":531.5698422898641,\"expectSx\":209.61537540129893,\"expectSy\":556.3741365722017,\"span\":416.77937449310457}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 31.2606 > 2 {\"n\":808,\"wheel\":2,\"sx\":179.55488006308946,\"sy\":527.2106635847774,\"expectSx\":180.44617304690863,\"expectSy\":558.4585924631788,\"span\":414.9918246479008}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 31.2606 > 2 {\"n\":808,\"wheel\":3,\"sx\":210.44738479281327,\"sy\":527.2096866249992,\"expectSx\":209.55596330838358,\"expectSy\":558.4575876248476,\"span\":414.99072560405153}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 37.4976 > 2 {\"n\":810,\"wheel\":2,\"sx\":179.44102475624453,\"sy\":523.1860216580362,\"expectSx\":180.51092861786435,\"expectSy\":560.6683223821774,\"span\":413.09724697534955}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 37.4975 > 2 {\"n\":810,\"wheel\":3,\"sx\":210.56116866054256,\"sy\":523.1851050198048,\"expectSx\":209.49111649032162,\"expectSy\":560.6673725061962,\"span\":413.09621566414523}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 53.4245 > 2 {\"n\":812,\"wheel\":2,\"sx\":179.11929113299394,\"sy\":511.8595382494797,\"expectSx\":180.64231517273,\"expectSy\":565.2623222276661,\"span\":409.2609903101694}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 53.4244 > 2 {\"n\":812,\"wheel\":3,\"sx\":210.8831499595482,\"sy\":511.8585184929638,\"expectSx\":209.35989592862657,\"expectSy\":565.261248061532,\"span\":409.2598406312952}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 68.3522 > 2 {\"n\":814,\"wheel\":2,\"sx\":178.8262795711796,\"sy\":501.5354225128968,\"expectSx\":180.77549012726027,\"expectSy\":569.8598050048898,\"span\":405.4195221421262}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 68.3521 > 2 {\"n\":814,\"wheel\":3,\"sx\":211.1762595429897,\"sy\":501.5343772196119,\"expectSx\":209.22674851257418,\"expectSy\":569.8586826141318,\"span\":405.4183415187831}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 82.1895 > 2 {\"n\":816,\"wheel\":2,\"sx\":178.55968906343364,\"sy\":492.130725791169,\"expectSx\":180.90230271131884,\"expectSy\":574.2868745766709,\"span\":401.71372276147184}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 82.1895 > 2 {\"n\":816,\"wheel\":3,\"sx\":211.44287853337025,\"sy\":492.1296895427752,\"expectSx\":209.09990573841537,\"expectSy\":574.2857423617135,\"span\":401.71254574187066}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 94.8879 > 2 {\"n\":818,\"wheel\":2,\"sx\":178.31801764102673,\"sy\":483.59253314029024,\"expectSx\":181.02307495900743,\"expectSy\":578.4418256940219,\"span\":398.2265829370402}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 94.8878 > 2 {\"n\":818,\"wheel\":3,\"sx\":211.68454731699228,\"sy\":483.5915205962372,\"expectSx\":208.97908182769885,\"expectSy\":578.440696664074,\"span\":398.22542614871867}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 106.4025 > 2 {\"n\":820,\"wheel\":2,\"sx\":178.1004125623139,\"sy\":475.8901382019383,\"expectSx\":181.13248818144544,\"expectSy\":582.2493894141885,\"span\":395.0188282009977}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 106.4023 > 2 {\"n\":820,\"wheel\":3,\"sx\":211.90213703269302,\"sy\":475.88915481879525,\"expectSx\":208.86961255976533,\"expectSy\":582.2482732664539,\"span\":395.01769301812146}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 116.7045 > 2 {\"n\":822,\"wheel\":2,\"sx\":177.9065646557337,\"sy\":469.01284500899146,\"expectSx\":181.23257779882024,\"expectSy\":585.6699391992997,\"span\":392.122611425413}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 116.7044 > 2 {\"n\":822,\"wheel\":3,\"sx\":212.0959651646005,\"sy\":469.0118920814137,\"expectSx\":208.7694691271257,\"expectSy\":585.6688349508245,\"span\":392.121500055582}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 125.7679 > 2 {\"n\":824,\"wheel\":2,\"sx\":177.73656527398168,\"sy\":462.9637582477403,\"expectSx\":181.31955260151628,\"expectSy\":588.6806316359506,\"span\":389.5562829838226}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 125.7678 > 2 {\"n\":824,\"wheel\":3,\"sx\":212.26594411838448,\"sy\":462.96283512703286,\"expectSx\":208.68244592223854,\"expectSy\":588.6795432139314,\"span\":389.55519013176087}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 133.5645 > 2 {\"n\":826,\"wheel\":2,\"sx\":177.59079370267068,\"sy\":457.75639783871804,\"expectSx\":181.39611489845046,\"expectSy\":591.2666613052666,\"span\":387.3316309741808}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 133.5643 > 2 {\"n\":826,\"wheel\":3,\"sx\":212.41169587519937,\"sy\":457.7555030578514,\"expectSx\":208.60584102286106,\"expectSy\":591.2655847380202,\"span\":387.33055656371334}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 140.0793 > 2 {\"n\":828,\"wheel\":2,\"sx\":177.46980660857153,\"sy\":453.41072457701824,\"expectSx\":181.4593070383873,\"expectSy\":593.4332102708896,\"span\":385.44431924697994}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 140.0791 > 2 {\"n\":828,\"wheel\":3,\"sx\":212.53266419846756,\"sy\":453.4098561857079,\"expectSx\":208.54261238306583,\"expectSy\":593.4321487225984,\"span\":385.44325696561066}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 145.2801 > 2 {\"n\":830,\"wheel\":2,\"sx\":177.3742369281868,\"sy\":449.94922925814393,\"expectSx\":181.51193996351057,\"expectSy\":595.1704128399215,\"span\":383.90206825575143}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 145.2799 > 2 {\"n\":830,\"wheel\":3,\"sx\":212.6282158568397,\"sy\":449.9483851559712,\"expectSx\":208.48994833357185,\"expectSy\":595.1693617699788,\"span\":383.90101817235984}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 149.1649 > 2 {\"n\":832,\"wheel\":2,\"sx\":177.3047179769399,\"sy\":447.3950315262402,\"expectSx\":181.5515342681127,\"expectSy\":596.4994720757201,\"span\":382.68772327600584}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 149.1647 > 2 {\"n\":832,\"wheel\":3,\"sx\":212.69771727471345,\"sy\":447.394209391943,\"expectSx\":208.45032806118962,\"expectSy\":596.4984349094966,\"span\":382.68667919841954}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 151.6990 > 2 {\"n\":834,\"wheel\":2,\"sx\":177.26180170626043,\"sy\":445.76793616627776,\"expectSx\":181.57921064858456,\"expectSy\":597.4055093622736,\"span\":381.8129907605669}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 151.6988 > 2 {\"n\":834,\"wheel\":3,\"sx\":212.74061596904542,\"sy\":445.76713364442213,\"expectSx\":208.42263023308413,\"expectSy\":597.404485756608,\"span\":381.81194983669275}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 152.8972 > 2 {\"n\":836,\"wheel\":2,\"sx\":177.24591274010837,\"sy\":445.0841152095436,\"expectSx\":181.59736189377904,\"expectSy\":597.9193806414877,\"span\":381.2529800495424}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 152.8970 > 2 {\"n\":836,\"wheel\":3,\"sx\":212.7564869972189,\"sy\":445.0833297765554,\"expectSx\":208.404461476432,\"expectSy\":597.9183659083872,\"span\":381.2519432243689}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 152.7282 > 2 {\"n\":838,\"wheel\":2,\"sx\":177.25729097104627,\"sy\":445.35267296064063,\"expectSx\":181.60231041899198,\"expectSy\":598.0190689380559,\"span\":381.0252528014772}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 152.7280 > 2 {\"n\":838,\"wheel\":3,\"sx\":212.7450899978827,\"sy\":445.3519020929499,\"expectSx\":208.39949922110762,\"expectSy\":598.0180671689858,\"span\":381.0242141237833}",
-    "L2 20261001 chaos: rear wheel on screen vs the lips (px) 2.2652 > 2 {\"n\":370,\"wheel\":2,\"sx\":57.36760027315652,\"sy\":542.0745936756101,\"expectSx\":56.06289378124136,\"expectSy\":540.2228630727292,\"span\":452.0408701549472}",
-    "L2 20261001 chaos: rear wheel on screen vs the lips (px) 2.1395 > 2 {\"n\":370,\"wheel\":3,\"sx\":74.50796183322934,\"sy\":557.8998440219817,\"expectSx\":73.192260260093,\"expectSy\":556.2126964312788,\"span\":474.17774667689054}",
-    "L2 20261001 chaos: rear wheel on screen vs the lips (px) 4.9626 > 2 {\"n\":372,\"wheel\":2,\"sx\":58.353613543354605,\"sy\":549.5056999717824,\"expectSx\":55.96621018502141,\"expectSy\":545.155108856453,\"span\":451.4302207877939}",
-    "L2 20261001 chaos: rear wheel on screen vs the lips (px) 4.8037 > 2 {\"n\":372,\"wheel\":3,\"sx\":75.26951182435289,\"sy\":565.2606911225911,\"expectSx\":72.90440436581572,\"expectSy\":561.0795453090213,\"span\":474.63894055581676}"
-   ],
+   "fails": [],
    "errors": []
   },
   "1280x720": {
    "drives": 6,
    "frames": 3000,
    "checks": {
-    "car centre vs road frame (half widths)": {
+    "car centre vs road frame (units)": {
      "n": 3000,
      "fail": 0,
-     "worst": 0.0068,
+     "worst": 1.1986,
      "worstDrive": {
       "day": 20261001,
       "level": 1,
@@ -233,9 +171,10 @@
       "frames": 1000
      },
      "worstDetail": {
-      "n": 842,
-      "frac": 0.17075831682628606,
-      "simFrac": 0.17751720882836577,
+      "n": 798,
+      "lateral": -334.27501863318065,
+      "simX": -333.0764049518516,
+      "frac": -0.19214299485112274,
       "state": 1
      }
     },
@@ -270,58 +209,58 @@
       "airborne": false
      }
     },
-    "rear wheel vs road frame (half widths)": {
+    "rear wheel vs road frame (units)": {
      "n": 5998,
-     "fail": 10,
-     "worst": 0.0225,
+     "fail": 0,
+     "worst": 4.52,
      "worstDrive": {
       "day": 20261001,
-      "level": 1,
+      "level": 4,
       "tape": "driver",
       "frames": 1000
      },
      "worstDetail": {
-      "n": 838,
+      "n": 902,
       "wheel": 3,
-      "frac": 0.33496050458685267,
-      "sim": 0.3574468110435334
+      "lateral": 553.6938351763885,
+      "simX": 558.2138489372021
      }
     },
     "rear wheel on screen vs the lips (px)": {
-     "n": 5998,
-     "fail": 358,
-     "worst": 263.8671,
+     "n": 5648,
+     "fail": 0,
+     "worst": 0.3613,
      "worstDrive": {
       "day": 20261001,
-      "level": 3,
+      "level": 4,
       "tape": "driver",
       "frames": 1000
      },
      "worstDetail": {
-      "n": 836,
-      "wheel": 2,
-      "sx": 611.2071946943636,
-      "sy": 393.55182891198456,
-      "expectSx": 617.7841163976883,
-      "expectSy": 657.3369703269111,
-      "span": 621.0427731013765
+      "n": 902,
+      "wheel": 3,
+      "sx": 649.3941708803052,
+      "sy": 581.7152426223439,
+      "expectSx": 649.7451034885155,
+      "expectSy": 581.6292713804157,
+      "span": 677.6484469789273
      }
     },
-    "racer centre vs road frame (half widths)": {
+    "racer centre vs road frame (units)": {
      "n": 7500,
      "fail": 0,
-     "worst": 0.0069,
+     "worst": 0.789,
      "worstDrive": {
       "day": 20261001,
-      "level": 3,
+      "level": 4,
       "tape": "driver",
       "frames": 1000
      },
      "worstDetail": {
-      "n": 872,
-      "racer": 1,
-      "frac": -0.8291280785913043,
-      "sim": -0.801784024792208
+      "n": 898,
+      "racer": 0,
+      "lateral": 130.00997470358857,
+      "simX": 129.22092730834862
      }
     },
     "racer along the road vs z (units)": {
@@ -368,68 +307,7 @@
     "ramp riding frames": 25,
     "airborne frames": 145
    },
-   "fails": [
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0116 > 0.01 {\"n\":830,\"wheel\":3,\"frac\":0.32016638049656776,\"sim\":0.33176086003240424}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0123 > 0.01 {\"n\":832,\"wheel\":3,\"frac\":0.32894871648278023,\"sim\":0.3412497306000674}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0191 > 0.01 {\"n\":834,\"wheel\":3,\"frac\":0.3343603850512751,\"sim\":0.35347933068952186}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.7274 > 2 {\"n\":834,\"wheel\":3,\"sx\":684.5735015457162,\"sy\":544.015053529827,\"expectSx\":687.3007619220125,\"expectSy\":543.9900457410697,\"span\":471.70500669539877}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0164 > 0.01 {\"n\":836,\"wheel\":3,\"frac\":0.33629807458110483,\"sim\":0.3527108478157062}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.4498 > 2 {\"n\":836,\"wheel\":3,\"sx\":685.6427205514257,\"sy\":544.0246774198785,\"expectSx\":688.092443795067,\"expectSy\":544.0044103138555,\"span\":493.50581670524787}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0225 > 0.01 {\"n\":838,\"wheel\":3,\"frac\":0.33496050458685267,\"sim\":0.3574468110435334}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 3.5155 > 2 {\"n\":838,\"wheel\":3,\"sx\":686.5415361556979,\"sy\":544.0352557143966,\"expectSx\":690.0569408677286,\"expectSy\":544.0093965347971,\"span\":516.8458744766644}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0171 > 0.01 {\"n\":840,\"wheel\":3,\"frac\":0.33073576231705304,\"sim\":0.34786269351283117}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.8033 > 2 {\"n\":840,\"wheel\":3,\"sx\":687.2242395332382,\"sy\":544.0540792628084,\"expectSx\":690.0274935204513,\"expectSy\":544.0364348526402,\"span\":540.9901383459862}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0214 > 0.01 {\"n\":842,\"wheel\":3,\"frac\":0.323669855506574,\"sim\":0.3450587752820492}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 3.6570 > 2 {\"n\":842,\"wheel\":3,\"sx\":687.6220403730327,\"sy\":544.0737759466067,\"expectSx\":691.2789626204564,\"expectSy\":544.0545066101619,\"span\":564.9848853165133}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0148 > 0.01 {\"n\":844,\"wheel\":3,\"frac\":0.31410519711857043,\"sim\":0.32895424677495694}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.6429 > 2 {\"n\":844,\"wheel\":3,\"sx\":687.7018427339765,\"sy\":544.0973928486102,\"expectSx\":690.3446829543827,\"expectSy\":544.0862861286698,\"span\":587.9773206256748}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0145 > 0.01 {\"n\":846,\"wheel\":3,\"frac\":0.3095739847169876,\"sim\":0.32409894673474926}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.6812 > 2 {\"n\":846,\"wheel\":3,\"sx\":688.7787090199845,\"sy\":548.509321955093,\"expectSx\":691.4598672964771,\"expectSy\":548.5025366240365,\"span\":609.5515037868381}",
-    "L1 20261001 driver: rear wheel vs road frame (half widths) -0.0145 > 0.01 {\"n\":848,\"wheel\":3,\"frac\":0.29834041839255465,\"sim\":0.3128086269872998}",
-    "L1 20261001 driver: rear wheel on screen vs the lips (px) 2.7598 > 2 {\"n\":848,\"wheel\":3,\"sx\":688.7036922908446,\"sy\":551.2293668365095,\"expectSx\":691.463481865543,\"expectSy\":551.2252585779121,\"span\":629.7143790061581}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 9.9153 > 2 {\"n\":800,\"wheel\":2,\"sx\":615.4812122988023,\"sy\":570.9665250643803,\"expectSx\":615.7296134729801,\"expectSy\":580.8786721681557,\"span\":692.5041459940834}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 9.9152 > 2 {\"n\":800,\"wheel\":3,\"sx\":664.5209889902235,\"sy\":570.9653725997961,\"expectSx\":664.2725658130635,\"expectSy\":580.8775098770091,\"span\":692.5027007365076}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 20.8283 > 2 {\"n\":802,\"wheel\":2,\"sx\":615.2479005082218,\"sy\":561.626702761979,\"expectSx\":615.7712938954376,\"expectSy\":582.4484430032925,\"span\":691.246542935196}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 20.8283 > 2 {\"n\":802,\"wheel\":3,\"sx\":664.7550338369276,\"sy\":561.6252928076649,\"expectSx\":664.2315794805058,\"expectSy\":582.4470077681575,\"span\":691.2447642999334}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 31.8486 > 2 {\"n\":804,\"wheel\":2,\"sx\":615.0353158859219,\"sy\":553.1074269973444,\"expectSx\":615.8336175655573,\"expectSy\":584.9460369843764,\"span\":689.3183005104956}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 31.8486 > 2 {\"n\":804,\"wheel\":3,\"sx\":664.9680978307293,\"sy\":553.1058752410246,\"expectSx\":664.1696889785721,\"expectSy\":584.9444424575653,\"span\":689.3163334674812}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 42.9467 > 2 {\"n\":806,\"wheel\":2,\"sx\":614.8377832844292,\"sy\":545.1831849913011,\"expectSx\":615.9156555177692,\"expectSy\":588.1163281278136,\"span\":686.9033544915213}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 42.9466 > 2 {\"n\":806,\"wheel\":3,\"sx\":665.165880304379,\"sy\":545.181589804209,\"expectSx\":664.0878540203082,\"expectSy\":588.1146711384897,\"span\":686.9013252011999}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 54.0855 > 2 {\"n\":808,\"wheel\":2,\"sx\":614.6507397244591,\"sy\":537.6691678203124,\"expectSx\":616.0064370062343,\"expectSy\":591.7377091895561,\"span\":684.1590544315346}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 54.0855 > 2 {\"n\":808,\"wheel\":3,\"sx\":665.352970880333,\"sy\":537.6676116040611,\"expectSx\":663.9970788187371,\"expectSy\":591.7360764694306,\"span\":684.1570661029109}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 64.8594 > 2 {\"n\":810,\"wheel\":2,\"sx\":614.4785941388745,\"sy\":530.7421155306963,\"expectSx\":616.1056515405544,\"expectSy\":595.5811185063715,\"span\":681.2506686271657}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 64.8593 > 2 {\"n\":810,\"wheel\":3,\"sx\":665.524997466081,\"sy\":530.740659749784,\"expectSx\":663.8977152896474,\"expectSy\":595.5795732273078,\"span\":681.248802034399}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 92.3195 > 2 {\"n\":812,\"wheel\":2,\"sx\":613.9929740204466,\"sy\":511.2874060874317,\"expectSx\":616.3067387202202,\"expectSy\":603.5778935228844,\"span\":675.3684658562078}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 92.3193 > 2 {\"n\":812,\"wheel\":3,\"sx\":666.0110164200057,\"sy\":511.2857997609354,\"expectSx\":663.6969035673058,\"expectSy\":603.5761417309318,\"span\":675.3663832672562}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 118.0189 > 2 {\"n\":814,\"wheel\":2,\"sx\":613.5521180573598,\"sy\":493.6097035619167,\"expectSx\":616.511037367876,\"expectSy\":611.5914911674217,\"span\":669.4700971159568}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 118.0187 > 2 {\"n\":814,\"wheel\":3,\"sx\":666.4520263569996,\"sy\":493.60807004028743,\"expectSx\":663.4926525891817,\"expectSy\":611.5896560299531,\"span\":669.4679562350409}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 141.8107 > 2 {\"n\":816,\"wheel\":2,\"sx\":613.1522008006215,\"sy\":477.55221068875284,\"expectSx\":616.7056691311292,\"expectSy\":619.3183503837772,\"span\":663.7716912878154}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 141.8104 > 2 {\"n\":816,\"wheel\":3,\"sx\":666.8519843884081,\"sy\":477.55060376775555,\"expectSx\":663.2979732994944,\"expectSy\":619.3164949847006,\"span\":663.7695555132021}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 163.6188 > 2 {\"n\":818,\"wheel\":2,\"sx\":612.7906557854498,\"sy\":463.012103993859,\"expectSx\":616.8914713200396,\"expectSy\":626.5795369965663,\"span\":658.4016431320663}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 163.6186 > 2 {\"n\":818,\"wheel\":3,\"sx\":667.2135199503008,\"sy\":463.0105455848558,\"expectSx\":663.11208795908,\"expectSy\":626.5776826690657,\"span\":658.3995422685368}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 183.3728 > 2 {\"n\":820,\"wheel\":2,\"sx\":612.4659415187176,\"sy\":449.92641023643716,\"expectSx\":617.0598568170649,\"expectSy\":633.2416566515095,\"span\":653.4545344148569}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 183.3725 > 2 {\"n\":820,\"wheel\":3,\"sx\":667.5382046080902,\"sy\":449.9249077105909,\"expectSx\":662.9436118261242,\"expectSy\":633.2398201276394,\"span\":653.4524720142736}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 201.0288 > 2 {\"n\":822,\"wheel\":2,\"sx\":612.1773605605985,\"sy\":438.2675793569546,\"expectSx\":617.2142703080794,\"expectSy\":639.2332993602975,\"span\":648.9813197755934}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 201.0285 > 2 {\"n\":822,\"wheel\":3,\"sx\":667.8267493516546,\"sy\":438.2661335845961,\"expectSx\":662.7891110957291,\"expectSy\":639.2314791959532,\"span\":648.9792994405744}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 216.5478 > 2 {\"n\":824,\"wheel\":2,\"sx\":611.9248423860884,\"sy\":428.0326063798839,\"expectSx\":617.3484627026587,\"expectSy\":644.5124296483954,\"span\":645.0117029359499}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 216.5474 > 2 {\"n\":824,\"wheel\":3,\"sx\":668.0792308120693,\"sy\":428.03121524519,\"expectSx\":662.6548401468629,\"expectSy\":644.5106332109633,\"span\":645.0097161700984}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 229.8863 > 2 {\"n\":826,\"wheel\":2,\"sx\":611.7087673780087,\"sy\":419.23705037376715,\"expectSx\":617.4669081303308,\"expectSy\":649.0512106744026,\"span\":641.5651969727306}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 229.8859 > 2 {\"n\":826,\"wheel\":3,\"sx\":668.2952706551741,\"sy\":419.23571051808767,\"expectSx\":662.5363254827766,\"expectSy\":649.049431555009,\"span\":641.5632431305112}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 241.0244 > 2 {\"n\":828,\"wheel\":2,\"sx\":611.5298007140203,\"sy\":411.90822480204,\"expectSx\":617.5646499494287,\"expectSy\":652.8570785626465,\"span\":638.6363129143878}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 241.0240 > 2 {\"n\":828,\"wheel\":3,\"sx\":668.4742043939103,\"sy\":411.9069321367225,\"expectSx\":662.4385242940114,\"expectSy\":652.8553228728563,\"span\":638.6343816648287}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 249.9111 > 2 {\"n\":830,\"wheel\":2,\"sx\":611.3887443480395,\"sy\":406.07861822001274,\"expectSx\":617.6463417046896,\"expectSy\":655.911338437305,\"span\":636.2379489293538}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 249.9106 > 2 {\"n\":830,\"wheel\":3,\"sx\":668.6152295915101,\"sy\":406.0773684303495,\"expectSx\":662.3567818230097,\"expectSy\":655.9095987519322,\"span\":636.2360398038827}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 256.5478 > 2 {\"n\":832,\"wheel\":2,\"sx\":611.2864219698827,\"sy\":401.78270768624645,\"expectSx\":617.7077779050343,\"expectSy\":658.2501085266515,\"span\":634.3444590900783}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 256.5473 > 2 {\"n\":832,\"wheel\":3,\"sx\":668.7175221336491,\"sy\":401.78149611266167,\"expectSx\":662.2953032484729,\"expectSy\":658.2483913697033,\"span\":634.34256198545}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 260.8776 > 2 {\"n\":834,\"wheel\":2,\"sx\":611.2235660792307,\"sy\":399.05046802949505,\"expectSx\":617.7508421700595,\"expectSy\":659.8464301218638,\"span\":632.9745047415931}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 260.8771 > 2 {\"n\":834,\"wheel\":3,\"sx\":668.7803486565665,\"sy\":399.04928995574306,\"expectSx\":662.2522038902318,\"expectSy\":659.8447353837308,\"span\":632.9726147526351}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 262.9294 > 2 {\"n\":836,\"wheel\":2,\"sx\":611.200745398443,\"sy\":397.9068638702915,\"expectSx\":617.7793872506198,\"expectSy\":660.7539493924899,\"span\":632.0900976424816}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 262.9289 > 2 {\"n\":836,\"wheel\":3,\"sx\":668.8031399175451,\"sy\":397.90571431177864,\"expectSx\":662.2236300395604,\"expectSy\":660.7522692783868,\"span\":632.088215776434}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 262.6496 > 2 {\"n\":838,\"wheel\":2,\"sx\":611.2182896945162,\"sy\":398.36623230299864,\"expectSx\":617.7873787932785,\"expectSy\":660.933672436258,\"span\":631.7185929335228}",
-    "L2 20261001 driver: rear wheel on screen vs the lips (px) 262.6491 > 2 {\"n\":838,\"wheel\":3,\"sx\":668.7855653827904,\"sy\":398.36510627355796,\"expectSx\":662.2156158169525,\"expectSy\":660.93201457654,\"span\":631.7167095764428}",
-    "L3 20261001 driver: rear wheel on screen vs the lips (px) 9.9951 > 2 {\"n\":800,\"wheel\":2,\"sx\":615.4699667761123,\"sy\":566.0951788217608,\"expectSx\":615.7196766994997,\"expectSy\":576.087156310639,\"span\":681.9666918894056}",
-    "L3 20261001 driver: rear wheel on screen vs the lips (px) 9.9951 > 2 {\"n\":800,\"wheel\":3,\"sx\":664.5326561515539,\"sy\":566.0941128191023,\"expectSx\":664.2829198769964,\"expectSy\":576.0860701663149,\"span\":681.9648829366672}"
-   ],
+   "fails": [],
    "errors": []
   }
  },
@@ -442,7 +320,7 @@
   "worstPx": 8.4912,
   "frames": 200
  },
- "started": "2026-10-20T06:15:42.074Z",
- "pass": false,
- "finished": "2026-10-20T06:50:39.344Z"
+ "started": "2026-10-23T20:13:23.880Z",
+ "pass": true,
+ "finished": "2026-10-23T21:19:46.214Z"
 }
