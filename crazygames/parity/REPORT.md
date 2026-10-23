@@ -2,7 +2,7 @@
 
 Original: SnapHit/Drift_Fever at cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de. Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36. Time zone Australia/Sydney. Days 20261001 to 20261028.
 
-PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads and the real frame, identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok; 268s
+PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads, the real frame and the shipped page (28 jobs, 26100 frames drawn), identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok, K8 ok, K9 ok; 1526s
 
 ## Known answers
 
@@ -13,6 +13,8 @@ PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tap
 - K5_frame_loop_dead: pass
 - K6_real_frame: pass
 - K7_every_ending_reached: pass {"offRoad":1920,"hits":240,"ranOut":6,"finishes":469,"continues":386,"nextLevel":168}
+- K8_shipped_page: pass
+- K9_page_viewport_independent: pass
 
 ## Coverage
 
@@ -30,6 +32,8 @@ PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tap
 | ran out of time | 3 | 8877 | 0 | 0 | 6 | 3 |
 | fresh player, eased ramp | 4 | 17270 | 3 | 0 | 4 | 1 |
 | real frame | 3 | 4500 | 0 | 0 | 0 | 0 |
+| page | 24 | 22200 | 0 | 0 | 5 | 0 |
+| page records | 4 | 3901 | 1 | 1 | 0 | 0 |
 
 ## Hooks fired on the module side, level 6
 
