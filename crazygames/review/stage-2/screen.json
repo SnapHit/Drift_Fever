@@ -1,29 +1,29 @@
 {
  "viewports": {
   "390x844": {
-   "drives": 36,
-   "frames": 13809,
+   "drives": 37,
+   "frames": 15110,
    "checks": {
     "car centre vs road frame (units)": {
-     "n": 13809,
+     "n": 15100,
      "fail": 0,
-     "worst": 1.5421,
+     "worst": 1.9834,
      "worstDrive": {
       "day": 20261001,
       "level": 3,
-      "tape": "hug",
-      "frames": 800
+      "tape": "centre",
+      "frames": 2600
      },
      "worstDetail": {
-      "n": 398,
-      "lateral": 4275.201458905982,
-      "simX": 4276.7435218866385,
-      "frac": 1.4107342123493387,
+      "n": 1602,
+      "lateral": 2818.2278202848534,
+      "simX": 2820.211202797866,
+      "frac": 1.1769099324752075,
       "state": 1
      }
     },
     "car centre along the road vs position (units)": {
-     "n": 13809,
+     "n": 15100,
      "fail": 0,
      "worst": 4.2834,
      "worstDrive": {
@@ -37,7 +37,7 @@
      }
     },
     "car height above drawn road vs carY (units)": {
-     "n": 13719,
+     "n": 14981,
      "fail": 0,
      "worst": 7.5969,
      "worstDrive": {
@@ -54,7 +54,7 @@
      }
     },
     "rear wheel vs road frame (units)": {
-     "n": 27104,
+     "n": 29962,
      "fail": 0,
      "worst": 4.6239,
      "worstDrive": {
@@ -71,7 +71,7 @@
      }
     },
     "rear wheel on screen vs the lips (px)": {
-     "n": 26404,
+     "n": 29052,
      "fail": 0,
      "worst": 0.3532,
      "worstDrive": {
@@ -91,46 +91,46 @@
      }
     },
     "racer centre vs road frame (units)": {
-     "n": 34527,
+     "n": 38409,
      "fail": 0,
-     "worst": 0.8267,
+     "worst": 1.0623,
      "worstDrive": {
-      "day": 20261002,
-      "level": 2,
-      "tape": "driver",
-      "frames": 1000
+      "day": 20261001,
+      "level": 3,
+      "tape": "centre",
+      "frames": 2600
      },
      "worstDetail": {
-      "n": 962,
-      "racer": 2,
-      "lateral": 217.61984321418836,
-      "simX": 218.44649913772975
+      "n": 1982,
+      "racer": 0,
+      "lateral": 109.97906887509899,
+      "simX": 111.04140812833886
      }
     },
     "racer along the road vs z (units)": {
-     "n": 34527,
+     "n": 38409,
      "fail": 0,
-     "worst": 1.08,
+     "worst": 2.8153,
      "worstDrive": {
       "day": 20261001,
-      "level": 2,
-      "tape": "hug",
-      "frames": 800
+      "level": 3,
+      "tape": "centre",
+      "frames": 2600
      },
      "worstDetail": {
-      "n": 448,
+      "n": 2482,
       "racer": 0
      }
     },
     "contact: gap between the drawn cars (units, 0 is touching)": {
-     "n": 220,
+     "n": 256,
      "fail": 0,
      "worst": 0,
      "worstDrive": null,
      "worstDetail": null
     },
     "ramp deck half width drawn vs JUMP_RAMP_HALF (units)": {
-     "n": 50,
+     "n": 66,
      "fail": 0,
      "worst": 0.0001,
      "worstDrive": {
@@ -144,14 +144,38 @@
       "half": 1662.1614990234375,
       "expectHalf": 1662.1614444444444
      }
+    },
+    "gate drawn at the segment the simulation banked (segments)": {
+     "n": 1,
+     "fail": 0,
+     "worst": 0,
+     "worstDrive": null,
+     "worstDetail": null
+    },
+    "car at the drawn gate when it is banked (segments)": {
+     "n": 1,
+     "fail": 0,
+     "worst": 0,
+     "worstDrive": null,
+     "worstDetail": null
+    },
+    "hit: drawn hazard against the car (overlap units, must be positive)": {
+     "n": 1,
+     "fail": 0,
+     "worst": 0,
+     "worstDrive": null,
+     "worstDetail": null
     }
    },
    "counts": {
-    "edge scraping frames": 2221,
-    "contacts": 220,
-    "ramp riding frames": 50,
-    "airborne frames": 290,
-    "off road deaths past the edge": 9
+    "edge scraping frames": 2268,
+    "contacts": 256,
+    "ramp riding frames": 66,
+    "airborne frames": 377,
+    "off road deaths past the edge": 9,
+    "gates passed": 1,
+    "off road deaths on the scrape meter": 1,
+    "hits": 1
    },
    "fails": [],
    "errors": []
@@ -210,7 +234,7 @@
      }
     },
     "rear wheel vs road frame (units)": {
-     "n": 5998,
+     "n": 6000,
      "fail": 0,
      "worst": 4.52,
      "worstDrive": {
@@ -227,7 +251,7 @@
      }
     },
     "rear wheel on screen vs the lips (px)": {
-     "n": 5648,
+     "n": 5650,
      "fail": 0,
      "worst": 0.3613,
      "worstDrive": {
@@ -320,7 +344,17 @@
   "worstPx": 8.4912,
   "frames": 200
  },
- "started": "2026-10-23T20:13:23.880Z",
+ "started": "2026-10-23T23:35:42.530Z",
+ "coverage": {
+  "hits": 1,
+  "gatesPassed": 1,
+  "contacts": 256,
+  "airborneFrames": 377,
+  "offRoadDeaths": 10,
+  "edgeScrapingFrames": 2268,
+  "rampRidingFrames": 66,
+  "complete": true
+ },
  "pass": true,
- "finished": "2026-10-23T21:19:46.214Z"
+ "finished": "2026-10-24T00:37:00.091Z"
 }

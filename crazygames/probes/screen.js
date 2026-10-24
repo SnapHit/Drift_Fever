@@ -22,6 +22,10 @@ const jobsFor = (viewport) => {
   const out = [];
   const plan = quick ? [[days[0], [2, 5], { driver: 500, hug: 400 }]] : [[days[0], J.LEVELS, { driver: 1000, hug: 800, chaos: 500 }], [days[1], J.LEVELS, { driver: 1000, hug: 800, chaos: 500 }]];
   for (const [day, levels, tapes] of plan) for (const level of levels) for (const tape in tapes) out.push({ day, level, mode: 'DAILY', seed: J.seedOf(day, level, tape), tape, maxFrames: tapes[tape], every: 2, viewport });
+  /* None of the drives above reaches a gate or dies to a hazard, so the
+     hit and gate checks would never run. This one passes gates and ends
+     on a hazard (frame 2572). */
+  if (!quick && viewport === J.VIEW) out.push({ day: days[0], level: 3, mode: 'DAILY', seed: J.seedOf(days[0], 3, 'centre'), tape: 'centre', maxFrames: 2600, every: 2, viewport });
   return out;
 };
 const results = { viewports: {}, knownAnswer: null, started: new Date().toISOString() };
@@ -73,7 +77,11 @@ for (const viewport of [J.VIEW, J.VIEW_WIDE]) {
 await env.close();
 const main = results.viewports['390x844'];
 const anyFail = Object.values(results.viewports).some(v => Object.values(v.checks).some(c => c.fail > 0) || v.errors.length);
-results.pass = !anyFail && results.knownAnswer.caught && Object.values(results.viewports).every(v => Object.keys(v.counts).every(k => !/ with | but |inside|clear|no drawn|not drawn/.test(k) || v.counts[k] === 0));
+/* Every outcome the brief names must have been seen and checked at least once, or the check proved nothing. */
+const seen = main.counts;
+results.coverage = { hits: seen['hits'] || 0, gatesPassed: seen['gates passed'] || 0, contacts: seen['contacts'] || 0, airborneFrames: seen['airborne frames'] || 0, offRoadDeaths: (seen['off road deaths past the edge'] || 0) + (seen['off road deaths on the scrape meter'] || 0), edgeScrapingFrames: seen['edge scraping frames'] || 0, rampRidingFrames: seen['ramp riding frames'] || 0 };
+results.coverage.complete = quick || Object.values(results.coverage).every(v => v > 0);
+results.pass = !anyFail && results.knownAnswer.caught && results.coverage.complete && Object.values(results.viewports).every(v => Object.keys(v.counts).every(k => !/ with | but |inside|clear|no drawn|not drawn/.test(k) || v.counts[k] === 0));
 results.finished = new Date().toISOString();
 L.writeJson(path.join(L.root, 'review', 'stage-2', 'screen.json'), results);
 console.log('\nscreen agreement: ' + (results.pass ? 'PASS' : 'FAIL'));
@@ -84,5 +92,6 @@ for (const vp in results.viewports) {
   console.log('  counts: ' + JSON.stringify(v.counts));
   for (const f of v.fails.slice(0, 8)) console.log('  FAIL ' + f);
 }
+console.log('coverage at 390x844: ' + JSON.stringify(results.coverage));
 console.log('known answer (drawn car offset 0.05 hw): ' + JSON.stringify(results.knownAnswer));
 process.exit(results.pass ? 0 : 1);

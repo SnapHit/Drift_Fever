@@ -54,6 +54,8 @@
   const stats = { frames: 0, checks: {}, worst: {}, counts: {}, fails: [] };
   function note(name, value, limit, detail) {
     const c = stats.checks[name] = stats.checks[name] || { n: 0, fail: 0, worst: 0, sum: 0 };
+    /* a value that could not be measured is a failure, never a pass */
+    if (!Number.isFinite(value)) { c.n++; c.fail++; c.worst = Infinity; c.worstDetail = detail; if (stats.fails.length < 40) stats.fails.push(name + ' not measured (' + value + ') ' + JSON.stringify(detail)); return; }
     c.n++; c.sum += Math.abs(value);
     if (Math.abs(value) > c.worst) { c.worst = Math.abs(value); c.worstDetail = detail; }
     if (Math.abs(value) > limit) { c.fail++; if (stats.fails.length < 40) stats.fails.push(name + ' ' + value.toFixed(4) + ' > ' + limit + ' ' + JSON.stringify(detail)); }
@@ -220,17 +222,28 @@
       note('racer centre vs road frame (units)', ag.lateral - (r.x + s.fn.bodyOffsetX(r.yaw)), TOL.units, { n, racer: i, lateral: ag.lateral, simX: r.x + s.fn.bodyOffsetX(r.yaw) });
       note('racer along the road vs z (units)', (ag.u + rIdx) * F.SEGMENT_LENGTH - (rS + s.fn.bodyOffsetZ(r.yaw)), 12, { n, racer: i });
     });
-    /* 7. gates: at the frame a gate is passed, the drawn gate stood where the car is */
-    if (info.before === DRIVING && info.after === DRIVING && s.get('gatesPassed') !== lastGates) {
-      if (s.get('gatesPassed') > lastGates) {
-        count('gates passed');
-        const g = s.fn.gateSegment(s.get('gatesPassed'));
-        const qg = findQuad(blocks, t => (t.kind === 'gate' || t.kind === 'finish') && t.seg === g);
-        if (qg < 0) { count('gate passed with no drawn gate'); }
-        else { const post = quadCorners(blocks, qg); const gs = toRoadS(mid(post.a, post.b)); note('gate drawn at the segment the simulation banked (segments)', gs / F.SEGMENT_LENGTH - g, 1.5, { n, g, drawnSeg: gs / F.SEGMENT_LENGTH }); }
+    /* 7. gates: the gate the simulation banks is the one that was drawn
+       where it stands. Both renderers draw only the gate not yet crossed
+       (nextGate; the original's drawCheckpoint and drawFinishGate), so on
+       the frame after the crossing it is gone by design. What is checked
+       is the last sampled frame before the crossing: the gate drawn then
+       is the gate banked, at its segment, and the car had reached it. */
+    if (info.before === DRIVING && s.get('gatesPassed') > lastGates) {
+      count('gates passed');
+      const g = s.fn.gateSegment(s.get('gatesPassed'));
+      if (!gateSeen || gateSeen.g !== g || n - gateSeen.n > 2) { count('gate passed with no drawn gate'); stats.fails.push('gate ' + g + ' passed at frame ' + n + ' with no drawn gate on the frame before: ' + JSON.stringify(gateSeen)); }
+      else {
+        note('gate drawn at the segment the simulation banked (segments)', gateSeen.drawnSeg - g, 1.5, { n, g, drawnSeg: gateSeen.drawnSeg });
+        note('car at the drawn gate when it is banked (segments)', Math.max(0, gateSeen.drawnSeg - gateSeen.carSeg - 1), 1.5, { n, g, drawnSeg: gateSeen.drawnSeg, carSeg: gateSeen.carSeg });
       }
     }
     lastGates = s.get('gatesPassed');
+    if (st === DRIVING) {
+      const ng = s.get('nextGate');
+      const qg = findQuad(blocks, t => (t.kind === 'gate' || t.kind === 'finish') && t.seg === ng);
+      if (qg >= 0) { const post = quadCorners(blocks, qg); gateSeen = { g: ng, n, drawnSeg: toRoadS(mid(post.a, post.b)) / F.SEGMENT_LENGTH, carSeg: carS / F.SEGMENT_LENGTH }; }
+      else gateSeen = null;
+    }
     /* 8. a ramp: while the simulation says the car is riding a ramp, the drawn deck is under it */
     for (const j of s.get('jumps')) {
       if (!j.riding || j.done) continue;
@@ -244,27 +257,35 @@
       note('ramp deck half width drawn vs JUMP_RAMP_HALF (units)', half - expectHalf, 4, { n, half, expectHalf });
     }
   }
-  let lastGates = 0;
+  let lastGates = 0, gateSeen = null;
   /* world point to road coordinates, through the frame table the renderer built */
   function toRoad(p) {
     const T = S().world.probe.table();
-    let best = null;
+    /* A point far out on the inside of a bend projects inside neither
+       chord: it lies in the wedge between two, at their joint. So the
+       nearest chord with the projection clamped is kept as well, and used
+       when no chord holds the point. */
+    let best = null, near = null;
+    const SL = S().get('FEEL').SEGMENT_LENGTH;
     for (let n = 0; n + 1 < T.count; n++) {
       const ax = T.x[n], az = T.z[n], bx = T.x[n + 1], bz = T.z[n + 1];
       const dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz;
       const u = ((p.x - ax) * dx + (p.z - az) * dz) / l2;
-      if (u < -0.001 || u > 1.001) continue;
-      const px = ax + dx * u, pz = az + dz * u;
+      const uc = u < 0 ? 0 : (u > 1 ? 1 : u);
+      const px = ax + dx * uc, pz = az + dz * uc;
       const lat = ((p.x - px) * -dz + (p.z - pz) * dx) / Math.sqrt(l2);   // positive to the right of travel: right is (-forward.z, forward.x)
+      const dist = Math.hypot(p.x - px, p.z - pz);
+      if (!near || dist < near.d) near = { d: dist, s: (T.idx[n] + uc) * SL, x: lat };
+      if (u < -0.001 || u > 1.001) continue;
       const d = Math.abs(lat);
-      if (!best || d < best.d) best = { d, s: (T.idx[n] + u) * S().get('FEEL').SEGMENT_LENGTH, x: lat };
+      if (!best || d < best.d) best = { d, s: (T.idx[n] + u) * SL, x: lat };
     }
-    return best || { s: NaN, x: NaN };
+    return best || near || { s: NaN, x: NaN };
   }
   function toRoadS(p) { return toRoad(p).s; }
   function toRoadX(p) { return toRoad(p).x; }
   function hazardAlongside(s, carIdx) { return s.get('hazards').some(h => carIdx >= h.from - 2 && carIdx <= h.to + 2); }
-  function reset() { stats.frames = 0; stats.checks = {}; stats.counts = {}; stats.fails = []; lastGates = 0; }
+  function reset() { stats.frames = 0; stats.checks = {}; stats.counts = {}; stats.fails = []; lastGates = 0; gateSeen = null; }
   function summary() { const out = { frames: stats.frames, checks: {}, counts: stats.counts, fails: stats.fails }; for (const k in stats.checks) { const c = stats.checks[k]; out.checks[k] = { n: c.n, fail: c.fail, worst: +c.worst.toFixed(4), mean: +(c.sum / Math.max(1, c.n)).toFixed(4), worstDetail: c.worstDetail }; } return out; }
   root.screenProbe = { sample, summary, reset, TOL, _againstQuad: againstQuad };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
