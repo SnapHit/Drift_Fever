@@ -182,7 +182,11 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
 
 - Stage 1: done. The simulation is vendored and parity is proven; see
   `parity/REPORT.md`.
-- Stage 2, the greybox renderer: built on the `crazygames-stage-2`
-  branch; `review/stage-2/REPORT.md` has the measurements. `STAGE-2.md`
-  is its brief. It consumes `createSim(hooks)` and never feeds back into
-  it, and the parity test's K8 is what says so.
+- Stage 2: done and merged 24 October 2026. The greybox renderer, brief in
+  `STAGE-2.md`, results in `review/stage-2/REPORT.md`. It consumes
+  `createSim(hooks)` and never feeds back into it, and the parity test's
+  K8 is what says so. Open: the drawn drift yaw is far smaller than the
+  live game's, the hazard stripes outshine the road edge, the JavaScript
+  frame budget is just over at 6x throttle, and WebGPU, the readability
+  rule and a real Chromebook are unproven.
+- Stage 3, art, is next. Its brief starts from the report's "For stage 3".
