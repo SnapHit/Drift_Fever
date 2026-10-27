@@ -1,5 +1,5 @@
 {
- "started": "2026-10-23T11:13:29.306Z",
+ "started": "2026-10-27T20:10:16.432Z",
  "knownAnswers": {
   "A replica vs original bvis 390x844": {
    "frames": 600,
@@ -23,18 +23,18 @@
    "frames": 1425,
    "groundOnly": {
     "contiguousRun": {
-     "worstSeconds": 3.56,
-     "p05Seconds": 4.07,
+     "worstSeconds": 1.82,
+     "p05Seconds": 2.04,
      "medianSeconds": 4.49,
      "maxSeconds": 4.49,
-     "under35": 0
+     "under35": 336
     },
     "furthestVisible": {
-     "worstSeconds": 3.73,
-     "p05Seconds": 4.13,
+     "worstSeconds": 2.47,
+     "p05Seconds": 3.2,
      "medianSeconds": 4.49,
      "maxSeconds": 4.49,
-     "under35": 0
+     "under35": 122
     }
    },
    "original": {
@@ -55,40 +55,39 @@
    },
    "worstFrameGroundOnly": {
     "day": 20261002,
-    "level": 3,
-    "n": 760,
-    "segs": 30,
-    "furthest": 202,
-    "oSegs": 141,
-    "oFurthest": 141,
-    "gSegs": 160,
-    "gFurthest": 202
+    "level": 5,
+    "n": 890,
+    "segs": 82,
+    "furthest": 195,
+    "oSegs": 71,
+    "oFurthest": 178,
+    "gSegs": 82,
+    "gFurthest": 195
    },
-   "framesShorterThanOriginal": 0,
-   "worstShortfallSeconds": 0,
-   "framesFurthestShorterThanOriginal": 0,
+   "framesShorterThanOriginal": 409,
+   "worstShortfallSeconds": 2.13,
+   "framesFurthestShorterThanOriginal": 200,
    "everything": {
     "contiguousRun": {
      "worstSeconds": 0,
      "p05Seconds": 0.49,
-     "medianSeconds": 4.49,
+     "medianSeconds": 3.89,
      "maxSeconds": 4.49,
-     "under35": 370
+     "under35": 586
     },
     "furthestVisible": {
-     "worstSeconds": 2.44,
-     "p05Seconds": 3.96,
+     "worstSeconds": 0,
+     "p05Seconds": 2.78,
      "medianSeconds": 4.49,
      "maxSeconds": 4.49,
-     "under35": 23
+     "under35": 205
     },
     "reasons": {
-     "draw distance": 889,
-     "occluded by gantry": 87,
-     "occluded by surface": 52,
-     "occluded by jump": 394,
-     "off screen": 1,
-     "occluded by lane": 2
+     "draw distance": 593,
+     "occluded by gantry": 15,
+     "occluded by lane": 18,
+     "occluded by surface": 417,
+     "occluded by jump": 382
     }
    },
    "knownAnswerB": {
@@ -104,18 +103,18 @@
    "frames": 1425,
    "groundOnly": {
     "contiguousRun": {
-     "worstSeconds": 3.27,
-     "p05Seconds": 3.96,
-     "medianSeconds": 4.49,
+     "worstSeconds": 1.31,
+     "p05Seconds": 1.51,
+     "medianSeconds": 3.93,
      "maxSeconds": 4.49,
-     "under35": 8
+     "under35": 617
     },
     "furthestVisible": {
-     "worstSeconds": 3.53,
-     "p05Seconds": 4.07,
+     "worstSeconds": 1.49,
+     "p05Seconds": 2.07,
      "medianSeconds": 4.49,
      "maxSeconds": 4.49,
-     "under35": 0
+     "under35": 294
     }
    },
    "original": {
@@ -137,13 +136,13 @@
    "worstFrameGroundOnly": {
     "day": 20261002,
     "level": 3,
-    "n": 780,
-    "segs": 14,
-    "furthest": 186,
-    "oSegs": 108,
-    "oFurthest": 108,
-    "gSegs": 147,
-    "gFurthest": 186
+    "n": 880,
+    "segs": 59,
+    "furthest": 202,
+    "oSegs": 40,
+    "oFurthest": 168,
+    "gSegs": 59,
+    "gFurthest": 202
    },
    "framesShorterThanOriginal": 0,
    "worstShortfallSeconds": 0,
@@ -152,23 +151,23 @@
     "contiguousRun": {
      "worstSeconds": 0,
      "p05Seconds": 0.49,
-     "medianSeconds": 4.49,
+     "medianSeconds": 3.18,
      "maxSeconds": 4.49,
-     "under35": 366
+     "under35": 804
     },
     "furthestVisible": {
-     "worstSeconds": 2.27,
-     "p05Seconds": 3.89,
+     "worstSeconds": 0.31,
+     "p05Seconds": 1.69,
      "medianSeconds": 4.49,
      "maxSeconds": 4.49,
-     "under35": 27
+     "under35": 391
     },
     "reasons": {
-     "draw distance": 867,
-     "occluded by gantry": 81,
-     "occluded by surface": 82,
-     "occluded by jump": 394,
-     "occluded by lane": 1
+     "draw distance": 467,
+     "occluded by gantry": 2,
+     "occluded by lane": 36,
+     "occluded by surface": 608,
+     "occluded by jump": 312
     }
    },
    "knownAnswerB": {
@@ -196,25 +195,438 @@
    "median": 51,
    "max": 180
   },
-  "minLeadSecondsAheadHere": 3.11,
+  "minLeadSecondsAheadHere": 3.24,
   "minLeadSecondsAheadOriginal": 0.49,
   "later": [],
   "countingEverythingDrawn": {
-   "laterThanOriginal": 3,
-   "worstLaterSegments": 93,
+   "laterThanOriginal": 35,
+   "worstLaterSegments": 138,
    "later": [
     {
-     "day": 20261016,
+     "day": 20261001,
+     "level": 6,
+     "kind": "blocker",
+     "from": 1007,
+     "to": 1011,
+     "x": 0.6069140230258927,
+     "half": 420,
+     "swing": 0,
+     "mine": 804,
+     "mineAll": 843,
+     "orig": 829
+    },
+    {
+     "day": 20261001,
+     "level": 6,
+     "kind": "blocker",
+     "from": 5745,
+     "to": 5749,
+     "x": -0.4226971512893215,
+     "half": 420,
+     "swing": 0,
+     "mine": 5550,
+     "mineAll": 5639,
+     "orig": 5589
+    },
+    {
+     "day": 20261003,
+     "level": 5,
+     "kind": "blocker",
+     "from": 967,
+     "to": 971,
+     "x": 0.3958843394834548,
+     "half": 420,
+     "swing": 0,
+     "mine": 764,
+     "mineAll": 812,
+     "orig": 789
+    },
+    {
+     "day": 20261004,
+     "level": 6,
+     "kind": "blocker",
+     "from": 2233,
+     "to": 2237,
+     "x": 0.5683992336643859,
+     "half": 420,
+     "swing": 0,
+     "mine": 2030,
+     "mineAll": 2062,
+     "orig": 2055
+    },
+    {
+     "day": 20261006,
+     "level": 2,
+     "kind": "blocker",
+     "from": 966,
+     "to": 970,
+     "x": -0.2901045374944806,
+     "half": 420,
+     "swing": 0,
+     "mine": 763,
+     "mineAll": 807,
+     "orig": 788
+    },
+    {
+     "day": 20261006,
+     "level": 5,
+     "kind": "blocker",
+     "from": 2290,
+     "to": 2294,
+     "x": 0.4064765262650326,
+     "half": 420,
+     "swing": 0,
+     "mine": 2087,
+     "mineAll": 2135,
+     "orig": 2112
+    },
+    {
+     "day": 20261006,
+     "level": 5,
+     "kind": "mover",
+     "from": 3939,
+     "to": 3943,
+     "x": 0,
+     "half": 320,
+     "swing": 0.36,
+     "mine": 3736,
+     "mineAll": 3771,
+     "orig": 3761
+    },
+    {
+     "day": 20261007,
+     "level": 2,
+     "kind": "blocker",
+     "from": 2336,
+     "to": 2340,
+     "x": 0.546153643229045,
+     "half": 420,
+     "swing": 0,
+     "mine": 2133,
+     "mineAll": 2169,
+     "orig": 2158
+    },
+    {
+     "day": 20261008,
+     "level": 4,
+     "kind": "blocker",
+     "from": 1064,
+     "to": 1068,
+     "x": 0.28594608963932844,
+     "half": 420,
+     "swing": 0,
+     "mine": 861,
+     "mineAll": 902,
+     "orig": 886
+    },
+    {
+     "day": 20261008,
+     "level": 5,
+     "kind": "blocker",
+     "from": 1053,
+     "to": 1057,
+     "x": 0.508691651104018,
+     "half": 420,
+     "swing": 0,
+     "mine": 850,
+     "mineAll": 893,
+     "orig": 875
+    },
+    {
+     "day": 20261008,
+     "level": 6,
+     "kind": "blocker",
+     "from": 2313,
+     "to": 2317,
+     "x": -0.49889157876372336,
+     "half": 420,
+     "swing": 0,
+     "mine": 2110,
+     "mineAll": 2170,
+     "orig": 2135
+    },
+    {
+     "day": 20261009,
+     "level": 5,
+     "kind": "blocker",
+     "from": 1026,
+     "to": 1030,
+     "x": -0.5728271706588566,
+     "half": 420,
+     "swing": 0,
+     "mine": 823,
+     "mineAll": 870,
+     "orig": 848
+    },
+    {
+     "day": 20261009,
+     "level": 5,
+     "kind": "blocker",
+     "from": 4420,
+     "to": 4424,
+     "x": -0.44323035506065933,
+     "half": 420,
+     "swing": 0,
+     "mine": 4217,
+     "mineAll": 4262,
+     "orig": 4242
+    },
+    {
+     "day": 20261010,
+     "level": 6,
+     "kind": "blocker",
+     "from": 5546,
+     "to": 5550,
+     "x": -0.31884396427311007,
+     "half": 420,
+     "swing": 0,
+     "mine": 5343,
+     "mineAll": 5404,
+     "orig": 5368
+    },
+    {
+     "day": 20261012,
+     "level": 6,
+     "kind": "blocker",
+     "from": 3266,
+     "to": 3270,
+     "x": 0.36392523250076925,
+     "half": 420,
+     "swing": 0,
+     "mine": 3063,
+     "mineAll": 3107,
+     "orig": 3088
+    },
+    {
+     "day": 20261013,
+     "level": 5,
+     "kind": "blocker",
+     "from": 3035,
+     "to": 3039,
+     "x": -0.3686775859538466,
+     "half": 420,
+     "swing": 0,
+     "mine": 2832,
+     "mineAll": 2893,
+     "orig": 2857
+    },
+    {
+     "day": 20261013,
+     "level": 5,
+     "kind": "blocker",
+     "from": 5406,
+     "to": 5410,
+     "x": -0.4641277901083231,
+     "half": 420,
+     "swing": 0,
+     "mine": 5203,
+     "mineAll": 5239,
+     "orig": 5228
+    },
+    {
+     "day": 20261014,
+     "level": 3,
+     "kind": "blocker",
+     "from": 947,
+     "to": 951,
+     "x": -0.4675487288879231,
+     "half": 420,
+     "swing": 0,
+     "mine": 744,
+     "mineAll": 781,
+     "orig": 769
+    },
+    {
+     "day": 20261014,
+     "level": 4,
+     "kind": "blocker",
+     "from": 3340,
+     "to": 3344,
+     "x": 0.28500690306071197,
+     "half": 420,
+     "swing": 0,
+     "mine": 3149,
+     "mineAll": 3187,
+     "orig": 3162
+    },
+    {
+     "day": 20261014,
+     "level": 5,
+     "kind": "blocker",
+     "from": 985,
+     "to": 989,
+     "x": -0.31142936371266844,
+     "half": 420,
+     "swing": 0,
+     "mine": 782,
+     "mineAll": 828,
+     "orig": 807
+    },
+    {
+     "day": 20261014,
      "level": 5,
      "kind": "splitter",
-     "from": 2578,
-     "to": 2621,
+     "from": 5401,
+     "to": 5444,
      "x": 0,
      "half": 300,
      "swing": 0,
-     "mine": 2375,
-     "mineAll": 2415,
-     "orig": 2400
+     "mine": 5198,
+     "mineAll": 5252,
+     "orig": 5223
+    },
+    {
+     "day": 20261016,
+     "level": 4,
+     "kind": "blocker",
+     "from": 998,
+     "to": 1002,
+     "x": 0.570941989296116,
+     "half": 420,
+     "swing": 0,
+     "mine": 795,
+     "mineAll": 843,
+     "orig": 820
+    },
+    {
+     "day": 20261018,
+     "level": 6,
+     "kind": "blocker",
+     "from": 1000,
+     "to": 1004,
+     "x": 0.49577451395336536,
+     "half": 420,
+     "swing": 0,
+     "mine": 797,
+     "mineAll": 849,
+     "orig": 822
+    },
+    {
+     "day": 20261019,
+     "level": 2,
+     "kind": "blocker",
+     "from": 1045,
+     "to": 1049,
+     "x": -0.37716060067526996,
+     "half": 420,
+     "swing": 0,
+     "mine": 842,
+     "mineAll": 887,
+     "orig": 867
+    },
+    {
+     "day": 20261019,
+     "level": 6,
+     "kind": "blocker",
+     "from": 6312,
+     "to": 6316,
+     "x": 0.5932202811725438,
+     "half": 420,
+     "swing": 0,
+     "mine": 6112,
+     "mineAll": 6156,
+     "orig": 6134
+    },
+    {
+     "day": 20261021,
+     "level": 4,
+     "kind": "blocker",
+     "from": 2165,
+     "to": 2169,
+     "x": 0.4648537698108703,
+     "half": 420,
+     "swing": 0,
+     "mine": 1962,
+     "mineAll": 2013,
+     "orig": 1987
+    },
+    {
+     "day": 20261021,
+     "level": 5,
+     "kind": "blocker",
+     "from": 970,
+     "to": 974,
+     "x": 0.32515601275023076,
+     "half": 420,
+     "swing": 0,
+     "mine": 767,
+     "mineAll": 820,
+     "orig": 792
+    },
+    {
+     "day": 20261021,
+     "level": 5,
+     "kind": "blocker",
+     "from": 4657,
+     "to": 4661,
+     "x": -0.39877294891513887,
+     "half": 420,
+     "swing": 0,
+     "mine": 4454,
+     "mineAll": 4487,
+     "orig": 4479
+    },
+    {
+     "day": 20261021,
+     "level": 6,
+     "kind": "jump",
+     "from": 7170,
+     "to": 7178,
+     "mine": 6991,
+     "mineAll": 7002,
+     "orig": 7001
+    },
+    {
+     "day": 20261022,
+     "level": 5,
+     "kind": "blocker",
+     "from": 1839,
+     "to": 1843,
+     "x": 0.3617826792318374,
+     "half": 420,
+     "swing": 0,
+     "mine": 1636,
+     "mineAll": 1689,
+     "orig": 1661
+    },
+    {
+     "day": 20261023,
+     "level": 5,
+     "kind": "blocker",
+     "from": 4584,
+     "to": 4588,
+     "x": 0.3328567700972781,
+     "half": 420,
+     "swing": 0,
+     "mine": 4381,
+     "mineAll": 4432,
+     "orig": 4406
+    },
+    {
+     "day": 20261024,
+     "level": 2,
+     "kind": "blocker",
+     "from": 956,
+     "to": 960,
+     "x": -0.5399928063713014,
+     "half": 420,
+     "swing": 0,
+     "mine": 753,
+     "mineAll": 794,
+     "orig": 778
+    },
+    {
+     "day": 20261026,
+     "level": 6,
+     "kind": "blocker",
+     "from": 3253,
+     "to": 3257,
+     "x": -0.3964355626050383,
+     "half": 420,
+     "swing": 0,
+     "mine": 3050,
+     "mineAll": 3099,
+     "orig": 3075
     },
     {
      "day": 20261026,
@@ -225,8 +637,8 @@
      "x": 0,
      "half": 300,
      "swing": 0,
-     "mine": 5270,
-     "mineAll": 5375,
+     "mine": 5266,
+     "mineAll": 5412,
      "orig": 5348
     },
     {
@@ -239,7 +651,7 @@
      "half": 420,
      "swing": 0,
      "mine": 2746,
-     "mineAll": 2863,
+     "mineAll": 2908,
      "orig": 2770
     }
    ]
@@ -254,12 +666,11 @@
     "swing": 0
    },
    "before": 1317,
-   "withCrest": 1428,
+   "withCrest": 1480,
    "caught": true
   },
   "errors": []
  },
- "partAFrom": "2026-10-23T10:13:59.225Z",
- "pass": true,
- "finished": "2026-10-23T11:15:46.944Z"
+ "pass": false,
+ "finished": "2026-10-27T21:06:48.394Z"
 }

@@ -353,3 +353,21 @@ on the car. Both were the camera, not the simulation.
 
 Known answers, both caught: the stage 2 portrait rig measures 0.65x (slow),
 and the stage 2 follow puts the car 24.5 px off centre on the same drive.
+
+Visibility on the lowered camera (`visibility.json`, rerun 28 October):
+hazards and jumps are unaffected by the original's rule. Of 2,245, none
+is seen later than in the live game, and every one is first seen at
+least 3.24 s ahead (the live game's worst is 0.49 s). Counting gantries
+and ramps as blockers, 35 are seen later, worst by 138 segments (was 3).
+The road ahead past crests is shorter than the live game's on some
+frames, so the probe's own pass condition now fails:
+
+| ground only | 390x844 | 1280x720 | live game |
+|---|---|---|---|
+| worst contiguous run | 1.82 s | 1.31 s | 0.58 s |
+| median | 4.49 s | 3.93 s | 3.96 s |
+| frames under 3.5 s | 336 | 617 | 300 (portrait), 1,143 (landscape) |
+| frames shorter than the live game | 409 of 1,425 | see json | |
+
+Accepted for now by the reviewer: feel first, with a hard floor of one
+second ahead for any hazard or jump, which holds at 3.24 s.
