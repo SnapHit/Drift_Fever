@@ -1,13 +1,13 @@
 {
  "pass": true,
- "when": "2026-10-23T10:13:41.974Z",
+ "when": "2026-10-27T20:17:38.235Z",
  "commit": "cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de",
  "chromium": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36",
  "tz": "Australia/Sydney",
  "days": 28,
  "from": 20261001,
  "to": 20261028,
- "summary": "PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads, the real frame and the shipped page (28 jobs, 26100 frames drawn), identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok, K8 ok, K9 ok; 1526s",
+ "summary": "PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads, the real frame and the shipped page (28 jobs, 26100 frames drawn), identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok, K8 ok, K9 ok; 2263s",
  "files": {
   "sim/drift-fever-sim.js": "73657f46640ce7a939b4afadd788d433abefa176b4c75307818e68f26448585b",
   "vendor/original/COMMIT": "ba39f838dfbdeebb40f1f3d9b84d4fdc5b0030170882b7e9f2f1b006c484d543",
@@ -21,9 +21,9 @@
   "tools/original.js": "6385caf52921e2f808485c8ff840e458bd2bf3298713b88b04e07fbc373c9bc9",
   "tools/serve.js": "070406a822bee9c58aef8cfdb3951e6e7846bb328c33b0090188f319b6fe2f3e",
   "public/index.html": "7e3cdb3bb42dd4c42e13caa73dcccc1e14382f987ea1279d88186472e6b4ed31",
-  "public/game.js": "e4b8543ad5beb17117bb7ba625f7a7c1f763f0d20bfe17dc887bc17ca238e1a1",
+  "public/game.js": "a0c52151b375cc05425b152dcb86989af8bc6091357fc65cc7411f4a1083e735",
   "public/chrome.js": "e270f4dbbe9a450ab69524eb1db3ba177e0bc09ae5f1e3c5919e99b9744b8dca",
-  "public/world.js": "c8a1f46fa79304ec6efc1167988f2548776ec246793ae5d8349ae5b7d7bee833",
+  "public/world.js": "e37697c7ac909d30ba7516897e809f07b7942f7b1ed510d7b0d1ece5dec90e67",
   "public/chrome.css": "d1b19f115cfc50cc3c291cec7f13a88cd1867dafde7a6e33fdfa54875918ecfe",
   "public/vendor/three.webgpu.min.js": "20385e54765e07e10507aead793174bfec7da502ba840f4aca4f0745b9fbaa54",
   "index.html@cd06dd5acaa3517a43aa2f34d94fea8e0b0ba1de": "c62a50ca543bb453056800bc8acba6bd4642f2a6874defe655495ab1b2d52bbe"

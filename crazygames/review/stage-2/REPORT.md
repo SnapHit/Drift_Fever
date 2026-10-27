@@ -321,3 +321,35 @@ game driven one frame further is caught (position and carX differ).
 - **Add a known answer for the gate and hit checks**, and more drives
   that reach them, and extend K8 beyond 2 days if the runner allows.
 - **Fix the `camHeight` write** in Drift_Fever's `render()`.
+
+---
+
+## After play, 28 October 2026: the camera
+
+The author played the preview and found two things wrong: it felt far
+too slow, and the camera drifted slowly side to side instead of staying
+on the car. Both were the camera, not the simulation.
+
+- **Slow.** The rigs above sat nearly three times higher than the live
+  game's camera (6,038 against 2,200 in portrait), and how fast the
+  ground seems to pass goes roughly as speed over height. The rigs are
+  now portrait fov 110, back 2,900, up 2,900, pitch 18; landscape fov 62,
+  back 4,200, up 2,000, pitch 10.
+- **Sway.** The camera copied the simulation's `cameraX`, which is the
+  car's sideways position times 0.55. In 3D that left the car sliding off
+  centre with the camera catching up. It now follows the car itself, with
+  0.05 s of smoothing.
+- `?tune=1` adds a CAM button with live sliders for the rig, so the
+  camera can be judged and set by playing.
+- `?debug=1` now prints the rig in use (it printed `cam undefined`).
+
+`probes/camera.js`, output `camera.json`:
+
+| | 390x844 | 1280x720 |
+|---|---|---|
+| road at the car moves down the screen, against the live game | 1.19x | 1.30x |
+| car off the screen's centre line, worst | 9.6 px | 17.2 px |
+| same, p95 | 7.6 px | 13.5 px |
+
+Known answers, both caught: the stage 2 portrait rig measures 0.65x (slow),
+and the stage 2 follow puts the car 24.5 px off centre on the same drive.

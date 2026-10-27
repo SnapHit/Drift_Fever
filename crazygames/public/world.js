@@ -36,11 +36,27 @@ export const WORLD = {
      less road than the original past crests on 4 of 114 frames; this one,
      higher and steeper, never did. The horizon sits at 27 per cent of the
      height in portrait and 14 in landscape, the car at 64 and 78. */
-  PORTRAIT:  { fov: 100, back: 5594, height: 6038, pitch: 28.7 },   // vertical field of view, units behind the car, above its ground, degrees down
-  LANDSCAPE: { fov: 66,  back: 5600, height: 5600, pitch: 25.0 },
+  /* Lowered 28 October 2026, after play: the rigs above saw well past
+     crests but felt slow, because how fast the ground seems to pass goes
+     roughly as speed over camera height, and these sat nearly three times
+     higher than the live game's 2200. The rigs below are solved to make
+     the road surface at the car move down the screen about as fast as the
+     live game's does (probes/speed.js), while still showing both road
+     edges beside the car in portrait. ?tune=1 adjusts them live. The
+     earlier rigs: portrait fov 100, back 5594, height 6038, pitch 28.7;
+     landscape fov 66, back 5600, height 5600, pitch 25. */
+  PORTRAIT:  { fov: 110, back: 2900, height: 2900, pitch: 18.0 },   // vertical field of view, units behind the car, above its ground, degrees down
+  LANDSCAPE: { fov: 62,  back: 4200, height: 2000, pitch: 10.0 },
   CAM_NEAR:             120,
   CAM_FAR:           140000,
-  CAM_FOLLOW_X:        1.00,     // share of the simulation's cameraX (already carX times CAMERA_FOLLOW) the camera copies
+  /* The camera sits behind the car itself, not behind the simulation's
+     cameraX. cameraX is carX times CAMERA_FOLLOW (0.55): right for the
+     original's flat picture, where following the car fully shoved the
+     whole screen sideways, but in 3D it left the car sliding off centre
+     and the camera catching up a beat later, a constant slow sway. */
+  CAM_FOLLOW_X:        1.00,     // share of the car's carX the camera follows across the road
+  CAM_X_LAG:           0.05,     // seconds of smoothing on that, just enough to take out jitter
+  CAM_X_SNAP:          2000,     // a jump bigger than this (a respawn, a new run) is taken at once
   CAM_LIFT:            0.62,     // share of the car's height the camera follows in a jump, per camLift
   /* How much real turn one unit of post scale curvature draws as, in
      radians of heading per segment. 1/SEGMENT_LENGTH would make the near
@@ -699,7 +715,10 @@ export function createWorld(SIM, canvas, opts) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const lift = SIM.camLift * Math.max(0, SIM.carY) * W.CAM_LIFT;
-    const camX = SIM.cameraX * W.CAM_FOLLOW_X;
+    const camTarget = SIM.carX * W.CAM_FOLLOW_X;
+    if (camXs === null || !(W.CAM_X_LAG > 0) || Math.abs(camTarget - camXs) > W.CAM_X_SNAP) camXs = camTarget;
+    else camXs += (camTarget - camXs) * (1 - Math.exp(-dt / W.CAM_X_LAG));
+    const camX = camXs;
     camera.position.set(camX, carGroundY + rig.height + lift, rig.back);
     camera.rotation.set(-rig.pitch * Math.PI / 180, 0, 0, 'YXZ');
     const sx = SIM.shakeX || 0, sy = SIM.shakeY || 0;
@@ -733,6 +752,7 @@ export function createWorld(SIM, canvas, opts) {
     camera.updateMatrixWorld();
     if (profile) { profile.rest += performance.now() - t5; profile.frames++; }
   }
+  let camXs = null;
   let profile = null;
   let frameDt = 1 / 60;
   let probeOffset = 0;

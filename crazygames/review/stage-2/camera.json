@@ -1,0 +1,54 @@
+{
+ "started": "2026-10-27T19:39:08.239Z",
+ "viewports": {
+  "390x844": {
+   "liveRate": 0.053334054641932645,
+   "speedRatio": 1.1877629836630832,
+   "rig": {
+    "fov": 110,
+    "back": 2900,
+    "height": 2900,
+    "pitch": 18
+   },
+   "frames": 1376,
+   "worstPx": 9.647704418932044,
+   "worstFrame": 211,
+   "p95Px": 7.570108356665441,
+   "meanPx": 1.5303972904252008,
+   "width": 390,
+   "speedPass": true,
+   "centrePass": true
+  },
+  "1280x720": {
+   "liveRate": 0.04549824566610368,
+   "speedRatio": 1.2959499217491826,
+   "rig": {
+    "fov": 62,
+    "back": 4200,
+    "height": 2000,
+    "pitch": 10
+   },
+   "frames": 1376,
+   "worstPx": 17.246377335125388,
+   "worstFrame": 211,
+   "p95Px": 13.532436268532592,
+   "meanPx": 2.735760549580371,
+   "width": 1280,
+   "speedPass": true,
+   "centrePass": true
+  }
+ },
+ "knownAnswers": {
+  "oldPortraitRigIsSlow": {
+   "speedRatio": 0.6541628626439072,
+   "caught": true
+  },
+  "oldFollowSways": {
+   "worstPx": 24.53788350829524,
+   "p95Px": 22.754115411750686,
+   "caught": true
+  }
+ },
+ "pass": true,
+ "finished": "2026-10-27T19:39:35.867Z"
+}
