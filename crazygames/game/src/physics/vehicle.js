@@ -1,0 +1,261 @@
+/* THE VEHICLE. An arcade rear wheel drive model of our own: two axles,
+   each with a tyre grip curve that peaks and then falls to a tail, a
+   friction circle on each so throttle and brake eat into cornering grip,
+   weight transfer between the axles, a handbrake that takes the rear's
+   grip away, and a countersteer assist that scales with a hidden level.
+
+   Units metres, seconds, kilograms, radians. Inside the step the car's
+   own frame is x forward and y left, with yaw positive to the left, which
+   is three.js's rotation about Y for a car that faces -Z. The world
+   velocity is kept in world axes (wvx, wvz) so collisions can act on it
+   directly; the step converts to the body frame and back.
+
+   Deterministic: no Math.random, no clock, no allocation that depends on
+   timing. The same input stream from the same start gives the same run.
+   Every constant comes from TUNE.VEHICLE and TUNE.ASSIST, read on every
+   step so the tuning panel applies live. */
+import { TUNE } from '../tune.js';
+
+export const STEP = 1 / 120;
+const DEG = Math.PI / 180;
+
+export function createVehicle(x, z, yaw) {
+  return {
+    x: x || 0, z: z || 0, yaw: yaw || 0,
+    wvx: 0, wvz: 0,       // world velocity
+    r: 0,                 // yaw rate, rad/s, positive left
+    steerDriver: 0,       // the driver's steering angle after the slew, rad
+    steer: 0,             // the angle the front wheels are at, with the assist, rad
+    axF: 0,               // filtered longitudinal acceleration, for weight transfer
+    hb: 0,                // handbrake state, 1 locked, easing back to 0
+    speed: 0, vx: 0, vy: 0,
+    slip: 0,              // body slip angle, rad, positive when the car points right of its travel
+    alphaF: 0, alphaR: 0, // axle slip angles
+    rearSlide: 0, frontSlide: 0, spinning: 0,
+    wheelF: 0, wheelR: 0, // wheel rotation angles for drawing
+    loadF: 0, loadR: 0,
+    throttle: 0, brake: 0,
+    hit: null,            // the biggest hit this step: { speed, hard, nx, nz }
+  };
+}
+
+/* The tyre: a rise to the peak at s = 1 with zero slope there, then a
+   fall to the tail. Returns the grip as a share of mu * load, signed to
+   oppose the slip. */
+function tyre(alpha, peakRad, tail, fall) {
+  const s = Math.abs(alpha) / peakRad;
+  const f = s <= 1 ? s * (2 - s) : tail + (1 - tail) * Math.exp(-fall * (s - 1));
+  return alpha < 0 ? f : -f;
+}
+
+function moveToward(v, target, max) {
+  if (v < target) return Math.min(target, v + max);
+  return Math.max(target, v - max);
+}
+
+function smooth01(x) { x = x < 0 ? 0 : x > 1 ? 1 : x; return x * x * (3 - 2 * x); }
+
+/* One fixed step. input: { steer -1..1 (+ is right), throttle 0..1,
+   brake 0..1, handbrake 0 or 1 }. */
+export function stepVehicle(s, input, dt) {
+  const V = TUNE.VEHICLE, A = TUNE.ASSIST;
+  const m = V.MASS, g = V.GRAVITY, L = V.WHEELBASE, a = V.CG_TO_FRONT, b = L - a;
+  const Iz = V.INERTIA_FACTOR * m * a * b;
+  const fx = -Math.sin(s.yaw), fz = -Math.cos(s.yaw);     // forward in world
+  const lx = -Math.cos(s.yaw), lz = Math.sin(s.yaw);      // left in world
+  let vx = s.wvx * fx + s.wvz * fz;
+  let vy = s.wvx * lx + s.wvz * lz;
+  const speed = Math.sqrt(vx * vx + vy * vy);
+  const absVx = Math.abs(vx);
+  const fwdSign = vx < 0 ? -1 : 1;
+
+  /* ---- the handbrake state ---- */
+  if (input.handbrake > 0) s.hb = 1;
+  else if (s.hb > 0) s.hb = V.HANDBRAKE_RELEASE > 0 ? Math.max(0, s.hb - dt / V.HANDBRAKE_RELEASE) : 0;
+
+  /* ---- steering: the driver's slewed angle, then the assist ---- */
+  const lockFull = V.LOCK * DEG;
+  const lockDrive = (V.LOCK + (V.LOCK_AT_SPEED - V.LOCK) * Math.min(1, speed / V.LOCK_SPEED)) * DEG;
+  const beta = speed > 0.01 ? Math.atan2(vy, absVx) : 0;
+  s.slip = beta;
+  let steerIn = input.steer;
+  let throttleIn = input.throttle;
+  let assist = 0;
+  if (vx > V.LOW_SPEED && A.LEVEL > 0) {
+    /* The spin control. A spin is a yaw rate running away, not an angle:
+       a held drift through a sweeper turns at well under one radian a
+       second, a power on spin at over two. Between YAW_SOFT and YAW_MAX,
+       steering further into the slide fades out and the throttle eases,
+       so a held button cannot spin the car; steering against the slide is
+       never touched. beta > 0 means the car points right of its travel, a
+       right hand slide, and steering right (input > 0) deepens it. */
+    const absR = Math.abs(s.r);
+    if (absR > A.YAW_SOFT) {
+      const over = Math.min(1, (absR - A.YAW_SOFT) / (A.YAW_MAX - A.YAW_SOFT)) * A.LEVEL;
+      if (steerIn * beta > 0) steerIn *= 1 - over;
+      throttleIn *= 1 - over * A.THROTTLE_EASE;
+    }
+    assist = (A.COUNTERSTEER * beta - A.YAW_DAMP * s.r) * A.LEVEL;
+    const guard = A.SPIN_ANGLE * DEG;
+    if (beta > guard) assist += A.SPIN_GAIN * (beta - guard) * A.LEVEL;
+    else if (beta < -guard) assist += A.SPIN_GAIN * (beta + guard) * A.LEVEL;
+  }
+  const target = -steerIn * lockDrive;
+  const turningIn = Math.abs(target) > Math.abs(s.steerDriver) && target * s.steerDriver >= 0;
+  s.steerDriver = moveToward(s.steerDriver, target, (turningIn ? V.STEER_RATE : V.STEER_RETURN) * lockFull * dt);
+  const lockAssist = A.COUNTERSTEER_LOCK * DEG;
+  let delta = s.steerDriver + assist;
+  if (delta > lockAssist) delta = lockAssist; else if (delta < -lockAssist) delta = -lockAssist;
+  s.steer = delta;
+  const cosD = Math.cos(delta), sinD = Math.sin(delta);
+
+  /* ---- axle loads with weight transfer ---- */
+  const minLoad = V.MIN_AXLE_LOAD * m * g;
+  let loadF = m * g * b / L - m * s.axF * V.CG_HEIGHT / L;
+  let loadR = m * g * a / L + m * s.axF * V.CG_HEIGHT / L;
+  if (loadF < minLoad) loadF = minLoad;
+  if (loadR < minLoad) loadR = minLoad;
+  s.loadF = loadF; s.loadR = loadR;
+
+  /* ---- longitudinal demands ---- */
+  const throttle = throttleIn, brake = input.brake;
+  let driveR = 0;
+  if (throttle > 0) driveR = throttle * m * V.ACCEL * Math.max(0, 1 - Math.max(0, vx) / V.TOP_SPEED) * (1 - s.hb);
+  else if (vx <= 0.3 && brake > 0 && throttle === 0) driveR = -brake * m * V.ACCEL * 0.5 * Math.max(0, 1 - absVx / V.REVERSE_SPEED);
+  const brakeTotal = (vx > 0.3 || (vx < -0.3)) ? brake * m * V.BRAKE : (vx > 0.05 && brake > 0 ? brake * m * V.BRAKE : 0);
+  const brakeF = -fwdSign * brakeTotal * V.BRAKE_FRONT_SHARE;
+  const brakeR = -fwdSign * brakeTotal * (1 - V.BRAKE_FRONT_SHARE);
+  const hbForce = -fwdSign * m * V.HANDBRAKE_DECEL * s.hb * (absVx > 0.2 ? 1 : absVx / 0.2);
+  s.throttle = throttle; s.brake = brake;
+
+  /* ---- the front axle ---- */
+  const muF = V.MU_FRONT, capF = muF * loadF;
+  let FxF = brakeF;
+  if (FxF < -capF) FxF = -capF; else if (FxF > capF) FxF = capF;
+  const latCapF = capF * Math.sqrt(Math.max(0, 1 - (FxF / capF) * (FxF / capF)));
+  const vlatF = vy + a * s.r;
+  const alphaF = speed > 0.01 ? Math.atan2(vlatF, absVx) - delta * fwdSign : 0;
+  let FyF = tyre(alphaF, V.PEAK_ANGLE_FRONT * DEG, V.TAIL_FRONT, V.TAIL_FALL) * latCapF;
+  s.alphaF = alphaF;
+
+  /* ---- the rear axle: drive, brake, handbrake, wheelspin ---- */
+  const muR = V.MU_REAR * (1 + (V.HANDBRAKE_GRIP - 1) * s.hb);
+  const capR = muR * loadR;
+  let FxR = driveR + brakeR;
+  let spinning = 0;
+  let latScaleR = 1;
+  if (Math.abs(FxR) >= capR) {
+    spinning = FxR > 0 ? 1 : 0;
+    FxR = (FxR > 0 ? 1 : -1) * capR * (spinning ? V.SPIN_DRIVE : 1);
+    latScaleR = spinning ? V.SPIN_GRIP : 0.4;
+  } else {
+    latScaleR = Math.sqrt(Math.max(0, 1 - (FxR / capR) * (FxR / capR)));
+  }
+  const vlatR = vy - b * s.r;
+  const alphaR = speed > 0.01 ? Math.atan2(vlatR, absVx) : 0;
+  const tailR = V.TAIL_REAR + A.GRIP_EASE * A.LEVEL;
+  let FyR = tyre(alphaR, V.PEAK_ANGLE_REAR * DEG, tailR > 1 ? 1 : tailR, V.TAIL_FALL) * capR * latScaleR;
+  s.alphaR = alphaR;
+  s.spinning = spinning;
+  s.rearSlide = Math.min(2, Math.abs(alphaR) / (V.PEAK_ANGLE_REAR * DEG));
+  s.frontSlide = Math.min(2, Math.abs(alphaF) / (V.PEAK_ANGLE_FRONT * DEG));
+
+  /* Neither axle may reverse its own lateral slip within one step; that
+     is what makes the model still at rest instead of twitching. The
+     front's slip is measured across the steered wheel, not the body. */
+  const halfM = 0.5 * m / dt;
+  const vlatWheelF = vlatF * cosD - vx * sinD;
+  const limF = Math.abs(vlatWheelF) * halfM; if (FyF > limF) FyF = limF; else if (FyF < -limF) FyF = -limF;
+  const limR = Math.abs(vlatR) * halfM; if (FyR > limR) FyR = limR; else if (FyR < -limR) FyR = -limR;
+
+  /* ---- resistance ---- */
+  let resist = -V.DRAG * m * vx * absVx;
+  const rollF = m * V.ROLL;
+  if (absVx > 0.01) resist -= fwdSign * Math.min(rollF, absVx * m / dt);
+
+  /* ---- sum, integrate ---- */
+  const Fx = FxR + FxF * cosD + hbForce - FyF * sinD + resist;
+  const Fy = FyF * cosD + FyR + FxF * sinD;
+  const yawMoment = a * (FyF * cosD + FxF * sinD) - b * FyR;
+  const ax = Fx / m, ay = Fy / m;
+  s.axF += (ax - s.axF) * Math.min(1, dt / V.WEIGHT_TRANSFER_TAU);
+  s.r += yawMoment / Iz * dt;
+  // world velocity from the body accelerations
+  s.wvx += (ax * fx + ay * lx) * dt;
+  s.wvz += (ax * fz + ay * lz) * dt;
+
+  /* ---- the low speed blend: below LOW_SPEED the car turns as a
+     kinematic bicycle and stops sliding, so it can be parked ---- */
+  vx = s.wvx * fx + s.wvz * fz;
+  vy = s.wvx * lx + s.wvz * lz;
+  const w = 1 - smooth01((Math.sqrt(vx * vx + vy * vy) - V.LOW_SPEED * 0.5) / V.LOW_SPEED);
+  if (w > 0) {
+    const rK = vx * Math.tan(delta) / L;
+    const vyK = b * rK;
+    s.r += (rK - s.r) * w;
+    vy += (vyK - vy) * w;
+    s.wvx = vx * fx + vy * lx;
+    s.wvz = vx * fz + vy * lz;
+  }
+  s.yaw += s.r * dt;
+  if (s.yaw > Math.PI) s.yaw -= 2 * Math.PI; else if (s.yaw < -Math.PI) s.yaw += 2 * Math.PI;
+  s.x += s.wvx * dt;
+  s.z += s.wvz * dt;
+  s.vx = vx; s.vy = vy;
+  s.speed = Math.sqrt(vx * vx + vy * vy);
+
+  /* ---- the wheels, for drawing ---- */
+  const wr = V.WHEEL_RADIUS;
+  s.wheelF += vx / wr * dt;
+  s.wheelR += (spinning ? Math.max(vx, 8) * 2.2 : s.hb > 0.5 ? vx * (1 - s.hb) : vx) / wr * dt;
+}
+
+/* A collision impulse at a body point: n is the unit normal pointing
+   into the car (away from the wall), px, pz the point in world. Returns
+   the normal speed that was removed. The car is a 2D rigid body here:
+   its yaw rate takes a share of the hit through the point's lever arm. */
+export function applyImpact(s, px, pz, nx, nz, restitution, friction) {
+  const V = TUNE.VEHICLE;
+  const m = V.MASS, a = V.CG_TO_FRONT, b = V.WHEELBASE - a;
+  const Iz = V.INERTIA_FACTOR * m * a * b;
+  const rx = px - s.x, rz = pz - s.z;            // lever arm
+  // point velocity: v + omega x r, omega about +Y: (x, z) -> (omega*z, -omega*x)
+  const pvx = s.wvx + s.r * rz, pvz = s.wvz - s.r * rx;
+  const vn = pvx * nx + pvz * nz;
+  if (vn >= 0) return 0;
+  const rn = rz * nx - rx * nz;                  // r x n, scalar about Y
+  const kn = 1 / m + rn * rn / Iz;
+  const j = -(1 + restitution) * vn / kn;
+  s.wvx += j * nx / m; s.wvz += j * nz / m;
+  s.r += j * rn / Iz;
+  // friction along the tangent
+  const tx = -nz, tz = nx;
+  const pvx2 = s.wvx + s.r * rz, pvz2 = s.wvz - s.r * rx;
+  const vt = pvx2 * tx + pvz2 * tz;
+  const rt = rz * tx - rx * tz;
+  const kt = 1 / m + rt * rt / Iz;
+  let jt = -vt / kt;
+  const maxJt = friction * j;
+  if (jt > maxJt) jt = maxJt; else if (jt < -maxJt) jt = -maxJt;
+  s.wvx += jt * tx / m; s.wvz += jt * tz / m;
+  s.r += jt * rt / Iz;
+  return -vn;
+}
+
+/* The body's contact points in world: four corners and the two side
+   midpoints. Fills out (12 numbers) and returns it. */
+export function bodyPoints(s, out) {
+  const V = TUNE.VEHICLE;
+  const hl = V.HALF_LENGTH, hw = V.HALF_WIDTH;
+  const fx = -Math.sin(s.yaw), fz = -Math.cos(s.yaw);
+  const lx = -Math.cos(s.yaw), lz = Math.sin(s.yaw);
+  const pts = out || new Float64Array(12);
+  const put = (i, f, l) => { pts[i * 2] = s.x + fx * f + lx * l; pts[i * 2 + 1] = s.z + fz * f + lz * l; };
+  put(0, hl, hw); put(1, hl, -hw); put(2, -hl, hw); put(3, -hl, -hw); put(4, 0, hw); put(5, 0, -hw);
+  return pts;
+}
+
+/* The state that defines a run, as a string, for the determinism test. */
+export function vehicleHash(s) {
+  return [s.x, s.z, s.yaw, s.wvx, s.wvz, s.r, s.steerDriver, s.axF, s.hb].map(v => v.toString()).join(',');
+}
