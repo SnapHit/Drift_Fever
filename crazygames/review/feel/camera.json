@@ -1,5 +1,5 @@
 {
- "started": "2026-10-29T10:26:50.539Z",
+ "started": "2026-10-29T10:38:13.567Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "viewports": {
   "1280x720": {
@@ -18,7 +18,7 @@
     "hits": 0
    },
    "drift": {
-    "frames": 2901,
+    "frames": 2836,
     "offScreenFrames": 0,
     "worstExcess": -0.426,
     "worstFrame": 0,
@@ -29,21 +29,21 @@
      "ndcX": 0.12382966765296848,
      "ndcY": -0.5740174652109753
     },
-    "hits": 4
+    "hits": 0
    },
    "hit": {
     "frames": 600,
     "offScreenFrames": 0,
-    "worstExcess": -0.426,
-    "worstFrame": 0,
+    "worstExcess": -0.397,
+    "worstFrame": 226,
     "worstCorner": {
      "f": -2.2,
      "l": -0.92,
      "y": 0,
-     "ndcX": 0.12382966765296848,
-     "ndcY": -0.5740174652109753
+     "ndcX": 0.0007655091520799694,
+     "ndcY": -0.6030423035388989
     },
-    "hits": 11
+    "hits": 16
    },
    "knownAnswerLookUp": {
     "frames": 900,
@@ -68,32 +68,32 @@
     "hits": 0
    },
    "drift": {
-    "frames": 2901,
+    "frames": 2836,
     "offScreenFrames": 0,
-    "worstExcess": -0.4466,
-    "worstFrame": 19,
+    "worstExcess": -0.407,
+    "worstFrame": 96,
     "worstCorner": {
      "f": -2.2,
-     "l": 0.92,
+     "l": -0.92,
      "y": 1.45,
-     "ndcX": -0.5534051772970087,
-     "ndcY": -0.1545490685606779
+     "ndcX": 0.5930006234050096,
+     "ndcY": -0.1538929188297355
     },
-    "hits": 4
+    "hits": 0
    },
    "hit": {
     "frames": 600,
     "offScreenFrames": 0,
-    "worstExcess": -0.4194,
-    "worstFrame": 339,
+    "worstExcess": -0.3846,
+    "worstFrame": 224,
     "worstCorner": {
      "f": -2.2,
      "l": 0.92,
      "y": 1.45,
-     "ndcX": -0.5806041043091221,
-     "ndcY": -0.2021733017022869
+     "ndcX": -0.6153716922774798,
+     "ndcY": -0.2202855258930768
     },
-    "hits": 11
+    "hits": 16
    },
    "knownAnswerLookUp": {
     "frames": 900,

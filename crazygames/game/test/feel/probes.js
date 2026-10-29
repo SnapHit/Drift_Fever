@@ -11,7 +11,10 @@
       same hash; one perturbed step gives a different hash.
    2. Drive: the scripted driver laps the test track inside the walls
       without touching them; the drift script holds more than 30 degrees
-      for more than two seconds through the sweeper. Known answers: the
+      for more than 1.5 s through hairpin 2 (moved from the sweeper on 29
+      October 2026: a drift now carves and slows the car, so a held 30
+      degree slide turns tighter than the long fast sweeper; it belongs in
+      a hairpin). Known answers: the
       driver with its steering inverted, and the drift script without its
       handbrake.
    3. Camera: every frame of those drives keeps the whole car on screen in
@@ -73,7 +76,7 @@ function holdAbove(frames, deg, section) {
 if (run('determinism')) {
   console.log('\n== 1. determinism');
   const side = await L.openPage(env, L.LANDSCAPE, 'ground=track');
-  const a = await drive(side.page, { drift: 'sweeper' }, 1500);
+  const a = await drive(side.page, { drift: 'hairpin2' }, 1500);
   const steps = a.tape.reduce((s, e) => s + e.n, 0);
   const replayed = await side.page.evaluate(t => window.__feel.replay(t), a.tape);
   // the same tape at a different cadence: one step per frame, through the frame function with no driver
@@ -114,7 +117,7 @@ if (run('drive') || run('camera')) {
     const side = await L.openPage(env, vp, 'ground=track');
     const lap = await drive(side.page, {}, 5400);
     const sections = await side.page.evaluate(() => window.__feel.world.ground.sections);
-    const dr = await drive(side.page, { drift: 'sweeper' }, 5400);
+    const dr = await drive(side.page, { drift: 'hairpin2' }, 5400);
     // a hit for the shake: drive straight into the first wall with the driver off, then watch the camera settle
     const hit = await (async () => {
       await side.page.evaluate(() => { const F = window.__feel; F.setDriver(null); F.restart(); F.draw = false; window.__clock = 1000; F.inject = { steer: 0, throttle: 1, brake: 0, handbrake: 0 }; });
@@ -129,13 +132,13 @@ if (run('drive') || run('camera')) {
       const last = lap.frames[lap.frames.length - 1];
       const maxLat = Math.max(...lap.frames.map(f => Math.abs(f.lat)));
       const hw = lap.frames[0].hw;
-      const hold = holdAbove(dr.frames, 30, sections.sweeper);
+      const hold = holdAbove(dr.frames, 30, sections.hairpin2);
       const drLast = dr.frames[dr.frames.length - 1];
       out.drive = { lap: { lapped: lap.lapped, frames: lap.frames.length, seconds: +(lap.frames.length / 60).toFixed(1), maxAbsLateral: +maxLat.toFixed(2), halfWidth: hw, wallContacts: last.hits, hardHits: last.hard, respawns: lap.frames.reduce((s, f) => s + f.resp, 0), topKmh: +(Math.max(...lap.frames.map(f => f.v)) * 3.6).toFixed(0) },
-        drift: { lapped: dr.lapped, holdAbove30: hold, wallContacts: drLast.hits, hardHits: drLast.hard, maxAbsLateral: +Math.max(...dr.frames.map(f => Math.abs(f.lat))).toFixed(2), sweeper: sections.sweeper, maxAngle: +Math.max(...dr.frames.map(f => f.angle)).toFixed(1) } };
+        drift: { lapped: dr.lapped, holdAbove30: hold, wallContacts: drLast.hits, hardHits: drLast.hard, maxAbsLateral: +Math.max(...dr.frames.map(f => Math.abs(f.lat))).toFixed(2), section: 'hairpin2', range: sections.hairpin2, maxAngle: +Math.max(...dr.frames.map(f => f.angle)).toFixed(1) } };
       verdict('driver laps the test track', lap.lapped, out.drive.lap.seconds + ' s');
       verdict('driver stays inside the walls, never touching', maxLat < hw && last.hits === 0 && out.drive.lap.respawns === 0, 'max |lateral| ' + maxLat.toFixed(2) + ' of ' + hw + ' m, contacts ' + last.hits + ', respawns ' + out.drive.lap.respawns);
-      verdict('drift script holds above 30 degrees for at least 2 s through the sweeper', hold.seconds >= 2, hold.seconds + ' s at a mean ' + hold.meanAngle + ' degrees, ' + hold.meanKmh + ' km/h');
+      verdict('drift script holds above 30 degrees for at least 1.5 s through hairpin 2', hold.seconds >= 1.5, hold.seconds + ' s at a mean ' + hold.meanAngle + ' degrees, ' + hold.meanKmh + ' km/h');
       // known answers
       const inv = await drive(side.page, { invert: -1 }, 5400);
       const invLast = inv.frames[inv.frames.length - 1];
@@ -143,11 +146,11 @@ if (run('drive') || run('camera')) {
       out.drive.knownAnswerInverted = { lapped: inv.lapped, wallContacts: invLast.hits, caught: invBad };
       verdict('known answer: the inverted driver fails to lap cleanly', invBad, 'lapped ' + inv.lapped + ', contacts ' + invLast.hits);
       const noHb = await side.page.evaluate(async () => { const m = await import('./src/physics/driver.js'); const hb = m.DRIVER.DRIFT_HB; m.DRIVER.DRIFT_HB = 0; return hb; });
-      const dr0 = await drive(side.page, { drift: 'sweeper' }, 5400);
+      const dr0 = await drive(side.page, { drift: 'hairpin2' }, 5400);
       await side.page.evaluate(async hb => { const m = await import('./src/physics/driver.js'); m.DRIVER.DRIFT_HB = hb; }, noHb);
-      const hold0 = holdAbove(dr0.frames, 30, sections.sweeper);
-      out.drive.knownAnswerNoHandbrake = { holdAbove30: hold0, caught: hold0.seconds < 2 };
-      verdict('known answer: the drift script without its handbrake cannot hold 2 s', hold0.seconds < 2, hold0.seconds + ' s');
+      const hold0 = holdAbove(dr0.frames, 30, sections.hairpin2);
+      out.drive.knownAnswerNoHandbrake = { holdAbove30: hold0, caught: hold0.seconds < 1.5 };
+      verdict('known answer: the drift script without its handbrake cannot hold 1.5 s', hold0.seconds < 1.5, hold0.seconds + ' s');
     }
     // camera
     const cam = {};
@@ -158,7 +161,7 @@ if (run('drive') || run('camera')) {
       cam[k] = { frames: fr.length, offScreenFrames: off.length, worstExcess: worst.ex, worstFrame: worst.i, worstCorner: worst.corner, hits: fr[fr.length - 1].hits };
     }
     // the known answer: the camera looking 30 m up into the sky
-    const far = await drive(side.page, { drift: 'sweeper' }, 900, [['CAMERA.LOOK_UP', 30]]);
+    const far = await drive(side.page, { drift: 'hairpin2' }, 900, [['CAMERA.LOOK_UP', 30]]);
     await side.page.evaluate(() => { window.__feel.TUNE.CAMERA.LOOK_UP = 0.7; });
     const farOff = far.frames.filter(f => f.ex > 0).length;
     cam.knownAnswerLookUp = { frames: far.frames.length, offScreenFrames: farOff, caught: farOff > 0 };
@@ -181,7 +184,7 @@ if (run('perf')) {
     const cdp = await side.context.newCDPSession(side.page);
     await cdp.send('Emulation.setCPUThrottlingRate', { rate: throttle });
     await side.page.evaluate(({ loadMs }) => {
-      const F = window.__feel; F.draw = true; F.restart(); F.setDriver({ drift: 'sweeper' }); window.__clock = 1000;
+      const F = window.__feel; F.draw = true; F.restart(); F.setDriver({ drift: 'hairpin2' }); window.__clock = 1000;
       // the known answer's load: busy work inside every step, so the frame carries about loadMs more JavaScript
       if (loadMs) { const step = F.world.stepWorld; F.world.stepWorld = inp => { const t0 = performance.now(); let g = 0; while (performance.now() - t0 < loadMs / 2 && g++ < 1e9) {} return step(inp); }; }
     }, { loadMs: loadMs || 0 });
@@ -217,7 +220,7 @@ if (run('shots')) {
   for (const [vname, vp] of [['1280x720', L.LANDSCAPE], ['390x844', L.PORTRAIT]]) {
     const side = await L.openPage(env, vp, 'ground=track', { touch: vp === L.PORTRAIT });
     const sections = await side.page.evaluate(() => window.__feel.world.ground.sections);
-    await side.page.evaluate(() => { const F = window.__feel; F.draw = false; F.restart(); F.setDriver({ drift: 'sweeper' }); window.__clock = 1000; });
+    await side.page.evaluate(() => { const F = window.__feel; F.draw = false; F.restart(); F.setDriver({ drift: 'hairpin2' }); window.__clock = 1000; });
     // to the frame with the biggest angle inside the sweeper
     let best = null, i = 0;
     for (let k = 0; k < 20 && !best; k++) {

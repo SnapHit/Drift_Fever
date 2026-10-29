@@ -1,5 +1,6 @@
-/* TOUCH. Four big buttons: steer left and right under the left thumb,
-   brake and handbrake under the right. A thumb that slides from one
+/* TOUCH. Three big buttons: steer left and right under the left thumb,
+   DRIFT under the right (there is no brake: DRIFT with no steering stops
+   the car). A thumb that slides from one
    button to its neighbour without lifting changes buttons, because every
    pointer is hit tested against the button rectangles on every move,
    not bound to the element it landed on. A restart button sits at the
@@ -14,7 +15,6 @@ export function createTouch(root, onActive, onRestart) {
       <button type="button" data-b="right" aria-label="steer right"><span>&#9654;</span></button>
     </div>
     <div class="pad right">
-      <button type="button" data-b="brake" aria-label="brake, or reverse when stopped"><span>BRAKE<br><small style="font-size:9px;letter-spacing:.08em;opacity:.75">REVERSE</small></span></button>
       <button type="button" data-b="hb" aria-label="handbrake"><span>DRIFT</span></button>
     </div>`;
   root.appendChild(el);

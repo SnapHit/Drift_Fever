@@ -124,7 +124,7 @@ export function stepVehicle(s, input, dt) {
   /* ---- longitudinal demands ---- */
   const throttle = throttleIn, brake = input.brake;
   let driveR = 0;
-  if (throttle > 0) driveR = throttle * m * V.ACCEL * Math.max(0, 1 - Math.max(0, vx) / V.TOP_SPEED) * (1 - s.hb);
+  if (throttle > 0) driveR = throttle * m * V.ACCEL * Math.max(0, 1 - Math.max(0, vx) / V.TOP_SPEED) * (1 - s.hb * (input.steer === 0 ? 1 : 0.5));
   else if (vx <= 0.3 && brake > 0 && throttle === 0) driveR = -brake * m * V.REVERSE_ACCEL * Math.max(0, 1 - Math.max(0, -vx) / V.REVERSE_SPEED);
   /* The brake acts against forward travel only. Rolling backwards, the
      brake input is the reverse gear and the throttle is the brake. This
@@ -133,7 +133,11 @@ export function stepVehicle(s, input, dt) {
   const brakeTotal = vx > 0.05 ? brake * m * V.BRAKE : (vx < -0.3 && throttle > 0 ? throttle * m * V.BRAKE : 0);
   const brakeF = -fwdSign * brakeTotal * V.BRAKE_FRONT_SHARE;
   const brakeR = -fwdSign * brakeTotal * (1 - V.BRAKE_FRONT_SHARE);
-  const hbForce = -fwdSign * m * V.HANDBRAKE_DECEL * s.hb * (absVx > 0.2 ? 1 : absVx / 0.2);
+  /* DRIFT pressed with no steering is the brake: there is no other. With
+     steering it only breaks the rear loose, and the drift's own scrub
+     slows the car. */
+  const hbBraking = input.steer === 0 ? 1 : 0;
+  const hbForce = -fwdSign * m * V.HANDBRAKE_DECEL * s.hb * hbBraking * (absVx > 0.2 ? 1 : absVx / 0.2);
   s.throttle = throttle; s.brake = brake;
 
   /* ---- the front axle ---- */
@@ -196,7 +200,7 @@ export function stepVehicle(s, input, dt) {
     const absB = Math.abs(beta), dir = beta > 0 ? 1 : -1;
     /* a slide past DRIFT_ENTER starts a drift, and so does the handbrake
        at speed: tap DRIFT and the tail kicks out to the drift angle */
-    if (!s.drifting && (absB > A.DRIFT_ENTER * DEG || (s.hb > 0.5 && vx > A.DRIFT_MIN_SPEED))) s.drifting = 1;
+    if (!s.drifting && (absB > A.DRIFT_ENTER * DEG || (s.hb > 0.5 && vx > A.DRIFT_MIN_SPEED && input.steer !== 0))) s.drifting = 1;
     else if (s.drifting && absB < A.DRIFT_EXIT * DEG && s.hb === 0) s.drifting = 0;
     if (s.drifting) {
       /* the angle the driver is asking for: steering into the slide
@@ -209,7 +213,7 @@ export function stepVehicle(s, input, dt) {
       const into = input.steer * dirUse;
       let target = into > 0 ? (A.DRIFT_ANGLE + A.DRIFT_RANGE * into) * Math.min(1, into * 2) : 0;
       target *= A.DRIFT_LIFT + (1 - A.DRIFT_LIFT) * input.throttle;
-      if (s.hb > 0) target = Math.max(target, A.DRIFT_ANGLE);
+      if (s.hb > 0 && input.steer !== 0) target = Math.max(target, A.DRIFT_ANGLE);
       // beta > 0 opens with a right turn (-r)
       s.r -= dirUse * A.DRIFT_HOLD * (target * DEG - absB * (dirUse === dir ? 1 : -1)) * dt * A.LEVEL;
       /* +r always closes the slide angle, whichever way it points, so the
@@ -227,9 +231,24 @@ export function stepVehicle(s, input, dt) {
      away in a second or two, which reads as the car bogging down. Give
      back DRIFT_KEEP of the speed lost this step while drifting under
      throttle. */
-  if (s.drifting && throttle > 0 && A.LEVEL > 0) {
+  if (s.drifting && throttle > 0 && A.LEVEL > 0 && A.DRIFT_KEEP > 0) {
     const sp1 = Math.hypot(s.wvx, s.wvz);
     if (sp1 > 0.1 && sp1 < speed) { const k = (sp1 + (speed - sp1) * A.DRIFT_KEEP * throttle * A.LEVEL) / sp1; s.wvx *= k; s.wvz *= k; }
+  }
+  /* The carve and the scrub: in a drift the path bends towards where the
+     car points, and the slide slows the car to DRIFT_CRUISE. The path's
+     direction psi is measured like yaw, so v = (-sin psi, -cos psi), and
+     a slide of beta has psi = yaw + beta; carving moves psi towards yaw. */
+  if (s.drifting && A.LEVEL > 0) {
+    const sp = Math.hypot(s.wvx, s.wvz);
+    if (sp > 1) {
+      const absB = Math.abs(beta);
+      const c = Math.min(A.DRIFT_CARVE * absB * dt, absB) * (beta > 0 ? 1 : -1) * A.LEVEL;
+      const psi = Math.atan2(-s.wvx, -s.wvz) - c;
+      let sp2 = sp;
+      if (sp > A.DRIFT_CRUISE) sp2 = Math.max(A.DRIFT_CRUISE, sp - A.DRIFT_SCRUB * Math.min(1.5, absB / (45 * DEG)) * dt * A.LEVEL);
+      s.wvx = -Math.sin(psi) * sp2; s.wvz = -Math.cos(psi) * sp2;
+    }
   }
 
   /* ---- the low speed blend: below LOW_SPEED the car turns as a

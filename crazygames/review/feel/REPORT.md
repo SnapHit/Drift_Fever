@@ -320,3 +320,45 @@ in 50.8 s without touching a wall; the drift script holds over 30 degrees
 for 2.13 s through the sweeper at a mean 43.7 degrees and 63 km/h; the
 car stays on screen in every frame at both viewports; JavaScript p95 5.3
 ms at 6x throttle. Each known answer was caught.
+
+---
+
+## After play, 29 October 2026 (second round): no brake, a drift that carves
+
+The author: the brake does not work well and should not be a separate
+control; starting a turn in the car park and hitting DRIFT kept all the
+car's momentum and slid it straight on into the barrier. A drift should
+slow the car and take it round in an arc, Drift Boss style, where the
+skill is timing.
+
+- **No brake, no throttle.** The car drives itself once the player has
+  pressed anything. The controls are left, right and DRIFT. DRIFT with
+  steering drifts; DRIFT with no steering stops the car (90 to 20 km/h in
+  2 s). Keyboard: left and right steer; space, shift, up, down, W or S
+  drift. Gamepad: stick or d-pad steer; A, B, X or a trigger drift. There
+  is no reverse; getting unstuck is automatic. The physics still takes a
+  brake and throttle, for the scripted driver.
+- **The drift carves and slows.** The give-back of speed in a drift is
+  gone. In a drift the car's path now bends towards where it points
+  (`DRIFT_CARVE`), and the slide scrubs speed down to 72 km/h
+  (`DRIFT_SCRUB`, `DRIFT_CRUISE`), all tunable at `?tune=1`.
+
+Car park, from the start, then steer right and hold DRIFT
+(`handling.json`, `parkArc`):
+
+| drift starts after | speed then | slowest in the drift | turned | radius | closest to the barrier | wall hits |
+|---|---|---|---|---|---|---|
+| 2.0 s | 67 km/h | 56 km/h | 248 deg | 16.6 m | 23.8 m | 0 |
+| 2.6 s | 83 km/h | 64 km/h | 241 deg | 19.2 m | 7.8 m | 0 |
+| 3.2 s | 96 km/h | | 113 deg | | 1.9 m | 2 |
+
+Known answer: the previous drift from 2.6 s hits the barrier. A drift
+started 3.2 s in, about 10 m from the barrier, still hits it: that is a
+late turn.
+
+The drift measurement moved from the sweeper to hairpin 2: a held 30
+degree slide now turns tighter than the long fast sweeper, so it belongs
+in a hairpin. The scripted drifter holds over 30 degrees for 1.9 s
+through hairpin 2 (the whole corner) at a mean 42.2 degrees and 53 km/h,
+lapping without touching a wall; without its handbrake it holds 0 s
+(caught). All other probes rerun and pass; JavaScript p95 3.4 ms at 6x.

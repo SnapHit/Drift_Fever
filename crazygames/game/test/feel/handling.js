@@ -18,7 +18,7 @@
    node game/test/feel/handling.js [--json] */
 import { createVehicle, stepVehicle, STEP } from '../../src/physics/vehicle.js';
 import { createWorld } from '../../src/physics/world.js';
-import { testTrack } from '../../src/ground/track.js';
+import { testTrack, carPark } from '../../src/ground/track.js';
 import { TUNE } from '../../src/tune.js';
 
 const DEG = Math.PI / 180;
@@ -86,18 +86,58 @@ function stuck(mode) {
   return { mode, escapedAfterS: escaped, stuck: escaped === null };
 }
 
+/* 4. The car park arc, the author's case: from the start, drive up the
+   park (the car drives itself), then steer right and hold DRIFT. The car
+   must carve round in an arc and not reach the barrier 65 m ahead of the
+   start. Reports the speed at the turn, the slowest speed in the drift,
+   the path's radius (distance over the turn of its direction) and wall
+   hits. Also DRIFT with no steering must stop the car. */
+function parkArc(goSecs) {
+  const w = createWorld(carPark());
+  let t = 0, hits = 0, turnSpeed = 0, minSpeed = Infinity, dist = 0, psi0 = null, psi = 0, minZ = Infinity;
+  const go = goSecs;
+  for (let i = 0; i < (go + 4) / STEP; i++) {
+    const drifting = t >= go;
+    w.stepWorld({ steer: drifting ? 1 : 0, throttle: 1, brake: 0, handbrake: drifting ? 1 : 0 });
+    t += STEP;
+    if (w.hit) hits++;
+    const c = w.car;
+    if (!drifting) turnSpeed = c.speed;
+    else {
+      minSpeed = Math.min(minSpeed, c.speed);
+      const p = Math.atan2(-c.wvx, -c.wvz);
+      if (psi0 === null) { psi0 = p; psi = 0; } else { let d = p - psi0; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; psi += d; psi0 = p; }
+      if (Math.abs(psi) < Math.PI) dist += c.speed * STEP;
+    }
+    minZ = Math.min(minZ, c.z);
+  }
+  return { secondsBeforeDrift: go, kmhAtTurn: +(turnSpeed * 3.6).toFixed(0), slowestKmhInDrift: +(minSpeed * 3.6).toFixed(0), turnedDeg: +(Math.abs(psi) * 180 / Math.PI).toFixed(0), radiusM: +(dist / Math.min(Math.PI, Math.abs(psi) || 1e-9)).toFixed(1), closestToBarrierM: +(minZ + 55).toFixed(1), wallHits: hits };
+}
+function driftBrake() {
+  const s = createVehicle(0, 0, 0); s.wvz = -25;
+  for (let i = 0; i < 2 / STEP; i++) stepVehicle(s, { steer: 0, throttle: 1, brake: 0, handbrake: 1 }, STEP);
+  return { kmhAfter2s: +(s.speed * 3.6).toFixed(0), slideDeg: +(Math.abs(s.slip) / DEG).toFixed(1) };
+}
+
 out.pace = pace();
+out.parkArc = [parkArc(2.0), parkArc(2.6), parkArc(3.2)];
+out.driftBrake = driftBrake();
 out.spins = spins();
 out.stuck = [stuck('throttle'), stuck('reverse')];
 const level = TUNE.ASSIST.LEVEL;
 TUNE.ASSIST.LEVEL = 0;
 out.knownAnswerAssistOff = { spins: spins().spins };
 TUNE.ASSIST.LEVEL = level;
+{ const keep = { c: TUNE.ASSIST.DRIFT_CARVE, s: TUNE.ASSIST.DRIFT_SCRUB, k: TUNE.ASSIST.DRIFT_KEEP }; TUNE.ASSIST.DRIFT_CARVE = 0; TUNE.ASSIST.DRIFT_SCRUB = 0; TUNE.ASSIST.DRIFT_KEEP = 0.8;
+  out.knownAnswerOldDrift = parkArc(2.6); TUNE.ASSIST.DRIFT_CARVE = keep.c; TUNE.ASSIST.DRIFT_SCRUB = keep.s; TUNE.ASSIST.DRIFT_KEEP = keep.k; }
 if ('RECOVER_AFTER' in TUNE.ASSIST) { const r = TUNE.ASSIST.RECOVER_AFTER; TUNE.ASSIST.RECOVER_AFTER = 1e9; out.knownAnswerNoRecovery = stuck('throttle'); TUNE.ASSIST.RECOVER_AFTER = r; }
 if (process.argv.includes('--json')) console.log(JSON.stringify(out, null, 1));
 else {
   console.log('pace', JSON.stringify(out.pace));
   console.log('spins', out.spins.spins + ' of ' + out.spins.cases, out.spins.rows.filter(r => r.spin).map(r => r.name + '@' + r.v0 + ' max ' + r.maxSlip + ' end ' + r.endSlip).join('; '));
   console.log('stuck', JSON.stringify(out.stuck));
+  for (const r of out.parkArc) console.log('park arc', JSON.stringify(r));
+  console.log('drift with no steer', JSON.stringify(out.driftBrake));
+  console.log('known answer, old drift', JSON.stringify(out.knownAnswerOldDrift));
   console.log('known answers', JSON.stringify({ assistOffSpins: out.knownAnswerAssistOff.spins, noRecovery: out.knownAnswerNoRecovery }));
 }

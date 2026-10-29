@@ -39,7 +39,7 @@ export const TUNE = {
     SPIN_GRIP:          0.85,    // lateral grip left when the rear is spinning under power
     SPIN_DRIVE:         0.85,    // drive force delivered when the rear is spinning
     HANDBRAKE_GRIP:     0.45,    // rear grip while the handbrake is on, as a share
-    HANDBRAKE_DECEL:    5.0,     // m/s^2 of braking from the locked rear
+    HANDBRAKE_DECEL:    9.0,     // m/s^2 of braking from the locked rear
     HANDBRAKE_RELEASE:  0.25,    // s for the rear to find grip again after release
     LOCK:               32,      // degrees of steering lock at a standstill
     LOCK_AT_SPEED:      12,      // degrees at LOCK_SPEED and above, for the driver's input
@@ -82,7 +82,15 @@ export const TUNE = {
     DRIFT_LIFT:         0.5,     // share of the angle kept with the throttle off
     DRIFT_HOLD:         40,      // rad/s of yaw rate per radian of angle error, per second
     DRIFT_DAMP:         8,       // yaw rate per unit of slide angle rate, against quick changes
-    DRIFT_KEEP:         0.8,     // share of the speed scrubbed by the slide that the drift gives back
+    /* A drift turns and slows the car, so DRIFT through a corner carves
+       an arc instead of sliding straight on into the wall. The path bends
+       towards where the car points at DRIFT_CARVE rad/s per radian of
+       slide, and the slide scrubs speed at DRIFT_SCRUB m/s^2 (at 45
+       degrees) down to DRIFT_CRUISE, where it holds. */
+    DRIFT_CARVE:        0.9,     // rad/s of path turn per radian of slide angle
+    DRIFT_SCRUB:        9,       // m/s^2 of slowing at a 45 degree slide
+    DRIFT_CRUISE:       20,      // m/s, the speed a drift settles to (54 km/h)
+    DRIFT_KEEP:         0.0,     // share of the speed scrubbed by the slide that the drift gives back
     RECOVER_AFTER:      1.2,     // s stuck (slow, against a wall or facing backwards, trying to drive) before the car is put back on the track
     RECOVER_SPEED:      2.0,     // m/s, below this counts as stuck
     RECOVER_LAUNCH:     8,       // m/s, the speed the car is given back on the track
@@ -125,7 +133,7 @@ export const TUNE = {
   },
   CONTROLS: {
     GAMEPAD_DEADZONE:   0.12,
-    TOUCH_AUTO_THROTTLE: 1,      // 1: the throttle is on whenever the brake is off, on touch
+    AUTO_THROTTLE:      1,       // 1: the car always drives once the player has pressed anything; no brake, DRIFT slows it
   },
 };
 
@@ -160,7 +168,10 @@ export const PANEL = [
   ['ASSIST.DRIFT_ANGLE',     'drift angle deg',  15,   50,  1],
   ['ASSIST.DRIFT_RANGE',     'drift steer range', 0,   35,  1],
   ['ASSIST.DRIFT_HOLD',      'drift hold',        0,   15,  0.5],
-  ['ASSIST.DRIFT_KEEP',      'drift keeps speed', 0,    1,  0.05],
+  ['ASSIST.DRIFT_CARVE',     'drift carve',       0,    3,  0.1],
+  ['ASSIST.DRIFT_SCRUB',     'drift slows m/s2',  0,   20,  0.5],
+  ['ASSIST.DRIFT_CRUISE',    'drift speed m/s',   6,   30,  1],
+  ['VEHICLE.HANDBRAKE_DECEL','drift brake m/s2',  2,   16,  0.5],
   ['ASSIST.ANGLE_PULL',      'angle pull',        0,   20,  0.5],
   ['CAMERA.DISTANCE',        'cam distance',      4,   16,  0.5],
   ['CAMERA.HEIGHT',          'cam height',        1,    9,  0.1],

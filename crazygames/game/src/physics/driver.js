@@ -15,15 +15,15 @@ export const DRIVER = {
   PLAN_MIN:     14,      // m, at least
   VMAX:         36,      // m/s
   BRAKE_MARGIN: 1.5,     // m/s over the target before braking
-  DRIFT_HB:     0.8,     // s of handbrake at the entry of a drift section
+  DRIFT_HB:     0.5,     // s of handbrake at the entry of a drift section
   DRIFT_LOOK:   0.35,    // look ahead gain while drifting (shorter: aims at the apex)
-  DRIFT_ENTRY_SPEED: 21, // m/s wanted at the entry of a drift section
+  DRIFT_ENTRY_SPEED: 18, // m/s wanted at the entry of a drift section
   DRIFT_WIDE:   2.0,     // m outside the centre before the driver lifts
   DRIFT_LIFT:   0.20,    // throttle left per metre further out
   DRIFT_MIN_THROTTLE: 0.35,
-  DRIFT_STEER_BASE: 0.8,  // steer into the turn while drifting
-  DRIFT_STEER_GAIN: 0.3,  // more per metre towards the outside
-  DRIFT_STEER_MIN:  0.25,
+  DRIFT_STEER_BASE: 0.6,  // steer into the turn while drifting
+  DRIFT_STEER_GAIN: 0.35,  // more per metre towards the outside
+  DRIFT_STEER_MIN:  0,
 };
 
 export function createDriver(ground, opts) {
@@ -85,7 +85,7 @@ export function createDriver(ground, opts) {
            when running wide, less when tight. */
         const into = Math.min(1, Math.max(D.DRIFT_STEER_MIN, D.DRIFT_STEER_BASE + outside * D.DRIFT_STEER_GAIN));
         steer = -turn[world.centreIndex] * into * o.invert;
-        if (world.time < hbUntil) { handbrake = 1; steer = steer > 0 ? 1 : -1; throttle = 1; }
+        if (world.time < hbUntil) { handbrake = 1; steer = -turn[world.centreIndex] * o.invert || (steer > 0 ? 1 : -1); throttle = 1; }
       }
       out.steer = steer; out.throttle = throttle; out.brake = brake; out.handbrake = handbrake;
       return out;
