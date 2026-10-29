@@ -68,7 +68,7 @@ window.addEventListener('resize', resize);
 
 function restart() {
   world.reset(); scoring.reset(); hud.reset(); scene.clearMarks();
-  tape.length = 0; acc = 0;
+  tape.length = 0; acc = 0; last = -1;      // the next frame starts the clock afresh
   prev.x = world.car.x; prev.z = world.car.z; prev.yaw = world.car.yaw;
   chase.reset({ yaw: world.car.yaw });
 }
@@ -91,13 +91,19 @@ function frame(t) {
   last = t;
   resize();
   const raw = input.read(t);
+  if (window.__feel.inject) Object.assign(raw, window.__feel.inject);   // the probes' input
   if (raw.restart) restart();
   const rec = quantise(raw);
   acc += dt;
-  let steps = 0;
+  /* How many steps this frame: the count is rounded up when the
+     accumulator is within a millionth of a step, so a 60 Hz frame is
+     always two steps and a 120 Hz frame always one, instead of the
+     float remainder slipping a step into the next frame. */
+  let steps = Math.floor(acc / STEP + 1e-6);
+  if (steps > MAX_STEPS) { steps = MAX_STEPS; acc = steps * STEP; }
   const p0 = performance.now();
-  while (acc >= STEP && steps < MAX_STEPS) { stepOnce(rec); acc -= STEP; steps++; }
-  if (steps === MAX_STEPS) acc = 0;
+  for (let i = 0; i < steps; i++) stepOnce(rec);
+  acc = Math.max(0, acc - steps * STEP);
   physMs = performance.now() - p0; lastSteps = steps;
   const alpha = acc / STEP;
   const c = world.car;
@@ -132,6 +138,7 @@ scene.ready.then(() => {
 /* ---- the probe API ---- */
 window.__feel = {
   draw: true,          // the probes turn the GPU submission off on the way to a frame
+  inject: null,        // { steer, throttle, brake, handbrake } written over the live input by the probes
   TUNE, STEP, world, scoring, chase, scene, input, hud, view, pose, tape, groundName, tunedFromDevice: tuned,
   frame, restart,
   hash: () => world.hash(),

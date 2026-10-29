@@ -1,0 +1,106 @@
+{
+ "started": "2026-10-29T09:38:06.595Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
+ "viewports": {
+  "1280x720": {
+   "lap": {
+    "frames": 3235,
+    "offScreenFrames": 0,
+    "worstExcess": -0.426,
+    "worstFrame": 0,
+    "worstCorner": {
+     "f": -2.2,
+     "l": -0.92,
+     "y": 0,
+     "ndcX": 0.12382966765296848,
+     "ndcY": -0.5740174652109753
+    },
+    "hits": 0
+   },
+   "drift": {
+    "frames": 3088,
+    "offScreenFrames": 0,
+    "worstExcess": -0.426,
+    "worstFrame": 0,
+    "worstCorner": {
+     "f": -2.2,
+     "l": -0.92,
+     "y": 0,
+     "ndcX": 0.12382966765296848,
+     "ndcY": -0.5740174652109753
+    },
+    "hits": 0
+   },
+   "hit": {
+    "frames": 600,
+    "offScreenFrames": 0,
+    "worstExcess": -0.398,
+    "worstFrame": 106,
+    "worstCorner": {
+     "f": -2.2,
+     "l": -0.92,
+     "y": 0,
+     "ndcX": 0.02543163114950247,
+     "ndcY": -0.6020370951649641
+    },
+    "hits": 2
+   },
+   "knownAnswerLookUp": {
+    "frames": 900,
+    "offScreenFrames": 900,
+    "caught": true
+   },
+   "errors": []
+  },
+  "390x844": {
+   "lap": {
+    "frames": 3235,
+    "offScreenFrames": 0,
+    "worstExcess": -0.5811,
+    "worstFrame": 0,
+    "worstCorner": {
+     "f": -2.2,
+     "l": -0.92,
+     "y": 0,
+     "ndcX": 0.32788547783023714,
+     "ndcY": -0.41891628591833235
+    },
+    "hits": 0
+   },
+   "drift": {
+    "frames": 3088,
+    "offScreenFrames": 0,
+    "worstExcess": -0.4983,
+    "worstFrame": 56,
+    "worstCorner": {
+     "f": -2.2,
+     "l": 0.92,
+     "y": 1.45,
+     "ndcX": -0.5016784438635623,
+     "ndcY": -0.10735284574039777
+    },
+    "hits": 0
+   },
+   "hit": {
+    "frames": 600,
+    "offScreenFrames": 0,
+    "worstExcess": -0.2841,
+    "worstFrame": 91,
+    "worstCorner": {
+     "f": -2.2,
+     "l": 0.92,
+     "y": 1.45,
+     "ndcX": -0.7159055494002107,
+     "ndcY": -0.10406158277681915
+    },
+    "hits": 2
+   },
+   "knownAnswerLookUp": {
+    "frames": 900,
+    "offScreenFrames": 900,
+    "caught": true
+   },
+   "errors": []
+  }
+ }
+}

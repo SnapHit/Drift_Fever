@@ -17,6 +17,7 @@ const WALL_HALF = 0.25;        // m, half the wall's thickness
 const TUNNEL_GUARD = 2.5;      // m, a point this far behind a wall is still pushed back in
 const WALL_RESTITUTION = 0.12;
 const WALL_FRICTION = 0.5;
+const HIT_MIN = 0.8;           // m/s along the normal before a contact counts as a hit
 const CONE_RADIUS = 0.3;
 const CONE_DRAG = 2.5;         // per second
 const OFF_TRACK = 6;           // m past the half width is a respawn
@@ -150,7 +151,7 @@ export function createWorld(ground) {
     }
     /* A hit is a new contact, or a hard one at any time; a scrape along
        a wall is one contact however many steps it lasts. */
-    if (worst && (!world.touching || worst.hard)) {
+    if (worst && worst.speed >= HIT_MIN && (!world.touching || worst.hard)) {
       world.hits++;
       if (worst.hard) {
         world.hardHits++;
