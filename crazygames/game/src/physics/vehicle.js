@@ -28,6 +28,8 @@ export function createVehicle(x, z, yaw) {
     steer: 0,             // the angle the front wheels are at, with the assist, rad
     axF: 0,               // filtered longitudinal acceleration, for weight transfer
     hb: 0,                // handbrake state, 1 locked, easing back to 0
+    drifting: 0,          // 1 while the drift controller holds the slide
+    prevBeta: 0,          // last step's slide angle, for the damping
     speed: 0, vx: 0, vy: 0,
     slip: 0,              // body slip angle, rad, positive when the car points right of its travel
     alphaF: 0, alphaR: 0, // axle slip angles
@@ -95,7 +97,9 @@ export function stepVehicle(s, input, dt) {
       if (steerIn * beta > 0) steerIn *= 1 - over;
       throttleIn *= 1 - over * A.THROTTLE_EASE;
     }
-    assist = (A.COUNTERSTEER * beta - A.YAW_DAMP * s.r) * A.LEVEL;
+    /* In a drift the drift controller owns the angle, so the countersteer
+       assist steps back and only the yaw damping stays. */
+    assist = ((s.drifting ? 0 : A.COUNTERSTEER * beta) - A.YAW_DAMP * s.r) * A.LEVEL;
     const guard = A.SPIN_ANGLE * DEG;
     if (beta > guard) assist += A.SPIN_GAIN * (beta - guard) * A.LEVEL;
     else if (beta < -guard) assist += A.SPIN_GAIN * (beta + guard) * A.LEVEL;
@@ -121,8 +125,12 @@ export function stepVehicle(s, input, dt) {
   const throttle = throttleIn, brake = input.brake;
   let driveR = 0;
   if (throttle > 0) driveR = throttle * m * V.ACCEL * Math.max(0, 1 - Math.max(0, vx) / V.TOP_SPEED) * (1 - s.hb);
-  else if (vx <= 0.3 && brake > 0 && throttle === 0) driveR = -brake * m * V.ACCEL * 0.5 * Math.max(0, 1 - absVx / V.REVERSE_SPEED);
-  const brakeTotal = (vx > 0.3 || (vx < -0.3)) ? brake * m * V.BRAKE : (vx > 0.05 && brake > 0 ? brake * m * V.BRAKE : 0);
+  else if (vx <= 0.3 && brake > 0 && throttle === 0) driveR = -brake * m * V.REVERSE_ACCEL * Math.max(0, 1 - Math.max(0, -vx) / V.REVERSE_SPEED);
+  /* The brake acts against forward travel only. Rolling backwards, the
+     brake input is the reverse gear and the throttle is the brake. This
+     used to brake any motion past 0.3 m/s either way, which stopped
+     reverse at walking pace and left the car stuck nose to a wall. */
+  const brakeTotal = vx > 0.05 ? brake * m * V.BRAKE : (vx < -0.3 && throttle > 0 ? throttle * m * V.BRAKE : 0);
   const brakeF = -fwdSign * brakeTotal * V.BRAKE_FRONT_SHARE;
   const brakeR = -fwdSign * brakeTotal * (1 - V.BRAKE_FRONT_SHARE);
   const hbForce = -fwdSign * m * V.HANDBRAKE_DECEL * s.hb * (absVx > 0.2 ? 1 : absVx / 0.2);
@@ -144,12 +152,13 @@ export function stepVehicle(s, input, dt) {
   let FxR = driveR + brakeR;
   let spinning = 0;
   let latScaleR = 1;
-  if (Math.abs(FxR) >= capR) {
+  const capDrive = FxR > 0 ? capR * V.TRACTION : capR;
+  if (Math.abs(FxR) >= capDrive) {
     spinning = FxR > 0 ? 1 : 0;
-    FxR = (FxR > 0 ? 1 : -1) * capR * (spinning ? V.SPIN_DRIVE : 1);
+    FxR = (FxR > 0 ? 1 : -1) * capDrive * (spinning ? V.SPIN_DRIVE : 1);
     latScaleR = spinning ? V.SPIN_GRIP : 0.4;
   } else {
-    latScaleR = Math.sqrt(Math.max(0, 1 - (FxR / capR) * (FxR / capR)));
+    latScaleR = Math.sqrt(Math.max(0, 1 - (FxR / capDrive) * (FxR / capDrive)));
   }
   const vlatR = vy - b * s.r;
   const alphaR = speed > 0.01 ? Math.atan2(vlatR, absVx) : 0;
@@ -180,9 +189,48 @@ export function stepVehicle(s, input, dt) {
   const ax = Fx / m, ay = Fy / m;
   s.axF += (ax - s.axF) * Math.min(1, dt / V.WEIGHT_TRANSFER_TAU);
   s.r += yawMoment / Iz * dt;
+  /* The angle limiter: past ANGLE_LIMIT the car is turned back towards
+     its travel, so a slide stays a drift and does not tip into a spin.
+     beta > 0 is a right hand slide, which a left turn (+r) closes. */
+  if (vx > V.LOW_SPEED && A.LEVEL > 0) {
+    const absB = Math.abs(beta), dir = beta > 0 ? 1 : -1;
+    /* a slide past DRIFT_ENTER starts a drift, and so does the handbrake
+       at speed: tap DRIFT and the tail kicks out to the drift angle */
+    if (!s.drifting && (absB > A.DRIFT_ENTER * DEG || (s.hb > 0.5 && vx > A.DRIFT_MIN_SPEED))) s.drifting = 1;
+    else if (s.drifting && absB < A.DRIFT_EXIT * DEG && s.hb === 0) s.drifting = 0;
+    if (s.drifting) {
+      /* the angle the driver is asking for: steering into the slide
+         (the same sign as beta, see the spin control) opens it, out of
+         it closes it, and lifting off closes it a little */
+      /* at the very start of a handbrake drift the slide has no direction
+         yet: take it from the steering, defaulting to the way the car is
+         turning */
+      const dirUse = absB < 2 * DEG ? (input.steer !== 0 ? (input.steer > 0 ? 1 : -1) : (s.r < 0 ? 1 : -1)) : dir;
+      const into = input.steer * dirUse;
+      let target = into > 0 ? (A.DRIFT_ANGLE + A.DRIFT_RANGE * into) * Math.min(1, into * 2) : 0;
+      target *= A.DRIFT_LIFT + (1 - A.DRIFT_LIFT) * input.throttle;
+      if (s.hb > 0) target = Math.max(target, A.DRIFT_ANGLE);
+      // beta > 0 opens with a right turn (-r)
+      s.r -= dirUse * A.DRIFT_HOLD * (target * DEG - absB * (dirUse === dir ? 1 : -1)) * dt * A.LEVEL;
+      /* +r always closes the slide angle, whichever way it points, so the
+         damping is the same expression for both directions */
+      s.r += A.DRIFT_DAMP * (beta - s.prevBeta) * A.LEVEL;
+    }
+    const lim = A.ANGLE_LIMIT * DEG;
+    if (beta > lim) s.r += A.ANGLE_PULL * (beta - lim) * dt * A.LEVEL;
+    else if (beta < -lim) s.r += A.ANGLE_PULL * (beta + lim) * dt * A.LEVEL;
+  }
   // world velocity from the body accelerations
   s.wvx += (ax * fx + ay * lx) * dt;
   s.wvz += (ax * fz + ay * lz) * dt;
+  /* A drift keeps its speed: the tyres' sideways scrub would bleed it
+     away in a second or two, which reads as the car bogging down. Give
+     back DRIFT_KEEP of the speed lost this step while drifting under
+     throttle. */
+  if (s.drifting && throttle > 0 && A.LEVEL > 0) {
+    const sp1 = Math.hypot(s.wvx, s.wvz);
+    if (sp1 > 0.1 && sp1 < speed) { const k = (sp1 + (speed - sp1) * A.DRIFT_KEEP * throttle * A.LEVEL) / sp1; s.wvx *= k; s.wvz *= k; }
+  }
 
   /* ---- the low speed blend: below LOW_SPEED the car turns as a
      kinematic bicycle and stops sliding, so it can be parked ---- */
@@ -197,6 +245,7 @@ export function stepVehicle(s, input, dt) {
     s.wvx = vx * fx + vy * lx;
     s.wvz = vx * fz + vy * lz;
   }
+  s.prevBeta = beta;
   s.yaw += s.r * dt;
   if (s.yaw > Math.PI) s.yaw -= 2 * Math.PI; else if (s.yaw < -Math.PI) s.yaw += 2 * Math.PI;
   s.x += s.wvx * dt;
@@ -227,7 +276,7 @@ export function applyImpact(s, px, pz, nx, nz, restitution, friction) {
   const kn = 1 / m + rn * rn / Iz;
   const j = -(1 + restitution) * vn / kn;
   s.wvx += j * nx / m; s.wvz += j * nz / m;
-  s.r += j * rn / Iz;
+  s.r += j * rn / Iz * V.WALL_SPIN;
   // friction along the tangent
   const tx = -nz, tz = nx;
   const pvx2 = s.wvx + s.r * rz, pvz2 = s.wvz - s.r * rx;
@@ -238,7 +287,7 @@ export function applyImpact(s, px, pz, nx, nz, restitution, friction) {
   const maxJt = friction * j;
   if (jt > maxJt) jt = maxJt; else if (jt < -maxJt) jt = -maxJt;
   s.wvx += jt * tx / m; s.wvz += jt * tz / m;
-  s.r += jt * rt / Iz;
+  s.r += jt * rt / Iz * V.WALL_SPIN;
   return -vn;
 }
 

@@ -61,7 +61,7 @@ export function createWorld(ground) {
     ground, car, cones, segs, step: 0, time: 0,
     along: 0, lateral: 0, centreIndex: 0,   // where the car is along the track, and how far left of the centre
     hit: null,                              // this step's hit, if any: { speed, hard, kind, x, z }
-    respawned: false, touching: false, hits: 0, hardHits: 0, conesKnocked: 0, nearest: Infinity, nearestClip: null,
+    respawned: false, recovered: false, stuckT: 0, lastTouch: -1, wallNx: 0, wallNz: 0, touching: false, hits: 0, hardHits: 0, conesKnocked: 0, nearest: Infinity, nearestClip: null,
     stepWorld, reset, hash, locate, clipDistance,
   };
 
@@ -69,7 +69,7 @@ export function createWorld(ground) {
     const c = createVehicle(ground.start.x, ground.start.z, ground.start.yaw);
     Object.assign(car, c);
     for (const k of cones) { k.x = k.x0; k.z = k.z0; k.vx = 0; k.vz = 0; k.knocked = 0; k.tilt = 0; k.tiltX = 0; k.tiltZ = 0; }
-    world.step = 0; world.time = 0; world.hit = null; world.touching = false; world.hits = 0; world.hardHits = 0; world.conesKnocked = 0; world.respawned = false;
+    world.step = 0; world.time = 0; world.hit = null; world.touching = false; world.stuckT = 0; world.lastTouch = -1; world.recovered = false; world.hits = 0; world.hardHits = 0; world.conesKnocked = 0; world.respawned = false;
     world.centreIndex = 0; world.along = 0; world.lateral = 0; world.nearest = Infinity;
     locate(true);
   }
@@ -142,7 +142,7 @@ export function createWorld(ground) {
           const depth = WALL_HALF - d;
           car.x += s.nx * depth; car.z += s.nz * depth;
           const removed = applyImpact(car, px, pz, s.nx, s.nz, WALL_RESTITUTION, WALL_FRICTION);
-          any = true; contact = true;
+          any = true; contact = true; world.wallNx = s.nx; world.wallNz = s.nz;
           if (removed > 0 && (!worst || removed > worst.speed)) worst = { speed: removed, kind: s.kind, nx: s.nx, nz: s.nz, x: px, z: pz, hard: removed >= S.HARD_HIT };
           bodyPoints(car, pts);
         }
@@ -199,10 +199,44 @@ export function createWorld(ground) {
     world.nearestCone = nearest;
   }
 
+  /* GETTING UNSTUCK. A car that is barely moving while the player tries
+     to drive (throttle or brake held), with its nose against a wall or
+     facing back down the track, for RECOVER_AFTER seconds, is put back on
+     the track pointing the right way and rolling. Reverse still works and
+     usually gets there first; this is for the player who does not know
+     it is there. In the car park, with no track, it is turned to face
+     away from the wall instead. Deterministic: it reads only the state. */
+  function unstick(input) {
+    const A = TUNE.ASSIST;
+    if (car.speed > A.RECOVER_SPEED || !(input.throttle > 0 || input.brake > 0)) { world.stuckT = 0; return; }
+    const nearWall = world.touching || (world.lastTouch >= 0 && world.time - world.lastTouch < 0.4);
+    let facingBack = false;
+    if (ground.centre.length) {
+      const c = ground.centre[world.centreIndex];
+      const dot = Math.cos(car.yaw - c.heading);
+      facingBack = dot < -0.35;
+    }
+    if (!nearWall && !facingBack) { world.stuckT = 0; return; }
+    world.stuckT += STEP;
+    if (world.stuckT < A.RECOVER_AFTER) return;
+    world.stuckT = 0;
+    if (ground.centre.length) {
+      const c = ground.centre[world.centreIndex];
+      Object.assign(car, createVehicle(c.x, c.z, c.heading));
+      car.wvx = -Math.sin(c.heading) * A.RECOVER_LAUNCH; car.wvz = -Math.cos(c.heading) * A.RECOVER_LAUNCH;
+      locate(true);
+    } else {
+      const yaw = Math.atan2(-world.wallNx, -world.wallNz);
+      Object.assign(car, createVehicle(car.x + world.wallNx * 1.0, car.z + world.wallNz * 1.0, yaw));
+    }
+    world.respawned = true; world.recovered = true;
+  }
+
   function stepWorld(input) {
-    world.hit = null; world.respawned = false;
+    world.hit = null; world.respawned = false; world.recovered = false;
     stepVehicle(car, input, STEP);
     collideWalls();
+    if (world.touching) world.lastTouch = world.time;
     collideCones(STEP);
     if (ground.centre.length) {
       locate(false);
@@ -220,6 +254,7 @@ export function createWorld(ground) {
       world.nearest = world.nearestCone;
       world.nearestClip = null;
     }
+    unstick(input);
     world.step++;
     world.time = world.step * STEP;
   }

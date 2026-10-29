@@ -2,8 +2,8 @@
  "0": {
   "file": "shots/drift-1280x720.png",
   "viewport": "1280x720",
-  "angle": 30.01,
-  "kmh": 80
+  "angle": 30.93,
+  "kmh": 67
  },
  "1": {
   "file": "shots/park-1280x720.png",
@@ -13,14 +13,14 @@
  "2": {
   "file": "shots/drift-390x844.png",
   "viewport": "390x844",
-  "angle": 30.01,
-  "kmh": 80
+  "angle": 30.93,
+  "kmh": 67
  },
  "3": {
   "file": "shots/park-390x844.png",
   "viewport": "390x844",
   "ground": "park"
  },
- "started": "2026-10-29T09:42:14.271Z",
+ "started": "2026-10-29T10:26:50.539Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here"
 }

@@ -6,7 +6,7 @@
    still playable with it open on a phone. */
 import { TUNE, PANEL, tuneGet, tuneSet, tuneDefaults } from '../tune.js';
 
-const KEY = 'driftfever.cg.tune';
+const KEY = 'driftfever.cg.tune.v2';   // v2 from 29 October 2026: saves from before the handling rework are ignored
 
 export function loadSavedTune() {
   try {

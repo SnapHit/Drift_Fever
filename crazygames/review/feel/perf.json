@@ -1,5 +1,5 @@
 {
- "started": "2026-10-29T09:42:14.271Z",
+ "started": "2026-10-29T10:26:50.539Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "budgetMs": 16.7,
  "runs": [
@@ -11,39 +11,39 @@
    "tier": "low",
    "frame": {
     "n": 390,
-    "p50": 0.6,
+    "p50": 0.4,
     "p95": 1.7,
-    "p99": 6.8,
-    "worst": 11.8,
-    "mean": 0.81
+    "p99": 5,
+    "worst": 8.8,
+    "mean": 0.63
    },
    "jsWithoutSubmit": {
     "n": 390,
     "p50": 0.1,
-    "p95": 0.2,
-    "p99": 0.7,
-    "worst": 1.8,
-    "mean": 0.12
+    "p95": 0.3,
+    "p99": 1.3,
+    "worst": 8,
+    "mean": 0.16
    },
    "physics": {
     "n": 390,
     "p50": 0,
-    "p95": 0.1,
-    "p99": 0.3,
-    "worst": 0.6,
-    "mean": 0.04
+    "p95": 0.2,
+    "p99": 0.6,
+    "worst": 3.7,
+    "mean": 0.07
    },
    "submit": {
     "n": 390,
-    "p50": 0.5,
-    "p95": 1.3,
-    "p99": 6.8,
-    "worst": 11.7,
-    "mean": 0.69
+    "p50": 0.3,
+    "p95": 1.1,
+    "p99": 4.5,
+    "worst": 5,
+    "mean": 0.47
    },
    "stepsPerFrame": 2,
    "firstFrames": {
-    "worst": 9.2
+    "worst": 6.5
    },
    "errors": []
   },
@@ -55,39 +55,39 @@
    "tier": "low",
    "frame": {
     "n": 390,
-    "p50": 2.7,
-    "p95": 7.7,
-    "p99": 10.2,
-    "worst": 22.3,
-    "mean": 3.11
+    "p50": 2.3,
+    "p95": 7.8,
+    "p99": 14.1,
+    "worst": 19.7,
+    "mean": 2.99
    },
    "jsWithoutSubmit": {
     "n": 390,
     "p50": 0.2,
-    "p95": 2.2,
-    "p99": 4.5,
-    "worst": 7,
+    "p95": 2.1,
+    "p99": 5.3,
+    "worst": 8.4,
     "mean": 0.55
    },
    "physics": {
     "n": 390,
-    "p50": 0,
-    "p95": 0.9,
-    "p99": 2.7,
-    "worst": 5.9,
-    "mean": 0.16
+    "p50": 0.1,
+    "p95": 1.1,
+    "p99": 4.1,
+    "worst": 5.2,
+    "mean": 0.26
    },
    "submit": {
     "n": 390,
-    "p50": 2.1,
+    "p50": 1.9,
     "p95": 7.1,
-    "p99": 9.4,
-    "worst": 22,
-    "mean": 2.57
+    "p99": 12.2,
+    "worst": 17.8,
+    "mean": 2.44
    },
    "stepsPerFrame": 2,
    "firstFrames": {
-    "worst": 38.2
+    "worst": 23.7
    },
    "errors": []
   },
@@ -99,57 +99,57 @@
    "tier": "low",
    "frame": {
     "n": 390,
-    "p50": 6,
-    "p95": 13.4,
-    "p99": 18.3,
-    "worst": 36.2,
-    "mean": 5.99
+    "p50": 2.2,
+    "p95": 12.4,
+    "p99": 17.1,
+    "worst": 26.3,
+    "mean": 3.68
    },
    "jsWithoutSubmit": {
     "n": 390,
     "p50": 0.2,
-    "p95": 4.2,
-    "p99": 5.7,
-    "worst": 6.9,
-    "mean": 0.94
+    "p95": 5.3,
+    "p99": 10,
+    "worst": 13.1,
+    "mean": 0.98
    },
    "physics": {
     "n": 390,
     "p50": 0.1,
-    "p95": 1.4,
-    "p99": 3.1,
-    "worst": 6.7,
-    "mean": 0.26
+    "p95": 2.4,
+    "p99": 7.3,
+    "worst": 9.3,
+    "mean": 0.46
    },
    "submit": {
     "n": 390,
-    "p50": 5,
-    "p95": 11.7,
-    "p99": 17.3,
-    "worst": 35.1,
-    "mean": 5.05
+    "p50": 0.8,
+    "p95": 9.3,
+    "p99": 14,
+    "worst": 26.3,
+    "mean": 2.7
    },
    "stepsPerFrame": 2,
    "firstFrames": {
-    "worst": 54.2
+    "worst": 45.7
    },
    "errors": []
   }
  ],
  "summary": {
-  "jsWithoutSubmitP95At6x": 4.2,
-  "jsWithoutSubmitWorstAt6x": 6.9,
-  "frameP95At6x": 13.4,
-  "frameWorstAt6x": 36.2,
-  "physicsP95At6x": 1.4,
+  "jsWithoutSubmitP95At6x": 5.3,
+  "jsWithoutSubmitWorstAt6x": 13.1,
+  "frameP95At6x": 12.4,
+  "frameWorstAt6x": 26.3,
+  "physicsP95At6x": 2.4,
   "holdsBudgetAt6x": true
  },
  "knownAnswer": {
   "loadMs": 20,
   "atThrottle": 4,
-  "p95Before": 2.2,
-  "p95Loaded": 24.3,
-  "rise": 22.1,
+  "p95Before": 2.1,
+  "p95Loaded": 25.2,
+  "rise": 23.1,
   "verdictFlipped": true,
   "caught": true
  }

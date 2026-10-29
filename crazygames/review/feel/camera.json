@@ -1,10 +1,10 @@
 {
- "started": "2026-10-29T09:42:14.271Z",
+ "started": "2026-10-29T10:26:50.539Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "viewports": {
   "1280x720": {
    "lap": {
-    "frames": 3235,
+    "frames": 3046,
     "offScreenFrames": 0,
     "worstExcess": -0.426,
     "worstFrame": 0,
@@ -18,7 +18,7 @@
     "hits": 0
    },
    "drift": {
-    "frames": 3088,
+    "frames": 2901,
     "offScreenFrames": 0,
     "worstExcess": -0.426,
     "worstFrame": 0,
@@ -29,21 +29,21 @@
      "ndcX": 0.12382966765296848,
      "ndcY": -0.5740174652109753
     },
-    "hits": 0
+    "hits": 4
    },
    "hit": {
     "frames": 600,
     "offScreenFrames": 0,
-    "worstExcess": -0.398,
-    "worstFrame": 106,
+    "worstExcess": -0.426,
+    "worstFrame": 0,
     "worstCorner": {
      "f": -2.2,
      "l": -0.92,
      "y": 0,
-     "ndcX": 0.02543163114950247,
-     "ndcY": -0.6020370951649641
+     "ndcX": 0.12382966765296848,
+     "ndcY": -0.5740174652109753
     },
-    "hits": 2
+    "hits": 11
    },
    "knownAnswerLookUp": {
     "frames": 900,
@@ -54,7 +54,7 @@
   },
   "390x844": {
    "lap": {
-    "frames": 3235,
+    "frames": 3046,
     "offScreenFrames": 0,
     "worstExcess": -0.5105,
     "worstFrame": 0,
@@ -68,32 +68,32 @@
     "hits": 0
    },
    "drift": {
-    "frames": 3088,
+    "frames": 2901,
     "offScreenFrames": 0,
-    "worstExcess": -0.5059,
-    "worstFrame": 55,
+    "worstExcess": -0.4466,
+    "worstFrame": 19,
     "worstCorner": {
      "f": -2.2,
      "l": 0.92,
      "y": 1.45,
-     "ndcX": -0.49406715740651713,
-     "ndcY": -0.1632614286902477
+     "ndcX": -0.5534051772970087,
+     "ndcY": -0.1545490685606779
     },
-    "hits": 0
+    "hits": 4
    },
    "hit": {
     "frames": 600,
     "offScreenFrames": 0,
-    "worstExcess": -0.2964,
-    "worstFrame": 91,
+    "worstExcess": -0.4194,
+    "worstFrame": 339,
     "worstCorner": {
      "f": -2.2,
      "l": 0.92,
      "y": 1.45,
-     "ndcX": -0.7035685709922093,
-     "ndcY": -0.1689362705677733
+     "ndcX": -0.5806041043091221,
+     "ndcY": -0.2021733017022869
     },
-    "hits": 2
+    "hits": 11
    },
    "knownAnswerLookUp": {
     "frames": 900,

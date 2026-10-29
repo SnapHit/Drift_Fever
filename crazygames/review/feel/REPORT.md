@@ -271,3 +271,52 @@ touch buttons showing in portrait.
   with `node game/test/feel/...` rather than npm scripts.
 - The build counts `game/test/` out of the shipped files, so the probes
   and the Node harness are not served from the preview.
+
+---
+
+## After play, 29 October 2026: pace, spins, getting stuck
+
+The author played it: too slow to accelerate, the turn tips into an
+uncontrollable spin, and the car gets stuck facing a wall with almost no
+way to reverse. Measured by `game/test/feel/handling.js` (output
+`handling.json`), before and after:
+
+| | before | after |
+|---|---|---|
+| 0 to 100 km/h | 7.2 s | 3.4 s |
+| speed after 5 s | 77 km/h | 125 km/h |
+| top speed on the flat | 133 km/h | 168 km/h |
+| slide angle, full steer held at 15 m/s | 90 degrees | 4 |
+| slide angle, DRIFT tap then steer held | 90, never held | about 45, held, carrying speed |
+| spins over 12 player-like patterns | every one slid to 90 | 0 |
+| nose to a wall, throttle on | stuck | back on track in 1.4 s |
+| nose to a wall, reverse | stuck (reverse was braked at 0.3 m/s) | clear in 1.1 s |
+
+Known answers, both caught: with the assist off 4 of 12 patterns spin;
+with the recovery off the car stays stuck.
+
+What changed:
+- **Pace:** more drive and a higher top speed, and launch traction so a
+  standing start hooks up instead of spinning the rear.
+- **Reverse was broken:** the brake acted against motion either way past
+  0.3 m/s, so reverse never got past walking pace. The brake now acts
+  against forward travel only; the brake button is labelled REVERSE too.
+- **A drift controller** (`vehicle.js`, `TUNE.ASSIST.DRIFT_*`): the DRIFT
+  button kicks the tail out; once sliding, how far the steering points
+  into the corner sets the angle (about 45 degrees at full steer), and
+  letting go of the steering straightens the car. Steering out of the
+  slide ends the drift. An angle limiter at 58 degrees and damping on the
+  slide angle stop overshoot.
+- **Walls** pass on only 35 per cent of a hit's turning, so the car
+  slides along a wall instead of being spun to face it.
+- **Getting unstuck:** barely moving while trying to drive, against a
+  wall or facing backwards, for 1.2 s, puts the car back on the track
+  pointing the right way at 29 km/h.
+- The scripted drift driver now steers into the turn, as the controller
+  expects.
+
+All FEEL.md probes rerun and pass: replay bit identical; the driver laps
+in 50.8 s without touching a wall; the drift script holds over 30 degrees
+for 2.13 s through the sweeper at a mean 43.7 degrees and 63 km/h; the
+car stays on screen in every frame at both viewports; JavaScript p95 5.3
+ms at 6x throttle. Each known answer was caught.

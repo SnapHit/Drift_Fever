@@ -13,30 +13,32 @@ export const TUNE = {
   VEHICLE: {
     MASS:               1250,    // kg
     WHEELBASE:          2.55,    // m, front axle to rear axle
-    CG_TO_FRONT:        1.15,    // m, centre of mass to the front axle (rear heavy helps rotation)
+    CG_TO_FRONT:        1.25,    // m, centre of mass to the front axle (rear heavy helps rotation)
     CG_HEIGHT:          0.52,    // m, for weight transfer
     TRACK:              1.60,    // m, left wheel to right wheel, for the wheels and the corners
     HALF_LENGTH:        2.20,    // m, body half length, for collisions
     HALF_WIDTH:         0.92,    // m, body half width
     WHEEL_RADIUS:       0.33,    // m
-    INERTIA_FACTOR:     0.95,    // yaw inertia as a share of m * (a*b): below 1 turns in quicker
-    ACCEL:              8.5,     // m/s^2, drive at a standstill
-    TOP_SPEED:          48,      // m/s, where the drive force reaches zero (173 km/h)
-    REVERSE_SPEED:      8,       // m/s
+    INERTIA_FACTOR:     1.15,    // yaw inertia as a share of m * (a*b): below 1 turns in quicker
+    ACCEL:              12,      // m/s^2, drive at a standstill (was 8.5: 0 to 100 km/h took 7.2 s)
+    TOP_SPEED:          62,      // m/s, where the drive force reaches zero (223 km/h; was 48)
+    TRACTION:           1.6,     // drive grip as a multiple of the rear's lateral grip, so a launch hooks up instead of spinning
+    REVERSE_SPEED:      12,      // m/s
+    REVERSE_ACCEL:      7,       // m/s^2
     DRAG:               0.0012,  // per metre: drag deceleration is DRAG * v^2
     ROLL:               0.35,    // m/s^2, rolling resistance
     BRAKE:              16,      // m/s^2, full brake
     BRAKE_FRONT_SHARE:  0.65,    // share of the brake on the front axle
-    MU_FRONT:           1.15,    // peak tyre grip, front axle (as a multiple of the axle load)
-    MU_REAR:            1.05,    // and rear
+    MU_FRONT:           1.20,    // peak tyre grip, front axle (as a multiple of the axle load)
+    MU_REAR:            1.15,    // and rear
     PEAK_ANGLE_FRONT:   9,       // degrees of slip where the front tyre peaks
     PEAK_ANGLE_REAR:    8,       // and the rear
-    TAIL_FRONT:         0.78,    // grip left at a full slide, as a share of the peak
-    TAIL_REAR:          0.70,
+    TAIL_FRONT:         0.85,    // grip left at a full slide, as a share of the peak
+    TAIL_REAR:          0.78,
     TAIL_FALL:          0.9,     // how quickly grip falls past the peak (per unit of excess slip)
-    SPIN_GRIP:          0.60,    // lateral grip left when the rear is spinning under power
+    SPIN_GRIP:          0.85,    // lateral grip left when the rear is spinning under power
     SPIN_DRIVE:         0.85,    // drive force delivered when the rear is spinning
-    HANDBRAKE_GRIP:     0.30,    // rear grip while the handbrake is on, as a share
+    HANDBRAKE_GRIP:     0.45,    // rear grip while the handbrake is on, as a share
     HANDBRAKE_DECEL:    5.0,     // m/s^2 of braking from the locked rear
     HANDBRAKE_RELEASE:  0.25,    // s for the rear to find grip again after release
     LOCK:               32,      // degrees of steering lock at a standstill
@@ -48,18 +50,42 @@ export const TUNE = {
     MIN_AXLE_LOAD:      0.18,    // never less than this share of the weight on an axle
     LOW_SPEED:          3.0,     // m/s, below this the kinematic model takes over
     GRAVITY:            9.81,
+    WALL_SPIN:          0.35,    // share of a wall hit's turning that reaches the car: walls slide you along instead of spinning you round
   },
   ASSIST: {
     LEVEL:              1.0,     // the hidden level: 0 is raw, 1 is the phone setting
-    COUNTERSTEER:       0.50,    // steer added per radian of body slip, scaled by LEVEL
+    COUNTERSTEER:       0.60,    // steer added per radian of body slip, scaled by LEVEL
     COUNTERSTEER_LOCK:  40,      // degrees the assist may steer to, beyond the driver's lock
-    SPIN_ANGLE:         55,      // degrees of slip where the spin guard starts
-    SPIN_GAIN:          2.5,     // extra countersteer per radian past that
+    SPIN_ANGLE:         40,      // degrees of slip where the spin guard starts
+    SPIN_GAIN:          5.0,     // extra countersteer per radian past that
     YAW_SOFT:           0.8,     // rad/s of yaw where the spin control starts
     YAW_MAX:            1.6,     // and where steering in is gone and the throttle fully eased
     THROTTLE_EASE:      0.9,     // share of the throttle the spin control lifts by YAW_MAX
     YAW_DAMP:           0.15,    // steer against yaw rate, per rad/s, scaled by LEVEL
     GRIP_EASE:          0.0,     // extra rear tail grip at full LEVEL (0 keeps the tuned tyre)
+    ANGLE_LIMIT:        58,      // degrees of slide past which the car is turned back towards its travel
+    ANGLE_PULL:         60,      // rad/s of yaw rate added per radian past the limit, per second, scaled by LEVEL
+    /* The drift controller. Once the car is sliding (past DRIFT_ENTER) it
+       is in a drift until the slide closes below DRIFT_EXIT. In a drift,
+       steering sets the angle: full steer into the slide holds
+       DRIFT_ANGLE + DRIFT_RANGE, less steer holds less, and letting go of
+       the steering asks for none, so the car straightens itself (the
+       natural thing to do on a phone). The handbrake holds at least
+       DRIFT_ANGLE. Lifting off the throttle closes it a little. The car is
+       turned towards that angle at DRIFT_HOLD, and DRIFT_DAMP resists the
+       slide angle changing quickly, which stops a flick overshooting. */
+    DRIFT_ENTER:        14,      // degrees
+    DRIFT_MIN_SPEED:    8,       // m/s, the handbrake starts a drift above this
+    DRIFT_EXIT:         6,       // degrees
+    DRIFT_ANGLE:        30,      // degrees held by the handbrake, and the base of the steered angle
+    DRIFT_RANGE:        16,      // more degrees with full steer into the slide
+    DRIFT_LIFT:         0.5,     // share of the angle kept with the throttle off
+    DRIFT_HOLD:         40,      // rad/s of yaw rate per radian of angle error, per second
+    DRIFT_DAMP:         8,       // yaw rate per unit of slide angle rate, against quick changes
+    DRIFT_KEEP:         0.8,     // share of the speed scrubbed by the slide that the drift gives back
+    RECOVER_AFTER:      1.2,     // s stuck (slow, against a wall or facing backwards, trying to drive) before the car is put back on the track
+    RECOVER_SPEED:      2.0,     // m/s, below this counts as stuck
+    RECOVER_LAUNCH:     8,       // m/s, the speed the car is given back on the track
   },
   CAMERA: {
     DISTANCE:           8.5,     // m behind the car
@@ -121,6 +147,8 @@ export const PANEL = [
   ['VEHICLE.INERTIA_FACTOR', 'yaw inertia',     0.5,  1.6,  0.05],
   ['VEHICLE.CG_TO_FRONT',    'cg to front m',   0.9,  1.6,  0.05],
   ['VEHICLE.BRAKE',          'brake m/s2',        6,   24,  1],
+  ['VEHICLE.TRACTION',       'launch traction', 1.0,  2.5,  0.1],
+  ['VEHICLE.WALL_SPIN',      'wall spin',         0,    1,  0.05],
   ['ASSIST.LEVEL',           'assist level',      0,    1,  0.05],
   ['ASSIST.COUNTERSTEER',    'countersteer',      0,    2,  0.05],
   ['ASSIST.YAW_DAMP',        'yaw damp',          0,  0.4,  0.01],
@@ -128,6 +156,12 @@ export const PANEL = [
   ['ASSIST.YAW_SOFT',        'spin ctrl from',  0.5,    3,  0.1],
   ['ASSIST.YAW_MAX',         'spin ctrl full',    1,    4,  0.1],
   ['ASSIST.THROTTLE_EASE',   'spin ctrl lift',    0,    1,  0.05],
+  ['ASSIST.ANGLE_LIMIT',     'max angle deg',    30,   90,  1],
+  ['ASSIST.DRIFT_ANGLE',     'drift angle deg',  15,   50,  1],
+  ['ASSIST.DRIFT_RANGE',     'drift steer range', 0,   35,  1],
+  ['ASSIST.DRIFT_HOLD',      'drift hold',        0,   15,  0.5],
+  ['ASSIST.DRIFT_KEEP',      'drift keeps speed', 0,    1,  0.05],
+  ['ASSIST.ANGLE_PULL',      'angle pull',        0,   20,  0.5],
   ['CAMERA.DISTANCE',        'cam distance',      4,   16,  0.5],
   ['CAMERA.HEIGHT',          'cam height',        1,    9,  0.1],
   ['CAMERA.LOOK_AHEAD',      'cam look ahead',    0,   16,  0.5],

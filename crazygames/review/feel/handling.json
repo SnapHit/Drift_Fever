@@ -1,0 +1,117 @@
+{
+ "pace": {
+  "zeroTo100s": 3.42,
+  "kmhAfter5s": 124.9,
+  "topKmh": 168
+ },
+ "spins": {
+  "cases": 12,
+  "spins": 0,
+  "rows": [
+   {
+    "name": "hold steer",
+    "v0": 15,
+    "maxSlip": 4.6,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake tap, steer held",
+    "v0": 15,
+    "maxSlip": 47.9,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake held with steer",
+    "v0": 15,
+    "maxSlip": 51.6,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "flick left then right",
+    "v0": 15,
+    "maxSlip": 47.5,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "hold steer",
+    "v0": 25,
+    "maxSlip": 9.1,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake tap, steer held",
+    "v0": 25,
+    "maxSlip": 49.7,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake held with steer",
+    "v0": 25,
+    "maxSlip": 52.1,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "flick left then right",
+    "v0": 25,
+    "maxSlip": 47.7,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "hold steer",
+    "v0": 35,
+    "maxSlip": 48,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake tap, steer held",
+    "v0": 35,
+    "maxSlip": 50.4,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake held with steer",
+    "v0": 35,
+    "maxSlip": 52.3,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "flick left then right",
+    "v0": 35,
+    "maxSlip": 48,
+    "endSlip": 0,
+    "spin": false
+   }
+  ]
+ },
+ "stuck": [
+  {
+   "mode": "throttle",
+   "escapedAfterS": 1.38,
+   "stuck": false
+  },
+  {
+   "mode": "reverse",
+   "escapedAfterS": 1.08,
+   "stuck": false
+  }
+ ],
+ "knownAnswerAssistOff": {
+  "spins": 4
+ },
+ "knownAnswerNoRecovery": {
+  "mode": "throttle",
+  "escapedAfterS": null,
+  "stuck": true
+ }
+}
