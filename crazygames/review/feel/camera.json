@@ -1,5 +1,5 @@
 {
- "started": "2026-10-29T09:41:37.394Z",
+ "started": "2026-10-29T09:42:14.271Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "viewports": {
   "1280x720": {
