@@ -14,7 +14,27 @@ nothing outside `crazygames/`.** Gameplay changes happen in the root
 are re-vendored here by commit. If the renderer appears to need a gameplay
 change, stop and say so.
 
-## The one rule that governs everything else
+## New direction, 29 October 2026: read DESIGN.md first
+
+The author played the stage 2 greybox and decided the live game's design
+does not suit CrazyGames. **The edition is now a new game under the same
+name, described in `DESIGN.md`**: a real 3D drift game for teenagers. It
+lives in `game/`, ships at `/` on the preview, and is built in the order
+DESIGN.md gives, from briefs in `briefs/`.
+
+- The parity rule below now applies only to the greybox (`public/`,
+  `sim/`, `parity/`), which stays playable at `/greybox/` for comparison.
+  The new game is not bound to the live game's mechanics.
+- Everything in "Hard constraints" still applies to the new game, except
+  the first bullet (mechanics preserved).
+- Parallel sessions each work on their own branch and only in the folders
+  their brief names. The reviewer merges to `main`. Never push to `main`
+  from a brief's session.
+- `tools/build-site.js` copies everything under `game/` into `dist/`
+  except `test/` folders, `*.test.js` and folders holding a `.noship`
+  file; `game/later/` does not count towards the initial download.
+
+## The one rule that governs the greybox
 
 **The vendored simulation is identical to the original, and the parity test
 is what says so.** `sim/drift-fever-sim.js` is generated. Nobody edits it by
@@ -122,8 +142,8 @@ grit at the screen in the same body) is replaced, never cut.
 
 ## Hard constraints, from the brief, which apply to every change
 
-- Every mechanic in BRIEF.md "Preserved exactly" is preserved exactly. The
-  parity test is the proof and it is part of the build.
+- Greybox only: every mechanic in BRIEF.md "Preserved exactly" is
+  preserved exactly. The parity test is the proof and it is part of the build.
 - Initial download 20MB or less; 250MB and 1,500 files total; PEGI 12.
 - three.js WebGPURenderer with the WebGL 2 fallback as a first class path.
   The lowest quality tier holds 60fps on WebGL 2 on a five year old
@@ -147,7 +167,7 @@ grit at the screen in the same body) is replaced, never cut.
 - Pick the statistic that can see the failure. A median hides a few bad
   cases; report the worst case and the count.
 - One stage at a time, in the brief's order. Do not design ahead.
-- Commit straight to `main`, one push at a time. Pushing to `main` is the
+- The reviewer commits straight to `main`, one push at a time; brief sessions use their branch. Pushing to `main` is the
   deploy, of the live site and of this preview. A change is not finished
   until it is on `main`. Nothing outside `crazygames/` is touched.
 - Australian spelling in comments and copy. No em or en dashes.
@@ -182,11 +202,10 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
 
 - Stage 1: done. The simulation is vendored and parity is proven; see
   `parity/REPORT.md`.
-- Stage 2: done and merged 24 October 2026. The greybox renderer, brief in
-  `STAGE-2.md`, results in `review/stage-2/REPORT.md`. It consumes
-  `createSim(hooks)` and never feeds back into it, and the parity test's
-  K8 is what says so. Open: the drawn drift yaw is far smaller than the
-  live game's, the hazard stripes outshine the road edge, the JavaScript
-  frame budget is just over at 6x throttle, and WebGPU, the readability
-  rule and a real Chromebook are unproven.
-- Stage 3, art, is next. Its brief starts from the report's "For stage 3".
+- Stage 2: done and merged 24 October 2026; camera fixed after play on 28
+  October. Results in `review/stage-2/REPORT.md`. Now the reference at
+  `/greybox/`.
+- 29 October 2026: new direction, `DESIGN.md`. In progress in parallel:
+  the feel prototype (`briefs/FEEL.md`, branch `crazygames-feel`), the
+  track generator (`briefs/TRACKS.md`, `crazygames-tracks`) and the five
+  car models (`briefs/CARS.md`, `crazygames-cars`).
