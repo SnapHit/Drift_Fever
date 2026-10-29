@@ -64,9 +64,9 @@ export const TUNE = {
   CAMERA: {
     DISTANCE:           8.5,     // m behind the car
     DISTANCE_SPEED:     0.045,   // extra metres per m/s
-    HEIGHT:             3.4,     // m above the ground
+    HEIGHT:             3.8,     // m above the ground
     LOOK_AHEAD:         6.0,     // m ahead of the car the camera looks at
-    LOOK_UP:            0.9,     // m above the ground
+    LOOK_UP:            0.7,     // m above the ground
     LAG:                0.22,    // s, time constant of the heading follow
     SWING:              0.65,    // share of the drift angle the camera swings out by
     SWING_MAX:          50,      // degrees, the most it swings

@@ -1,20 +1,86 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-au">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
 <title>Drift Fever</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Drift Fever, CrazyGames edition: the driving feel prototype.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1a1d33">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1d33'/%3E%3Crect x='6' y='11' width='20' height='10' rx='3' fill='%2319d8ff' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
-  :root { color-scheme: dark; }
-  body { margin: 0; padding: 24px 16px; background: #0b0d12; color: #e8ecf1; font: 16px/1.5 system-ui, sans-serif; max-width: 40rem; margin-inline: auto; }
-  h1 { font-size: 1.6rem; margin: 0 0 .5rem; color: #4ff0ff; }
-  a { color: #4ff0ff; }
+  :root { color-scheme: dark; --cyan: #19d8ff; --edge: #f6e7a1; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1d33; color: #eef1f7; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { touch-action: none; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
+  #world { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #ui { position: fixed; inset: 0; pointer-events: none; }
+  #ui > * { pointer-events: auto; }
+  #fail { position: fixed; left: 16px; right: 16px; top: 40%; text-align: center; font-size: 16px; }
+
+  /* the HUD */
+  #hud { position: absolute; inset: 0; pointer-events: none; }
+  #hud > * { pointer-events: none; }
+  #total { position: absolute; top: max(10px, env(safe-area-inset-top)); left: 0; right: 0; text-align: center; font-weight: 800; letter-spacing: 0.02em; }
+  #totalN { font-size: clamp(28px, 6vw, 44px); line-height: 1; display: block; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+  #totalL { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.6; }
+  #live { position: absolute; left: 0; top: 0; display: none; transform: translate(-1000px, -1000px); will-change: transform; }
+  #live.on { display: block; }
+  #live > span { position: absolute; left: 0; top: -14px; transform: translate(-50%, -100%); font-weight: 900; font-size: clamp(22px, 4.5vw, 34px); color: var(--cyan); text-shadow: 0 2px 6px rgba(0,0,0,0.7); white-space: nowrap; }
+  #live > #liveM { top: -48px; font-size: clamp(16px, 3.4vw, 24px); color: var(--edge); }
+  #live.near > #liveN { color: #ff8a3c; }
+  #live.bump > #liveM { animation: bump 0.18s ease-out; }
+  @keyframes bump { from { transform: translate(-50%, -100%) scale(1.5); } to { transform: translate(-50%, -100%) scale(1); } }
+  #callouts { position: absolute; left: 0; right: 0; top: 28%; text-align: center; pointer-events: none; }
+  .callout { font-weight: 900; font-size: clamp(22px, 5vw, 40px); letter-spacing: 0.06em; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.7); animation: rise 1.5s ease-out forwards; }
+  .callout.bank { color: var(--edge); }
+  .callout.good { color: var(--cyan); }
+  .callout.lost { color: #ff5a5a; }
+  @keyframes rise { 0% { opacity: 0; transform: translateY(12px) scale(0.9); } 15% { opacity: 1; transform: none; } 70% { opacity: 1; } 100% { opacity: 0; transform: translateY(-24px); } }
+  #readout { position: absolute; right: max(12px, env(safe-area-inset-right)); top: max(10px, env(safe-area-inset-top)); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 14px; opacity: 0.85; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+  #readout .u { font-size: 10px; opacity: 0.6; margin: 0 8px 0 3px; text-transform: uppercase; }
+  #ground { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); font-size: 12px; opacity: 0.8; pointer-events: auto; }
+  #ground a { color: var(--cyan); text-decoration: none; }
+  #ground span { opacity: 0.6; }
+  #ground a, #ground span { margin-right: 10px; }
+  #restart { position: absolute; right: max(12px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 28px); width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,0.14); color: #fff; font-size: 24px; line-height: 44px; padding: 0; }
+
+  /* touch */
+  #touch { position: absolute; inset: 0; display: none; }
+  #touch.on { display: block; }
+  #touch .pad { position: absolute; bottom: max(14px, env(safe-area-inset-bottom)); display: flex; gap: 10px; }
+  #touch .pad.left { left: max(12px, env(safe-area-inset-left)); }
+  #touch .pad.right { right: max(12px, env(safe-area-inset-right)); }
+  #touch button { width: min(22vw, 120px); height: min(22vw, 120px); min-width: 72px; min-height: 72px; border-radius: 18px; border: 2px solid rgba(255,255,255,0.25); background: rgba(10, 14, 30, 0.45); color: #fff; font-weight: 800; font-size: 15px; letter-spacing: 0.08em; padding: 0; touch-action: none; -webkit-tap-highlight-color: transparent; }
+  #touch button span { font-size: 26px; pointer-events: none; }
+  #touch button[data-b="brake"] span, #touch button[data-b="hb"] span { font-size: 15px; }
+  #touch button[data-b="hb"] { border-color: rgba(25, 216, 255, 0.6); }
+  #touch button.down { background: rgba(25, 216, 255, 0.35); border-color: var(--cyan); }
+  @media (orientation: portrait) {
+    #touch button { width: min(22vw, 110px); height: min(26vw, 130px); }
+  }
+
+  /* tune and debug */
+  #tune { position: absolute; left: 0; right: 0; bottom: 0; max-height: 55%; display: flex; flex-direction: column; font-size: 12px; pointer-events: auto; }
+  #tuneBar { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.55); padding: 4px 8px; }
+  #tuneBar pre { margin: 0; white-space: pre-wrap; word-break: break-all; font-size: 11px; flex: 1; }
+  #tuneFold { border: 1px solid #888; background: #222; color: #fff; border-radius: 6px; padding: 4px 10px; }
+  #tuneBody { display: none; overflow: auto; background: rgba(0,0,0,0.75); padding: 6px 10px 90px; }
+  #tune.open #tuneBody { display: block; }
+  #tuneBody label { display: grid; grid-template-columns: 9em 1fr 4em; align-items: center; gap: 8px; padding: 2px 0; }
+  #tuneBody input[type=range] { width: 100%; }
+  #tuneBody .v { text-align: right; font-variant-numeric: tabular-nums; }
+  #tuneBody button { margin-top: 8px; border: 1px solid #888; background: #222; color: #fff; border-radius: 6px; padding: 6px 12px; }
+  #debug { position: absolute; left: max(12px, env(safe-area-inset-left)); top: calc(max(10px, env(safe-area-inset-top)) + 26px); margin: 0; font-size: 11px; background: rgba(0,0,0,0.5); padding: 4px 6px; border-radius: 4px; pointer-events: none; }
 </style>
+<script type="importmap">{ "imports": { "three": "./vendor/three.webgpu.min.js" } }</script>
 </head>
 <body>
-<h1>Drift Fever</h1>
-<p>The new CrazyGames edition is being built here. The first playable version, a driving feel prototype, replaces this page when it lands.</p>
-<p><a href="greybox/">The stage 2 greybox</a> · <a href="status/">Status</a></p>
+<canvas id="world"></canvas>
+<div id="ui"></div>
+<p id="fail" hidden></p>
+<script type="module" src="src/main.js"></script>
 </body>
 </html>
