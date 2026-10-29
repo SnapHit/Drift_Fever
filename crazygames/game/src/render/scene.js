@@ -200,7 +200,8 @@ export function createScene(canvas, opts) {
   const markAlpha = new Float32Array(LOOK.MARK_MAX * 6);
   markGeo.setAttribute('position', new THREE.BufferAttribute(markPos, 3));
   markGeo.setAttribute('alpha', new THREE.BufferAttribute(markAlpha, 1));
-  const markMat = new THREE.MeshBasicMaterial({ color: LOOK.MARK, transparent: true, opacity: 0.75, depthWrite: false });
+  // double sided: a quad's winding follows the direction of travel, and a car slides either way
+  const markMat = new THREE.MeshBasicMaterial({ color: LOOK.MARK, transparent: true, opacity: 0.75, depthWrite: false, side: THREE.DoubleSide });
   const marks = new THREE.Mesh(markGeo, markMat);
   marks.frustumCulled = false;
   marks.position.y = 0.02;

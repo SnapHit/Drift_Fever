@@ -1,0 +1,156 @@
+{
+ "started": "2026-10-29T09:38:32.266Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
+ "budgetMs": 16.7,
+ "runs": [
+  {
+   "throttle": 1,
+   "loadMs": 0,
+   "frames": 420,
+   "backend": "webgl2",
+   "tier": "low",
+   "frame": {
+    "n": 390,
+    "p50": 0.4,
+    "p95": 1.6,
+    "p99": 6.2,
+    "worst": 10,
+    "mean": 0.65
+   },
+   "jsWithoutSubmit": {
+    "n": 390,
+    "p50": 0.1,
+    "p95": 0.2,
+    "p99": 0.4,
+    "worst": 8,
+    "mean": 0.13
+   },
+   "physics": {
+    "n": 390,
+    "p50": 0,
+    "p95": 0.1,
+    "p99": 0.2,
+    "worst": 5.2,
+    "mean": 0.06
+   },
+   "submit": {
+    "n": 390,
+    "p50": 0.3,
+    "p95": 1.2,
+    "p99": 4.8,
+    "worst": 9.9,
+    "mean": 0.52
+   },
+   "stepsPerFrame": 2,
+   "firstFrames": {
+    "worst": 7.6
+   },
+   "errors": []
+  },
+  {
+   "throttle": 4,
+   "loadMs": 0,
+   "frames": 420,
+   "backend": "webgl2",
+   "tier": "low",
+   "frame": {
+    "n": 390,
+    "p50": 1.5,
+    "p95": 7.6,
+    "p99": 13.1,
+    "worst": 19.6,
+    "mean": 2.36
+   },
+   "jsWithoutSubmit": {
+    "n": 390,
+    "p50": 0.1,
+    "p95": 1.6,
+    "p99": 3.3,
+    "worst": 7.8,
+    "mean": 0.43
+   },
+   "physics": {
+    "n": 390,
+    "p50": 0,
+    "p95": 0.8,
+    "p99": 3.1,
+    "worst": 3.5,
+    "mean": 0.15
+   },
+   "submit": {
+    "n": 390,
+    "p50": 0.9,
+    "p95": 6.6,
+    "p99": 12.6,
+    "worst": 19.6,
+    "mean": 1.93
+   },
+   "stepsPerFrame": 2,
+   "firstFrames": {
+    "worst": 39
+   },
+   "errors": []
+  },
+  {
+   "throttle": 6,
+   "loadMs": 0,
+   "frames": 420,
+   "backend": "webgl2",
+   "tier": "low",
+   "frame": {
+    "n": 390,
+    "p50": 4.5,
+    "p95": 19.5,
+    "p99": 36.4,
+    "worst": 46.1,
+    "mean": 6.65
+   },
+   "jsWithoutSubmit": {
+    "n": 390,
+    "p50": 0.2,
+    "p95": 5.4,
+    "p99": 9.7,
+    "worst": 16.1,
+    "mean": 1.02
+   },
+   "physics": {
+    "n": 390,
+    "p50": 0.1,
+    "p95": 1.3,
+    "p99": 6,
+    "worst": 9.7,
+    "mean": 0.26
+   },
+   "submit": {
+    "n": 390,
+    "p50": 2.3,
+    "p95": 17.5,
+    "p99": 28.6,
+    "worst": 41.1,
+    "mean": 5.62
+   },
+   "stepsPerFrame": 2,
+   "firstFrames": {
+    "worst": 59.2
+   },
+   "errors": []
+  }
+ ],
+ "summary": {
+  "jsWithoutSubmitP95At6x": 5.4,
+  "jsWithoutSubmitWorstAt6x": 16.1,
+  "frameP95At6x": 19.5,
+  "frameWorstAt6x": 46.1,
+  "physicsP95At6x": 1.3,
+  "holdsBudgetAt6x": true
+ },
+ "knownAnswer": {
+  "loadMs": 20,
+  "atThrottle": 4,
+  "p95Before": 1.6,
+  "p95Loaded": 24.9,
+  "rise": 23.3,
+  "verdictFlipped": true,
+  "caught": true
+ }
+}

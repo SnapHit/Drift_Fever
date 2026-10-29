@@ -49,7 +49,8 @@ export function createChaseCamera() {
     const sx = Math.sin(state.shakeT * C.SHAKE_HZ * Math.PI * 2) * state.shake;
     const sy = Math.cos(state.shakeT * C.SHAKE_HZ * Math.PI * 2 * 0.77) * state.shake * 0.6;
     const lx = -Math.cos(state.yaw), lz = Math.sin(state.yaw);
-    state.tx = pose.x + fx * C.LOOK_AHEAD + lx * sx; state.ty = C.LOOK_UP + sy; state.tz = pose.z + fz * C.LOOK_AHEAD + lz * sx;
+    const look = C.LOOK_AHEAD * (state.portrait ? C.PORTRAIT_LOOK : 1);
+    state.tx = pose.x + fx * look + lx * sx; state.ty = C.LOOK_UP + sy; state.tz = pose.z + fz * look + lz * sx;
     state.fov = (state.portrait ? C.FOV_PORTRAIT : C.FOV) + C.FOV_SPEED * pose.speed;
     if (cam) {
       cam.position.set(state.px, state.py, state.pz);

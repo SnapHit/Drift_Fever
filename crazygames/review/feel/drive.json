@@ -1,5 +1,5 @@
 {
- "started": "2026-10-29T09:38:06.595Z",
+ "started": "2026-10-29T09:41:37.394Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "lap": {
   "lapped": true,

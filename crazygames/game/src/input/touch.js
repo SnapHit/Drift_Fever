@@ -25,6 +25,8 @@ export function createTouch(root, onActive, onRestart) {
   let shown = false;
   function show() { if (!shown) { shown = true; el.classList.add('on'); } }
   if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) show();
+  // a touch anywhere, on a device the media query did not call coarse, brings the buttons up
+  window.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') show(); }, { passive: true });
 
   function hitTest(x, y) {
     for (const name in buttons) {
@@ -41,8 +43,8 @@ export function createTouch(root, onActive, onRestart) {
   const area = el;
   area.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    show();
     const name = hitTest(e.clientX, e.clientY);
+    if (name === null && e.pointerType === 'mouse') return;     // a mouse on empty ground is not a touch
     pointers.set(e.pointerId, name);
     try { area.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
     recount(); onActive();

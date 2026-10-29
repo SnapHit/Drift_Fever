@@ -74,7 +74,8 @@ export const TUNE = {
     FOV_PORTRAIT:       78,      // and in portrait
     FOV_SPEED:          0.35,    // degrees per m/s
     PORTRAIT_DISTANCE:  1.05,    // multiplier on the distance in portrait
-    PORTRAIT_HEIGHT:    1.10,    // and on the height
+    PORTRAIT_HEIGHT:    1.25,    // and on the height
+    PORTRAIT_LOOK:      1.30,    // and on the look ahead
     SHAKE:              0.06,    // m of look target shake per m/s of impact
     SHAKE_MAX:          0.9,     // m
     SHAKE_DECAY:        6.0,     // per second

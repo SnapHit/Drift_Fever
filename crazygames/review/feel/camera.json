@@ -1,5 +1,5 @@
 {
- "started": "2026-10-29T09:38:06.595Z",
+ "started": "2026-10-29T09:41:37.394Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "viewports": {
   "1280x720": {
@@ -56,42 +56,42 @@
    "lap": {
     "frames": 3235,
     "offScreenFrames": 0,
-    "worstExcess": -0.5811,
+    "worstExcess": -0.5105,
     "worstFrame": 0,
     "worstCorner": {
      "f": -2.2,
      "l": -0.92,
      "y": 0,
-     "ndcX": 0.32788547783023714,
-     "ndcY": -0.41891628591833235
+     "ndcX": 0.3212234425440934,
+     "ndcY": -0.489479642213361
     },
     "hits": 0
    },
    "drift": {
     "frames": 3088,
     "offScreenFrames": 0,
-    "worstExcess": -0.4983,
-    "worstFrame": 56,
+    "worstExcess": -0.5059,
+    "worstFrame": 55,
     "worstCorner": {
      "f": -2.2,
      "l": 0.92,
      "y": 1.45,
-     "ndcX": -0.5016784438635623,
-     "ndcY": -0.10735284574039777
+     "ndcX": -0.49406715740651713,
+     "ndcY": -0.1632614286902477
     },
     "hits": 0
    },
    "hit": {
     "frames": 600,
     "offScreenFrames": 0,
-    "worstExcess": -0.2841,
+    "worstExcess": -0.2964,
     "worstFrame": 91,
     "worstCorner": {
      "f": -2.2,
      "l": 0.92,
      "y": 1.45,
-     "ndcX": -0.7159055494002107,
-     "ndcY": -0.10406158277681915
+     "ndcX": -0.7035685709922093,
+     "ndcY": -0.1689362705677733
     },
     "hits": 2
    },
