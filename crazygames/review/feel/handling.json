@@ -1,36 +1,59 @@
 {
+ "gripAndBuild": [
+  {
+   "kmh": 43,
+   "gripRadiusM": 10.6,
+   "gripMaxSlideDeg": 3.3,
+   "driftTo30s": 0.75,
+   "driftPeakDegPerS": 87
+  },
+  {
+   "kmh": 72,
+   "gripRadiusM": 17.3,
+   "gripMaxSlideDeg": 2.8,
+   "driftTo30s": 0.72,
+   "driftPeakDegPerS": 61
+  },
+  {
+   "kmh": 101,
+   "gripRadiusM": 32.4,
+   "gripMaxSlideDeg": 10,
+   "driftTo30s": 0.71,
+   "driftPeakDegPerS": 58
+  }
+ ],
  "pace": {
-  "zeroTo100s": 3.42,
-  "kmhAfter5s": 124.9,
+  "zeroTo100s": 3.37,
+  "kmhAfter5s": 125.5,
   "topKmh": 168
  },
  "parkArc": [
   {
    "secondsBeforeDrift": 2,
-   "kmhAtTurn": 67,
-   "slowestKmhInDrift": 56,
-   "turnedDeg": 248,
-   "radiusM": 16.6,
-   "closestToBarrierM": 23.8,
+   "kmhAtTurn": 69,
+   "slowestKmhInDrift": 52,
+   "turnedDeg": 255,
+   "radiusM": 16.4,
+   "closestToBarrierM": 21.6,
    "wallHits": 0
   },
   {
    "secondsBeforeDrift": 2.6,
-   "kmhAtTurn": 83,
-   "slowestKmhInDrift": 64,
-   "turnedDeg": 241,
-   "radiusM": 19.2,
-   "closestToBarrierM": 7.8,
+   "kmhAtTurn": 84,
+   "slowestKmhInDrift": 58,
+   "turnedDeg": 249,
+   "radiusM": 18.7,
+   "closestToBarrierM": 4.8,
    "wallHits": 0
   },
   {
    "secondsBeforeDrift": 3.2,
-   "kmhAtTurn": 96,
-   "slowestKmhInDrift": 4,
-   "turnedDeg": 113,
-   "radiusM": 16.3,
-   "closestToBarrierM": 1.9,
-   "wallHits": 2
+   "kmhAtTurn": 97,
+   "slowestKmhInDrift": 0,
+   "turnedDeg": 247,
+   "radiusM": 4.5,
+   "closestToBarrierM": 2.6,
+   "wallHits": 1
   }
  ],
  "driftBrake": {
@@ -44,84 +67,84 @@
    {
     "name": "hold steer",
     "v0": 15,
-    "maxSlip": 4.6,
+    "maxSlip": 2.7,
     "endSlip": 0,
     "spin": false
    },
    {
     "name": "handbrake tap, steer held",
     "v0": 15,
-    "maxSlip": 46,
+    "maxSlip": 46.9,
     "endSlip": 0,
     "spin": false
    },
    {
     "name": "handbrake held with steer",
     "v0": 15,
-    "maxSlip": 47.4,
+    "maxSlip": 47.5,
     "endSlip": 0,
     "spin": false
    },
    {
     "name": "flick left then right",
     "v0": 15,
-    "maxSlip": 46,
+    "maxSlip": 12.4,
     "endSlip": 0,
     "spin": false
    },
    {
     "name": "hold steer",
     "v0": 25,
-    "maxSlip": 9.1,
+    "maxSlip": 6.1,
     "endSlip": 0,
     "spin": false
    },
    {
     "name": "handbrake tap, steer held",
     "v0": 25,
-    "maxSlip": 46.6,
-    "endSlip": 0,
-    "spin": false
-   },
-   {
-    "name": "handbrake held with steer",
-    "v0": 25,
-    "maxSlip": 48.2,
-    "endSlip": 0,
-    "spin": false
-   },
-   {
-    "name": "flick left then right",
-    "v0": 25,
-    "maxSlip": 46.2,
-    "endSlip": 0,
-    "spin": false
-   },
-   {
-    "name": "hold steer",
-    "v0": 35,
-    "maxSlip": 46.5,
-    "endSlip": 0,
-    "spin": false
-   },
-   {
-    "name": "handbrake tap, steer held",
-    "v0": 35,
     "maxSlip": 47.3,
     "endSlip": 0,
     "spin": false
    },
    {
     "name": "handbrake held with steer",
+    "v0": 25,
+    "maxSlip": 48.1,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "flick left then right",
+    "v0": 25,
+    "maxSlip": 47.2,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "hold steer",
     "v0": 35,
-    "maxSlip": 48.8,
+    "maxSlip": 47.7,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake tap, steer held",
+    "v0": 35,
+    "maxSlip": 47.8,
+    "endSlip": 0,
+    "spin": false
+   },
+   {
+    "name": "handbrake held with steer",
+    "v0": 35,
+    "maxSlip": 48.6,
     "endSlip": 0,
     "spin": false
    },
    {
     "name": "flick left then right",
     "v0": 35,
-    "maxSlip": 46.5,
+    "maxSlip": 47.1,
     "endSlip": 0,
     "spin": false
    }
@@ -130,25 +153,25 @@
  "stuck": [
   {
    "mode": "throttle",
-   "escapedAfterS": 1.38,
+   "escapedAfterS": 1.35,
    "stuck": false
   },
   {
    "mode": "reverse",
-   "escapedAfterS": 1.08,
+   "escapedAfterS": 0.96,
    "stuck": false
   }
  ],
- "knownAnswerAssistOff": {
-  "spins": 4
+ "knownAnswerFirstPrototype": {
+  "spins": 8
  },
  "knownAnswerOldDrift": {
   "secondsBeforeDrift": 2.6,
-  "kmhAtTurn": 83,
+  "kmhAtTurn": 84,
   "slowestKmhInDrift": 4,
-  "turnedDeg": 125,
-  "radiusM": 19.7,
-  "closestToBarrierM": 1.9,
+  "turnedDeg": 165,
+  "radiusM": 14.3,
+  "closestToBarrierM": 1.2,
   "wallHits": 2
  },
  "knownAnswerNoRecovery": {

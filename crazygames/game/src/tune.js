@@ -23,23 +23,26 @@ export const TUNE = {
     ACCEL:              12,      // m/s^2, drive at a standstill (was 8.5: 0 to 100 km/h took 7.2 s)
     TOP_SPEED:          62,      // m/s, where the drive force reaches zero (223 km/h; was 48)
     TRACTION:           1.6,     // drive grip as a multiple of the rear's lateral grip, so a launch hooks up instead of spinning
+    TURN_LIFT:          0.85,    // share of the drive eased off at full steer on grip, so a held turn holds its speed
+    TURN_LIFT_FROM:     10,      // m/s, above this
     REVERSE_SPEED:      12,      // m/s
     REVERSE_ACCEL:      7,       // m/s^2
     DRAG:               0.0012,  // per metre: drag deceleration is DRAG * v^2
     ROLL:               0.35,    // m/s^2, rolling resistance
     BRAKE:              16,      // m/s^2, full brake
     BRAKE_FRONT_SHARE:  0.65,    // share of the brake on the front axle
-    MU_FRONT:           1.20,    // peak tyre grip, front axle (as a multiple of the axle load)
-    MU_REAR:            1.15,    // and rear
+    MU_FRONT:           1.80,    // arcade grip: about 1.5 g in a turn (was 1.2, about 1 g)    // peak tyre grip, front axle (as a multiple of the axle load)
+    MU_REAR:            2.10,    // more than the front, so a hard grip turn grips instead of stepping out    // and rear
     PEAK_ANGLE_FRONT:   9,       // degrees of slip where the front tyre peaks
     PEAK_ANGLE_REAR:    8,       // and the rear
     TAIL_FRONT:         0.85,    // grip left at a full slide, as a share of the peak
-    TAIL_REAR:          0.78,
+    TAIL_REAR:          0.85,
     TAIL_FALL:          0.9,     // how quickly grip falls past the peak (per unit of excess slip)
     SPIN_GRIP:          0.85,    // lateral grip left when the rear is spinning under power
     SPIN_DRIVE:         0.85,    // drive force delivered when the rear is spinning
-    HANDBRAKE_GRIP:     0.45,    // rear grip while the handbrake is on, as a share
+    HANDBRAKE_GRIP:     0.25,    // rear grip while the handbrake is on, as a share
     HANDBRAKE_DECEL:    9.0,     // m/s^2 of braking from the locked rear
+    HANDBRAKE_ENGAGE:   0.25,    // s for the handbrake to take the rear's grip, so the tail steps out gradually
     HANDBRAKE_RELEASE:  0.25,    // s for the rear to find grip again after release
     LOCK:               32,      // degrees of steering lock at a standstill
     LOCK_AT_SPEED:      12,      // degrees at LOCK_SPEED and above, for the driver's input
@@ -58,6 +61,8 @@ export const TUNE = {
     COUNTERSTEER_LOCK:  40,      // degrees the assist may steer to, beyond the driver's lock
     SPIN_ANGLE:         40,      // degrees of slip where the spin guard starts
     SPIN_GAIN:          5.0,     // extra countersteer per radian past that
+    SLIDE_FROM:         10,      // degrees of slide where the spin control and yaw damping start
+    SLIDE_FULL:         25,      // and where they are fully on
     YAW_SOFT:           0.8,     // rad/s of yaw where the spin control starts
     YAW_MAX:            1.6,     // and where steering in is gone and the throttle fully eased
     THROTTLE_EASE:      0.9,     // share of the throttle the spin control lifts by YAW_MAX
@@ -80,6 +85,8 @@ export const TUNE = {
     DRIFT_ANGLE:        30,      // degrees held by the handbrake, and the base of the steered angle
     DRIFT_RANGE:        16,      // more degrees with full steer into the slide
     DRIFT_LIFT:         0.5,     // share of the angle kept with the throttle off
+    DRIFT_EASE_IN:      50,      // degrees a second the held drift angle may grow, so a drift builds instead of snapping in
+    DRIFT_EASE_OUT:     120,     // and shrink
     DRIFT_HOLD:         40,      // rad/s of yaw rate per radian of angle error, per second
     DRIFT_DAMP:         8,       // yaw rate per unit of slide angle rate, against quick changes
     /* A drift turns and slows the car, so DRIFT through a corner carves
@@ -87,6 +94,7 @@ export const TUNE = {
        towards where the car points at DRIFT_CARVE rad/s per radian of
        slide, and the slide scrubs speed at DRIFT_SCRUB m/s^2 (at 45
        degrees) down to DRIFT_CRUISE, where it holds. */
+    DRIFT_GRIP:         0.35,    // share of the rear's grip it keeps for as long as a drift lasts
     DRIFT_CARVE:        0.9,     // rad/s of path turn per radian of slide angle
     DRIFT_SCRUB:        9,       // m/s^2 of slowing at a 45 degree slide
     DRIFT_CRUISE:       20,      // m/s, the speed a drift settles to (54 km/h)
@@ -141,8 +149,8 @@ export const TUNE = {
 export const PANEL = [
   ['VEHICLE.ACCEL',          'accel m/s2',        3,   16,  0.5],
   ['VEHICLE.TOP_SPEED',      'top speed m/s',    25,   70,  1],
-  ['VEHICLE.MU_FRONT',       'grip front',      0.6,  1.8,  0.05],
-  ['VEHICLE.MU_REAR',        'grip rear',       0.6,  1.8,  0.05],
+  ['VEHICLE.MU_FRONT',       'grip front',      0.6,  2.5,  0.05],
+  ['VEHICLE.MU_REAR',        'grip rear',       0.6,  2.5,  0.05],
   ['VEHICLE.TAIL_REAR',      'rear slide grip', 0.4,  1.0,  0.02],
   ['VEHICLE.TAIL_FRONT',     'front slide grip',0.4,  1.0,  0.02],
   ['VEHICLE.PEAK_ANGLE_REAR','rear peak deg',     4,   16,  0.5],
@@ -156,6 +164,7 @@ export const PANEL = [
   ['VEHICLE.CG_TO_FRONT',    'cg to front m',   0.9,  1.6,  0.05],
   ['VEHICLE.BRAKE',          'brake m/s2',        6,   24,  1],
   ['VEHICLE.TRACTION',       'launch traction', 1.0,  2.5,  0.1],
+  ['VEHICLE.TURN_LIFT',      'turn eases drive',  0,    1,  0.05],
   ['VEHICLE.WALL_SPIN',      'wall spin',         0,    1,  0.05],
   ['ASSIST.LEVEL',           'assist level',      0,    1,  0.05],
   ['ASSIST.COUNTERSTEER',    'countersteer',      0,    2,  0.05],
@@ -167,8 +176,11 @@ export const PANEL = [
   ['ASSIST.ANGLE_LIMIT',     'max angle deg',    30,   90,  1],
   ['ASSIST.DRIFT_ANGLE',     'drift angle deg',  15,   50,  1],
   ['ASSIST.DRIFT_RANGE',     'drift steer range', 0,   35,  1],
-  ['ASSIST.DRIFT_HOLD',      'drift hold',        0,   15,  0.5],
+  ['ASSIST.DRIFT_HOLD',      'drift hold',        0,   60,  1],
+  ['ASSIST.DRIFT_EASE_IN',   'drift ease in deg/s', 20, 200, 5],
+  ['VEHICLE.HANDBRAKE_ENGAGE','drift engage s',   0,  0.6, 0.05],
   ['ASSIST.DRIFT_CARVE',     'drift carve',       0,    3,  0.1],
+  ['ASSIST.DRIFT_GRIP',      'drift rear grip',   0.2,  1,  0.05],
   ['ASSIST.DRIFT_SCRUB',     'drift slows m/s2',  0,   20,  0.5],
   ['ASSIST.DRIFT_CRUISE',    'drift speed m/s',   6,   30,  1],
   ['VEHICLE.HANDBRAKE_DECEL','drift brake m/s2',  2,   16,  0.5],

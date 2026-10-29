@@ -362,3 +362,43 @@ in a hairpin. The scripted drifter holds over 30 degrees for 1.9 s
 through hairpin 2 (the whole corner) at a mean 42.2 degrees and 53 km/h,
 lapping without touching a wall; without its handbrake it holds 0 s
 (caught). All other probes rerun and pass; JavaScript p95 3.4 ms at 6x.
+
+---
+
+## After play, 29 October 2026 (third round): turning on grip, easing into a drift
+
+The author: turning without drifting does not turn enough, and the drift
+snaps in instead of easing in. `handling.json`, `gripAndBuild`:
+
+| from | grip turn radius, full steer | most slide | drift to 30 degrees | fastest slide growth |
+|---|---|---|---|---|
+| 43 km/h | 50 m before, now 10.6 m | 3 degrees | 0.33 s before, now 0.75 s | 116 deg/s before, now 87 |
+| 72 km/h | 77 m before, now 17.3 m | 3 | 0.72 s | 61 |
+| 101 km/h | 100 m before, now 32.4 m | 10 | 0.71 s | 58 |
+
+What changed:
+- **Arcade grip:** about 1.5 g in a turn instead of 1 g (`MU_FRONT` 1.8,
+  `MU_REAR` 2.1, the rear the grippier so a hard grip turn grips instead
+  of stepping out).
+- **A held turn holds its speed:** the self-driving throttle eases off by
+  `TURN_LIFT` (85 per cent at full steer) on grip; before, the car
+  gathered speed through every turn and ran wide.
+- **The spin control only acts on a slide:** it cut the steering whenever
+  the car turned quickly, grip turns included. It now fades in between
+  10 and 25 degrees of slide (`SLIDE_FROM`, `SLIDE_FULL`).
+- **The drift eases in:** the handbrake takes the rear's grip over 0.25 s
+  (`HANDBRAKE_ENGAGE`), and the angle the drift holds grows at no more
+  than 50 degrees a second (`DRIFT_EASE_IN`).
+- **A drift keeps its speed:** the rear keeps 35 per cent of its grip for
+  the whole drift (`DRIFT_GRIP`), not only while DRIFT is held; with full
+  grip back at 40 degrees of slide it scrubbed to walking pace. A held
+  drift now sits near 46 degrees at 43 to 70 km/h.
+
+Known answers: the first prototype's tune spins 8 of 12 patterns (the
+previous known answer, assist off, no longer spins with this much grip,
+so it was replaced); with recovery off the car stays stuck; the previous
+drift hits the car park barrier. The scripted drifter now steers by the
+angle from its direction of travel to its target, as a drift follows its
+path and not its nose, and drifts through hairpin 2 for 2.23 s over 30
+degrees at a mean 43 degrees and 61 km/h with no contact. All probes
+pass; JavaScript p95 3.3 ms at 6x.

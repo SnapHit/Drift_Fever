@@ -30,6 +30,8 @@ export function createVehicle(x, z, yaw) {
     hb: 0,                // handbrake state, 1 locked, easing back to 0
     drifting: 0,          // 1 while the drift controller holds the slide
     prevBeta: 0,          // last step's slide angle, for the damping
+    driftTarget: 0,       // the angle the drift controller is holding, easing towards the asked one, degrees
+    hbGrip: 0,            // how far the handbrake has taken the rear's grip, 0 to 1, easing in
     speed: 0, vx: 0, vy: 0,
     slip: 0,              // body slip angle, rad, positive when the car points right of its travel
     alphaF: 0, alphaR: 0, // axle slip angles
@@ -92,14 +94,20 @@ export function stepVehicle(s, input, dt) {
        never touched. beta > 0 means the car points right of its travel, a
        right hand slide, and steering right (input > 0) deepens it. */
     const absR = Math.abs(s.r);
-    if (absR > A.YAW_SOFT) {
-      const over = Math.min(1, (absR - A.YAW_SOFT) / (A.YAW_MAX - A.YAW_SOFT)) * A.LEVEL;
+    /* Only a sliding car can spin: in a grip turn the yaw rate is high
+       because the car is turning, and cutting the steering there (as this
+       did until 29 October 2026) left full lock at 43 km/h circling on a
+       50 m radius. The spin control now fades in between SLIDE_FROM and
+       SLIDE_FULL degrees of slide. */
+    const sliding = smooth01((Math.abs(beta) / DEG - A.SLIDE_FROM) / (A.SLIDE_FULL - A.SLIDE_FROM));
+    if (absR > A.YAW_SOFT && sliding > 0) {
+      const over = Math.min(1, (absR - A.YAW_SOFT) / (A.YAW_MAX - A.YAW_SOFT)) * A.LEVEL * sliding;
       if (steerIn * beta > 0) steerIn *= 1 - over;
       throttleIn *= 1 - over * A.THROTTLE_EASE;
     }
     /* In a drift the drift controller owns the angle, so the countersteer
        assist steps back and only the yaw damping stays. */
-    assist = ((s.drifting ? 0 : A.COUNTERSTEER * beta) - A.YAW_DAMP * s.r) * A.LEVEL;
+    assist = ((s.drifting ? 0 : A.COUNTERSTEER * beta) - A.YAW_DAMP * s.r * sliding) * A.LEVEL;
     const guard = A.SPIN_ANGLE * DEG;
     if (beta > guard) assist += A.SPIN_GAIN * (beta - guard) * A.LEVEL;
     else if (beta < -guard) assist += A.SPIN_GAIN * (beta + guard) * A.LEVEL;
@@ -124,7 +132,11 @@ export function stepVehicle(s, input, dt) {
   /* ---- longitudinal demands ---- */
   const throttle = throttleIn, brake = input.brake;
   let driveR = 0;
-  if (throttle > 0) driveR = throttle * m * V.ACCEL * Math.max(0, 1 - Math.max(0, vx) / V.TOP_SPEED) * (1 - s.hb * (input.steer === 0 ? 1 : 0.5));
+  /* Steering on grip eases the drive: the car drives itself, and a held
+     turn should hold its speed, not gather it and run wide. TURN_LIFT of
+     the drive goes at full steer, above TURN_LIFT_FROM; a drift keeps it. */
+  const turnLift = s.drifting ? 0 : V.TURN_LIFT * Math.abs(input.steer) * smooth01((vx - V.TURN_LIFT_FROM) / 4);
+  if (throttle > 0) driveR = throttle * m * V.ACCEL * Math.max(0, 1 - Math.max(0, vx) / V.TOP_SPEED) * (1 - s.hb * (input.steer === 0 ? 1 : 0.5)) * (1 - turnLift);
   else if (vx <= 0.3 && brake > 0 && throttle === 0) driveR = -brake * m * V.REVERSE_ACCEL * Math.max(0, 1 - Math.max(0, -vx) / V.REVERSE_SPEED);
   /* The brake acts against forward travel only. Rolling backwards, the
      brake input is the reverse gear and the throttle is the brake. This
@@ -151,7 +163,15 @@ export function stepVehicle(s, input, dt) {
   s.alphaF = alphaF;
 
   /* ---- the rear axle: drive, brake, handbrake, wheelspin ---- */
-  const muR = V.MU_REAR * (1 + (V.HANDBRAKE_GRIP - 1) * s.hb);
+  /* the handbrake takes the rear's grip over HANDBRAKE_ENGAGE seconds,
+     not at once, so the tail steps out instead of snapping out */
+  s.hbGrip = input.handbrake > 0 ? (V.HANDBRAKE_ENGAGE > 0 ? Math.min(1, s.hbGrip + dt / V.HANDBRAKE_ENGAGE) : 1) : s.hb;
+  /* In a drift the rear keeps DRIFT_GRIP of its grip after DRIFT is
+     released: with full grip back while sliding at 40 degrees it scrubbed
+     the car down to walking pace in a couple of seconds. */
+  const hbShare = Math.min(s.hb, s.hbGrip);
+  const driftShare = s.drifting && A.LEVEL > 0 ? 1 - (1 - A.DRIFT_GRIP) * A.LEVEL : 1;
+  const muR = V.MU_REAR * Math.min(1 + (V.HANDBRAKE_GRIP - 1) * hbShare, driftShare);
   const capR = muR * loadR;
   let FxR = driveR + brakeR;
   let spinning = 0;
@@ -202,6 +222,7 @@ export function stepVehicle(s, input, dt) {
        at speed: tap DRIFT and the tail kicks out to the drift angle */
     if (!s.drifting && (absB > A.DRIFT_ENTER * DEG || (s.hb > 0.5 && vx > A.DRIFT_MIN_SPEED && input.steer !== 0))) s.drifting = 1;
     else if (s.drifting && absB < A.DRIFT_EXIT * DEG && s.hb === 0) s.drifting = 0;
+    if (!s.drifting) s.driftTarget = 0;
     if (s.drifting) {
       /* the angle the driver is asking for: steering into the slide
          (the same sign as beta, see the spin control) opens it, out of
@@ -214,6 +235,13 @@ export function stepVehicle(s, input, dt) {
       let target = into > 0 ? (A.DRIFT_ANGLE + A.DRIFT_RANGE * into) * Math.min(1, into * 2) : 0;
       target *= A.DRIFT_LIFT + (1 - A.DRIFT_LIFT) * input.throttle;
       if (s.hb > 0 && input.steer !== 0) target = Math.max(target, A.DRIFT_ANGLE);
+      /* Ease in: the angle the controller holds rises towards the one
+         asked for at DRIFT_EASE_IN degrees a second, so a drift builds
+         instead of snapping in; it falls at DRIFT_EASE_OUT. */
+      const want = target;
+      if (want > s.driftTarget) s.driftTarget = Math.min(want, Math.max(s.driftTarget, absB / DEG) + A.DRIFT_EASE_IN * dt);
+      else s.driftTarget = Math.max(want, s.driftTarget - A.DRIFT_EASE_OUT * dt);
+      target = s.driftTarget;
       // beta > 0 opens with a right turn (-r)
       s.r -= dirUse * A.DRIFT_HOLD * (target * DEG - absB * (dirUse === dir ? 1 : -1)) * dt * A.LEVEL;
       /* +r always closes the slide angle, whichever way it points, so the

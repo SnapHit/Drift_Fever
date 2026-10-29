@@ -1,33 +1,33 @@
 {
- "started": "2026-10-29T10:38:13.567Z",
+ "started": "2026-10-29T11:02:46.242Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "lap": {
   "lapped": true,
-  "frames": 3046,
-  "seconds": 50.8,
-  "maxAbsLateral": 1.34,
+  "frames": 2995,
+  "seconds": 49.9,
+  "maxAbsLateral": 2.16,
   "halfWidth": 7,
   "wallContacts": 0,
   "hardHits": 0,
   "respawns": 0,
-  "topKmh": 111
+  "topKmh": 110
  },
  "drift": {
   "lapped": true,
   "holdAbove30": {
-   "seconds": 1.9,
-   "meanAngle": 42.2,
-   "meanKmh": 53
+   "seconds": 2.23,
+   "meanAngle": 43,
+   "meanKmh": 61
   },
   "wallContacts": 0,
   "hardHits": 0,
-  "maxAbsLateral": 4.77,
+  "maxAbsLateral": 3.86,
   "section": "hairpin2",
   "range": [
    476,
    528
   ],
-  "maxAngle": 45.2
+  "maxAngle": 46.9
  },
  "knownAnswerInverted": {
   "lapped": false,

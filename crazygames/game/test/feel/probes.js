@@ -11,10 +11,11 @@
       same hash; one perturbed step gives a different hash.
    2. Drive: the scripted driver laps the test track inside the walls
       without touching them; the drift script holds more than 30 degrees
-      for more than 1.5 s through hairpin 2 (moved from the sweeper on 29
-      October 2026: a drift now carves and slows the car, so a held 30
-      degree slide turns tighter than the long fast sweeper; it belongs in
-      a hairpin). Known answers: the
+      cleanly through hairpin 2: over 30 degrees for at least 1.5 s with
+      no wall contact. Changed on 29 October 2026 from 2 s through the
+      sweeper: a drift now carves and slows the car, so it turns tighter
+      than the long fast sweeper; it belongs in a hairpin. Holding a drift
+      for longer is also measured in handling.js (DRIFT and steer held). Known answers: the
       driver with its steering inverted, and the drift script without its
       handbrake.
    3. Camera: every frame of those drives keeps the whole car on screen in
@@ -138,7 +139,7 @@ if (run('drive') || run('camera')) {
         drift: { lapped: dr.lapped, holdAbove30: hold, wallContacts: drLast.hits, hardHits: drLast.hard, maxAbsLateral: +Math.max(...dr.frames.map(f => Math.abs(f.lat))).toFixed(2), section: 'hairpin2', range: sections.hairpin2, maxAngle: +Math.max(...dr.frames.map(f => f.angle)).toFixed(1) } };
       verdict('driver laps the test track', lap.lapped, out.drive.lap.seconds + ' s');
       verdict('driver stays inside the walls, never touching', maxLat < hw && last.hits === 0 && out.drive.lap.respawns === 0, 'max |lateral| ' + maxLat.toFixed(2) + ' of ' + hw + ' m, contacts ' + last.hits + ', respawns ' + out.drive.lap.respawns);
-      verdict('drift script holds above 30 degrees for at least 1.5 s through hairpin 2', hold.seconds >= 1.5, hold.seconds + ' s at a mean ' + hold.meanAngle + ' degrees, ' + hold.meanKmh + ' km/h');
+      verdict('drift script drifts cleanly through hairpin 2: over 30 degrees for at least 1.5 s, no wall contact', hold.seconds >= 1.5 && drLast.hits === 0, hold.seconds + ' s at a mean ' + hold.meanAngle + ' degrees, ' + hold.meanKmh + ' km/h');
       // known answers
       const inv = await drive(side.page, { invert: -1 }, 5400);
       const invLast = inv.frames[inv.frames.length - 1];

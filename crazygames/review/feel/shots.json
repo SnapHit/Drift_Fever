@@ -21,6 +21,6 @@
   "viewport": "390x844",
   "ground": "park"
  },
- "started": "2026-10-29T10:38:13.567Z",
+ "started": "2026-10-29T11:02:46.242Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here"
 }

@@ -1,10 +1,10 @@
 {
- "started": "2026-10-29T10:38:13.567Z",
+ "started": "2026-10-29T11:02:46.242Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "viewports": {
   "1280x720": {
    "lap": {
-    "frames": 3046,
+    "frames": 2995,
     "offScreenFrames": 0,
     "worstExcess": -0.426,
     "worstFrame": 0,
@@ -18,7 +18,7 @@
     "hits": 0
    },
    "drift": {
-    "frames": 2836,
+    "frames": 2797,
     "offScreenFrames": 0,
     "worstExcess": -0.426,
     "worstFrame": 0,
@@ -34,16 +34,16 @@
    "hit": {
     "frames": 600,
     "offScreenFrames": 0,
-    "worstExcess": -0.397,
-    "worstFrame": 226,
+    "worstExcess": -0.3707,
+    "worstFrame": 376,
     "worstCorner": {
      "f": -2.2,
      "l": -0.92,
      "y": 0,
-     "ndcX": 0.0007655091520799694,
-     "ndcY": -0.6030423035388989
+     "ndcX": 0.09305926259304978,
+     "ndcY": -0.6292849260966913
     },
-    "hits": 16
+    "hits": 10
    },
    "knownAnswerLookUp": {
     "frames": 900,
@@ -54,7 +54,7 @@
   },
   "390x844": {
    "lap": {
-    "frames": 3046,
+    "frames": 2995,
     "offScreenFrames": 0,
     "worstExcess": -0.5105,
     "worstFrame": 0,
@@ -68,32 +68,32 @@
     "hits": 0
    },
    "drift": {
-    "frames": 2836,
+    "frames": 2797,
     "offScreenFrames": 0,
-    "worstExcess": -0.407,
-    "worstFrame": 96,
+    "worstExcess": -0.4248,
+    "worstFrame": 95,
     "worstCorner": {
      "f": -2.2,
      "l": -0.92,
      "y": 1.45,
-     "ndcX": 0.5930006234050096,
-     "ndcY": -0.1538929188297355
+     "ndcX": 0.5751637065388708,
+     "ndcY": -0.1455245916626554
     },
     "hits": 0
    },
    "hit": {
     "frames": 600,
     "offScreenFrames": 0,
-    "worstExcess": -0.3846,
-    "worstFrame": 224,
+    "worstExcess": -0.4285,
+    "worstFrame": 316,
     "worstCorner": {
      "f": -2.2,
-     "l": 0.92,
+     "l": -0.92,
      "y": 1.45,
-     "ndcX": -0.6153716922774798,
-     "ndcY": -0.2202855258930768
+     "ndcX": 0.5714797151767527,
+     "ndcY": -0.1956243059456927
     },
-    "hits": 16
+    "hits": 10
    },
    "knownAnswerLookUp": {
     "frames": 900,

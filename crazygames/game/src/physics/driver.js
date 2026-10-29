@@ -15,15 +15,16 @@ export const DRIVER = {
   PLAN_MIN:     14,      // m, at least
   VMAX:         36,      // m/s
   BRAKE_MARGIN: 1.5,     // m/s over the target before braking
-  DRIFT_HB:     0.5,     // s of handbrake at the entry of a drift section
+  DRIFT_HB:     0.4,     // s of handbrake at the entry of a drift section
+  DRIFT_LEAD:   6,      // m before the section the drift starts: a drift takes about 0.75 s to build
   DRIFT_LOOK:   0.35,    // look ahead gain while drifting (shorter: aims at the apex)
-  DRIFT_ENTRY_SPEED: 18, // m/s wanted at the entry of a drift section
+  DRIFT_ENTRY_SPEED: 20, // m/s wanted at the entry of a drift section
   DRIFT_WIDE:   2.0,     // m outside the centre before the driver lifts
   DRIFT_LIFT:   0.20,    // throttle left per metre further out
   DRIFT_MIN_THROTTLE: 0.35,
-  DRIFT_STEER_BASE: 0.6,  // steer into the turn while drifting
-  DRIFT_STEER_GAIN: 0.35,  // more per metre towards the outside
-  DRIFT_STEER_MIN:  0,
+  DRIFT_STEER_BASE: 0.7,  // steer into the turn while drifting
+  DRIFT_STEER_GAIN: 3,  // more per metre towards the outside
+  DRIFT_STEER_MIN:  0.3,
 };
 
 export function createDriver(ground, opts) {
@@ -47,7 +48,7 @@ export function createDriver(ground, opts) {
       let drifting = false;
       if (sec) {
         const s = world.along;
-        const inside = s >= sec[0] && s <= sec[1];
+        const inside = s >= sec[0] - D.DRIFT_LEAD && s <= sec[1];
         if (inside && !inSection) hbUntil = world.time + D.DRIFT_HB;
         inSection = inside;
         drifting = inside;
@@ -83,8 +84,18 @@ export function createDriver(ground, opts) {
            points into the corner (vehicle.js): steering out of the slide
            ends the drift, so a drifting driver steers into the turn, more
            when running wide, less when tight. */
-        const into = Math.min(1, Math.max(D.DRIFT_STEER_MIN, D.DRIFT_STEER_BASE + outside * D.DRIFT_STEER_GAIN));
-        steer = -turn[world.centreIndex] * into * o.invert;
+        /* In a drift the path follows the direction of travel, not the
+           nose, so the driver steers by the angle from the velocity to its
+           target: more into the turn when the path must bend more, out of
+           it (which ends the drift) when the corner is done. diff > 0 is a
+           target to the left, which wants steer < 0. */
+        const psiV = Math.atan2(-car.wvx, -car.wvz), psiT = Math.atan2(-dx, -dz);
+        let diff = psiT - psiV; while (diff > Math.PI) diff -= 2 * Math.PI; while (diff < -Math.PI) diff += 2 * Math.PI;
+        let ds = -diff * D.DRIFT_STEER_GAIN;
+        const intoSign = -turn[world.centreIndex];
+        if (ds * intoSign > 0 && Math.abs(ds) < D.DRIFT_STEER_MIN) ds = intoSign * D.DRIFT_STEER_MIN;
+        steer = Math.max(-1, Math.min(1, ds)) * o.invert;
+        void outside;
         if (world.time < hbUntil) { handbrake = 1; steer = -turn[world.centreIndex] * o.invert || (steer > 0 ? 1 : -1); throttle = 1; }
       }
       out.steer = steer; out.throttle = throttle; out.brake = brake; out.handbrake = handbrake;

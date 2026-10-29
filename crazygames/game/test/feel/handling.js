@@ -12,7 +12,7 @@
       plays with the throttle always on), and nose to a wall pressing
       reverse. Escaped when it is 3 m clear of the wall and moving, or the
       game has put it back on the track, within 3 s.
-   Known answers: assist off must spin more than assist on; with the
+   Known answers: the first prototype's handling must spin; with the
    recovery switched off the throttle-on case must stay stuck.
 
    node game/test/feel/handling.js [--json] */
@@ -119,15 +119,53 @@ function driftBrake() {
   return { kmhAfter2s: +(s.speed * 3.6).toFixed(0), slideDeg: +(Math.abs(s.slip) / DEG).toFixed(1) };
 }
 
+/* 5. Turning on grip, and how gradually a drift builds (the author's
+   third round): full steer for 1.5 s from 43, 72 and 101 km/h, the path's
+   radius over the last 0.5 s and the most slide on the way (a grip turn
+   stays under the 14 degree drift threshold); then full steer and DRIFT
+   from the same speeds, the time to a 30 degree slide and the fastest the
+   slide angle grows. Known answer: before this round, 43 km/h on full
+   lock circled at about 50 m and a drift reached 30 degrees in 0.33 s. */
+function gripAndBuild() {
+  const rows = [];
+  for (const v0 of [12, 20, 28]) {
+    const s = createVehicle(0, 0, 0); s.wvz = -v0;
+    let psiPrev = null, turn = 0, dist = 0, maxSlip = 0;
+    for (let i = 0; i < 1.5 / STEP; i++) {
+      stepVehicle(s, { steer: 1, throttle: 1, brake: 0, handbrake: 0 }, STEP);
+      maxSlip = Math.max(maxSlip, Math.abs(s.slip) / DEG);
+      const p = Math.atan2(-s.wvx, -s.wvz);
+      if (i * STEP >= 1.0) { if (psiPrev !== null) { let d = p - psiPrev; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; turn += Math.abs(d); dist += s.speed * STEP; } psiPrev = p; }
+    }
+    const d = createVehicle(0, 0, 0); d.wvz = -v0;
+    let t30 = null, prev = 0, peak = 0;
+    for (let i = 0; i < 2 / STEP; i++) {
+      stepVehicle(d, { steer: 1, throttle: 1, brake: 0, handbrake: 1 }, STEP);
+      const a = Math.abs(d.slip) / DEG; peak = Math.max(peak, (a - prev) / STEP); prev = a;
+      if (t30 === null && a >= 30) t30 = i * STEP;
+    }
+    rows.push({ kmh: Math.round(v0 * 3.6), gripRadiusM: +(dist / turn).toFixed(1), gripMaxSlideDeg: +maxSlip.toFixed(1), driftTo30s: t30 === null ? null : +t30.toFixed(2), driftPeakDegPerS: Math.round(peak) });
+  }
+  return rows;
+}
+
+out.gripAndBuild = gripAndBuild();
 out.pace = pace();
 out.parkArc = [parkArc(2.0), parkArc(2.6), parkArc(3.2)];
 out.driftBrake = driftBrake();
 out.spins = spins();
 out.stuck = [stuck('throttle'), stuck('reverse')];
-const level = TUNE.ASSIST.LEVEL;
-TUNE.ASSIST.LEVEL = 0;
-out.knownAnswerAssistOff = { spins: spins().spins };
-TUNE.ASSIST.LEVEL = level;
+/* Known answer for the spins: the first prototype's handling (as merged
+   on 29 October 2026, before play), which the author found tipping into
+   spins, must spin in this battery. Only the values that changed are set;
+   the new controllers are switched off by their own constants. */
+{
+  const saved = JSON.parse(JSON.stringify(TUNE));
+  Object.assign(TUNE.VEHICLE, { ACCEL: 8.5, TOP_SPEED: 48, TRACTION: 1, INERTIA_FACTOR: 0.95, CG_TO_FRONT: 1.15, MU_FRONT: 1.15, MU_REAR: 1.05, TAIL_FRONT: 0.78, TAIL_REAR: 0.70, SPIN_GRIP: 0.60, HANDBRAKE_GRIP: 0.30, HANDBRAKE_DECEL: 5, HANDBRAKE_ENGAGE: 0, WALL_SPIN: 1, TURN_LIFT: 0 });
+  Object.assign(TUNE.ASSIST, { COUNTERSTEER: 0.5, YAW_DAMP: 0.15, SPIN_ANGLE: 55, SPIN_GAIN: 2.5, ANGLE_PULL: 0, DRIFT_HOLD: 0, DRIFT_DAMP: 0, DRIFT_CARVE: 0, DRIFT_SCRUB: 0, DRIFT_KEEP: 0, SLIDE_FROM: 0, SLIDE_FULL: 0.001, DRIFT_EASE_IN: 1000 });
+  out.knownAnswerFirstPrototype = { spins: spins().spins };
+  for (const g of Object.keys(saved)) Object.assign(TUNE[g], saved[g]);
+}
 { const keep = { c: TUNE.ASSIST.DRIFT_CARVE, s: TUNE.ASSIST.DRIFT_SCRUB, k: TUNE.ASSIST.DRIFT_KEEP }; TUNE.ASSIST.DRIFT_CARVE = 0; TUNE.ASSIST.DRIFT_SCRUB = 0; TUNE.ASSIST.DRIFT_KEEP = 0.8;
   out.knownAnswerOldDrift = parkArc(2.6); TUNE.ASSIST.DRIFT_CARVE = keep.c; TUNE.ASSIST.DRIFT_SCRUB = keep.s; TUNE.ASSIST.DRIFT_KEEP = keep.k; }
 if ('RECOVER_AFTER' in TUNE.ASSIST) { const r = TUNE.ASSIST.RECOVER_AFTER; TUNE.ASSIST.RECOVER_AFTER = 1e9; out.knownAnswerNoRecovery = stuck('throttle'); TUNE.ASSIST.RECOVER_AFTER = r; }
@@ -135,9 +173,10 @@ if (process.argv.includes('--json')) console.log(JSON.stringify(out, null, 1));
 else {
   console.log('pace', JSON.stringify(out.pace));
   console.log('spins', out.spins.spins + ' of ' + out.spins.cases, out.spins.rows.filter(r => r.spin).map(r => r.name + '@' + r.v0 + ' max ' + r.maxSlip + ' end ' + r.endSlip).join('; '));
+  for (const r of out.gripAndBuild) console.log('grip and build', JSON.stringify(r));
   console.log('stuck', JSON.stringify(out.stuck));
   for (const r of out.parkArc) console.log('park arc', JSON.stringify(r));
   console.log('drift with no steer', JSON.stringify(out.driftBrake));
   console.log('known answer, old drift', JSON.stringify(out.knownAnswerOldDrift));
-  console.log('known answers', JSON.stringify({ assistOffSpins: out.knownAnswerAssistOff.spins, noRecovery: out.knownAnswerNoRecovery }));
+  console.log('known answers', JSON.stringify({ firstPrototypeSpins: out.knownAnswerFirstPrototype.spins, noRecovery: out.knownAnswerNoRecovery }));
 }
