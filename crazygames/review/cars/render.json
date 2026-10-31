@@ -1,5 +1,5 @@
 {
- "when": "2026-10-31T05:08:26.388Z",
+ "when": "2026-10-31T06:13:20.482Z",
  "counts": {
   "empty": {
    "triangles": 1,
@@ -129,41 +129,41 @@
  "silhouettes": {
   "straight": {
    "closest": {
-    "a": "tourer",
-    "b": "driftbuild",
-    "diff": 0.108
+    "a": "starter",
+    "b": "fastback",
+    "diff": 0.116
    },
-   "under": 4,
+   "under": 3,
    "pairs": [
-    {
-     "a": "tourer",
-     "b": "driftbuild",
-     "diff": 0.108
-    },
     {
      "a": "starter",
      "b": "fastback",
      "diff": 0.116
     },
     {
+     "a": "tourer",
+     "b": "driftbuild",
+     "diff": 0.132
+    },
+    {
      "a": "fastback",
      "b": "driftbuild",
-     "diff": 0.133
+     "diff": 0.142
     },
     {
      "a": "tourer",
      "b": "fastback",
-     "diff": 0.137
+     "diff": 0.151
     },
     {
      "a": "starter",
      "b": "driftbuild",
-     "diff": 0.166
+     "diff": 0.176
     },
     {
      "a": "starter",
      "b": "tourer",
-     "diff": 0.178
+     "diff": 0.192
     },
     {
      "a": "starter",
@@ -178,12 +178,12 @@
     {
      "a": "hatch",
      "b": "driftbuild",
-     "diff": 0.316
+     "diff": 0.323
     },
     {
      "a": "hatch",
      "b": "tourer",
-     "diff": 0.331
+     "diff": 0.344
     }
    ],
    "sizes": {
@@ -198,9 +198,9 @@
      "h": 28
     },
     "tourer": {
-     "pixels": 807,
+     "pixels": 795,
      "w": 36,
-     "h": 25
+     "h": 24
     },
     "fastback": {
      "pixels": 862,
@@ -208,9 +208,9 @@
      "h": 28
     },
     "driftbuild": {
-     "pixels": 826,
-     "w": 36,
-     "h": 26
+     "pixels": 836,
+     "w": 38,
+     "h": 25
     }
    },
    "limit": 0.15,
@@ -218,36 +218,31 @@
   },
   "slide35": {
    "closest": {
-    "a": "starter",
-    "b": "tourer",
-    "diff": 0.146
+    "a": "tourer",
+    "b": "driftbuild",
+    "diff": 0.152
    },
-   "under": 2,
+   "under": 0,
    "pairs": [
+    {
+     "a": "tourer",
+     "b": "driftbuild",
+     "diff": 0.152
+    },
     {
      "a": "starter",
      "b": "tourer",
-     "diff": 0.146
-    },
-    {
-     "a": "tourer",
-     "b": "driftbuild",
-     "diff": 0.149
-    },
-    {
-     "a": "tourer",
-     "b": "fastback",
-     "diff": 0.164
+     "diff": 0.159
     },
     {
      "a": "starter",
      "b": "fastback",
-     "diff": 0.169
+     "diff": 0.172
     },
     {
-     "a": "starter",
-     "b": "driftbuild",
-     "diff": 0.193
+     "a": "tourer",
+     "b": "fastback",
+     "diff": 0.18
     },
     {
      "a": "starter",
@@ -255,24 +250,29 @@
      "diff": 0.197
     },
     {
+     "a": "starter",
+     "b": "driftbuild",
+     "diff": 0.197
+    },
+    {
      "a": "fastback",
      "b": "driftbuild",
-     "diff": 0.242
+     "diff": 0.243
     },
     {
      "a": "hatch",
      "b": "fastback",
-     "diff": 0.258
+     "diff": 0.261
     },
     {
      "a": "hatch",
      "b": "tourer",
-     "diff": 0.303
+     "diff": 0.316
     },
     {
      "a": "hatch",
      "b": "driftbuild",
-     "diff": 0.322
+     "diff": 0.324
     }
    ],
    "sizes": {
@@ -287,23 +287,23 @@
      "h": 29
     },
     "tourer": {
-     "pixels": 1263,
+     "pixels": 1244,
      "w": 71,
-     "h": 26
+     "h": 25
     },
     "fastback": {
-     "pixels": 1440,
+     "pixels": 1446,
      "w": 71,
      "h": 29
     },
     "driftbuild": {
-     "pixels": 1251,
-     "w": 70,
-     "h": 28
+     "pixels": 1262,
+     "w": 72,
+     "h": 29
     }
    },
    "limit": 0.15,
-   "pass": false
+   "pass": true
   }
  },
  "shots": [
@@ -346,33 +346,30 @@
  "code": {
   "disk": {
    "build.js": 26679,
-   "driftbuild.js": 2175,
+   "driftbuild.js": 2174,
    "fastback.js": 1752,
    "hatch.js": 1651,
    "index.js": 1729,
    "starter.js": 1935,
-   "tourer.js": 1652
+   "tourer.js": 1651
   },
   "fetched": {
    "index.js": 1729,
    "build.js": 26679,
    "starter.js": 1935,
-   "tourer.js": 1652,
    "hatch.js": 1651,
-   "driftbuild.js": 2175,
-   "fastback.js": 1752
+   "tourer.js": 1651,
+   "fastback.js": 1752,
+   "driftbuild.js": 2174
   },
   "agree": true,
-  "fetchedTotal": 37573
+  "fetchedTotal": 37571
  },
  "errors": [],
  "failures": [
-  "silhouettes at 30 m (0 deg): tourer and driftbuild differ by only 0.108",
   "silhouettes at 30 m (0 deg): starter and fastback differ by only 0.116",
-  "silhouettes at 30 m (0 deg): fastback and driftbuild differ by only 0.133",
-  "silhouettes at 30 m (0 deg): tourer and fastback differ by only 0.137",
-  "silhouettes at 30 m (35 deg): starter and tourer differ by only 0.146",
-  "silhouettes at 30 m (35 deg): tourer and driftbuild differ by only 0.149"
+  "silhouettes at 30 m (0 deg): tourer and driftbuild differ by only 0.132",
+  "silhouettes at 30 m (0 deg): fastback and driftbuild differ by only 0.142"
  ],
  "pass": false
 }

@@ -33,7 +33,7 @@ export default {
   },
   extras: [
     { type: 'mirrors', at: 0.14, reach: 0.15 },
-    { type: 'lip', back: 0.0, chord: 0.22, h: 0.09, span: 0.82, paint: true },
+    { type: 'lip', back: 0.0, chord: 0.24, h: 0.12, span: 0.84, paint: true },
     { type: 'exhaust', x: [0.55, -0.55], y: 0.31, r: 0.05, out: 0.015 },
   ],
   wheel: { segments: 15, spokes: 5, spokeShare: 0.33, rim: 0.66, dish: 0.045, colour: 0x5a5e66 },

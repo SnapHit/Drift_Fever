@@ -1,5 +1,5 @@
 {
- "when": "2026-10-31T05:08:01.858Z",
+ "when": "2026-10-31T06:13:18.870Z",
  "three": "184",
  "cars": {
   "starter": {
@@ -442,7 +442,7 @@
    "dims": {
     "length": 4.84,
     "width": 1.98,
-    "height": 1.24,
+    "height": 1.2,
     "wheelbase": 2.86,
     "track": 1.66,
     "wheelRadius": 0.35,
@@ -462,10 +462,10 @@
     "drawCalls": 10
    },
    "ownCode": {
-    "raw": 1652,
-    "gzip": 872
+    "raw": 1651,
+    "gzip": 871
    },
-   "roof": 1.23,
+   "roof": 1.19,
    "tyresAtFullLock": {
     "hits": 0,
     "worst": 0
@@ -512,7 +512,7 @@
     },
     {
      "name": "height m",
-     "value": 1.24,
+     "value": 1.2,
      "limit": [
       1.1,
       1.5
@@ -897,7 +897,7 @@
     "drawCalls": 10
    },
    "ownCode": {
-    "raw": 2175,
+    "raw": 2174,
     "gzip": 1029
    },
    "roof": 1.114,
@@ -1298,8 +1298,8 @@
    "gzip": 10056
   },
   "all": {
-   "raw": 37573,
-   "gzip": 14708
+   "raw": 37571,
+   "gzip": 14707
   },
   "limit": 102400,
   "pass": true

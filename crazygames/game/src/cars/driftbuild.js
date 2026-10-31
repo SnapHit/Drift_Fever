@@ -36,7 +36,7 @@ export default {
     { type: 'canards', z: 0.14, x0: 0.62, x1: 0.84, y: 0.3, rise: 0.06, colour: 0x1d1e22 },
     { type: 'skirts', y0: 0.1, y1: 0.2, out: 0.1, colour: 0x1d1e22 },
     { type: 'diffuser', depth: 0.45, y0: 0.13, y1: 0.33, rise: 0.12, span: 0.7, fins: 4, colour: 0x1d1e22 },
-    { type: 'wing', z: 1.98, chord: 0.38, thick: 0.05, angle: 0.22, y: 1.36, span: 0.88, post: 0.45, plateUp: 0.1, plateDown: 0.28, platePaint: true, colour: 0x16171b },
+    { type: 'wing', z: 1.98, chord: 0.38, thick: 0.05, angle: 0.22, y: 1.36, span: 0.97, post: 0.45, plateUp: 0.1, plateDown: 0.3, platePaint: true, colour: 0x16171b },
     { type: 'exhaust', x: [0.36], y: 0.24, r: 0.055, out: 0.015 },
   ],
   wheel: { segments: 18, spokes: 6, spokeShare: 0.34, rim: 0.66, dish: 0.07, colour: 0xc08a3e },

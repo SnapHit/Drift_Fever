@@ -15,7 +15,7 @@ export default {
   tail: { low: 0.3, belt: 0.86, deck: 0.92, taper: 0.86, round: 0.34 },
   belt: 0.78, beltRise: 0.05, hood: 0.82, hoodCrown: 0.05,
   screen: [-0.26, 0.38],
-  roof: { h: 1.24, end: 1.02, w: 0.5, drop: 0.04, crown: 0.035 },
+  roof: { h: 1.2, end: 1.02, w: 0.5, drop: 0.04, crown: 0.035 },
   rear: { base: 1.86, deck: 0.93 },
   windows: [[-0.14, 0.72], [0.8, 1.3]],
   shoulder: 0.09, glassIn: 0.18, waist: 0.46,
