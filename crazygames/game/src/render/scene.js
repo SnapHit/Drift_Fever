@@ -156,7 +156,9 @@ export function createScene(canvas, opts) {
     const postMat = new THREE.MeshLambertMaterial({ color: LOOK.GANTRY });
     for (const side of [1, -1]) { const post = new THREE.Mesh(new THREE.BoxGeometry(p, h, p), postMat); post.position.set(s.x + lx * reach * side, h / 2, s.z + lz * reach * side); g.add(post); }
     const beam = new THREE.Mesh(new THREE.BoxGeometry(reach * 2 + p, 0.6, p), new THREE.MeshLambertMaterial({ color: beamColour }));
-    beam.position.set(s.x, h - 0.3, s.z); beam.rotation.y = -s.heading + Math.PI / 2;
+    /* the box runs along x; rotated by the heading about y its x axis is
+       (cos h, -sin h), which is the track's left vector (-cos h, sin h) reversed */
+    beam.position.set(s.x, h - 0.3, s.z); beam.rotation.y = s.heading;
     g.add(beam);
     return g;
   }

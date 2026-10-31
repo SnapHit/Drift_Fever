@@ -1,0 +1,109 @@
+{
+ "0": {
+  "file": "shots/title-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "title"
+ },
+ "1": {
+  "file": "shots/career-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "career"
+ },
+ "2": {
+  "file": "shots/garage-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "garage"
+ },
+ "3": {
+  "file": "shots/countdown-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "countdown"
+ },
+ "4": {
+  "file": "shots/drive-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "drive"
+ },
+ "5": {
+  "file": "shots/results-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "results"
+ },
+ "6": {
+  "file": "shots/free-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "free"
+ },
+ "7": {
+  "file": "shots/title-390x844.png",
+  "viewport": "390x844",
+  "screen": "title"
+ },
+ "8": {
+  "file": "shots/career-390x844.png",
+  "viewport": "390x844",
+  "screen": "career"
+ },
+ "9": {
+  "file": "shots/garage-390x844.png",
+  "viewport": "390x844",
+  "screen": "garage"
+ },
+ "10": {
+  "file": "shots/countdown-390x844.png",
+  "viewport": "390x844",
+  "screen": "countdown"
+ },
+ "11": {
+  "file": "shots/drive-390x844.png",
+  "viewport": "390x844",
+  "screen": "drive"
+ },
+ "12": {
+  "file": "shots/results-390x844.png",
+  "viewport": "390x844",
+  "screen": "results"
+ },
+ "13": {
+  "file": "shots/free-390x844.png",
+  "viewport": "390x844",
+  "screen": "free"
+ },
+ "14": {
+  "file": "shots/title-844x390.png",
+  "viewport": "844x390",
+  "screen": "title"
+ },
+ "15": {
+  "file": "shots/career-844x390.png",
+  "viewport": "844x390",
+  "screen": "career"
+ },
+ "16": {
+  "file": "shots/garage-844x390.png",
+  "viewport": "844x390",
+  "screen": "garage"
+ },
+ "17": {
+  "file": "shots/countdown-844x390.png",
+  "viewport": "844x390",
+  "screen": "countdown"
+ },
+ "18": {
+  "file": "shots/drive-844x390.png",
+  "viewport": "844x390",
+  "screen": "drive"
+ },
+ "19": {
+  "file": "shots/results-844x390.png",
+  "viewport": "844x390",
+  "screen": "results"
+ },
+ "20": {
+  "file": "shots/free-844x390.png",
+  "viewport": "844x390",
+  "screen": "free"
+ },
+ "started": "2026-10-31T10:43:21.326Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here"
+}

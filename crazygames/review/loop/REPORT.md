@@ -250,6 +250,7 @@ the car park with the touch pad showing).
   drive with no countdown or results, so the feel probes run unchanged.
 - `package.json` and `tools/serve.js` are outside the brief's folders, so
   the loop probes run with `node game/test/loop/probes.js`.
-- The car session's note: a rear wheel vanishing after a sliding frame in
-  software WebGL 2 was not seen in the screenshots here, and was not
-  looked for.
+- The car session's note holds here too: in `shots/free-1280x720.png`
+  the starter's left rear wheel is missing after a slide, on the
+  sandbox's software WebGL 2. Noted, not chased, as the car session
+  asked; untested on a real GPU.

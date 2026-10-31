@@ -1,5 +1,5 @@
 {
- "started": "2026-10-31T10:17:41.984Z",
+ "started": "2026-10-31T10:43:21.326Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "reload": {
   "coinsBefore": 4100,
@@ -21,6 +21,13 @@
    "failedWrites": 0
   },
   "runScore": 19
+ },
+ "unlock": {
+  "lockedAtStart": true,
+  "refusedWhileLocked": true,
+  "stillLockedWithNoStar": true,
+  "openAfterOneStar": true,
+  "startsWhenOpen": true
  },
  "throwing": {
   "property": {

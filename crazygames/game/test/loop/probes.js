@@ -280,10 +280,14 @@ if (run('shots')) {
     await shot('garage', async () => { await side.page.evaluate(() => { window.__loop.action('garage'); window.__loop.action('pick-car', 'tourer'); }); });
     await shot('countdown', async () => { await side.page.evaluate(() => { window.__loop.action('play-career', '0'); window.__feel.draw = false; window.__clock = 1000; }); await L.runFrames(side.page, 70); });
     await shot('drive', async () => {
-      // a ghost first, then into the second run with a slightly different
-      // driver (so the ghost is not hidden inside the car), to a frame mid drift
+      // a ghost first, then the second run held on the line for two seconds
+      // (DRIFT with no steering) so the ghost is ahead and in view, then the
+      // driver takes over, to a frame mid drift
       await L.beginRun(side.page, 'career', 0); await L.driveToResults(side.page, RUN_BUDGET);
-      await L.beginRun(side.page, 'again', null, { drift: '*', gain: 0.85 });
+      await L.beginRun(side.page, 'again', null, null);
+      await side.page.evaluate(() => { window.__feel.setDriver(null); window.__feel.inject = { steer: 0, throttle: 0, brake: 0, handbrake: 1 }; });
+      await L.runFrames(side.page, 120);
+      await side.page.evaluate(() => { window.__feel.inject = null; window.__feel.setDriver({ drift: '*' }); });
       let best = null;
       for (let k = 0; k < 40 && !best; k++) { const fr = await L.runFrames(side.page, 30, L.COLLECT); for (const f of fr) if (f.angle > 28 && f.v > 12 && f.state === 'drive') { best = f; break; } }
     });
