@@ -1,0 +1,28 @@
+{
+ "node": {
+  "seedsPerKind": 40,
+  "repeatMismatches": 0,
+  "distinctHashes": {
+   "circuit": 40,
+   "sprint": 40
+  }
+ },
+ "chromium": {
+  "seedsPerKind": 40,
+  "differFromNode": 0,
+  "dailyMatches": true,
+  "nudgedDifferFromNode": 80,
+  "ulpDifferFromNode": 0,
+  "mathSinVariantDifferFromNode": 0,
+  "mathSinVariantFirstDifference": null
+ },
+ "knownAnswers": {
+  "flakyGenerator": 11,
+  "seedIgnoringDistinct": 1
+ },
+ "staticScan": {
+  "generate.js": [],
+  "analyse.js": [],
+  "dmath.js": []
+ }
+}

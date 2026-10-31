@@ -1,0 +1,326 @@
+{
+ "seedsPerKind": 100,
+ "difficulty": "seed n uses ((n - 1) mod 11) / 10",
+ "kinds": {
+  "circuit": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "failuresByCheck": {},
+   "worst": {
+    "clearance": -0.0485,
+    "otherBarrier": 4.7059,
+    "tightest": 12.5247,
+    "widestCorner": 109.7243,
+    "minWidth": 11.05,
+    "maxWidth": 16.47,
+    "maxGrade": 0.04,
+    "maxCrest": 0.001,
+    "maxLift": 0.3796,
+    "maxBankDeg": 3,
+    "minLength": 682,
+    "maxLength": 1200,
+    "minStep": 1.9978,
+    "maxStep": 2.0001
+   },
+   "attempts": {
+    "n": 100,
+    "min": 1,
+    "p5": 1,
+    "p50": 11,
+    "p95": 46,
+    "max": 106,
+    "mean": 15.55
+   },
+   "generationMs": {
+    "n": 100,
+    "min": 4.186,
+    "p5": 5.258,
+    "p50": 27.496,
+    "p95": 129.02,
+    "max": 321.969,
+    "mean": 39.073
+   },
+   "rejectedAttemptsByCheck": {
+    "closure": 1110,
+    "turning": 36,
+    "length": 191,
+    "overlap": 263,
+    "clearance": 256
+   }
+  },
+  "sprint": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "failuresByCheck": {},
+   "worst": {
+    "clearance": -0.0514,
+    "otherBarrier": 6.2608,
+    "tightest": 12.7337,
+    "widestCorner": 107.8865,
+    "minWidth": 11.07,
+    "maxWidth": 16.64,
+    "maxGrade": 0.04,
+    "maxCrest": 0.001,
+    "maxLift": 0.4041,
+    "maxBankDeg": 3,
+    "minLength": 674,
+    "maxLength": 1182,
+    "minStep": 1.9979,
+    "maxStep": 2.0001
+   },
+   "attempts": {
+    "n": 100,
+    "min": 1,
+    "p5": 1,
+    "p50": 1,
+    "p95": 5,
+    "max": 7,
+    "mean": 1.82
+   },
+   "generationMs": {
+    "n": 100,
+    "min": 3.254,
+    "p5": 4.087,
+    "p50": 7.994,
+    "p95": 33.561,
+    "max": 80.66,
+    "mean": 12.236
+   },
+   "rejectedAttemptsByCheck": {
+    "length": 51,
+    "overlap": 56,
+    "clearance": 55
+   }
+  }
+ },
+ "targets": {
+  "circuit 600": {
+   "tracks": 100,
+   "invalid": 1,
+   "fallback": 1,
+   "lengths": [
+    542,
+    680
+   ]
+  },
+  "circuit 900": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    814,
+    990
+   ]
+  },
+  "circuit 1200": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    1092,
+    1320
+   ]
+  },
+  "sprint 600": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    548,
+    658
+   ]
+  },
+  "sprint 900": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    856,
+    990
+   ]
+  },
+  "sprint 1200": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    1146,
+    1320
+   ]
+  }
+ },
+ "knownAnswers": {
+  "control": [],
+  "overlap: a sprint that turns 300 degrees and crosses itself": {
+   "expected": "overlap",
+   "failed": [
+    "overlap",
+    "clearance"
+   ],
+   "detail": {
+    "ok": false,
+    "crossings": 4,
+    "gapBreaks": 152,
+    "closestOtherBarrier": 0.05510000000000037
+   }
+  },
+  "overlap: two parts whose barriers run closer than the gap": {
+   "expected": "overlap",
+   "failed": [
+    "spacing",
+    "overlap"
+   ],
+   "detail": {
+    "ok": false,
+    "crossings": 0,
+    "gapBreaks": 128,
+    "closestOtherBarrier": 2.2805999999999997
+   },
+   "crossings": 0
+  },
+  "clearance: five left wall points moved to 40% of the half width": {
+   "expected": "clearance",
+   "failed": [
+    "clearance",
+    "contract"
+   ],
+   "detail": {
+    "ok": false,
+    "worstMargin": -2.7365341196630926,
+    "at": 80,
+    "breaks": 9
+   }
+  },
+  "length: the same track against a target it misses": {
+   "expected": "length",
+   "failed": [
+    "length"
+   ],
+   "detail": {
+    "ok": false,
+    "length": 1140,
+    "min": 1142,
+    "max": 1340
+   }
+  },
+  "radius: a corner of radius 11": {
+   "expected": "radius",
+   "failed": [
+    "radius"
+   ],
+   "detail": {
+    "ok": false,
+    "corners": 1,
+    "outside": 1,
+    "tightest": 10.999980750033686,
+    "widest": 10.999980750033686
+   }
+  },
+  "radius: a corner of radius 160": {
+   "expected": "radius",
+   "failed": [
+    "radius"
+   ],
+   "detail": {
+    "ok": false,
+    "corners": 1,
+    "outside": 1,
+    "tightest": 159.99999999999986,
+    "widest": 159.99999999999986
+   }
+  },
+  "width: 9 m on the start straight": {
+   "expected": "width",
+   "failed": [
+    "width"
+   ],
+   "detail": {
+    "ok": false,
+    "min": 9,
+    "max": 15.4
+   }
+  },
+  "elevation: a 1.2 m bump 16 m long": {
+   "expected": "elevation",
+   "failed": [
+    "elevation"
+   ],
+   "detail": {
+    "ok": false,
+    "maxGrade": 0.12497640256998876,
+    "maxCrestCurvature": 0.033123632539289266,
+    "liftAtTopSpeed": 12.979331649442194,
+    "maxBankDeg": 3.0000070153049903
+   }
+  },
+  "elevation: an 8% ramp": {
+   "expected": "elevation",
+   "failed": [
+    "elevation"
+   ],
+   "detail": {
+    "ok": false,
+    "maxGrade": 0.8041500000000001,
+    "maxCrestCurvature": 0.20001250000000004,
+    "liftAtTopSpeed": 78.37390927624874,
+    "maxBankDeg": 3.0000070153049903
+   }
+  },
+  "elevation: 8.6 degrees of bank": {
+   "expected": "elevation",
+   "failed": [
+    "elevation"
+   ],
+   "detail": {
+    "ok": false,
+    "maxGrade": 0.021400000000000002,
+    "maxCrestCurvature": 0.00029375000000000234,
+    "liftAtTopSpeed": 0.11510448521916503,
+    "maxBankDeg": 8.594366926962348
+   }
+  },
+  "contract: left wall points shifted three samples": {
+   "expected": "contract",
+   "failed": [
+    "overlap",
+    "contract"
+   ],
+   "detail": {
+    "ok": false,
+    "problems": [
+     "left wall not closed",
+     "a wall point is not beside its sample: 9.696 m",
+     "run-off inside a clip zone: 0.57 m"
+    ]
+   }
+  },
+  "spacing: one sample removed": {
+   "expected": "spacing",
+   "failed": [
+    "spacing"
+   ],
+   "detail": {
+    "ok": false,
+    "minStep": 1.9988110465974502,
+    "maxStep": 3.9995913716278513,
+    "worstHeadingSin": 0.012249163830941856
+   }
+  }
+ },
+ "fallbackCourses": [
+  {
+   "kind": "circuit",
+   "fallback": true,
+   "length": 980,
+   "failed": []
+  },
+  {
+   "kind": "sprint",
+   "fallback": true,
+   "length": 922,
+   "failed": []
+  }
+ ]
+}

@@ -88,7 +88,7 @@ export const TRACKS = {
   TOP_SPEED:       62,           // m/s, the car's flat out speed (TUNE.VEHICLE.TOP_SPEED)
   ELEVATION_USE:   0.8,          // share of the grade and crest limits the generator aims for
   TURN_BIAS:       0.72,         // chance a corner turns the way the plan wants
-  ATTEMPTS:        400,
+  ATTEMPTS:        1000,         // a failed attempt costs about a millisecond; no seed tested needs more than a few hundred
   /* Features, each [easy, hard] where a range is given, lerped by the
      difficulty. R radius in m, angle in degrees of turn (including the
      clothoid ramps), lt the ramp length in m, width in m. */
@@ -665,7 +665,7 @@ export function generateTrack(seed, options) {
   }
   /* Nothing passed: the safe course, which always does (the validity
      test checks it). */
-  const t = build(fallbackPlan(kind, rng, d), kind, rng, d, o);
+  const t = build(fallbackPlan(kind, (target.min + target.max) / 2), kind, rng, d, o);
   return finishTrack(t, seedN, kind, d, target, TRACKS.ATTEMPTS, failures, true);
 }
 
@@ -682,16 +682,20 @@ function finishTrack(t, seed, kind, d, target, attempts, failures, fallback) {
   };
 }
 
-/* A plain course that passes every check: a rounded rectangle for a
-   circuit, two easy bends for a sprint. */
-function fallbackPlan(kind, rng, d) {
-  const sweep = (a) => ({ c: corner('sweeper', 60, a, 20, 13, 'outer') });
+/* A plain course that passes every check, sized to the goal (a corner
+   is its ramp length longer than R times its angle): a rounded
+   rectangle for a circuit, four easy bends for a sprint. */
+function fallbackPlan(kind, goal) {
+  const sweep = (R, a) => ({ c: corner('sweeper', R, a, 20, 13, 'outer') });
   if (kind === 'circuit') {
+    const R = clamp((goal - 480) / TWO_PI, 40, 110), X = clamp((goal - TWO_PI * R - 4 * 20) / 4, 60, TRACKS.STRAIGHT_MAX);
     const q = TWO_PI / 4;
-    const els = [{ s: 60, adj: true, min: 60 }, sweep(q), { s: 80, adj: true }, sweep(q), { s: 120, adj: true }, sweep(q), { s: 80, adj: true }, sweep(q), { s: 60, adj: true, min: 10 }];
+    const els = [{ s: X - 10, adj: true, min: 50 }, sweep(R, q), { s: X, adj: true }, sweep(R, q), { s: X, adj: true }, sweep(R, q), { s: X, adj: true }, sweep(R, q), { s: 10, adj: true, min: 10 }];
     return { els, sgn: 1 };
   }
-  return { els: [{ s: 60 }, sweep(60 * DEG), { s: 80 }, sweep(-60 * DEG), { s: 80 }, sweep(60 * DEG), { s: 80 }, sweep(-60 * DEG), { s: 110 }], sgn: 0 };
+  const a = 60 * DEG, R = clamp((goal - TRACKS.FINISH_RUNOUT - 80 - 5 * 80) / (4 * a), 40, 110);
+  const X = clamp((goal - 4 * (R * a + 20) - TRACKS.FINISH_RUNOUT) / 5, 50, TRACKS.STRAIGHT_MAX - TRACKS.FINISH_RUNOUT);
+  return { els: [{ s: X }, sweep(R, a), { s: X }, sweep(R, -a), { s: X }, sweep(R, a), { s: X }, sweep(R, -a), { s: X + TRACKS.FINISH_RUNOUT }], sgn: 0 };
 }
 
 /* For the probes and the lab: build a course from a hand written list of

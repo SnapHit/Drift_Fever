@@ -1,0 +1,286 @@
+{
+ "tracks": [
+  {
+   "kind": "circuit",
+   "seed": 1,
+   "nan": 0,
+   "tris": 9034,
+   "box": [
+    -121,
+    -303,
+    40,
+    69
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 2,
+   "nan": 0,
+   "tris": 6932,
+   "box": [
+    -7,
+    -168,
+    212,
+    83
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 3,
+   "nan": 0,
+   "tris": 10822,
+   "box": [
+    -341,
+    -214,
+    7,
+    117
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 4,
+   "nan": 0,
+   "tris": 7110,
+   "box": [
+    -7,
+    -122,
+    229,
+    119
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 5,
+   "nan": 0,
+   "tris": 11718,
+   "box": [
+    -116,
+    -317,
+    191,
+    60
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 6,
+   "nan": 0,
+   "tris": 10654,
+   "box": [
+    -92,
+    -128,
+    171,
+    220
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 7,
+   "nan": 0,
+   "tris": 9210,
+   "box": [
+    -218,
+    -244,
+    43,
+    89
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 8,
+   "nan": 0,
+   "tris": 7878,
+   "box": [
+    -7,
+    -106,
+    225,
+    168
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 9,
+   "nan": 0,
+   "tris": 10118,
+   "box": [
+    -86,
+    -100,
+    248,
+    162
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "circuit",
+   "seed": 10,
+   "nan": 0,
+   "tris": 10476,
+   "box": [
+    -11,
+    -115,
+    336,
+    123
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 1,
+   "nan": 0,
+   "tris": 8900,
+   "box": [
+    -7,
+    -605,
+    307,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 2,
+   "nan": 0,
+   "tris": 10188,
+   "box": [
+    -7,
+    -236,
+    596,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 3,
+   "nan": 0,
+   "tris": 11680,
+   "box": [
+    -598,
+    -487,
+    7,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 4,
+   "nan": 0,
+   "tris": 8862,
+   "box": [
+    -528,
+    -326,
+    7,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 5,
+   "nan": 0,
+   "tris": 10006,
+   "box": [
+    -273,
+    -527,
+    111,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 6,
+   "nan": 0,
+   "tris": 8946,
+   "box": [
+    -12,
+    -118,
+    622,
+    4
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 7,
+   "nan": 0,
+   "tris": 11140,
+   "box": [
+    -58,
+    -798,
+    215,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 8,
+   "nan": 0,
+   "tris": 11312,
+   "box": [
+    -95,
+    -532,
+    233,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 9,
+   "nan": 0,
+   "tris": 10524,
+   "box": [
+    -197,
+    -651,
+    7,
+    1
+   ],
+   "drawCalls": 2
+  },
+  {
+   "kind": "sprint",
+   "seed": 10,
+   "nan": 0,
+   "tris": 11154,
+   "box": [
+    -7,
+    -464,
+    538,
+    1
+   ],
+   "drawCalls": 2
+  }
+ ],
+ "testTrack": {
+  "nan": 0,
+  "tris": 7158,
+  "box": [
+   -9,
+   -177,
+   119,
+   16
+  ],
+  "drawCalls": 2
+ },
+ "knownAnswer": {
+  "nan": 18,
+  "tris": 9034,
+  "box": [
+   null,
+   null,
+   null,
+   null
+  ],
+  "drawCalls": 2
+ }
+}

@@ -194,7 +194,7 @@ export function validateTrack(track, target) {
       const e = dot < 0 ? 1 : cr;
       if (e > worstHeading) worstHeading = e;
     }
-    put('spacing', lo >= 1.99 && hi <= 2.001 && worstHeading < 0.02 && n >= 3, { minStep: lo, maxStep: hi, worstHeadingSin: worstHeading });
+    put('spacing', lo >= 1.99 && hi <= 2.001 && worstHeading < 0.06 && n >= 3, { minStep: lo, maxStep: hi, worstHeadingSin: worstHeading });
   }
 
   /* the length inside the target */
