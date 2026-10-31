@@ -1,0 +1,401 @@
+{
+ "seedsPerKind": 1000,
+ "difficulty": "seed n uses ((n - 1) mod 11) / 10",
+ "kinds": {
+  "circuit": {
+   "partGap": {
+    "apartAlongTrack": 60,
+    "tracksWithPartsWithin20m": 580,
+    "gap": {
+     "n": 580,
+     "min": 4.048,
+     "p5": 5.73,
+     "p50": 17.045,
+     "p95": 28.559,
+     "max": 39.954,
+     "mean": 16.984
+    },
+    "tracksWithBarriersCloserThanTheRoadWidth": 139
+   },
+   "tracks": 1000,
+   "invalid": 0,
+   "fallback": 0,
+   "failuresByCheck": {},
+   "worst": {
+    "clearance": -0.0524,
+    "otherBarrier": 4.0075,
+    "tightest": 12.5079,
+    "widestCorner": 109.8298,
+    "minWidth": 11.03,
+    "maxWidth": 16.93,
+    "maxGrade": 0.04,
+    "maxCrest": 0.0011,
+    "maxLift": 0.4286,
+    "maxBankDeg": 3,
+    "minLength": 614,
+    "maxLength": 1200,
+    "minStep": 1.9978,
+    "maxStep": 2.0001
+   },
+   "attempts": {
+    "n": 1000,
+    "min": 1,
+    "p5": 1,
+    "p50": 9,
+    "p95": 43,
+    "max": 123,
+    "mean": 14.077
+   },
+   "generationMs": {
+    "n": 1000,
+    "min": 3.684,
+    "p5": 5.989,
+    "p50": 25.766,
+    "p95": 116.725,
+    "max": 351.188,
+    "mean": 38.743
+   },
+   "rejectedAttemptsByCheck": {
+    "closure": 10091,
+    "turning": 311,
+    "length": 1760,
+    "overlap": 2320,
+    "clearance": 2259
+   }
+  },
+  "sprint": {
+   "partGap": {
+    "apartAlongTrack": 60,
+    "tracksWithPartsWithin20m": 662,
+    "gap": {
+     "n": 662,
+     "min": 4.089,
+     "p5": 6.706,
+     "p50": 18.265,
+     "p95": 28.028,
+     "max": 38.941,
+     "mean": 17.875
+    },
+    "tracksWithBarriersCloserThanTheRoadWidth": 142
+   },
+   "tracks": 1000,
+   "invalid": 0,
+   "fallback": 0,
+   "failuresByCheck": {},
+   "worst": {
+    "clearance": -0.0553,
+    "otherBarrier": 4.0176,
+    "tightest": 12.5428,
+    "widestCorner": 109.872,
+    "minWidth": 11,
+    "maxWidth": 16.97,
+    "maxGrade": 0.04,
+    "maxCrest": 0.001,
+    "maxLift": 0.4041,
+    "maxBankDeg": 3,
+    "minLength": 630,
+    "maxLength": 1198,
+    "minStep": 1.9978,
+    "maxStep": 2.0001
+   },
+   "attempts": {
+    "n": 1000,
+    "min": 1,
+    "p5": 1,
+    "p50": 1,
+    "p95": 5,
+    "max": 15,
+    "mean": 2.051
+   },
+   "generationMs": {
+    "n": 1000,
+    "min": 3.67,
+    "p5": 4.829,
+    "p50": 11.018,
+    "p95": 41.496,
+    "max": 520.774,
+    "mean": 16.326
+   },
+   "rejectedAttemptsByCheck": {
+    "length": 583,
+    "overlap": 710,
+    "clearance": 658
+   }
+  }
+ },
+ "targets": {
+  "circuit 600": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    542,
+    660
+   ]
+  },
+  "circuit 900": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    814,
+    990
+   ]
+  },
+  "circuit 1200": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    1092,
+    1320
+   ]
+  },
+  "sprint 600": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    548,
+    658
+   ]
+  },
+  "sprint 900": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    856,
+    990
+   ]
+  },
+  "sprint 1200": {
+   "tracks": 100,
+   "invalid": 0,
+   "fallback": 0,
+   "lengths": [
+    1146,
+    1320
+   ]
+  }
+ },
+ "knownAnswers": {
+  "control": [],
+  "overlap: a sprint that turns 300 degrees and crosses itself": {
+   "expected": "overlap",
+   "failed": [
+    "overlap",
+    "clearance"
+   ],
+   "detail": {
+    "ok": false,
+    "crossings": 4,
+    "gapBreaks": 152,
+    "closestOtherBarrier": 0.05510000000000037
+   }
+  },
+  "overlap: two parts whose barriers run closer than the gap": {
+   "expected": "overlap",
+   "failed": [
+    "overlap"
+   ],
+   "detail": {
+    "ok": false,
+    "crossings": 0,
+    "gapBreaks": 128,
+    "closestOtherBarrier": 2.2805999999999997
+   },
+   "crossings": 0
+  },
+  "partGap": {
+   "gap": 2.2858883437298503,
+   "ratio": 0.18660313010039595
+  },
+  "clearance: five left wall points moved to 40% of the half width": {
+   "expected": "clearance",
+   "failed": [
+    "clearance",
+    "contract"
+   ],
+   "detail": {
+    "ok": false,
+    "worstMargin": -2.7365341196630926,
+    "at": 80,
+    "breaks": 9
+   }
+  },
+  "length: the same track against a target it misses": {
+   "expected": "length",
+   "failed": [
+    "length"
+   ],
+   "detail": {
+    "ok": false,
+    "length": 1140,
+    "min": 1142,
+    "max": 1340
+   }
+  },
+  "radius: a corner of radius 11": {
+   "expected": "radius",
+   "failed": [
+    "radius"
+   ],
+   "detail": {
+    "ok": false,
+    "corners": 1,
+    "outside": 1,
+    "tightest": 10.999980750033686,
+    "widest": 10.999980750033686
+   }
+  },
+  "radius: a corner of radius 160": {
+   "expected": "radius",
+   "failed": [
+    "radius"
+   ],
+   "detail": {
+    "ok": false,
+    "corners": 1,
+    "outside": 1,
+    "tightest": 159.99999999999986,
+    "widest": 159.99999999999986
+   }
+  },
+  "width: 9 m on the start straight": {
+   "expected": "width",
+   "failed": [
+    "width"
+   ],
+   "detail": {
+    "ok": false,
+    "min": 9,
+    "max": 15.4
+   }
+  },
+  "elevation: a 1.2 m bump 16 m long": {
+   "expected": "elevation",
+   "failed": [
+    "elevation"
+   ],
+   "detail": {
+    "ok": false,
+    "maxGrade": 0.12497640256998876,
+    "maxCrestCurvature": 0.033123632539289266,
+    "liftAtTopSpeed": 12.979331649442194,
+    "maxBankDeg": 3.0000070153049903
+   }
+  },
+  "elevation: an 8% ramp": {
+   "expected": "elevation",
+   "failed": [
+    "elevation"
+   ],
+   "detail": {
+    "ok": false,
+    "maxGrade": 0.8041500000000001,
+    "maxCrestCurvature": 0.20001250000000004,
+    "liftAtTopSpeed": 78.37390927624874,
+    "maxBankDeg": 3.0000070153049903
+   }
+  },
+  "elevation: 8.6 degrees of bank": {
+   "expected": "elevation",
+   "failed": [
+    "elevation"
+   ],
+   "detail": {
+    "ok": false,
+    "maxGrade": 0.021400000000000002,
+    "maxCrestCurvature": 0.00029375000000000234,
+    "liftAtTopSpeed": 0.11510448521916503,
+    "maxBankDeg": 8.594366926962348
+   }
+  },
+  "contract: left wall points shifted three samples": {
+   "expected": "contract",
+   "failed": [
+    "overlap",
+    "contract"
+   ],
+   "detail": {
+    "ok": false,
+    "problems": [
+     "left wall not closed",
+     "a wall point is not beside its sample: 9.696 m",
+     "run-off inside a clip zone: 0.57 m"
+    ]
+   }
+  },
+  "spacing: one sample removed": {
+   "expected": "spacing",
+   "failed": [
+    "spacing"
+   ],
+   "detail": {
+    "ok": false,
+    "minStep": 1.9988110465974502,
+    "maxStep": 3.9995913716278513,
+    "worstHeadingSin": 0.012249163830941856
+   }
+  }
+ },
+ "fallbackCourses": [
+  {
+   "kind": "circuit",
+   "target": "default",
+   "fallback": true,
+   "length": 900,
+   "failed": []
+  },
+  {
+   "kind": "circuit",
+   "target": 600,
+   "fallback": true,
+   "length": 600,
+   "failed": []
+  },
+  {
+   "kind": "circuit",
+   "target": 900,
+   "fallback": true,
+   "length": 900,
+   "failed": []
+  },
+  {
+   "kind": "circuit",
+   "target": 1200,
+   "fallback": true,
+   "length": 1200,
+   "failed": []
+  },
+  {
+   "kind": "sprint",
+   "target": "default",
+   "fallback": true,
+   "length": 900,
+   "failed": []
+  },
+  {
+   "kind": "sprint",
+   "target": 600,
+   "fallback": true,
+   "length": 596,
+   "failed": []
+  },
+  {
+   "kind": "sprint",
+   "target": 900,
+   "fallback": true,
+   "length": 900,
+   "failed": []
+  },
+  {
+   "kind": "sprint",
+   "target": 1200,
+   "fallback": true,
+   "length": 1132,
+   "failed": []
+  }
+ ]
+}
