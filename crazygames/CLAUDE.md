@@ -207,7 +207,9 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   `/greybox/`.
 - 29 October 2026: new direction, `DESIGN.md`. The feel prototype
   (`briefs/FEEL.md`) is merged and live at `/`; results in
-  `review/feel/REPORT.md`, probes in `game/test/feel/`. Next, one session
-  at a time (the author's allocation resets every five hours): the track
-  generator (`briefs/TRACKS.md`, branch `crazygames-tracks`), then the five
-  car models (`briefs/CARS.md`, `crazygames-cars`).
+  `review/feel/REPORT.md`, probes in `game/test/feel/`, handling tuned
+  over three rounds of play.
+- 31 October 2026, in progress: the track generator (`briefs/TRACKS.md`,
+  branch `crazygames-tracks`) and the five car models (`briefs/CARS.md`,
+  `crazygames-cars`) in parallel, then the game loop (`briefs/GAME-LOOP.md`,
+  `crazygames-loop`), which uses whichever of the two has landed.
