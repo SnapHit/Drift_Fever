@@ -140,24 +140,33 @@ if (run('save')) {
   verdict('saved progress survives a reload', same && after.coins > 0 && after.car === 'hatch' && !!after.ghosts['career:1'], 'coins ' + after.coins + ', car ' + after.car + ', paint ' + out.save.reload.paint + ', ghost steps ' + out.save.reload.ghostSteps);
   await side.close();
 
-  // b. storage throwing on every call
-  const thrower = `Object.defineProperty(window, 'localStorage', { get() { throw new Error('storage is off'); }, configurable: true });`;
-  const ctx = await env.browser.newContext({ viewport: L.PORTRAIT, deviceScaleFactor: 1 });
-  const page = await ctx.newPage();
-  const errors = [];
-  page.on('pageerror', e => errors.push(String(e)));
-  page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
-  await page.addInitScript(`(function () { window.requestAnimationFrame = function () { return 0; }; window.cancelAnimationFrame = function () {}; ${thrower} })();`);
-  await page.goto(env.url + '?renderer=webgl2&auto=1', { waitUntil: 'load', timeout: 120000 });
-  await page.waitForFunction(() => window.__ready === true || (document.getElementById('fail') && !document.getElementById('fail').hidden), null, { timeout: 120000 });
-  const threw = await page.evaluate(() => { try { localStorage.getItem('x'); return false; } catch (e) { return true; } });
-  await L.beginRun(page, 'career', 0);
-  const r2 = await L.driveToResults(page, RUN_BUDGET);
-  const st2 = await L.saveStatus(page);
-  const title = await page.evaluate(() => { window.__loop.action('title'); return { screen: window.__loop.screens.current, text: document.querySelector('.screen .sub') && document.querySelector('.screen .sub').textContent }; });
-  out.save.throwing = { storageThrows: threw, finished: r2.finished, score: r2.results && r2.results.score, status: st2, titleAfter: title, pageErrors: errors };
-  verdict('the game runs to a results screen with storage throwing on every call', threw && r2.finished && r2.screen.shown && errors.length === 0 && st2.available === false, 'score ' + (r2.results && r2.results.score) + ', failed writes ' + st2.failedWrites + ' of ' + st2.writes + ', page errors ' + errors.length);
-  await ctx.close();
+  // b. storage throwing: first the property itself, then every method
+  const throwers = {
+    property: `Object.defineProperty(window, 'localStorage', { get() { throw new Error('storage is off'); }, configurable: true });`,
+    methods: `Object.defineProperty(window, 'localStorage', { get() { return { getItem() { throw new Error('no'); }, setItem() { throw new Error('no'); }, removeItem() { throw new Error('no'); }, clear() { throw new Error('no'); }, key() { throw new Error('no'); }, get length() { throw new Error('no'); } }; }, configurable: true });`,
+  };
+  out.save.throwing = {};
+  for (const [name, thrower] of Object.entries(throwers)) {
+    const ctx = await env.browser.newContext({ viewport: L.PORTRAIT, deviceScaleFactor: 1 });
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', e => errors.push(String(e)));
+    page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
+    await page.addInitScript(`(function () { window.requestAnimationFrame = function () { return 0; }; window.cancelAnimationFrame = function () {}; ${thrower} })();`);
+    await page.goto(env.url + '?renderer=webgl2&auto=1', { waitUntil: 'load', timeout: 120000 });
+    const ready = await page.waitForFunction(() => window.__ready === true || (document.getElementById('fail') && !document.getElementById('fail').hidden), null, { timeout: 120000 }).then(() => true).catch(() => false);
+    const threw = await page.evaluate(() => { try { localStorage.getItem('x'); return false; } catch (e) { return true; } });
+    let r2 = { finished: false, screen: { shown: false }, results: null }, st2 = null, title = null;
+    if (ready) {
+      await L.beginRun(page, 'career', 0);
+      r2 = await L.driveToResults(page, RUN_BUDGET);
+      st2 = await L.saveStatus(page);
+      title = await page.evaluate(() => { window.__loop.action('title'); return { screen: window.__loop.screens.current, text: document.querySelector('.screen .sub') && document.querySelector('.screen .sub').textContent }; });
+    }
+    out.save.throwing[name] = { storageThrows: threw, ready, finished: r2.finished, score: r2.results && r2.results.score, status: st2, titleAfter: title, pageErrors: errors };
+    verdict('the game runs to a results screen with localStorage\'s ' + name + ' throwing', threw && ready && r2.finished && r2.screen.shown && errors.length === 0 && st2.available === false, 'score ' + (r2.results && r2.results.score) + ', failed writes ' + (st2 && st2.failedWrites) + ' of ' + (st2 && st2.writes) + ', page errors ' + errors.length);
+    await ctx.close();
+  }
 
   // c. corrupted saves
   const side3 = await L.openPage(env, L.PORTRAIT, 'auto=1');

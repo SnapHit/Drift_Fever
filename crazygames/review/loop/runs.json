@@ -1,0 +1,259 @@
+{
+ "started": "2026-10-31T10:14:30.046Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
+ "budgetFrames": 18000,
+ "tracks": [
+  {
+   "mode": "career 1",
+   "name": "circuit 1101",
+   "kind": "circuit",
+   "length": 566,
+   "seed": 1101,
+   "difficulty": 0.46,
+   "corners": 5,
+   "fallback": false,
+   "laps": 3,
+   "targets": [
+    930,
+    2050,
+    3740
+   ],
+   "finished": true,
+   "resultsScreen": {
+    "shown": true,
+    "score": "824",
+    "stars": 0
+   },
+   "score": 824,
+   "bestChain": 137,
+   "stars": 0,
+   "coins": 16,
+   "seconds": 83.7,
+   "wallContacts": 3,
+   "hardHits": 3,
+   "respawns": 0,
+   "topKmh": 121,
+   "maxAngle": 47.32,
+   "driftFrames": 1213,
+   "wallSeconds": 2
+  },
+  {
+   "mode": "career 2",
+   "name": "sprint 1202",
+   "kind": "sprint",
+   "length": 844,
+   "seed": 1202,
+   "difficulty": 0.27,
+   "corners": 5,
+   "fallback": false,
+   "laps": 1,
+   "targets": [
+    440,
+    970,
+    1770
+   ],
+   "finished": true,
+   "resultsScreen": {
+    "shown": true,
+    "score": "19",
+    "stars": 0
+   },
+   "score": 19,
+   "bestChain": 9,
+   "stars": 0,
+   "coins": 0,
+   "seconds": 34.5,
+   "wallContacts": 2,
+   "hardHits": 2,
+   "respawns": 0,
+   "topKmh": 130,
+   "maxAngle": 27.44,
+   "driftFrames": 146,
+   "wallSeconds": 1
+  },
+  {
+   "mode": "career 3",
+   "name": "circuit 1303",
+   "kind": "circuit",
+   "length": 642,
+   "seed": 1303,
+   "difficulty": 0.29,
+   "corners": 5,
+   "fallback": false,
+   "laps": 3,
+   "targets": [
+    1060,
+    2330,
+    4240
+   ],
+   "finished": true,
+   "resultsScreen": {
+    "shown": true,
+    "score": "57",
+    "stars": 0
+   },
+   "score": 57,
+   "bestChain": 10,
+   "stars": 0,
+   "coins": 1,
+   "seconds": 84.1,
+   "wallContacts": 4,
+   "hardHits": 3,
+   "respawns": 0,
+   "topKmh": 121,
+   "maxAngle": 26.26,
+   "driftFrames": 316,
+   "wallSeconds": 2
+  },
+  {
+   "mode": "career 4",
+   "name": "sprint 1404",
+   "kind": "sprint",
+   "length": 982,
+   "seed": 1404,
+   "difficulty": 0.54,
+   "corners": 13,
+   "fallback": false,
+   "laps": 1,
+   "targets": [
+    520,
+    1140,
+    2070
+   ],
+   "finished": true,
+   "resultsScreen": {
+    "shown": true,
+    "score": "202",
+    "stars": 0
+   },
+   "score": 202,
+   "bestChain": 123,
+   "stars": 0,
+   "coins": 4,
+   "seconds": 43.9,
+   "wallContacts": 1,
+   "hardHits": 0,
+   "respawns": 0,
+   "topKmh": 114,
+   "maxAngle": 45.69,
+   "driftFrames": 406,
+   "wallSeconds": 1
+  },
+  {
+   "mode": "career 5",
+   "name": "circuit 1505",
+   "kind": "circuit",
+   "length": 604,
+   "seed": 1505,
+   "difficulty": 0.6,
+   "corners": 8,
+   "fallback": false,
+   "laps": 3,
+   "targets": [
+    1000,
+    2190,
+    3990
+   ],
+   "finished": true,
+   "resultsScreen": {
+    "shown": true,
+    "score": "369",
+    "stars": 0
+   },
+   "score": 369,
+   "bestChain": 92,
+   "stars": 0,
+   "coins": 7,
+   "seconds": 86.7,
+   "wallContacts": 3,
+   "hardHits": 3,
+   "respawns": 0,
+   "topKmh": 103,
+   "maxAngle": 32.75,
+   "driftFrames": 744,
+   "wallSeconds": 2
+  },
+  {
+   "mode": "career 6",
+   "name": "sprint 1606",
+   "kind": "sprint",
+   "length": 1034,
+   "seed": 1606,
+   "difficulty": 0.66,
+   "corners": 14,
+   "fallback": false,
+   "laps": 1,
+   "targets": [
+    550,
+    1200,
+    2190
+   ],
+   "finished": true,
+   "resultsScreen": {
+    "shown": true,
+    "score": "221",
+    "stars": 0
+   },
+   "score": 221,
+   "bestChain": 150,
+   "stars": 0,
+   "coins": 4,
+   "seconds": 48.5,
+   "wallContacts": 5,
+   "hardHits": 2,
+   "respawns": 0,
+   "topKmh": 113,
+   "maxAngle": 47.16,
+   "driftFrames": 477,
+   "wallSeconds": 1
+  },
+  {
+   "mode": "daily",
+   "name": "sprint 1976143581",
+   "kind": "sprint",
+   "length": 992,
+   "seed": 1976143581,
+   "difficulty": 0.39,
+   "corners": 7,
+   "fallback": false,
+   "laps": 1,
+   "targets": [
+    520,
+    1150,
+    2090
+   ],
+   "finished": true,
+   "resultsScreen": {
+    "shown": true,
+    "score": "87",
+    "stars": 0
+   },
+   "score": 87,
+   "bestChain": 51,
+   "stars": 0,
+   "coins": 2,
+   "seconds": 39.4,
+   "wallContacts": 5,
+   "hardHits": 2,
+   "respawns": 0,
+   "topKmh": 123,
+   "maxAngle": 46.5,
+   "driftFrames": 282,
+   "wallSeconds": 1
+  }
+ ],
+ "summary": {
+  "circuitsFinished": 3,
+  "sprintsFinished": 4,
+  "allScreensShown": true
+ },
+ "knownAnswer": {
+  "laps": 99,
+  "budgetFrames": 9000,
+  "finished": false,
+  "lapsDone": 5,
+  "state": "drive",
+  "caught": true
+ },
+ "errors": []
+}

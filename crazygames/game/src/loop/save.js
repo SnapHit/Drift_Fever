@@ -73,8 +73,11 @@ export function repair(raw) {
 
 export function createSave(opts) {
   const o = opts || {};
-  const store = o.storage !== undefined ? o.storage : (typeof localStorage !== 'undefined' ? localStorage : null);
   const status = { available: false, loaded: false, repaired: 0, lastError: null, writes: 0, failedWrites: 0 };
+  /* even reading the localStorage property can throw (a sandboxed frame,
+     storage switched off), so the store itself is taken inside a try */
+  let store = null;
+  try { store = o.storage !== undefined ? o.storage : (typeof localStorage !== 'undefined' ? localStorage : null); } catch (e) { store = null; status.lastError = String(e); }
   let state = defaults();
   function load() {
     let raw = null;

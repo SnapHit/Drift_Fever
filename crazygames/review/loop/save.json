@@ -1,0 +1,126 @@
+{
+ "started": "2026-10-31T10:17:41.984Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
+ "reload": {
+  "coinsBefore": 4100,
+  "coinsAfter": 4100,
+  "car": "hatch",
+  "paint": "lime",
+  "career1": {
+   "stars": 0,
+   "best": 19
+  },
+  "ghostSteps": 4138,
+  "identical": true,
+  "status": {
+   "available": true,
+   "loaded": true,
+   "repaired": 0,
+   "lastError": null,
+   "writes": 0,
+   "failedWrites": 0
+  },
+  "runScore": 19
+ },
+ "throwing": {
+  "property": {
+   "storageThrows": true,
+   "ready": true,
+   "finished": true,
+   "score": 824,
+   "status": {
+    "available": false,
+    "loaded": false,
+    "repaired": 0,
+    "lastError": "Error: storage is off",
+    "writes": 3,
+    "failedWrites": 0
+   },
+   "titleAfter": {
+    "screen": "title",
+    "text": "CrazyGames edition (no memory on this device)"
+   },
+   "pageErrors": []
+  },
+  "methods": {
+   "storageThrows": true,
+   "ready": true,
+   "finished": true,
+   "score": 824,
+   "status": {
+    "available": false,
+    "loaded": false,
+    "repaired": 0,
+    "lastError": "Error: no",
+    "writes": 3,
+    "failedWrites": 3
+   },
+   "titleAfter": {
+    "screen": "title",
+    "text": "CrazyGames edition (no memory on this device)"
+   },
+   "pageErrors": []
+  }
+ },
+ "corrupted": {
+  "blobs": {
+   "notJson": "not json {{{",
+   "wrongShape": "{\"v\":1,\"coins\":\"abc\",\"car\":\"a real car brand\",\"cars\":\"x\",\"career\":{\"0\":{\"stars\":\"three\",\"best\":-5},\"x\":1},\"daily\":7,\"ghosts\":{\"career:0\":{\"score\":10,\"steps\":3,\"car\":\"starter\",\"tape\":[[1,0,1,0,0],[2,\"x\",1,0,0]]},\"career:1\":{\"score\":5,\"steps\":2,\"car\":\"starter\",\"tape\":[[2,0,1,0,0]]}}}"
+  },
+  "results": {
+   "notJson": {
+    "status": {
+     "available": true,
+     "loaded": false,
+     "repaired": 1,
+     "lastError": "unreadable save",
+     "writes": 0,
+     "failedWrites": 0
+    },
+    "state": {
+     "coins": 0,
+     "car": "starter",
+     "cars": [
+      "starter"
+     ],
+     "career": {},
+     "ghosts": []
+    },
+    "finished": true,
+    "errors": []
+   },
+   "wrongShape": {
+    "status": {
+     "available": true,
+     "loaded": true,
+     "repaired": 7,
+     "lastError": null,
+     "writes": 0,
+     "failedWrites": 0
+    },
+    "state": {
+     "coins": 0,
+     "car": "starter",
+     "cars": [
+      "starter"
+     ],
+     "career": {},
+     "ghosts": [
+      "career:1"
+     ]
+    },
+    "finished": true,
+    "errors": []
+   }
+  },
+  "knownAnswer": {
+   "rawPassesInvariants": false,
+   "repairedPassesInvariants": true,
+   "fixes": 7,
+   "ghostsKept": [
+    "career:1"
+   ],
+   "caught": true
+  }
+ }
+}
