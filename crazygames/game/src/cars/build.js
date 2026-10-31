@@ -33,7 +33,7 @@ export const FINISH = {
   TYRE:      0x1b1b1f,
   TYRE_WALL: 0x24242a,
   GAP:       0x121216,   // between the spokes
-  GLASS:     0x141a26,
+  GLASS:     0x223047,
   HEAD_LENS: 0xd6dde6,
   HEAD_GLOW: 0xfff1d2,
   TAIL_LENS: 0x4a080c,
@@ -43,7 +43,7 @@ export const FINISH = {
   UNDERGLOW_SPREAD: 0.55,  // m the glow reaches past the body
   UNDERGLOW_LIFT:   0.025, // m above the ground
   PAINT_ROUGH: 0.42, PAINT_METAL: 0.2,
-  GLASS_ROUGH: 0.15, GLASS_METAL: 0.5,
+  GLASS_ROUGH: 0.12, GLASS_METAL: 0.3,
   TRIM_ROUGH:  0.72, TRIM_METAL:  0.1,
   LAMP_ROUGH:  0.3,
 };
@@ -272,11 +272,13 @@ function endFaces(S, sh, sink) {
     if (r[0] < 0) box(sink, mat, colour, r[0], r[1], r[2], r[3], z0, z1);
     else both(s => box(sink, mat, colour, s > 0 ? r[0] : -r[1], s > 0 ? r[1] : -r[0], r[2], r[3], z0, z1));
   };
+  // trim pieces stand proud by list order, so a later one sits on an earlier one without fighting it
+  const proud = i => d * 0.4 + i * 0.004;
   sink.begin('front');
-  for (const r of S.front.trim || []) put('trim', r[4] != null ? r[4] : FINISH.BLACK, r, zF - d * 0.6, zF + 0.01);
+  (S.front.trim || []).forEach((r, i) => put('trim', r[4] != null ? r[4] : FINISH.BLACK, r, zF - proud(i), zF + 0.01));
   for (const r of S.front.lamps) put('head', null, r, zF - d, zF + 0.01);
   sink.begin('rear');
-  for (const r of S.back.trim || []) put('trim', r[4] != null ? r[4] : FINISH.BLACK, r, zR - 0.01, zR + d * 0.6);
+  (S.back.trim || []).forEach((r, i) => put('trim', r[4] != null ? r[4] : FINISH.BLACK, r, zR - 0.01, zR + proud(i)));
   for (const r of S.back.lamps) put('tail', null, r, zR - 0.01, zR + d);
 }
 

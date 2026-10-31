@@ -1,42 +1,39 @@
-/* THE STARTER: a compact, balanced coupe, friendly. Cyan by default.
-   Built to the feel prototype's vehicle exactly: wheelbase 2.55 m, track
-   1.60 m, wheel radius 0.33 m, and inside its 4.40 by 1.84 m collision
-   box, which is centred 0.025 m ahead of the middle of the wheelbase
-   (the centre of mass sits 1.25 m behind the front axle).
-
-   Every number is metres. z runs from the front bumper (negative) to the
-   rear; the middle of the wheelbase is z = 0, the front axle -1.275. */
+/* RAW POWER: a muscular fastback. A long flat bonnet with a raised
+   bulge, a short roof that runs straight into a long sloping deck and a
+   kicked up tail, a full width grille band, wide rear hips over wider
+   rear tyres, and big twin exhausts. */
 export default {
   id: 'fastback',
-  label: 'Starter coupe',
-  character: 'compact and balanced, friendly',
-  paint: 0x19d8ff,
-  dims: { length: 4.36, wheelbase: 2.55, track: 1.60, wheelRadius: 0.33, tyre: [0.22, 0.22] },
-  offset: -0.025,          // the body's middle from the middle of the wheelbase
-  halfWidth: 0.915,        // the sides; the tyres' outer faces are at 0.91
+  label: 'Fastback',
+  character: 'muscular, wide rear arches, raw power',
+  paint: 0xe8452c,
+  dims: { length: 4.7, wheelbase: 2.76, track: 1.62, wheelRadius: 0.35, tyre: [0.24, 0.3] },
+  offset: 0.03,
+  halfWidth: 0.925,
   floor: 0.15, sill: 0.27,
-  nose: { low: 0.25, belt: 0.64, deck: 0.68, taper: 0.84, round: 0.32 },
-  tail: { low: 0.32, belt: 0.86, deck: 0.93, taper: 0.88, round: 0.26 },
-  belt: 0.84, beltRise: 0.04, hood: 0.89, hoodCrown: 0.045,
-  screen: [-0.62, 0.02],
-  roof: { h: 1.32, end: 0.76, w: 0.6, drop: 0.03, crown: 0.035 },
-  rear: { base: 1.42, deck: 0.96 },
-  windows: [[-0.5, 0.42], [0.5, 1.08]],
-  shoulder: 0.035, glassIn: 0.12, waist: 0.42,
-  archGap: [0.05, 0.045], archSteps: 6, spacing: 0.2,
-  sillTrim: true,
+  nose: { low: 0.27, belt: 0.7, deck: 0.73, taper: 0.92, round: 0.18 },
+  tail: { low: 0.33, belt: 0.9, deck: 1.0, taper: 0.95, round: 0.16 },
+  belt: 0.82, beltRise: 0.02, hood: 0.88, hoodCrown: 0.03,
+  screen: [-0.32, 0.3],
+  roof: { h: 1.3, end: 0.62, w: 0.58, drop: 0.02, crown: 0.03 },
+  rear: { base: 2.08, deck: 0.98 },
+  rearGlass: [[0.64, 1.3]],
+  windows: [[-0.2, 0.55], [0.62, 1.12]],
+  shoulder: 0.03, glassIn: 0.13, waist: 0.48,
+  flare: { front: { amount: 0.012, len: 0.5 }, rear: { amount: 0.05, len: 0.8, belt: 0.6 } },
+  archGap: [0.05, 0.05], archSteps: 6, spacing: 0.2,
+  bulge: { from: -1.95, to: -0.42, w: 0.3, h: 0.05 },
   front: {
-    lamps: [[0.44, 0.72, 0.5, 0.6]],
-    trim: [[-0.34, 0.34, 0.42, 0.56], [-0.5, 0.5, 0.29, 0.37]],
+    lamps: [[0.56, 0.78, 0.52, 0.62]],
+    trim: [[-0.84, 0.84, 0.48, 0.66], [-0.6, 0.6, 0.3, 0.38]],
   },
   back: {
-    lamps: [[0.42, 0.75, 0.7, 0.8]],
-    trim: [[-0.21, 0.21, 0.5, 0.62, 0xd9d8cf], [-0.7, 0.7, 0.36, 0.44, 0x34363d]],
+    lamps: [[0.32, 0.8, 0.76, 0.86]],
+    trim: [[-0.2, 0.2, 0.58, 0.7, 0xd9d8cf], [-0.8, 0.8, 0.38, 0.46, 0x16171b]],
   },
   extras: [
     { type: 'mirrors', at: 0.14, reach: 0.15 },
-    { type: 'lip', back: 0.03, chord: 0.16, h: 0.045, span: 0.66, paint: true },
-    { type: 'exhaust', x: [0.48], y: 0.3, r: 0.04, out: 0.01 },
+    { type: 'exhaust', x: [0.55, -0.55], y: 0.31, r: 0.05, out: 0.015 },
   ],
-  wheel: { segments: 15, spokes: 5, spokeShare: 0.33, rim: 0.66, dish: 0.035, colour: 0xc3c8cf },
+  wheel: { segments: 15, spokes: 5, spokeShare: 0.33, rim: 0.66, dish: 0.045, colour: 0x5a5e66 },
 };
