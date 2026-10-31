@@ -68,12 +68,15 @@ export function makeCar(THREE, id, options) {
 /* A model made see through, for the ghost: every material cloned so the
    original car is untouched. */
 export function makeGhostly(model, opacity, tint) {
-  model.group.traverse(m => {
-    if (!m.isMesh) return;
-    const mat = m.material.clone();
+  const ghostly = src => {
+    const mat = src.clone();
     mat.transparent = true; mat.opacity = opacity; mat.depthWrite = false;
     if (tint !== undefined && mat.color) mat.color.lerp({ r: ((tint >> 16) & 255) / 255, g: ((tint >> 8) & 255) / 255, b: (tint & 255) / 255 }, 0.5);
-    m.material = mat;
+    return mat;
+  };
+  model.group.traverse(m => {
+    if (!m.isMesh || !m.material) return;
+    m.material = Array.isArray(m.material) ? m.material.map(ghostly) : ghostly(m.material);
     m.renderOrder = 2;
   });
   return model;

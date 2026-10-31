@@ -38,8 +38,11 @@ export function dailySeed(date) {
 /* A track for a spec. The result always has: kind, length, centre,
    walls, clips, start, startLine, checkpoints (at least one per lap),
    finish (sprints), bounds, sections, cones, seed, name. */
+let memo = null;   // the last track generated, so going again does not generate it twice
 export function trackFor(spec) {
   const s = spec || {};
+  const memoKey = [s.seed, s.kind, s.difficulty, s.length].join('|');
+  if (memo && memo.key === memoKey) return memo.track;
   let t;
   if (GENERATOR) {
     /* The physics and the scene are flat: the generator's elevation and
@@ -60,6 +63,7 @@ export function trackFor(spec) {
   if (t.finish === undefined) t.finish = null;
   if (!t.sections) t.sections = {};
   if (!t.cones) t.cones = [];
+  memo = { key: memoKey, track: t };
   return t;
 }
 
