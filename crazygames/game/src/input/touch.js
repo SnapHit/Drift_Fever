@@ -72,7 +72,9 @@ export function createTouch(root, onActive, onRestart) {
 
   const out = { steer: 0, throttle: 0, brake: 0, handbrake: 0 };
   return {
-    el, show,
+    el, show, restartButton: restart,
+    /* the loop hides the pad on its screens; the restart button goes with it */
+    setVisible(v) { el.classList.toggle('hidden', !v); restart.classList.toggle('hidden', !v); if (!v) { pointers.clear(); recount(); } },
     read() {
       out.steer = (held.right ? 1 : 0) - (held.left ? 1 : 0);
       out.throttle = 0;

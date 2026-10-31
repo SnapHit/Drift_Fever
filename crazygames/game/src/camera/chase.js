@@ -59,7 +59,19 @@ export function createChaseCamera() {
     }
   }
 
-  return { state, update, reset, hit };
+  /* The menu camera: a slow orbit around a point on the start line, for
+     the title and the garage, written straight to the three.js camera. */
+  function orbit(centre, t, cam, aspect) {
+    const C = TUNE.CAMERA;
+    const portrait = aspect < 1;
+    const ang = t * 0.25, dist = portrait ? 11 : 9, height = portrait ? 4.2 : 3.2;
+    cam.position.set(centre.x + Math.sin(ang) * dist, height, centre.z + Math.cos(ang) * dist);
+    cam.lookAt(centre.x, 0.9, centre.z);
+    const fov = portrait ? C.FOV_PORTRAIT : C.FOV;
+    if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+  }
+
+  return { state, update, reset, hit, orbit };
 }
 
 /* Is the car's whole box on screen? Projects the eight corners of the

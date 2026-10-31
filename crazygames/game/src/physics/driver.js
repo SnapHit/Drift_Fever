@@ -38,8 +38,10 @@ export function createDriver(ground, opts) {
     curvature[i] = Math.abs(d) / 4;
     turn[i] = d > 0 ? 1 : d < 0 ? -1 : 0;     // +1 a left turn
   }
-  const sec = o.drift && ground.sections[o.drift];
-  let hbUntil = -1, inSection = false;
+  /* the sections to drift: one by name, or every one with '*' */
+  const secs = o.drift === '*' ? Object.values(ground.sections || {}) : (o.drift && ground.sections[o.drift] ? [ground.sections[o.drift]] : []);
+  const sec = secs.length > 0;
+  let hbUntil = -1, inSection = false, current = null;
   const out = { steer: 0, throttle: 0, brake: 0, handbrake: 0 };
   return {
     input(world) {
@@ -48,7 +50,8 @@ export function createDriver(ground, opts) {
       let drifting = false;
       if (sec) {
         const s = world.along;
-        const inside = s >= sec[0] - D.DRIFT_LEAD && s <= sec[1];
+        let inside = false;
+        for (const sc of secs) if (s >= sc[0] - D.DRIFT_LEAD && s <= sc[1]) { inside = true; current = sc; break; }
         if (inside && !inSection) hbUntil = world.time + D.DRIFT_HB;
         inSection = inside;
         drifting = inside;
@@ -71,8 +74,9 @@ export function createDriver(ground, opts) {
       let brake = v > vDes + D.BRAKE_MARGIN ? Math.min(1, (v - vDes - D.BRAKE_MARGIN) / 4) : 0;
       let handbrake = 0;
       if (sec && !drifting) {
-        // before the section: arrive at the entry speed
-        const ahead = (sec[0] - world.along + ground.length) % ground.length;
+        // before the next section: arrive at the entry speed
+        let ahead = Infinity;
+        for (const sc of secs) { const a = (sc[0] - world.along + ground.length) % ground.length; if (a < ahead) ahead = a; }
         if (ahead < 60 && ahead > 0) { if (v > D.DRIFT_ENTRY_SPEED + 1) { throttle = 0; brake = 0.5; } else if (v < D.DRIFT_ENTRY_SPEED - 1) { throttle = 1; brake = 0; } }
       }
       if (drifting) {
@@ -95,7 +99,7 @@ export function createDriver(ground, opts) {
         const intoSign = -turn[world.centreIndex];
         if (ds * intoSign > 0 && Math.abs(ds) < D.DRIFT_STEER_MIN) ds = intoSign * D.DRIFT_STEER_MIN;
         steer = Math.max(-1, Math.min(1, ds)) * o.invert;
-        void outside;
+        void outside; void current;
         if (world.time < hbUntil) { handbrake = 1; steer = -turn[world.centreIndex] * o.invert || (steer > 0 ? 1 : -1); throttle = 1; }
       }
       out.steer = steer; out.throttle = throttle; out.brake = brake; out.handbrake = handbrake;

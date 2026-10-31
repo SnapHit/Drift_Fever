@@ -13,14 +13,20 @@
    down, W or S drift; R restart. Gamepad: left stick or d-pad steer, A,
    B, X or either trigger drift, Y or start restart.
    Touch: the big buttons touch.js draws; a thumb can slide between the
-   two steer buttons without lifting. */
+   two steer buttons without lifting.
+
+   For the game loop: setStarted(false) holds the car on the line through
+   a countdown (the throttle stays off until the player presses anything,
+   or the loop calls setStarted(true) at GO), and record.action is an
+   edge, true on the frame DRIFT, Enter, R or a gamepad face button was
+   pressed, which is the one input that goes again from the results. */
 import { TUNE } from '../tune.js';
 import { createTouch } from './touch.js';
 
 export function createInput(root) {
   const keys = new Set();
-  const record = { steer: 0, throttle: 0, brake: 0, handbrake: 0, restart: false, source: 'keys' };
-  let restartEdge = false;
+  const record = { steer: 0, throttle: 0, brake: 0, handbrake: 0, restart: false, action: false, source: 'keys' };
+  let restartEdge = false, actionEdge = false, hbWas = 0;
   let lastKey = 0, lastPad = 0, lastTouch = 0, now = 0;
   const touch = createTouch(root, () => { lastTouch = now; }, () => { restartEdge = true; lastTouch = now; });
 
@@ -29,7 +35,8 @@ export function createInput(root) {
      no brake; DRIFT slows it). Until then it waits on the line. */
   let started = false;
   window.addEventListener('keydown', e => {
-    if (e.key === 'r' || e.key === 'R') { if (!e.repeat) restartEdge = true; lastKey = now; e.preventDefault(); return; }
+    if (e.key === 'r' || e.key === 'R') { if (!e.repeat) { restartEdge = true; actionEdge = true; } lastKey = now; e.preventDefault(); return; }
+    if (e.key === 'Enter') { if (!e.repeat) actionEdge = true; lastKey = now; return; }
     const k = keyMap[e.key];
     if (!k) return;
     keys.add(k); lastKey = now; e.preventDefault();
@@ -52,7 +59,7 @@ export function createInput(root) {
       const restart = b(3) || b(9);
       const active = steer !== 0 || handbrake || restart;
       if (active) { lastPad = now; }
-      if (restart && !padSeen) restartEdge = true;
+      if (restart && !padSeen) { restartEdge = true; actionEdge = true; }
       padSeen = !!restart;
       if (active || record.source === 'pad') return { steer, throttle, brake, handbrake };
     }
@@ -79,9 +86,12 @@ export function createInput(root) {
     record.brake = 0;
     record.throttle = started && TUNE.CONTROLS.AUTO_THROTTLE ? 1 : 0;
     record.restart = restartEdge;
-    restartEdge = false;
+    if (record.handbrake && !hbWas) actionEdge = true;
+    hbWas = record.handbrake;
+    record.action = actionEdge;
+    restartEdge = false; actionEdge = false;
     return record;
   }
 
-  return { read, touch, record };
+  return { read, touch, record, setStarted(v) { started = !!v; }, get started() { return started; } };
 }

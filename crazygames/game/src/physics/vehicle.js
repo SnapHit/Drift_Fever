@@ -13,15 +13,22 @@
    Deterministic: no Math.random, no clock, no allocation that depends on
    timing. The same input stream from the same start gives the same run.
    Every constant comes from TUNE.VEHICLE and TUNE.ASSIST, read on every
-   step so the tuning panel applies live. */
+   step so the tuning panel applies live.
+
+   A car may carry its own handling: createVehicle takes a tune, a pair
+   { VEHICLE, ASSIST } whose prototypes are TUNE.VEHICLE and TUNE.ASSIST
+   with a car's few overrides as own properties (see garage/roster.js),
+   so everything not overridden still reads the live tune. With no tune
+   the car is the starter, which is the tune itself. */
 import { TUNE } from '../tune.js';
 
 export const STEP = 1 / 120;
 const DEG = Math.PI / 180;
 
-export function createVehicle(x, z, yaw) {
+export function createVehicle(x, z, yaw, tune) {
   return {
     x: x || 0, z: z || 0, yaw: yaw || 0,
+    tune: tune || null,   // this car's handling, or null for the starter (TUNE itself)
     wvx: 0, wvz: 0,       // world velocity
     r: 0,                 // yaw rate, rad/s, positive left
     steerDriver: 0,       // the driver's steering angle after the slew, rad
@@ -62,7 +69,7 @@ function smooth01(x) { x = x < 0 ? 0 : x > 1 ? 1 : x; return x * x * (3 - 2 * x)
 /* One fixed step. input: { steer -1..1 (+ is right), throttle 0..1,
    brake 0..1, handbrake 0 or 1 }. */
 export function stepVehicle(s, input, dt) {
-  const V = TUNE.VEHICLE, A = TUNE.ASSIST;
+  const V = s.tune ? s.tune.VEHICLE : TUNE.VEHICLE, A = s.tune ? s.tune.ASSIST : TUNE.ASSIST;
   const m = V.MASS, g = V.GRAVITY, L = V.WHEELBASE, a = V.CG_TO_FRONT, b = L - a;
   const Iz = V.INERTIA_FACTOR * m * a * b;
   const fx = -Math.sin(s.yaw), fz = -Math.cos(s.yaw);     // forward in world
@@ -311,7 +318,7 @@ export function stepVehicle(s, input, dt) {
    the normal speed that was removed. The car is a 2D rigid body here:
    its yaw rate takes a share of the hit through the point's lever arm. */
 export function applyImpact(s, px, pz, nx, nz, restitution, friction) {
-  const V = TUNE.VEHICLE;
+  const V = s.tune ? s.tune.VEHICLE : TUNE.VEHICLE;
   const m = V.MASS, a = V.CG_TO_FRONT, b = V.WHEELBASE - a;
   const Iz = V.INERTIA_FACTOR * m * a * b;
   const rx = px - s.x, rz = pz - s.z;            // lever arm
@@ -341,7 +348,7 @@ export function applyImpact(s, px, pz, nx, nz, restitution, friction) {
 /* The body's contact points in world: four corners and the two side
    midpoints. Fills out (12 numbers) and returns it. */
 export function bodyPoints(s, out) {
-  const V = TUNE.VEHICLE;
+  const V = s.tune ? s.tune.VEHICLE : TUNE.VEHICLE;
   const hl = V.HALF_LENGTH, hw = V.HALF_WIDTH;
   const fx = -Math.sin(s.yaw), fz = -Math.cos(s.yaw);
   const lx = -Math.cos(s.yaw), lz = Math.sin(s.yaw);

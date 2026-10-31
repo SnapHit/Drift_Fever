@@ -201,3 +201,29 @@ export function tuneGet(path) { const [g, k] = path.split('.'); return TUNE[g][k
 export function tuneSet(path, v) { const [g, k] = path.split('.'); TUNE[g][k] = v; }
 export function tuneDefaults() { return JSON.parse(JSON.stringify(DEFAULTS)); }
 const DEFAULTS = JSON.parse(JSON.stringify(TUNE));
+
+/* THE GAME LOOP BLOCK: everything tunable about a run that is not the
+   car's feel. The countdown, the lap count, how a run's score turns into
+   stars and coins, what cars and paint cost, and how the ghost looks.
+   Nothing here is balanced yet; the numbers are a first guess for the
+   author to play against, and the loop probes report what the scripted
+   drifter scores against the star targets. */
+export const LOOP = {
+  COUNTDOWN:          3.0,     // s, 3 2 1 then GO
+  GO_SHOWN:           0.8,     // s the GO stays up after the car is released
+  LAPS:               3,       // laps of a circuit
+  CHECKPOINTS:        3,       // per lap when a track names none (the test track)
+  RESULTS_LOCKOUT:    0.7,     // s before the results screen takes the go again input
+  FINISH_SETTLE:      0.35,    // s after the line before the open chain is banked and the results shown
+  STAR_RATE:          0.55,    // points per metre of run (length times laps) for the first star
+  STAR_LEVELS:        [1, 2.2, 4],   // the three targets as multiples of the first
+  COIN_PER_POINT:     0.02,    // coins from the score
+  COIN_PER_STAR:      25,      // and for each star earned (first time and every time)
+  DAILY_BONUS:        1.5,     // the daily drift pays this much more
+  PAINT_PRICE:        60,      // coins for a paint other than the car's own
+  GHOST_OPACITY:      0.38,
+  GHOST_TINT:         0xdfe6ff,
+  GHOST_MIN_STEPS:    120,     // a run shorter than a second is not a ghost
+  SAVE_VERSION:       1,
+  FREE_TRACK:         'park',
+};

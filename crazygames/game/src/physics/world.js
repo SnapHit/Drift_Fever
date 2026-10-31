@@ -24,7 +24,10 @@ const OFF_TRACK = 6;           // m past the half width is a respawn
 
 export { STEP };
 
-export function createWorld(ground) {
+/* opts.tune: the car's handling (see vehicle.js), or nothing for the
+   starter. */
+export function createWorld(ground, opts) {
+  const tune = (opts && opts.tune) || null;
   const segs = [];
   for (const wall of ground.walls) {
     const p = wall.points;
@@ -54,11 +57,11 @@ export function createWorld(ground) {
     for (let cx = cellX(x0); cx <= cellX(x1); cx++) for (let cz = cellZ(z0); cz <= cellZ(z1); cz++) grid[cz * cols + cx].push(s);
   }
 
-  const car = createVehicle(ground.start.x, ground.start.z, ground.start.yaw);
+  const car = createVehicle(ground.start.x, ground.start.z, ground.start.yaw, tune);
   const cones = ground.cones.map(c => ({ x0: c.x, z0: c.z, x: c.x, z: c.z, vx: 0, vz: 0, knocked: 0, tilt: 0, tiltX: 0, tiltZ: 0 }));
   const pts = new Float64Array(12);
   const world = {
-    ground, car, cones, segs, step: 0, time: 0,
+    ground, car, cones, segs, tune, step: 0, time: 0,
     along: 0, lateral: 0, centreIndex: 0,   // where the car is along the track, and how far left of the centre
     hit: null,                              // this step's hit, if any: { speed, hard, kind, x, z }
     respawned: false, recovered: false, stuckT: 0, lastTouch: -1, wallNx: 0, wallNz: 0, touching: false, hits: 0, hardHits: 0, conesKnocked: 0, nearest: Infinity, nearestClip: null,
@@ -66,7 +69,7 @@ export function createWorld(ground) {
   };
 
   function reset() {
-    const c = createVehicle(ground.start.x, ground.start.z, ground.start.yaw);
+    const c = createVehicle(ground.start.x, ground.start.z, ground.start.yaw, tune);
     Object.assign(car, c);
     for (const k of cones) { k.x = k.x0; k.z = k.z0; k.vx = 0; k.vz = 0; k.knocked = 0; k.tilt = 0; k.tiltX = 0; k.tiltZ = 0; }
     world.step = 0; world.time = 0; world.hit = null; world.touching = false; world.stuckT = 0; world.lastTouch = -1; world.recovered = false; world.hits = 0; world.hardHits = 0; world.conesKnocked = 0; world.respawned = false;
@@ -163,7 +166,7 @@ export function createWorld(ground) {
   }
 
   function collideCones(dt) {
-    const V = TUNE.VEHICLE;
+    const V = tune ? tune.VEHICLE : TUNE.VEHICLE;
     const fx = -Math.sin(car.yaw), fz = -Math.cos(car.yaw);
     const lx = -Math.cos(car.yaw), lz = Math.sin(car.yaw);
     let nearest = Infinity;
@@ -207,7 +210,7 @@ export function createWorld(ground) {
      it is there. In the car park, with no track, it is turned to face
      away from the wall instead. Deterministic: it reads only the state. */
   function unstick(input) {
-    const A = TUNE.ASSIST;
+    const A = tune ? tune.ASSIST : TUNE.ASSIST;
     if (car.speed > A.RECOVER_SPEED || !(input.throttle > 0 || input.brake > 0)) { world.stuckT = 0; return; }
     const nearWall = world.touching || (world.lastTouch >= 0 && world.time - world.lastTouch < 0.4);
     let facingBack = false;
@@ -222,12 +225,12 @@ export function createWorld(ground) {
     world.stuckT = 0;
     if (ground.centre.length) {
       const c = ground.centre[world.centreIndex];
-      Object.assign(car, createVehicle(c.x, c.z, c.heading));
+      Object.assign(car, createVehicle(c.x, c.z, c.heading, tune));
       car.wvx = -Math.sin(c.heading) * A.RECOVER_LAUNCH; car.wvz = -Math.cos(c.heading) * A.RECOVER_LAUNCH;
       locate(true);
     } else {
       const yaw = Math.atan2(-world.wallNx, -world.wallNz);
-      Object.assign(car, createVehicle(car.x + world.wallNx * 1.0, car.z + world.wallNz * 1.0, yaw));
+      Object.assign(car, createVehicle(car.x + world.wallNx * 1.0, car.z + world.wallNz * 1.0, yaw, tune));
     }
     world.respawned = true; world.recovered = true;
   }
@@ -243,7 +246,7 @@ export function createWorld(ground) {
       if (Math.abs(world.lateral) > world.halfWidth + OFF_TRACK) {
         // off the track: back on the line, pointing down it, stopped
         const c = ground.centre[world.centreIndex];
-        Object.assign(car, createVehicle(c.x, c.z, c.heading));
+        Object.assign(car, createVehicle(c.x, c.z, c.heading, tune));
         world.respawned = true;
         locate(true);
       }

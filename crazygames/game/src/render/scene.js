@@ -1,12 +1,15 @@
 /* THE SCENE. Plain shapes in real 3D: the ground, the road with bright
-   edges, the walls, the clipping zone markers, the cones, the car as a
-   body, a cabin, four wheels and lights, and the tyre marks the rear
-   wheels lay while they slide. three.js WebGPURenderer, with the WebGL 2
-   fallback forced by ?renderer=webgl2. No textures, no shadows, a
-   hemisphere light and a sun, fog to the horizon. Every number of taste
-   lives in LOOK at the top. */
+   edges, kerbs through the corners, the walls, the clipping zone
+   markers, a start gantry and a finish line, the cones, the car (through
+   render/car.js, so a model drops in), the ghost as a see through copy,
+   and the tyre marks the rear wheels lay while they slide. three.js
+   WebGPURenderer, with the WebGL 2 fallback forced by ?renderer=webgl2.
+   No textures, no shadows, a hemisphere light and a sun, fog to the
+   horizon. Every number of taste lives in LOOK at the top. */
 import * as THREE from 'three';
-import { TUNE } from '../tune.js';
+import { TUNE, LOOP } from '../tune.js';
+import { makeCar, makeGhostly } from './car.js';
+import { carById, carTune, paintById } from '../garage/roster.js';
 
 export const LOOK = {
   SKY:          0x1a1d33,
@@ -21,6 +24,19 @@ export const LOOK = {
   WALL_TYRES:   0x3a3f4a,
   WALL_CLIP:    0xff8a3c,     // a wall inside a clipping zone
   WALL_HEIGHT:  1.0,
+  KERB_A:       0x7d5753,     // kerbs through the corners, muted so the edge stays the brightest thing
+  KERB_B:       0x8f8f96,
+  KERB_WIDTH:   1.0,          // m inside the edge line
+  KERB_RADIUS:  70,           // m: corners this tight or tighter get kerbs
+  KERB_STRIPE:  2,            // samples per stripe
+  LINE:         0xffffff,     // the start and finish lines
+  LINE_DEPTH:   1.0,
+  GANTRY:       0xd8dbe6,     // the start gantry's posts and beam
+  GANTRY_BEAM:  0x19d8ff,
+  GANTRY_H:     5.0,          // m
+  GANTRY_POST:  0.35,
+  FINISH_BEAM:  0xf6e7a1,
+  CHECK_POST:   0x5a5d6a,     // a thin post either side at each checkpoint
   CONE:         0xff7a1a,
   CAR:          0x19d8ff,     // fixed cyan
   CAR_DARK:     0x0d6f85,
@@ -87,15 +103,34 @@ export function createScene(canvas, opts) {
     plane.position.set((b.minX + b.maxX) / 2, -0.02, (b.minZ + b.maxZ) / 2);
     groundGroup.add(plane);
     if (ground.centre.length) {
-      groundGroup.add(ribbon(ground.centre, true, c => c.width / 2, c => -c.width / 2, LOOK.ROAD, 0));
-      groundGroup.add(ribbon(ground.centre, true, c => c.width / 2 + LOOK.EDGE_WIDTH, c => c.width / 2 - LOOK.EDGE_WIDTH, LOOK.EDGE, 0.01));
-      groundGroup.add(ribbon(ground.centre, true, c => -(c.width / 2 - LOOK.EDGE_WIDTH), c => -(c.width / 2 + LOOK.EDGE_WIDTH), LOOK.EDGE, 0.01));
-      // the start line, a few samples past the car's start
-      const s = ground.centre[Math.min(ground.centre.length - 1, 4)];
-      const line = new THREE.Mesh(new THREE.PlaneGeometry(s.width, 1.0), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-      line.rotation.x = -Math.PI / 2; line.rotation.z = -s.heading;
-      line.position.set(s.x, 0.015, s.z);
-      groundGroup.add(line);
+      const isLoop = ground.kind === 'circuit';
+      groundGroup.add(ribbon(ground.centre, isLoop, c => c.width / 2, c => -c.width / 2, LOOK.ROAD, 0));
+      groundGroup.add(ribbon(ground.centre, isLoop, c => c.width / 2 + LOOK.EDGE_WIDTH, c => c.width / 2 - LOOK.EDGE_WIDTH, LOOK.EDGE, 0.01));
+      groundGroup.add(ribbon(ground.centre, isLoop, c => -(c.width / 2 - LOOK.EDGE_WIDTH), c => -(c.width / 2 + LOOK.EDGE_WIDTH), LOOK.EDGE, 0.01));
+      const closed = ground.kind === 'circuit';
+      const C = ground.centre, n = C.length;
+      const at = m => C[Math.max(0, Math.min(n - 1, Math.round(m / 2)))];
+      // the start line and its gantry
+      const sl = at(ground.startLine === undefined ? 8 : ground.startLine);
+      groundGroup.add(roadLine(sl, LOOK.LINE));
+      groundGroup.add(gantry(sl, LOOK.GANTRY_BEAM));
+      // a sprint's finish line and gantry
+      if (ground.finish) { const f = at(ground.finish.along); groundGroup.add(roadLine(f, LOOK.LINE)); groundGroup.add(gantry(f, LOOK.FINISH_BEAM)); }
+      // checkpoints: a thin post either side
+      for (const m of ground.checkpoints || []) { const c = at(m); for (const side of [1, -1]) { const lx = -Math.cos(c.heading), lz = Math.sin(c.heading); const p = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.2, 0.2), new THREE.MeshLambertMaterial({ color: LOOK.CHECK_POST })); p.position.set(c.x + lx * (c.width / 2 + 0.8) * side, 1.1, c.z + lz * (c.width / 2 + 0.8) * side); groundGroup.add(p); } }
+      // kerbs through the corners, both sides, striped
+      const kerbs = { a: [], b: [] };
+      for (let i = 0; i < (closed ? n : n - 1); i++) {
+        const ia = closed ? (i - 1 + n) % n : Math.max(0, i - 1), ib = closed ? (i + 1) % n : Math.min(n - 1, i + 1);
+        let d = C[ib].heading - C[ia].heading; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+        const span = (ib - ia + n) % n * 2 || 2;
+        if (Math.abs(d) / span < 1 / LOOK.KERB_RADIUS) continue;
+        const list = Math.floor(i / LOOK.KERB_STRIPE) % 2 ? kerbs.a : kerbs.b;
+        const a = C[i], b = C[(i + 1) % n];
+        for (const sgn of [1, -1]) quad(list, a, b, sgn * (a.width / 2 - LOOK.EDGE_WIDTH), sgn * (a.width / 2 - LOOK.EDGE_WIDTH - LOOK.KERB_WIDTH), 0.012);
+      }
+      const kerbMesh = (list, colour) => { if (!list.length) return; const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(list, 3)); const norm = new Float32Array(list.length); for (let i = 1; i < norm.length; i += 3) norm[i] = 1; g.setAttribute('normal', new THREE.BufferAttribute(norm, 3)); const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: colour })); m.frustumCulled = false; groundGroup.add(m); };
+      kerbMesh(kerbs.a, LOOK.KERB_A); kerbMesh(kerbs.b, LOOK.KERB_B);
     } else {
       // the car park: a lighter slab inside the walls
       const slab = new THREE.Mesh(new THREE.PlaneGeometry(b.maxX - b.minX, b.maxZ - b.minZ), new THREE.MeshLambertMaterial({ color: LOOK.ROAD }));
@@ -138,6 +173,34 @@ export function createScene(canvas, opts) {
     clearMarks();
   }
 
+  /* One quad of a ribbon between samples a and b at lateral offsets oA
+     and oB (to the left; the right edge is negative), pushed onto list. */
+  function quad(pos, a, b, oA, oB, lift) {
+    const al = [-Math.cos(a.heading), Math.sin(a.heading)], bl = [-Math.cos(b.heading), Math.sin(b.heading)];
+    const aL = [a.x + al[0] * oA, a.z + al[1] * oA], aR = [a.x + al[0] * oB, a.z + al[1] * oB];
+    const bL = [b.x + bl[0] * oA, b.z + bl[1] * oA], bR = [b.x + bl[0] * oB, b.z + bl[1] * oB];
+    // counter clockwise seen from above, so the faces point up
+    pos.push(aL[0], lift, aL[1], aR[0], lift, aR[1], bL[0], lift, bL[1], bL[0], lift, bL[1], aR[0], lift, aR[1], bR[0], lift, bR[1]);
+  }
+  /* A line across the road at a sample. */
+  function roadLine(s, colour) {
+    const line = new THREE.Mesh(new THREE.PlaneGeometry(s.width, LOOK.LINE_DEPTH), new THREE.MeshBasicMaterial({ color: colour }));
+    line.rotation.x = -Math.PI / 2; line.rotation.z = -s.heading;
+    line.position.set(s.x, 0.015, s.z);
+    return line;
+  }
+  /* Two posts and a beam over the road at a sample. */
+  function gantry(s, beamColour) {
+    const g = new THREE.Group();
+    const lx = -Math.cos(s.heading), lz = Math.sin(s.heading);
+    const reach = s.width / 2 + 1.2, h = LOOK.GANTRY_H, p = LOOK.GANTRY_POST;
+    const postMat = new THREE.MeshLambertMaterial({ color: LOOK.GANTRY });
+    for (const side of [1, -1]) { const post = new THREE.Mesh(new THREE.BoxGeometry(p, h, p), postMat); post.position.set(s.x + lx * reach * side, h / 2, s.z + lz * reach * side); g.add(post); }
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(reach * 2 + p, 0.6, p), new THREE.MeshLambertMaterial({ color: beamColour }));
+    beam.position.set(s.x, h - 0.3, s.z); beam.rotation.y = -s.heading + Math.PI / 2;
+    g.add(beam);
+    return g;
+  }
   /* A ribbon along the centre line between two lateral offsets, both
      measured to the left (so the right edge of the road is negative),
      closed or not. */
@@ -146,11 +209,7 @@ export function createScene(canvas, opts) {
     const count = closed ? n : n - 1;
     for (let i = 0; i < count; i++) {
       const a = centre[i], b = centre[(i + 1) % n];
-      const al = [-Math.cos(a.heading), Math.sin(a.heading)], bl = [-Math.cos(b.heading), Math.sin(b.heading)];
-      const aL = [a.x + al[0] * offA(a), a.z + al[1] * offA(a)], aR = [a.x + al[0] * offB(a), a.z + al[1] * offB(a)];
-      const bL = [b.x + bl[0] * offA(b), b.z + bl[1] * offA(b)], bR = [b.x + bl[0] * offB(b), b.z + bl[1] * offB(b)];
-      // counter clockwise seen from above, so the faces point up
-      pos.push(aL[0], lift, aL[1], aR[0], lift, aR[1], bL[0], lift, bL[1], bL[0], lift, bL[1], aR[0], lift, aR[1], bR[0], lift, bR[1]);
+      quad(pos, a, b, offA(a), offB(a), lift);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
@@ -161,38 +220,45 @@ export function createScene(canvas, opts) {
     return m;
   }
 
-  /* ---- the car ---- */
-  const V = TUNE.VEHICLE;
-  const car = new THREE.Group();
-  const bodyMat = new THREE.MeshLambertMaterial({ color: LOOK.CAR });
-  const darkMat = new THREE.MeshLambertMaterial({ color: LOOK.CAR_DARK });
-  const bodyL = V.HALF_LENGTH * 2, bodyW = V.TRACK - 0.12;    // narrower than the track so the wheels show
-  const body = new THREE.Mesh(new THREE.BoxGeometry(bodyW, 0.5, bodyL), bodyMat);
-  body.position.y = V.WHEEL_RADIUS + 0.17;
-  car.add(body);
-  const cabin = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.78, 0.5, bodyL * 0.42), darkMat);
-  cabin.position.set(0, V.WHEEL_RADIUS + 0.17 + 0.48, bodyL * 0.04);
-  car.add(cabin);
-  const lampF = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.9, 0.12, 0.08), new THREE.MeshBasicMaterial({ color: LOOK.LAMP_FRONT }));
-  lampF.position.set(0, V.WHEEL_RADIUS + 0.3, -bodyL / 2 + 0.02);
-  car.add(lampF);
-  const lampR = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.9, 0.12, 0.08), new THREE.MeshBasicMaterial({ color: LOOK.LAMP_REAR }));
-  lampR.position.set(0, V.WHEEL_RADIUS + 0.3, bodyL / 2 - 0.02);
-  car.add(lampR);
-  const wheelGeo = new THREE.CylinderGeometry(V.WHEEL_RADIUS, V.WHEEL_RADIUS, 0.28, 14);
-  wheelGeo.rotateZ(Math.PI / 2);
-  const wheelMat = new THREE.MeshLambertMaterial({ color: LOOK.WHEEL });
-  const wheels = {};
-  const a = V.CG_TO_FRONT, bRear = V.WHEELBASE - a, half = V.TRACK / 2;
-  for (const [name, x, z] of [['fl', -half, -a], ['fr', half, -a], ['rl', -half, bRear], ['rr', half, bRear]]) {
-    const pivot = new THREE.Group();
-    pivot.position.set(x, V.WHEEL_RADIUS, z);
-    const w = new THREE.Mesh(wheelGeo, wheelMat);
-    pivot.add(w);
-    car.add(pivot);
-    wheels[name] = { pivot, mesh: w };
-  }
+  /* ---- the car, and the ghost ---- */
+  const car = new THREE.Group();        // the physics origin: the centre of mass
   scene.add(car);
+  const ghostRoot = new THREE.Group();
+  ghostRoot.visible = false;
+  scene.add(ghostRoot);
+  let model = null, ghostModel = null;
+  /* Where the rear wheels are from the physics origin, for the marks. */
+  const rig = { bRear: TUNE.VEHICLE.WHEELBASE - TUNE.VEHICLE.CG_TO_FRONT, half: TUNE.VEHICLE.TRACK / 2 };
+  /* Mount a model at the physics origin: the model's origin is the middle
+     of the wheelbase, the physics origin the centre of mass, CG_TO_FRONT
+     behind the front axle, so the model sits WHEELBASE / 2 - CG_TO_FRONT
+     back along +Z. */
+  function mount(root, id, paintHex, ghost) {
+    const t = carTune(id), V = t ? t.VEHICLE : TUNE.VEHICLE;
+    let m = makeCar(THREE, id, { paint: paintHex });
+    if (ghost) m = makeGhostly(m, LOOP.GHOST_OPACITY, LOOP.GHOST_TINT);
+    m.group.position.z = V.WHEELBASE / 2 - V.CG_TO_FRONT;
+    root.add(m.group);
+    return { model: m, bRear: V.WHEELBASE - V.CG_TO_FRONT, half: V.TRACK / 2 };
+  }
+  function setCar(id, paintId) {
+    if (model) { car.remove(model.group); model.dispose(); }
+    const r = mount(car, id, paintById(paintId || carById(id).paint).hex, false);
+    model = r.model; rig.bRear = r.bRear; rig.half = r.half;
+  }
+  function setGhost(id, paintId) {
+    if (ghostModel) { ghostRoot.remove(ghostModel.group); ghostModel.dispose(); ghostModel = null; }
+    if (!id) { ghostRoot.visible = false; return; }
+    ghostModel = mount(ghostRoot, id, paintById(paintId || carById(id).paint).hex, true).model;
+  }
+  function poseWheels(m, c) {
+    if (!m) return;
+    const w = m.wheels;
+    w.fl.pivot.rotation.y = c.steer; w.fr.pivot.rotation.y = c.steer;
+    w.fl.mesh.rotation.x = c.wheelF; w.fr.mesh.rotation.x = c.wheelF;
+    w.rl.mesh.rotation.x = c.wheelR; w.rr.mesh.rotation.x = c.wheelR;
+  }
+  setCar('starter');
 
   /* ---- tyre marks: a ring of quads under the rear wheels ---- */
   const markGeo = new THREE.BufferGeometry();
@@ -253,17 +319,22 @@ export function createScene(canvas, opts) {
 
   /* ---- per frame ---- */
   const coneM = new THREE.Matrix4(), coneQ = new THREE.Quaternion(), coneE = new THREE.Euler(), coneS = new THREE.Vector3(1, 1, 1);
-  function update(pose, world, dt) {
-    /* pose: the interpolated car {x, z, yaw}; world.car for the rest */
+  function update(pose, world, dt, ghost) {
+    /* pose: the interpolated car {x, z, yaw}; world.car for the rest;
+       ghost: { x, z, yaw, car } interpolated, or null */
     const c = world.car;
     car.position.set(pose.x, 0, pose.z);
     car.rotation.y = pose.yaw;
-    wheels.fl.pivot.rotation.y = c.steer; wheels.fr.pivot.rotation.y = c.steer;
-    wheels.fl.mesh.rotation.x = c.wheelF; wheels.fr.mesh.rotation.x = c.wheelF;
-    wheels.rl.mesh.rotation.x = c.wheelR; wheels.rr.mesh.rotation.x = c.wheelR;
+    poseWheels(model, c);
+    if (ghost && ghostModel) {
+      ghostRoot.visible = true;
+      ghostRoot.position.set(ghost.x, 0, ghost.z); ghostRoot.rotation.y = ghost.yaw;
+      if (ghost.car) poseWheels(ghostModel, ghost.car);
+    } else ghostRoot.visible = false;
     // marks and smoke off the rear wheels while they slide
     const sliding = c.rearSlide >= LOOK.MARK_MIN_SLIDE || c.hb > 0.5 || c.spinning;
     const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
+    const bRear = rig.bRear, half = rig.half;
     for (const [name, side] of [['rl', 1], ['rr', -1]]) {
       const wx = pose.x - fx * bRear + lx * half * side, wz = pose.z - fz * bRear + lz * half * side;
       if (sliding && c.speed > 1.5) {
@@ -291,7 +362,8 @@ export function createScene(canvas, opts) {
   let lastSubmit = 0;
   function render() { const t0 = performance.now(); renderer.render(scene, camera); lastSubmit = performance.now() - t0; }
   return {
-    THREE, renderer, scene, camera, car, ready, setGround, update, resize, render, clearMarks,
+    THREE, renderer, scene, camera, car, ready, setGround, setCar, setGhost, update, resize, render, clearMarks,
+    carModel: () => model,
     info: () => ({ backend, tier, submitMs: lastSubmit }),
     setTier: t => { if (LOOK.TIERS[t]) { tier = t; applyTier(); } },
   };
