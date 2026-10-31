@@ -1,0 +1,1309 @@
+{
+ "when": "2026-10-31T04:58:13.357Z",
+ "three": "184",
+ "cars": {
+  "starter": {
+   "label": "Starter coupe",
+   "dims": {
+    "length": 4.4,
+    "width": 1.83,
+    "height": 1.313,
+    "wheelbase": 2.55,
+    "track": 1.6,
+    "wheelRadius": 0.33,
+    "tyreFront": 0.22,
+    "tyreRear": 0.22,
+    "halfLength": 2.2,
+    "halfWidth": 0.915,
+    "centreZ": -0.025,
+    "frontAxle": -1.275,
+    "rearAxle": 1.275
+   },
+   "triangles": 1988,
+   "drawCalls": 9,
+   "materials": 5,
+   "withUnderglow": {
+    "triangles": 1998,
+    "drawCalls": 10
+   },
+   "ownCode": {
+    "raw": 1935,
+    "gzip": 986
+   },
+   "roof": 1.313,
+   "tyresAtFullLock": {
+    "hits": 0,
+    "worst": 0
+   },
+   "checks": [
+    {
+     "name": "triangles",
+     "value": 1988,
+     "limit": [
+      800,
+      3000
+     ],
+     "pass": true
+    },
+    {
+     "name": "draw calls (underglow off)",
+     "value": 9,
+     "limit": "<= 12",
+     "pass": true
+    },
+    {
+     "name": "materials",
+     "value": 5,
+     "limit": "<= 6",
+     "pass": true
+    },
+    {
+     "name": "length m",
+     "value": 4.4,
+     "limit": [
+      3.6,
+      4.9
+     ],
+     "pass": true
+    },
+    {
+     "name": "width m",
+     "value": 1.83,
+     "limit": [
+      1.6,
+      2
+     ],
+     "pass": true
+    },
+    {
+     "name": "height m",
+     "value": 1.313,
+     "limit": [
+      1.1,
+      1.5
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase m (measured from the wheels)",
+     "value": 2.55,
+     "limit": [
+      2.2,
+      2.95
+     ],
+     "pass": true
+    },
+    {
+     "name": "track m (measured)",
+     "value": 1.6,
+     "limit": [
+      1.4,
+      1.75
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheel radius m (measured)",
+     "value": 0.33,
+     "limit": [
+      0.28,
+      0.38
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase as a share of length",
+     "value": 0.58,
+     "limit": [
+      0.55,
+      0.66
+     ],
+     "pass": true
+    },
+    {
+     "name": "front overhang m",
+     "value": 0.95,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "rear overhang m",
+     "value": 0.9,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "dims agree with the wheels (wheelbase, track, radius within 1 mm)",
+     "value": 0,
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "class: inside the physics box (4.40 by 1.84, centred 0.025 m ahead of the wheelbase middle), wheelbase, track and wheel radius exactly the physics values",
+     "value": {
+      "length": 4.4,
+      "width": 1.83,
+      "centreZ": -0.025,
+      "wheelbase": 2.55,
+      "track": 1.6,
+      "radius": 0.33
+     },
+     "limit": "TUNE.VEHICLE",
+     "pass": true
+    },
+    {
+     "name": "wheels touching the ground at rest: lowest point of each wheel, worst m",
+     "value": 0,
+     "limit": "|y| <= 0.002",
+     "pass": true
+    },
+    {
+     "name": "over a whole turn: a wheel never sinks, and lifts no more than its polygon allows (m)",
+     "value": {
+      "highest": 0.007,
+      "lowest": 0,
+      "polygonAllows": 0.007
+     },
+     "limit": "lowest >= -0.002, highest <= R(1 - cos(pi/S)) + 0.002",
+     "pass": true
+    },
+    {
+     "name": "nothing but the tyres below 50 mm (lowest body point m)",
+     "value": 0.15,
+     "limit": ">= 0.05",
+     "pass": true
+    },
+    {
+     "name": "body points inside a tyre, wheels straight",
+     "value": 0,
+     "limit": 0,
+     "pass": true
+    },
+    {
+     "name": "tyres inside the body width: worst tyre face past the body side (m)",
+     "value": -0.005,
+     "limit": "<= 0.005",
+     "pass": true
+    },
+    {
+     "name": "facing -Z: headlights ahead of the front axle, tail lights behind the rear",
+     "value": {
+      "head": -2.21,
+      "tail": 2.16,
+      "frontAxle": -1.275
+     },
+     "limit": "head < front axle < 0 < rear axle < tail",
+     "pass": true
+    },
+    {
+     "name": "origin at the middle of the wheelbase on the ground (m)",
+     "value": {
+      "x": 0,
+      "z": 0
+     },
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "every part closed with its faces outwards (signed volume > 0)",
+     "value": {
+      "parts": 10,
+      "inverted": []
+     },
+     "limit": "all > 0",
+     "pass": true
+    }
+   ]
+  },
+  "hatch": {
+   "label": "Light hatch",
+   "dims": {
+    "length": 3.72,
+    "width": 1.68,
+    "height": 1.42,
+    "wheelbase": 2.32,
+    "track": 1.48,
+    "wheelRadius": 0.3,
+    "tyreFront": 0.19,
+    "tyreRear": 0.19,
+    "halfLength": 1.86,
+    "halfWidth": 0.84,
+    "centreZ": -0.02,
+    "frontAxle": -1.16,
+    "rearAxle": 1.16
+   },
+   "triangles": 2036,
+   "drawCalls": 9,
+   "materials": 5,
+   "withUnderglow": {
+    "triangles": 2046,
+    "drawCalls": 10
+   },
+   "ownCode": {
+    "raw": 1651,
+    "gzip": 869
+   },
+   "roof": 1.42,
+   "tyresAtFullLock": {
+    "hits": 0,
+    "worst": 0
+   },
+   "checks": [
+    {
+     "name": "triangles",
+     "value": 2036,
+     "limit": [
+      800,
+      3000
+     ],
+     "pass": true
+    },
+    {
+     "name": "draw calls (underglow off)",
+     "value": 9,
+     "limit": "<= 12",
+     "pass": true
+    },
+    {
+     "name": "materials",
+     "value": 5,
+     "limit": "<= 6",
+     "pass": true
+    },
+    {
+     "name": "length m",
+     "value": 3.72,
+     "limit": [
+      3.6,
+      4.9
+     ],
+     "pass": true
+    },
+    {
+     "name": "width m",
+     "value": 1.68,
+     "limit": [
+      1.6,
+      2
+     ],
+     "pass": true
+    },
+    {
+     "name": "height m",
+     "value": 1.42,
+     "limit": [
+      1.1,
+      1.5
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase m (measured from the wheels)",
+     "value": 2.32,
+     "limit": [
+      2.2,
+      2.95
+     ],
+     "pass": true
+    },
+    {
+     "name": "track m (measured)",
+     "value": 1.48,
+     "limit": [
+      1.4,
+      1.75
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheel radius m (measured)",
+     "value": 0.3,
+     "limit": [
+      0.28,
+      0.38
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase as a share of length",
+     "value": 0.624,
+     "limit": [
+      0.55,
+      0.66
+     ],
+     "pass": true
+    },
+    {
+     "name": "front overhang m",
+     "value": 0.72,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "rear overhang m",
+     "value": 0.68,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "dims agree with the wheels (wheelbase, track, radius within 1 mm)",
+     "value": 0,
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "class: length 3.6 to 3.9 m, wheelbase 2.2 to 2.45 m: the shortest of the five",
+     "value": {
+      "length": 3.72,
+      "wheelbase": 2.32,
+      "shortest": true
+     },
+     "limit": "as stated",
+     "pass": true
+    },
+    {
+     "name": "wheels touching the ground at rest: lowest point of each wheel, worst m",
+     "value": 0,
+     "limit": "|y| <= 0.002",
+     "pass": true
+    },
+    {
+     "name": "over a whole turn: a wheel never sinks, and lifts no more than its polygon allows (m)",
+     "value": {
+      "highest": 0.006,
+      "lowest": 0,
+      "polygonAllows": 0.006
+     },
+     "limit": "lowest >= -0.002, highest <= R(1 - cos(pi/S)) + 0.002",
+     "pass": true
+    },
+    {
+     "name": "nothing but the tyres below 50 mm (lowest body point m)",
+     "value": 0.07,
+     "limit": ">= 0.05",
+     "pass": true
+    },
+    {
+     "name": "body points inside a tyre, wheels straight",
+     "value": 0,
+     "limit": 0,
+     "pass": true
+    },
+    {
+     "name": "tyres inside the body width: worst tyre face past the body side (m)",
+     "value": -0.005,
+     "limit": "<= 0.005",
+     "pass": true
+    },
+    {
+     "name": "facing -Z: headlights ahead of the front axle, tail lights behind the rear",
+     "value": {
+      "head": -1.865,
+      "tail": 1.825,
+      "frontAxle": -1.16
+     },
+     "limit": "head < front axle < 0 < rear axle < tail",
+     "pass": true
+    },
+    {
+     "name": "origin at the middle of the wheelbase on the ground (m)",
+     "value": {
+      "x": 0,
+      "z": 0
+     },
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "every part closed with its faces outwards (signed volume > 0)",
+     "value": {
+      "parts": 11,
+      "inverted": []
+     },
+     "limit": "all > 0",
+     "pass": true
+    }
+   ]
+  },
+  "tourer": {
+   "label": "Grand tourer",
+   "dims": {
+    "length": 4.84,
+    "width": 1.968,
+    "height": 1.3,
+    "wheelbase": 2.86,
+    "track": 1.66,
+    "wheelRadius": 0.35,
+    "tyreFront": 0.245,
+    "tyreRear": 0.255,
+    "halfLength": 2.42,
+    "halfWidth": 0.984,
+    "centreZ": 0.06,
+    "frontAxle": -1.43,
+    "rearAxle": 1.43
+   },
+   "triangles": 2468,
+   "drawCalls": 9,
+   "materials": 5,
+   "withUnderglow": {
+    "triangles": 2478,
+    "drawCalls": 10
+   },
+   "ownCode": {
+    "raw": 1696,
+    "gzip": 883
+   },
+   "roof": 1.29,
+   "tyresAtFullLock": {
+    "hits": 0,
+    "worst": 0
+   },
+   "checks": [
+    {
+     "name": "triangles",
+     "value": 2468,
+     "limit": [
+      800,
+      3000
+     ],
+     "pass": true
+    },
+    {
+     "name": "draw calls (underglow off)",
+     "value": 9,
+     "limit": "<= 12",
+     "pass": true
+    },
+    {
+     "name": "materials",
+     "value": 5,
+     "limit": "<= 6",
+     "pass": true
+    },
+    {
+     "name": "length m",
+     "value": 4.84,
+     "limit": [
+      3.6,
+      4.9
+     ],
+     "pass": true
+    },
+    {
+     "name": "width m",
+     "value": 1.968,
+     "limit": [
+      1.6,
+      2
+     ],
+     "pass": true
+    },
+    {
+     "name": "height m",
+     "value": 1.3,
+     "limit": [
+      1.1,
+      1.5
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase m (measured from the wheels)",
+     "value": 2.86,
+     "limit": [
+      2.2,
+      2.95
+     ],
+     "pass": true
+    },
+    {
+     "name": "track m (measured)",
+     "value": 1.66,
+     "limit": [
+      1.4,
+      1.75
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheel radius m (measured)",
+     "value": 0.35,
+     "limit": [
+      0.28,
+      0.38
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase as a share of length",
+     "value": 0.591,
+     "limit": [
+      0.55,
+      0.66
+     ],
+     "pass": true
+    },
+    {
+     "name": "front overhang m",
+     "value": 0.93,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "rear overhang m",
+     "value": 1.05,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "dims agree with the wheels (wheelbase, track, radius within 1 mm)",
+     "value": 0,
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "class: length 4.6 to 4.9 m, width at least 1.9 m, wheelbase at least 2.75 m: the longest wheelbase of the five",
+     "value": {
+      "length": 4.84,
+      "width": 1.968,
+      "wheelbase": 2.86,
+      "longest": true
+     },
+     "limit": "as stated",
+     "pass": true
+    },
+    {
+     "name": "wheels touching the ground at rest: lowest point of each wheel, worst m",
+     "value": 0,
+     "limit": "|y| <= 0.002",
+     "pass": true
+    },
+    {
+     "name": "over a whole turn: a wheel never sinks, and lifts no more than its polygon allows (m)",
+     "value": {
+      "highest": 0.004,
+      "lowest": 0,
+      "polygonAllows": 0.004
+     },
+     "limit": "lowest >= -0.002, highest <= R(1 - cos(pi/S)) + 0.002",
+     "pass": true
+    },
+    {
+     "name": "nothing but the tyres below 50 mm (lowest body point m)",
+     "value": 0.14,
+     "limit": ">= 0.05",
+     "pass": true
+    },
+    {
+     "name": "body points inside a tyre, wheels straight",
+     "value": 0,
+     "limit": 0,
+     "pass": true
+    },
+    {
+     "name": "tyres inside the body width: worst tyre face past the body side (m)",
+     "value": -0.012,
+     "limit": "<= 0.005",
+     "pass": true
+    },
+    {
+     "name": "facing -Z: headlights ahead of the front axle, tail lights behind the rear",
+     "value": {
+      "head": -2.345,
+      "tail": 2.465,
+      "frontAxle": -1.43
+     },
+     "limit": "head < front axle < 0 < rear axle < tail",
+     "pass": true
+    },
+    {
+     "name": "origin at the middle of the wheelbase on the ground (m)",
+     "value": {
+      "x": 0,
+      "z": 0
+     },
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "every part closed with its faces outwards (signed volume > 0)",
+     "value": {
+      "parts": 10,
+      "inverted": []
+     },
+     "limit": "all > 0",
+     "pass": true
+    }
+   ]
+  },
+  "fastback": {
+   "label": "Fastback",
+   "dims": {
+    "length": 4.74,
+    "width": 1.95,
+    "height": 1.289,
+    "wheelbase": 2.76,
+    "track": 1.62,
+    "wheelRadius": 0.35,
+    "tyreFront": 0.24,
+    "tyreRear": 0.3,
+    "halfLength": 2.37,
+    "halfWidth": 0.975,
+    "centreZ": 0.03,
+    "frontAxle": -1.38,
+    "rearAxle": 1.38
+   },
+   "triangles": 2076,
+   "drawCalls": 9,
+   "materials": 5,
+   "withUnderglow": {
+    "triangles": 2086,
+    "drawCalls": 10
+   },
+   "ownCode": {
+    "raw": 1672,
+    "gzip": 866
+   },
+   "roof": 1.289,
+   "tyresAtFullLock": {
+    "hits": 0,
+    "worst": 0
+   },
+   "checks": [
+    {
+     "name": "triangles",
+     "value": 2076,
+     "limit": [
+      800,
+      3000
+     ],
+     "pass": true
+    },
+    {
+     "name": "draw calls (underglow off)",
+     "value": 9,
+     "limit": "<= 12",
+     "pass": true
+    },
+    {
+     "name": "materials",
+     "value": 5,
+     "limit": "<= 6",
+     "pass": true
+    },
+    {
+     "name": "length m",
+     "value": 4.74,
+     "limit": [
+      3.6,
+      4.9
+     ],
+     "pass": true
+    },
+    {
+     "name": "width m",
+     "value": 1.95,
+     "limit": [
+      1.6,
+      2
+     ],
+     "pass": true
+    },
+    {
+     "name": "height m",
+     "value": 1.289,
+     "limit": [
+      1.1,
+      1.5
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase m (measured from the wheels)",
+     "value": 2.76,
+     "limit": [
+      2.2,
+      2.95
+     ],
+     "pass": true
+    },
+    {
+     "name": "track m (measured)",
+     "value": 1.62,
+     "limit": [
+      1.4,
+      1.75
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheel radius m (measured)",
+     "value": 0.35,
+     "limit": [
+      0.28,
+      0.38
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase as a share of length",
+     "value": 0.582,
+     "limit": [
+      0.55,
+      0.66
+     ],
+     "pass": true
+    },
+    {
+     "name": "front overhang m",
+     "value": 0.96,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "rear overhang m",
+     "value": 1.02,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "dims agree with the wheels (wheelbase, track, radius within 1 mm)",
+     "value": 0,
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "class: length 4.5 to 4.9 m, rear tyres at least 40 mm wider than the fronts, body at least 60 mm wider at the rear axle than the front",
+     "value": {
+      "length": 4.74,
+      "tyreFront": 0.24,
+      "tyreRear": 0.3,
+      "bodyFront": 1.874,
+      "bodyRear": 1.95
+     },
+     "limit": "as stated",
+     "pass": true
+    },
+    {
+     "name": "wheels touching the ground at rest: lowest point of each wheel, worst m",
+     "value": 0,
+     "limit": "|y| <= 0.002",
+     "pass": true
+    },
+    {
+     "name": "over a whole turn: a wheel never sinks, and lifts no more than its polygon allows (m)",
+     "value": {
+      "highest": 0.008,
+      "lowest": 0,
+      "polygonAllows": 0.008
+     },
+     "limit": "lowest >= -0.002, highest <= R(1 - cos(pi/S)) + 0.002",
+     "pass": true
+    },
+    {
+     "name": "nothing but the tyres below 50 mm (lowest body point m)",
+     "value": 0.15,
+     "limit": ">= 0.05",
+     "pass": true
+    },
+    {
+     "name": "body points inside a tyre, wheels straight",
+     "value": 0,
+     "limit": 0,
+     "pass": true
+    },
+    {
+     "name": "tyres inside the body width: worst tyre face past the body side (m)",
+     "value": -0.007,
+     "limit": "<= 0.005",
+     "pass": true
+    },
+    {
+     "name": "facing -Z: headlights ahead of the front axle, tail lights behind the rear",
+     "value": {
+      "head": -2.325,
+      "tail": 2.385,
+      "frontAxle": -1.38
+     },
+     "limit": "head < front axle < 0 < rear axle < tail",
+     "pass": true
+    },
+    {
+     "name": "origin at the middle of the wheelbase on the ground (m)",
+     "value": {
+      "x": 0,
+      "z": 0
+     },
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "every part closed with its faces outwards (signed volume > 0)",
+     "value": {
+      "parts": 10,
+      "inverted": []
+     },
+     "limit": "all > 0",
+     "pass": true
+    }
+   ]
+  },
+  "driftbuild": {
+   "label": "Drift build",
+   "dims": {
+    "length": 4.57,
+    "width": 1.99,
+    "height": 1.32,
+    "wheelbase": 2.62,
+    "track": 1.7,
+    "wheelRadius": 0.34,
+    "tyreFront": 0.26,
+    "tyreRear": 0.27,
+    "halfLength": 2.285,
+    "halfWidth": 0.995,
+    "centreZ": -0.045,
+    "frontAxle": -1.31,
+    "rearAxle": 1.31
+   },
+   "triangles": 2300,
+   "drawCalls": 9,
+   "materials": 5,
+   "withUnderglow": {
+    "triangles": 2310,
+    "drawCalls": 10
+   },
+   "ownCode": {
+    "raw": 2174,
+    "gzip": 1021
+   },
+   "roof": 1.164,
+   "tyresAtFullLock": {
+    "hits": 0,
+    "worst": 0
+   },
+   "checks": [
+    {
+     "name": "triangles",
+     "value": 2300,
+     "limit": [
+      800,
+      3000
+     ],
+     "pass": true
+    },
+    {
+     "name": "draw calls (underglow off)",
+     "value": 9,
+     "limit": "<= 12",
+     "pass": true
+    },
+    {
+     "name": "materials",
+     "value": 5,
+     "limit": "<= 6",
+     "pass": true
+    },
+    {
+     "name": "length m",
+     "value": 4.57,
+     "limit": [
+      3.6,
+      4.9
+     ],
+     "pass": true
+    },
+    {
+     "name": "width m",
+     "value": 1.99,
+     "limit": [
+      1.6,
+      2
+     ],
+     "pass": true
+    },
+    {
+     "name": "height m",
+     "value": 1.32,
+     "limit": [
+      1.1,
+      1.5
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase m (measured from the wheels)",
+     "value": 2.62,
+     "limit": [
+      2.2,
+      2.95
+     ],
+     "pass": true
+    },
+    {
+     "name": "track m (measured)",
+     "value": 1.7,
+     "limit": [
+      1.4,
+      1.75
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheel radius m (measured)",
+     "value": 0.34,
+     "limit": [
+      0.28,
+      0.38
+     ],
+     "pass": true
+    },
+    {
+     "name": "wheelbase as a share of length",
+     "value": 0.573,
+     "limit": [
+      0.55,
+      0.66
+     ],
+     "pass": true
+    },
+    {
+     "name": "front overhang m",
+     "value": 1.02,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "rear overhang m",
+     "value": 0.93,
+     "limit": [
+      0.55,
+      1.15
+     ],
+     "pass": true
+    },
+    {
+     "name": "dims agree with the wheels (wheelbase, track, radius within 1 mm)",
+     "value": 0,
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "class: roof at most 1.22 m, the lowest of the five; width at least 1.95 m; a wing at least 50 mm above the roof",
+     "value": {
+      "roof": 1.164,
+      "width": 1.99,
+      "height": 1.32,
+      "lowest": true
+     },
+     "limit": "as stated",
+     "pass": true
+    },
+    {
+     "name": "wheels touching the ground at rest: lowest point of each wheel, worst m",
+     "value": 0,
+     "limit": "|y| <= 0.002",
+     "pass": true
+    },
+    {
+     "name": "over a whole turn: a wheel never sinks, and lifts no more than its polygon allows (m)",
+     "value": {
+      "highest": 0.005,
+      "lowest": 0,
+      "polygonAllows": 0.005
+     },
+     "limit": "lowest >= -0.002, highest <= R(1 - cos(pi/S)) + 0.002",
+     "pass": true
+    },
+    {
+     "name": "nothing but the tyres below 50 mm (lowest body point m)",
+     "value": 0.1,
+     "limit": ">= 0.05",
+     "pass": true
+    },
+    {
+     "name": "body points inside a tyre, wheels straight",
+     "value": 0,
+     "limit": 0,
+     "pass": true
+    },
+    {
+     "name": "tyres inside the body width: worst tyre face past the body side (m)",
+     "value": -0.005,
+     "limit": "<= 0.005",
+     "pass": true
+    },
+    {
+     "name": "facing -Z: headlights ahead of the front axle, tail lights behind the rear",
+     "value": {
+      "head": -2.275,
+      "tail": 2.215,
+      "frontAxle": -1.31
+     },
+     "limit": "head < front axle < 0 < rear axle < tail",
+     "pass": true
+    },
+    {
+     "name": "origin at the middle of the wheelbase on the ground (m)",
+     "value": {
+      "x": 0,
+      "z": 0
+     },
+     "limit": "< 0.001",
+     "pass": true
+    },
+    {
+     "name": "every part closed with its faces outwards (signed volume > 0)",
+     "value": {
+      "parts": 14,
+      "inverted": []
+     },
+     "limit": "all > 0",
+     "pass": true
+    }
+   ]
+  }
+ },
+ "knownAnswers": [
+  {
+   "name": "counter: a 12 triangle box in its own material added to the starter",
+   "check": "counts +12 triangles, +1 call, +1 material",
+   "expect": "pass",
+   "got": "pass",
+   "value": [
+    12,
+    1,
+    1
+   ],
+   "caught": true,
+   "note": "the known answer is +12, +1, +1: a counter that misses the box or counts it wrongly fails here"
+  },
+  {
+   "name": "budget: the tourer with stations every 50 mm",
+   "check": "triangles",
+   "expect": "fail",
+   "got": "fail",
+   "value": 4336,
+   "caught": true
+  },
+  {
+   "name": "code size: 10,000 bytes appended to a copy of build.js",
+   "check": "size grows by exactly 10,000",
+   "expect": "pass",
+   "got": "pass",
+   "value": 10000,
+   "caught": true,
+   "note": "the known answer is 10,000: a counter that reads anything else fails here"
+  },
+  {
+   "name": "code size: three.js counted as if it were car code",
+   "check": "all five under 50 KB raw",
+   "expect": "fail",
+   "got": "fail",
+   "value": 1034378,
+   "caught": true
+  },
+  {
+   "name": "ground: the starter with its wheels moved up 30 mm",
+   "check": "wheels touching the ground at rest: lowest point of each wheel, worst m",
+   "expect": "fail",
+   "got": "fail",
+   "value": 0.03,
+   "caught": true
+  },
+  {
+   "name": "ground: the starter with its wheels moved down 30 mm",
+   "check": "wheels touching the ground at rest: lowest point of each wheel, worst m",
+   "expect": "fail",
+   "got": "fail",
+   "value": 0.03,
+   "caught": true
+  },
+  {
+   "name": "ground over a turn: the starter judged as 15 segment wheels but built with 6",
+   "check": "over a whole turn: a wheel never sinks, and lifts no more than its polygon allows (m)",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "highest": 0.044,
+    "lowest": 0,
+    "polygonAllows": 0.007
+   },
+   "caught": true,
+   "note": "the 6 segment wheel lifts R(1 - cos 30 deg) = 44 mm between vertices"
+  },
+  {
+   "name": "ground: the drift build with its splitter at 20 mm",
+   "check": "nothing but the tyres below 50 mm (lowest body point m)",
+   "expect": "fail",
+   "got": "fail",
+   "value": 0.02,
+   "caught": true
+  },
+  {
+   "name": "ranges: the starter stretched to 5.2 m",
+   "check": "length m",
+   "expect": "fail",
+   "got": "fail",
+   "value": 5.24,
+   "caught": true
+  },
+  {
+   "name": "ranges: the hatch on a 1.2 m track",
+   "check": "track m (measured)",
+   "expect": "fail",
+   "got": "fail",
+   "value": 1.2,
+   "caught": true
+  },
+  {
+   "name": "class: the starter 60 mm wider than the physics box",
+   "check": "class: inside the physics box (4.40 by 1.84, centred 0.025 m ahead of the wheelbase middle), wheelbase, track and wheel radius exactly the physics values",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "length": 4.4,
+    "width": 1.89,
+    "centreZ": -0.025,
+    "wheelbase": 2.55,
+    "track": 1.6,
+    "radius": 0.33
+   },
+   "caught": true
+  },
+  {
+   "name": "class: the starter on a 2.60 m wheelbase",
+   "check": "class: inside the physics box (4.40 by 1.84, centred 0.025 m ahead of the wheelbase middle), wheelbase, track and wheel radius exactly the physics values",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "length": 4.4,
+    "width": 1.83,
+    "centreZ": -0.025,
+    "wheelbase": 2.6,
+    "track": 1.6,
+    "radius": 0.33
+   },
+   "caught": true
+  },
+  {
+   "name": "class: the fastback with no hips and equal tyres",
+   "check": "class: length 4.5 to 4.9 m, rear tyres at least 40 mm wider than the fronts, body at least 60 mm wider at the rear axle than the front",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "length": 4.74,
+    "tyreFront": 0.27,
+    "tyreRear": 0.27,
+    "bodyFront": 1.874,
+    "bodyRear": 1.85
+   },
+   "caught": true
+  },
+  {
+   "name": "class: the drift build without its wing",
+   "check": "class: roof at most 1.22 m, the lowest of the five; width at least 1.95 m; a wing at least 50 mm above the roof",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "roof": 1.164,
+    "width": 1.99,
+    "height": 1.17,
+    "lowest": true
+   },
+   "caught": true
+  },
+  {
+   "name": "tyres: the starter on wheels 80 mm bigger in the same arches",
+   "check": "body points inside a tyre, wheels straight",
+   "expect": "fail",
+   "got": "fail",
+   "value": 268,
+   "caught": true
+  },
+  {
+   "name": "tyres: the starter on a track 120 mm wider",
+   "check": "tyres inside the body width: worst tyre face past the body side (m)",
+   "expect": "fail",
+   "got": "fail",
+   "value": 0.055,
+   "caught": true
+  },
+  {
+   "name": "facing: the starter turned round",
+   "check": "facing -Z: headlights ahead of the front axle, tail lights behind the rear",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "head": 2.21,
+    "tail": -2.16,
+    "frontAxle": 1.275
+   },
+   "caught": true
+  },
+  {
+   "name": "origin: the starter built 200 mm forward of its origin",
+   "check": "origin at the middle of the wheelbase on the ground (m)",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "x": 0,
+    "z": -0.2
+   },
+   "caught": true
+  },
+  {
+   "name": "closed: the starter body with every face turned inside out",
+   "check": "every part closed with its faces outwards (signed volume > 0)",
+   "expect": "fail",
+   "got": "fail",
+   "value": {
+    "parts": 10,
+    "inverted": [
+     "body"
+    ]
+   },
+   "caught": true
+  }
+ ],
+ "code": {
+  "shared": {
+   "raw": 28408,
+   "gzip": 10056
+  },
+  "all": {
+   "raw": 37536,
+   "gzip": 14681
+  },
+  "limit": 102400,
+  "pass": true
+ },
+ "pass": true,
+ "failures": []
+}

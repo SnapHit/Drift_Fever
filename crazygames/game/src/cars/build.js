@@ -190,7 +190,8 @@ function shape(S) {
   const y7 = z => inCabin(z) ? roofEdgeY(z) : deck(z) + hc * 0.7;
   const y8 = z => inCabin(z) ? roofEdgeY(z) + crown(z) : deck(z) + hc;
   const arch = (axle, front) => ({ z: axle, r: D.wheelRadius + (front ? S.archGap[0] : S.archGap[1]),
-    wellX: D.track / 2 - (front ? D.tyre[0] : D.tyre[1]) / 2 - 0.05 });
+    // the front wells run deeper inboard, so a tyre at full lock swings inside them
+    wellX: D.track / 2 - (front ? D.tyre[0] : D.tyre[1]) / 2 - (front ? 0.2 : 0.05) });
   const arches = [arch(fa, true), arch(ra, false)];
   return { zF, zR, fa, ra, side, floor, belt, deck, y7, y8, glassX, roofXAt, flareAt, arches, inCabin };
 }
