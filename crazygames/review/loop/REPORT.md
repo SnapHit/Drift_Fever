@@ -212,11 +212,18 @@ to 23.7 ms, the verdict flips. CAUGHT.
 
 ## Screenshots
 
-`shots/` holds every screen in 1280x720, 390x844 and 844x390: `title`,
-`career`, `garage` (the tourer picked, not owned), `countdown`, `drive`
-(mid drift on career 1 with the ghost, the chain by the car, the lap and
-the clock, the best to beat), `results` and `free` (a handbrake turn in
-the car park with the touch pad showing).
+`shots/` holds every screen in 1280x720, 390x844 and 844x390, written
+by the probe: `title`, `career`, `garage` (the tourer picked, not
+owned), `countdown` (the car held under the gantry, the 2), `drive` (mid
+drift on career 1, the chain by the car, the lap and the clock, the best
+to beat), `results`, `ghost` (the car held with DRIFT while the saved
+ghost, a pale see through car, drives on ahead: by the orange wall in
+`ghost-1280x720.png`, already round the corner in the narrower portrait
+view) and `free` (a
+handbrake turn in the car park with the touch pad showing in the phone
+viewports). The first drive shots had the ghost hidden inside the car:
+the probe replays the same deterministic driver, so the ghost sat
+exactly where the car was, which is the ghost working.
 
 ## Not done, and deviations from the brief
 

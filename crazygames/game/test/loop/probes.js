@@ -292,6 +292,15 @@ if (run('shots')) {
       for (let k = 0; k < 40 && !best; k++) { const fr = await L.runFrames(side.page, 30, L.COLLECT); for (const f of fr) if (f.angle > 28 && f.v > 12 && f.state === 'drive') { best = f; break; } }
     });
     await shot('results', async () => { await L.driveToResults(side.page, RUN_BUDGET); });
+    await shot('ghost', async () => {
+      // the car held on the line (DRIFT, no steering) while the ghost drives away
+      await L.beginRun(side.page, 'again', null, null);
+      await side.page.evaluate(() => { window.__feel.setDriver(null); window.__feel.inject = { steer: 0, throttle: 1, brake: 0, handbrake: 0 }; });
+      await L.runFrames(side.page, 150);
+      await side.page.evaluate(() => { window.__feel.inject = { steer: 0, throttle: 0, brake: 0, handbrake: 1 }; });
+      await L.runFrames(side.page, 240);
+      await side.page.evaluate(() => { window.__feel.inject = null; });
+    });
     await shot('free', async () => {
       await side.page.evaluate(() => { window.__loop.action('free'); window.__feel.draw = false; window.__clock = 1000; window.__feel.inject = { steer: 0, throttle: 1, brake: 0, handbrake: 0 }; });
       await L.runFrames(side.page, 150);

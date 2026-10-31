@@ -30,80 +30,95 @@
   "screen": "results"
  },
  "6": {
+  "file": "shots/ghost-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "ghost"
+ },
+ "7": {
   "file": "shots/free-1280x720.png",
   "viewport": "1280x720",
   "screen": "free"
  },
- "7": {
+ "8": {
   "file": "shots/title-390x844.png",
   "viewport": "390x844",
   "screen": "title"
  },
- "8": {
+ "9": {
   "file": "shots/career-390x844.png",
   "viewport": "390x844",
   "screen": "career"
  },
- "9": {
+ "10": {
   "file": "shots/garage-390x844.png",
   "viewport": "390x844",
   "screen": "garage"
  },
- "10": {
+ "11": {
   "file": "shots/countdown-390x844.png",
   "viewport": "390x844",
   "screen": "countdown"
  },
- "11": {
+ "12": {
   "file": "shots/drive-390x844.png",
   "viewport": "390x844",
   "screen": "drive"
  },
- "12": {
+ "13": {
   "file": "shots/results-390x844.png",
   "viewport": "390x844",
   "screen": "results"
  },
- "13": {
+ "14": {
+  "file": "shots/ghost-390x844.png",
+  "viewport": "390x844",
+  "screen": "ghost"
+ },
+ "15": {
   "file": "shots/free-390x844.png",
   "viewport": "390x844",
   "screen": "free"
  },
- "14": {
+ "16": {
   "file": "shots/title-844x390.png",
   "viewport": "844x390",
   "screen": "title"
  },
- "15": {
+ "17": {
   "file": "shots/career-844x390.png",
   "viewport": "844x390",
   "screen": "career"
  },
- "16": {
+ "18": {
   "file": "shots/garage-844x390.png",
   "viewport": "844x390",
   "screen": "garage"
  },
- "17": {
+ "19": {
   "file": "shots/countdown-844x390.png",
   "viewport": "844x390",
   "screen": "countdown"
  },
- "18": {
+ "20": {
   "file": "shots/drive-844x390.png",
   "viewport": "844x390",
   "screen": "drive"
  },
- "19": {
+ "21": {
   "file": "shots/results-844x390.png",
   "viewport": "844x390",
   "screen": "results"
  },
- "20": {
+ "22": {
+  "file": "shots/ghost-844x390.png",
+  "viewport": "844x390",
+  "screen": "ghost"
+ },
+ "23": {
   "file": "shots/free-844x390.png",
   "viewport": "844x390",
   "screen": "free"
  },
- "started": "2026-10-31T10:43:21.326Z",
+ "started": "2026-10-31T11:23:13.519Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here"
 }
