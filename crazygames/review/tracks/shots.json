@@ -1,0 +1,30 @@
+[
+ {
+  "spec": "circuit:7",
+  "seed": 7,
+  "kind": "circuit",
+  "length": 904,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "circuit 7   904 m   9 corners, 0 hairpins, 6 direction changes   76% in corners   longest straight 88 m   tightest 33.9 m   width 13.5 m   9 clips   difficulty 0.41 (asked 0.50)   9 attempts, 66 ms   valid",
+  "errors": [],
+  "file": "shots/circuit-7.png",
+  "ride": "shots/circuit-7-ride.png",
+  "ok": true
+ },
+ {
+  "spec": "sprint:42",
+  "seed": 42,
+  "kind": "sprint",
+  "length": 828,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "sprint 42   828 m   9 corners, 2 hairpins, 5 direction changes   60% in corners   longest straight 126 m   tightest 15.4 m   width 13.5 m   9 clips   difficulty 0.57 (asked 0.50)   1 attempt, 44 ms   valid",
+  "errors": [],
+  "file": "shots/sprint-42.png",
+  "ride": "shots/sprint-42-ride.png",
+  "ok": true
+ }
+]

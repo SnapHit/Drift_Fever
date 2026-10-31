@@ -67,7 +67,7 @@ export const TRACKS = {
   RUNOFF_RAMP:     16,           // m over which a barrier steps out to its run-off and back
   START_STRAIGHT:  [50, 80],     // m
   CLOSE_STRAIGHT:  10,           // m, at least, before a circuit's start straight
-  FINISH_STRAIGHT: [40, 70],     // m before a sprint's finish line
+  FINISH_STRAIGHT: [30, 50],     // m before a sprint's finish line
   FINISH_RUNOUT:   40,           // m of track past a sprint's finish line
   STRAIGHT_MAX:    150,          // m, no straight longer
   SHRINK:          0.6,          // a circuit's closure may shorten a straight to this share of its drawn length
