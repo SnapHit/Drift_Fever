@@ -140,6 +140,22 @@ if (run('save')) {
   verdict('saved progress survives a reload', same && after.coins > 0 && after.car === 'hatch' && !!after.ghosts['career:1'], 'coins ' + after.coins + ', car ' + after.car + ', paint ' + out.save.reload.paint + ', ghost steps ' + out.save.reload.ghostSteps);
   await side.close();
 
+  // a2. the career ladder unlocks in order
+  const sideU = await L.openPage(env, L.PORTRAIT, 'auto=1');
+  const unlock = await sideU.page.evaluate(() => {
+    const Lp = window.__loop, S = Lp.save; try { localStorage.clear(); } catch (e) {} S.reset();
+    const r = {};
+    r.lockedAtStart = !Lp.careerUnlocked(S.state, 1) && Lp.careerUnlocked(S.state, 0);
+    Lp.action('play-career', '1'); r.refusedWhileLocked = Lp.app.state !== 'countdown';
+    S.careerResult(0, 0, 500); r.stillLockedWithNoStar = !Lp.careerUnlocked(S.state, 1);
+    S.careerResult(0, 1, 1200); r.openAfterOneStar = Lp.careerUnlocked(S.state, 1) && !Lp.careerUnlocked(S.state, 2);
+    Lp.action('play-career', '1'); r.startsWhenOpen = Lp.app.state === 'countdown' && Lp.app.spec.index === 1;
+    return r;
+  });
+  out.save.unlock = unlock;
+  verdict('the career ladder unlocks in order, one star at a time', Object.values(unlock).every(v => v === true), JSON.stringify(unlock));
+  await sideU.close();
+
   // b. storage throwing: first the property itself, then every method
   const throwers = {
     property: `Object.defineProperty(window, 'localStorage', { get() { throw new Error('storage is off'); }, configurable: true });`,
@@ -247,8 +263,8 @@ if (run('shots')) {
   const dir = path.join(L.reviewDir, 'shots');
   fs.mkdirSync(dir, { recursive: true });
   out.shots = [];
-  for (const [vname, vp] of [['1280x720', L.LANDSCAPE], ['390x844', L.PORTRAIT]]) {
-    const side = await L.openPage(env, vp, 'auto=1', { touch: vp === L.PORTRAIT });
+  for (const [vname, vp] of [['1280x720', L.LANDSCAPE], ['390x844', L.PORTRAIT], ['844x390', { width: 844, height: 390 }]]) {
+    const side = await L.openPage(env, vp, 'auto=1', { touch: vp !== L.LANDSCAPE });
     await side.page.evaluate(() => { try { localStorage.clear(); } catch (e) {} const S = window.__loop.save; S.reset(); S.addCoins(2400); S.buyCar('hatch', 900); S.careerResult(0, 2, 1480); S.careerResult(1, 1, 610); });
     const shot = async (name, prep) => {
       if (prep) await prep();
@@ -264,9 +280,10 @@ if (run('shots')) {
     await shot('garage', async () => { await side.page.evaluate(() => { window.__loop.action('garage'); window.__loop.action('pick-car', 'tourer'); }); });
     await shot('countdown', async () => { await side.page.evaluate(() => { window.__loop.action('play-career', '0'); window.__feel.draw = false; window.__clock = 1000; }); await L.runFrames(side.page, 70); });
     await shot('drive', async () => {
-      // a ghost first, then into the second run, to a frame mid drift
+      // a ghost first, then into the second run with a slightly different
+      // driver (so the ghost is not hidden inside the car), to a frame mid drift
       await L.beginRun(side.page, 'career', 0); await L.driveToResults(side.page, RUN_BUDGET);
-      await L.beginRun(side.page, 'again');
+      await L.beginRun(side.page, 'again', null, { drift: '*', gain: 0.85 });
       let best = null;
       for (let k = 0; k < 40 && !best; k++) { const fr = await L.runFrames(side.page, 30, L.COLLECT); for (const f of fr) if (f.angle > 28 && f.v > 12 && f.state === 'drive') { best = f; break; } }
     });

@@ -261,7 +261,7 @@ function onAction(action, arg) {
     case 'daily': startRun(dailySpec()); break;
     case 'play-career': { const i = +arg; if (careerUnlocked(save.state, i)) startRun(careerSpec(i)); break; }
     case 'again': if (app.spec && app.spec.mode !== 'free') startRun(app.spec); break;
-    case 'pick-car': app.picked = arg; screens.garage(save.state, app.picked); break;
+    case 'pick-car': app.picked = arg; previewCar(); screens.garage(save.state, app.picked); break;
     case 'buy-car': if (save.buyCar(arg, carById(arg).price)) { save.chooseCar(arg); app.picked = arg; menuGround(); } screens.garage(save.state, app.picked); break;
     case 'choose-car': if (save.chooseCar(arg)) menuGround(); screens.garage(save.state, app.picked); break;
     case 'paint': {
@@ -270,9 +270,15 @@ function onAction(action, arg) {
         const free = arg === car.paint || arg === save.state.cars[id].paint;
         if (free || save.state.coins >= LOOP.PAINT_PRICE) { if (!free) save.addCoins(-LOOP.PAINT_PRICE); save.setPaint(id, arg); if (id === save.state.car) menuGround(); }
       }
+      previewCar();
       screens.garage(save.state, app.picked); break;
     }
   }
+}
+/* The garage's backdrop shows the car being looked at, in its paint. */
+function previewCar() {
+  const id = app.picked || save.state.car;
+  scene.setCar(id, save.state.cars[id] ? save.state.cars[id].paint : carById(id).paint);
 }
 hud.exit.addEventListener('click', () => { if (app.state !== 'dev') { menuGround(); showMenu('title'); } });
 
@@ -328,7 +334,7 @@ window.__feel = {
 };
 window.__loop = {
   app, save, LOOP, screens, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
-  action: onAction, startRun, dailySpec, careerSpec, trackFor,
+  action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor,
   progress: () => app.progress && app.progress.state,
   results: () => app.results,
   ghostHash: () => app.ghost ? app.ghost.hash() : null,
