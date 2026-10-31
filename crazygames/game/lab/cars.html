@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en-au">
+<head>
+<meta charset="utf-8">
+<title>Drift Fever: the cars</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1a1d33">
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: dark; --cyan: #19d8ff; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1d33; color: #eef1f7; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+  body { touch-action: none; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
+  #world { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .bar { position: fixed; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left)); background: rgba(10, 12, 26, 0.55); }
+  #top { top: 0; padding-top: max(8px, env(safe-area-inset-top)); }
+  #bottom { bottom: 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); flex-direction: column; gap: 6px; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .row > b { width: 4.6em; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.7; }
+  button { min-height: 36px; min-width: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: #fff; font: inherit; font-weight: 700; padding: 0 10px; }
+  button.on { border-color: var(--cyan); background: rgba(25, 216, 255, 0.28); }
+  button.sw { width: 32px; min-width: 32px; padding: 0; }
+  input[type=color] { width: 40px; height: 34px; border: 0; padding: 0; background: none; }
+  #stats { position: fixed; right: max(8px, env(safe-area-inset-right)); font-variant-numeric: tabular-nums; background: rgba(10, 12, 26, 0.6); border-radius: 8px; padding: 6px 8px; font-size: 12px; }
+  #stats table { border-collapse: collapse; }
+  #stats td, #stats th { padding: 1px 6px; text-align: right; }
+  #stats td:first-child, #stats th:first-child { text-align: left; }
+  #stats tr.sel td { color: var(--cyan); }
+  #note { opacity: 0.7; font-size: 11px; }
+  body.shot .bar, body.shot #stats { display: none; }
+  #fail { position: fixed; left: 16px; right: 16px; top: 40%; text-align: center; }
+</style>
+<script type="importmap">{ "imports": { "three": "../vendor/three.webgpu.min.js" } }</script>
+</head>
+<body>
+<canvas id="world"></canvas>
+<div id="top" class="bar"></div>
+<div id="stats"></div>
+<div id="bottom" class="bar">
+  <div class="row" id="paintRow"><b>Paint</b></div>
+  <div class="row" id="glowRow"><b>Glow</b></div>
+  <div class="row" id="viewRow"><b>View</b></div>
+</div>
+<p id="fail" hidden></p>
+<script type="module">
+/* THE CAR LAB. The five cars on a turntable under the game's own lights
+   (LOOK in render/scene.js), with paint and underglow pickers, and the
+   triangle and draw call count of each car measured by rendering it
+   alone. Drag to turn the table. Query: car=<id> or all, view=turntable,
+   chase, far (the chase camera's height and pitch, 30 m back) or three
+   (a fixed three-quarter), yaw=<degrees> for the car's own heading in
+   the fixed views, renderer=webgl2 to force the fallback, shot=1 to
+   hide the controls and stop the clock for the probes, which drive it
+   through window.__lab. */
+import * as THREE from 'three';
+import { createCar, CARS } from '../src/cars/index.js';
+import { LOOK } from '../src/render/scene.js';
+import { TUNE } from '../src/tune.js';
+
+const Q = new URLSearchParams(location.search);
+const SHOT = Q.get('shot') === '1';
+if (SHOT) document.body.classList.add('shot');
+const canvas = document.getElementById('world');
+const renderer = new THREE.WebGPURenderer({ canvas, antialias: !SHOT, forceWebGL: Q.get('renderer') === 'webgl2', alpha: false });
+const fail = msg => { const f = document.getElementById('fail'); f.textContent = msg; f.hidden = false; };
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(LOOK.SKY);
+scene.fog = new THREE.Fog(LOOK.FOG, LOOK.FOG_NEAR, LOOK.FOG_FAR);
+const camera = new THREE.PerspectiveCamera(TUNE.CAMERA.FOV, 1, 0.1, 900);
+scene.add(new THREE.HemisphereLight(LOOK.HEMI_SKY, LOOK.HEMI_GROUND, LOOK.HEMI));
+const sun = new THREE.DirectionalLight(0xfff0dd, LOOK.SUN);
+sun.position.set(...LOOK.SUN_DIR);
+scene.add(sun);
+const env = new THREE.Group();
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600), new THREE.MeshLambertMaterial({ color: LOOK.GROUND }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02;
+const table = new THREE.Mesh(new THREE.CircleGeometry(3.4, 48), new THREE.MeshLambertMaterial({ color: LOOK.ROAD }));
+table.rotation.x = -Math.PI / 2; table.position.y = -0.005;
+const road = new THREE.Mesh(new THREE.PlaneGeometry(12, 120), new THREE.MeshLambertMaterial({ color: LOOK.ROAD }));
+road.rotation.x = -Math.PI / 2; road.position.set(0, -0.006, -20);
+const edges = [-6, 6].map(x => { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.45, 120), new THREE.MeshLambertMaterial({ color: LOOK.EDGE })); m.rotation.x = -Math.PI / 2; m.position.set(x, -0.004, -20); return m; });
+env.add(ground, table, road, ...edges);
+scene.add(env);
+
+/* The five, each on its own spot; only the shown ones are visible. */
+const cars = {}, spots = {};
+const turn = new THREE.Group();
+scene.add(turn);
+CARS.forEach((c, i) => {
+  const car = createCar(THREE, c.id);
+  cars[c.id] = car;
+  const spot = new THREE.Group();
+  spot.add(car.group);
+  turn.add(spot);
+  spots[c.id] = spot;
+});
+
+const state = { car: Q.get('car') || 'starter', view: Q.get('view') || 'turntable', yaw: (+Q.get('yaw') || 0) * Math.PI / 180, spin: 0, paint: null, glow: null, lightsOn: true };
+const W = { w: 1, h: 1 };
+
+function layout() {
+  const all = state.car === 'all';
+  CARS.forEach((c, i) => {
+    const spot = spots[c.id];
+    spot.visible = all || c.id === state.car;
+    if (all) { spot.position.set((i - 2) * 2.6, 0, (i % 2) * 1.2 - 0.6); }
+    else spot.position.set(0, 0, 0);
+  });
+  table.visible = state.view === 'turntable' && !all;
+  road.visible = edges[0].visible = edges[1].visible = state.view !== 'turntable';
+}
+
+function placeCamera() {
+  const portrait = W.w < W.h, C = TUNE.CAMERA;
+  const all = state.car === 'all';
+  turn.rotation.y = 0;
+  for (const id in spots) spots[id].rotation.y = 0;
+  if (state.view === 'chase' || state.view === 'far') {
+    // the chase rig at a standstill: DISTANCE behind (or 30 m for far), HEIGHT up, looking LOOK_AHEAD past the car
+    const near = C.DISTANCE * (portrait ? C.PORTRAIT_DISTANCE : 1), h = C.HEIGHT * (portrait ? C.PORTRAIT_HEIGHT : 1), look = C.LOOK_AHEAD * (portrait ? C.PORTRAIT_LOOK : 1);
+    const back = state.view === 'far' ? 30 : near;
+    camera.fov = portrait ? C.FOV_PORTRAIT : C.FOV;
+    camera.position.set(0, h, back);
+    camera.lookAt(0, C.LOOK_UP, back - near - look);
+    for (const id in spots) spots[id].rotation.y = state.yaw;
+  } else if (state.view === 'three') {
+    camera.fov = portrait ? 46 : 32;
+    const d = all ? 17 : (portrait ? 12.5 : 10.5);
+    camera.position.set(-d * 0.62, d * 0.3, -d * 0.74);
+    camera.lookAt(0, 0.55, 0);
+    for (const id in spots) spots[id].rotation.y = state.yaw;
+  } else {
+    camera.fov = portrait ? 50 : 36;
+    const d = all ? 18 : (portrait ? 11.5 : 9.5);
+    camera.position.set(d * 0.7, d * 0.36, d * 0.62);
+    camera.lookAt(0, 0.5, 0);
+    if (all) for (const id in spots) spots[id].rotation.y = state.spin + 0.6;
+    else turn.rotation.y = state.spin;
+  }
+  camera.aspect = W.w / W.h;
+  camera.updateProjectionMatrix();
+}
+
+function resize() {
+  W.w = window.innerWidth; W.h = window.innerHeight;
+  renderer.setPixelRatio(SHOT ? 1 : Math.min(2, window.devicePixelRatio || 1));
+  renderer.setSize(W.w, W.h, false);
+}
+
+function render() { layout(); placeCamera(); renderer.render(scene, camera); }
+
+/* Each car alone: the triangles and draw calls the renderer reports for
+   a frame with nothing else in it, underglow off and on. */
+function measureAll() {
+  const out = {};
+  const keep = { env: env.visible, car: state.car, view: state.view };
+  env.visible = false;
+  // an empty frame first: what the renderer counts with no car in it (the background)
+  for (const id in spots) spots[id].visible = false;
+  renderer.info.reset(); renderer.render(scene, camera);
+  const base = { triangles: renderer.info.render.triangles, drawCalls: renderer.info.render.drawCalls };
+  out.empty = base;
+  for (const c of CARS) {
+    state.car = c.id; state.view = 'three'; layout(); placeCamera();
+    const car = cars[c.id], glowWas = car.underglow.visible;
+    const row = {};
+    for (const glow of [false, true]) {
+      car.underglow.visible = glow;
+      renderer.info.reset(); renderer.render(scene, camera);
+      const i = renderer.info.render;
+      row[glow ? 'withGlow' : 'plain'] = { triangles: i.triangles - base.triangles, drawCalls: i.drawCalls - base.drawCalls };
+    }
+    car.underglow.visible = glowWas;
+    out[c.id] = row;
+  }
+  env.visible = keep.env; state.car = keep.car; state.view = keep.view;
+  return out;
+}
+
+/* ---- the controls ---- */
+const top = document.getElementById('top');
+const buttons = {};
+for (const c of [...CARS, { id: 'all', label: 'All five' }]) {
+  const b = document.createElement('button');
+  b.textContent = c.id === 'all' ? 'All five' : c.label;
+  b.onclick = () => { state.car = c.id; syncButtons(); syncStats(); };
+  top.appendChild(b); buttons[c.id] = b;
+}
+const PAINTS = [null, 0x19d8ff, 0xf4f4f0, 0x1c1d22, 0xe8322c, 0xffc21c, 0x37c95a, 0x7a4cff, 0xff4fb0];
+const GLOWS = [null, 0x19d8ff, 0xff2bd6, 0x7cff3a, 0xffb21c, 0xffffff];
+const hex = n => '#' + n.toString(16).padStart(6, '0');
+function swatches(rowId, list, label, apply) {
+  const row = document.getElementById(rowId), els = [];
+  for (const v of list) {
+    const b = document.createElement('button');
+    b.className = v == null ? '' : 'sw';
+    if (v == null) b.textContent = label; else b.style.background = hex(v);
+    b.onclick = () => { apply(v); els.forEach(e => e.classList.toggle('on', e === b)); };
+    row.appendChild(b); els.push(b);
+  }
+  const input = document.createElement('input'); input.type = 'color'; input.value = '#19d8ff';
+  input.oninput = () => { apply(parseInt(input.value.slice(1), 16)); els.forEach(e => e.classList.remove('on')); };
+  row.appendChild(input);
+  els[0].classList.add('on');
+}
+function applyPaint(v) { state.paint = v; for (const c of CARS) cars[c.id].setPaint(v == null ? c.paint : v); }
+function applyGlow(v) { state.glow = v; for (const c of CARS) cars[c.id].setUnderglow(v); }
+swatches('paintRow', PAINTS, 'Own', applyPaint);
+swatches('glowRow', GLOWS, 'Off', applyGlow);
+const viewRow = document.getElementById('viewRow'), viewButtons = {};
+for (const [v, label] of [['turntable', 'Turntable'], ['chase', 'Chase'], ['far', '30 m'], ['three', 'Three quarter']]) {
+  const b = document.createElement('button'); b.textContent = label;
+  b.onclick = () => { state.view = v; syncButtons(); };
+  viewRow.appendChild(b); viewButtons[v] = b;
+}
+const lightsB = document.createElement('button');
+lightsB.onclick = () => { state.lightsOn = !state.lightsOn; for (const id in cars) cars[id].lights.set(state.lightsOn ? 1 : 0, state.lightsOn ? 1 : 0); syncButtons(); };
+viewRow.appendChild(lightsB);
+function syncButtons() {
+  for (const id in buttons) buttons[id].classList.toggle('on', id === state.car);
+  for (const v in viewButtons) viewButtons[v].classList.toggle('on', v === state.view);
+  lightsB.textContent = state.lightsOn ? 'Lights on' : 'Lights off';
+  lightsB.classList.toggle('on', state.lightsOn);
+}
+let counts = null;
+function syncStats() {
+  const el = document.getElementById('stats');
+  el.style.top = (top.getBoundingClientRect().bottom + 6) + 'px';
+  if (!counts) { el.textContent = 'measuring'; return; }
+  let html = '<table><tr><th>car</th><th>tris</th><th>calls</th><th>m</th></tr>';
+  for (const c of CARS) {
+    const d = cars[c.id].dims, n = counts[c.id].plain;
+    html += `<tr class="${c.id === state.car ? 'sel' : ''}"><td>${c.label}</td><td>${n.triangles}</td><td>${n.drawCalls}</td><td>${d.length.toFixed(2)} x ${d.width.toFixed(2)}</td></tr>`;
+  }
+  html += '</table><div id="note">underglow on adds ' + (counts.starter.withGlow.triangles - counts.starter.plain.triangles) + ' tris and ' + (counts.starter.withGlow.drawCalls - counts.starter.plain.drawCalls) + ' call</div>';
+  el.innerHTML = html;
+}
+
+/* drag turns the table */
+let drag = null;
+canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, spin: state.spin }; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => { if (drag) state.spin = drag.spin + (e.clientX - drag.x) * 0.01; });
+canvas.addEventListener('pointerup', () => { drag = null; });
+canvas.addEventListener('pointercancel', () => { drag = null; });
+
+window.addEventListener('resize', () => { resize(); syncStats(); });
+resize();
+syncButtons();
+renderer.init().then(() => {
+  counts = measureAll();
+  syncStats();
+  let last = performance.now();
+  const frame = now => {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (!drag) state.spin += dt * 0.35;
+    render();
+    requestAnimationFrame(frame);
+  };
+  if (!SHOT) requestAnimationFrame(frame); else render();
+  window.__lab = {
+    THREE, cars, state, counts, renderer, scene, camera, env,
+    backend: renderer.backend && renderer.backend.isWebGPUBackend ? 'webgpu' : 'webgl2',
+    show(o) { Object.assign(state, o); if (o.yawDeg != null) state.yaw = o.yawDeg * Math.PI / 180; render(); return true; },
+    measure: measureAll,
+    /* the car's box projected to the screen, in pixels, for framing checks */
+    screenBox(id) {
+      const car = cars[id], b = new THREE.Box3().setFromObject(car.group), pts = [];
+      for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) { const v = new THREE.Vector3(x, y, z).project(camera); pts.push([(v.x + 1) / 2 * W.w, (1 - v.y) / 2 * W.h]); }
+      return { x0: Math.min(...pts.map(p => p[0])), x1: Math.max(...pts.map(p => p[0])), y0: Math.min(...pts.map(p => p[1])), y1: Math.max(...pts.map(p => p[1])) };
+    },
+  };
+  window.__ready = true;
+}).catch(e => { fail('The renderer could not start: ' + e.message); window.__ready = true; });
+</script>
+</body>
+</html>
