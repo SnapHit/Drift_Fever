@@ -214,5 +214,11 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   `review/cars/REPORT.md`. Open: three pairs are hard to tell apart straight
   from behind at 30 m, and a rear wheel vanishes after a sliding frame in
   the sandbox's software WebGL 2 (`game/test/cars/vanish.js`), untested on a
-  real GPU. In progress: the track generator (`crazygames-tracks`) and the
-  game loop (`briefs/GAME-LOOP.md`, `crazygames-loop`).
+  real GPU.
+- 31 October 2026: the track generator (`briefs/TRACKS.md`) is merged:
+  `game/src/tracks/`, the browser at `/lab/tracks`, results in
+  `review/tracks/REPORT.md`. For the game loop: the physics is flat, so use
+  `{ elevation: 0 }` until the car follows the road's height; draw tracks
+  with `buildTrackMesh`, not scene.js's closed loop; generate once per
+  track (worst 521 ms). In progress: the game loop
+  (`briefs/GAME-LOOP.md`, `crazygames-loop`).
