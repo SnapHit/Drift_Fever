@@ -1,57 +1,57 @@
 {
  "kinds": {
   "circuit": {
-   "tracks": 30,
+   "tracks": 100,
    "notFinished": 0,
    "respawns": 0,
    "wallHits": 0,
    "hardHits": 0,
    "tracksWithHits": 0,
    "seconds": {
-    "n": 30,
-    "min": 41.375,
-    "p5": 42.275,
-    "p50": 55.75,
+    "n": 100,
+    "min": 32.792,
+    "p5": 37.75,
+    "p50": 52.392,
     "p95": 70.508,
-    "max": 73.55,
-    "mean": 55.254
+    "max": 74.55,
+    "mean": 53.802
    },
    "clipMin": {
-    "n": 30,
-    "min": 3.563,
-    "p5": 3.593,
-    "p50": 4.557,
-    "p95": 5.517,
+    "n": 100,
+    "min": 3.211,
+    "p5": 3.487,
+    "p50": 4.49,
+    "p95": 5.391,
     "max": 5.777,
-    "mean": 4.513
+    "mean": 4.442
    },
    "tracksWithoutClipReadings": 0,
    "mostBeyondEdge": 0
   },
   "sprint": {
-   "tracks": 30,
+   "tracks": 100,
    "notFinished": 0,
    "respawns": 0,
    "wallHits": 0,
    "hardHits": 0,
    "tracksWithHits": 0,
    "seconds": {
-    "n": 30,
-    "min": 38.283,
-    "p5": 39.617,
-    "p50": 51.9,
-    "p95": 69.7,
+    "n": 100,
+    "min": 32.133,
+    "p5": 37.258,
+    "p50": 50.95,
+    "p95": 68.692,
     "max": 70.333,
-    "mean": 51.286
+    "mean": 51.029
    },
    "clipMin": {
-    "n": 30,
-    "min": 3.278,
-    "p5": 3.483,
-    "p50": 4.632,
+    "n": 100,
+    "min": 3.22,
+    "p5": 3.286,
+    "p50": 4.451,
     "p95": 5.47,
-    "max": 5.655,
-    "mean": 4.512
+    "max": 5.73,
+    "mean": 4.442
    },
    "tracksWithoutClipReadings": 0,
    "mostBeyondEdge": 0

@@ -1,158 +1,158 @@
 {
- "seedsPerKind": 50,
+ "seedsPerKind": 1000,
  "difficulty": "seed n uses ((n - 1) mod 11) / 10",
  "kinds": {
   "circuit": {
    "partGap": {
     "apartAlongTrack": 60,
-    "tracksWithPartsWithin20m": 33,
+    "tracksWithPartsWithin20m": 580,
     "gap": {
-     "n": 33,
-     "min": 4.709,
-     "p5": 8.193,
-     "p50": 17.516,
-     "p95": 24.176,
-     "max": 25.765,
-     "mean": 16.845
+     "n": 580,
+     "min": 4.048,
+     "p5": 5.73,
+     "p50": 17.045,
+     "p95": 28.559,
+     "max": 39.954,
+     "mean": 16.984
     },
-    "tracksWithBarriersCloserThanTheRoadWidth": 6
+    "tracksWithBarriersCloserThanTheRoadWidth": 139
    },
-   "tracks": 50,
+   "tracks": 1000,
    "invalid": 0,
    "fallback": 0,
    "failuresByCheck": {},
    "worst": {
-    "clearance": -0.0452,
-    "otherBarrier": 4.7059,
-    "tightest": 13.205,
-    "widestCorner": 109.7243,
-    "minWidth": 11.09,
-    "maxWidth": 16.47,
-    "maxGrade": 0.0398,
-    "maxCrest": 0.0009,
-    "maxLift": 0.3576,
+    "clearance": -0.0524,
+    "otherBarrier": 4.0075,
+    "tightest": 12.5079,
+    "widestCorner": 109.8298,
+    "minWidth": 11.03,
+    "maxWidth": 16.93,
+    "maxGrade": 0.04,
+    "maxCrest": 0.0011,
+    "maxLift": 0.4286,
     "maxBankDeg": 3,
-    "minLength": 682,
+    "minLength": 614,
     "maxLength": 1200,
-    "minStep": 1.998,
+    "minStep": 1.9978,
     "maxStep": 2.0001
    },
    "attempts": {
-    "n": 50,
+    "n": 1000,
     "min": 1,
     "p5": 1,
     "p50": 9,
     "p95": 43,
-    "max": 106,
-    "mean": 16.04
+    "max": 123,
+    "mean": 14.077
    },
    "generationMs": {
-    "n": 50,
-    "min": 5.683,
-    "p5": 6.068,
-    "p50": 35.558,
-    "p95": 156.451,
-    "max": 346.266,
-    "mean": 52.256
+    "n": 1000,
+    "min": 3.684,
+    "p5": 5.989,
+    "p50": 25.766,
+    "p95": 116.725,
+    "max": 351.188,
+    "mean": 38.743
    },
    "rejectedAttemptsByCheck": {
-    "closure": 561,
-    "turning": 17,
-    "length": 108,
-    "overlap": 151,
-    "clearance": 147
+    "closure": 10091,
+    "turning": 311,
+    "length": 1760,
+    "overlap": 2320,
+    "clearance": 2259
    }
   },
   "sprint": {
    "partGap": {
     "apartAlongTrack": 60,
-    "tracksWithPartsWithin20m": 32,
+    "tracksWithPartsWithin20m": 662,
     "gap": {
-     "n": 32,
-     "min": 7.622,
-     "p5": 8.723,
-     "p50": 18.757,
-     "p95": 28.433,
-     "max": 38.074,
-     "mean": 18.613
+     "n": 662,
+     "min": 4.089,
+     "p5": 6.706,
+     "p50": 18.265,
+     "p95": 28.028,
+     "max": 38.941,
+     "mean": 17.875
     },
-    "tracksWithBarriersCloserThanTheRoadWidth": 6
+    "tracksWithBarriersCloserThanTheRoadWidth": 142
    },
-   "tracks": 50,
+   "tracks": 1000,
    "invalid": 0,
    "fallback": 0,
    "failuresByCheck": {},
    "worst": {
-    "clearance": -0.0444,
-    "otherBarrier": 7.6183,
-    "tightest": 12.992,
-    "widestCorner": 106.0277,
-    "minWidth": 11.07,
-    "maxWidth": 16.64,
+    "clearance": -0.0553,
+    "otherBarrier": 4.0176,
+    "tightest": 12.5428,
+    "widestCorner": 109.872,
+    "minWidth": 11,
+    "maxWidth": 16.97,
     "maxGrade": 0.04,
     "maxCrest": 0.001,
     "maxLift": 0.4041,
     "maxBankDeg": 3,
-    "minLength": 674,
-    "maxLength": 1160,
-    "minStep": 1.998,
+    "minLength": 630,
+    "maxLength": 1198,
+    "minStep": 1.9978,
     "maxStep": 2.0001
    },
    "attempts": {
-    "n": 50,
+    "n": 1000,
     "min": 1,
     "p5": 1,
     "p50": 1,
     "p95": 5,
-    "max": 5,
-    "mean": 1.82
+    "max": 15,
+    "mean": 2.051
    },
    "generationMs": {
-    "n": 50,
-    "min": 3.751,
-    "p5": 4.881,
-    "p50": 10.59,
-    "p95": 36.965,
-    "max": 54.998,
-    "mean": 14.9
+    "n": 1000,
+    "min": 3.67,
+    "p5": 4.829,
+    "p50": 11.018,
+    "p95": 41.496,
+    "max": 520.774,
+    "mean": 16.326
    },
    "rejectedAttemptsByCheck": {
-    "length": 24,
-    "overlap": 27,
-    "clearance": 26
+    "length": 583,
+    "overlap": 710,
+    "clearance": 658
    }
   }
  },
  "targets": {
   "circuit 600": {
-   "tracks": 50,
+   "tracks": 100,
    "invalid": 0,
    "fallback": 0,
    "lengths": [
-    548,
+    542,
     660
    ]
   },
   "circuit 900": {
-   "tracks": 50,
+   "tracks": 100,
    "invalid": 0,
    "fallback": 0,
    "lengths": [
-    822,
+    814,
     990
    ]
   },
   "circuit 1200": {
-   "tracks": 50,
+   "tracks": 100,
    "invalid": 0,
    "fallback": 0,
    "lengths": [
     1092,
-    1312
+    1320
    ]
   },
   "sprint 600": {
-   "tracks": 50,
+   "tracks": 100,
    "invalid": 0,
    "fallback": 0,
    "lengths": [
@@ -161,21 +161,21 @@
    ]
   },
   "sprint 900": {
-   "tracks": 50,
+   "tracks": 100,
    "invalid": 0,
    "fallback": 0,
    "lengths": [
     856,
-    988
+    990
    ]
   },
   "sprint 1200": {
-   "tracks": 50,
+   "tracks": 100,
    "invalid": 0,
    "fallback": 0,
    "lengths": [
-    1192,
-    1318
+    1146,
+    1320
    ]
   }
  },
