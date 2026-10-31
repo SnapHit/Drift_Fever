@@ -1,5 +1,5 @@
 {
- "when": "2026-10-31T04:58:13.357Z",
+ "when": "2026-10-31T05:08:01.858Z",
  "three": "184",
  "cars": {
   "starter": {
@@ -441,15 +441,15 @@
    "label": "Grand tourer",
    "dims": {
     "length": 4.84,
-    "width": 1.968,
-    "height": 1.3,
+    "width": 1.98,
+    "height": 1.24,
     "wheelbase": 2.86,
     "track": 1.66,
     "wheelRadius": 0.35,
     "tyreFront": 0.245,
     "tyreRear": 0.255,
     "halfLength": 2.42,
-    "halfWidth": 0.984,
+    "halfWidth": 0.99,
     "centreZ": 0.06,
     "frontAxle": -1.43,
     "rearAxle": 1.43
@@ -462,10 +462,10 @@
     "drawCalls": 10
    },
    "ownCode": {
-    "raw": 1696,
-    "gzip": 883
+    "raw": 1652,
+    "gzip": 872
    },
-   "roof": 1.29,
+   "roof": 1.23,
    "tyresAtFullLock": {
     "hits": 0,
     "worst": 0
@@ -503,7 +503,7 @@
     },
     {
      "name": "width m",
-     "value": 1.968,
+     "value": 1.98,
      "limit": [
       1.6,
       2
@@ -512,7 +512,7 @@
     },
     {
      "name": "height m",
-     "value": 1.3,
+     "value": 1.24,
      "limit": [
       1.1,
       1.5
@@ -583,7 +583,7 @@
      "name": "class: length 4.6 to 4.9 m, width at least 1.9 m, wheelbase at least 2.75 m: the longest wheelbase of the five",
      "value": {
       "length": 4.84,
-      "width": 1.968,
+      "width": 1.98,
       "wheelbase": 2.86,
       "longest": true
      },
@@ -620,7 +620,7 @@
     },
     {
      "name": "tyres inside the body width: worst tyre face past the body side (m)",
-     "value": -0.012,
+     "value": -0.033,
      "limit": "<= 0.005",
      "pass": true
     },
@@ -658,31 +658,31 @@
    "label": "Fastback",
    "dims": {
     "length": 4.74,
-    "width": 1.95,
-    "height": 1.289,
+    "width": 2,
+    "height": 1.409,
     "wheelbase": 2.76,
     "track": 1.62,
     "wheelRadius": 0.35,
     "tyreFront": 0.24,
     "tyreRear": 0.3,
     "halfLength": 2.37,
-    "halfWidth": 0.975,
+    "halfWidth": 1,
     "centreZ": 0.03,
     "frontAxle": -1.38,
     "rearAxle": 1.38
    },
-   "triangles": 2076,
+   "triangles": 2084,
    "drawCalls": 9,
    "materials": 5,
    "withUnderglow": {
-    "triangles": 2086,
+    "triangles": 2094,
     "drawCalls": 10
    },
    "ownCode": {
-    "raw": 1672,
-    "gzip": 866
+    "raw": 1752,
+    "gzip": 896
    },
-   "roof": 1.289,
+   "roof": 1.409,
    "tyresAtFullLock": {
     "hits": 0,
     "worst": 0
@@ -690,7 +690,7 @@
    "checks": [
     {
      "name": "triangles",
-     "value": 2076,
+     "value": 2084,
      "limit": [
       800,
       3000
@@ -720,7 +720,7 @@
     },
     {
      "name": "width m",
-     "value": 1.95,
+     "value": 2,
      "limit": [
       1.6,
       2
@@ -729,7 +729,7 @@
     },
     {
      "name": "height m",
-     "value": 1.289,
+     "value": 1.409,
      "limit": [
       1.1,
       1.5
@@ -802,8 +802,8 @@
       "length": 4.74,
       "tyreFront": 0.24,
       "tyreRear": 0.3,
-      "bodyFront": 1.874,
-      "bodyRear": 1.95
+      "bodyFront": 1.9,
+      "bodyRear": 2
      },
      "limit": "as stated",
      "pass": true
@@ -838,7 +838,7 @@
     },
     {
      "name": "tyres inside the body width: worst tyre face past the body side (m)",
-     "value": -0.007,
+     "value": -0.02,
      "limit": "<= 0.005",
      "pass": true
     },
@@ -864,7 +864,7 @@
     {
      "name": "every part closed with its faces outwards (signed volume > 0)",
      "value": {
-      "parts": 10,
+      "parts": 11,
       "inverted": []
      },
      "limit": "all > 0",
@@ -877,7 +877,7 @@
    "dims": {
     "length": 4.57,
     "width": 1.99,
-    "height": 1.32,
+    "height": 1.46,
     "wheelbase": 2.62,
     "track": 1.7,
     "wheelRadius": 0.34,
@@ -897,10 +897,10 @@
     "drawCalls": 10
    },
    "ownCode": {
-    "raw": 2174,
-    "gzip": 1021
+    "raw": 2175,
+    "gzip": 1029
    },
-   "roof": 1.164,
+   "roof": 1.114,
    "tyresAtFullLock": {
     "hits": 0,
     "worst": 0
@@ -947,7 +947,7 @@
     },
     {
      "name": "height m",
-     "value": 1.32,
+     "value": 1.46,
      "limit": [
       1.1,
       1.5
@@ -1017,9 +1017,9 @@
     {
      "name": "class: roof at most 1.22 m, the lowest of the five; width at least 1.95 m; a wing at least 50 mm above the roof",
      "value": {
-      "roof": 1.164,
+      "roof": 1.114,
       "width": 1.99,
-      "height": 1.32,
+      "height": 1.46,
       "lowest": true
      },
      "limit": "as stated",
@@ -1221,8 +1221,8 @@
     "length": 4.74,
     "tyreFront": 0.27,
     "tyreRear": 0.27,
-    "bodyFront": 1.874,
-    "bodyRear": 1.85
+    "bodyFront": 1.9,
+    "bodyRear": 1.84
    },
    "caught": true
   },
@@ -1232,9 +1232,9 @@
    "expect": "fail",
    "got": "fail",
    "value": {
-    "roof": 1.164,
+    "roof": 1.114,
     "width": 1.99,
-    "height": 1.17,
+    "height": 1.12,
     "lowest": true
    },
    "caught": true
@@ -1298,8 +1298,8 @@
    "gzip": 10056
   },
   "all": {
-   "raw": 37536,
-   "gzip": 14681
+   "raw": 37573,
+   "gzip": 14708
   },
   "limit": 102400,
   "pass": true

@@ -1,0 +1,22 @@
+{
+ "fresh": 406,
+ "hiddenOnPurpose": 0,
+ "freshAgain": 406,
+ "afterSlidingChase": 0,
+ "afterFreshGeometry": 406,
+ "errors": [],
+ "knownAnswers": [
+  {
+   "name": "wheel hidden on purpose reads as missing",
+   "value": 0,
+   "caught": true
+  },
+  {
+   "name": "wheel on a fresh page reads as present",
+   "value": 406,
+   "caught": true
+  }
+ ],
+ "reproduced": true,
+ "recoveredByFreshGeometry": true
+}
