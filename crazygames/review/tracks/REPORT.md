@@ -43,7 +43,7 @@ cross engine check); the JSON beside this file is what it wrote and
   ride along at driving height), with kind, seed, previous and next,
   today's track, random, difficulty and length, and a line of stats.
   Works on a phone in portrait (`shots/lab-portrait.png`).
-- Every known answer was caught (27 of them, listed below).
+- Every known answer was caught (24 of them, listed below).
 - `npm run build` passes: the new game is 20 files, 1.14 MB initial
   download. Nothing outside `game/src/tracks/`, `game/test/tracks/`,
   `game/lab/` and `review/tracks/` was touched.
