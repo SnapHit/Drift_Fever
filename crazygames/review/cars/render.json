@@ -1,0 +1,375 @@
+{
+ "when": "2026-10-31T06:13:20.482Z",
+ "counts": {
+  "empty": {
+   "triangles": 1,
+   "drawCalls": 1
+  },
+  "starter": {
+   "geometry": {
+    "triangles": 1988,
+    "drawCalls": 9
+   },
+   "rendered": {
+    "plain": {
+     "triangles": 1988,
+     "drawCalls": 9
+    },
+    "withGlow": {
+     "triangles": 1998,
+     "drawCalls": 10
+    }
+   },
+   "agree": true
+  },
+  "hatch": {
+   "geometry": {
+    "triangles": 2036,
+    "drawCalls": 9
+   },
+   "rendered": {
+    "plain": {
+     "triangles": 2036,
+     "drawCalls": 9
+    },
+    "withGlow": {
+     "triangles": 2046,
+     "drawCalls": 10
+    }
+   },
+   "agree": true
+  },
+  "tourer": {
+   "geometry": {
+    "triangles": 2468,
+    "drawCalls": 9
+   },
+   "rendered": {
+    "plain": {
+     "triangles": 2468,
+     "drawCalls": 9
+    },
+    "withGlow": {
+     "triangles": 2478,
+     "drawCalls": 10
+    }
+   },
+   "agree": true
+  },
+  "fastback": {
+   "geometry": {
+    "triangles": 2084,
+    "drawCalls": 9
+   },
+   "rendered": {
+    "plain": {
+     "triangles": 2084,
+     "drawCalls": 9
+    },
+    "withGlow": {
+     "triangles": 2094,
+     "drawCalls": 10
+    }
+   },
+   "agree": true
+  },
+  "driftbuild": {
+   "geometry": {
+    "triangles": 2300,
+    "drawCalls": 9
+   },
+   "rendered": {
+    "plain": {
+     "triangles": 2300,
+     "drawCalls": 9
+    },
+    "withGlow": {
+     "triangles": 2310,
+     "drawCalls": 10
+    }
+   },
+   "agree": true
+  }
+ },
+ "knownAnswers": [
+  {
+   "name": "renderer counts: a 12 triangle box in its own material added to the starter",
+   "expect": "+12 triangles, +1 call",
+   "value": {
+    "triangles": 12,
+    "drawCalls": 1
+   },
+   "caught": true
+  },
+  {
+   "name": "code fetched: the comparison with build.js left out",
+   "expect": "disagree",
+   "value": "disagree",
+   "caught": true
+  },
+  {
+   "name": "silhouette: the starter against itself",
+   "expect": "fail (diff < 0.15)",
+   "value": 0,
+   "caught": true
+  },
+  {
+   "name": "silhouette: the starter against itself repainted pink",
+   "expect": "fail (diff < 0.15)",
+   "value": 0,
+   "caught": true
+  },
+  {
+   "name": "silhouette: the mask holds the car and only the car",
+   "expect": "between 0.05 and 5 per cent of the screen",
+   "value": 762,
+   "caught": true
+  }
+ ],
+ "silhouettes": {
+  "straight": {
+   "closest": {
+    "a": "starter",
+    "b": "fastback",
+    "diff": 0.116
+   },
+   "under": 3,
+   "pairs": [
+    {
+     "a": "starter",
+     "b": "fastback",
+     "diff": 0.116
+    },
+    {
+     "a": "tourer",
+     "b": "driftbuild",
+     "diff": 0.132
+    },
+    {
+     "a": "fastback",
+     "b": "driftbuild",
+     "diff": 0.142
+    },
+    {
+     "a": "tourer",
+     "b": "fastback",
+     "diff": 0.151
+    },
+    {
+     "a": "starter",
+     "b": "driftbuild",
+     "diff": 0.176
+    },
+    {
+     "a": "starter",
+     "b": "tourer",
+     "diff": 0.192
+    },
+    {
+     "a": "starter",
+     "b": "hatch",
+     "diff": 0.202
+    },
+    {
+     "a": "hatch",
+     "b": "fastback",
+     "diff": 0.223
+    },
+    {
+     "a": "hatch",
+     "b": "driftbuild",
+     "diff": 0.323
+    },
+    {
+     "a": "hatch",
+     "b": "tourer",
+     "diff": 0.344
+    }
+   ],
+   "sizes": {
+    "starter": {
+     "pixels": 762,
+     "w": 34,
+     "h": 27
+    },
+    "hatch": {
+     "pixels": 730,
+     "w": 30,
+     "h": 28
+    },
+    "tourer": {
+     "pixels": 795,
+     "w": 36,
+     "h": 24
+    },
+    "fastback": {
+     "pixels": 862,
+     "w": 36,
+     "h": 28
+    },
+    "driftbuild": {
+     "pixels": 836,
+     "w": 38,
+     "h": 25
+    }
+   },
+   "limit": 0.15,
+   "pass": false
+  },
+  "slide35": {
+   "closest": {
+    "a": "tourer",
+    "b": "driftbuild",
+    "diff": 0.152
+   },
+   "under": 0,
+   "pairs": [
+    {
+     "a": "tourer",
+     "b": "driftbuild",
+     "diff": 0.152
+    },
+    {
+     "a": "starter",
+     "b": "tourer",
+     "diff": 0.159
+    },
+    {
+     "a": "starter",
+     "b": "fastback",
+     "diff": 0.172
+    },
+    {
+     "a": "tourer",
+     "b": "fastback",
+     "diff": 0.18
+    },
+    {
+     "a": "starter",
+     "b": "hatch",
+     "diff": 0.197
+    },
+    {
+     "a": "starter",
+     "b": "driftbuild",
+     "diff": 0.197
+    },
+    {
+     "a": "fastback",
+     "b": "driftbuild",
+     "diff": 0.243
+    },
+    {
+     "a": "hatch",
+     "b": "fastback",
+     "diff": 0.261
+    },
+    {
+     "a": "hatch",
+     "b": "tourer",
+     "diff": 0.316
+    },
+    {
+     "a": "hatch",
+     "b": "driftbuild",
+     "diff": 0.324
+    }
+   ],
+   "sizes": {
+    "starter": {
+     "pixels": 1210,
+     "w": 65,
+     "h": 27
+    },
+    "hatch": {
+     "pixels": 1208,
+     "w": 59,
+     "h": 29
+    },
+    "tourer": {
+     "pixels": 1244,
+     "w": 71,
+     "h": 25
+    },
+    "fastback": {
+     "pixels": 1446,
+     "w": 71,
+     "h": 29
+    },
+    "driftbuild": {
+     "pixels": 1262,
+     "w": 72,
+     "h": 29
+    }
+   },
+   "limit": 0.15,
+   "pass": true
+  }
+ },
+ "shots": [
+  "shots/starter-three-quarter.png",
+  "shots/starter-rear-three-quarter.png",
+  "shots/starter-chase.png",
+  "shots/starter-chase-slide.png",
+  "shots/hatch-three-quarter.png",
+  "shots/hatch-rear-three-quarter.png",
+  "shots/hatch-chase.png",
+  "shots/hatch-chase-slide.png",
+  "shots/tourer-three-quarter.png",
+  "shots/tourer-rear-three-quarter.png",
+  "shots/tourer-chase.png",
+  "shots/tourer-chase-slide.png",
+  "shots/fastback-three-quarter.png",
+  "shots/fastback-rear-three-quarter.png",
+  "shots/fastback-chase.png",
+  "shots/fastback-chase-slide.png",
+  "shots/driftbuild-three-quarter.png",
+  "shots/driftbuild-rear-three-quarter.png",
+  "shots/driftbuild-chase.png",
+  "shots/driftbuild-chase-slide.png",
+  "shots/all-three-quarter.png",
+  "shots/all-turntable.png",
+  "shots/all-underglow.png",
+  "shots/starter-30m.png",
+  "shots/starter-30m-slide.png",
+  "shots/hatch-30m.png",
+  "shots/hatch-30m-slide.png",
+  "shots/tourer-30m.png",
+  "shots/tourer-30m-slide.png",
+  "shots/fastback-30m.png",
+  "shots/fastback-30m-slide.png",
+  "shots/driftbuild-30m.png",
+  "shots/driftbuild-30m-slide.png",
+  "shots/lab-phone.png"
+ ],
+ "backend": "webgl2",
+ "code": {
+  "disk": {
+   "build.js": 26679,
+   "driftbuild.js": 2174,
+   "fastback.js": 1752,
+   "hatch.js": 1651,
+   "index.js": 1729,
+   "starter.js": 1935,
+   "tourer.js": 1651
+  },
+  "fetched": {
+   "index.js": 1729,
+   "build.js": 26679,
+   "starter.js": 1935,
+   "hatch.js": 1651,
+   "tourer.js": 1651,
+   "fastback.js": 1752,
+   "driftbuild.js": 2174
+  },
+  "agree": true,
+  "fetchedTotal": 37571
+ },
+ "errors": [],
+ "failures": [
+  "silhouettes at 30 m (0 deg): starter and fastback differ by only 0.116",
+  "silhouettes at 30 m (0 deg): tourer and driftbuild differ by only 0.132",
+  "silhouettes at 30 m (0 deg): fastback and driftbuild differ by only 0.142"
+ ],
+ "pass": false
+}

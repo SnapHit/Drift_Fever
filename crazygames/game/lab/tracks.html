@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en-au">
+<head>
+<meta charset="utf-8">
+<title>Drift Fever: track lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1a1d33">
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: dark; --cyan: #19d8ff; --edge: #f6e7a1; --clip: #ff8a3c; }
+  html, body { margin: 0; height: 100%; background: #1a1d33; color: #eef1f7; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 14px; }
+  body { display: flex; flex-direction: column; overscroll-behavior: none; }
+  #bar { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left)); background: #12142a; }
+  #bar .group { display: flex; gap: 4px; align-items: center; }
+  button, select, input { font: inherit; color: #fff; background: #262a48; border: 1px solid #3b4170; border-radius: 8px; padding: 6px 10px; min-height: 34px; }
+  button.on { background: var(--cyan); color: #06222b; border-color: var(--cyan); font-weight: 700; }
+  input[type=number] { width: 7.5em; }
+  input[type=range] { width: 7em; padding: 0; }
+  label { opacity: 0.8; font-size: 12px; }
+  #stats { padding: 4px 12px; font-size: 12px; line-height: 1.5; background: #12142a; border-top: 1px solid #262a48; font-variant-numeric: tabular-nums; }
+  #stats b { color: var(--cyan); font-weight: 700; }
+  #stats .bad { color: #ff6a6a; font-weight: 700; }
+  #stats .ok { color: #8be08b; }
+  #views { flex: 1; display: flex; min-height: 0; }
+  .view { position: relative; flex: 1; min-width: 0; min-height: 0; }
+  .view canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .view .tag { position: absolute; left: 8px; top: 6px; font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.15em; pointer-events: none; }
+  .view .modes { position: absolute; right: 8px; top: 6px; display: flex; gap: 4px; }
+  #plan { border-right: 1px solid #262a48; }
+  @media (orientation: portrait) { #views { flex-direction: column; } #plan { border-right: 0; border-bottom: 1px solid #262a48; } }
+  #fail { color: #ff8a8a; padding: 6px 12px; }
+</style>
+<script type="importmap">{ "imports": { "three": "../vendor/three.webgpu.min.js" } }</script>
+</head>
+<body>
+<div id="bar">
+  <div class="group"><button id="kCircuit" class="on">Circuit</button><button id="kSprint">Sprint</button></div>
+  <div class="group"><button id="prev" aria-label="previous seed">&#9664;</button><input id="seed" type="number" min="0" step="1" inputmode="numeric"><button id="next" aria-label="next seed">&#9654;</button></div>
+  <div class="group"><button id="today">Today</button><button id="random">Random</button></div>
+  <div class="group"><label for="diff">difficulty <span id="diffV"></span></label><input id="diff" type="range" min="0" max="1" step="0.05"></div>
+  <div class="group"><label for="len">length</label><select id="len"><option value="">600 to 1200 m</option><option value="600">about 600 m</option><option value="800">about 800 m</option><option value="1000">about 1000 m</option><option value="1200">about 1200 m</option></select></div>
+</div>
+<div id="stats">...</div>
+<p id="fail" hidden></p>
+<div id="views">
+  <div class="view" id="plan"><canvas id="planC"></canvas><span class="tag">from above</span></div>
+  <div class="view" id="three"><canvas id="threeC"></canvas><span class="tag">3D</span><div class="modes"><button id="mOrbit" class="on">Orbit</button><button id="mRide">Ride</button></div></div>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { generateTrack, dailySeed } from '../src/tracks/generate.js';
+import { characterOf, validateTrack } from '../src/tracks/analyse.js';
+import { buildTrackMesh, LOOK } from '../src/tracks/mesh.js';
+
+const $ = id => document.getElementById(id);
+const query = new URLSearchParams(location.search);
+const state = {
+  kind: query.get('kind') === 'sprint' ? 'sprint' : 'circuit',
+  seed: query.has('seed') ? (+query.get('seed') >>> 0) : dailySeed(new Date()),
+  difficulty: query.has('d') ? Math.max(0, Math.min(1, +query.get('d'))) : 0.5,
+  length: query.get('len') || '',
+  mode: 'orbit',
+};
+let track = null;
+
+/* ---- controls ---- */
+function syncControls() {
+  $('kCircuit').classList.toggle('on', state.kind === 'circuit');
+  $('kSprint').classList.toggle('on', state.kind === 'sprint');
+  $('seed').value = state.seed;
+  $('diff').value = state.difficulty;
+  $('diffV').textContent = state.difficulty.toFixed(2);
+  $('len').value = state.length;
+  $('mOrbit').classList.toggle('on', state.mode === 'orbit');
+  $('mRide').classList.toggle('on', state.mode === 'ride');
+  const q = new URLSearchParams({ kind: state.kind, seed: state.seed, d: state.difficulty });
+  if (state.length) q.set('len', state.length);
+  if (query.get('renderer')) q.set('renderer', query.get('renderer'));
+  history.replaceState(null, '', '?' + q.toString());
+}
+$('kCircuit').onclick = () => { state.kind = 'circuit'; show(); };
+$('kSprint').onclick = () => { state.kind = 'sprint'; show(); };
+$('prev').onclick = () => { state.seed = (state.seed - 1) >>> 0; show(); };
+$('next').onclick = () => { state.seed = (state.seed + 1) >>> 0; show(); };
+$('seed').onchange = () => { state.seed = (+$('seed').value) >>> 0; show(); };
+$('today').onclick = () => { state.seed = dailySeed(new Date()); show(); };
+$('random').onclick = () => { state.seed = (Math.random() * 4294967296) >>> 0; show(); };
+$('diff').oninput = () => { $('diffV').textContent = (+$('diff').value).toFixed(2); };
+$('diff').onchange = () => { state.difficulty = +$('diff').value; show(); };
+$('len').onchange = () => { state.length = $('len').value; show(); };
+$('mOrbit').onclick = () => { state.mode = 'orbit'; syncControls(); dirty = true; };
+$('mRide').onclick = () => { state.mode = 'ride'; ride.s = track ? track.start.along : 0; syncControls(); dirty = true; };
+
+function show() {
+  const t0 = performance.now();
+  track = generateTrack(state.seed, { kind: state.kind, difficulty: state.difficulty, length: state.length ? +state.length : undefined });
+  const ms = performance.now() - t0;
+  const ch = characterOf(track);
+  const v = validateTrack(track, track.target);
+  const today = state.seed === dailySeed(new Date()) ? ' (today)' : '';
+  $('stats').innerHTML =
+    `<b>${track.kind} ${track.seed}${today}</b> &nbsp; ${track.length} m &nbsp; ${ch.corners} corners, ${ch.hairpins} hairpins, ${ch.directionChanges} direction changes &nbsp; ` +
+    `${Math.round(ch.cornerShare * 100)}% in corners &nbsp; longest straight ${ch.longestStraight} m &nbsp; tightest ${ch.minRadius.toFixed(1)} m &nbsp; ` +
+    `width ${ch.meanWidth.toFixed(1)} m &nbsp; ${track.clips.length} clips &nbsp; difficulty ${track.difficulty.toFixed(2)} (asked ${state.difficulty.toFixed(2)}) &nbsp; ` +
+    `${track.attempts} attempt${track.attempts > 1 ? 's' : ''}, ${ms.toFixed(0)} ms &nbsp; ` +
+    (v.ok ? '<span class="ok">valid</span>' : '<span class="bad">INVALID: ' + v.failed.join(', ') + '</span>') + (track.fallback ? ' <span class="bad">fallback</span>' : '');
+  syncControls();
+  drawPlan();
+  setTrack3d();
+  window.__lab.track = track;
+  window.__lab.valid = v;
+}
+
+/* ---- from above, on a 2D canvas ---- */
+const planC = $('planC');
+const hex = n => '#' + n.toString(16).padStart(6, '0');
+function drawPlan() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = planC.clientWidth, h = planC.clientHeight;
+  planC.width = Math.max(1, Math.round(w * dpr)); planC.height = Math.max(1, Math.round(h * dpr));
+  const g = planC.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.fillStyle = '#24252b'; g.fillRect(0, 0, w, h);
+  if (!track) return;
+  const b = track.bounds, pad = 10;
+  const bw = b.maxX - b.minX - 50, bh = b.maxZ - b.minZ - 50;
+  const sc = Math.min((w - pad * 2) / bw, (h - pad * 2) / bh);
+  const ox = w / 2 - ((b.minX + b.maxX) / 2) * sc, oz = h / 2 - ((b.minZ + b.maxZ) / 2) * sc;
+  const P = (x, z) => [ox + x * sc, oz + z * sc];
+  const C = track.centre, n = C.length, closed = track.kind === 'circuit';
+  const side = (c, u) => P(c.x - Math.cos(c.heading) * u, c.z + Math.sin(c.heading) * u);
+  // run-off: fill between the edge and the barrier
+  for (const [wall, sgn] of [[track.walls[0], 1], [track.walls[1], -1]]) {
+    g.fillStyle = hex(LOOK.RUNOFF);
+    for (let i = 0; i + 1 < wall.points.length && i + 1 <= (closed ? n : n - 1); i++) {
+      const c0 = C[i % n], c1 = C[(i + 1) % n];
+      const a = side(c0, sgn * c0.width / 2), bq = side(c1, sgn * c1.width / 2), p0 = P(wall.points[i].x, wall.points[i].z), p1 = P(wall.points[i + 1].x, wall.points[i + 1].z);
+      if (Math.hypot(p0[0] - a[0], p0[1] - a[1]) < 0.3 * sc && Math.hypot(p1[0] - bq[0], p1[1] - bq[1]) < 0.3 * sc) continue;
+      g.beginPath(); g.moveTo(...a); g.lineTo(...bq); g.lineTo(...p1); g.lineTo(...p0); g.closePath(); g.fill();
+    }
+  }
+  // the road
+  g.fillStyle = hex(LOOK.ROAD); g.strokeStyle = hex(LOOK.ROAD); g.lineWidth = 1;
+  const m = closed ? n : n - 1;
+  for (let i = 0; i < m; i++) {
+    const c0 = C[i], c1 = C[(i + 1) % n];
+    const a = side(c0, c0.width / 2), bq = side(c1, c1.width / 2), cq = side(c1, -c1.width / 2), d = side(c0, -c0.width / 2);
+    g.beginPath(); g.moveTo(...a); g.lineTo(...bq); g.lineTo(...cq); g.lineTo(...d); g.closePath(); g.fill(); g.stroke();
+  }
+  // the edges
+  g.strokeStyle = hex(LOOK.EDGE); g.lineWidth = Math.max(1, 0.9 * sc);
+  for (const sgn of [1, -1]) { g.beginPath(); for (let i = 0; i < n; i++) { const p = side(C[i], sgn * C[i].width / 2); i ? g.lineTo(...p) : g.moveTo(...p); } if (closed) g.closePath(); g.stroke(); }
+  // barriers by kind, clips on top
+  const kindColour = { concrete: LOOK.WALL, tyres: LOOK.WALL_TYRES, fence: LOOK.WALL_FENCE };
+  for (const wall of track.walls) {
+    const p = wall.points;
+    for (let i = 0; i + 1 < p.length; i++) {
+      const s = i * 2;
+      let kind = wall.kind;
+      if (!wall.cap) for (const sp of wall.spans) if (s >= sp.from && s < sp.to) { kind = sp.kind; break; }
+      const clip = !wall.cap && track.clips.some(c => c.side === wall.side && s >= c.from && s < c.to);
+      g.strokeStyle = hex(clip ? LOOK.WALL_CLIP : kind === 'tyres' ? 0x7d8698 : kindColour[kind] || LOOK.WALL);
+      g.lineWidth = clip ? Math.max(2, 1.2 * sc) : Math.max(1, (kind === 'tyres' ? 0.9 : 0.5) * sc);
+      g.beginPath(); g.moveTo(...P(p[i].x, p[i].z)); g.lineTo(...P(p[i + 1].x, p[i + 1].z)); g.stroke();
+    }
+  }
+  // lines and checkpoints
+  const line = (along, colour, wdt) => { const c = C[Math.round(along / 2)]; g.strokeStyle = colour; g.lineWidth = wdt; g.beginPath(); g.moveTo(...side(c, c.width / 2)); g.lineTo(...side(c, -c.width / 2)); g.stroke(); };
+  for (const cp of track.checkpoints) line(cp, '#8d92a8', 1.5);
+  line(track.startLine, '#ffffff', 3);
+  if (track.finish) line(track.finish.along, '#ffffff', 5);
+  // the start and its direction
+  const s0 = track.start, f = [-Math.sin(s0.yaw), -Math.cos(s0.yaw)];
+  const a = P(s0.x, s0.z), bq = P(s0.x + f[0] * 14, s0.z + f[1] * 14);
+  g.strokeStyle = '#19d8ff'; g.fillStyle = '#19d8ff'; g.lineWidth = 3;
+  g.beginPath(); g.moveTo(...a); g.lineTo(...bq); g.stroke();
+  g.beginPath(); g.arc(a[0], a[1], 4, 0, Math.PI * 2); g.fill();
+  // corner labels: the radius at each apex
+  g.font = '10px system-ui, sans-serif'; g.fillStyle = 'rgba(238,241,247,0.8)'; g.textAlign = 'center';
+  for (const c of track.corners) {
+    const q = C[Math.min(n - 1, Math.round(c.apex / 2))];
+    const out = c.dir === 'left' ? -1 : 1;
+    const p = side(q, out * (q.width / 2 + 10));
+    g.fillText(Math.round(c.radius) + ' m', p[0], p[1] + 3);
+  }
+}
+
+/* ---- in 3D ---- */
+const threeC = $('threeC');
+let renderer = null, scene, camera, trackGroup = null, groundPlane = null, dirty = true;
+const orbit = { yaw: 0.6, pitch: 0.75, dist: 400, target: new THREE.Vector3(), auto: true };
+const ride = { s: 0, speed: 22 };
+async function init3d() {
+  renderer = new THREE.WebGPURenderer({ canvas: threeC, antialias: true, forceWebGL: query.get('renderer') === 'webgl2' });
+  await renderer.init();
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1a1d33);
+  scene.fog = new THREE.Fog(0x2a2742, 300, 1600);
+  camera = new THREE.PerspectiveCamera(55, 1, 0.5, 4000);
+  scene.add(new THREE.HemisphereLight(0x9ca6ff, 0x2b2418, 2.4));
+  const sun = new THREE.DirectionalLight(0xfff0dd, 3.6); sun.position.set(-0.5, 0.8, 0.3); scene.add(sun);
+}
+function setTrack3d() {
+  if (!renderer) return;
+  if (trackGroup) { scene.remove(trackGroup); trackGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
+  if (groundPlane) { scene.remove(groundPlane); groundPlane.geometry.dispose(); }
+  trackGroup = buildTrackMesh(track, THREE);
+  scene.add(trackGroup);
+  const b = track.bounds;
+  groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(b.maxX - b.minX + 800, b.maxZ - b.minZ + 800), new THREE.MeshLambertMaterial({ color: 0x24252b }));
+  groundPlane.rotation.x = -Math.PI / 2;
+  groundPlane.position.set((b.minX + b.maxX) / 2, b.minY - 0.05, (b.minZ + b.maxZ) / 2);
+  scene.add(groundPlane);
+  orbit.target.set((b.minX + b.maxX) / 2, 0, (b.minZ + b.maxZ) / 2);
+  orbit.dist = Math.max(b.maxX - b.minX, b.maxZ - b.minZ) * 0.95;
+  ride.s = track.start.along;
+  dirty = true;
+}
+function sampleAt(s) {
+  const C = track.centre, n = C.length, L = track.kind === 'circuit' ? track.length : (n - 1) * 2;
+  let u = track.kind === 'circuit' ? ((s % L) + L) % L : Math.max(0, Math.min(L, s));
+  const i = Math.floor(u / 2), t = u / 2 - i, a = C[i % n], b = C[(i + 1) % n] || a;
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t };
+}
+function place3d(dt) {
+  const w = threeC.clientWidth, h = threeC.clientHeight;
+  if (renderer.domElement.width !== Math.round(w * renderer.getPixelRatio()) || renderer.domElement.height !== Math.round(h * renderer.getPixelRatio())) { renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); }
+  if (state.mode === 'ride') {
+    ride.s += ride.speed * dt;
+    if (track.kind === 'sprint' && ride.s > track.finish.along) ride.s = track.start.along;
+    const p = sampleAt(ride.s - 9), q = sampleAt(ride.s + 14);
+    camera.position.set(p.x, p.y + 4.2, p.z);
+    camera.lookAt(q.x, q.y + 0.8, q.z);
+  } else {
+    if (orbit.auto) orbit.yaw += dt * 0.12;
+    const t = orbit.target, cp = Math.cos(orbit.pitch);
+    camera.position.set(t.x + Math.sin(orbit.yaw) * cp * orbit.dist, t.y + Math.sin(orbit.pitch) * orbit.dist, t.z + Math.cos(orbit.yaw) * cp * orbit.dist);
+    camera.lookAt(t);
+  }
+}
+let lastT = -1;
+function loop(t) {
+  const dt = lastT < 0 ? 0 : Math.min(0.1, (t - lastT) / 1000);
+  lastT = t;
+  if (renderer && track && (dirty || state.mode === 'ride' || orbit.auto)) { place3d(dt); renderer.render(scene, camera); dirty = false; }
+  requestAnimationFrame(loop);
+}
+/* drag to turn, pinch or wheel to zoom */
+const pointers = new Map();
+let pinch0 = 0, dist0 = 0;
+threeC.addEventListener('pointerdown', e => { threeC.setPointerCapture(e.pointerId); pointers.set(e.pointerId, [e.clientX, e.clientY]); orbit.auto = false; if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); dist0 = orbit.dist; } });
+threeC.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId)) return;
+  const prev = pointers.get(e.pointerId);
+  pointers.set(e.pointerId, [e.clientX, e.clientY]);
+  if (pointers.size === 2) { const [a, b] = [...pointers.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch0 > 0) orbit.dist = Math.max(30, Math.min(3000, dist0 * pinch0 / d)); }
+  else { orbit.yaw -= (e.clientX - prev[0]) * 0.008; orbit.pitch = Math.max(0.08, Math.min(1.5, orbit.pitch + (e.clientY - prev[1]) * 0.006)); }
+  dirty = true;
+});
+const up = e => { pointers.delete(e.pointerId); if (pointers.size < 2) pinch0 = 0; };
+threeC.addEventListener('pointerup', up); threeC.addEventListener('pointercancel', up);
+threeC.addEventListener('wheel', e => { e.preventDefault(); orbit.dist = Math.max(30, Math.min(3000, orbit.dist * Math.exp(e.deltaY * 0.001))); orbit.auto = false; dirty = true; }, { passive: false });
+window.addEventListener('resize', () => { drawPlan(); dirty = true; });
+
+window.__lab = {
+  ready: false, track: null, valid: null,
+  show(opts) { Object.assign(state, opts || {}); show(); },
+  /* draw a frame now, for screenshots: orbit at a fixed angle, or ride at s */
+  frame(opts) { const o = opts || {}; if (o.mode) state.mode = o.mode; orbit.auto = false; if (o.yaw !== undefined) orbit.yaw = o.yaw; if (o.pitch !== undefined) orbit.pitch = o.pitch; if (o.s !== undefined) ride.s = o.s; place3d(0); renderer.render(scene, camera); syncControls(); },
+};
+show();
+init3d().then(() => { setTrack3d(); requestAnimationFrame(loop); window.__lab.ready = true; }).catch(e => {
+  $('fail').textContent = 'The 3D view could not start: ' + (e && e.message || e); $('fail').hidden = false; window.__lab.ready = true;
+});
+</script>
+</body>
+</html>
