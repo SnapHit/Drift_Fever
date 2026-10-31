@@ -1,17 +1,17 @@
 {
  "node": {
-  "seedsPerKind": 40,
+  "seedsPerKind": 1000,
   "repeatMismatches": 0,
   "distinctHashes": {
-   "circuit": 40,
-   "sprint": 40
+   "circuit": 1000,
+   "sprint": 1000
   }
  },
  "chromium": {
-  "seedsPerKind": 40,
+  "seedsPerKind": 200,
   "differFromNode": 0,
   "dailyMatches": true,
-  "nudgedDifferFromNode": 80,
+  "nudgedDifferFromNode": 400,
   "ulpDifferFromNode": 0,
   "mathSinVariantDifferFromNode": 0,
   "mathSinVariantFirstDifference": null

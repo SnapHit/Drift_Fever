@@ -1,0 +1,47 @@
+PASS 1 determinism, same seed twice: 0 mismatches over 2000 tracks
+PASS 1 determinism, different seeds differ: 1000 and 1000 distinct of 1000 per kind
+CAUGHT 1a a generator that flips a seed bit at random: 11 of 20 repeats mismatched
+CAUGHT 1b a generator that ignores the seed: 1 distinct of 20
+PASS 1 no engine dependent maths in the generator: 0 calls found
+CAUGHT 1c the same scan on physics/world.js: 18 calls found (Math.hypot, **, Math.cos, Math.sin, Math.atan2)
+PASS 1 Node and Chromium give the same bytes: 0 of 400 differ; the daily track matches
+CAUGHT 1d the browser copy with sine one part in a million high: 400 of 400 tracks differ from Node
+NOTE 1f the browser copy with sine one unit in the last place high: 0 of 400 tracks differ from Node (information: the output is rounded to 0.1 mm and a millionth of a radian, which absorbs most last bit differences)
+NOTE 1e the generator on Math.sin and Math.cos instead of dmath.js: 0 of 400 tracks differ between Node and this Chromium (information only: these two engines happen to agree here, other engines are not guaranteed to)
+PASS 2 validity, circuits: 0 invalid and 0 fallbacks of 1000; worst clearance margin -0.052 m, closest other barrier 4.01 m, radii 12.51 to 109.8 m, widths 11.03 to 16.93 m, lengths 614 to 1200 m, lift at top speed 0.43 g
+PASS 2 validity, sprints: 0 invalid and 0 fallbacks of 1000; worst clearance margin -0.055 m, closest other barrier 4.02 m, radii 12.54 to 109.9 m, widths 11 to 16.97 m, lengths 630 to 1198 m, lift at top speed 0.40 g
+PASS 2 validity, circuits of about 600 m: 0 invalid, 0 fallbacks of 100, lengths 542 to 660 m
+PASS 2 validity, circuits of about 900 m: 0 invalid, 0 fallbacks of 100, lengths 814 to 990 m
+PASS 2 validity, circuits of about 1200 m: 0 invalid, 0 fallbacks of 100, lengths 1092 to 1320 m
+PASS 2 validity, sprints of about 600 m: 0 invalid, 0 fallbacks of 100, lengths 548 to 658 m
+PASS 2 validity, sprints of about 900 m: 0 invalid, 0 fallbacks of 100, lengths 856 to 990 m
+PASS 2 validity, sprints of about 1200 m: 0 invalid, 0 fallbacks of 100, lengths 1146 to 1320 m
+PASS 2 the fallback courses are valid: circuit default: 900 m valid; circuit 600: 600 m valid; circuit 900: 900 m valid; circuit 1200: 1200 m valid; sprint default: 900 m valid; sprint 600: 596 m valid; sprint 900: 900 m valid; sprint 1200: 1132 m valid
+PASS 2 control: the base for the broken tracks is valid: circuit 5
+CAUGHT 2 overlap: a sprint that turns 300 degrees and crosses itself: a 300 degree corner of radius 30 between straights; fails overlap, clearance
+CAUGHT 2 overlap: two parts whose barriers run closer than the gap: two left hairpins that bring the course back alongside its start straight, 2.75 m barrier to barrier, without crossing; fails overlap
+CAUGHT 2 clearance: five left wall points moved to 40% of the half width: samples 40 to 44; fails clearance, contract
+CAUGHT 2 length: the same track against a target it misses: target starts 2 m above its length; fails length
+CAUGHT 2 radius: a corner of radius 11: one 90 degree corner, radius 11 m; fails radius
+CAUGHT 2 radius: a corner of radius 160: one 40 degree corner, radius 160 m; fails radius
+CAUGHT 2 width: 9 m on the start straight: samples 10 to 20; fails width
+CAUGHT 2 elevation: a 1.2 m bump 16 m long: centred on 60 m; fails elevation
+CAUGHT 2 elevation: an 8% ramp: 40 m at 8%; fails elevation
+CAUGHT 2 elevation: 8.6 degrees of bank: samples 50 to 55; fails elevation
+CAUGHT 2 contract: left wall points shifted three samples: the wall no longer beside its samples; fails overlap, contract
+CAUGHT 2 spacing: one sample removed: a 4 m step at 200 m; fails spacing
+PASS 3 drift character, circuits: in corners 62% [51, 71], 40 to 77%, direction changes 6 [2, 12], 0 to 16, longest straight 114 [72, 152], 60 to 164 m (p50 [p5, p95], worst); requested and estimated difficulty rank together at 0.815
+PASS 3 drift character, sprints: in corners 61% [52, 68], 43 to 75%, direction changes 8 [3, 13], 1 to 18, longest straight 112 [90, 152], 80 to 166 m (p50 [p5, p95], worst); requested and estimated difficulty rank together at 0.849
+PASS 3 the analyser on a course built to known numbers: corners 3 (3), direction changes 2 (2), longest straight 100 m (100), in corners 0.343 (0.326 +- one sample a corner end), radii 30, 30, 20
+CAUGHT 3 the analyser with its straight threshold at 25 m: reads 1 corners, 0 changes, longest straight 296 m on the same course
+PASS W the scripted driver in world.js, circuits: 100 of 100 finished, 0 respawns, 0 wall touches (0 hard) on 0 tracks, 52.392 [37.75, 70.508], 32.792 to 74.55 s, clipDistance read on every track
+PASS W the scripted driver in world.js, sprints: 100 of 100 finished, 0 respawns, 0 wall touches (0 hard) on 0 tracks, 50.95 [37.258, 68.692], 32.133 to 70.333 s, clipDistance read on every track
+CAUGHT W a right barrier moved to 0.3 m right of the centre line for 30 m: touches 0 before, 387 after (194 hard), respawns 193
+PASS W clipDistance at a clip wall: reads 0.525 m, expected 0.58 m (1.5 m less the half width)
+CAUGHT W the same with the barriers misaligned by ten samples: reads 6.251 m
+PASS D dailySeed: one seed per local date in 6 time zones, 00:05 and 23:55: seed 1976143581 for 31 October 2026 everywhere, 1113709271 the next day; 3653 distinct seeds over 3,653 days
+CAUGHT D the same with the UTC date: gives 3 different seeds for the one local date
+PASS M buildTrackMesh in Node: 0 of 20 generated tracks with a non finite vertex; 6932 to 11718 triangles in 2 draw calls; the hand made test track builds too
+CAUGHT M a track with one NaN coordinate: 18 non finite values found
+
+all measurements pass and every known answer was caught in 265 s

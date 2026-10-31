@@ -179,8 +179,11 @@ function validity() {
       tracks[kind].push(t);
     }
     for (const k of Object.keys(worst)) worst[k] = Math.round(worst[k] * 10000) / 10000;
-    out.kinds[kind] = { tracks: SEEDS, invalid, fallback, failuresByCheck: Object.fromEntries(Object.entries(fails).map(([k, v]) => [k, { count: v.length, seeds: v.slice(0, 20) }])), worst, attempts: dist(attempts), generationMs: dist(ms), rejectedAttemptsByCheck: rejected };
-    result('2 validity, ' + kind + 's', invalid === 0 && fallback === 0, invalid + ' invalid and ' + fallback + ' fallbacks of ' + SEEDS + '; worst clearance margin ' + worst.clearance.toFixed(3) + ' m, closest other barrier ' + worst.otherBarrier.toFixed(2) + ' m, radii ' + worst.tightest.toFixed(2) + ' to ' + worst.widestCorner.toFixed(1) + ' m, widths ' + worst.minWidth + ' to ' + worst.maxWidth + ' m, lengths ' + worst.minLength + ' to ' + worst.maxLength + ' m, lift at top speed ' + worst.maxLift.toFixed(2) + ' g');
+    const pg = tracks[kind].map(partGap);
+    const pgFinite = pg.filter(g => Number.isFinite(g.gap));
+    out.kinds[kind] = { partGap: { apartAlongTrack: PART_APART, tracksWithPartsWithin20m: pgFinite.length, gap: pgFinite.length ? dist(pgFinite.map(g => g.gap)) : null, tracksWithBarriersCloserThanTheRoadWidth: pgFinite.filter(g => g.ratio < 1).length }, tracks: SEEDS, invalid, fallback, failuresByCheck: Object.fromEntries(Object.entries(fails).map(([k, v]) => [k, { count: v.length, seeds: v.slice(0, 20) }])), worst, attempts: dist(attempts), generationMs: dist(ms), rejectedAttemptsByCheck: rejected };
+    { const g = out.kinds[kind].partGap; summary.push('NOTE 2 ' + kind + 's, barriers of parts at least ' + PART_APART + ' m apart along the track: ' + g.tracksWithPartsWithin20m + ' tracks have such parts within 20 m of each other, closest ' + (g.gap ? g.gap.min.toFixed(2) + ' m (p50 ' + g.gap.p50.toFixed(1) + ')' : 'none') + '; ' + g.tracksWithBarriersCloserThanTheRoadWidth + ' of ' + SEEDS + ' tracks have two such barriers closer than the road is wide (not a check: see the report)'); }
+    result('2 validity, ' + kind + 's', invalid === 0 && fallback === 0, invalid + ' invalid and ' + fallback + ' fallbacks of ' + SEEDS + '; worst clearance margin ' + worst.clearance.toFixed(3) + ' m, closest barrier not beside the same stretch of wall ' + worst.otherBarrier.toFixed(2) + ' m, radii ' + worst.tightest.toFixed(2) + ' to ' + worst.widestCorner.toFixed(1) + ' m, widths ' + worst.minWidth + ' to ' + worst.maxWidth + ' m, lengths ' + worst.minLength + ' to ' + worst.maxLength + ' m, lift at top speed ' + worst.maxLift.toFixed(2) + ' g');
   }
   /* explicit targets */
   for (const kind of KINDS) for (const L of [600, 900, 1200]) {
@@ -214,6 +217,34 @@ function validity() {
   return tracks;
 }
 
+
+/* The second reading of "no wall closer than the width": the closest
+   approach between the barriers of two parts of the track at least
+   PART_APART metres apart along it, against the narrower road of the two.
+   Reported, not enforced: the generator enforces GAP between barriers
+   and the full width clear of every barrier, which is the first reading. */
+const PART_APART = 60;
+function partGap(t) {
+  const n = t.centre.length, closed = t.kind === 'circuit', k = PART_APART / TRACKS.SAMPLE;
+  const pts = [];
+  for (const w of [t.walls[0], t.walls[1]]) for (let i = 0; i < n; i++) pts.push({ x: w.points[i].x, z: w.points[i].z, i });
+  const cell = new Map(), C = 10, key = (a, b) => a * 100003 + b;
+  for (const p of pts) { const kk = key(Math.floor(p.x / C), Math.floor(p.z / C)); (cell.get(kk) || cell.set(kk, []).get(kk)).push(p); }
+  let best = Infinity, ratio = Infinity, under = 0;
+  for (const p of pts) {
+    const cx = Math.floor(p.x / C), cz = Math.floor(p.z / C);
+    for (let a = cx - 2; a <= cx + 2; a++) for (let b = cz - 2; b <= cz + 2; b++) for (const q of cell.get(key(a, b)) || []) {
+      let sep = Math.abs(p.i - q.i); if (closed) sep = Math.min(sep, n - sep);
+      if (sep < k) continue;
+      const d = Math.sqrt((p.x - q.x) ** 2 + (p.z - q.z) ** 2);
+      const w = Math.min(t.centre[p.i].width, t.centre[q.i].width);
+      if (d < best) best = d;
+      if (d / w < ratio) ratio = d / w;
+    }
+  }
+  return { gap: best, ratio };
+}
+
 /* Hand broken tracks: each must fail the check it breaks. */
 function brokenTracks() {
   const ka = {};
@@ -234,6 +265,9 @@ function brokenTracks() {
     const t = trackFromElements('sprint', [{ s: 100 }, { c: { R: 20, angle: 180, lt: 0, width: 14 } }, { s: 30 }, { c: { R: 12.5, angle: 180, lt: 0, width: 14 } }, { s: 25 }]);
     expect('overlap: two parts whose barriers run closer than the gap', t, all, 'overlap', 'two left hairpins that bring the course back alongside its start straight, 2.75 m barrier to barrier, without crossing');
     ka['overlap: two parts whose barriers run closer than the gap'].crossings = validateTrack(t, all).checks.overlap.crossings;
+    const g = partGap(t);
+    ka.partGap = g;
+    known('2 the part gap measurement on the same track', g.ratio < 1 && g.gap < 3, 'reads ' + g.gap.toFixed(2) + ' m, ' + g.ratio.toFixed(2) + ' of the road width');
   }
   {
     const t = clone(base);
@@ -407,6 +441,29 @@ function physics() {
     result('W clipDistance at a clip wall', Math.abs(good - want) < 0.1, 'reads ' + good.toFixed(3) + ' m, expected ' + want.toFixed(2) + ' m (1.5 m less the half width)');
     known('W the same with the barriers misaligned by ten samples', !(Math.abs(bad - want) < 0.1), 'reads ' + (Number.isFinite(bad) ? bad.toFixed(3) + ' m' : 'nothing'));
   }
+  /* a sprint's end caps stop the car: flat out past the finish, and
+     reversing from the start; without the caps it must get past */
+  {
+    const run = (t) => {
+      const w = createWorld(t), d = createDriver(t, {});
+      let most = -Infinity;
+      for (let i = 0; i < Math.round(200 / STEP); i++) { const inp = { ...d.input(w) }; if (w.along > t.finish.along - 5) { inp.throttle = 1; inp.brake = 0; inp.steer = 0; } w.stepWorld(inp); most = Math.max(most, w.along - t.length); if (w.along > t.length + 30 || w.respawned) break; }
+      const w2 = createWorld(t);
+      let least = Infinity;
+      for (let i = 0; i < Math.round(6 / STEP); i++) { w2.stepWorld({ steer: 0, throttle: 0, brake: 1, handbrake: 0 }); least = Math.min(least, w2.along); }
+      return { pastEnd: most, leastAlong: least };
+    };
+    const N = Math.min(30, SEEDS);
+    let worstEnd = -Infinity, worstStart = Infinity;
+    for (let s = 1; s <= N; s++) { const r = run(generateTrack(s, { kind: 'sprint' })); worstEnd = Math.max(worstEnd, r.pastEnd); worstStart = Math.min(worstStart, r.leastAlong); }
+    const t = generateTrack(1, { kind: 'sprint' });
+    const open = clone(t); open.walls = open.walls.filter(w => !w.cap);
+    const r = run(open);
+    out.endCaps = { sprints: N, mostPastLastSample: worstEnd, leastAlongReversing: worstStart, withoutCaps: r };
+    const front = TRACKS.CAP_BACK - 0.25, half = 2.2;
+    result('W a sprint\'s end caps stop the car', worstEnd <= front - half + 0.05 && worstStart >= -front + half - 0.05, N + ' sprints: the car stops ' + worstEnd.toFixed(2) + ' m along from the last sample, flat out (its nose at the cap face, ' + front.toFixed(2) + ' m past), and at ' + worstStart.toFixed(2) + ' m reversing from the start');
+    known('W the same sprint with its caps removed', r.pastEnd > 5 || r.leastAlong < -5, 'gets ' + r.pastEnd.toFixed(1) + ' m past the end, ' + r.leastAlong.toFixed(1) + ' m behind the start');
+  }
   writeJson('drive.json', out);
 }
 
@@ -453,6 +510,22 @@ async function meshes() {
   console.error = quiet;
   out.knownAnswer = r;
   known('M a track with one NaN coordinate', r.nan > 0, r.nan + ' non finite values found');
+  /* options.elevation: 0 gives a flat course, for a host whose car does not follow the road's height */
+  {
+    let flat = 0, hilly = 0;
+    for (let s = 1; s <= 20; s++) for (const kind of KINDS) {
+      for (const [opt, acc] of [[{ kind, elevation: 0 }, 'f'], [{ kind }, 'h']]) {
+        const t = generateTrack(s, opt);
+        let m = 0;
+        for (const c of t.centre) m = Math.max(m, Math.abs(c.y), Math.abs(c.bank));
+        for (const w of t.walls) for (const p of w.points) m = Math.max(m, Math.abs(p.y));
+        if (acc === 'f') flat = Math.max(flat, m); else hilly = Math.max(hilly, m);
+      }
+    }
+    out.flatOption = { flatMax: flat, defaultMax: hilly };
+    result('M elevation: 0 gives a flat course', flat === 0, 'largest |y| or |bank| over 40 tracks ' + flat);
+    known('M the same measure on the default courses', hilly > 0.1, 'largest ' + hilly.toFixed(2));
+  }
   writeJson('mesh.json', out);
 }
 
