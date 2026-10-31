@@ -220,5 +220,12 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   `review/tracks/REPORT.md`. For the game loop: the physics is flat, so use
   `{ elevation: 0 }` until the car follows the road's height; draw tracks
   with `buildTrackMesh`, not scene.js's closed loop; generate once per
-  track (worst 521 ms). In progress: the game loop
-  (`briefs/GAME-LOOP.md`, `crazygames-loop`).
+  track (worst 521 ms).
+- 31 October 2026: the game loop (`briefs/GAME-LOOP.md`) is merged and live
+  at `/`: title, daily drift with a ghost, an eight track career with
+  stars, free drift, a garage with coins, the five cars and paint. Results
+  in `review/loop/REPORT.md`, probes in `game/test/loop/`, run settings in
+  `LOOP` in `tune.js`. Open: star targets, coins and prices are unbalanced
+  first guesses for the author to set by play; the countdown releases the
+  car at GO; no upgrades or tilt; the vanishing rear wheel shows in the
+  software renderer.
