@@ -237,7 +237,7 @@ function finishRun() {
   }
   app.results = { score, best, stars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
-  hud.setCount('', false); input.touch.setVisible(false);
+  hud.setCount('', false); hud.setVisible(false); input.touch.setVisible(false);
   screens.results(app.results);
 }
 

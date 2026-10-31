@@ -4,14 +4,13 @@
    with each wheel { pivot, mesh }, units metres, Y up, the car facing -Z
    and its origin on the ground at the middle of the wheelbase.
 
-   Until the five models (another session, folder ../cars/) are merged,
-   this builds the feel prototype's block car to the roster's dimensions
-   for each id: a body, a cabin, four wheels and two lamps. The real ones
-   drop in by the import at MODELS below. */
+   The five models in ../cars/ (merged 31 October 2026) answer it. The
+   block car below stood in before that and still can: set MODELS to null
+   and it is built to the roster's dimensions for each id. */
 import { carById } from '../garage/roster.js';
+import * as models from '../cars/index.js';
 
-/* The models, when merged: import { createCar } from '../cars/index.js' */
-const MODELS = null;
+const MODELS = models;
 
 export const STAND_IN = !MODELS;
 

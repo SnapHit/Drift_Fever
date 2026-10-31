@@ -1,20 +1,19 @@
 /* WHERE TRACKS COME FROM. The game asks for a track by a spec,
    { seed, kind, difficulty, length }, and gets one in the data contract
-   of briefs/TRACKS.md. Until the generator (another session, folder
-   ../tracks/) is merged, every spec is answered with the hand made test
-   track, dressed with the fields the generator promises and the game
-   reads (startLine, checkpoints, finish, seed, name). The real one drops
-   in by the import at GENERATOR below.
+   of briefs/TRACKS.md from the generator in ../tracks/ (merged 31
+   October 2026). The hand made test track stood in before that, and
+   still can: set GENERATOR to null and every spec is answered with it,
+   dressed with the fields the generator promises and the game reads.
 
-   dailySeed(date) is the generator's contract too: the same seed for the
-   same local calendar date everywhere. The stand-in is the FNV-1a hash
-   the TRACKS brief's implementation uses, so the daily key does not
-   change when the generator lands. */
+   The physics and the scene are flat, so generated tracks are asked for
+   with elevation 0 until the car follows the road's height. A track is
+   generated once per run (the worst case measured by the track session
+   is about half a second). */
 import { testTrack, carPark } from './track.js';
 import { LOOP } from '../tune.js';
+import * as generator from '../tracks/generate.js';
 
-/* The generator, when merged: import { generateTrack, dailySeed } from '../tracks/generate.js' */
-const GENERATOR = null;
+const GENERATOR = generator;
 
 export const STAND_IN = !GENERATOR;
 
