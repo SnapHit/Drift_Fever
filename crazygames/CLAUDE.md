@@ -209,7 +209,10 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   (`briefs/FEEL.md`) is merged and live at `/`; results in
   `review/feel/REPORT.md`, probes in `game/test/feel/`, handling tuned
   over three rounds of play.
-- 31 October 2026, in progress: the track generator (`briefs/TRACKS.md`,
-  branch `crazygames-tracks`) and the five car models (`briefs/CARS.md`,
-  `crazygames-cars`) in parallel, then the game loop (`briefs/GAME-LOOP.md`,
-  `crazygames-loop`), which uses whichever of the two has landed.
+- 31 October 2026: the five car models (`briefs/CARS.md`) are merged:
+  `game/src/cars/`, the turntable at `/lab/cars.html`, results in
+  `review/cars/REPORT.md`. Open: three pairs are hard to tell apart straight
+  from behind at 30 m, and a rear wheel vanishes after a sliding frame in
+  the sandbox's software WebGL 2 (`game/test/cars/vanish.js`), untested on a
+  real GPU. In progress: the track generator (`crazygames-tracks`) and the
+  game loop (`briefs/GAME-LOOP.md`, `crazygames-loop`).
