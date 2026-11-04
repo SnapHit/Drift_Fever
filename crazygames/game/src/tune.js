@@ -61,7 +61,8 @@ export const TUNE = {
        run did. */
     BOOST_MIN_DRIFT:    0.6,     // s of drift before the exit pays a boost
     BOOST_PER_S:        0.7,     // s of boost per s of drift
-    BOOST_MAX:          2.0,     // s
+    BOOST_MAX:          0,       // s; 0 is off. Off by default: on generated tracks the scripted drifter hit walls
+                                 // 1.5 to 2.4 times as often with it on (it ends drifts mid corner). Try 1 to 2 at ?tune=1.
     BOOST_ACCEL:        9,       // m/s^2 of extra drive while boosting
     BOOST_TOP:          14,      // m/s added to the top speed while boosting
     WALL_SPIN:          0.35,    // share of a wall hit's turning that reaches the car: walls slide you along instead of spinning you round
@@ -180,6 +181,8 @@ export const PANEL = [
   ['VEHICLE.BRAKE',          'brake m/s2',        6,   24,  1],
   ['VEHICLE.TRACTION',       'launch traction', 1.0,  2.5,  0.1],
   ['VEHICLE.TURN_LIFT',      'turn eases drive',  0,    1,  0.05],
+  ['VEHICLE.BOOST_MAX',      'drift boost s (0 off)', 0, 2.5, 0.1],
+  ['VEHICLE.BOOST_ACCEL',    'boost push m/s2',   0,   16,  0.5],
   ['VEHICLE.WALL_SPIN',      'wall spin',         0,    1,  0.05],
   ['ASSIST.LEVEL',           'assist level',      0,    1,  0.05],
   ['ASSIST.COUNTERSTEER',    'countersteer',      0,    2,  0.05],
