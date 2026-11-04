@@ -15,7 +15,7 @@ import { TUNE } from '../tune.js';
 const DEG = Math.PI / 180;
 
 export function createChaseCamera() {
-  const state = { yaw: 0, shake: 0, shakeT: 0, fov: TUNE.CAMERA.FOV, portrait: false, initialised: false,
+  const state = { yaw: 0, shake: 0, shakeT: 0, fov: TUNE.CAMERA.FOV, portrait: false, initialised: false, boostK: 0,
     px: 0, py: 0, pz: 0, tx: 0, ty: 0, tz: 0 };
 
   function wrap(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; }
@@ -46,12 +46,17 @@ export function createChaseCamera() {
     // the shake: a decaying sine on the look target, sideways and up
     state.shakeT += dt;
     state.shake *= Math.exp(-dt * C.SHAKE_DECAY);
-    const sx = Math.sin(state.shakeT * C.SHAKE_HZ * Math.PI * 2) * state.shake;
-    const sy = Math.cos(state.shakeT * C.SHAKE_HZ * Math.PI * 2 * 0.77) * state.shake * 0.6;
+    /* a fine rumble at speed, and more while boosting: drawn only, the
+       physics never sees it */
+    const rumble = Math.max(0, pose.speed - C.RUMBLE_FROM) * C.SPEED_RUMBLE * (1 + state.boostK);
+    const sh = Math.min(C.SHAKE_MAX, state.shake + rumble);
+    const sx = Math.sin(state.shakeT * C.SHAKE_HZ * Math.PI * 2) * sh;
+    const sy = Math.cos(state.shakeT * C.SHAKE_HZ * Math.PI * 2 * 0.77) * sh * 0.6;
     const lx = -Math.cos(state.yaw), lz = Math.sin(state.yaw);
     const look = C.LOOK_AHEAD * (state.portrait ? C.PORTRAIT_LOOK : 1);
     state.tx = pose.x + fx * look + lx * sx; state.ty = C.LOOK_UP + sy; state.tz = pose.z + fz * look + lz * sx;
-    state.fov = (state.portrait ? C.FOV_PORTRAIT : C.FOV) + C.FOV_SPEED * pose.speed;
+    state.boostK += ((pose.boost > 0 ? 1 : 0) - state.boostK) * (1 - Math.exp(-dt / Math.max(0.01, C.BOOST_FOV_TIME)));
+    state.fov = (state.portrait ? C.FOV_PORTRAIT : C.FOV) + C.FOV_SPEED * pose.speed + C.BOOST_FOV * state.boostK;
     if (cam) {
       cam.position.set(state.px, state.py, state.pz);
       cam.lookAt(state.tx, state.ty, state.tz);

@@ -20,8 +20,8 @@ export const TUNE = {
     HALF_WIDTH:         0.92,    // m, body half width
     WHEEL_RADIUS:       0.33,    // m
     INERTIA_FACTOR:     1.15,    // yaw inertia as a share of m * (a*b): below 1 turns in quicker
-    ACCEL:              12,      // m/s^2, drive at a standstill (was 8.5: 0 to 100 km/h took 7.2 s)
-    TOP_SPEED:          62,      // m/s, where the drive force reaches zero (223 km/h; was 48)
+    ACCEL:              14,      // m/s^2, drive at a standstill (was 8.5: 0 to 100 km/h took 7.2 s)
+    TOP_SPEED:          68,      // m/s, where the drive force reaches zero (223 km/h; was 48)
     TRACTION:           1.6,     // drive grip as a multiple of the rear's lateral grip, so a launch hooks up instead of spinning
     TURN_LIFT:          0.85,    // share of the drive eased off at full steer on grip, so a held turn holds its speed
     TURN_LIFT_FROM:     10,      // m/s, above this
@@ -53,6 +53,17 @@ export const TUNE = {
     MIN_AXLE_LOAD:      0.18,    // never less than this share of the weight on an axle
     LOW_SPEED:          3.0,     // m/s, below this the kinematic model takes over
     GRAVITY:            9.81,
+    /* THE SLINGSHOT (5 November 2026, for speed and fury): a drift held
+       for at least BOOST_MIN_DRIFT seconds gives a burst of speed as it
+       ends, BOOST_PER_S seconds of boost per second of drift up to
+       BOOST_MAX. A hard hit or a respawn cancels the drift's credit. Kept
+       in the physics, not the scoring, so a ghost boosts exactly as its
+       run did. */
+    BOOST_MIN_DRIFT:    0.6,     // s of drift before the exit pays a boost
+    BOOST_PER_S:        0.7,     // s of boost per s of drift
+    BOOST_MAX:          2.0,     // s
+    BOOST_ACCEL:        9,       // m/s^2 of extra drive while boosting
+    BOOST_TOP:          14,      // m/s added to the top speed while boosting
     WALL_SPIN:          0.35,    // share of a wall hit's turning that reaches the car: walls slide you along instead of spinning you round
   },
   ASSIST: {
@@ -97,7 +108,7 @@ export const TUNE = {
     DRIFT_GRIP:         0.35,    // share of the rear's grip it keeps for as long as a drift lasts
     DRIFT_CARVE:        0.9,     // rad/s of path turn per radian of slide angle
     DRIFT_SCRUB:        9,       // m/s^2 of slowing at a 45 degree slide
-    DRIFT_CRUISE:       20,      // m/s, the speed a drift settles to (54 km/h)
+    DRIFT_CRUISE:       24,      // m/s, the speed a drift settles to (54 km/h)
     DRIFT_KEEP:         0.0,     // share of the speed scrubbed by the slide that the drift gives back
     RECOVER_AFTER:      1.2,     // s stuck (slow, against a wall or facing backwards, trying to drive) before the car is put back on the track
     RECOVER_SPEED:      2.0,     // m/s, below this counts as stuck
@@ -114,7 +125,11 @@ export const TUNE = {
     SWING_MAX:          50,      // degrees, the most it swings
     FOV:                62,      // degrees, vertical, in landscape
     FOV_PORTRAIT:       78,      // and in portrait
-    FOV_SPEED:          0.35,    // degrees per m/s
+    FOV_SPEED:          0.5,     // degrees per m/s (was 0.35; more sense of speed)
+    BOOST_FOV:          10,      // degrees more while boosting, eased in and out
+    BOOST_FOV_TIME:     0.25,    // s for the boost field of view to ease
+    SPEED_RUMBLE:       0.012,   // m of look target rumble per m/s above RUMBLE_FROM, for a sense of speed
+    RUMBLE_FROM:        30,      // m/s
     PORTRAIT_DISTANCE:  1.05,    // multiplier on the distance in portrait
     PORTRAIT_HEIGHT:    1.25,    // and on the height
     PORTRAIT_LOOK:      1.30,    // and on the look ahead
@@ -132,8 +147,8 @@ export const TUNE = {
     CHAIN_STEP:         2.0,     // seconds of drift per multiplier step
     CHAIN_MAX:          8,       // the multiplier's ceiling
     BANK_GAP:           0.7,     // seconds straight before the chain banks
-    HARD_HIT:           4.0,     // m/s into a wall loses the chain
-    HIT_SPEED_KEEP:     0.55,    // share of speed kept through a hard hit
+    HARD_HIT:           6.0,     // m/s into a wall loses the chain
+    HIT_SPEED_KEEP:     0.75,    // share of speed kept through a hard hit
     PROX_DIST:          1.6,     // m from a clip wall or a cone for the proximity bonus
     PROX_BONUS:         2.0,     // multiplier on points while close
     BIG_ANGLE:          45,      // degrees, the callout

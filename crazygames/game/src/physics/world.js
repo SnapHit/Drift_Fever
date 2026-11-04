@@ -236,9 +236,21 @@ export function createWorld(ground, opts) {
   }
 
   function stepWorld(input) {
-    world.hit = null; world.respawned = false; world.recovered = false;
+    world.hit = null; world.respawned = false; world.recovered = false; world.boosted = 0;
+    const wasDrifting = car.drifting;
     stepVehicle(car, input, STEP);
     collideWalls();
+    /* the slingshot: a drift's time is its credit; the exit pays it out */
+    {
+      const V = car.tune ? car.tune.VEHICLE : TUNE.VEHICLE;
+      if (car.boost > 0) car.boost = Math.max(0, car.boost - STEP);
+      if (car.drifting) car.driftT += STEP;
+      if (world.hit && world.hit.hard) car.driftT = 0;
+      if (wasDrifting && !car.drifting) {
+        if (car.driftT >= V.BOOST_MIN_DRIFT) { car.boost = Math.min(V.BOOST_MAX, Math.max(car.boost, car.driftT * V.BOOST_PER_S)); world.boosted = car.boost; }
+        car.driftT = 0;
+      }
+    }
     if (world.touching) world.lastTouch = world.time;
     collideCones(STEP);
     if (ground.centre.length) {

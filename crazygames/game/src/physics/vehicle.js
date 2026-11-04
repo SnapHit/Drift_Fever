@@ -36,6 +36,8 @@ export function createVehicle(x, z, yaw, tune) {
     axF: 0,               // filtered longitudinal acceleration, for weight transfer
     hb: 0,                // handbrake state, 1 locked, easing back to 0
     drifting: 0,          // 1 while the drift controller holds the slide
+    boost: 0,             // s of slingshot boost left
+    driftT: 0,            // s the current drift has lasted, its credit towards a boost
     prevBeta: 0,          // last step's slide angle, for the damping
     driftTarget: 0,       // the angle the drift controller is holding, easing towards the asked one, degrees
     hbGrip: 0,            // how far the handbrake has taken the rear's grip, 0 to 1, easing in
@@ -143,7 +145,8 @@ export function stepVehicle(s, input, dt) {
      turn should hold its speed, not gather it and run wide. TURN_LIFT of
      the drive goes at full steer, above TURN_LIFT_FROM; a drift keeps it. */
   const turnLift = s.drifting ? 0 : V.TURN_LIFT * Math.abs(input.steer) * smooth01((vx - V.TURN_LIFT_FROM) / 4);
-  if (throttle > 0) driveR = throttle * m * V.ACCEL * Math.max(0, 1 - Math.max(0, vx) / V.TOP_SPEED) * (1 - s.hb * (input.steer === 0 ? 1 : 0.5)) * (1 - turnLift);
+  const boosting = s.boost > 0 ? 1 : 0;
+  if (throttle > 0) driveR = throttle * m * (V.ACCEL + boosting * V.BOOST_ACCEL) * Math.max(0, 1 - Math.max(0, vx) / (V.TOP_SPEED + boosting * V.BOOST_TOP)) * (1 - s.hb * (input.steer === 0 ? 1 : 0.5)) * (1 - turnLift);
   else if (vx <= 0.3 && brake > 0 && throttle === 0) driveR = -brake * m * V.REVERSE_ACCEL * Math.max(0, 1 - Math.max(0, -vx) / V.REVERSE_SPEED);
   /* The brake acts against forward travel only. Rolling backwards, the
      brake input is the reverse gear and the throttle is the brake. This
@@ -360,5 +363,5 @@ export function bodyPoints(s, out) {
 
 /* The state that defines a run, as a string, for the determinism test. */
 export function vehicleHash(s) {
-  return [s.x, s.z, s.yaw, s.wvx, s.wvz, s.r, s.steerDriver, s.axF, s.hb].map(v => v.toString()).join(',');
+  return [s.x, s.z, s.yaw, s.wvx, s.wvz, s.r, s.steerDriver, s.axF, s.hb, s.boost, s.driftT].map(v => v.toString()).join(',');
 }

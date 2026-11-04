@@ -166,12 +166,12 @@ function frame(t) {
   const c = world.car;
   let dy = c.yaw - prev.yaw; if (dy > Math.PI) dy -= 2 * Math.PI; else if (dy < -Math.PI) dy += 2 * Math.PI;
   pose.x = prev.x + (c.x - prev.x) * alpha; pose.z = prev.z + (c.z - prev.z) * alpha; pose.yaw = prev.yaw + dy * alpha;
-  pose.slip = c.slip; pose.speed = c.speed;
+  pose.slip = c.slip; pose.speed = c.speed; pose.boost = c.boost;
   if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
   else chase.update(pose, dt, scene.camera, view.w / view.h);
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
   scene.update(pose, world, dt, g);
-  hud.update(scoring, pose, scene.camera, THREE, view);
+  hud.update(scoring, pose, scene.camera, THREE, view, dt);
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;
     hud.setRun(app.track.kind === 'circuit' ? 'LAP ' + Math.min(p.laps, p.lap + 1) + '/' + p.laps : Math.round(p.remaining) + ' m', app.runTime.toFixed(1));

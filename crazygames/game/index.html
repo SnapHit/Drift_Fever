@@ -47,6 +47,9 @@
   #runinfo #clock { font-size: 13px; opacity: 0.75; font-weight: 700; }
   #exit { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); width: 36px; height: 36px; border-radius: 18px; border: 0; background: rgba(255,255,255,0.14); color: #fff; font-size: 16px; line-height: 36px; padding: 0; pointer-events: auto; }
   #count { position: absolute; left: 0; right: 0; top: 34%; text-align: center; font-weight: 900; font-size: clamp(72px, 22vw, 160px); line-height: 1; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.7); display: none; }
+  #streaks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #boost { position: absolute; left: 0; right: 0; top: 22%; text-align: center; font-weight: 900; font-style: italic; font-size: clamp(28px, 8vw, 56px); letter-spacing: 0.08em; color: #ffd23f; text-shadow: 0 0 18px rgba(255,140,0,0.8), 0 3px 10px rgba(0,0,0,0.6); opacity: 0; transform: scale(0.8); transition: opacity 0.15s, transform 0.15s; pointer-events: none; }
+  #boost.on { opacity: 1; transform: scale(1); }
   #count.on { display: block; }
   #count.go { color: var(--cyan); }
   #count.pop { animation: pop 0.5s ease-out; }

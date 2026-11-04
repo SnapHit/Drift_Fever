@@ -58,7 +58,7 @@ export const TRACKS = {
   SAMPLE:          2,            // m between centre samples, fixed by the physics
   LENGTH:          [600, 1200],  // m, the default target range
   LENGTH_SLACK:    0.1,          // a single number target accepts this share either side
-  WIDTH:           [10, 18],     // m, the stated range of the drivable width
+  WIDTH:           [11, 30],     // m, the stated range of the drivable width (widened 5 November 2026: corners were too easy to hit)
   RADIUS:          [12, 120],    // m, the stated range of every corner's tightest radius
   STRAIGHT_RADIUS: 250,          // m: gentler than this counts as straight
   INNER_CLEAR:     4,            // m: half the width is at most the radius less this, so the inside wall never folds
@@ -77,8 +77,8 @@ export const TRACKS = {
   LINK_SHARE:      [0.45, 0.7],  // share of the straights between features that are short links, easy to hard
   LINK:            [6, 24],      // m, a short link
   STRAIGHT:        [[30, 75], [22, 50]],   // m, a longer straight, easy and hard
-  STRAIGHT_WIDTH:  [13, 11.5],   // m on straights, easy to hard
-  WIDTH_SMOOTH:    6,            // samples either side the width is averaged over
+  STRAIGHT_WIDTH:  [14, 12.5],   // m on straights, easy to hard
+  WIDTH_SMOOTH:    8,            // samples either side the width is averaged over
   BANK_MAX:        3,            // degrees
   BANK_RADIUS:     20,           // m: this tight or tighter takes the full bank
   BANK_SMOOTH:     5,            // samples either side
@@ -96,11 +96,11 @@ export const TRACKS = {
     hairpin: [1, 3], tight: [3, 2], sweeper: [3, 1], esses: [2, 3], chicane: [1, 2],
   },
   FEATURES: {
-    hairpin: { R: [[16, 22], [12.5, 16]], angle: [150, 195], lt: 8,  width: [[15, 17], [13, 15]], clip: 'inner', outside: 'tyres', runoff: 0.7 },
-    tight:   { R: [[24, 34], [18, 26]],   angle: [70, 120],  lt: 10, width: [[14, 16], [12, 14]], clip: 'either', outside: 'tyres', runoff: 0.5 },
-    sweeper: { R: [[60, 110], [40, 75]],  angle: [45, 120],  lt: 20, width: [[13, 15], [11, 13]], clip: 'outer', outside: 'concrete', runoff: 0 },
-    esses:   { R: [[32, 50], [22, 36]],   angle: [45, 95],   lt: 12, width: [[14, 16], [12, 14]], clip: 'alternate', outside: 'concrete', runoff: 0, count: [2, 3] },
-    chicane: { R: [[26, 36], [18, 26]],   angle: [25, 45],   lt: 8,  width: [[13, 14], [11, 12]], clip: 'middle', outside: 'concrete', runoff: 0, link: [0, 6] },
+    hairpin: { R: [[20, 26], [17, 21]],   angle: [150, 195], lt: 8,  width: [[26, 30], [24, 26]], clip: 'inner', outside: 'tyres', runoff: 0.7 },
+    tight:   { R: [[28, 38], [22, 30]],   angle: [70, 120],  lt: 10, width: [[24, 28], [22, 24]], clip: 'either', outside: 'tyres', runoff: 0.5 },
+    sweeper: { R: [[60, 110], [40, 75]],  angle: [45, 120],  lt: 20, width: [[20, 23], [18, 21]], clip: 'outer', outside: 'concrete', runoff: 0 },
+    esses:   { R: [[34, 50], [26, 36]],   angle: [45, 95],   lt: 12, width: [[22, 25], [20, 23]], clip: 'alternate', outside: 'concrete', runoff: 0, count: [2, 3] },
+    chicane: { R: [[28, 38], [22, 30]],   angle: [25, 45],   lt: 8,  width: [[19, 21], [17, 19]], clip: 'middle', outside: 'concrete', runoff: 0, link: [0, 6] },
   },
   FENCE_FROM:      40,           // m: straights at least this long are fenced, away from the corners
 };
