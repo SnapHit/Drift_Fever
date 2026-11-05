@@ -58,10 +58,11 @@
    corner, a double hairpin, a corner that tightens, one that opens) are
    drawn by weight for the difficulty and joined by straights, most of
    them short links. A circuit steers its features towards one full
-   turn, or for a figure eight one full turn and then back to none, then
-   the corner angles are trimmed to make the turning exact, and the
-   straights are lengthened (least squares, never shortened) to close
-   the gap in position, so the loop meets itself exactly. Then it is
+   turn, then the corner angles are trimmed to make the turning exact,
+   and the straights' lengths and the corners' angles are solved
+   together to close the gap in position at the asked lap length, so the
+   loop meets itself exactly. A figure eight draws one lobe that way,
+   level with its start, and mirrors it. Then it is
    scaled by a fraction of a per cent so the lap is a whole number of
    samples. Width, run-off, barrier kinds, clipping zones, elevation and
    bank are laid along it. Where the centre line crosses itself once,
@@ -117,7 +118,7 @@ export const TRACKS = {
   TOP_SPEED:       62,           // m/s, the car's flat out speed (TUNE.VEHICLE.TOP_SPEED)
   ELEVATION_USE:   0.8,          // share of the grade and crest limits the rise and fall aims for
   TURN_BIAS:       0.72,         // chance a corner turns the way the plan wants
-  PLAN_SHARE:      0.8,          // share of a circuit's goal the plan draws features for; closure lengthens the rest
+  PLAN_SHARE:      0.7,          // share of a circuit's goal the plan draws features for; closure lengthens the rest
   CLOSE_ANGLE:     3,            // m of straight that a degree of corner angle costs the closure, so it prefers lengthening
   ATTEMPTS:        1000,         // a failed attempt costs about a millisecond; no seed tested needs more than a few hundred
   /* Features, each [easy, hard] where a range is given, lerped by the
@@ -155,15 +156,18 @@ export const TRACKS = {
      turn then back to none), and any single clean crossing of the
      centre line, planned or not, becomes a bridge. */
   CROSS: {
-    chance: [0.3, 0.45],         // share of circuit attempts planned as a figure eight, easy to hard
-    minSin: 0.766,               // sine of the least angle between the passes (50 degrees)
+    chance: [0.35, 0.5],         // share of circuit attempts planned as a figure eight, easy to hard
+    eightStart: 0.6,             // a figure eight's start straight, as a share of a circuit's
+    turnBias: 0.85,              // chance a lobe's corner turns the way the lobe wants (a lobe has less room to wander than a lap)
+    minLap: 760,                 // m: a figure eight is only tried on a lap at least this long, since each lobe holds a full turn
+    minSin: 0.643,               // sine of the least angle between the passes (40 degrees)
     clearance: 5.0,              // m from the lower road's surface to the upper's at the crossing
     dipShare: 0.3,               // share of the clearance the lower road dips, the rest the upper climbs
     grade: 0.075,                // the ramps' steepest slope, rise over run
     crest: 0.0025,               // 1/m, the ramps' sharpest vertical curvature (0.41 g off the car at 40 m/s)
     margin: 3,                   // m the deck reaches past the lower road's barriers, and the cut past the upper's
     layerGap: 4.0,               // m: barriers this far apart in height belong to different layers and may cross
-    apart: 60,                   // m, at least, along the track between the two passes' structures
+    apart: 40,                   // m, at least, along the track between the two passes' structures
     startClear: 30,              // m a structure keeps from the start line
   },
 };
@@ -319,7 +323,7 @@ function makeFeature(type, dir, rng, d) {
 
 /* A sequence of elements: { s: length, adj, min, max } straights and
    { c } corners. eight: plan a figure eight, one full turn and back. */
-function planCircuit(rng, d, goal, eight) {
+function planCircuit(rng, d, goal) {
   const T = TRACKS;
   const sgn = rng() < 0.5 ? 1 : -1;
   /* the one longer run, scaled down on a short lap */
@@ -331,7 +335,7 @@ function planCircuit(rng, d, goal, eight) {
   while (est < budget && guard++ < 60) {
     const type = weightedPick(rng, T.WEIGHTS, d);
     const u = Math.min(1, (est + 80) / budget);
-    const want = sgn * TWO_PI * (eight ? (u < 0.5 ? 2 * u : 2 - 2 * u) : u);
+    const want = sgn * TWO_PI * u;
     const toward = want - H >= 0 ? 1 : -1;
     const dir = rng() < T.TURN_BIAS ? toward : -toward;
     const f = makeFeature(type, dir, rng, d);
@@ -342,7 +346,7 @@ function planCircuit(rng, d, goal, eight) {
     est += s;
   }
   /* Turn the rest of the way: whole corners while far off, then trim. */
-  let D = (eight ? 0 : sgn * TWO_PI) - H;
+  let D = sgn * TWO_PI - H;
   guard = 0;
   while (Math.abs(D) > 140 * DEG && guard++ < 6) {
     const type = rng() < 0.5 ? 'sweeper' : 'tight';
@@ -357,7 +361,55 @@ function planCircuit(rng, d, goal, eight) {
   if (!trimTurning(els, D)) return null;
   const last = els[els.length - 1];
   if (last.s !== undefined) { last.min = Math.max(last.min, T.CLOSE_STRAIGHT); last.s = Math.max(last.s, T.CLOSE_STRAIGHT); }
-  return { els, sgn, eight };
+  return { els, sgn, eight: false };
+}
+
+/* A figure eight, closed by symmetry: one lobe is drawn like a circuit
+   that turns a full turn, trimmed to exactly that, and closed so it ends
+   level with its start (the same z, half the goal long); the second lobe
+   is its mirror image, turning the other way, which lands exactly on the
+   start. The lobes must cross on the mirror line, where the bridge goes.
+   The start straight is drawn shorter, since each lobe has one. */
+function planEight(rng, d, goal, target) {
+  const T = TRACKS;
+  const sgn = rng() < 0.5 ? 1 : -1;
+  const ss = T.START_STRAIGHT.circuit, scale = Math.min(1, goal / T.START_STRAIGHT.lap) * T.CROSS.eightStart;
+  const els = [{ s: between(rng, ss[0], ss[1]) * scale, adj: true, min: ss[0] * scale, start: true }];
+  let H = 0, est = els[0].s;
+  const budget = goal / 2 * T.PLAN_SHARE;
+  let guard = 0;
+  while (est < budget && guard++ < 60) {
+    const type = weightedPick(rng, T.WEIGHTS, d);
+    const u = Math.min(1, (est + 80) / budget);
+    const want = sgn * TWO_PI * u;
+    const toward = want - H >= 0 ? 1 : -1;
+    const dir = rng() < T.CROSS.turnBias ? toward : -toward;
+    const f = makeFeature(type, dir, rng, d);
+    for (const it of f.items) { if (it.c) { els.push({ c: it.c }); est += Math.abs(it.c.a) * it.c.R; } else { els.push({ s: it.link, adj: false }); est += it.link; } }
+    H += f.net;
+    const s = straightBetween(rng, d);
+    els.push({ s, adj: true, min: T.LINK[0] });
+    est += s;
+  }
+  /* the rest of the turn in tight corners, which a lobe has room for */
+  let D = sgn * TWO_PI - H;
+  guard = 0;
+  while (Math.abs(D) > 140 * DEG && guard++ < 6) {
+    const f = makeFeature('tight', D > 0 ? 1 : -1, rng, d);
+    const c = f.items[0].c;
+    c.a = (D > 0 ? 1 : -1) * clamp(Math.abs(D), c.aMin, c.aMax);
+    els.push({ c });
+    const s = straightBetween(rng, d);
+    els.push({ s, adj: true, min: T.LINK[0] });
+    D -= c.a;
+  }
+  if (!trimTurning(els, D)) return null;
+  const last = els[els.length - 1];
+  last.min = Math.max(last.min, T.CLOSE_STRAIGHT); last.s = Math.max(last.s, T.CLOSE_STRAIGHT);
+  /* level with the start, half the lap: z and length, not x */
+  if (!closePosition(els, { min: target.min / 2, max: target.max / 2 }, [false, true, true, true])) return null;
+  const mirror = els.map(e => e.s !== undefined ? { s: e.s, adj: e.adj, min: e.min } : { c: Object.assign({}, e.c, { a: -e.c.a }) });
+  return { els: els.concat(mirror), sgn, eight: true };
 }
 
 function straightBetween(rng, d) {
@@ -495,8 +547,9 @@ function integrate(pieces) {
    re-integrates. A degree of angle is costed as CLOSE_ANGLE metres of
    straight. Converges whenever a closure inside the bounds exists; a
    plan with none fails here. */
-function closePosition(els, target) {
+function closePosition(els, target, rowsOn) {
   const T = TRACKS;
+  const on = rowsOn || [true, true, true, true];
   const aScale = T.CLOSE_ANGLE / DEG;   // m per radian
   const vars = [];
   for (const e of els) {
@@ -528,26 +581,35 @@ function closePosition(els, target) {
     }
     return end;
   };
-  const solve = (list, r) => {
-    /* least norm: x += Jt (J Jt)^-1 r on the listed columns */
-    const M = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
-    for (const v of list) for (let a = 0; a < 4; a++) for (let b = 0; b < 4; b++) M[a][b] += v.j[a] * v.j[b];
-    const lam = solveLinear(M, r);
-    if (!lam) return false;
-    for (const v of list) for (let a = 0; a < 4; a++) v.x += v.j[a] * lam[a];
-    return true;
+  const act = [0, 1, 2, 3].filter(a => on[a]), na = act.length;
+  /* the inverse of J Jt over the rows in use, for the least norm step
+     x += Jt (J Jt)^-1 r; the Jacobian is fixed within a round */
+  const inverse = (list) => {
+    const M = act.map(() => act.map(() => 0));
+    for (const v of list) for (let a = 0; a < na; a++) for (let b = 0; b < na; b++) M[a][b] += v.j[act[a]] * v.j[act[b]];
+    const inv = [];
+    for (let k = 0; k < na; k++) { const e = act.map((_, i) => i === k ? 1 : 0); const col = solveLinear(M, e); if (!col) return null; inv.push(col); }
+    return inv;   // inv[k][a]: column k
   };
-  const residual = (g) => { const r = g.slice(); for (const v of vars) for (let a = 0; a < 4; a++) r[a] -= v.x * v.j[a]; return r; };
+  const solve = (list, inv, r) => {
+    const lam = new Array(na).fill(0);
+    for (let a = 0; a < na; a++) for (let k = 0; k < na; k++) lam[a] += inv[k][a] * r[act[k]];
+    for (const v of list) for (let a = 0; a < na; a++) v.x += v.j[act[a]] * lam[a];
+  };
+  const residual = (g) => { const r = g.slice(); for (const v of vars) for (let a = 0; a < 4; a++) r[a] -= v.x * v.j[a]; for (let a = 0; a < 4; a++) if (!on[a]) r[a] = 0; return r; };
   let end = rows();
   /* the length to make: the nearest inside the target, a little in from its edges */
   const goal = clamp(end.s, target.min + 4, Math.max(target.min + 4, target.max - 4));
+  const gapOf = () => { const g = [-end.x, -end.z, 0, goal - end.s]; for (let a = 0; a < 4; a++) if (!on[a]) g[a] = 0; return g; };
   for (let round = 0; round < 8; round++) {
-    const g = [-end.x, -end.z, 0, goal - end.s];
+    const g = gapOf();
     if (g[0] * g[0] + g[1] * g[1] + g[3] * g[3] < 1e-14) break;
+    const inv = inverse(vars);
+    if (!inv) return false;
     for (let iter = 0; iter < 300; iter++) {
       const r = residual(g);
       if (r[0] * r[0] + r[1] * r[1] + r[2] * r[2] + r[3] * r[3] < 1e-14) break;
-      if (!solve(vars, r)) return false;
+      solve(vars, inv, r);
       for (const v of vars) { if (v.x < v.lo) v.x = v.lo; else if (v.x > v.hi) v.x = v.hi; }
     }
     {
@@ -562,15 +624,25 @@ function closePosition(els, target) {
   /* the last bit of position exactly, by the straights alone (linear),
      those not at a bound */
   {
-    const gx = -end.x, gz = -end.z;
+    const g = gapOf();
+    const gx = g[0], gz = g[1];
     if (gx * gx + gz * gz > 1e-6) return false;
     const free = vars.filter(v => v.kind === 's' && v.lo < -1e-9 && v.hi > 1e-9);
-    let a = 0, b = 0, c = 0;
-    for (const v of free) { a += v.j[0] * v.j[0]; b += v.j[0] * v.j[1]; c += v.j[1] * v.j[1]; }
-    const det = a * c - b * b;
-    if (Math.abs(det) < 1e-9) return false;
-    const lx = (c * gx - b * gz) / det, lz = (a * gz - b * gx) / det;
-    for (const v of free) { v.x = v.j[0] * lx + v.j[1] * lz; if (v.x < v.lo - 1e-6 || v.x > v.hi + 1e-6) return false; }
+    if (on[0] && on[1]) {
+      let a = 0, b = 0, c = 0;
+      for (const v of free) { a += v.j[0] * v.j[0]; b += v.j[0] * v.j[1]; c += v.j[1] * v.j[1]; }
+      const det = a * c - b * b;
+      if (Math.abs(det) < 1e-9) return false;
+      const lx = (c * gx - b * gz) / det, lz = (a * gz - b * gx) / det;
+      for (const v of free) { v.x = v.j[0] * lx + v.j[1] * lz; if (v.x < v.lo - 1e-6 || v.x > v.hi + 1e-6) return false; }
+    } else {
+      /* one position row: the straights share it by their direction's share of it */
+      const row = on[0] ? 0 : 1, gr = on[0] ? gx : gz;
+      let a = 0;
+      for (const v of free) a += v.j[row] * v.j[row];
+      if (a < 1e-9) return false;
+      for (const v of free) { v.x = v.j[row] * gr / a; if (v.x < v.lo - 1e-6 || v.x > v.hi + 1e-6) return false; }
+    }
     apply();
   }
   const first = els[0], last = els[els.length - 1];
@@ -723,9 +795,9 @@ function build(plan, kind, rng, d, opts, always) {
       const upExtent = pick.deckHalf + Lup, dnExtent = pick.cutHalf + Ldn;
       let sep = Math.abs(pick.up - pick.dn);
       if (closed) sep = Math.min(sep, length - sep);
-      /* room along the track for both structures, and neither over the start zone */
-      const clearOfStart = (at, ext) => closed ? Math.abs(alongDist(0, at)) > ext + X.startClear : (at - ext >= T.START_LINE + X.startClear && at + ext <= length - 10);
-      const fits = sep >= upExtent + dnExtent + X.apart && clearOfStart(pick.up, upExtent) && clearOfStart(pick.dn, dnExtent);
+      /* room along the track for both structures; a sprint keeps them off its ends */
+      const inside = (at, ext) => closed || (at - ext >= T.START_LINE + X.startClear && at + ext <= length - 10);
+      const fits = sep >= upExtent + dnExtent + X.apart && inside(pick.up, upExtent) && inside(pick.dn, dnExtent);
       if (fits) bridge = { along: pick.up, under: pick.dn, angle: Math.round(dasin(Math.min(1, x.sinAngle)) / DEG * 10) / 10, height: Hup, depth: Hdn, deckHalf: pick.deckHalf, cutHalf: pick.cutHalf, Lup, Ldn };
       else if (!always) return { reject: 'crossover' };
     }
@@ -733,13 +805,48 @@ function build(plan, kind, rng, d, opts, always) {
   /* the structure's reach at every sample: 1 on the deck, falling over
      the ramps; and the cut's, on the lower pass */
   const struct = new Array(n).fill(0), cut = new Array(n).fill(0), part = new Array(n).fill(null);
-  if (bridge) {
+  const layStructure = () => {
     for (let i = 0; i < n; i++) {
+      struct[i] = 0; cut[i] = 0; part[i] = null;
       const du = Math.abs(alongDist(i, bridge.along)), dl = Math.abs(alongDist(i, bridge.under));
       if (du <= bridge.deckHalf) { struct[i] = 1; part[i] = 'deck'; }
       else if (du < bridge.deckHalf + bridge.Lup) { struct[i] = rampHeight(bridge.deckHalf + bridge.Lup - du, bridge.height) / bridge.height; part[i] = 'ramp'; }
       if (dl <= bridge.cutHalf) { cut[i] = 1; part[i] = 'cut'; }
       else if (dl < bridge.cutHalf + bridge.Ldn) { cut[i] = rampHeight(bridge.cutHalf + bridge.Ldn - dl, bridge.depth) / bridge.depth; part[i] = 'cut'; }
+    }
+  };
+  if (bridge) layStructure();
+  /* A figure eight crosses near its waist, where a circuit starts, so a
+     crossover circuit starts somewhere else: the loop is turned so the
+     start is 10 m into the longest straight that keeps startClear metres
+     from the structure before it and 50 m after, or there is no bridge. */
+  if (bridge && closed) {
+    const before = Math.round(X.startClear / SAMPLE) + 5, after = Math.round(50 / SAMPLE) + 5;
+    let bestRun = null;
+    let i0 = -1;
+    const straightAt = i => !S[i].corner;
+    const runs = [];
+    for (let i = 0; i < n; i++) { if (straightAt(i)) { if (i0 < 0) i0 = i; } else if (i0 >= 0) { runs.push([i0, i - 1]); i0 = -1; } }
+    if (i0 >= 0) runs.push([i0, n - 1]);
+    if (runs.length > 1 && runs[0][0] === 0 && runs[runs.length - 1][1] === n - 1) { const lastRun = runs.pop(); runs[0] = [lastRun[0] - n, runs[0][1]]; }
+    for (const [a, b] of runs) {
+      if ((b - a + 1) * SAMPLE < 30) continue;
+      let clear = true;
+      for (let i = a - before; i <= a + after && clear; i++) if (part[((i % n) + n) % n]) clear = false;
+      if (clear && (!bestRun || b - a > bestRun[1] - bestRun[0])) bestRun = [a, b];
+    }
+    if (!bestRun) { if (!always) return { reject: 'crossover' }; }
+    else {
+      const shift = ((bestRun[0] % n) + n) % n;
+      if (shift !== 0) {
+        const rot = arr => arr.splice(0, 0, ...arr.splice(shift));
+        rot(S); rot(width);
+        for (let i = 0; i < n; i++) S[i].s = i * SAMPLE;
+        const back = v => { v -= shift * SAMPLE; return ((v % length) + length) % length; };
+        for (const c of corners) { const len = c.to - c.from, arcLen = c.arcTo - c.arcFrom, arcOff = c.arcFrom - c.from; c.from = back(c.from); c.to = c.from + len; c.arcFrom = c.from + arcOff; c.arcTo = c.arcFrom + arcLen; }
+        bridge.along = back(bridge.along); bridge.under = back(bridge.under);
+        layStructure();
+      }
     }
   }
 
@@ -955,8 +1062,8 @@ export function generateTrack(seed, options) {
   let failures = {};
   for (let attempt = 1; attempt <= TRACKS.ATTEMPTS; attempt++) {
     const goal = between(rng, target.min, target.max);
-    const eight = eights && rng() < lerp(TRACKS.CROSS.chance[0], TRACKS.CROSS.chance[1], d);
-    const plan = kind === 'circuit' ? planCircuit(rng, d, goal, eight) : planSprint(rng, d, goal);
+    const eight = eights && goal >= TRACKS.CROSS.minLap && rng() < lerp(TRACKS.CROSS.chance[0], TRACKS.CROSS.chance[1], d);
+    const plan = kind === 'sprint' ? planSprint(rng, d, goal) : eight ? planEight(rng, d, goal, target) : planCircuit(rng, d, goal);
     if (!plan) { failures.turning = (failures.turning || 0) + 1; continue; }
     if (kind === 'circuit' && !closePosition(plan.els, target)) { failures.closure = (failures.closure || 0) + 1; continue; }
     /* the length after closure, before the cost of a build */
