@@ -24,13 +24,13 @@ export const FX = {
   DUST_ALPHA:     0.5,
   DUST_COLOUR:    0xb8a078,
   DUST_MIN_SPEED: 3,       // m/s
-  SPARK_LIFE:     0.45,
-  SPARK_SIZE:     0.12,
-  SPARK_COUNT:    [6, 26], // per hit, scaled by its speed
+  SPARK_LIFE:     0.55,
+  SPARK_SIZE:     0.2,
+  SPARK_COUNT:    [10, 40], // per hit, scaled by its speed
   SPARK_SPEED:    [3, 11], // m/s
   SPARK_GRAVITY:  9.8,
   SPARK_MIN_HIT:  1.5,     // m/s along the normal
-  SPARK_SCRAPE:   18,      // sparks per second while scraping along a wall
+  SPARK_SCRAPE:   45,      // sparks per second while scraping along a wall
   FLAME_LIFE:     0.12,
   FLAME_SIZE:     0.22,
   FLAME_RATE:     90,      // per second while boosting

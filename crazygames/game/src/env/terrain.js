@@ -26,7 +26,7 @@ export const TERRAIN = {
   FIELD_REACH:  150,      // m, the distance a node that no sample reaches reports
   BELOW:        -0.03,    // m, the flat ground sits just under the road against z fighting
   SEA_LEVEL:    -1.5,     // m
-  SEA_BEYOND:   { coastal: 70, docks: 36 },   // m past the track's extent the water starts
+  SEA_BEYOND:   { coastal: 40, docks: 30 },   // m past the track's extent the water starts
 };
 
 const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
@@ -146,10 +146,13 @@ export function buildTerrain(track, theme, options) {
   }
   const seaS = (x, z) => sea ? (x - centre.x) * sea.dir.x + (z - centre.z) * sea.dir.z - sea.from : -Infinity;
 
+  const C = track.centre;
   const heightAt = (x, z) => {
     const d = field.edge(x, z);
     const mask = smooth(theme.flatFrom, theme.flatTo, d);
-    let h = 0;
+    // the flat ground beside the road sits at the road's own height there (zero on a flat track)
+    const base = C.length ? (C[field.nearest(x, z)].y || 0) : 0;
+    let h = base * (1 - mask);
     if (theme.hill > 0) {
       const f = hillsN.fbm(x * theme.hillScale, z * theme.hillScale, 4, 2.1, 0.5);
       h += theme.hill * Math.pow(Math.max(0, f + 0.35), 1.4) * mask;
@@ -160,7 +163,7 @@ export function buildTerrain(track, theme, options) {
       const toSea = smooth(-sea.cliff / 2, sea.cliff / 2, s);
       h = h * (1 - smooth(-sea.cliff - 20, -sea.cliff / 2, s)) - sea.drop * toSea;
     }
-    return h === 0 ? TERRAIN.BELOW : h + TERRAIN.BELOW;
+    return h + TERRAIN.BELOW;
   };
   const edgeDistance = (x, z) => field.edge(x, z);
 

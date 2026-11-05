@@ -2,8 +2,9 @@
    (../tracks/mesh.js) returns a group named `track` whose meshes are
    named for what they are: today `road` (one vertex coloured mesh of
    asphalt, edges, kerbs, run-off and lines) and `barriers`; the next
-   track session splits them into `road`, `kerb`, `wall`, `clip`,
-   `line`, `bridge` and `ramp`. styleTrack replaces each mesh's
+   track session splits them into `road`, `edge`, `kerb`, `runoff`,
+   `line`, `wall`, `clip`, `bridge`, `ramp` and `cut`, and the table
+   below names them all. styleTrack replaces each mesh's
    material by its name and leaves the geometry's vertex colours as
    they are, so the road edge keeps exactly the colour the readability
    rule is measured on; the textures are grain around one. Meshes with
@@ -18,6 +19,7 @@ import { asphaltTexture, concreteTexture } from './textures.js';
 export const TRACK_STYLE = {
   ASPHALT_TILE:  7,        // m per repeat of the grain
   CONCRETE_TILE: 3,
+  EDGE_PAINT:    0xf6e7a1, // what the edge line emits when it is its own mesh (the builder's LOOK.EDGE)
   ROAD_LIFT:     1.5,      // the asphalt's vertex colour is dark; the material brightens the whole road mesh, edge included
   ROUGH_WET:     0.22,     // rain: the road reflects the sky and the lamps
   METAL_WET:     0.08,
@@ -73,8 +75,11 @@ export function styleTrack(THREE, group, preset, options) {
     : lam(geo, { map: T.asphalt, color: lift });
   const table = {
     road:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return asphalt(geo); },
-    ramp:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return asphalt(geo); },
+    edge:     geo => lam(geo, { emissive: TRACK_STYLE.EDGE_PAINT, emissiveIntensity: preset.edgeGlow || 0 }),
     kerb:     geo => lam(geo, {}),
+    runoff:   geo => lam(geo, {}),
+    ramp:     geo => lam(geo, {}),
+    cut:      geo => lam(geo, {}),
     line:     geo => lam(geo, { emissive: 0xffffff, emissiveIntensity: TRACK_STYLE.LINE_EMISSIVE * (preset.edgeGlow || 0) }),
     wall:     geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },
     barriers: geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },

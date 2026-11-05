@@ -12,7 +12,7 @@
       the least clearance over every instance.
    b. The terrain never rises onto the road: at every centre sample,
       across the road and two metres beyond the edge, the ground is at
-      the flat level under the road.
+      the flat level just under the road's own height there.
    c. Sight lines: from the chase camera's position at every 10 m along
       the track (TUNE.CAMERA: behind and above the car, on the road's
       heading), lines to the road's centre every 4 m ahead to 60 m. A
@@ -53,7 +53,7 @@ function cameraAt(c, speed) {
   const C = TUNE.CAMERA;
   const dist = C.DISTANCE + C.DISTANCE_SPEED * speed;
   const fx = -Math.sin(c.heading), fz = -Math.cos(c.heading);
-  return { x: c.x - fx * dist, y: C.HEIGHT, z: c.z - fz * dist };
+  return { x: c.x - fx * dist, y: (c.y || 0) + C.HEIGHT, z: c.z - fz * dist };
 }
 
 /* Does the segment a to b pass through the vertical volume of an
@@ -115,7 +115,7 @@ export function checkTrack(track, theme, options) {
     const lx = -Math.cos(c.heading), lz = Math.sin(c.heading);
     for (let u = -c.width / 2 - 2; u <= c.width / 2 + 2; u += 2) {
       const h = (o.terrainLift || 0) + terrain.heightAt(c.x + lx * u, c.z + lz * u);
-      const rise = Math.abs(h - TERRAIN.BELOW);
+      const rise = Math.abs(h - (c.y || 0) - TERRAIN.BELOW);
       if (rise > worstRise) worstRise = rise;
     }
   }

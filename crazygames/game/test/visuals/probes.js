@@ -74,7 +74,8 @@ const PROJECT = `
          camera sees over the barrier's top (a metre high) */
       const dWall = Math.hypot(c.x + lx * sgn * wo - cam.position.x, c.z + lz * sgn * wo - cam.position.z);
       const over = Math.max(2.5, dWall * 1.0 / Math.max(0.5, cam.position.y - 1.0) + 0.6);
-      const set = { edge: [sgn * (hw - 0.28), 0.02], road: [sgn * (hw - 2.6), 0.0], wall: [sgn * wo, 0.5], outside: [sgn * (wo + over), 0.0] };
+      const cy = c.y || 0;
+      const set = { edge: [sgn * (hw - 0.28), cy + 0.02], road: [sgn * (hw - 2.6), cy], wall: [sgn * wo, cy + 0.5], outside: [sgn * (wo + over), cy] };
       const row = { along: a, side: sgn };
       let ok = true;
       for (const k of Object.keys(set)) {
