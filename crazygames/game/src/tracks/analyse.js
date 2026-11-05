@@ -377,13 +377,23 @@ export function validateTrack(track, target) {
   }
 
   /* no wall closer than the drivable width: from every centre sample, no
-     wall segment (its own or any other part's) inside half the width */
+     wall segment inside half the width, other than its own barrier
+     within OWN_WALL samples, which the contract check below holds beside
+     its sample to a centimetre (where the width changes along the road a
+     neighbouring wall point at a narrower width sits a little inside this
+     sample's half width, which is the road narrowing, not a wall in it) */
   {
     let worst = Infinity, at = -1, breaks = 0;
+    const OWN_WALL = 10;
     for (let i = 0; i < n; i++) {
       const c = C[i], hw = c.width / 2;
       let best = Infinity;
-      grid.near(c.x, c.z, hw + 0.5, s => { if (s.cap) return; if (Math.abs((c.y || 0) - segY(s, c.x, c.z)) >= LAYER) return; const d = segDist(c.x, c.z, s.ax, s.az, s.bx, s.bz); if (d < best) best = d; });
+      grid.near(c.x, c.z, hw + 0.5, s => {
+        if (s.cap) return;
+        if (s.wall < 2) { let sep = Math.abs(s.i - i); if (closed) sep = Math.min(sep, n - sep); if (sep <= OWN_WALL) return; }
+        if (Math.abs((c.y || 0) - segY(s, c.x, c.z)) >= LAYER) return;
+        const d = segDist(c.x, c.z, s.ax, s.az, s.bx, s.bz); if (d < best) best = d;
+      });
       const margin = (best === Infinity ? hw + 0.5 : best) - hw;
       if (margin < worst) { worst = margin; at = i * T.SAMPLE; }
       if (margin < -0.1) breaks++;

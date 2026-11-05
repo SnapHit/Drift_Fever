@@ -272,9 +272,12 @@ function brokenTracks() {
     known('2 the part gap measurement on the same track', g.ratio < 1 && g.gap < 3, 'reads ' + g.gap.toFixed(2) + ' m, ' + g.ratio.toFixed(2) + ' of the road width');
   }
   {
+    /* a wall from one part of the track standing in the road of another:
+       five left wall points moved onto the centre line 300 m further on
+       (a wall point moved within its own road is the contract check's) */
     const t = clone(base);
-    for (let i = 40; i <= 44; i++) { const c = t.centre[i], p = t.walls[0].points[i]; p.x = c.x + (p.x - c.x) * 0.4; p.z = c.z + (p.z - c.z) * 0.4; }
-    expect('clearance: five left wall points moved to 40% of the half width', t, all, 'clearance', 'samples 40 to 44');
+    for (let i = 40; i <= 44; i++) { const c = t.centre[(i + 150) % t.centre.length], p = t.walls[0].points[i]; p.x = c.x; p.z = c.z; p.y = c.y; }
+    expect('clearance: five left wall points moved into the road 300 m further on', t, all, 'clearance', 'samples 40 to 44 placed on the centre line at samples 190 to 194');
   }
   {
     const t = clone(base);
