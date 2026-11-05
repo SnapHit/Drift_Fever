@@ -19,11 +19,8 @@ export const TRACK_STYLE = {
   ASPHALT_TILE:  7,        // m per repeat of the grain
   CONCRETE_TILE: 3,
   ROAD_LIFT:     1.5,      // the asphalt's vertex colour is dark; the material brightens the whole road mesh, edge included
-  ROUGH_DRY:     0.86,
   ROUGH_WET:     0.22,     // rain: the road reflects the sky and the lamps
   METAL_WET:     0.08,
-  ROUGH_KERB:    0.7,
-  ROUGH_WALL:    0.9,
   CLIP_EMISSIVE: 0.9,      // the clipping posts glow a little, more at night
   LINE_EMISSIVE: 0.35,
   RACING_LINE_ALPHA: 0.3,     // black over the asphalt, at most this opaque
@@ -65,16 +62,24 @@ export function styleTrack(THREE, group, preset, options) {
   const T = textures(THREE);
   const wet = !!preset.wet;
   const vc = geo => !!geo.attributes.color;
-  const std = (geo, extra) => new THREE.MeshStandardMaterial(Object.assign({ vertexColors: vc(geo), roughness: TRACK_STYLE.ROUGH_DRY, metalness: 0 }, extra));
+  /* Lambert for everything dry: no specular sheen, so a low sun does
+     not turn the road or the ground into a bright sheet brighter than
+     the edge line. The wet road is the one standard material, for its
+     reflections. */
+  const lam = (geo, extra) => new THREE.MeshLambertMaterial(Object.assign({ vertexColors: vc(geo) }, extra));
+  const lift = new THREE.Color(TRACK_STYLE.ROAD_LIFT, TRACK_STYLE.ROAD_LIFT, TRACK_STYLE.ROAD_LIFT);
+  const asphalt = geo => wet
+    ? new THREE.MeshStandardMaterial({ vertexColors: vc(geo), map: T.asphalt, color: lift, roughness: TRACK_STYLE.ROUGH_WET, metalness: TRACK_STYLE.METAL_WET })
+    : lam(geo, { map: T.asphalt, color: lift });
   const table = {
-    road:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return std(geo, { map: T.asphalt, color: new THREE.Color(TRACK_STYLE.ROAD_LIFT, TRACK_STYLE.ROAD_LIFT, TRACK_STYLE.ROAD_LIFT), roughness: wet ? TRACK_STYLE.ROUGH_WET : TRACK_STYLE.ROUGH_DRY, metalness: wet ? TRACK_STYLE.METAL_WET : 0 }); },
-    ramp:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return std(geo, { map: T.asphalt, roughness: wet ? TRACK_STYLE.ROUGH_WET : TRACK_STYLE.ROUGH_DRY, metalness: wet ? TRACK_STYLE.METAL_WET : 0 }); },
-    kerb:     geo => std(geo, { roughness: TRACK_STYLE.ROUGH_KERB }),
-    line:     geo => std(geo, { roughness: TRACK_STYLE.ROUGH_KERB, emissive: 0xffffff, emissiveIntensity: TRACK_STYLE.LINE_EMISSIVE * (preset.edgeGlow || 0) }),
-    wall:     geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return std(geo, { map: T.concrete, roughness: TRACK_STYLE.ROUGH_WALL, side: THREE.DoubleSide }); },
-    barriers: geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return std(geo, { map: T.concrete, roughness: TRACK_STYLE.ROUGH_WALL, side: THREE.DoubleSide }); },
-    bridge:   geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return std(geo, { map: T.concrete, roughness: TRACK_STYLE.ROUGH_WALL, side: THREE.DoubleSide }); },
-    clip:     geo => std(geo, { roughness: 0.5, emissive: 0xff8a3c, emissiveIntensity: TRACK_STYLE.CLIP_EMISSIVE * (0.3 + (preset.edgeGlow || 0)) }),
+    road:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return asphalt(geo); },
+    ramp:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return asphalt(geo); },
+    kerb:     geo => lam(geo, {}),
+    line:     geo => lam(geo, { emissive: 0xffffff, emissiveIntensity: TRACK_STYLE.LINE_EMISSIVE * (preset.edgeGlow || 0) }),
+    wall:     geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },
+    barriers: geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },
+    bridge:   geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },
+    clip:     geo => lam(geo, { emissive: 0xff8a3c, emissiveIntensity: TRACK_STYLE.CLIP_EMISSIVE * (0.3 + (preset.edgeGlow || 0)) }),
   };
   const styled = [];
   group.traverse(m => {

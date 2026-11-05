@@ -33,7 +33,7 @@ export const PRESETS = {
     headlights:   false,
     wet:          false,
     rain:         false,
-    edgeGlow:     0.0,          // emission on the road edge, for the dark presets
+    edgeGlow:     0.6,          // emission on the road's paint: the edge line stays the brightest thing under any light
     smoke:        0xd9c8c0,     // tyre smoke, lit by the sun
     windX:        1.2, windZ: 0.4,   // m/s, the way the smoke drifts
     cloud:        0.6,          // how much of the sky has cloud streaks
@@ -47,11 +47,11 @@ export const PRESETS = {
     sunDisc:      0xdfe6ff,     // the moon
     sunElev:      38,
     sunAzim:      150,
-    sun:          0.55,         // moonlight, cool
+    sun:          1.0,          // moonlight, cool, strong enough that the car reads
     sunColour:    0x8fa4ff,
     hemiSky:      0x2a3560,
     hemiGround:   0x101018,
-    hemi:         0.42,
+    hemi:         0.95,
     fogNear:      70,
     fogFar:       420,
     exposure:     1.0,
@@ -60,7 +60,7 @@ export const PRESETS = {
     headlights:   true,
     wet:          false,
     rain:         false,
-    edgeGlow:     0.55,
+    edgeGlow:     0.75,
     smoke:        0x6f7490,
     windX:        0.8, windZ: 0.3,
     cloud:        0.2,
@@ -87,7 +87,7 @@ export const PRESETS = {
     headlights:   false,
     wet:          false,
     rain:         false,
-    edgeGlow:     0.0,
+    edgeGlow:     0.6,
     smoke:        0xfff0e0,
     windX:        -0.6, windZ: 0.8,
     cloud:        0.8,
@@ -114,8 +114,8 @@ export const PRESETS = {
     headlights:   true,
     wet:          true,
     rain:         true,
-    edgeGlow:     0.25,
-    smoke:        0xb0b6c4,
+    edgeGlow:     0.6,
+    smoke:        0x8a9098,
     windX:        3.0, windZ: 1.0,
     cloud:        1.0,
   },

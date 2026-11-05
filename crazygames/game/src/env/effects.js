@@ -13,7 +13,7 @@ export const FX = {
   SMOKE_GROW:     1.2,     // m per second
   SMOKE_RISE:     1.1,     // m per second
   SMOKE_RATE:     26,      // puffs per second per wheel at a full slide
-  SMOKE_ALPHA:    0.38,
+  SMOKE_ALPHA:    0.32,
   SMOKE_DRAG:     1.6,     // per second, how fast a puff gives up the car's speed to the wind
   SMOKE_KEEP:     0.3,     // share of the wheel's velocity a puff is born with
   SMOKE_SPIN:     0.8,     // radians per second

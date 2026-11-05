@@ -59,7 +59,7 @@ export const LOOK = {
   BLOOM:        { threshold: 0.85, strength: 0.55, radius: 0.012, taps: 12 },
   LOW_TIER_CORES: 4,
   TIERS: {
-    low:  { pixelRatio: 1.0, shadow: 1024, shadowRange: 36, terrainCell: 8, sceneryShare: 0.4, shadowMinHeight: 2.5, smoke: 48, dust: 32, sparks: 60, rain: 140, marks: 1400, bloom: false, headlight: false },
+    low:  { pixelRatio: 1.0, shadow: 1024, shadowRange: 36, terrainCell: 8, sceneryShare: 0.4, shadowMinHeight: 2.5, smoke: 48, dust: 32, sparks: 60, rain: 140, marks: 1400, bloom: false, headlight: true },
     high: { pixelRatio: 2.0, shadow: 2048, shadowRange: 52, terrainCell: 5, sceneryShare: 1.0, shadowMinHeight: 0,   smoke: 120, dust: 80, sparks: 160, rain: 400, marks: 4000, bloom: true,  headlight: true },
   },
 };
@@ -151,7 +151,7 @@ export function createScene(canvas, opts) {
     } else {
       // the car park: a lighter slab inside the walls, and its walls
       track = null;
-      const slab = new THREE.Mesh(new THREE.PlaneGeometry(b.maxX - b.minX, b.maxZ - b.minZ), new THREE.MeshStandardMaterial({ color: LOOK.PARK, roughness: p.wet ? TRACK_STYLE.ROUGH_WET : TRACK_STYLE.ROUGH_DRY }));
+      const slab = new THREE.Mesh(new THREE.PlaneGeometry(b.maxX - b.minX, b.maxZ - b.minZ), p.wet ? new THREE.MeshStandardMaterial({ color: LOOK.PARK, roughness: TRACK_STYLE.ROUGH_WET }) : new THREE.MeshLambertMaterial({ color: LOOK.PARK }));
       slab.rotation.x = -Math.PI / 2;
       slab.position.set((b.minX + b.maxX) / 2, 0, (b.minZ + b.maxZ) / 2);
       slab.receiveShadow = true;
@@ -170,7 +170,7 @@ export function createScene(canvas, opts) {
     // cones
     if (cones) { scene.remove(cones); cones.geometry.dispose(); cones = null; }
     if (ground.cones.length) {
-      cones = new THREE.InstancedMesh(new THREE.ConeGeometry(0.28, 0.75, 8), new THREE.MeshStandardMaterial({ color: LOOK.CONE, roughness: 0.6 }), ground.cones.length);
+      cones = new THREE.InstancedMesh(new THREE.ConeGeometry(0.28, 0.75, 8), new THREE.MeshLambertMaterial({ color: LOOK.CONE }), ground.cones.length);
       cones.frustumCulled = false; cones.castShadow = true;
       scene.add(cones);
     }
@@ -199,7 +199,7 @@ export function createScene(canvas, opts) {
         list.push(...q[3], ...q[2], ...q[6], ...q[3], ...q[6], ...q[7]);
       }
     }
-    const wallMesh = (list, colour) => { if (!list.length) return; const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(list, 3)); g.computeVertexNormals(); const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: colour, roughness: 0.9, side: THREE.DoubleSide })); m.name = 'wall'; m.castShadow = true; m.receiveShadow = true; groundGroup.add(m); };
+    const wallMesh = (list, colour) => { if (!list.length) return; const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(list, 3)); g.computeVertexNormals(); const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: colour, side: THREE.DoubleSide })); m.name = 'wall'; m.castShadow = true; m.receiveShadow = true; groundGroup.add(m); };
     wallMesh(wallGeo.plain, LOOK.WALL); wallMesh(wallGeo.tyres, LOOK.WALL_TYRES); wallMesh(wallGeo.clip, LOOK.WALL_CLIP);
   }
 
@@ -212,7 +212,9 @@ export function createScene(canvas, opts) {
     group.traverse(m => {
       if (!m.isMesh || m.name !== 'road' || !m.geometry.attributes.color) return;
       const old = m.material;
-      const nm = new THREE.MeshStandardNodeMaterial({ vertexColors: true, map: old.map, color: old.color, roughness: old.roughness, metalness: old.metalness });
+      const nm = old.isMeshStandardMaterial
+        ? new THREE.MeshStandardNodeMaterial({ vertexColors: true, map: old.map, color: old.color, roughness: old.roughness, metalness: old.metalness })
+        : new THREE.MeshLambertNodeMaterial({ vertexColors: true, map: old.map, color: old.color });
       const vc = TSL.vertexColor();
       // only the bright, saturated paint glows: the asphalt (dark) stays dark
       const lum = vc.r.max(vc.g).max(vc.b);
@@ -239,16 +241,16 @@ export function createScene(canvas, opts) {
     const g = new THREE.Group();
     const lx = -Math.cos(s.heading), lz = Math.sin(s.heading);
     const reach = s.width / 2 + 1.2, h = LOOK.GANTRY_H, p = LOOK.GANTRY_POST;
-    const postMat = new THREE.MeshStandardMaterial({ color: LOOK.GANTRY, roughness: 0.6, metalness: 0.3 });
+    const postMat = new THREE.MeshLambertMaterial({ color: LOOK.GANTRY });
     for (const side of [1, -1]) { const post = new THREE.Mesh(new THREE.BoxGeometry(p, h, p), postMat); post.position.set(s.x + lx * reach * side, h / 2, s.z + lz * reach * side); post.castShadow = true; g.add(post); }
-    const beam = new THREE.Mesh(new THREE.BoxGeometry(reach * 2 + p, 0.6, p), new THREE.MeshStandardMaterial({ color: beamColour, roughness: 0.5, emissive: beamColour, emissiveIntensity: preset.lamps ? LOOK.GANTRY_LIT : 0.25 }));
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(reach * 2 + p, 0.6, p), new THREE.MeshLambertMaterial({ color: beamColour, emissive: beamColour, emissiveIntensity: preset.lamps ? LOOK.GANTRY_LIT : 0.25 }));
     /* the box runs along x; rotated by the heading about y its x axis is
        (cos h, -sin h), which is the track's left vector (-cos h, sin h) reversed */
     beam.position.set(s.x, h - 0.3, s.z); beam.rotation.y = s.heading; beam.castShadow = true;
     g.add(beam);
     if (start) {
       if (!bannerTex) bannerTex = bannerTexture(THREE, 'DRIFT FEVER', 0x111318, 0x19d8ff);
-      const banner = new THREE.Mesh(new THREE.PlaneGeometry(reach * 2 - 1, LOOK.GANTRY_BANNER), new THREE.MeshStandardMaterial({ map: bannerTex, emissive: 0xffffff, emissiveMap: bannerTex, emissiveIntensity: preset.lamps ? 0.8 : 0.2, side: THREE.DoubleSide, roughness: 0.6 }));
+      const banner = new THREE.Mesh(new THREE.PlaneGeometry(reach * 2 - 1, LOOK.GANTRY_BANNER), new THREE.MeshLambertMaterial({ map: bannerTex, emissive: 0xffffff, emissiveMap: bannerTex, emissiveIntensity: preset.lamps ? 0.8 : 0.2, side: THREE.DoubleSide }));
       banner.position.set(s.x, h - 0.6 - LOOK.GANTRY_BANNER / 2, s.z); banner.rotation.y = s.heading;
       g.add(banner);
     }

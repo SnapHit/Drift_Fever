@@ -42,8 +42,8 @@ export const THEMES = {
   },
   coastal: {
     name: 'coastal',
-    ground:      [0x6f8a3f, 0x8c9a4a],
-    dry:         0xc9b27a,               // sand
+    ground:      [0x62793a, 0x7a8842],
+    dry:         0xb8a06a,               // sand
     rock:        0x7a6e62,
     snow:        null,
     hill:        28,
@@ -66,8 +66,8 @@ export const THEMES = {
   },
   desert: {
     name: 'desert',
-    ground:      [0xc48a52, 0xd9a36a],
-    dry:         0xe0b57c,
+    ground:      [0xb07a48, 0xc08f58],
+    dry:         0xc9a06c,
     rock:        0x8a4a34,               // red rock
     snow:        null,
     hill:        40,

@@ -13,7 +13,6 @@ import { sponsorAtlas } from './textures.js';
 import { makeRng } from './rng.js';
 
 export const WORLD = {
-  TERRAIN_ROUGH:   1.0,
   WATER_ROUGH_DRY: 0.25,
   WATER_LEVEL_LIFT: 0.0,
   WATER_SIZE:      2400,     // m, the water plane
@@ -38,7 +37,7 @@ export function buildEnvironment(THREE, track, options) {
   tg.setAttribute('color', new THREE.BufferAttribute(terrain.colours, 3));
   tg.setIndex(new THREE.BufferAttribute(terrain.indices, 1));
   tg.computeVertexNormals();
-  const terrainMesh = new THREE.Mesh(tg, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: WORLD.TERRAIN_ROUGH, metalness: 0 }));
+  const terrainMesh = new THREE.Mesh(tg, new THREE.MeshLambertMaterial({ vertexColors: true }));
   terrainMesh.name = 'terrain';
   terrainMesh.receiveShadow = true;
   terrainMesh.frustumCulled = false;
@@ -66,8 +65,8 @@ export function buildEnvironment(THREE, track, options) {
   /* props */
   const placed = placeScenery(track, theme, terrain, { share: tier.sceneryShare === undefined ? 1 : tier.sceneryShare });
   const props = buildProps(THREE, theme, seed);
-  const bodyMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 });
-  const litMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, emissive: 0xffffff, emissiveIntensity: preset.lamps ? WORLD.LIT_INTENSITY.on : WORLD.LIT_INTENSITY.off });
+  const bodyMat = new THREE.MeshLambertMaterial({ vertexColors: true });
+  const litMat = new THREE.MeshLambertMaterial({ vertexColors: true, emissive: 0xffffff, emissiveIntensity: preset.lamps ? WORLD.LIT_INTENSITY.on : WORLD.LIT_INTENSITY.off });
   disposables.push(bodyMat, litMat);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), s3 = new THREE.Vector3(), col = new THREE.Color();
   const meshes = {};
@@ -122,7 +121,7 @@ export function buildEnvironment(THREE, track, options) {
     fg.setAttribute('position', new THREE.Float32BufferAttribute(fp, 3));
     fg.setAttribute('uv', new THREE.Float32BufferAttribute(fuv, 2));
     fg.computeVertexNormals();
-    const faceMat = new THREE.MeshStandardMaterial({ map: atlas.texture, roughness: 0.5, emissive: 0xffffff, emissiveMap: atlas.texture, emissiveIntensity: preset.lamps ? 0.9 : 0.15, side: THREE.DoubleSide });
+    const faceMat = new THREE.MeshLambertMaterial({ map: atlas.texture, emissive: 0xffffff, emissiveMap: atlas.texture, emissiveIntensity: preset.lamps ? 0.9 : 0.15, side: THREE.DoubleSide });
     const faces = new THREE.Mesh(fg, faceMat);
     faces.name = 'boards';
     faces.frustumCulled = false;
