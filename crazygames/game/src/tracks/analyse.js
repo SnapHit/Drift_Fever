@@ -181,14 +181,17 @@ export function findCrossings(track) {
   return out;
 }
 
-/* Proper intersection of two segments, with the parameters along each. */
-function segIntersect(a, b) {
+/* Intersection of two segments, with the parameters along each. Each
+   segment owns its start and not its end, so a crossing on a sample
+   point is counted once. */
+function segIntersect(a, b, inclusive) {
   const rx = a.bx - a.ax, rz = a.bz - a.az, sx = b.bx - b.ax, sz = b.bz - b.az;
   const den = rx * sz - rz * sx;
   if (Math.abs(den) < 1e-12) return null;
   const qx = b.ax - a.ax, qz = b.az - a.az;
   const t = (qx * sz - qz * sx) / den, u = (qx * rz - qz * rx) / den;
-  if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+  const e = inclusive ? 1e-9 : 0;
+  if (t < -e || t >= 1 + e || u < -e || u >= 1 + e) return null;
   return { t, u, x: a.ax + rx * t, z: a.az + rz * t };
 }
 
@@ -341,8 +344,8 @@ export function validateTrack(track, target) {
         if (bi <= ai) return;
         if (sameP(a.ax, a.az, b.ax, b.az) || sameP(a.ax, a.az, b.bx, b.bz) || sameP(a.bx, a.bz, b.ax, b.az) || sameP(a.bx, a.bz, b.bx, b.bz)) return;
         if (!segsCross(a, b)) return;
-        const r2 = segIntersect(a, b);
-        const dy = r2 ? Math.abs((a.ay + (a.by - a.ay) * r2.t) - (b.ay + (b.by - b.ay) * r2.u)) : 0;
+        const r2 = segIntersect(a, b, true);
+        const dy = r2 ? Math.abs((a.ay + (a.by - a.ay) * r2.t) - (b.ay + (b.by - b.ay) * r2.u)) : Math.abs(segY(a, (b.ax + b.bx) / 2, (b.az + b.bz) / 2) - segY(b, (a.ax + a.bx) / 2, (a.az + a.bz) / 2));
         if (dy >= LAYER) { bridged++; if (dy < leastLayerGap) leastLayerGap = dy; } else crossings++;
       });
     });

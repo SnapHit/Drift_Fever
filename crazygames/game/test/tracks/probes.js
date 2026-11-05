@@ -15,15 +15,17 @@
      M  the mesh builder in Node: finite geometry
 
    node game/test/tracks/probes.js [--seeds 1000] [--only 1,2,3,W,D,M] [--no-browser]
-   Writes review/tracks/*.json and prints a summary. Exits non zero if a
-   measurement fails or a known answer is not caught. */
+   Writes review/tracks/*.json (or TRACKS_REVIEW_DIR) and prints a
+   summary. Exits non zero if a measurement fails or a known answer is
+   not caught. The second generator's own measurements (busier corners,
+   banked corners, crossovers) are in tracks2.js beside this. */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import { execFileSync } from 'node:child_process';
 import { generateTrack, dailySeed, trackFromElements, TRACKS } from '../../src/tracks/generate.js';
-import { validateTrack, characterOf, cornersOf } from '../../src/tracks/analyse.js';
+import { validateTrack, characterOf, cornersOf, findCrossings } from '../../src/tracks/analyse.js';
 import { buildTrackMesh } from '../../src/tracks/mesh.js';
 import { createWorld } from '../../src/physics/world.js';
 import { createDriver } from '../../src/physics/driver.js';
@@ -298,13 +300,49 @@ function brokenTracks() {
   }
   {
     const t = clone(base);
-    for (let i = 0; i < t.centre.length; i++) t.centre[i].y += i >= 20 && i <= 40 ? (i - 20) * 2 * 0.08 : i > 40 ? 3.2 : 0;
-    expect('elevation: an 8% ramp', t, all, 'elevation', '40 m at 8%');
+    for (let i = 0; i < t.centre.length; i++) t.centre[i].y += i >= 20 && i <= 40 ? (i - 20) * 2 * 0.10 : i > 40 ? 4.0 : 0;
+    expect('elevation: a 10% ramp', t, all, 'elevation', '40 m at 10%, steeper than a bridge ramp');
   }
   {
     const t = clone(base);
-    for (let i = 50; i <= 55; i++) t.centre[i].bank = 0.15;
-    expect('elevation: 8.6 degrees of bank', t, all, 'elevation', 'samples 50 to 55');
+    for (let i = 50; i <= 55; i++) t.centre[i].bank = 0.35;
+    expect('elevation: 20 degrees of bank', t, all, 'elevation', 'samples 50 to 55, past the banked corners\' limit');
+  }
+  /* crossings: a track that crosses itself at grade, one whose bridge is
+     too low, and one whose bridge is not marked as a layer */
+  {
+    let seed = 1, x = null;
+    while (seed < 2000 && !x) { const t = generateTrack(seed, { kind: 'circuit', difficulty: 0.5 }); if (t.bridges.length) x = t; else seed++; }
+    ka.crossoverSeed = seed;
+    result('2 control: a generated crossover circuit is valid', !!x && validateTrack(x, all).ok, 'circuit ' + seed + (x ? ', bridge at ' + x.bridges[0].along + ' m over ' + x.bridges[0].under + ' m, ' + x.bridges[0].angle + ' degrees' : ', none found'));
+    if (x) {
+      const flat = clone(x);
+      for (const c of flat.centre) c.y = 0;
+      for (const w of flat.walls) for (const p of w.points) p.y = 0;
+      expect('crossover: the same circuit flattened, crossing itself at grade', flat, all, 'overlap', 'every height set to zero');
+      expect('crossover: the flattened circuit against the crossover check', flat, all, 'crossover', 'the passes 0 m apart in height');
+      const low = clone(x);
+      const b = low.bridges[0];
+      for (let i = 0; i < low.centre.length; i++) if (low.centre[i].y > 0) { low.centre[i].y *= 0.5; low.walls[0].points[i].y *= 0.5; low.walls[1].points[i].y *= 0.5; }
+      low.walls[0].points[low.centre.length].y = low.walls[0].points[0].y; low.walls[1].points[low.centre.length].y = low.walls[1].points[0].y;
+      expect('crossover: the bridge at half its height', low, all, 'crossover', 'the deck ' + (b.height * 0.5 + b.depth).toFixed(2) + ' m over the road beneath');
+      const unmarked = clone(x);
+      for (const c of unmarked.centre) c.layer = 0;
+      expect('crossover: the bridge not marked as a layer', unmarked, all, 'crossover', 'layer 0 everywhere');
+      const unlisted = clone(x);
+      unlisted.bridges = [];
+      expect('crossover: the bridge not listed', unlisted, all, 'crossover', 'bridges empty');
+    }
+  }
+  {
+    /* findCrossings on a course built to cross once: a straight, a 270
+       degree corner and a straight back across the first */
+    const t = trackFromElements('sprint', [{ s: 100 }, { c: { R: 30, angle: 270, lt: 0, width: 12 } }, { s: 120 }], { crossover: false });
+    const xs = findCrossings(t);
+    ka.findCrossings = xs.map(c => ({ alongI: Math.round(c.alongI), alongJ: Math.round(c.alongJ), sinAngle: +c.sinAngle.toFixed(3) }));
+    result('2 findCrossings on a course built to cross once at a right angle', xs.length === 1 && Math.abs(xs[0].sinAngle - 1) < 0.01 && Math.abs(xs[0].alongI - 70) < 3, xs.length + ' crossing' + (xs.length === 1 ? ' at ' + Math.round(xs[0].alongI) + ' and ' + Math.round(xs[0].alongJ) + ' m along, sine ' + xs[0].sinAngle.toFixed(3) + ' (expected 1 at 70 m, sine 1)' : 's'));
+    const none = trackFromElements('sprint', [{ s: 100 }, { c: { R: 30, angle: 90, lt: 0, width: 12 } }, { s: 120 }], { crossover: false });
+    known('2 findCrossings on the same course turning 90 degrees', findCrossings(none).length === 0, findCrossings(none).length + ' crossings');
   }
   {
     const t = clone(base);
@@ -435,11 +473,12 @@ function physics() {
     const good = park(t);
     const want = 1.5 - 0.92;
     const b = clone(t);
-    for (const k of [0, 1]) { const p = b.walls[k].points; p.unshift(...p.splice(p.length - 11, 10)); }
+    const half = Math.floor(t.centre.length / 2);
+    for (const k of [0, 1]) { const p = b.walls[k].points; p.unshift(...p.splice(p.length - 1 - half, half)); }
     const bad = park(b);
     out.knownAnswers.clipDistance = { clip, expected: want, aligned: good, misaligned: bad };
     result('W clipDistance at a clip wall', Math.abs(good - want) < 0.1, 'reads ' + good.toFixed(3) + ' m, expected ' + want.toFixed(2) + ' m (1.5 m less the half width)');
-    known('W the same with the barriers misaligned by ten samples', !(Math.abs(bad - want) < 0.1), 'reads ' + (Number.isFinite(bad) ? bad.toFixed(3) + ' m' : 'nothing'));
+    known('W the same with the barriers misaligned by half a lap', !(Math.abs(bad - want) < 0.1), 'reads ' + (Number.isFinite(bad) ? bad.toFixed(3) + ' m' : 'nothing'));
   }
   /* a sprint's end caps stop the car: flat out past the finish, and
      reversing from the start; without the caps it must get past */

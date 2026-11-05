@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 export const here = path.dirname(fileURLToPath(import.meta.url));
 export const root = path.resolve(here, '..', '..', '..');          // crazygames/
-export const reviewDir = path.join(root, 'review', 'tracks');
+export const reviewDir = process.env.TRACKS_REVIEW_DIR ? path.resolve(process.env.TRACKS_REVIEW_DIR) : path.join(root, 'review', 'tracks');
 
 export function findChromium() {
   if (process.env.TRACKS_CHROMIUM) return process.env.TRACKS_CHROMIUM;
