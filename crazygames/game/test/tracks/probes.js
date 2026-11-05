@@ -98,7 +98,7 @@ async function determinism() {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tracks-'));
     fs.cpSync(tracksDir, path.join(tmp, 'real'), { recursive: true });
     fs.cpSync(tracksDir, path.join(tmp, 'variant'), { recursive: true });
-    fs.writeFileSync(path.join(tmp, 'variant', 'dmath.js'), 'export const dsin = x => Math.sin(x);\nexport const dcos = x => Math.cos(x);\nexport const TWO_PI = 6.283185307179586;\nexport function wrapAngle(a) { return a - TWO_PI * Math.round(a / TWO_PI); }\n');
+    fs.writeFileSync(path.join(tmp, 'variant', 'dmath.js'), 'export const dsin = x => Math.sin(x);\nexport const dcos = x => Math.cos(x);\nexport const dasin = x => Math.asin(x);\nexport const TWO_PI = 6.283185307179586;\nexport function wrapAngle(a) { return a - TWO_PI * Math.round(a / TWO_PI); }\n');
     fs.cpSync(tracksDir, path.join(tmp, 'nudged'), { recursive: true });
     const dm = fs.readFileSync(path.join(tracksDir, 'dmath.js'), 'utf8');
     fs.writeFileSync(path.join(tmp, 'nudged', 'dmath.js'), dm.replace('export function dsin(x) {', 'export function dsin(x) { return dsinTrue(x) * (1 + 1e-6); }\nfunction dsinTrue(x) {'));
