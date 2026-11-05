@@ -5,6 +5,14 @@
    validateTrack passes it, and the probes in test/tracks/ use the same
    functions, with known answers that must fail.
 
+   Since the second generator (briefs/TRACKS-2.md) a track may cross
+   itself on a bridge: two parts of the track share the same x and z at
+   different heights. Every rule about walls being apart is therefore a
+   rule in three dimensions: barriers may cross or come close only where
+   they are at least TRACKS.CROSS.layerGap metres apart vertically, and
+   findCrossings reads the centre line's crossings so the crossover check
+   can see that each one is bridged.
+
    Deterministic like the generator: + - * /, Math.sqrt, Math.round and
    dmath.js only, because its verdicts decide which course a seed gives. */
 import { dsin, dcos, wrapAngle } from './dmath.js';
@@ -73,21 +81,123 @@ export function characterOf(track) {
   let changes = 0;
   for (let i = 1; i < corners.length; i++) if (corners[i].dir !== corners[i - 1].dir) changes++;
   if (closed && corners.length > 1 && corners[0].dir !== corners[corners.length - 1].dir) changes++;
-  let minR = Infinity, maxR = 0, hairpins = 0, wSum = 0;
+  let minR = Infinity, maxR = 0, hairpins = 0, wSum = 0, banked = 0, maxBank = 0;
   for (const c of corners) { if (c.radius < minR) minR = c.radius; if (c.radius > maxR) maxR = c.radius; if (Math.abs(c.angle) >= 130 && c.radius <= 22) hairpins++; }
   for (const c of track.centre) wSum += c.width;
+  /* every straight (a maximal run of samples gentler than STRAIGHT_RADIUS,
+     joined across a circuit's line), longest first */
+  const straights = [];
+  {
+    let run = 0, i0 = -1;
+    const m = closed ? n : n;
+    let startAt = 0;
+    if (closed) { while (startAt < n && Math.abs(k[startAt]) < K) startAt++; if (startAt === n) startAt = 0; }
+    for (let t = 0; t < m; t++) {
+      const i = (startAt + t) % n;
+      if (Math.abs(k[i]) < K) { if (run === 0) i0 = i; run++; }
+      else if (run > 0) { straights.push({ from: i0 * TRACKS.SAMPLE, length: run * TRACKS.SAMPLE }); run = 0; }
+    }
+    if (run > 0) straights.push({ from: i0 * TRACKS.SAMPLE, length: run * TRACKS.SAMPLE });
+    straights.sort((a, b) => b.length - a.length);
+  }
+  /* banked corners: a corner whose bank reaches BANKED_FROM degrees */
+  for (const c of corners) {
+    let b = 0;
+    for (let i = Math.round(c.from / TRACKS.SAMPLE); i <= Math.round(c.to / TRACKS.SAMPLE); i++) { const v = Math.abs(track.centre[((i % n) + n) % n].bank || 0); if (v > b) b = v; }
+    c.bankDeg = b / DEG;
+    if (c.bankDeg >= BANKED_FROM) banked++;
+    if (c.bankDeg > maxBank) maxBank = c.bankDeg;
+  }
+  const crossings = findCrossings(track);
+  const km = track.length / 1000;
   return {
     length: track.length,
     cornerShare: inCorner / n,
     directionChanges: changes,
+    directionChangesPerKm: changes / km,
     longestStraight: longest * TRACKS.SAMPLE,
+    secondStraight: straights.length > 1 ? straights[1].length : 0,
+    meanStraight: straights.length ? straights.reduce((a, s) => a + s.length, 0) / straights.length : 0,
+    straights: straights.length,
     corners: corners.length,
+    cornersPerKm: corners.length / km,
     hairpins,
+    banked, maxBankDeg: maxBank,
+    crossings: crossings.length,
     minRadius: minR, maxCornerRadius: maxR,
     meanWidth: wSum / n,
     clips: track.clips.length,
     cornerList: corners,
   };
+}
+const BANKED_FROM = 6;   // degrees: a corner banked this much counts as banked
+
+/* ---------------------------------------------------------- crossings */
+
+/* Where the centre line crosses itself: every pair of centre segments
+   that intersect and are not neighbours, each as { i, j, ti, tj, x, z,
+   angle (radians between the two directions, 0 to pi/2), alongI, alongJ }
+   with i < j. */
+export function findCrossings(track) {
+  const C = track.centre, n = C.length, closed = track.kind === 'circuit';
+  const m = closed ? n : n - 1;
+  const out = [];
+  if (m < 4) return out;
+  const CELL = 16;
+  let minX = Infinity, minZ = Infinity;
+  for (const c of C) { if (c.x < minX) minX = c.x; if (c.z < minZ) minZ = c.z; }
+  minX -= 1; minZ -= 1;
+  const map = new Map();
+  const key = (cx, cz) => cx * 100003 + cz;
+  const seg = i => { const a = C[i], b = C[(i + 1) % n]; return { ax: a.x, az: a.z, bx: b.x, bz: b.z }; };
+  for (let i = 0; i < m; i++) {
+    const s = seg(i);
+    const x0 = Math.floor((Math.min(s.ax, s.bx) - minX) / CELL), x1 = Math.floor((Math.max(s.ax, s.bx) - minX) / CELL);
+    const z0 = Math.floor((Math.min(s.az, s.bz) - minZ) / CELL), z1 = Math.floor((Math.max(s.az, s.bz) - minZ) / CELL);
+    for (let cx = x0; cx <= x1; cx++) for (let cz = z0; cz <= z1; cz++) { const k = key(cx, cz); let l = map.get(k); if (!l) { l = []; map.set(k, l); } l.push(i); }
+  }
+  const seen = new Set();
+  for (const list of map.values()) {
+    for (let p = 0; p < list.length; p++) for (let q = p + 1; q < list.length; q++) {
+      let i = list[p], j = list[q];
+      if (i > j) { const t = i; i = j; j = t; }
+      let sep = j - i; if (closed) sep = Math.min(sep, n - sep);
+      if (sep < 2) continue;
+      const id = i * n + j;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const a = seg(i), b = seg(j);
+      const r = segIntersect(a, b);
+      if (!r) continue;
+      const dax = a.bx - a.ax, daz = a.bz - a.az, dbx = b.bx - b.ax, dbz = b.bz - b.az;
+      const la = Math.sqrt(dax * dax + daz * daz), lb = Math.sqrt(dbx * dbx + dbz * dbz);
+      let cosang = la > 0 && lb > 0 ? Math.abs(dax * dbx + daz * dbz) / (la * lb) : 1;
+      if (cosang > 1) cosang = 1;
+      const sinang = Math.sqrt(1 - cosang * cosang);
+      out.push({ i, j, ti: r.t, tj: r.u, x: r.x, z: r.z, sinAngle: sinang, cosAngle: cosang, alongI: (i + r.t) * TRACKS.SAMPLE, alongJ: (j + r.u) * TRACKS.SAMPLE });
+    }
+  }
+  out.sort((a, b) => a.i - b.i || a.j - b.j);
+  return out;
+}
+
+/* Proper intersection of two segments, with the parameters along each. */
+function segIntersect(a, b) {
+  const rx = a.bx - a.ax, rz = a.bz - a.az, sx = b.bx - b.ax, sz = b.bz - b.az;
+  const den = rx * sz - rz * sx;
+  if (Math.abs(den) < 1e-12) return null;
+  const qx = b.ax - a.ax, qz = b.az - a.az;
+  const t = (qx * sz - qz * sx) / den, u = (qx * rz - qz * rx) / den;
+  if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+  return { t, u, x: a.ax + rx * t, z: a.az + rz * t };
+}
+
+/* The height of a wall segment at the point nearest (px, pz). */
+function segY(s, px, pz) {
+  const dx = s.bx - s.ax, dz = s.bz - s.az, l2 = dx * dx + dz * dz;
+  let t = l2 > 0 ? ((px - s.ax) * dx + (pz - s.az) * dz) / l2 : 0;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  return s.ay + (s.by - s.ay) * t;
 }
 
 /* An estimate, 0 easy to 1 hard, from how tight, how narrow and how busy
@@ -125,6 +235,7 @@ function segsCross(a, b) {
   if (o4 === 0 && onSeg(b.ax, b.az, b.bx, b.bz, a.bx, a.bz)) return true;
   return false;
 }
+const wrapAlong = (d, track) => { if (track.kind !== 'circuit') return d; const L = track.length; d = ((d % L) + L) % L; return d > L / 2 ? d - L : d; };
 const sameP = (x1, z1, x2, z2) => Math.abs(x1 - x2) < 1e-6 && Math.abs(z1 - z2) < 1e-6;
 
 /* Every wall segment, with its wall, index and arc position, in a grid. */
@@ -135,7 +246,7 @@ function segmentGrid(track) {
     let cum = 0;
     for (let i = 0; i + 1 < p.length; i++) {
       const dx = p[i + 1].x - p[i].x, dz = p[i + 1].z - p[i].z, len = Math.sqrt(dx * dx + dz * dz);
-      segs.push({ ax: p[i].x, az: p[i].z, bx: p[i + 1].x, bz: p[i + 1].z, wall: wi, i, cap: !!w.cap, side: w.side, arc0: cum, arc1: cum + len, total: 0 });
+      segs.push({ ax: p[i].x, az: p[i].z, bx: p[i + 1].x, bz: p[i + 1].z, ay: p[i].y || 0, by: p[i + 1].y || 0, wall: wi, i, cap: !!w.cap, side: w.side, arc0: cum, arc1: cum + len, total: 0 });
       cum += len;
     }
     for (const s of segs) if (s.wall === wi) s.total = cum;
@@ -219,15 +330,20 @@ export function validateTrack(track, target) {
   const { segs } = grid;
 
   /* no self-overlap: no two wall segments cross, and the barriers of two
-     different parts of the track keep GAP apart */
+     different parts of the track keep GAP apart, unless the two are at
+     least layerGap apart vertically (one on a bridge over the other) */
+  const LAYER = T.CROSS.layerGap;
   {
-    let crossings = 0, worstGap = Infinity, gapBreaks = 0;
+    let crossings = 0, worstGap = Infinity, gapBreaks = 0, bridged = 0, leastLayerGap = Infinity;
     segs.forEach((a, ai) => {
       const r = Math.max(Math.abs(a.bx - a.ax), Math.abs(a.bz - a.az));
       grid.near((a.ax + a.bx) / 2, (a.az + a.bz) / 2, r, (b, bi) => {
         if (bi <= ai) return;
         if (sameP(a.ax, a.az, b.ax, b.az) || sameP(a.ax, a.az, b.bx, b.bz) || sameP(a.bx, a.bz, b.ax, b.az) || sameP(a.bx, a.bz, b.bx, b.bz)) return;
-        if (segsCross(a, b)) crossings++;
+        if (!segsCross(a, b)) return;
+        const r2 = segIntersect(a, b);
+        const dy = r2 ? Math.abs((a.ay + (a.by - a.ay) * r2.t) - (b.ay + (b.by - b.ay) * r2.u)) : 0;
+        if (dy >= LAYER) { bridged++; if (dy < leastLayerGap) leastLayerGap = dy; } else crossings++;
       });
     });
     for (let wi = 0; wi < 2 && wi < track.walls.length; wi++) {
@@ -245,12 +361,16 @@ export function validateTrack(track, target) {
             if (sep <= 3 * T.GAP) return;
           }
           const d = segDist(p[i].x, p[i].z, s.ax, s.az, s.bx, s.bz);
+          if (d < T.GAP) {
+            const dy = Math.abs((p[i].y || 0) - segY(s, p[i].x, p[i].z));
+            if (dy >= LAYER) { if (dy < leastLayerGap) leastLayerGap = dy; return; }
+          }
           if (d < worstGap) worstGap = d;
           if (d < T.GAP) gapBreaks++;
         });
       }
     }
-    put('overlap', crossings === 0 && gapBreaks === 0, { crossings, gapBreaks, closestOtherBarrier: worstGap });
+    put('overlap', crossings === 0 && gapBreaks === 0, { crossings, gapBreaks, closestOtherBarrier: worstGap, bridgedCrossings: bridged, leastLayerGap });
   }
 
   /* no wall closer than the drivable width: from every centre sample, no
@@ -260,7 +380,7 @@ export function validateTrack(track, target) {
     for (let i = 0; i < n; i++) {
       const c = C[i], hw = c.width / 2;
       let best = Infinity;
-      grid.near(c.x, c.z, hw + 0.5, s => { if (s.cap) return; const d = segDist(c.x, c.z, s.ax, s.az, s.bx, s.bz); if (d < best) best = d; });
+      grid.near(c.x, c.z, hw + 0.5, s => { if (s.cap) return; if (Math.abs((c.y || 0) - segY(s, c.x, c.z)) >= LAYER) return; const d = segDist(c.x, c.z, s.ax, s.az, s.bx, s.bz); if (d < best) best = d; });
       const margin = (best === Infinity ? hw + 0.5 : best) - hw;
       if (margin < worst) { worst = margin; at = i * T.SAMPLE; }
       if (margin < -0.1) breaks++;
@@ -278,7 +398,31 @@ export function validateTrack(track, target) {
       if (Math.abs(C[i].bank) > bank) bank = Math.abs(C[i].bank);
     }
     const lift = T.TOP_SPEED * T.TOP_SPEED * crest / G;
-    put('elevation', grade <= T.GRADE_MAX && crest <= T.CREST_K_MAX && bank <= T.BANK_MAX * DEG + 1e-6, { maxGrade: grade, maxCrestCurvature: crest, liftAtTopSpeed: lift, maxBankDeg: bank / DEG });
+    /* the limits are the bridge ramps' (steeper and sharper than the
+       rise and fall between corners, which aims below them) and the
+       banked corners' */
+    put('elevation', grade <= T.CROSS.grade + 1e-3 && crest <= T.CROSS.crest + 1e-4 && bank <= T.BANK_CORNER_MAX * DEG + 1e-6, { maxGrade: grade, maxCrestCurvature: crest, liftAtTopSpeed: lift, maxBankDeg: bank / DEG });
+  }
+
+  /* crossovers: wherever the centre line crosses itself the two passes
+     are a bridge's clearance apart in height, the upper one is marked as
+     the bridge layer and the lower is not, and the track lists it */
+  {
+    const xs = findCrossings(track);
+    const problems = [];
+    let least = Infinity;
+    for (const x of xs) {
+      const yi = C[x.i].y + (C[(x.i + 1) % n].y - C[x.i].y) * x.ti, yj = C[x.j].y + (C[(x.j + 1) % n].y - C[x.j].y) * x.tj;
+      const dy = Math.abs(yi - yj);
+      if (dy < least) least = dy;
+      if (dy < T.CROSS.clearance - 0.05) problems.push('crossing at ' + Math.round(x.alongI) + ' and ' + Math.round(x.alongJ) + ' m is ' + dy.toFixed(2) + ' m apart in height');
+      const upper = yi > yj ? x.i : x.j, lower = yi > yj ? x.j : x.i;
+      if ((C[upper].layer || 0) !== 1 || (C[(upper + 1) % n].layer || 0) !== 1) problems.push('the upper pass at ' + Math.round(x.alongI) + ' m is not on the bridge layer');
+      if ((C[lower].layer || 0) !== 0) problems.push('the lower pass at ' + Math.round(x.alongJ) + ' m is on the bridge layer');
+      const listed = (track.bridges || []).some(b => Math.abs(wrapAlong(b.along - (upper === x.i ? x.alongI : x.alongJ), track)) <= 2 * T.SAMPLE);
+      if (!listed) problems.push('crossing at ' + Math.round(x.alongI) + ' m is not listed in bridges');
+    }
+    put('crossover', problems.length === 0, { crossings: xs.length, leastHeightApart: least, problems });
   }
 
   /* the contract world.js and the scene rely on */
