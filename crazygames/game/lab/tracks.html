@@ -52,6 +52,8 @@ import * as THREE from 'three';
 import { generateTrack, dailySeed } from '../src/tracks/generate.js';
 import { characterOf, validateTrack } from '../src/tracks/analyse.js';
 import { buildTrackMesh, LOOK } from '../src/tracks/mesh.js';
+import { createWorld } from '../src/physics/world.js';
+import { createCar } from '../src/cars/index.js';
 
 const $ = id => document.getElementById(id);
 const query = new URLSearchParams(location.search);
@@ -99,10 +101,14 @@ function show() {
   const ch = characterOf(track);
   const v = validateTrack(track, track.target);
   const today = state.seed === dailySeed(new Date()) ? ' (today)' : '';
+  const bridge = track.bridges && track.bridges[0];
   $('stats').innerHTML =
     `<b>${track.kind} ${track.seed}${today}</b> &nbsp; ${track.length} m &nbsp; ${ch.corners} corners, ${ch.hairpins} hairpins, ${ch.directionChanges} direction changes &nbsp; ` +
     `${Math.round(ch.cornerShare * 100)}% in corners &nbsp; longest straight ${ch.longestStraight} m &nbsp; tightest ${ch.minRadius.toFixed(1)} m &nbsp; ` +
-    `width ${ch.meanWidth.toFixed(1)} m &nbsp; ${track.clips.length} clips &nbsp; difficulty ${track.difficulty.toFixed(2)} (asked ${state.difficulty.toFixed(2)}) &nbsp; ` +
+    `width ${ch.meanWidth.toFixed(1)} m &nbsp; ${track.clips.length} clips &nbsp; ` +
+    `<b>${ch.banked}</b> banked corner${ch.banked === 1 ? '' : 's'}${ch.banked ? ' (up to ' + ch.maxBankDeg.toFixed(0) + ' degrees)' : ''} &nbsp; ` +
+    (bridge ? `<b>crossover</b> at ${Math.round(bridge.along)} m over ${Math.round(bridge.under)} m, ${bridge.angle} degrees, ${(bridge.height + bridge.depth).toFixed(1)} m clear &nbsp; ` : 'no crossover &nbsp; ') +
+    `difficulty ${track.difficulty.toFixed(2)} (asked ${state.difficulty.toFixed(2)}) &nbsp; ` +
     `${track.attempts} attempt${track.attempts > 1 ? 's' : ''}, ${ms.toFixed(0)} ms &nbsp; ` +
     (v.ok ? '<span class="ok">valid</span>' : '<span class="bad">INVALID: ' + v.failed.join(', ') + '</span>') + (track.fallback ? ' <span class="bad">fallback</span>' : '');
   syncControls();
@@ -140,14 +146,16 @@ function drawPlan() {
       g.beginPath(); g.moveTo(...a); g.lineTo(...bq); g.lineTo(...p1); g.lineTo(...p0); g.closePath(); g.fill();
     }
   }
-  // the road
-  g.fillStyle = hex(LOOK.ROAD); g.strokeStyle = hex(LOOK.ROAD); g.lineWidth = 1;
+  // the road; the lower pass first so a bridge draws over the road beneath
   const m = closed ? n : n - 1;
-  for (let i = 0; i < m; i++) {
+  const roadQuad = (i, hexFill) => {
     const c0 = C[i], c1 = C[(i + 1) % n];
     const a = side(c0, c0.width / 2), bq = side(c1, c1.width / 2), cq = side(c1, -c1.width / 2), d = side(c0, -c0.width / 2);
+    g.fillStyle = hexFill; g.strokeStyle = hexFill; g.lineWidth = 1;
     g.beginPath(); g.moveTo(...a); g.lineTo(...bq); g.lineTo(...cq); g.lineTo(...d); g.closePath(); g.fill(); g.stroke();
-  }
+  };
+  for (let i = 0; i < m; i++) if (C[i].layer !== 1) roadQuad(i, C[i].part === 'cut' ? '#33343b' : hex(LOOK.ROAD));
+  for (let i = 0; i < m; i++) if (C[i].layer === 1) roadQuad(i, C[i].part === 'deck' ? hex(LOOK.BRIDGE) : '#45474f');
   // the edges
   g.strokeStyle = hex(LOOK.EDGE); g.lineWidth = Math.max(1, 0.9 * sc);
   for (const sgn of [1, -1]) { g.beginPath(); for (let i = 0; i < n; i++) { const p = side(C[i], sgn * C[i].width / 2); i ? g.lineTo(...p) : g.moveTo(...p); } if (closed) g.closePath(); g.stroke(); }
@@ -176,21 +184,31 @@ function drawPlan() {
   g.strokeStyle = '#19d8ff'; g.fillStyle = '#19d8ff'; g.lineWidth = 3;
   g.beginPath(); g.moveTo(...a); g.lineTo(...bq); g.stroke();
   g.beginPath(); g.arc(a[0], a[1], 4, 0, Math.PI * 2); g.fill();
-  // corner labels: the radius at each apex
-  g.font = '10px system-ui, sans-serif'; g.fillStyle = 'rgba(238,241,247,0.8)'; g.textAlign = 'center';
+  // corner labels: the radius at each apex, and the bank where a corner is banked
+  g.font = '10px system-ui, sans-serif'; g.textAlign = 'center';
   for (const c of track.corners) {
     const q = C[Math.min(n - 1, Math.round(c.apex / 2))];
     const out = c.dir === 'left' ? -1 : 1;
     const p = side(q, out * (q.width / 2 + 10));
-    g.fillText(Math.round(c.radius) + ' m', p[0], p[1] + 3);
+    g.fillStyle = c.bank > 0 ? '#ffd27a' : 'rgba(238,241,247,0.8)';
+    g.fillText(Math.round(c.radius) + (c.radiusEnd && Math.abs(c.radiusEnd - c.radius) > 1 ? ' to ' + Math.round(c.radiusEnd) : '') + ' m' + (c.bank > 0 ? ', ' + Math.round(c.bank) + '\u00b0' : ''), p[0], p[1] + 3);
+  }
+  // the bridge: its deck outlined
+  for (const b of track.bridges || []) {
+    const i0 = Math.round(b.deck[0] / 2), i1 = Math.round(b.deck[1] / 2);
+    g.strokeStyle = '#ffffff'; g.lineWidth = 1.5; g.setLineDash([4, 3]);
+    g.beginPath();
+    for (let i = i0; i <= i1; i++) { const c = C[((i % n) + n) % n], p = side(c, c.width / 2 + 1.5); i === i0 ? g.moveTo(...p) : g.lineTo(...p); }
+    for (let i = i1; i >= i0; i--) { const c = C[((i % n) + n) % n], p = side(c, -c.width / 2 - 1.5); g.lineTo(...p); }
+    g.closePath(); g.stroke(); g.setLineDash([]);
   }
 }
 
 /* ---- in 3D ---- */
 const threeC = $('threeC');
-let renderer = null, scene, camera, trackGroup = null, groundPlane = null, dirty = true;
+let renderer = null, scene, camera, trackGroup = null, groundPlane = null, dirty = true, car = null, world = null;
 const orbit = { yaw: 0.6, pitch: 0.75, dist: 400, target: new THREE.Vector3(), auto: true };
-const ride = { s: 0, speed: 22 };
+const ride = { s: 0, speed: 22, ahead: 9 };   // the car rides this far ahead of the camera
 async function init3d() {
   renderer = new THREE.WebGPURenderer({ canvas: threeC, antialias: true, forceWebGL: query.get('renderer') === 'webgl2' });
   await renderer.init();
@@ -201,6 +219,11 @@ async function init3d() {
   camera = new THREE.PerspectiveCamera(55, 1, 0.5, 4000);
   scene.add(new THREE.HemisphereLight(0x9ca6ff, 0x2b2418, 2.4));
   const sun = new THREE.DirectionalLight(0xfff0dd, 3.6); sun.position.set(-0.5, 0.8, 0.3); scene.add(sun);
+  /* the starter car, shown on the ride, tilted with the road by the
+     physics world's reading of the road under it */
+  car = createCar(THREE, 'starter', {});
+  car.group.visible = false;
+  scene.add(car.group);
 }
 function setTrack3d() {
   if (!renderer) return;
@@ -209,10 +232,14 @@ function setTrack3d() {
   trackGroup = buildTrackMesh(track, THREE);
   scene.add(trackGroup);
   const b = track.bounds;
-  groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(b.maxX - b.minX + 800, b.maxZ - b.minZ + 800), new THREE.MeshLambertMaterial({ color: 0x24252b }));
+  /* drawn first and without writing depth, so the road in a cutting beneath a bridge shows through it */
+  groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(b.maxX - b.minX + 800, b.maxZ - b.minZ + 800), new THREE.MeshLambertMaterial({ color: 0x24252b, depthWrite: false }));
   groundPlane.rotation.x = -Math.PI / 2;
-  groundPlane.position.set((b.minX + b.maxX) / 2, b.minY - 0.05, (b.minZ + b.maxZ) / 2);
+  groundPlane.renderOrder = -1;
+  /* a crossover track's embankments and cuttings meet the ground at 0; a rolling track sits on its lowest point */
+  groundPlane.position.set((b.minX + b.maxX) / 2, track.bridges && track.bridges.length ? -0.05 : b.minY - 0.05, (b.minZ + b.maxZ) / 2);
   scene.add(groundPlane);
+  world = createWorld(track);
   orbit.target.set((b.minX + b.maxX) / 2, 0, (b.minZ + b.maxZ) / 2);
   orbit.dist = Math.max(b.maxX - b.minX, b.maxZ - b.minZ) * 0.95;
   ride.s = track.start.along;
@@ -233,7 +260,17 @@ function place3d(dt) {
     const p = sampleAt(ride.s - 9), q = sampleAt(ride.s + 14);
     camera.position.set(p.x, p.y + 4.2, p.z);
     camera.lookAt(q.x, q.y + 0.8, q.z);
+    /* the car on the centre line ahead: the world places it on the road's
+       height and reads its roll and pitch there, as the game's world does */
+    const i = Math.round(((ride.s % track.length) + track.length) % track.length / 2) % track.centre.length;
+    const c = track.centre[i];
+    world.car.x = c.x; world.car.z = c.z; world.car.yaw = c.heading; world.car.y = c.y;
+    world.locate(true);
+    car.group.position.set(c.x, world.car.y, c.z);
+    car.group.rotation.set(world.car.pitch, c.heading, world.car.roll, 'YXZ');
+    car.group.visible = true;
   } else {
+    car.group.visible = false;
     if (orbit.auto) orbit.yaw += dt * 0.12;
     const t = orbit.target, cp = Math.cos(orbit.pitch);
     camera.position.set(t.x + Math.sin(orbit.yaw) * cp * orbit.dist, t.y + Math.sin(orbit.pitch) * orbit.dist, t.z + Math.cos(orbit.yaw) * cp * orbit.dist);
@@ -268,7 +305,14 @@ window.__lab = {
   ready: false, track: null, valid: null,
   show(opts) { Object.assign(state, opts || {}); show(); },
   /* draw a frame now, for screenshots: orbit at a fixed angle, or ride at s */
-  frame(opts) { const o = opts || {}; if (o.mode) state.mode = o.mode; orbit.auto = false; if (o.yaw !== undefined) orbit.yaw = o.yaw; if (o.pitch !== undefined) orbit.pitch = o.pitch; if (o.s !== undefined) ride.s = o.s; place3d(0); renderer.render(scene, camera); syncControls(); },
+  frame(opts) {
+    const o = opts || {};
+    if (o.mode) state.mode = o.mode; orbit.auto = false;
+    if (o.yaw !== undefined) orbit.yaw = o.yaw; if (o.pitch !== undefined) orbit.pitch = o.pitch; if (o.dist !== undefined) orbit.dist = o.dist;
+    if (o.at !== undefined) { const c = sampleAt(o.at); orbit.target.set(c.x, c.y, c.z); }
+    if (o.s !== undefined) ride.s = o.s;
+    place3d(0); renderer.render(scene, camera); syncControls();
+  },
 };
 show();
 init3d().then(() => { setTrack3d(); requestAnimationFrame(loop); window.__lab.ready = true; }).catch(e => {
