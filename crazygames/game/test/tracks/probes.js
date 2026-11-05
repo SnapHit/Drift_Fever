@@ -453,10 +453,13 @@ function physics() {
     const t = generateTrack(1, { kind: 'circuit', difficulty: 0 });
     const clean = drive(t, 300);
     const b = clone(t);
-    for (let i = 60; i <= 75; i++) { const c = b.centre[i], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); b.walls[1].points[i] = { x: c.x - lx * 0.3, y: c.y, z: c.z - lz * 0.3 }; }
+    /* the barrier moved 2 m past the centre line, which no line through
+       the corner misses (0.3 m short of the centre, as this was, a car
+       running 0.9 m left of the centre slipped past) */
+    for (let i = 60; i <= 75; i++) { const c = b.centre[i], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); b.walls[1].points[i] = { x: c.x + lx * 2, y: c.y, z: c.z + lz * 2 }; }
     const broken = drive(b, 300);
     out.knownAnswers.wallIntoRoad = { clean: { hits: clean.hits, respawns: clean.respawns }, broken: { hits: broken.hits, respawns: broken.respawns, hardHits: broken.hardHits } };
-    known('W a right barrier moved to 0.3 m right of the centre line for 30 m', broken.hits + broken.respawns > clean.hits + clean.respawns, 'touches ' + clean.hits + ' before, ' + broken.hits + ' after (' + broken.hardHits + ' hard), respawns ' + broken.respawns);
+    known('W a right barrier moved to 2 m left of the centre line for 30 m', broken.hits + broken.respawns > clean.hits + clean.respawns, 'touches ' + clean.hits + ' before, ' + broken.hits + ' after (' + broken.hardHits + ' hard), respawns ' + broken.respawns);
   }
   /* clipDistance: a car parked 1.5 m in from a clip wall reads the gap to it */
   {
