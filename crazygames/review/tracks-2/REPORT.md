@@ -307,10 +307,11 @@ every difficulty.
 
 **The feel probes** (`feel-probes.log`, headless Chromium, the test
 track and the car park, which are flat): all passed; replay bit
-identical over 1,100 steps, one step per 120 Hz frame the same hash,
-the driver laps clean, the drift script holds hairpin 2 for 2.35 s, the
-car on screen in every frame at both viewports, JavaScript p95 at 6x
-throttle 3.6 ms, and the four known answers caught. **The Node handling
+identical over 2,998 steps, one step per 120 Hz frame the same hash,
+the driver laps clean in 49.3 s, the drift script holds hairpin 2 for
+2.35 s at 43 degrees, the car on screen in every frame at both
+viewports, JavaScript p95 at 6x throttle 0.2 ms (worst 23.5), and the
+six known answers caught. **The Node handling
 probe** (`handling.log`) is byte identical to the same run on `main`.
 **The corner wall probe** (`corners.log`, 80 generated tracks at
 elevation 0, the scripted driver drifting every corner): 80 finished,
