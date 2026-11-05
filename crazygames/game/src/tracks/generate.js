@@ -409,7 +409,7 @@ function planEight(rng, d, goal, target) {
   const last = els[els.length - 1];
   last.min = Math.max(last.min, T.CLOSE_STRAIGHT); last.s = Math.max(last.s, T.CLOSE_STRAIGHT);
   /* level with the start, half the lap: z and length, not x */
-  if (!closePosition(els, { min: target.min / 2, max: target.max / 2 }, [false, true, true, true])) return null;
+  if (!closePosition(els, { min: target.min / 2, max: target.max / 2 }, [false, true, true, true], goal / 2)) return null;
   const mirror = els.map(e => e.s !== undefined ? { s: e.s, adj: e.adj, min: e.min } : { c: Object.assign({}, e.c, { a: -e.c.a }) });
   return { els: els.concat(mirror), sgn, eight: true };
 }
@@ -549,7 +549,7 @@ function integrate(pieces) {
    re-integrates. A degree of angle is costed as CLOSE_ANGLE metres of
    straight. Converges whenever a closure inside the bounds exists; a
    plan with none fails here. */
-function closePosition(els, target, rowsOn) {
+function closePosition(els, target, rowsOn, drawnGoal) {
   const T = TRACKS;
   const on = rowsOn || [true, true, true, true];
   const aScale = T.CLOSE_ANGLE / DEG;   // m per radian
@@ -600,8 +600,10 @@ function closePosition(els, target, rowsOn) {
   };
   const residual = (g) => { const r = g.slice(); for (const v of vars) for (let a = 0; a < 4; a++) r[a] -= v.x * v.j[a]; for (let a = 0; a < 4; a++) if (!on[a]) r[a] = 0; return r; };
   let end = rows();
-  /* the length to make: the nearest inside the target, a little in from its edges */
-  const goal = clamp(end.s, target.min + 4, Math.max(target.min + 4, target.max - 4));
+  /* the length to make: the lap as drawn if it is inside the target, the
+     goal the attempt drew if the lap is short of it (the usual case: the
+     plan leaves room to grow), else a little inside the top */
+  const goal = end.s < target.min ? clamp(drawnGoal || target.min + 4, target.min + 4, Math.max(target.min + 4, target.max - 4)) : clamp(end.s, target.min + 4, Math.max(target.min + 4, target.max - 4));
   const gapOf = () => { const g = [-end.x, -end.z, 0, goal - end.s]; for (let a = 0; a < 4; a++) if (!on[a]) g[a] = 0; return g; };
   for (let round = 0; round < 8; round++) {
     const g = gapOf();
@@ -1093,7 +1095,7 @@ export function generateTrack(seed, options) {
     const eight = eights && goal >= TRACKS.CROSS.minLap && rng() < lerp(TRACKS.CROSS.chance[0], TRACKS.CROSS.chance[1], d);
     const plan = kind === 'sprint' ? planSprint(rng, d, goal) : eight ? planEight(rng, d, goal, target) : planCircuit(rng, d, goal);
     if (!plan) { failures.turning = (failures.turning || 0) + 1; continue; }
-    if (kind === 'circuit' && !closePosition(plan.els, target)) { failures.closure = (failures.closure || 0) + 1; continue; }
+    if (kind === 'circuit' && !closePosition(plan.els, target, null, goal)) { failures.closure = (failures.closure || 0) + 1; continue; }
     /* the length (after closure on a circuit), before the cost of a build */
     {
       const total = planLength(plan.els);
