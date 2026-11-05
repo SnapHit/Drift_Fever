@@ -168,7 +168,11 @@ export function stepVehicle(s, input, dt) {
   let loadR = m * g * a / L + m * s.axF * V.CG_HEIGHT / L;
   if (loadF < minLoad) loadF = minLoad;
   if (loadR < minLoad) loadR = minLoad;
-  loadF *= nScale; loadR *= nScale;
+  /* in a drift the controller owns the speed, and the extra load a bank
+     presses the car into the road with would only scrub it off (measured:
+     a held drift on a 12 degree bank settled at 50 km/h against 86 flat),
+     so the load only changes on grip; the pull across the road stays */
+  if (!s.drifting) { loadF *= nScale; loadR *= nScale; }
   s.loadF = loadF; s.loadR = loadR;
 
   /* ---- longitudinal demands ---- */

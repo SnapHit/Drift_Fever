@@ -71,7 +71,7 @@ export function createWorld(ground, opts) {
     along: 0, lateral: 0, centreIndex: 0,   // where the car is along the track, and how far left of the centre
     layer: 0,                               // the layer of the car's sample: 1 on a bridge and its ramps
     surface: { y: 0, bank: 0, grade: 0, roll: 0, pitch: 0 },   // the road under the car: height, roll, slope along, and the body's tilt
-    hit: null,                              // this step's hit, if any: { speed, hard, kind, x, z }
+    hit: null,                              // this step's hit, if any: { speed, hard, kind, x, z, wy (the wall's height there) }
     respawned: false, recovered: false, stuckT: 0, lastTouch: -1, wallNx: 0, wallNz: 0, touching: false, hits: 0, hardHits: 0, conesKnocked: 0, nearest: Infinity, nearestClip: null,
     stepWorld, reset, hash, locate, clipDistance,
   };
@@ -193,7 +193,7 @@ export function createWorld(ground, opts) {
           car.x += s.nx * depth; car.z += s.nz * depth;
           const removed = applyImpact(car, px, pz, s.nx, s.nz, WALL_RESTITUTION, WALL_FRICTION);
           any = true; contact = true; world.wallNx = s.nx; world.wallNz = s.nz;
-          if (removed > 0 && (!worst || removed > worst.speed)) worst = { speed: removed, kind: s.kind, nx: s.nx, nz: s.nz, x: px, z: pz, hard: removed >= S.HARD_HIT };
+          if (removed > 0 && (!worst || removed > worst.speed)) worst = { speed: removed, kind: s.kind, nx: s.nx, nz: s.nz, x: px, z: pz, wy, hard: removed >= S.HARD_HIT };
           bodyPoints(car, pts);
         }
       }
