@@ -15,7 +15,9 @@
 import { makeRng } from './rng.js';
 
 /* Footprint radius and height per kind at scale 1, for placing and for
-   the sight line probe. props.js builds them to these sizes. */
+   the sight line probe; rectangular things also give their box (width
+   across x, depth along z, before the instance turns) so the probe can
+   test the real shape. props.js builds them to these sizes. */
 export const PROP_DIMS = {
   pine:       { r: 1.7,  h: 9.0 },
   tree:       { r: 2.4,  h: 6.5 },
@@ -25,20 +27,20 @@ export const PROP_DIMS = {
   rock:       { r: 1.1,  h: 1.2 },
   boulder:    { r: 2.6,  h: 2.8 },
   mesa:       { r: 17,   h: 15 },
-  container:  { r: 3.3,  h: 2.6 },
-  warehouse:  { r: 14,   h: 8.5 },
-  crane:      { r: 14,   h: 24 },
+  container:  { r: 3.3,  h: 2.6,  box: [2.5, 6.2] },
+  warehouse:  { r: 14,   h: 8.5,  box: [25, 15] },
+  crane:      { r: 18,   h: 24,   box: [12, 36] },
   lamp:       { r: 0.4,  h: 8.5 },
   tyrestack:  { r: 0.7,  h: 1.0 },
   bollard:    { r: 0.3,  h: 0.9 },
-  house:      { r: 5.2,  h: 6.0 },
-  barn:       { r: 7.5,  h: 8.0 },
-  cabin:      { r: 4.0,  h: 4.5 },
+  house:      { r: 5.6,  h: 6.0,  box: [8.8, 6.8] },
+  barn:       { r: 7.9,  h: 8.0,  box: [13, 8.8] },
+  cabin:      { r: 4.5,  h: 4.5,  box: [6.8, 5.8] },
   haybale:    { r: 0.9,  h: 1.6 },
-  grandstand: { r: 9.5,  h: 7.0 },
+  grandstand: { r: 10.5, h: 7.0,  box: [19, 8.5] },
   tower:      { r: 1.4,  h: 15.5 },
   flag:       { r: 0.8,  h: 5.2 },
-  board:      { r: 3.2,  h: 3.2 },
+  board:      { r: 3.2,  h: 3.2,  box: [6.4, 0.5] },
 };
 
 export const SCENERY = {
@@ -227,6 +229,15 @@ export function placeScenery(track, theme, terrain, options) {
 /* Every instance as a flat list with its footprint and height, for the probe. */
 export function flatten(placed) {
   const list = [];
-  for (const kind of Object.keys(placed)) for (const i of placed[kind]) { const d = PROP_DIMS[kind] || { r: 1, h: 1 }; list.push({ kind, x: i.x, y: i.y, z: i.z, r: d.r * (i.s || 1), h: d.h * (i.s || 1) }); }
+  for (const kind of Object.keys(placed)) for (const i of placed[kind]) { const d = PROP_DIMS[kind] || { r: 1, h: 1 }; list.push({ kind, x: i.x, y: i.y, z: i.z, ry: i.ry || 0, s: i.s || 1, r: d.r * (i.s || 1), h: d.h * (i.s || 1), box: d.box ? [d.box[0] * (i.s || 1), d.box[1] * (i.s || 1)] : null }); }
   return list;
+}
+/* The points of an instance's footprint to test against the road: the
+   centre and, for a box, its four corners. */
+export function footprintPoints(it) {
+  if (!it.box) return [{ x: it.x, z: it.z, r: it.r }];
+  const c = Math.cos(it.ry), s = Math.sin(it.ry), hw = it.box[0] / 2, hd = it.box[1] / 2;
+  const pts = [{ x: it.x, z: it.z, r: 0 }];
+  for (const [a, b] of [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]]) pts.push({ x: it.x + a * c + b * s, z: it.z - a * s + b * c, r: 0 });
+  return pts;
 }

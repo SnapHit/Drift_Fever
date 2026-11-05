@@ -97,6 +97,33 @@ export function exactEdgeDistance(track, field, x, z) {
   return best;
 }
 
+/* Distance from a point to the barrier line itself, from the wall
+   polylines: positive outside the barrier, negative inside. The nearest
+   centre sample gives the side and the lateral offset; the wall's
+   offset there is read from its own points, so a barrier with no
+   run-off and one stepped out both measure true. For the car park, the
+   distance outside its slab. */
+export function wallClearance(track, field, x, z) {
+  const C = track.centre, n = C.length;
+  if (!n) return field.edge(x, z);
+  const i0 = field.nearest(x, z);
+  let best = Infinity, bi = i0;
+  for (let k = -8; k <= 8; k++) { const i = ((i0 + k) % n + n) % n; const d = (C[i].x - x) ** 2 + (C[i].z - z) ** 2; if (d < best) { best = d; bi = i; } }
+  const c = C[bi], lx = -Math.cos(c.heading), lz = Math.sin(c.heading);
+  const u = (x - c.x) * lx + (z - c.z) * lz;
+  const side = u >= 0 ? 'left' : 'right';
+  const w = track.walls && track.walls.find(q => q.side === side && !q.cap);
+  let off = c.width / 2;
+  if (w && w.points[bi]) { const p = w.points[bi]; off = Math.abs((p.x - c.x) * lx + (p.z - c.z) * lz); }
+  let clear = Math.abs(u) - off;
+  if (track.kind !== 'circuit' && (bi === 0 || bi === n - 1)) {
+    // past a sprint's end: the end cap closes it a metre beyond the last sample
+    const a = (x - c.x) * -Math.sin(c.heading) + (z - c.z) * -Math.cos(c.heading);
+    if ((bi === 0 && a < -1) || (bi === n - 1 && a > 1)) clear = Math.max(clear, Math.abs(a) - 1);
+  }
+  return clear;
+}
+
 export function buildTerrain(track, theme, options) {
   const o = options || {};
   const cell = o.cell || 8;
@@ -193,5 +220,6 @@ export function buildTerrain(track, theme, options) {
     extent, cell, cols, rows, positions, colours, indices, triangles: (cols - 1) * (rows - 1) * 2,
     heightAt, edgeDistance, nearestSample: field.nearest, field, sea, centre, minY, maxY,
     exactEdge: (x, z) => exactEdgeDistance(track, field, x, z),
+    wallClearance: (x, z) => wallClearance(track, field, x, z),
   };
 }

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en-au">
+<head>
+<meta charset="utf-8">
+<title>Drift Fever: scenery lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1a1d33">
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: dark; --cyan: #19d8ff; --edge: #f6e7a1; }
+  html, body { margin: 0; height: 100%; background: #1a1d33; color: #eef1f7; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 14px; overflow: hidden; }
+  #bar { position: fixed; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: max(8px, env(safe-area-inset-top)) 10px 6px; background: rgba(18, 20, 42, 0.85); z-index: 2; }
+  #bar .group { display: flex; gap: 4px; align-items: center; }
+  button, select, input { font: inherit; color: #fff; background: #262a48; border: 1px solid #3b4170; border-radius: 8px; padding: 6px 10px; min-height: 34px; }
+  button.on { background: var(--cyan); color: #06222b; border-color: var(--cyan); font-weight: 700; }
+  input[type=number] { width: 7.5em; }
+  label { opacity: 0.8; font-size: 12px; }
+  #world { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #stats { position: fixed; left: 0; right: 0; bottom: 0; padding: 6px 12px; font-size: 12px; line-height: 1.5; background: rgba(18, 20, 42, 0.85); font-variant-numeric: tabular-nums; z-index: 2; }
+  #stats b { color: var(--cyan); font-weight: 700; }
+  #fail { position: fixed; left: 16px; right: 16px; top: 40%; text-align: center; color: #ff8a8a; }
+</style>
+<script type="importmap">{ "imports": { "three": "../vendor/three.webgpu.min.js" } }</script>
+</head>
+<body>
+<div id="bar">
+  <div class="group"><label for="theme">theme</label><select id="theme"></select></div>
+  <div class="group"><label for="preset">preset</label><select id="preset"></select></div>
+  <div class="group"><label for="tier">tier</label><select id="tier"><option value="low">low</option><option value="high">high</option></select></div>
+  <div class="group"><button id="kCircuit" class="on">Circuit</button><button id="kSprint">Sprint</button></div>
+  <div class="group"><button id="prev" aria-label="previous seed">&#9664;</button><input id="seed" type="number" min="0" step="1" inputmode="numeric"><button id="next" aria-label="next seed">&#9654;</button></div>
+  <div class="group"><button id="mRide" class="on">Ride</button><button id="mOrbit">Orbit</button><button id="mHigh">From above</button></div>
+</div>
+<canvas id="world"></canvas>
+<div id="stats">...</div>
+<p id="fail" hidden></p>
+<script type="module">
+/* THE SCENERY LAB. The game's own scene (../src/render/scene.js) around
+   a generated track, with the scripted driver drifting round it so the
+   effects run, and the theme, preset, tier and seed switchable. Ride
+   follows the car with the chase camera; Orbit circles the start line
+   slowly; From above looks down on the whole track. ?theme= ?preset=
+   ?tier= ?seed= ?kind= ?mode= set the start. The stats line is what the
+   probes report: draw calls, triangles, the frame's JavaScript time. */
+import { generateTrack, dailySeed } from '../src/tracks/generate.js';
+import { createWorld, STEP } from '../src/physics/world.js';
+import { createDriver } from '../src/physics/driver.js';
+import { createScene } from '../src/render/scene.js';
+import { createChaseCamera } from '../src/camera/chase.js';
+import { THEME_NAMES } from '../src/env/themes.js';
+import { PRESET_NAMES } from '../src/env/presets.js';
+
+const $ = id => document.getElementById(id);
+const query = new URLSearchParams(location.search);
+const state = {
+  theme: query.get('theme') || '', preset: query.get('preset') || '', tier: query.get('tier') || 'low',
+  kind: query.get('kind') === 'sprint' ? 'sprint' : 'circuit',
+  seed: query.has('seed') ? (+query.get('seed') >>> 0) : dailySeed(new Date()),
+  mode: query.get('mode') || 'ride',
+};
+for (const [id, names] of [['theme', THEME_NAMES], ['preset', PRESET_NAMES]]) {
+  const sel = $(id);
+  sel.append(new Option('by seed', ''));
+  for (const n of names) sel.append(new Option(n, n));
+  sel.value = state[id];
+  sel.addEventListener('change', () => { state[id] = sel.value; rebuild(); });
+}
+$('tier').value = state.tier;
+$('tier').addEventListener('change', () => { state.tier = $('tier').value; scene.setTier(state.tier); });
+$('seed').value = state.seed;
+$('seed').addEventListener('change', () => { state.seed = (+$('seed').value) >>> 0; rebuild(); });
+$('prev').addEventListener('click', () => { state.seed = (state.seed - 1) >>> 0; $('seed').value = state.seed; rebuild(); });
+$('next').addEventListener('click', () => { state.seed = (state.seed + 1) >>> 0; $('seed').value = state.seed; rebuild(); });
+$('kCircuit').addEventListener('click', () => { state.kind = 'circuit'; kinds(); rebuild(); });
+$('kSprint').addEventListener('click', () => { state.kind = 'sprint'; kinds(); rebuild(); });
+function kinds() { $('kCircuit').classList.toggle('on', state.kind === 'circuit'); $('kSprint').classList.toggle('on', state.kind === 'sprint'); }
+for (const m of ['ride', 'orbit', 'high']) $('m' + m[0].toUpperCase() + m.slice(1)).addEventListener('click', () => { state.mode = m; modes(); });
+function modes() { for (const m of ['ride', 'orbit', 'high']) $('m' + m[0].toUpperCase() + m.slice(1)).classList.toggle('on', state.mode === m); }
+kinds(); modes();
+
+const canvas = $('world');
+const scene = createScene(canvas, { renderer: query.get('renderer') === 'webgl2' ? 'webgl2' : undefined, tier: state.tier, preset: state.preset || undefined, theme: state.theme || undefined });
+const chase = createChaseCamera();
+let track = null, world = null, driver = null, t = 0, acc = 0, last = -1;
+const pose = { x: 0, z: 0, yaw: 0, slip: 0, speed: 0, boost: 0 };
+function rebuild() {
+  track = generateTrack(state.seed, { kind: state.kind, elevation: 0 });
+  if (track.startLine === undefined) track.startLine = 8;
+  if (!track.cones) track.cones = [];
+  world = createWorld(track, {});
+  driver = createDriver(track, { drift: '*' });
+  scene.setLook({ preset: state.preset || null, theme: state.theme || null });
+  scene.setGround(track);
+  chase.reset({ yaw: world.car.yaw });
+  const u = new URLSearchParams({ theme: state.theme, preset: state.preset, tier: state.tier, kind: state.kind, seed: state.seed, mode: state.mode });
+  history.replaceState(null, '', '?' + u);
+}
+function resize() { const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight); scene.resize(w, h); }
+addEventListener('resize', resize);
+let frameMs = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (last < 0) last = now;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now; t += dt;
+  const t0 = performance.now();
+  acc += dt;
+  const steps = Math.min(8, Math.floor(acc / STEP + 1e-6));
+  for (let i = 0; i < steps; i++) world.stepWorld(driver.input(world));
+  acc = Math.max(0, acc - steps * STEP);
+  const c = world.car;
+  pose.x = c.x; pose.z = c.z; pose.yaw = c.yaw; pose.slip = c.slip; pose.speed = c.speed; pose.boost = c.boost;
+  const aspect = innerWidth / innerHeight;
+  if (state.mode === 'ride') chase.update(pose, dt, scene.camera, aspect);
+  else if (state.mode === 'orbit') { const s = track.start; chase.orbit({ x: s.x, z: s.z }, t, scene.camera, aspect); }
+  else { const b = track.bounds, cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2, r = Math.max(b.maxX - b.minX, b.maxZ - b.minZ) * 0.5; scene.camera.position.set(cx + Math.sin(t * 0.08) * r, r * 0.55, cz + Math.cos(t * 0.08) * r); scene.camera.lookAt(cx, 0, cz); if (scene.camera.fov !== 55) { scene.camera.fov = 55; scene.camera.updateProjectionMatrix(); } }
+  scene.update(pose, world, dt, null);
+  scene.render();
+  frameMs = frameMs * 0.9 + (performance.now() - t0) * 0.1;
+  const i = scene.info();
+  const e = i.env || { drawCalls: 0, triangles: 0, instances: 0, kinds: {} };
+  $('stats').innerHTML = '<b>' + track.name + '</b> ' + track.length + ' m, ' + i.theme + ' / ' + i.preset + ', ' + i.backend + ' ' + i.tier + (i.bloom ? ' bloom' : '') + ' &middot; draw calls <b>' + i.drawCalls + '</b>, triangles <b>' + i.triangles.toLocaleString() + '</b> &middot; world ' + e.instances + ' props in ' + e.drawCalls + ' calls (' + Object.entries(e.kinds).map(([k, n]) => k + ' ' + n).join(', ') + ') &middot; frame JS ' + frameMs.toFixed(1) + ' ms, submit ' + i.submitMs.toFixed(1) + ' ms';
+  window.__ready = true;
+}
+scene.ready.then(() => { resize(); rebuild(); requestAnimationFrame(frame); }).catch(e => { const el = $('fail'); el.textContent = 'The 3D renderer could not start: ' + (e && e.message || e); el.hidden = false; console.error(e); });
+window.__lab = { scene, state, rebuild, get track() { return track; }, get world() { return world; } };
+</script>
+</body>
+</html>
