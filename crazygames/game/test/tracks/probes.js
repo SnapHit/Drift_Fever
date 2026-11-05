@@ -536,12 +536,19 @@ async function meshes() {
     let nan = 0, tris = 0;
     g.traverse(o => { if (!o.geometry) return; const a = o.geometry.attributes.position.array; tris += a.length / 9; for (let i = 0; i < a.length; i++) if (!Number.isFinite(a[i])) nan++; });
     const box = new THREE.Box3().setFromObject(g);
-    return { nan, tris, box: [box.min.x, box.min.z, box.max.x, box.max.z].map(v => Math.round(v)), drawCalls: g.children.length };
+    return { nan, tris, box: [box.min.x, box.min.z, box.max.x, box.max.z].map(v => Math.round(v)), drawCalls: g.children.length, names: g.children.map(m => m.name) };
   };
   for (const kind of KINDS) for (let s = 1; s <= 10; s++) { const t = generateTrack(s, { kind }); const r = check(t); out.tracks.push({ kind, seed: s, ...r }); if (r.nan || !r.tris) bad++; }
+  /* and the first crossover circuit, for the bridge, ramp and cut meshes */
+  for (let s = 1; s < 2000; s++) { const t = generateTrack(s, { kind: 'circuit' }); if (!t.bridges.length) continue; const r = check(t); out.tracks.push({ kind: 'circuit', seed: s, crossover: true, ...r }); if (r.nan || !r.tris) bad++; break; }
   out.testTrack = check(testTrack());
   const tris = out.tracks.map(r => r.tris);
-  result('M buildTrackMesh in Node', bad === 0 && out.testTrack.nan === 0, bad + ' of 20 generated tracks with a non finite vertex; ' + Math.min(...tris) + ' to ' + Math.max(...tris) + ' triangles in 2 draw calls; the hand made test track builds too');
+  const calls = out.tracks.map(r => r.drawCalls);
+  const names = new Set();
+  for (const r of out.tracks) for (const nm of r.names) names.add(nm);
+  const want = ['road', 'edge', 'kerb', 'line', 'wall', 'clip', 'bridge', 'ramp'];
+  const missing = want.filter(nm => !names.has(nm));
+  result('M buildTrackMesh in Node', bad === 0 && out.testTrack.nan === 0 && missing.length === 0, bad + ' of ' + out.tracks.length + ' generated tracks with a non finite vertex; ' + Math.min(...tris) + ' to ' + Math.max(...tris) + ' triangles in ' + Math.min(...calls) + ' to ' + Math.max(...calls) + ' named meshes (' + [...names].join(', ') + '); the hand made test track builds too' + (missing.length ? '; MISSING ' + missing.join(', ') : ''));
   const b = clone(generateTrack(1, {}));
   b.centre[10].x = NaN;
   const quiet = console.error; console.error = () => {};
