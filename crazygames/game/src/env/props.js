@@ -166,7 +166,8 @@ export function buildProps(THREE, theme, seed) {
     L.push(new THREE.BoxGeometry(0.5, 0.22, 1.1), COL.LAMP_HEAD, 0, 7.95, -1.2);
   });
   make('tyrestack', (A) => {
-    for (let i = 0; i < 4; i++) A.push(new THREE.CylinderGeometry(0.66, 0.66, 0.24, 10), i === 2 ? COL.TYRE_BAND : COL.TYRE, 0, 0.12 + i * 0.25, 0);
+    // four tyres, the top one painted, with the tread's grooves as rings
+    for (let i = 0; i < 4; i++) A.push(new THREE.TorusGeometry(0.47, 0.19, 5, 10), i === 3 ? COL.TYRE_BAND : COL.TYRE, 0, 0.19 + i * 0.26, 0, Math.PI / 2, 0, 0);
   });
   make('bollard', (A) => {
     A.push(new THREE.CylinderGeometry(0.22, 0.26, 0.9, 8), COL.BOLLARD, 0, 0.45, 0);
