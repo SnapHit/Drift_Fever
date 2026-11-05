@@ -202,6 +202,7 @@ function banking() {
 }
 
 /* ===================================================== X crossovers */
+const OTHER_LAYER = 2.5;   // m of height between the car's road and a wall it touched: the wall was on the other layer (the probe's own number, not the physics')
 function lap(track, opts) {
   const w = createWorld(track, opts), d = createDriver(track, {});
   const n = track.centre.length;
@@ -215,7 +216,7 @@ function lap(track, opts) {
     if (w.layer !== prevLayer) { layerChanges++; if (track.centre[w.centreIndex].part === 'ramp' || track.centre[prev].part === 'ramp' || (track.centre[(w.centreIndex + n - 1) % n].part === 'ramp') || (track.centre[(w.centreIndex + 1) % n].part === 'ramp')) onRamp++; }
     prevLayer = w.layer;
     if (w.respawned) respawns++;
-    if (w.hit) { hits++; if (Math.abs(w.hit.wy - w.car.y) > TUNE.BANK.LAYER_HEIGHT) otherLayer++; }
+    if (w.hit) { hits++; if (Math.abs(w.hit.wy - w.car.y) > OTHER_LAYER) otherLayer++; }
     if (w.along < last - track.length / 2) laps++;
     last = w.along;
     if (laps >= 1) break;

@@ -93,6 +93,8 @@ export const TRACKS = {
   STRAIGHT_RADIUS: 250,          // m: gentler than this counts as straight
   INNER_CLEAR:     4,            // m: half the width is at most the radius less this, so the inside wall never folds
   GAP:             4,            // m, at least, between barriers of two different parts of the track
+  NEAR_CENTRES:    14,           // m: centre lines of two parts closer than this fail before the build (two roads of the least width and GAP apart are 15 m)
+  NEAR_APART:      40,           // m along the track before two samples count as two parts
   RUNOFF:          4,            // m of run-off before a set back barrier, inside the physics' 6 m respawn line
   RUNOFF_RAMP:     16,           // m over which a barrier steps out to its run-off and back
   START_STRAIGHT:  { circuit: [70, 120], sprint: [40, 70], lap: 850 },   // m: a circuit keeps one longer run to breathe and build speed, scaled down on a lap shorter than lap
@@ -339,7 +341,7 @@ function planCircuit(rng, d, goal) {
     const toward = want - H >= 0 ? 1 : -1;
     const dir = rng() < T.TURN_BIAS ? toward : -toward;
     const f = makeFeature(type, dir, rng, d);
-    for (const it of f.items) { if (it.c) { els.push({ c: it.c }); est += Math.abs(it.c.a) * it.c.R; } else { els.push({ s: it.link, adj: false }); est += it.link; } }
+    for (const it of f.items) { if (it.c) { els.push({ c: it.c }); est += cornerLength(it.c); } else { els.push({ s: it.link, adj: false }); est += it.link; } }
     H += f.net;
     const s = straightBetween(rng, d);
     els.push({ s, adj: true, min: T.LINK[0] });
@@ -385,7 +387,7 @@ function planEight(rng, d, goal, target) {
     const toward = want - H >= 0 ? 1 : -1;
     const dir = rng() < T.CROSS.turnBias ? toward : -toward;
     const f = makeFeature(type, dir, rng, d);
-    for (const it of f.items) { if (it.c) { els.push({ c: it.c }); est += Math.abs(it.c.a) * it.c.R; } else { els.push({ s: it.link, adj: false }); est += it.link; } }
+    for (const it of f.items) { if (it.c) { els.push({ c: it.c }); est += cornerLength(it.c); } else { els.push({ s: it.link, adj: false }); est += it.link; } }
     H += f.net;
     const s = straightBetween(rng, d);
     els.push({ s, adj: true, min: T.LINK[0] });
@@ -453,7 +455,7 @@ function planSprint(rng, d, goal) {
     const lean = 0.5 + 0.45 * Math.min(1, Math.abs(H) / (100 * DEG));
     const dir = rng() < lean ? back : -back;
     const f = makeFeature(type, dir, rng, d);
-    for (const it of f.items) { if (it.c) { els.push({ c: it.c }); est += Math.abs(it.c.a) * it.c.R; } else { els.push({ s: it.link, adj: false }); est += it.link; } }
+    for (const it of f.items) { if (it.c) { els.push({ c: it.c }); est += cornerLength(it.c); } else { els.push({ s: it.link, adj: false }); est += it.link; } }
     H += f.net;
     const s = straightBetween(rng, d);
     els.push({ s, adj: false });
@@ -778,6 +780,32 @@ function build(plan, kind, rng, d, opts, always) {
   /* a crossing that cannot be bridged is an overlap: say so now rather
      than after the whole build (the validator would) */
   if (xs.length > 1 || (xs.length === 1 && (!wantCross || xs[0].sinAngle < X.minSin))) { if (!always) return { reject: 'overlap' }; }
+  /* two parts of the track too close to share the road between them,
+     which the validator's gap rule would reject after the whole build:
+     centre samples at least NEAR_APART along the track closer than
+     NEAR_CENTRES, which two roads of the least width and a gap apart can
+     never be (a crossing's own neighbourhood is left to the validator) */
+  if (!always && xs.length === 0) {
+    const CELL = 16, apart = Math.round(T.NEAR_APART / SAMPLE);
+    const cells = new Map();
+    const key = (cx, cz) => cx * 100003 + cz;
+    for (let i = 0; i < n; i++) { const k = key(Math.floor(S[i].x / CELL), Math.floor(S[i].z / CELL)); let l = cells.get(k); if (!l) { l = []; cells.set(k, l); } l.push(i); }
+    const d2 = T.NEAR_CENTRES * T.NEAR_CENTRES;
+    for (let i = 0; i < n; i++) {
+      const cx = Math.floor(S[i].x / CELL), cz = Math.floor(S[i].z / CELL);
+      for (let a = cx - 1; a <= cx + 1; a++) for (let b = cz - 1; b <= cz + 1; b++) {
+        const l = cells.get(key(a, b));
+        if (!l) continue;
+        for (const j of l) {
+          if (j <= i) continue;
+          let sep = j - i; if (closed) sep = Math.min(sep, n - sep);
+          if (sep < apart) continue;
+          const dx = S[i].x - S[j].x, dz = S[i].z - S[j].z;
+          if (dx * dx + dz * dz < d2) return { reject: 'overlap' };
+        }
+      }
+    }
+  }
   if (wantCross) {
     if (xs.length === 1 && xs[0].sinAngle >= X.minSin) {
       const x = xs[0];
@@ -1066,8 +1094,8 @@ export function generateTrack(seed, options) {
     const plan = kind === 'sprint' ? planSprint(rng, d, goal) : eight ? planEight(rng, d, goal, target) : planCircuit(rng, d, goal);
     if (!plan) { failures.turning = (failures.turning || 0) + 1; continue; }
     if (kind === 'circuit' && !closePosition(plan.els, target)) { failures.closure = (failures.closure || 0) + 1; continue; }
-    /* the length after closure, before the cost of a build */
-    if (kind === 'circuit') {
+    /* the length (after closure on a circuit), before the cost of a build */
+    {
       const total = planLength(plan.els);
       if (total < target.min - 2 || total > target.max + 2) { failures.length = (failures.length || 0) + 1; if (eight) failures.eights = (failures.eights || 0) + 1; continue; }
     }
