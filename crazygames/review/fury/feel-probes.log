@@ -1,0 +1,32 @@
+
+== 1. determinism
+PASS replay from tape is bit identical: 2998 steps, 2515 tape entries
+PASS one step per frame at 120 Hz gives the same hash as two per frame at 60 Hz
+PASS known answer: one perturbed step changes the end state
+
+== 2. drive and 3. camera
+PASS driver laps the test track: 49.3 s
+PASS driver stays inside the walls, never touching: max |lateral| 2.17 of 7 m, contacts 0, respawns 0
+PASS drift script drifts cleanly through hairpin 2: over 30 degrees for at least 1.5 s, no wall contact: 2.35 s at a mean 43.4 degrees, 64 km/h
+PASS known answer: the inverted driver fails to lap cleanly: lapped false, contacts 52
+PASS known answer: the drift script without its handbrake cannot hold 1.5 s: 0 s
+PASS camera keeps the car fully on screen in 1280x720: lap 2958 frames, drift 2764, hit run 600 with 5 contacts; off screen 0, worst excess -0.426
+PASS known answer: a camera looking at the sky loses the car in 1280x720: 900 of 900 frames off screen
+PASS camera keeps the car fully on screen in 390x844: lap 2958 frames, drift 2764, hit run 600 with 5 contacts; off screen 0, worst excess -0.459
+PASS known answer: a camera looking at the sky loses the car in 390x844: 900 of 900 frames off screen
+
+== 4. perf
+throttle 1x: frame p95 1.1 worst 7.1 ms; js without submit p95 0.2 worst 4.1; physics p95 0.1 worst 0.2 (2 steps); submit p95 0.9; first frames worst 9.2; webgl2 low
+throttle 4x: frame p95 7.6 worst 16.4 ms; js without submit p95 2 worst 7.3; physics p95 1.1 worst 7.3 (2 steps); submit p95 6.2; first frames worst 59.7; webgl2 low
+throttle 6x: frame p95 10.1 worst 27.9 ms; js without submit p95 3.8 worst 12.2; physics p95 1.5 worst 10.7 (2 steps); submit p95 8.4; first frames worst 24.8; webgl2 low
+PASS JavaScript frame p95 at 6x throttle under 16.7 ms: 3.8 ms, worst 12.2
+PASS known answer: 20 ms of busy work per frame raises the p95 by about 20 ms and fails the budget: p95 2 -> 24.4 ms at 4x
+
+== shots
+wrote /home/claude/rv3/crazygames/review/feel/shots/drift-1280x720.png
+wrote /home/claude/rv3/crazygames/review/feel/shots/park-1280x720.png
+wrote /home/claude/rv3/crazygames/review/feel/shots/drift-390x844.png
+wrote /home/claude/rv3/crazygames/review/feel/shots/park-390x844.png
+
+all passed; wrote review/feel/determinism.json, drive.json, camera.json, perf.json, shots.json
+EXIT 0
