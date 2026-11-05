@@ -1,0 +1,69 @@
+{
+ "0": {
+  "theme": "forest",
+  "preset": "dusk",
+  "track": 0,
+  "name": "wide-forest-dusk",
+  "file": "shots/wide-forest-dusk-1280x720.png",
+  "title": "shots/title-forest-dusk-1280x720.png",
+  "tier": "high",
+  "bloom": true,
+  "drawCalls": 63,
+  "triangles": 918783,
+  "errors": []
+ },
+ "1": {
+  "theme": "coastal",
+  "preset": "dawn",
+  "track": 1,
+  "name": "wide-coastal-dawn",
+  "file": "shots/wide-coastal-dawn-1280x720.png",
+  "title": "shots/title-coastal-dawn-1280x720.png",
+  "tier": "high",
+  "bloom": true,
+  "drawCalls": 61,
+  "triangles": 776913,
+  "errors": []
+ },
+ "2": {
+  "theme": "docks",
+  "preset": "night",
+  "track": 3,
+  "name": "wide-docks-night",
+  "file": "shots/wide-docks-night-1280x720.png",
+  "title": "shots/title-docks-night-1280x720.png",
+  "tier": "high",
+  "bloom": true,
+  "drawCalls": 64,
+  "triangles": 656899,
+  "errors": []
+ },
+ "3": {
+  "theme": "mountain",
+  "preset": "dusk",
+  "track": 4,
+  "name": "wide-mountain-dusk",
+  "file": "shots/wide-mountain-dusk-1280x720.png",
+  "title": "shots/title-mountain-dusk-1280x720.png",
+  "tier": "high",
+  "bloom": true,
+  "drawCalls": 60,
+  "triangles": 571609,
+  "errors": []
+ },
+ "4": {
+  "theme": "desert",
+  "preset": "rain",
+  "track": 2,
+  "name": "wide-desert-rain",
+  "file": "shots/wide-desert-rain-1280x720.png",
+  "title": "shots/title-desert-rain-1280x720.png",
+  "tier": "high",
+  "bloom": true,
+  "drawCalls": 58,
+  "triangles": 561235,
+  "errors": []
+ },
+ "started": "2026-11-05T22:14:11.737Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here"
+}
