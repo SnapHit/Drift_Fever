@@ -15,6 +15,15 @@
    Every constant comes from TUNE.VEHICLE and TUNE.ASSIST, read on every
    step so the tuning panel applies live.
 
+   The road under the car (briefs/TRACKS-2.md): the world writes the
+   road's slope at the car into s.surf each step, { gx, gz } the rise
+   per metre in world x and z, kv the vertical curvature along the car's
+   travel, bank the road's roll. From those: gravity's pull along and
+   across the road, the load the car is pressed into a banked corner
+   with (and a crest's unloading), and a faster drift on a bank towards
+   its inside. Every constant is in TUNE.BANK, and with s.surf null or a
+   flat road every term is exactly zero, so the model is unchanged there.
+
    A car may carry its own handling: createVehicle takes a tune, a pair
    { VEHICLE, ASSIST } whose prototypes are TUNE.VEHICLE and TUNE.ASSIST
    with a car's few overrides as own properties (see garage/roster.js),
@@ -34,6 +43,9 @@ export function createVehicle(x, z, yaw, tune) {
     steerDriver: 0,       // the driver's steering angle after the slew, rad
     steer: 0,             // the angle the front wheels are at, with the assist, rad
     axF: 0,               // filtered longitudinal acceleration, for weight transfer
+    awx: 0, awz: 0,       // filtered world acceleration, for the load a bank presses the car into the road with
+    y: 0, roll: 0, pitch: 0, layer: 0,   // where the road is under the car, written by the world: height, and the body's tilt on it
+    surf: null,           // the road's slope under the car, written by the world (see above)
     hb: 0,                // handbrake state, 1 locked, easing back to 0
     drifting: 0,          // 1 while the drift controller holds the slide
     boost: 0,             // s of slingshot boost left
@@ -130,12 +142,33 @@ export function stepVehicle(s, input, dt) {
   s.steer = delta;
   const cosD = Math.cos(delta), sinD = Math.sin(delta);
 
+  /* ---- the road's slope: gravity along and across it, the load into it ---- */
+  const B = TUNE.BANK;
+  let gBx = 0, gBy = 0, nScale = 1, cruiseMore = 0;
+  if (s.surf) {
+    const gx = s.surf.gx, gz = s.surf.gz;
+    const inv = 1 / Math.sqrt(1 + gx * gx + gz * gz);     // cosine of the slope
+    /* gravity's share in the road's plane, down the slope, in world then body axes */
+    const gfx = -g * gx * inv, gfz = -g * gz * inv;
+    gBx = (gfx * fx + gfz * fz) * B.SLOPE;
+    gBy = (gfx * lx + gfz * lz) * B.GRIP;
+    /* the normal load: gravity's share into the road, less the car's own
+       acceleration up the slope (a turn into a bank presses it in), and a
+       crest's unloading; 1 on the flat */
+    nScale = 1 + B.GRIP * (inv * (1 - (s.awx * gx + s.awz * gz) / g) - 1) + B.LIFT * speed * speed * s.surf.kv / g;
+    if (nScale < 0.05) nScale = 0.05;
+    /* a drift on a bank towards its inside settles faster: beta > 0 is a
+       right hand slide, and a positive bank lowers the left edge */
+    cruiseMore = B.CRUISE_PER_DEG * (beta > 0 ? -1 : beta < 0 ? 1 : 0) * s.surf.bank / DEG;
+  }
+
   /* ---- axle loads with weight transfer ---- */
   const minLoad = V.MIN_AXLE_LOAD * m * g;
   let loadF = m * g * b / L - m * s.axF * V.CG_HEIGHT / L;
   let loadR = m * g * a / L + m * s.axF * V.CG_HEIGHT / L;
   if (loadF < minLoad) loadF = minLoad;
   if (loadR < minLoad) loadR = minLoad;
+  loadF *= nScale; loadR *= nScale;
   s.loadF = loadF; s.loadR = loadR;
 
   /* ---- longitudinal demands ---- */
@@ -220,8 +253,10 @@ export function stepVehicle(s, input, dt) {
   const Fx = FxR + FxF * cosD + hbForce - FyF * sinD + resist;
   const Fy = FyF * cosD + FyR + FxF * sinD;
   const yawMoment = a * (FyF * cosD + FxF * sinD) - b * FyR;
-  const ax = Fx / m, ay = Fy / m;
+  const ax = Fx / m + gBx, ay = Fy / m + gBy;
   s.axF += (ax - s.axF) * Math.min(1, dt / V.WEIGHT_TRANSFER_TAU);
+  s.awx += ((ax * fx + ay * lx) - s.awx) * Math.min(1, dt / V.WEIGHT_TRANSFER_TAU);
+  s.awz += ((ax * fz + ay * lz) - s.awz) * Math.min(1, dt / V.WEIGHT_TRANSFER_TAU);
   s.r += yawMoment / Iz * dt;
   /* The angle limiter: past ANGLE_LIMIT the car is turned back towards
      its travel, so a slide stays a drift and does not tip into a spin.
@@ -284,7 +319,8 @@ export function stepVehicle(s, input, dt) {
       const c = Math.min(A.DRIFT_CARVE * absB * dt, absB) * (beta > 0 ? 1 : -1) * A.LEVEL;
       const psi = Math.atan2(-s.wvx, -s.wvz) - c;
       let sp2 = sp;
-      if (sp > A.DRIFT_CRUISE) sp2 = Math.max(A.DRIFT_CRUISE, sp - A.DRIFT_SCRUB * Math.min(1.5, absB / (45 * DEG)) * dt * A.LEVEL);
+      const cruise = A.DRIFT_CRUISE + cruiseMore;
+      if (sp > cruise) sp2 = Math.max(cruise, sp - A.DRIFT_SCRUB * Math.min(1.5, absB / (45 * DEG)) * dt * A.LEVEL);
       s.wvx = -Math.sin(psi) * sp2; s.wvz = -Math.cos(psi) * sp2;
     }
   }
@@ -363,5 +399,5 @@ export function bodyPoints(s, out) {
 
 /* The state that defines a run, as a string, for the determinism test. */
 export function vehicleHash(s) {
-  return [s.x, s.z, s.yaw, s.wvx, s.wvz, s.r, s.steerDriver, s.axF, s.hb, s.boost, s.driftT].map(v => v.toString()).join(',');
+  return [s.x, s.z, s.yaw, s.wvx, s.wvz, s.r, s.steerDriver, s.axF, s.hb, s.boost, s.driftT, s.awx, s.awz].map(v => v.toString()).join(',');
 }

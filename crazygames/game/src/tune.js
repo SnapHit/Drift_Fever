@@ -115,6 +115,20 @@ export const TUNE = {
     RECOVER_SPEED:      2.0,     // m/s, below this counts as stuck
     RECOVER_LAUNCH:     8,       // m/s, the speed the car is given back on the track
   },
+  /* THE ROAD'S SHAPE UNDER THE CAR (briefs/TRACKS-2.md): banked corners
+     and the climbs to a bridge. New physics beside the handling, not a
+     retune of it: on a flat road every term here is exactly zero and the
+     car behaves as before. The world hands the vehicle the road's slope
+     under it each step; the vehicle feels gravity's share along and
+     across the road, the load the bank presses it into the road with,
+     and a crest's unloading. */
+  BANK: {
+    GRIP:               1.0,     // share of a banked road's help the tyres get: gravity's sideways pull and the extra load into the bank (0 is flat physics)
+    SLOPE:              1.0,     // share of gravity's pull along a slope: climbing slows the car, descending speeds it
+    LIFT:               1.0,     // share of a crest's unloading, and a dip's extra load
+    CRUISE_PER_DEG:     0.5,     // m/s added to the speed a drift settles to, per degree the road banks towards the inside of the slide
+    LAYER_HEIGHT:       2.5,     // m: a wall more than this above or below the car's road is on another layer and is never touched
+  },
   CAMERA: {
     DISTANCE:           8.5,     // m behind the car
     DISTANCE_SPEED:     0.045,   // extra metres per m/s
@@ -212,6 +226,8 @@ export const PANEL = [
   ['CAMERA.FOV_PORTRAIT',    'fov portrait',     50,  110,  1],
   ['CAMERA.FOV_SPEED',       'fov per m/s',       0,    1,  0.05],
   ['SCORING.MIN_ANGLE',      'score min angle',   5,   25,  1],
+  ['BANK.GRIP',              'bank grip',         0,    1,  0.05],
+  ['BANK.CRUISE_PER_DEG',    'bank drift m/s per deg', 0, 1.5, 0.05],
 ];
 
 /* Read and write by dotted path, for the panel and the probes. */

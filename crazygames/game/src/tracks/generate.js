@@ -164,6 +164,7 @@ export const TRACKS = {
     margin: 3,                   // m the deck reaches past the lower road's barriers, and the cut past the upper's
     layerGap: 4.0,               // m: barriers this far apart in height belong to different layers and may cross
     apart: 60,                   // m, at least, along the track between the two passes' structures
+    startClear: 30,              // m a structure keeps from the start line
   },
 };
 
@@ -722,7 +723,9 @@ function build(plan, kind, rng, d, opts, always) {
       const upExtent = pick.deckHalf + Lup, dnExtent = pick.cutHalf + Ldn;
       let sep = Math.abs(pick.up - pick.dn);
       if (closed) sep = Math.min(sep, length - sep);
-      const fits = sep >= upExtent + dnExtent + X.apart && (closed || (pick.up - upExtent >= T.START_LINE + 10 && pick.up + upExtent <= length - 10 && pick.dn - dnExtent >= T.START_LINE + 10 && pick.dn + dnExtent <= length - 10));
+      /* room along the track for both structures, and neither over the start zone */
+      const clearOfStart = (at, ext) => closed ? Math.abs(alongDist(0, at)) > ext + X.startClear : (at - ext >= T.START_LINE + X.startClear && at + ext <= length - 10);
+      const fits = sep >= upExtent + dnExtent + X.apart && clearOfStart(pick.up, upExtent) && clearOfStart(pick.dn, dnExtent);
       if (fits) bridge = { along: pick.up, under: pick.dn, angle: Math.round(dasin(Math.min(1, x.sinAngle)) / DEG * 10) / 10, height: Hup, depth: Hdn, deckHalf: pick.deckHalf, cutHalf: pick.cutHalf, Lup, Ldn };
       else if (!always) return { reject: 'crossover' };
     }
