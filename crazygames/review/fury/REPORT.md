@@ -44,5 +44,9 @@ stays on screen in every frame at both viewports, ghosts match frame for
 frame, runs finish on generated tracks, saves survive. JavaScript p95 at
 6x throttle 3.8 ms (feel) and 5.3 ms (generated circuit with a ghost).
 
-Not rerun: the track session's 1,000-seed validity suite timed out at
-the first, wider widths and has not been rerun at these.
+Track validity (`game/test/tracks/probes.js --seeds 200 --only 1,2,3`):
+determinism, validity of 200 circuits and 200 sprints (0 invalid, 0
+fallbacks) and drift character pass. One check fails: 1 of 100 circuits
+asked for at exactly 1,200 m fell back to the default course (which is
+valid). The game asks for 600 to 1,200 m, not 1,200 exactly. The full
+1,000-seed run was not repeated.

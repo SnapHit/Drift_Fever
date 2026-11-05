@@ -1,125 +1,125 @@
 {
- "seedsPerKind": 1000,
+ "seedsPerKind": 200,
  "difficulty": "seed n uses ((n - 1) mod 11) / 10",
  "kinds": {
   "circuit": {
    "partGap": {
     "apartAlongTrack": 60,
-    "tracksWithPartsWithin20m": 580,
+    "tracksWithPartsWithin20m": 61,
     "gap": {
-     "n": 580,
-     "min": 4.048,
-     "p5": 5.73,
-     "p50": 17.045,
-     "p95": 28.559,
-     "max": 39.954,
-     "mean": 16.984
+     "n": 61,
+     "min": 6.795,
+     "p5": 11.334,
+     "p50": 22.725,
+     "p95": 37.925,
+     "max": 40.23,
+     "mean": 25.045
     },
-    "tracksWithBarriersCloserThanTheRoadWidth": 139
+    "tracksWithBarriersCloserThanTheRoadWidth": 9
    },
-   "tracks": 1000,
+   "tracks": 200,
    "invalid": 0,
    "fallback": 0,
    "failuresByCheck": {},
    "worst": {
-    "clearance": -0.0524,
-    "otherBarrier": 4.0075,
-    "tightest": 12.5079,
+    "clearance": -0.0983,
+    "otherBarrier": 6.7254,
+    "tightest": 13.1694,
     "widestCorner": 109.8298,
-    "minWidth": 11.03,
-    "maxWidth": 16.93,
+    "minWidth": 12.5,
+    "maxWidth": 19.99,
     "maxGrade": 0.04,
-    "maxCrest": 0.0011,
-    "maxLift": 0.4286,
+    "maxCrest": 0.001,
+    "maxLift": 0.3796,
     "maxBankDeg": 3,
-    "minLength": 614,
+    "minLength": 670,
     "maxLength": 1200,
-    "minStep": 1.9978,
+    "minStep": 1.998,
     "maxStep": 2.0001
    },
    "attempts": {
-    "n": 1000,
+    "n": 200,
     "min": 1,
-    "p5": 1,
-    "p50": 9,
-    "p95": 43,
-    "max": 123,
-    "mean": 14.077
+    "p5": 2,
+    "p50": 18,
+    "p95": 101,
+    "max": 163,
+    "mean": 26.83
    },
    "generationMs": {
-    "n": 1000,
-    "min": 3.684,
-    "p5": 5.989,
-    "p50": 25.766,
-    "p95": 116.725,
-    "max": 351.188,
-    "mean": 38.743
+    "n": 200,
+    "min": 5.355,
+    "p5": 6.423,
+    "p50": 45.062,
+    "p95": 255.238,
+    "max": 491.843,
+    "mean": 73.039
    },
    "rejectedAttemptsByCheck": {
-    "closure": 10091,
-    "turning": 311,
-    "length": 1760,
-    "overlap": 2320,
-    "clearance": 2259
+    "closure": 3825,
+    "turning": 111,
+    "clearance": 1161,
+    "length": 686,
+    "overlap": 939
    }
   },
   "sprint": {
    "partGap": {
     "apartAlongTrack": 60,
-    "tracksWithPartsWithin20m": 662,
+    "tracksWithPartsWithin20m": 67,
     "gap": {
-     "n": 662,
-     "min": 4.089,
-     "p5": 6.706,
-     "p50": 18.265,
-     "p95": 28.028,
-     "max": 38.941,
-     "mean": 17.875
+     "n": 67,
+     "min": 7.208,
+     "p5": 9.233,
+     "p50": 20.243,
+     "p95": 38.78,
+     "max": 41.264,
+     "mean": 23.272
     },
-    "tracksWithBarriersCloserThanTheRoadWidth": 142
+    "tracksWithBarriersCloserThanTheRoadWidth": 13
    },
-   "tracks": 1000,
+   "tracks": 200,
    "invalid": 0,
    "fallback": 0,
    "failuresByCheck": {},
    "worst": {
-    "clearance": -0.0553,
-    "otherBarrier": 4.0176,
-    "tightest": 12.5428,
-    "widestCorner": 109.872,
-    "minWidth": 11,
-    "maxWidth": 16.97,
+    "clearance": -0.0997,
+    "otherBarrier": 7.1802,
+    "tightest": 13.2449,
+    "widestCorner": 107.4922,
+    "minWidth": 12.5,
+    "maxWidth": 19.72,
     "maxGrade": 0.04,
     "maxCrest": 0.001,
-    "maxLift": 0.4041,
+    "maxLift": 0.3943,
     "maxBankDeg": 3,
-    "minLength": 630,
-    "maxLength": 1198,
-    "minStep": 1.9978,
+    "minLength": 618,
+    "maxLength": 1200,
+    "minStep": 1.998,
     "maxStep": 2.0001
    },
    "attempts": {
-    "n": 1000,
+    "n": 200,
     "min": 1,
     "p5": 1,
-    "p50": 1,
-    "p95": 5,
-    "max": 15,
-    "mean": 2.051
+    "p50": 3,
+    "p95": 13,
+    "max": 38,
+    "mean": 4.675
    },
    "generationMs": {
-    "n": 1000,
-    "min": 3.67,
-    "p5": 4.829,
-    "p50": 11.018,
-    "p95": 41.496,
-    "max": 520.774,
-    "mean": 16.326
+    "n": 200,
+    "min": 4.185,
+    "p5": 5.104,
+    "p50": 21.81,
+    "p95": 94.084,
+    "max": 259.785,
+    "mean": 33.232
    },
    "rejectedAttemptsByCheck": {
-    "length": 583,
-    "overlap": 710,
-    "clearance": 658
+    "length": 248,
+    "clearance": 692,
+    "overlap": 354
    }
   }
  },
@@ -129,7 +129,7 @@
    "invalid": 0,
    "fallback": 0,
    "lengths": [
-    542,
+    544,
     660
    ]
   },
@@ -138,16 +138,16 @@
    "invalid": 0,
    "fallback": 0,
    "lengths": [
-    814,
-    990
+    812,
+    988
    ]
   },
   "circuit 1200": {
    "tracks": 100,
    "invalid": 0,
-   "fallback": 0,
+   "fallback": 1,
    "lengths": [
-    1092,
+    1080,
     1320
    ]
   },
@@ -156,8 +156,8 @@
    "invalid": 0,
    "fallback": 0,
    "lengths": [
-    548,
-    658
+    552,
+    660
    ]
   },
   "sprint 900": {
@@ -174,7 +174,7 @@
    "invalid": 0,
    "fallback": 0,
    "lengths": [
-    1146,
+    1182,
     1320
    ]
   }
@@ -190,8 +190,8 @@
    "detail": {
     "ok": false,
     "crossings": 4,
-    "gapBreaks": 152,
-    "closestOtherBarrier": 0.05510000000000037
+    "gapBreaks": 157,
+    "closestOtherBarrier": 0.038608817592685314
    }
   },
   "overlap: two parts whose barriers run closer than the gap": {
@@ -202,14 +202,14 @@
    "detail": {
     "ok": false,
     "crossings": 0,
-    "gapBreaks": 128,
-    "closestOtherBarrier": 2.2805999999999997
+    "gapBreaks": 136,
+    "closestOtherBarrier": 1.5505999999999993
    },
    "crossings": 0
   },
   "partGap": {
-   "gap": 2.2858883437298503,
-   "ratio": 0.18660313010039595
+   "gap": 1.5585581958977341,
+   "ratio": 0.11762703365265918
   },
   "clearance: five left wall points moved to 40% of the half width": {
    "expected": "clearance",
@@ -219,9 +219,9 @@
    ],
    "detail": {
     "ok": false,
-    "worstMargin": -2.7365341196630926,
-    "at": 80,
-    "breaks": 9
+    "worstMargin": -4.923325373661353,
+    "at": 88,
+    "breaks": 12
    }
   },
   "length: the same track against a target it misses": {
@@ -231,9 +231,9 @@
    ],
    "detail": {
     "ok": false,
-    "length": 1140,
-    "min": 1142,
-    "max": 1340
+    "length": 1078,
+    "min": 1080,
+    "max": 1278
    }
   },
   "radius: a corner of radius 11": {
@@ -270,7 +270,7 @@
    "detail": {
     "ok": false,
     "min": 9,
-    "max": 15.4
+    "max": 18.36
    }
   },
   "elevation: a 1.2 m bump 16 m long": {
@@ -280,10 +280,10 @@
    ],
    "detail": {
     "ok": false,
-    "maxGrade": 0.12497640256998876,
-    "maxCrestCurvature": 0.033123632539289266,
-    "liftAtTopSpeed": 12.979331649442194,
-    "maxBankDeg": 3.0000070153049903
+    "maxGrade": 0.13212640256998875,
+    "maxCrestCurvature": 0.03329863253928926,
+    "liftAtTopSpeed": 13.04790453425361,
+    "maxBankDeg": 2.282893038919252
    }
   },
   "elevation: an 8% ramp": {
@@ -293,10 +293,10 @@
    ],
    "detail": {
     "ok": false,
-    "maxGrade": 0.8041500000000001,
-    "maxCrestCurvature": 0.20001250000000004,
-    "liftAtTopSpeed": 78.37390927624874,
-    "maxBankDeg": 3.0000070153049903
+    "maxGrade": 0.7991250000000001,
+    "maxCrestCurvature": 0.20016250000000002,
+    "liftAtTopSpeed": 78.43268603465852,
+    "maxBankDeg": 2.282893038919252
    }
   },
   "elevation: 8.6 degrees of bank": {
@@ -306,9 +306,9 @@
    ],
    "detail": {
     "ok": false,
-    "maxGrade": 0.021400000000000002,
-    "maxCrestCurvature": 0.00029375000000000234,
-    "liftAtTopSpeed": 0.11510448521916503,
+    "maxGrade": 0.010725000000000012,
+    "maxCrestCurvature": 0.000175,
+    "liftAtTopSpeed": 0.06857288481141692,
     "maxBankDeg": 8.594366926962348
    }
   },
@@ -322,8 +322,8 @@
     "ok": false,
     "problems": [
      "left wall not closed",
-     "a wall point is not beside its sample: 9.696 m",
-     "run-off inside a clip zone: 0.57 m"
+     "a wall point is not beside its sample: 8.026 m",
+     "run-off inside a clip zone: 0.56 m"
     ]
    }
   },
@@ -334,9 +334,9 @@
    ],
    "detail": {
     "ok": false,
-    "minStep": 1.9988110465974502,
-    "maxStep": 3.9995913716278513,
-    "worstHeadingSin": 0.012249163830941856
+    "minStep": 1.9994451855452293,
+    "maxStep": 3.999961799817588,
+    "worstHeadingSin": 0.0035860961847770036
    }
   }
  },

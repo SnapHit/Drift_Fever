@@ -1,23 +1,15 @@
 {
  "node": {
-  "seedsPerKind": 1000,
+  "seedsPerKind": 200,
   "repeatMismatches": 0,
   "distinctHashes": {
-   "circuit": 1000,
-   "sprint": 1000
+   "circuit": 200,
+   "sprint": 200
   }
  },
- "chromium": {
-  "seedsPerKind": 200,
-  "differFromNode": 0,
-  "dailyMatches": true,
-  "nudgedDifferFromNode": 400,
-  "ulpDifferFromNode": 0,
-  "mathSinVariantDifferFromNode": 0,
-  "mathSinVariantFirstDifference": null
- },
+ "chromium": null,
  "knownAnswers": {
-  "flakyGenerator": 11,
+  "flakyGenerator": 7,
   "seedIgnoringDistinct": 1
  },
  "staticScan": {

@@ -229,3 +229,8 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   first guesses for the author to set by play; the countdown releases the
   car at GO; no upgrades or tilt; the vanishing rear wheel shows in the
   software renderer.
+- 5 November 2026, after play: corners about 30 per cent wider, softer
+  hard hits, a faster car, more sense of speed (field of view, rumble,
+  streaks). A drift exit boost is in the physics but off by default
+  (`BOOST_MAX` 0). Results in `review/fury/REPORT.md`, the corner probe in
+  `game/test/feel/corners.js`.
