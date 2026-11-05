@@ -1,0 +1,101 @@
+{
+ "radius": 60,
+ "rows": [
+  {
+   "assistLevel": 0,
+   "flat": {
+    "bankDeg": 1,
+    "steadyMs": 31.96,
+    "steadyKmh": 115.05,
+    "effectiveMu": 1.74,
+    "maxSlipDeg": 3.22
+   },
+   "banked": [
+    {
+     "askedDeg": 8,
+     "bankDeg": 9,
+     "steadyMs": 40.17,
+     "steadyKmh": 144.61,
+     "predictedMs": 39.21,
+     "ratioMeasured": 1.26,
+     "ratioPredicted": 1.23,
+     "withinPct": 2.46,
+     "maxSlipDeg": 4.22
+    },
+    {
+     "askedDeg": 12,
+     "bankDeg": 13,
+     "steadyMs": 46.78,
+     "steadyKmh": 168.41,
+     "predictedMs": 43.94,
+     "ratioMeasured": 1.46,
+     "ratioPredicted": 1.37,
+     "withinPct": 6.46,
+     "maxSlipDeg": 5.74
+    }
+   ]
+  },
+  {
+   "assistLevel": 1,
+   "flat": {
+    "bankDeg": 1,
+    "steadyMs": 30.77,
+    "steadyKmh": 110.76,
+    "effectiveMu": 1.61,
+    "maxSlipDeg": 2.93
+   },
+   "banked": [
+    {
+     "askedDeg": 8,
+     "bankDeg": 9,
+     "steadyMs": 37.35,
+     "steadyKmh": 134.47,
+     "predictedMs": 37.35,
+     "ratioMeasured": 1.21,
+     "ratioPredicted": 1.21,
+     "withinPct": 0,
+     "maxSlipDeg": 3.49
+    },
+    {
+     "askedDeg": 12,
+     "bankDeg": 13,
+     "steadyMs": 44.02,
+     "steadyKmh": 158.47,
+     "predictedMs": 41.49,
+     "ratioMeasured": 1.43,
+     "ratioPredicted": 1.35,
+     "withinPct": 6.09,
+     "maxSlipDeg": 4.58
+    }
+   ]
+  }
+ ],
+ "knownAnswers": {
+  "gripOff": {
+   "flatMs": 30.2,
+   "bankedMs": 30.2,
+   "same": true
+  }
+ },
+ "drift": {
+  "flat": {
+   "meanKmh": 86.4,
+   "meanAngle": 47.31,
+   "minAngle": 47.31,
+   "held": true
+  },
+  "banked12": {
+   "meanKmh": 105.79,
+   "meanAngle": 46.96,
+   "minAngle": 46.95,
+   "held": true
+  },
+  "askedMoreKmh": 21.6,
+  "knownAnswerCruiseOff": {
+   "meanKmh": 85.91,
+   "meanAngle": 46.76,
+   "minAngle": 46.76,
+   "held": true
+  }
+ }
+}

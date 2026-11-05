@@ -1,0 +1,25 @@
+PASS B busier, circuits: corners per km 10.742 -> 12.064, in corners 62% -> 70%, direction changes per km 6.623 -> 8.043: longest straight 120 -> 102 m, second 80 -> 64 m, mean straight 37.2 -> 25.667 m (medians); 23% of corners banked, 25 of 200 with a crossover
+CAUGHT B the old generator scores lower on busyness, circuits: lower on 3 of 3 busyness medians, higher on 2 of 2 straight medians
+PASS B busier, sprints: corners per km 11.335 -> 12.605, in corners 61% -> 69%, direction changes per km 8.197 -> 9.639: longest straight 114 -> 100 m, second 70 -> 58 m, mean straight 32.545 -> 23.846 m (medians); 20% of corners banked, 6 of 200 with a crossover
+CAUGHT B the old generator scores lower on busyness, sprints: lower on 3 of 3 busyness medians, higher on 2 of 2 straight medians
+PASS K banking, assist 0: steady grip speed round a 60 m corner: flat 115.05 km/h (mu 1.74); 9 degrees: 144.61 km/h, predicted 141.16 (1.26 times flat, predicted 1.23, within 2.46%); 13 degrees: 168.41 km/h, predicted 158.18 (1.46 times flat, predicted 1.37, within 6.46%)
+PASS K banking, assist 1: steady grip speed round a 60 m corner: flat 110.76 km/h (mu 1.61); 9 degrees: 134.47 km/h, predicted 134.46 (1.21 times flat, predicted 1.21, within 0%); 13 degrees: 158.47 km/h, predicted 149.36 (1.43 times flat, predicted 1.35, within 6.09%)
+CAUGHT K bank grip switched off: the banked corner gives the flat speed: flat 108.71 km/h, banked 108.71 km/h
+PASS K a held drift settles faster on a 12 degree bank: flat 86.4 km/h at 47.31 degrees, banked 105.79 km/h at 46.96 degrees (21.6 km/h more asked by CRUISE_PER_DEG)
+CAUGHT K CRUISE_PER_DEG at 0: the banked drift settles at the flat speed: banked 85.91 km/h against flat 86.4
+PASS X share of circuits with a crossover: 600 to 1200 m: 25 of 200; about 600 m: 0 of 200; about 900 m: 19 of 200; about 1200 m: 59 of 200; crossing angles 63.9 [43.7, 86.1], 41.7 to 89.5 degrees
+PASS X the scripted driver laps 200 crossover circuits: 200 lapped, 0 respawns, 0 layer jumps, 0 wall touches of which 0 with the other layer, 400 layer changes all on ramps (400), 65.07 [47.96, 78.19], 43.63 to 83.28 s
+CAUGHT X the nearest sample in x and z on every step jumps layers: 712 jumps on 198 of 200 circuits, 0 respawns
+NOTE X the old search in x and z only when a full search is made (incremental otherwise): 0 jumps on 0 circuits, 0 respawns, 0 not lapped (information: the step by step search stays on its layer; the full search at a respawn or reset is what could not)
+CAUGHT X the layer rule switched off: the car touches the other layer's walls: 11585 touches with the other layer on 50 circuits, 8851 respawns, 50 not lapped
+PASS T generation, circuits, default: median 7 ms, p95 24, worst 52 ms; attempts 5 [1, 21], 1 to 37; 0 fallbacks of 200
+PASS T generation, circuits, 600: median 6 ms, p95 15, worst 23 ms; attempts 8 [1, 33], 1 to 74; 0 fallbacks of 200
+PASS T generation, circuits, 900: median 7 ms, p95 23, worst 42 ms; attempts 6 [1, 25], 1 to 58; 0 fallbacks of 200
+PASS T generation, circuits, 1200: median 12 ms, p95 33, worst 59 ms; attempts 6 [1, 17], 1 to 37; 0 fallbacks of 200
+PASS T generation, sprints, default: median 4 ms, p95 8, worst 11 ms; attempts 1 [1, 3], 1 to 5; 0 fallbacks of 200
+PASS T generation, sprints, 600: median 2 ms, p95 3, worst 4 ms; attempts 1 [1, 4], 1 to 8; 0 fallbacks of 200
+PASS T generation, sprints, 900: median 4 ms, p95 8, worst 10 ms; attempts 1 [1, 5], 1 to 9; 0 fallbacks of 200
+PASS T generation, sprints, 1200: median 5 ms, p95 12, worst 16 ms; attempts 2 [1, 5], 1 to 12; 0 fallbacks of 200
+
+all measurements pass and every known answer was caught in 106 s
+DONE

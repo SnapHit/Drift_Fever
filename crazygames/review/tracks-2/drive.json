@@ -1,0 +1,95 @@
+{
+ "kinds": {
+  "circuit": {
+   "tracks": 100,
+   "notFinished": 0,
+   "respawns": 0,
+   "wallHits": 0,
+   "hardHits": 0,
+   "tracksWithHits": 0,
+   "seconds": {
+    "n": 100,
+    "min": 31.783,
+    "p5": 35.783,
+    "p50": 48.25,
+    "p95": 68.483,
+    "max": 75.133,
+    "mean": 49.94
+   },
+   "clipMin": {
+    "n": 100,
+    "min": 4.941,
+    "p5": 5.218,
+    "p50": 6.142,
+    "p95": 6.891,
+    "max": 7.097,
+    "mean": 6.091
+   },
+   "tracksWithoutClipReadings": 0,
+   "mostBeyondEdge": 0
+  },
+  "sprint": {
+   "tracks": 100,
+   "notFinished": 0,
+   "respawns": 0,
+   "wallHits": 0,
+   "hardHits": 0,
+   "tracksWithHits": 0,
+   "seconds": {
+    "n": 100,
+    "min": 30.317,
+    "p5": 37.417,
+    "p50": 51.442,
+    "p95": 69.592,
+    "max": 73.442,
+    "mean": 52.106
+   },
+   "clipMin": {
+    "n": 100,
+    "min": 4.956,
+    "p5": 5.316,
+    "p50": 6.024,
+    "p95": 6.79,
+    "max": 7.067,
+    "mean": 5.991
+   },
+   "tracksWithoutClipReadings": 0,
+   "mostBeyondEdge": 0
+  }
+ },
+ "knownAnswers": {
+  "wallIntoRoad": {
+   "clean": {
+    "hits": 0,
+    "respawns": 0
+   },
+   "broken": {
+    "hits": 0,
+    "respawns": 0,
+    "hardHits": 0
+   }
+  },
+  "clipDistance": {
+   "clip": {
+    "from": 68,
+    "to": 104,
+    "side": "left",
+    "kind": "inner",
+    "apex": 86,
+    "corner": 0
+   },
+   "expected": 0.58,
+   "aligned": 0.5800000001529034,
+   "misaligned": null
+  }
+ },
+ "endCaps": {
+  "sprints": 30,
+  "mostPastLastSample": -1.4500247747960202,
+  "leastAlongReversing": 1.4500000000000002,
+  "withoutCaps": {
+   "pastEnd": 30.05427443884969,
+   "leastAlong": -46.96250775557552
+  }
+ }
+}
