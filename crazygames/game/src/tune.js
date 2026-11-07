@@ -255,8 +255,9 @@ export const LOOP = {
   STAR_RATE:          0.3,     // points per metre of run (length times laps) for the first star (was 0.55: after play on 7 November, too hard to progress)
   STAR_LEVELS:        [1, 2, 3.5],   // the three targets as multiples of the first (was 1, 2.2, 4)
   STAR_HARD_EASE:     0.3,     // a track of difficulty d asks (1 - d x this) of the rate: tighter tracks score less per metre
-  COIN_PER_POINT:     0.02,    // coins from the score
-  COIN_PER_STAR:      25,      // and for each star earned (first time and every time)
+  COIN_PER_POINT:     0.1,     // coins from the score (was 0.02: after play on 8 November, a whole career earned too little to buy a car)
+  COIN_PER_STAR:      30,      // and for each star earned, every time (was 25)
+  NEW_STAR_BONUS:     100,     // and once more for each star newly won on a track or the day's daily
   DAILY_BONUS:        1.5,     // the daily drift pays this much more
   PAINT_PRICE:        60,      // coins for a paint other than the car's own
   GHOST_OPACITY:      0.38,

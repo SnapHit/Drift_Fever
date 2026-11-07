@@ -257,7 +257,12 @@ function startRun(spec) {
 
 function finishRun() {
   const spec = app.spec, score = scoring.state.total, best = scoring.state.best;
-  const stars = starsFor(score, app.targets), coins = coinsFor(score, stars, spec.mode);
+  const stars = starsFor(score, app.targets);
+  /* the stars this track (or today's daily) had before, for the new star bonus */
+  const had = spec.mode === 'career' ? ((save.state.career[String(spec.index)] || {}).stars || 0)
+    : spec.mode === 'daily' && save.state.daily.date === spec.date ? (save.state.daily.stars || 0) : spec.mode === 'daily' ? 0 : stars;
+  const newStars = Math.max(0, stars - had);
+  const coins = coinsFor(score, stars, spec.mode) + newStars * LOOP.NEW_STAR_BONUS;
   let improved = false, nextIndex = null;
   if (spec.mode === 'career') { improved = save.careerResult(spec.index, stars, score); if (spec.index + 1 < CAREER.length && careerUnlocked(save.state, spec.index + 1)) nextIndex = spec.index + 1; }
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
@@ -268,7 +273,7 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1 });
   }
-  app.results = { score, best, stars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
+  app.results = { score, best, stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   hud.setCount('', false); hud.setVisible(false); input.touch.setVisible(false);
   screens.results(app.results);

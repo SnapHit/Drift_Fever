@@ -253,3 +253,7 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   tracks (`LOOP.STAR_RATE` 0.3, `STAR_HARD_EASE` 0.3), and the second
   and third are 2 and 3.5 times the first. Career 1 is now 440, 890 and
   1,550; career 2 is 210, 420 and 730.
+- 8 November 2026, after play: a whole career earned too little to buy a
+  car. Coins are now 0.1 a point (was 0.02), 30 a star (was 25), and 100
+  more for each star newly won on a track or the day's daily, shown on
+  the results screen.
