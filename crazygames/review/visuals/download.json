@@ -1,0 +1,19 @@
+{
+ "started": "2026-11-05T07:41:58.360Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
+ "ownBytes": 1426605,
+ "ownMB": 1.36,
+ "buildMB": 1.36,
+ "buildFiles": 49,
+ "limitMB": 20,
+ "aimMB": 5,
+ "agree": true,
+ "knownAnswer": {
+  "base": 1.36,
+  "withLater": 1.36,
+  "withLab": 2.36,
+  "laterUnchanged": true,
+  "labGrew": true,
+  "caught": true
+ }
+}
