@@ -16,11 +16,12 @@ export function createHud(root) {
     <div id="count"></div>
     <canvas id="streaks"></canvas>
     <div id="boost">BOOST</div>
-    <button type="button" id="exit" aria-label="back to the title">&#10005;</button>`;
+    <button type="button" id="exit" aria-label="back to the title">&#10005;</button>
+    <button type="button" id="fs" aria-label="full screen" hidden></button>`;
   root.appendChild(el);
   const total = el.querySelector('#totalN'), live = el.querySelector('#live'), liveN = el.querySelector('#liveN'), liveM = el.querySelector('#liveM');
   const callouts = el.querySelector('#callouts'), speed = el.querySelector('#speed'), angle = el.querySelector('#angle');
-  const lapEl = el.querySelector('#lap'), clockEl = el.querySelector('#clock'), countEl = el.querySelector('#count'), toBeat = el.querySelector('#toBeat'), exit = el.querySelector('#exit');
+  const lapEl = el.querySelector('#lap'), clockEl = el.querySelector('#clock'), countEl = el.querySelector('#count'), toBeat = el.querySelector('#toBeat'), exit = el.querySelector('#exit'), fs = el.querySelector('#fs');
   let lastTotal = -1, lastLive = -1, lastMult = -1, lastSpeed = -1, lastAngle = -1, lastNear = null, lastVisible = null, lastLap = '', lastClock = '', lastCount = '', lastBeat = '';
   let shown = 0;
   const v = { x: 0, y: 0, z: 0 };
@@ -55,7 +56,7 @@ export function createHud(root) {
     }
   }
   return {
-    el, exit,
+    el, exit, fs,
     setVisible(on) { el.classList.toggle('hidden', !on); },
     /* text for the lap or distance slot and the clock; '' hides */
     setRun(lap, clock) {

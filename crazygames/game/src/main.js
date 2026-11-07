@@ -33,6 +33,7 @@ import { createDebug } from './ui/debug.js';
 import { createSave } from './loop/save.js';
 import { createProgress } from './loop/progress.js';
 import { createRace } from './scoring/race.js';
+import { fullscreenSupported, toggleFullscreen, onFullscreenChange, fullscreenIcon } from './ui/fullscreen.js';
 import { createGhost, compactTape } from './loop/ghost.js';
 import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
@@ -297,6 +298,7 @@ function startFree() {
 
 function onAction(action, arg) {
   switch (action) {
+    case 'fullscreen': toggleFullscreen(); break;
     case 'title': menuGround(); showMenu('title'); break;
     case 'career': showMenu('career'); break;
     case 'garage': app.picked = null; showMenu('garage'); break;
@@ -325,6 +327,10 @@ function previewCar() {
   scene.setCar(id, save.state.cars[id] ? save.state.cars[id].paint : carById(id).paint);
 }
 hud.exit.addEventListener('click', () => { if (app.state !== 'dev') { menuGround(); showMenu('title'); } });
+/* full screen: a button in the HUD beside the exit, and one on the title */
+if (fullscreenSupported()) { hud.fs.hidden = false; hud.fs.innerHTML = fullscreenIcon(false); }
+hud.fs.addEventListener('click', e => { e.stopPropagation(); toggleFullscreen(); });
+onFullscreenChange(on => { hud.fs.innerHTML = fullscreenIcon(on); hud.fs.setAttribute('aria-label', on ? 'exit full screen' : 'full screen'); if (app.state === 'title') showMenu('title'); });
 
 /* ---- go ---- */
 let running = false;

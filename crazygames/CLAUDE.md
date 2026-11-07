@@ -278,3 +278,7 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   10 to 26 m (generator version 4). Career 3 Crossover is seed 1327. The
   scripted careful driver now earns exactly one star on every career
   track clean; the scripted drifter one or two.
+- 8 November 2026, after play: a full screen button, in the HUD beside
+  the exit and on the title (`game/src/ui/fullscreen.js`), shown only
+  where the browser allows it (not on an iPhone's Safari). On CrazyGames
+  their player has its own.

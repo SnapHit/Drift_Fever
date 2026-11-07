@@ -6,6 +6,7 @@
 import { ROSTER, PAINTS, carById, upgradeLevels, UPGRADE_STATS, UPGRADE_NAMES } from '../garage/roster.js';
 import { CAREER, careerUnlocked, careerStars } from '../loop/modes.js';
 import { LOOP } from '../tune.js';
+import { fullscreenSupported, isFullscreen, fullscreenIcon } from './fullscreen.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
@@ -46,6 +47,7 @@ export function createScreens(root, onAction) {
         <button type="button" class="big" data-action="free"><b>FREE DRIFT</b><small>the car park, no timer</small></button>
         <button type="button" class="big" data-action="garage"><b>GARAGE</b><small>${esc(carById(save.car).name)}</small></button>
       </div>
+      ${fullscreenSupported() ? `<button type="button" class="fsbtn" data-action="fullscreen">${fullscreenIcon(isFullscreen())}<span>${isFullscreen() ? 'EXIT FULL SCREEN' : 'FULL SCREEN'}</span></button>` : ''}
       <p class="hint">Steer left and right. DRIFT throws the tail out; DRIFT with no steering stops. The car drives itself.</p>`);
   }
 
