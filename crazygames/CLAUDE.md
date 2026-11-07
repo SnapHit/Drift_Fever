@@ -266,3 +266,15 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   the roster ignores their old ghosts). A one-off back pay credits 100
   coins for each career star won before the new star bonus (`starPay`
   in the save).
+- 8 November 2026, after play: the run was neither a race nor a drift
+  test. Now both pay. Clean driving scores: each sector (between
+  checkpoints, and the line) with no wall contact pays its share of 65
+  per cent of the first star, and the finish pays 40 per cent of it at
+  par pace (`SCORING.PAR_SPEED` 18 m/s), more the faster, so a clean run
+  at par is one star; the results split drift, clean and pace. Drift
+  chains build faster (`CHAIN_STEP` 1.2 s, was 2) and survive 1.5 s of
+  straight (`BANK_GAP`), so they link across corners. Corners are 10 to
+  30 per cent longer in radius and 3 m wider, and the links between them
+  10 to 26 m (generator version 4). Career 3 Crossover is seed 1327. The
+  scripted careful driver now earns exactly one star on every career
+  track clean; the scripted drifter one or two.

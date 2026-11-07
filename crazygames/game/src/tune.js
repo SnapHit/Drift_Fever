@@ -162,13 +162,17 @@ export const TUNE = {
     MIN_ANGLE:          12,      // degrees of drift before points start
     MIN_SPEED:          6,       // m/s, below this nothing scores
     RATE:               0.011,   // points per second per degree per km/h
-    CHAIN_STEP:         2.0,     // seconds of drift per multiplier step
+    CHAIN_STEP:         1.2,     // seconds of drift per multiplier step (was 2.0: after play on 8 November, big chains were out of reach)
     CHAIN_MAX:          8,       // the multiplier's ceiling
-    BANK_GAP:           0.7,     // seconds straight before the chain banks
+    BANK_GAP:           1.5,     // seconds straight before the chain banks (was 0.7: a chain now links across a short straight into the next corner)
     HARD_HIT:           6.0,     // m/s into a wall loses the chain
     HIT_SPEED_KEEP:     0.75,    // share of speed kept through a hard hit
     PROX_DIST:          1.6,     // m from a clip wall or a cone for the proximity bonus
     PROX_BONUS:         2.0,     // multiplier on points while close
+    CLEAN_SHARE:        0.65,    // a run with no wall contact earns this share of the first star, sector by sector
+    PACE_SHARE:         0.4,     // and finishing at par pace this share, more the faster (so a clean run at par is one star)
+    PAR_SPEED:          18,      // m/s (65 km/h), the average speed that is par for a run: a careful clean driver's pace
+    PACE_CAP:           1.6,     // the pace bonus is at most this many times its value at par
     BIG_ANGLE:          45,      // degrees, the callout
     LONG_CHAIN:         8,       // seconds, the callout
   },

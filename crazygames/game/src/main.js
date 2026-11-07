@@ -32,6 +32,7 @@ import { createTunePanel, loadSavedTune } from './ui/tune.js';
 import { createDebug } from './ui/debug.js';
 import { createSave } from './loop/save.js';
 import { createProgress } from './loop/progress.js';
+import { createRace } from './scoring/race.js';
 import { createGhost, compactTape } from './loop/ghost.js';
 import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
@@ -125,6 +126,7 @@ function resetRun() {
   const world = app.world;
   world.reset(); scoring.reset(); hud.reset(); scene.clearMarks();
   if (app.progress) app.progress.reset();
+  if (app.race) app.race.reset();
   if (app.ghost) app.ghost.reset();
   tape.length = 0; acc = 0; last = -1; app.runTime = 0;
   prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
@@ -140,6 +142,7 @@ function stepOnce(rec) {
   record(inp);
   scoring.step(world, STEP);
   if (app.progress) app.progress.step(world);
+  if (app.race) app.race.step(world, app.progress.state);
   if (app.ghost) app.ghost.step();
   if (world.hit) chase.hit(world.hit.speed);
 }
@@ -179,7 +182,7 @@ function frame(t) {
     const p0 = performance.now();
     for (let i = 0; i < steps; i++) {
       stepOnce(rec);
-      if (S === 'drive') { app.runTime += STEP; if (app.progress.state.finished && app.settle === 0) { app.settle = LOOP.FINISH_SETTLE; scoring.bank(); } }
+      if (S === 'drive') { app.runTime += STEP; if (app.progress.state.finished && app.settle === 0) { app.settle = LOOP.FINISH_SETTLE; scoring.bank(); if (app.race) app.race.finish(app.runTime); } }
     }
     acc = Math.max(0, acc - steps * STEP);
     physMs = performance.now() - p0; lastSteps = steps;
@@ -222,7 +225,7 @@ function menuGround() {
   const spec = dailySpec();
   app.spec = spec; app.track = trackFor(spec);
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
-  app.progress = null; app.ghost = null; scene.setGhost(null);
+  app.progress = null; app.race = null; app.ghost = null; scene.setGhost(null);
   resetRun(); app.driver = null;
 }
 
@@ -244,6 +247,7 @@ function startRun(spec) {
   app.laps = lapsFor(app.track);
   app.targets = starTargets(app.track, app.laps);
   app.progress = createProgress(app.track, app.laps);
+  app.race = createRace(app.track, app.laps, scoring);
   const rec = ghostFor(spec.key, app.track);
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
@@ -274,7 +278,7 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { score, best, stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
+  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   hud.setCount('', false); hud.setVisible(false); input.touch.setVisible(false);
   screens.results(app.results);
@@ -284,7 +288,7 @@ function startFree() {
   app.spec = { mode: 'free', key: 'free', name: 'Free drift' };
   app.track = freeGround();
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
-  app.progress = null; app.ghost = null; scene.setGhost(null);
+  app.progress = null; app.race = null; app.ghost = null; scene.setGhost(null);
   app.state = 'free';
   input.setStarted(false);
   screens.hide(); hud.setVisible(true); hud.setRun('', ''); hud.setToBeat(''); input.touch.setVisible(true);

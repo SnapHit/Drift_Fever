@@ -11,7 +11,7 @@ import { dailySeed, localDate } from '../ground/source.js';
 export const CAREER = [
   { name: 'First slide',   kind: 'circuit', seed: 1101, difficulty: 0.10, length: 560 },
   { name: 'Harbour run',   kind: 'sprint',  seed: 1202, difficulty: 0.20, length: 800 },
-  { name: 'Crossover',     kind: 'circuit', seed: 1303, difficulty: 0.30, length: 820 },   // 772 m, a figure eight over a bridge
+  { name: 'Crossover',     kind: 'circuit', seed: 1327, difficulty: 0.30, length: 820 },   // 844 m, a figure eight over a bridge
   { name: 'Long shadows',  kind: 'sprint',  seed: 1404, difficulty: 0.40, length: 900 },
   { name: 'Tight city',    kind: 'circuit', seed: 1505, difficulty: 0.55, length: 620 },
   { name: 'Ridge road',    kind: 'sprint',  seed: 1606, difficulty: 0.65, length: 1000 },
@@ -41,10 +41,14 @@ export function careerStars(save) { let n = 0; for (const k of Object.keys(save.
 
 /* The three targets for a track: the first is STAR_RATE points per
    metre of the run, eased on harder tracks, the others multiples of it. */
-export function starTargets(track, laps) {
-  const metres = track.kind === 'circuit' ? track.length * laps : (track.finish ? track.finish.along : track.length);
+export function runMetres(track, laps) { return track.kind === 'circuit' ? track.length * laps : (track.finish ? track.finish.along : track.length); }
+/* the first star's points per metre of run on this track */
+export function starRate(track) {
   const d = track.requested && track.requested.difficulty !== undefined ? track.requested.difficulty : 0.5;
-  const base = metres * LOOP.STAR_RATE * (1 - d * LOOP.STAR_HARD_EASE);
+  return LOOP.STAR_RATE * (1 - d * LOOP.STAR_HARD_EASE);
+}
+export function starTargets(track, laps) {
+  const base = runMetres(track, laps) * starRate(track);
   return LOOP.STAR_LEVELS.map(k => Math.round(base * k / 10) * 10);
 }
 

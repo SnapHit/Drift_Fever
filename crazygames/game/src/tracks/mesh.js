@@ -40,10 +40,10 @@ export const LOOK = {
   LINE:          0xffffff,     // start and finish
   LINE_DEPTH:    1.0,          // m
   CHECKPOINT:    0x5a5d6a,
-  WALL:          0x8f8f99,     // concrete
+  WALL:          0x7a7a84,     // concrete (was 0x8f8f99: a sunlit barrier came within 1.35 times of the edge line's brightness)
   WALL_TYRES:    0x3a3f4a,
   WALL_FENCE:    0x6d7380,
-  WALL_CLIP:     0xff8a3c,     // a barrier inside a clipping zone, as the scene draws it
+  WALL_CLIP:     0xc25a26,     // a barrier inside a clipping zone, as the scene draws it (was 0xff8a3c: with longer corners its long sunlit runs came within 1.35 times of the edge line)
   HEIGHT:        { concrete: 1.0, tyres: 0.8, fence: 1.6 },
   THICK:         { concrete: 0.5, tyres: 0.9, fence: 0.12 },
   POST:          0xff8a3c,

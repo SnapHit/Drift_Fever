@@ -88,7 +88,7 @@ export const TRACKS = {
   SAMPLE:          2,            // m between centre samples, fixed by the physics
   LENGTH:          [600, 1200],  // m, the default target range
   LENGTH_SLACK:    0.1,          // a single number target accepts this share either side
-  WIDTH:           [11, 24],     // m, the stated range of the drivable width
+  WIDTH:           [11, 28],     // m, the stated range of the drivable width (was 24 at most: after play on 8 November, corners wider for deep drifts)
   RADIUS:          [12, 120],    // m, the stated range of every corner's tightest radius
   STRAIGHT_RADIUS: 250,          // m: gentler than this counts as straight
   INNER_CLEAR:     4,            // m: half the width is at most the radius less this, so the inside wall never folds
@@ -107,9 +107,9 @@ export const TRACKS = {
   START_LINE:      8,            // m along, the start line (the scene draws it at sample 4)
   CAP_BACK:        1,            // m a sprint's end cap sits beyond its last sample
   LINK_SHARE:      [0.6, 0.85],  // share of the straights between features that are short links, easy to hard
-  LINK:            [4, 18],      // m, a short link
+  LINK:            [10, 26],     // m, a short link (was 4 to 18: room to settle between linked corners, and a drift chain links across one)
   STRAIGHT:        [[26, 60], [20, 42]],   // m, a longer straight, easy and hard
-  STRAIGHT_WIDTH:  [14, 12.5],   // m on straights, easy to hard
+  STRAIGHT_WIDTH:  [15, 13.5],   // m on straights, easy to hard
   WIDTH_SMOOTH:    6,            // samples either side the width is averaged over
   BANK_MAX:        3,            // degrees of the gentle bank every corner gets by its curvature
   BANK_RADIUS:     20,           // m: this tight or tighter takes the full gentle bank
@@ -134,16 +134,16 @@ export const TRACKS = {
     flow: [2, 3], multi: [2, 2], double: [1, 2], tightening: [1, 2], opening: [1, 1],
   },
   FEATURES: {
-    hairpin:    { R: [[16, 22], [13, 17]],   angle: [150, 195], lt: 8,  width: [[19, 22], [17, 19]], clip: 'inner', outside: 'tyres', runoff: 0.7 },
-    tight:      { R: [[24, 34], [18, 26]],   angle: [70, 120],  lt: 10, width: [[18, 20], [16, 18]], clip: 'either', outside: 'tyres', runoff: 0.5 },
-    sweeper:    { R: [[60, 110], [40, 75]],  angle: [45, 120],  lt: 20, width: [[16, 18], [14, 16]], clip: 'outer', outside: 'concrete', runoff: 0 },
-    esses:      { R: [[32, 50], [22, 36]],   angle: [45, 95],   lt: 12, width: [[17, 19], [15, 17]], clip: 'alternate', outside: 'concrete', runoff: 0, count: [2, 3] },
-    chicane:    { R: [[26, 36], [18, 26]],   angle: [25, 45],   lt: 8,  width: [[15, 16], [13, 14]], clip: 'middle', outside: 'concrete', runoff: 0, link: [0, 6] },
-    flow:       { R: [[30, 46], [22, 34]],   angle: [40, 80],   lt: 10, width: [[17, 19], [15, 17]], clip: 'alternate', outside: 'concrete', runoff: 0, count: [3, 5], link: [0, 6] },
-    multi:      { R: [[40, 70], [28, 50]],   angle: [120, 200], lt: 12, width: [[17, 19], [15, 17]], clip: 'inner', outside: 'concrete', runoff: 0.3, count: [2, 3], vary: 0.35 },
-    double:     { R: [[18, 22], [15, 19]],   angle: [140, 180], lt: 8,  width: [[19, 22], [17, 19]], clip: 'inner', outside: 'tyres', runoff: 0.5, link: [12, 24] },
-    tightening: { R: [[40, 60], [30, 45]],   angle: [80, 130],  lt: 12, width: [[18, 20], [16, 18]], clip: 'inner', outside: 'tyres', runoff: 0.5, end: [0.45, 0.6] },
-    opening:    { R: [[20, 30], [16, 24]],   angle: [80, 130],  lt: 12, width: [[18, 20], [16, 18]], clip: 'outer', outside: 'tyres', runoff: 0, end: [1.7, 2.3] },
+    hairpin:    { R: [[21, 29], [17, 22]],   angle: [150, 195], lt: 8,  width: [[22, 25], [20, 22]], clip: 'inner', outside: 'tyres', runoff: 0.7 },
+    tight:      { R: [[31, 44], [23, 34]],   angle: [70, 120],  lt: 10, width: [[21, 23], [19, 21]], clip: 'either', outside: 'tyres', runoff: 0.5 },
+    sweeper:    { R: [[66, 121], [44, 82]],  angle: [45, 120],  lt: 20, width: [[19, 21], [17, 19]], clip: 'outer', outside: 'concrete', runoff: 0 },
+    esses:      { R: [[40, 62], [28, 45]],   angle: [45, 95],   lt: 12, width: [[20, 22], [18, 20]], clip: 'alternate', outside: 'concrete', runoff: 0, count: [2, 3] },
+    chicane:    { R: [[31, 43], [22, 31]],   angle: [25, 45],   lt: 8,  width: [[18, 19], [16, 17]], clip: 'middle', outside: 'concrete', runoff: 0, link: [0, 6] },
+    flow:       { R: [[38, 58], [28, 42]],   angle: [40, 80],   lt: 10, width: [[20, 22], [18, 20]], clip: 'alternate', outside: 'concrete', runoff: 0, count: [3, 5], link: [0, 6] },
+    multi:      { R: [[46, 80], [32, 57]],   angle: [120, 200], lt: 12, width: [[20, 22], [18, 20]], clip: 'inner', outside: 'concrete', runoff: 0.3, count: [2, 3], vary: 0.35 },
+    double:     { R: [[23, 29], [20, 25]],   angle: [140, 180], lt: 8,  width: [[22, 25], [20, 22]], clip: 'inner', outside: 'tyres', runoff: 0.5, link: [12, 24] },
+    tightening: { R: [[48, 72], [36, 54]],   angle: [80, 130],  lt: 12, width: [[21, 23], [19, 21]], clip: 'inner', outside: 'tyres', runoff: 0.5, end: [0.45, 0.6] },
+    opening:    { R: [[26, 39], [21, 31]],   angle: [80, 130],  lt: 12, width: [[21, 23], [19, 21]], clip: 'outer', outside: 'tyres', runoff: 0, end: [1.7, 2.3] },
   },
   FENCE_FROM:      40,           // m: straights at least this long are fenced, away from the corners
   /* Banked corners: a share of the corners, by type, tilted towards the
@@ -1125,7 +1125,7 @@ export function generateTrack(seed, options) {
 
 function finishTrack(t, seed, kind, d, target, attempts, failures, fallback, eight) {
   return {
-    name: kind + ' ' + seed, seed, version: 3,
+    name: kind + ' ' + seed, seed, version: 4,
     kind: t.kind, length: t.length,
     target: { min: r2(target.min), max: r2(target.max) }, requested: { difficulty: d },
     difficulty: difficultyOf(t),

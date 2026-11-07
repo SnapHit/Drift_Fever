@@ -67,7 +67,8 @@ const PROJECT = `
      road beyond it too) */
   const solid = []; sc.scene.traverse(o => { if (o.isMesh && /^(wall|clip|barriers|bridge|ramp|cut|road|kerb|runoff)$/.test(o.name)) solid.push(o); });
   const ray = new THREE.Raycaster(), to = new THREE.Vector3();
-  const hidden = (x, y, z) => { to.set(x, y, z).sub(cam.position); const d = to.length(); ray.set(cam.position, to.normalize()); ray.far = d - 0.3; return ray.intersectObjects(solid, false).length > 0; };
+  /* aimed a little above the line and stopping a metre short, so a ray grazing the road it lies on does not count as hidden */
+  const hidden = (x, y, z) => { to.set(x, y + 0.15, z).sub(cam.position); const d = to.length(); ray.set(cam.position, to.normalize()); ray.far = d - 1.0; return ray.intersectObjects(solid, false).length > 0; };
   const wallOff = (i, side) => { const c = C[i], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); const wl = T.walls.find(q => q.side === side && !q.cap); if (!wl || !wl.points[i]) return c.width / 2; const p = wl.points[i]; return Math.abs((p.x - c.x) * lx + (p.z - c.z) * lz); };
   for (let a = extra.from; a <= extra.to; a += extra.step) {
     const i = (Math.round((w.along + a) / 2) % n + n) % n;
@@ -140,8 +141,15 @@ if (run('readability') || run('shots')) {
       await side.page.evaluate(() => { try { localStorage.clear(); } catch (e) {} const S = window.__loop.save; S.reset(); for (let i = 0; i < 6; i++) S.careerResult(i, 1, 1000); });
       await L.beginRun(side.page, 'career', themeTrack[theme]);
       // to a frame mid drift
+      /* a frame mid drift where enough of the edge ahead is in view: wide
+         roads put the near edges off a portrait screen, and the inside
+         barrier of a long corner hides the far ones */
       let best = null;
-      for (let k = 0; k < 40 && !best; k++) { const fr = await L.runFrames(side.page, 30, L.COLLECT); for (const f of fr) if (f.angle > 25 && f.v > 10 && f.state === 'drive') { best = f; break; } }
+      for (let tries = 0; tries < 12 && !best; tries++) {
+        for (let k = 0; k < 40 && !best; k++) { const fr = await L.runFrames(side.page, 30, L.COLLECT); for (const f of fr) if (f.angle > 25 && f.v > 10 && f.state === 'drive') { best = f; break; } }
+        const seen = await side.page.evaluate(({ src, extra }) => new Function('F', 'i', 'extra', src)(window.__feel, 0, extra).length, { src: PROJECT, extra: { w: vp.width, h: vp.height, hudTop: READ.HUD_TOP, from: READ.AHEAD[0], to: READ.AHEAD[1], step: READ.STEP } });
+        if (best && seen < READ.MIN_SAMPLES) best = null;
+      }
       for (const preset of PRESET_NAMES) {
         await side.page.evaluate(p => { window.__feel.scene.setLook({ preset: p }); window.__feel.draw = true; }, preset);
         await L.runFrames(side.page, 1);

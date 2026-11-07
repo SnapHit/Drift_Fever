@@ -25,16 +25,27 @@ export function createScoring() {
     callouts: [],      // the last few { text, kind }; calloutCount counts them all
     calloutCount: 0,
     bigAngleSaid: false, longChainSaid: false, nearSaid: false,
+    drift: 0,          // of the total, from drifting
+    clean: 0,          // from clean sectors
+    pace: 0,           // from the pace at the finish
   };
   function callout(text, kind) { s.callouts.push({ text, kind }); s.calloutCount++; if (s.callouts.length > 6) s.callouts.shift(); }
   function reset() {
     s.total = 0; s.chain = 0; s.mult = 1; s.driftTime = 0; s.gap = 0; s.drifting = false; s.near = false; s.best = 0; s.angle = 0; s.lastBank = 0; s.lost = 0;
     s.callouts.length = 0; s.calloutCount = 0; s.bigAngleSaid = false; s.longChainSaid = false; s.nearSaid = false;
+    s.drift = 0; s.clean = 0; s.pace = 0;
+  }
+  /* points for driving, not drifting: kind is 'clean' or 'pace' */
+  function award(v, kind, text) {
+    v = Math.round(v);
+    if (v <= 0) return;
+    s.total += v; s[kind] += v;
+    callout(text + ' +' + v, 'bank');
   }
   function bank() {
     if (s.chain > 0) {
       const v = Math.round(s.chain * s.mult);
-      s.total += v; s.lastBank = v; s.lastBankMult = s.mult;
+      s.total += v; s.drift += v; s.lastBank = v; s.lastBankMult = s.mult;
       if (v > s.best) s.best = v;
       callout('+' + v + (s.mult > 1 ? '  x' + s.mult : ''), 'bank');
     }
@@ -69,5 +80,5 @@ export function createScoring() {
       if (s.gap >= S.BANK_GAP) { s.drifting = false; bank(); }
     }
   }
-  return { state: s, step, reset, bank, lose };
+  return { state: s, step, reset, bank, lose, award };
 }

@@ -1,5 +1,5 @@
 {
- "started": "2026-11-07T09:15:42.204Z",
+ "started": "2026-11-07T15:13:43.242Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here",
  "budgetMs": 16.7,
  "runs": [
@@ -14,73 +14,73 @@
    "bloom": false,
    "env": {
     "drawCalls": 22,
-    "triangles": 210072,
-    "instances": 1255,
+    "triangles": 212334,
+    "instances": 1269,
     "kinds": {
-     "pine": 424,
-     "tree": 261,
-     "bush": 392,
-     "rock": 78,
+     "pine": 430,
+     "tree": 265,
+     "bush": 397,
+     "rock": 79,
      "house": 8,
      "barn": 5,
-     "haybale": 52,
+     "haybale": 53,
      "grandstand": 3,
      "tower": 4,
-     "flag": 12,
+     "flag": 10,
      "tyrestack": 12,
-     "board": 4
+     "board": 3
     }
    },
    "frame": {
     "n": 270,
-    "p50": 1.9,
-    "p95": 302.5,
-    "p99": 1095.2,
-    "worst": 22708.6,
-    "mean": 184.16
+    "p50": 1.8,
+    "p95": 314.8,
+    "p99": 651.3,
+    "worst": 16942.1,
+    "mean": 142.47
    },
    "jsWithoutSubmit": {
     "n": 270,
     "p50": 0.2,
-    "p95": 0.4,
-    "p99": 0.9,
-    "worst": 3.1,
-    "mean": 0.24
+    "p95": 0.3,
+    "p99": 0.6,
+    "worst": 2.9,
+    "mean": 0.18
    },
    "physics": {
     "n": 270,
     "p50": 0.1,
     "p95": 0.2,
-    "p99": 0.4,
-    "worst": 0.6,
-    "mean": 0.1
+    "p99": 0.3,
+    "worst": 2.7,
+    "mean": 0.08
    },
    "submit": {
     "n": 270,
-    "p50": 1.6,
-    "p95": 302.2,
-    "p99": 1095,
-    "worst": 22707.7,
-    "mean": 183.92
+    "p50": 1.7,
+    "p95": 314.5,
+    "p99": 651,
+    "worst": 16941.4,
+    "mean": 142.28
    },
    "drawCalls": {
     "n": 270,
-    "p50": 66,
+    "p50": 63,
     "p95": 66,
-    "p99": 67,
-    "worst": 67,
-    "mean": 65.08
+    "p99": 66,
+    "worst": 66,
+    "mean": 63.83
    },
    "triangles": {
     "n": 270,
-    "p50": 333717,
-    "p95": 334501,
-    "p99": 334573,
-    "worst": 334593,
-    "mean": 333967.55
+    "p50": 337563,
+    "p95": 338375,
+    "p99": 338439,
+    "worst": 338451,
+    "mean": 337810.13
    },
    "firstFrames": {
-    "worst": 661.1
+    "worst": 499
    },
    "errors": []
   },
@@ -95,73 +95,73 @@
    "bloom": false,
    "env": {
     "drawCalls": 22,
-    "triangles": 210072,
-    "instances": 1255,
+    "triangles": 212334,
+    "instances": 1269,
     "kinds": {
-     "pine": 424,
-     "tree": 261,
-     "bush": 392,
-     "rock": 78,
+     "pine": 430,
+     "tree": 265,
+     "bush": 397,
+     "rock": 79,
      "house": 8,
      "barn": 5,
-     "haybale": 52,
+     "haybale": 53,
      "grandstand": 3,
      "tower": 4,
-     "flag": 12,
+     "flag": 10,
      "tyrestack": 12,
-     "board": 4
+     "board": 3
     }
    },
    "frame": {
     "n": 270,
-    "p50": 11.9,
-    "p95": 415.9,
-    "p99": 1537,
-    "worst": 40476.9,
-    "mean": 317.49
+    "p50": 11,
+    "p95": 317.1,
+    "p99": 1171.8,
+    "worst": 30757.6,
+    "mean": 247.69
    },
    "jsWithoutSubmit": {
     "n": 270,
-    "p50": 1.1,
-    "p95": 3.2,
-    "p99": 5.2,
-    "worst": 50.6,
-    "mean": 1.36
+    "p50": 0.8,
+    "p95": 3.7,
+    "p99": 6.5,
+    "worst": 10,
+    "mean": 1.11
    },
    "physics": {
     "n": 270,
     "p50": 0.1,
-    "p95": 1.7,
-    "p99": 3.1,
-    "worst": 50.3,
-    "mean": 0.69
+    "p95": 1.5,
+    "p99": 5.7,
+    "worst": 10,
+    "mean": 0.47
    },
    "submit": {
     "n": 270,
-    "p50": 10.8,
-    "p95": 415.6,
-    "p99": 1536.1,
-    "worst": 40469,
-    "mean": 316.12
+    "p50": 9.9,
+    "p95": 311.5,
+    "p99": 1168.9,
+    "worst": 30751.8,
+    "mean": 246.58
    },
    "drawCalls": {
     "n": 270,
-    "p50": 66,
+    "p50": 63,
     "p95": 66,
-    "p99": 67,
-    "worst": 67,
-    "mean": 65.08
+    "p99": 66,
+    "worst": 66,
+    "mean": 63.83
    },
    "triangles": {
     "n": 270,
-    "p50": 333717,
-    "p95": 334505,
-    "p99": 334577,
-    "worst": 334601,
-    "mean": 333967.52
+    "p50": 337563,
+    "p95": 338371,
+    "p99": 338459,
+    "worst": 338475,
+    "mean": 337810.19
    },
    "firstFrames": {
-    "worst": 1870.7
+    "worst": 1161.8
    },
    "errors": []
   },
@@ -176,73 +176,73 @@
    "bloom": true,
    "env": {
     "drawCalls": 22,
-    "triangles": 503368,
-    "instances": 3088,
+    "triangles": 510032,
+    "instances": 3124,
     "kinds": {
-     "pine": 1061,
-     "tree": 653,
-     "bush": 979,
-     "rock": 196,
+     "pine": 1075,
+     "tree": 662,
+     "bush": 992,
+     "rock": 198,
      "house": 20,
      "barn": 13,
-     "haybale": 131,
+     "haybale": 132,
      "grandstand": 3,
      "tower": 4,
-     "flag": 12,
+     "flag": 10,
      "tyrestack": 12,
-     "board": 4
+     "board": 3
     }
    },
    "frame": {
     "n": 270,
-    "p50": 3.4,
-    "p95": 886,
-    "p99": 10901.5,
-    "worst": 26569.1,
-    "mean": 425.7
+    "p50": 306,
+    "p95": 652.1,
+    "p99": 1070.6,
+    "worst": 20752,
+    "mean": 335.02
    },
    "jsWithoutSubmit": {
     "n": 270,
     "p50": 0.2,
     "p95": 0.5,
-    "p99": 4.4,
-    "worst": 16.3,
-    "mean": 0.35
+    "p99": 2.2,
+    "worst": 3.8,
+    "mean": 0.26
    },
    "physics": {
     "n": 270,
     "p50": 0.1,
     "p95": 0.2,
-    "p99": 2,
-    "worst": 16.1,
-    "mean": 0.18
+    "p99": 0.5,
+    "worst": 1.8,
+    "mean": 0.09
    },
    "submit": {
     "n": 270,
-    "p50": 2.7,
-    "p95": 885.8,
-    "p99": 10901,
-    "worst": 26563.8,
-    "mean": 425.35
+    "p50": 305.9,
+    "p95": 651.9,
+    "p99": 1070.1,
+    "worst": 20751.1,
+    "mean": 334.76
    },
    "drawCalls": {
     "n": 270,
-    "p50": 70,
-    "p95": 71,
-    "p99": 71,
-    "worst": 71,
-    "mean": 69.66
+    "p50": 68,
+    "p95": 70,
+    "p99": 70,
+    "worst": 70,
+    "mean": 68.24
    },
    "triangles": {
     "n": 270,
-    "p50": 892613,
-    "p95": 893389,
-    "p99": 893461,
-    "worst": 893481,
-    "mean": 892861.62
+    "p50": 904157,
+    "p95": 904953,
+    "p99": 905041,
+    "worst": 905049,
+    "mean": 904402.61
    },
    "firstFrames": {
-    "worst": 587.4
+    "worst": 507.8
    },
    "errors": []
   },
@@ -257,97 +257,97 @@
    "bloom": true,
    "env": {
     "drawCalls": 22,
-    "triangles": 503368,
-    "instances": 3088,
+    "triangles": 510032,
+    "instances": 3124,
     "kinds": {
-     "pine": 1061,
-     "tree": 653,
-     "bush": 979,
-     "rock": 196,
+     "pine": 1075,
+     "tree": 662,
+     "bush": 992,
+     "rock": 198,
      "house": 20,
      "barn": 13,
-     "haybale": 131,
+     "haybale": 132,
      "grandstand": 3,
      "tower": 4,
-     "flag": 12,
+     "flag": 10,
      "tyrestack": 12,
-     "board": 4
+     "board": 3
     }
    },
    "frame": {
     "n": 270,
-    "p50": 19,
-    "p95": 1499.6,
-    "p99": 19239.5,
-    "worst": 46189.2,
-    "mean": 720.15
+    "p50": 557.2,
+    "p95": 667.1,
+    "p99": 1800.1,
+    "worst": 35660,
+    "mean": 563.66
    },
    "jsWithoutSubmit": {
     "n": 270,
-    "p50": 1.4,
-    "p95": 4.3,
-    "p99": 12.4,
-    "worst": 56.7,
-    "mean": 1.74
+    "p50": 0.7,
+    "p95": 3,
+    "p99": 6.4,
+    "worst": 8.1,
+    "mean": 1.07
    },
    "physics": {
     "n": 270,
     "p50": 0.1,
-    "p95": 1.9,
-    "p99": 5.3,
-    "worst": 10.2,
-    "mean": 0.64
+    "p95": 1.5,
+    "p99": 4.8,
+    "worst": 5.6,
+    "mean": 0.39
    },
    "submit": {
     "n": 270,
-    "p50": 16.9,
-    "p95": 1497.2,
-    "p99": 19237.1,
-    "worst": 46181.5,
-    "mean": 718.41
+    "p50": 555.9,
+    "p95": 665,
+    "p99": 1798.3,
+    "worst": 35653.3,
+    "mean": 562.59
    },
    "drawCalls": {
     "n": 270,
-    "p50": 70,
-    "p95": 71,
-    "p99": 71,
-    "worst": 71,
-    "mean": 69.66
+    "p50": 68,
+    "p95": 70,
+    "p99": 70,
+    "worst": 70,
+    "mean": 68.24
    },
    "triangles": {
     "n": 270,
-    "p50": 892613,
-    "p95": 893393,
-    "p99": 893465,
-    "worst": 893485,
-    "mean": 892863.83
+    "p50": 904157,
+    "p95": 904945,
+    "p99": 905045,
+    "worst": 905057,
+    "mean": 904400.43
    },
    "firstFrames": {
-    "worst": 1762.6
+    "worst": 1300.3
    },
    "errors": []
   }
  ],
  "summary": {
-  "lowJsP95At6x": 3.2,
-  "lowJsWorstAt6x": 50.6,
-  "highJsP95At6x": 4.3,
-  "lowDrawCalls": 66,
-  "highDrawCalls": 70,
-  "lowTriangles": 333717,
-  "highTriangles": 892613,
+  "lowJsP95At6x": 3.7,
+  "lowJsWorstAt6x": 10,
+  "highJsP95At6x": 3,
+  "lowDrawCalls": 63,
+  "highDrawCalls": 68,
+  "lowTriangles": 337563,
+  "highTriangles": 904157,
   "holds": true
  },
  "knownAnswer": {
   "loadMs": 20,
-  "p95Before": 3.2,
-  "p95Loaded": 26.8,
-  "rise": 23.6,
+  "p95Before": 3.7,
+  "p95Loaded": 26,
+  "rise": 22.3,
   "caught": true
  },
  "knownAnswerDraw": {
-  "drawCallsBefore": 66,
-  "drawCallsWithExtraMesh": 68,
+  "drawCallsBefore": 63,
+  "drawCallsWithExtraMesh": 65,
   "added": 2,
   "caught": true
  }

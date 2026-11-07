@@ -175,7 +175,7 @@ const seeds = [];
 for (let k = 0; k < seedsN; k++) seeds.push([2000 + k * 7, k % 2 ? 'sprint' : 'circuit']);
 /* the tracks as the game asks for them, banked and with crossovers; four
    figure eights for certain: the career's crossover and three more */
-const extra = [[1303, 'circuit', 820, 0.3], [3014, 'circuit', 1000], [3019, 'circuit', 1000], [3023, 'circuit', 1000]];
+const extra = [[1327, 'circuit', 820, 0.3], [3007, 'circuit', 1000], [3016, 'circuit', 1000], [3029, 'circuit', 1000]];
 for (const e of extra) seeds.push(e);
 const rows = [];
 let worst = { clear: Infinity, rise: 0, blockedShare: 0, blockedNear: 0, inside: 0 };
