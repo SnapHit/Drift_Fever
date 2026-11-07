@@ -10,12 +10,14 @@
    Ghost tapes are stored compact: [[n, steer, throttle, brake, hb], ...]
    as the recorder's run length entries. */
 import { LOOP } from '../tune.js';
-import { ROSTER, PAINTS } from '../garage/roster.js';
+import { ROSTER, PAINTS, upgradeLevels, UPGRADE_STATS } from '../garage/roster.js';
 
 export const KEY = 'driftfever.cg.save.v' + LOOP.SAVE_VERSION;
 
 export function defaults() {
-  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan' } }, career: {}, daily: {}, ghosts: {} };
+  /* starPay: the one-off back pay of the new star bonus for stars won
+     before it existed (8 November 2026) has been made, or was never owed */
+  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true };
 }
 
 const isNum = v => typeof v === 'number' && isFinite(v);
@@ -36,7 +38,7 @@ export function validGhost(g) {
     steps += e[0];
   }
   if (steps !== g.steps) return null;
-  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1 };
+  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1, rev: isNum(g.rev) ? g.rev : 1, up: upgradeLevels(g.up) };
 }
 
 /* Repair anything into a valid save. Counts what it had to fix. */
@@ -51,10 +53,10 @@ export function repair(raw) {
     for (const id of Object.keys(raw.cars)) {
       if (!carIds.has(id) || !isObj(raw.cars[id])) { fix(); continue; }
       const paint = raw.cars[id].paint;
-      s.cars[id] = { paint: paintIds.has(paint) ? paint : (fix(), ROSTER.find(c => c.id === id).paint) };
+      s.cars[id] = { paint: paintIds.has(paint) ? paint : (fix(), ROSTER.find(c => c.id === id).paint), up: upgradeLevels(raw.cars[id].up) };
     }
   } else if (raw.cars !== undefined) fix();
-  if (!s.cars.starter) s.cars.starter = { paint: 'cyan' };
+  if (!s.cars.starter) s.cars.starter = { paint: 'cyan', up: upgradeLevels() };
   if (carIds.has(raw.car) && s.cars[raw.car]) s.car = raw.car; else if (raw.car !== undefined) fix();
   if (isObj(raw.career)) {
     for (const k of Object.keys(raw.career)) {
@@ -68,6 +70,7 @@ export function repair(raw) {
   if (isObj(raw.ghosts)) {
     for (const k of Object.keys(raw.ghosts)) { const g = validGhost(raw.ghosts[k]); if (g) s.ghosts[k] = g; else fix(); }
   } else if (raw.ghosts !== undefined) fix();
+  s.starPay = raw.starPay === true;   // a save from before the back pay has not had it
   return { state: s, fixes };
 }
 
@@ -87,6 +90,13 @@ export function createSave(opts) {
     try { parsed = JSON.parse(raw); } catch (e) { status.repaired = 1; status.lastError = 'unreadable save'; state = defaults(); status.loaded = false; return state; }
     const r = repair(parsed);
     state = r.state; status.repaired = r.fixes; status.loaded = true;
+    /* the back pay, once: the new star bonus for every career star won
+       before it existed */
+    if (!state.starPay) {
+      let n = 0; for (const k of Object.keys(state.career)) n += state.career[k].stars;
+      status.backPay = n * LOOP.NEW_STAR_BONUS;
+      state.coins += status.backPay; state.starPay = true; write();
+    }
     return state;
   }
   function write() {
@@ -103,7 +113,15 @@ export function createSave(opts) {
     /* the pieces of the game that change the save */
     addCoins(n) { state.coins = Math.max(0, Math.floor(state.coins + n)); write(); },
     ownsCar(id) { return !!state.cars[id]; },
-    buyCar(id, price) { if (state.cars[id] || state.coins < price || !carIds.has(id)) return false; state.coins -= price; state.cars[id] = { paint: ROSTER.find(c => c.id === id).paint }; write(); return true; },
+    buyCar(id, price) { if (state.cars[id] || state.coins < price || !carIds.has(id)) return false; state.coins -= price; state.cars[id] = { paint: ROSTER.find(c => c.id === id).paint, up: upgradeLevels() }; write(); return true; },
+    /* one step of an upgrade on an owned car, at the price of that step */
+    buyUpgrade(id, stat) {
+      const car = state.cars[id];
+      if (!car || !UPGRADE_STATS.includes(stat)) return false;
+      const lv = upgradeLevels(car.up), price = LOOP.UPGRADE_PRICES[lv[stat]];
+      if (price === undefined || state.coins < price) return false;
+      state.coins -= price; lv[stat]++; car.up = lv; write(); return true;
+    },
     chooseCar(id) { if (!state.cars[id]) return false; state.car = id; write(); return true; },
     setPaint(id, paint) { if (!state.cars[id] || !paintIds.has(paint)) return false; state.cars[id].paint = paint; write(); return true; },
     careerResult(index, stars, score) {

@@ -3,7 +3,7 @@
    data-action and an optional data-arg, and one click handler hands them
    to the host. Big targets for thumbs: everything is reachable in
    390x844 portrait and in landscape. No images, no fonts, system text. */
-import { ROSTER, PAINTS, carById } from '../garage/roster.js';
+import { ROSTER, PAINTS, carById, upgradeLevels, UPGRADE_STATS, UPGRADE_NAMES } from '../garage/roster.js';
 import { CAREER, careerUnlocked, careerStars } from '../loop/modes.js';
 import { LOOP } from '../tune.js';
 
@@ -39,6 +39,7 @@ export function createScreens(root, onAction) {
       ${coins(save)}
       <h1><span>DRIFT</span><span>FEVER</span></h1>
       <p class="sub">${info.standIn ? 'test track build' : 'CrazyGames edition'}${info.storage ? '' : ' <em>(no memory on this device)</em>'}</p>
+      ${info.backPay ? `<p class="sub pay">+${fmt(info.backPay)} coins for the stars you have already won</p>` : ''}
       <div class="menu">
         <button type="button" class="big primary" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
         <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total} of ${CAREER.length * 3} stars</small></button>
@@ -60,6 +61,17 @@ export function createScreens(root, onAction) {
     show('career', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>CAREER</h2></header><div class="list">${rows}</div>`);
   }
 
+  /* the upgrades of an owned car: a row per stat, its steps as pips and
+     the price of the next step */
+  function upgrades(save, id) {
+    const lv = upgradeLevels(save.cars[id].up), P = LOOP.UPGRADE_PRICES;
+    return '<div class="ups">' + UPGRADE_STATS.map(k => {
+      const n = lv[k], price = P[n], pips = P.map((_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('');
+      const can = price !== undefined && save.coins >= price;
+      return `<button type="button" class="up" data-action="upgrade" data-arg="${k}" ${can ? '' : 'disabled'}><b>${UPGRADE_NAMES[k]}</b><span class="pips">${pips}</span><small>${price === undefined ? 'full' : '<span class="coin">&#9679;</span> ' + fmt(price)}</small></button>`;
+    }).join('') + '</div>';
+  }
+
   function garage(save, picked) {
     const sel = picked || save.car;
     const car = carById(sel), owned = !!save.cars[sel], chosen = save.car === sel;
@@ -77,7 +89,7 @@ export function createScreens(root, onAction) {
     else action = `<button type="button" class="big" data-action="title"><b>CHOSEN</b><small>back to the title</small></button>`;
     show('garage', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>GARAGE</h2></header>
       <div class="cards">${cards}</div>
-      <div class="detail"><h3>${esc(car.name)}</h3><p>${esc(car.character)}</p><div class="paints">${paints}</div>${action}</div>`);
+      <div class="detail"><h3>${esc(car.name)}</h3><p>${esc(car.character)}</p><div class="paints">${paints}</div>${owned ? upgrades(save, sel) : ''}${action}</div>`);
   }
 
   /* r: { score, best, stars, targets, coins, improved, mode, name, seconds, nextIndex, laps, kind } */

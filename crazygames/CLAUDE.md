@@ -257,3 +257,12 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   car. Coins are now 0.1 a point (was 0.02), 30 a star (was 25), and 100
   more for each star newly won on a track or the day's daily, shown on
   the results screen.
+- 8 November 2026, after play: car upgrades. Every owned car can buy
+  three steps each of power, grip and steering (`LOOP.UPGRADE_PRICES`
+  250, 500 and 900; effects in `LOOP.UPGRADE`), saved per car and
+  recorded with each ghost so it replays the car it was. The four paid
+  cars had been left slower than the starter by the 5 November speed-up;
+  each is now at least as quick, more so the dearer it is (`rev: 2` in
+  the roster ignores their old ghosts). A one-off back pay credits 100
+  coins for each career star won before the new star bonus (`starPay`
+  in the save).

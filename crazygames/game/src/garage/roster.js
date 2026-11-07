@@ -13,7 +13,7 @@
    None of these is balanced; they are characters for the author to play.
    The dimensions follow the car models' specs (length, wheelbase, track,
    wheel radius) so the physics box matches what is drawn. */
-import { TUNE } from '../tune.js';
+import { TUNE, LOOP } from '../tune.js';
 
 export const PAINTS = [
   { id: 'cyan',    hex: 0x19d8ff, name: 'cyan' },
@@ -35,37 +35,37 @@ export const ROSTER = [
   },
   {
     id: 'hatch', name: 'Light hatch', character: 'Small and twitchy. Turns in a flash, slides early.',
-    price: 900, paint: 'amber',
+    price: 900, paint: 'amber', rev: 2,
     dims: { length: 3.68, width: 1.70, wheelbase: 2.32, track: 1.48, wheelRadius: 0.30 },
     handling: {
-      VEHICLE: { MASS: 1020, WHEELBASE: 2.32, CG_TO_FRONT: 1.14, TRACK: 1.48, HALF_LENGTH: 1.84, HALF_WIDTH: 0.85, WHEEL_RADIUS: 0.30, INERTIA_FACTOR: 0.95, ACCEL: 11.5, TOP_SPEED: 55, STEER_RATE: 4.2, STEER_RETURN: 6.0, LOCK: 35 },
+      VEHICLE: { MASS: 1020, WHEELBASE: 2.32, CG_TO_FRONT: 1.14, TRACK: 1.48, HALF_LENGTH: 1.84, HALF_WIDTH: 0.85, WHEEL_RADIUS: 0.30, INERTIA_FACTOR: 0.95, ACCEL: 15.5, TOP_SPEED: 66, STEER_RATE: 4.2, STEER_RETURN: 6.0, LOCK: 35 },
       ASSIST: { DRIFT_EASE_IN: 70, DRIFT_CRUISE: 18 },
     },
   },
   {
     id: 'tourer', name: 'Grand tourer', character: 'Long, wide and heavy. Smooth, holds a slide forever.',
-    price: 1800, paint: 'wine',
+    price: 1800, paint: 'wine', rev: 2,
     dims: { length: 4.80, width: 1.90, wheelbase: 2.86, track: 1.66, wheelRadius: 0.35 },
     handling: {
-      VEHICLE: { MASS: 1620, WHEELBASE: 2.86, CG_TO_FRONT: 1.40, TRACK: 1.66, HALF_LENGTH: 2.40, HALF_WIDTH: 0.95, WHEEL_RADIUS: 0.35, INERTIA_FACTOR: 1.30, ACCEL: 11, TOP_SPEED: 64, STEER_RATE: 2.6, STEER_RETURN: 4.0, LOCK: 30 },
+      VEHICLE: { MASS: 1620, WHEELBASE: 2.86, CG_TO_FRONT: 1.40, TRACK: 1.66, HALF_LENGTH: 2.40, HALF_WIDTH: 0.95, WHEEL_RADIUS: 0.35, INERTIA_FACTOR: 1.30, ACCEL: 14, TOP_SPEED: 72, STEER_RATE: 2.6, STEER_RETURN: 4.0, LOCK: 30 },
       ASSIST: { DRIFT_EASE_IN: 38, DRIFT_DAMP: 11, DRIFT_SCRUB: 7, DRIFT_CRUISE: 22 },
     },
   },
   {
     id: 'fastback', name: 'Fastback', character: 'Raw power. Fast everywhere, wants a firm hand.',
-    price: 3200, paint: 'flame',
+    price: 3200, paint: 'flame', rev: 2,
     dims: { length: 4.70, width: 1.92, wheelbase: 2.76, track: 1.62, wheelRadius: 0.35 },
     handling: {
-      VEHICLE: { MASS: 1480, WHEELBASE: 2.76, CG_TO_FRONT: 1.32, TRACK: 1.62, HALF_LENGTH: 2.35, HALF_WIDTH: 0.96, WHEEL_RADIUS: 0.35, INERTIA_FACTOR: 1.15, ACCEL: 14.5, TOP_SPEED: 70, TURN_LIFT: 0.75 },
+      VEHICLE: { MASS: 1480, WHEELBASE: 2.76, CG_TO_FRONT: 1.32, TRACK: 1.62, HALF_LENGTH: 2.35, HALF_WIDTH: 0.96, WHEEL_RADIUS: 0.35, INERTIA_FACTOR: 1.15, ACCEL: 16.5, TOP_SPEED: 76, TURN_LIFT: 0.75 },
       ASSIST: { DRIFT_CRUISE: 24, DRIFT_SCRUB: 8 },
     },
   },
   {
     id: 'driftbuild', name: 'Drift build', character: 'Low, wide and aggressive. The biggest angles.',
-    price: 6000, paint: 'magenta',
+    price: 6000, paint: 'magenta', rev: 2,
     dims: { length: 4.48, width: 2.00, wheelbase: 2.62, track: 1.70, wheelRadius: 0.34 },
     handling: {
-      VEHICLE: { MASS: 1280, WHEELBASE: 2.62, CG_TO_FRONT: 1.30, TRACK: 1.70, HALF_LENGTH: 2.24, HALF_WIDTH: 1.00, WHEEL_RADIUS: 0.34, INERTIA_FACTOR: 1.08, ACCEL: 13, TOP_SPEED: 66, LOCK: 36, STEER_RATE: 3.6 },
+      VEHICLE: { MASS: 1280, WHEELBASE: 2.62, CG_TO_FRONT: 1.30, TRACK: 1.70, HALF_LENGTH: 2.24, HALF_WIDTH: 1.00, WHEEL_RADIUS: 0.34, INERTIA_FACTOR: 1.08, ACCEL: 15.5, TOP_SPEED: 72, LOCK: 36, STEER_RATE: 3.6 },
       ASSIST: { DRIFT_ANGLE: 34, DRIFT_RANGE: 20, ANGLE_LIMIT: 64, DRIFT_CRUISE: 23, DRIFT_SCRUB: 8 },
     },
   },
@@ -74,11 +74,32 @@ export const ROSTER = [
 export function carById(id) { return ROSTER.find(c => c.id === id) || ROSTER[0]; }
 export function paintById(id) { return PAINTS.find(p => p.id === id) || PAINTS[0]; }
 
-/* The handling the physics reads for a car. The starter returns null,
-   which the physics takes as TUNE itself. */
-export function carTune(id) {
-  const c = carById(id);
-  const hv = c.handling.VEHICLE || {}, ha = c.handling.ASSIST || {};
+/* A car's handling revision: bumped when its overrides change, so a ghost
+   recorded on the old handling is not replayed on the new (8 November
+   2026: the four paid cars made at least as quick as the starter, which
+   had been made faster on 5 November and left them behind). */
+export function carRev(id) { return carById(id).rev || 1; }
+
+export const UPGRADE_STATS = ['power', 'grip', 'steer'];
+export const UPGRADE_NAMES = { power: 'Power', grip: 'Grip', steer: 'Steering' };
+
+/* Upgrade levels from anything: { power, grip, steer }, each 0 to the
+   number of prices. */
+export function upgradeLevels(up) {
+  const out = {}, max = LOOP.UPGRADE_PRICES.length;
+  for (const k of UPGRADE_STATS) { const v = up && typeof up[k] === 'number' && isFinite(up[k]) ? Math.floor(up[k]) : 0; out[k] = Math.max(0, Math.min(max, v)); }
+  return out;
+}
+
+/* The handling the physics reads for a car and its upgrades. The starter
+   with no upgrades returns null, which the physics takes as TUNE itself. */
+export function carTune(id, up) {
+  const c = carById(id), lv = upgradeLevels(up), U = LOOP.UPGRADE;
+  const hv = Object.assign({}, c.handling.VEHICLE || {}), ha = c.handling.ASSIST || {};
+  const base = k => (hv[k] !== undefined ? hv[k] : TUNE.VEHICLE[k]);
+  if (lv.power) { hv.ACCEL = base('ACCEL') * (1 + U.POWER_ACCEL * lv.power); hv.TOP_SPEED = base('TOP_SPEED') * (1 + U.POWER_TOP * lv.power); }
+  if (lv.grip) { hv.MU_FRONT = base('MU_FRONT') * (1 + U.GRIP * lv.grip); hv.MU_REAR = base('MU_REAR') * (1 + U.GRIP * lv.grip); }
+  if (lv.steer) { hv.LOCK = base('LOCK') * (1 + U.STEER_LOCK * lv.steer); hv.LOCK_AT_SPEED = base('LOCK_AT_SPEED') * (1 + U.STEER_LOCK * lv.steer); hv.STEER_RATE = base('STEER_RATE') * (1 + U.STEER_RATE * lv.steer); }
   if (!Object.keys(hv).length && !Object.keys(ha).length) return null;
   return { VEHICLE: Object.assign(Object.create(TUNE.VEHICLE), hv), ASSIST: Object.assign(Object.create(TUNE.ASSIST), ha) };
 }

@@ -260,6 +260,14 @@ export const LOOP = {
   NEW_STAR_BONUS:     100,     // and once more for each star newly won on a track or the day's daily
   DAILY_BONUS:        1.5,     // the daily drift pays this much more
   PAINT_PRICE:        60,      // coins for a paint other than the car's own
+  UPGRADE_PRICES:     [250, 500, 900],   // coins for each step of an upgrade, the same for every car
+  UPGRADE: {                   // what each step does, as a share of the car's own value
+    POWER_ACCEL:      0.06,    // power: drive, per step
+    POWER_TOP:        0.04,    // and top speed
+    GRIP:             0.04,    // grip: both axles' peak grip, per step
+    STEER_LOCK:       0.07,    // steering: lock at a standstill and at speed, per step
+    STEER_RATE:       0.07,    // and how fast it turns in
+  },
   GHOST_OPACITY:      0.38,
   GHOST_TINT:         0xdfe6ff,
   GHOST_MIN_STEPS:    120,     // a run shorter than a second is not a ghost

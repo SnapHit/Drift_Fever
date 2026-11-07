@@ -9,7 +9,7 @@ import { createWorld } from '../physics/world.js';
 import { carTune } from '../garage/roster.js';
 
 export function createGhost(track, record) {
-  const world = createWorld(track, { tune: carTune(record.car) });
+  const world = createWorld(track, { tune: carTune(record.car, record.up) });   // the car as it was when the run was recorded, upgrades and all
   const tape = record.tape;
   const g = { record, world, entry: 0, left: 0, done: false, steps: 0, prev: { x: world.car.x, y: world.car.y || 0, z: world.car.z, yaw: world.car.yaw } };
   const inp = { steer: 0, throttle: 0, brake: 0, handbrake: 0 };

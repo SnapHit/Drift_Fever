@@ -34,7 +34,7 @@ import { createSave } from './loop/save.js';
 import { createProgress } from './loop/progress.js';
 import { createGhost, compactTape } from './loop/ghost.js';
 import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
-import { carTune, carById, carBox } from './garage/roster.js';
+import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
 
 const query = new URLSearchParams(location.search);
 const MAX_STEPS = 8;              // steps per frame before time is dropped
@@ -79,7 +79,7 @@ function quantise(rec) {
 /* ---- the world for a ground, with the chosen car ---- */
 function setGround(ground, carId, paintId) {
   app.ground = ground;
-  app.world = createWorld(ground, { tune: carTune(carId) });
+  app.world = createWorld(ground, { tune: carTune(carId, save.state.cars[carId] && save.state.cars[carId].up) });
   box = carBox(carId);
   scene.setGround(ground);
   scene.setCar(carId, paintId);
@@ -208,7 +208,7 @@ function frame(t) {
 /* ---- the states ---- */
 function titleInfo() {
   const d = dailySpec();
-  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, storage: save.status.available };
+  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, storage: save.status.available, backPay: save.status.backPay || 0 };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -228,11 +228,12 @@ function menuGround() {
 
 /* A saved ghost only drives the track it was recorded on. A ghost from an
    earlier generator version (gen) was recorded on a different layout of
-   the same seed, so it is ignored, left in the save, and replaced by the
-   next ghost worth keeping. */
+   the same seed, and one from before its car's handling changed (rev)
+   drove a different car, so either is ignored, left in the save, and
+   replaced by the next ghost worth keeping. */
 function ghostFor(key, track) {
   const rec = save.ghost(key);
-  return rec && rec.gen === (track.version || 1) ? rec : null;
+  return rec && rec.gen === (track.version || 1) && rec.rev === carRev(rec.car) ? rec : null;
 }
 
 function startRun(spec) {
@@ -271,7 +272,7 @@ function finishRun() {
   const prevGhost = ghostFor(spec.key, app.track);
   let ghostSaved = false;
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
-    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1 });
+    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
   app.results = { score, best, stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
@@ -302,6 +303,7 @@ function onAction(action, arg) {
     case 'pick-car': app.picked = arg; previewCar(); screens.garage(save.state, app.picked); break;
     case 'buy-car': if (save.buyCar(arg, carById(arg).price)) { save.chooseCar(arg); app.picked = arg; menuGround(); } screens.garage(save.state, app.picked); break;
     case 'choose-car': if (save.chooseCar(arg)) menuGround(); screens.garage(save.state, app.picked); break;
+    case 'upgrade': { const id = app.picked || save.state.car; if (save.buyUpgrade(id, arg) && id === save.state.car) menuGround(); screens.garage(save.state, app.picked); break; }
     case 'paint': {
       const id = app.picked || save.state.car, car = carById(id);
       if (save.state.cars[id]) {
