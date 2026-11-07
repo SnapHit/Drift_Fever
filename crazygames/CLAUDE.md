@@ -289,4 +289,6 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   drift angle and speed. It starts on the first tap, pauses while the
   page is hidden, and a sound button in the HUD and on the title mutes it
   (remembered on the device). Hits, scrapes, score and UI sounds and
-  music are not done.
+  music are not done. After a listen the same day the engine was
+  rebuilt as a deep V8 (it sounded like a fly): firing note with half and
+  quarter harmonics, a lope once a revolution, revs 800 to 5,900.
