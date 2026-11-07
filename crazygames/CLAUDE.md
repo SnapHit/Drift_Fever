@@ -290,5 +290,10 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   page is hidden, and a sound button in the HUD and on the title mutes it
   (remembered on the device). Hits, scrapes, score and UI sounds and
   music are not done. After a listen the same day the engine was
-  rebuilt as a deep V8 (it sounded like a fly): firing note with half and
-  quarter harmonics, a lope once a revolution, revs 800 to 5,900.
+  rebuilt as a deep V8 (it sounded like a fly), and after a second listen
+  ("still buzzy, pitch too high") rebuilt again from exhaust pulses, not
+  oscillators: each firing strikes fixed low resonances, rendered into
+  six seamless loops at set revs as the sound starts and crossfaded
+  (`renderEngineLoop`, `SOUND.V8`), revs 650 to 3,900. An AudioWorklet
+  would be the natural home but hangs in the sandbox's headless
+  Chromium, so it could not be tested here.

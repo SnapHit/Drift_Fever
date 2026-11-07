@@ -1,14 +1,14 @@
 /* SOUND: the engine and the tyres, synthesised with Web Audio, so there
    is nothing to download and nothing to licence.
 
-   The engine is a big V8 (after play on 8 November: the first, a four
-   cylinder revving to 7,400, sounded like a fly): the firing note, half
-   and a quarter of it, through a hard clipper, a closed low pass that
-   opens a little with the revs and a bass shelf, with a lope once a
-   revolution. The revs come from the speed through a gearbox of
-   SOUND.GEARS: each gear runs from SHIFT_RPM to MAX_RPM, so the note
-   climbs, drops at a shift, and climbs again; wheelspin and a slide add
-   revs.
+   The engine is a big, lazy V8 made of exhaust pulses, not tones (after
+   play on 8 November: oscillators sounded like a fly, twice): each
+   firing strikes fixed low resonances (renderEngineLoop, a few loops at
+   set revs rendered as the sound starts and crossfaded), so it rumbles
+   rather than buzzes. The
+   revs come from the speed through a gearbox of SOUND.GEARS: each gear
+   runs from SHIFT_RPM to MAX_RPM, so the note climbs, drops at a shift,
+   and climbs again; wheelspin and a slide add revs.
 
    The tyres are looped noise through two band passes, a low hiss and a
    high squeal, whose level grows with the drift angle and the speed,
@@ -22,18 +22,27 @@
 
 export const SOUND = {
   MASTER:        1.0,      // the overall level
-  ENGINE:        0.12,     // the engine's level
+  ENGINE:        0.55,     // the engine's level
   TYRES:         0.38,     // the tyres' level at a full slide (the squeal kept as loud against the deeper engine)
-  IDLE_RPM:      800,
-  SHIFT_RPM:     2900,     // where a gear starts after an upshift
-  MAX_RPM:       5900,     // where it shifts up: a big V8 that does not scream
+  IDLE_RPM:      650,
+  SHIFT_RPM:     1900,     // where a gear starts after an upshift
+  MAX_RPM:       3900,     // where it shifts up: a big, lazy V8 (a firing note of 43 to 260 Hz)
   GEARS:         [0, 15, 28, 42, 58, 80],   // m/s at the top of gears one to five (the last is the ceiling)
-  SLIDE_RPM:     1100,     // revs added at a full rear slide or wheelspin
+  SLIDE_RPM:     700,      // revs added at a full rear slide or wheelspin
   RPM_EASE:      0.09,     // s for the revs to follow
-  CYLINDERS:     8,        // firings per two revolutions
-  CUTOFF:        [380, 1300],   // Hz, the engine's low pass from idle to the limiter: deep, but open enough for a phone speaker
-  BURBLE:        0.45,     // depth of the cross-plane V8's lope, once a revolution
-  BASS_DB:       4,        // dB of low shelf under 160 Hz, for the rumble where a speaker can give it
+  BASS_DB:       5,        // dB of low shelf under 160 Hz, for the rumble where a speaker can give it
+  V8: {                    // the exhaust model, rendered into loops by renderEngineLoop
+    resonators: [[62, 0.05, 1], [124, 0.03, 0.7], [270, 0.012, 0.3]],   // Hz, decay s, weight: the exhaust's body, pipe and muffler
+    pattern:    [1, 0.62, 0.9, 0.55, 0.95, 0.68, 0.84, 0.58],          // each firing's strength in turn: the banks' uneven pulses
+    jitter:     0.06,     // share of random wobble in the firing interval
+    noise:      0.25,     // exhaust puff after each firing
+    drive:      1.6,      // soft clip
+    lowpass:    650,      // Hz, the last filter: no buzz above it
+    highpass:   28,       // Hz, below this nothing a speaker could play
+    load:       0.85,     // how hard each firing is struck in the loops
+    loops:      [700, 1150, 1700, 2350, 3100, 3900],   // rpm of the pre-rendered loops the engine crossfades between
+    cycles:     8,        // engine cycles (two revolutions each) in a loop
+  },
   SQUEAL_FROM:   9,        // degrees of slide before the tyres sing
   SQUEAL_FULL:   38,       // degrees at full voice
   SQUEAL_HZ:     [1100, 1900],  // the squeal's band, rising with the angle
@@ -55,32 +64,58 @@ export function rpmFor(speed) {
   return { rpm: from + (SOUND.MAX_RPM - from) * f, gear: g };
 }
 
+/* One seamless loop of the V8 at a steady rpm: a cross-plane V8 fires
+   every 90 degrees of crank, but each bank's exhaust sees its pulses
+   unevenly, which is the burble; so each firing strikes a bank of
+   resonators (the exhaust's body, pipe and muffler) with a strength from
+   the bank pattern and a little jitter, and a puff of noise rides on it.
+   The jitter repeats every loop and the loop is cut after the resonators
+   have settled into that repeat, so it joins without a click. */
+export function renderEngineLoop(sr, rpm, o) {
+  const fire = rpm / 60 * 4;                                   // firings a second
+  const per = sr / fire, firings = o.cycles * 8;
+  const pat = o.pattern, res = o.resonators.map(([f, decay, w]) => { const R = Math.exp(-1 / (decay * sr)), wv = 2 * Math.PI * f / sr; return { a1: 2 * R * Math.cos(wv), a2: -R * R, g: (1 - R) * w * 6, y1: 0, y2: 0 }; });
+  let seed = 97531; const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 4294967296; };
+  const jit = []; for (let k = 0; k < firings; k++) jit.push(1 + (rand() - 0.5) * o.jitter);
+  const sum = jit.reduce((a, b) => a + b, 0); for (let k = 0; k < firings; k++) jit[k] *= firings / sum;   // the loop is exactly its length
+  const loopLen = Math.round(per * firings), warm = 3, out = new Float32Array(loopLen);
+  const lpA = 1 - Math.exp(-2 * Math.PI * o.lowpass / sr);
+  const hpA = Math.exp(-2 * Math.PI * o.highpass / sr);
+  let lpY = 0, hpY = 0, hpX = 0, puff = 0, next = 0, k = 0;
+  const total = loopLen * (warm + 1);
+  for (let n = 0; n < total; n++) {
+    let x = 0;
+    if (n >= next) { x = pat[k % pat.length] * (0.55 + 0.45 * o.load); next += per * jit[k % firings]; k++; puff = 1; }
+    const nz = (rand() * 2 - 1) * puff * o.noise * (0.4 + 0.6 * o.load); puff *= 0.9965;
+    let y = 0;
+    for (const r of res) { const v = r.g * (x + nz * 0.02) + r.a1 * r.y1 + r.a2 * r.y2; r.y2 = r.y1; r.y1 = v; y += v; }
+    y += nz * 0.15;
+    lpY += (y - lpY) * lpA;
+    hpY = hpA * (hpY + lpY - hpX); hpX = lpY;     // a DC blocker: the pulses all push one way
+    if (n >= loopLen * warm) out[n - loopLen * warm] = Math.tanh(hpY * o.drive);
+  }
+  return out;
+}
+
 /* The graph, on any AudioContext (a live one, or an OfflineAudioContext
    for a test render). update() sets every level for a moment in time. */
 export function buildVoices(ctx, out) {
   const master = ctx.createGain(); master.gain.value = 0; master.connect(out);
-  // engine: a V8 is a low firing note with strong sub harmonics and an
-  // uneven lope; on a phone speaker, which cannot give the fundamental,
-  // the ear finds the low pitch from those harmonics under a closed filter
-  const fire = ctx.createOscillator(); fire.type = 'sawtooth';          // the firing frequency
-  const half = ctx.createOscillator(); half.type = 'sawtooth';          // half of it: the body
-  const quarter = ctx.createOscillator(); quarter.type = 'square';      // a quarter: the rumble
-  const gFire = ctx.createGain(); gFire.gain.value = 0.3;
-  const gHalf = ctx.createGain(); gHalf.gain.value = 0.8;
-  const gQuarter = ctx.createGain(); gQuarter.gain.value = 0.35;
-  const shaper = ctx.createWaveShaper();
-  const curve = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; curve[i] = Math.tanh(3 * x); } shaper.curve = curve;
-  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.9;
-  const lp2 = ctx.createBiquadFilter(); lp2.type = 'lowpass'; lp2.frequency.value = 1500; lp2.Q.value = 0.5;
+  // engine: loops of exhaust pulses through fixed resonances, rendered
+  // here at a few revs and crossfaded, each nudged in pitch to the revs
+  // between them, so the resonances barely move and the note stays deep
   const bass = ctx.createBiquadFilter(); bass.type = 'lowshelf'; bass.frequency.value = 160; bass.gain.value = SOUND.BASS_DB;
-  const beat = ctx.createGain(); beat.gain.value = 1 - SOUND.BURBLE / 2;
-  const lope = ctx.createOscillator(); lope.type = 'sine';             // once a revolution
-  const lopeDepth = ctx.createGain(); lopeDepth.gain.value = SOUND.BURBLE / 2;
-  lope.connect(lopeDepth); lopeDepth.connect(beat.gain);
   const engine = ctx.createGain(); engine.gain.value = SOUND.ENGINE;
-  fire.connect(gFire); half.connect(gHalf); quarter.connect(gQuarter);
-  gFire.connect(shaper); gHalf.connect(shaper); gQuarter.connect(shaper);
-  shaper.connect(lp); lp.connect(lp2); lp2.connect(bass); bass.connect(beat); beat.connect(engine); engine.connect(master);
+  bass.connect(engine); engine.connect(master);
+  const loops = SOUND.V8.loops.map(r => {
+    const data = renderEngineLoop(ctx.sampleRate, r, SOUND.V8);
+    const b = ctx.createBuffer(1, data.length, ctx.sampleRate); b.getChannelData(0).set(data);
+    const src = ctx.createBufferSource(); src.buffer = b; src.loop = true;
+    const g = ctx.createGain(); g.gain.value = 0;
+    src.connect(g); g.connect(bass); src.start();
+    return { rpm: r, src, g };
+  });
+  const ready = Promise.resolve();
   // tyres: two bands of one looped noise
   const len = Math.floor(ctx.sampleRate * 2), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
   let seed = 12345; for (let i = 0; i < len; i++) { seed = (seed * 1103515245 + 12345) >>> 0; d[i] = seed / 2147483648 - 1; }
@@ -92,7 +127,7 @@ export function buildVoices(ctx, out) {
   const hiss = ctx.createGain(); hiss.gain.value = 0;
   noise.connect(squealBand); squealBand.connect(squealBand2); squealBand2.connect(squeal); squeal.connect(master);
   noise.connect(hissBand); hissBand.connect(hiss); hiss.connect(master);
-  fire.start(); half.start(); quarter.start(); lope.start(); noise.start();
+  noise.start();
   let rpm = SOUND.IDLE_RPM;
   /* car: { speed m/s, slip rad, rearSlide, spinning, hb }; on: the car is
      being driven (else everything fades); level: the master level; t: the
@@ -102,12 +137,16 @@ export function buildVoices(ctx, out) {
     const slide = car ? Math.max(clamp01((car.rearSlide || 0) - 0.6), car.spinning ? 1 : 0) : 0;
     const want = car ? rpmFor(car.speed).rpm + slide * SOUND.SLIDE_RPM : SOUND.IDLE_RPM;
     rpm += (Math.min(SOUND.MAX_RPM + 400, want) - rpm) * k;
-    const crank = rpm / 60, f = crank * SOUND.CYLINDERS / 2, r = clamp01((rpm - SOUND.IDLE_RPM) / (SOUND.MAX_RPM - SOUND.IDLE_RPM));
-    const tc = 0.02;
-    fire.frequency.setTargetAtTime(f, t, tc); half.frequency.setTargetAtTime(f / 2 * 1.003, t, tc); quarter.frequency.setTargetAtTime(f / 4, t, tc);
-    lope.frequency.setTargetAtTime(crank, t, tc);
-    lp.frequency.setTargetAtTime(SOUND.CUTOFF[0] + (SOUND.CUTOFF[1] - SOUND.CUTOFF[0]) * r, t, tc);
-    engine.gain.setTargetAtTime(SOUND.ENGINE * (0.8 + 0.3 * r), t, tc);
+    const r = clamp01((rpm - SOUND.IDLE_RPM) / (SOUND.MAX_RPM - SOUND.IDLE_RPM)), tc = 0.02;
+    // the two loops either side of the revs, equal power, each played at the revs
+    let i = 0; while (i < loops.length - 2 && rpm > loops[i + 1].rpm) i++;
+    const lo = loops[i], hi = loops[i + 1], x = clamp01((rpm - lo.rpm) / (hi.rpm - lo.rpm));
+    for (const L of loops) {
+      const g = L === lo ? Math.cos(x * Math.PI / 2) : L === hi ? Math.sin(x * Math.PI / 2) : 0;
+      L.g.gain.setTargetAtTime(g, t, tc);
+      if (g > 0) L.src.playbackRate.setTargetAtTime(rpm / L.rpm, t, tc);
+    }
+    engine.gain.setTargetAtTime(SOUND.ENGINE * (0.85 + 0.25 * r), t, tc);
     const angle = car ? Math.abs(car.slip || 0) * 180 / Math.PI : 0;
     const voice = car ? smooth(SOUND.SQUEAL_FROM, SOUND.SQUEAL_FULL, angle) * smooth(2, SOUND.SPEED_FULL, car.speed) : 0;
     const hb = car && car.hb > 0.5 && car.speed > 3 ? 0.6 : 0;
@@ -118,7 +157,7 @@ export function buildVoices(ctx, out) {
     squealBand.frequency.setTargetAtTime(sf, t, 0.05); squealBand2.frequency.setTargetAtTime(sf * 1.01, t, 0.05);
     master.gain.setTargetAtTime(on ? level : 0, t, SOUND.FADE / 3);
   }
-  return { update, master, rpm: () => rpm };
+  return { update, master, ready, rpm: () => rpm };
 }
 
 export function createSound() {
