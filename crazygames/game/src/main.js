@@ -202,6 +202,15 @@ function menuGround() {
   resetRun(); app.driver = null;
 }
 
+/* A saved ghost only drives the track it was recorded on. A ghost from an
+   earlier generator version (gen) was recorded on a different layout of
+   the same seed, so it is ignored, left in the save, and replaced by the
+   next ghost worth keeping. */
+function ghostFor(key, track) {
+  const rec = save.ghost(key);
+  return rec && rec.gen === (track.version || 1) ? rec : null;
+}
+
 function startRun(spec) {
   app.spec = spec; app.key = spec.key;
   app.track = trackFor(spec);
@@ -210,7 +219,7 @@ function startRun(spec) {
   app.laps = lapsFor(app.track);
   app.targets = starTargets(app.track, app.laps);
   app.progress = createProgress(app.track, app.laps);
-  const rec = save.ghost(spec.key);
+  const rec = ghostFor(spec.key, app.track);
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
   hud.setToBeat(rec ? 'best ' + rec.score : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
@@ -230,10 +239,10 @@ function finishRun() {
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
   save.addCoins(coins);
   const steps = tape.reduce((s, e) => s + e.n, 0);
-  const prevGhost = save.ghost(spec.key);
+  const prevGhost = ghostFor(spec.key, app.track);
   let ghostSaved = false;
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
-    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime });
+    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1 });
   }
   app.results = { score, best, stars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
