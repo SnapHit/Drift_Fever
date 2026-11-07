@@ -30,7 +30,8 @@
 export const LOOK = {
   ROAD:          0x3a3b44,
   EDGE:          0xf6e7a1,     // the readability rule: the brightest, most saturated thing on screen
-  EDGE_WIDTH:    0.45,         // m either side of the road edge
+  EDGE_WIDTH:    0.45,         // m, half the edge line's width
+  EDGE_INSET:    0.25,         // m the edge line stands in from the road edge: a barrier on the edge is 0.5 m thick and would hide its outer half
   KERB_A:        0x7d5753,     // kerbs, muted so the edge stays the brightest thing
   KERB_B:        0x8f8f96,
   KERB_WIDTH:    1.0,          // m, inside the edge line
@@ -120,13 +121,14 @@ export function buildTrackMesh(track, THREE) {
     }
     /* kerbs through the tighter corners, striped per sample */
     if (Math.abs(kappa[i]) >= 1 / LOOK.KERB_RADIUS && Math.abs(kappa[j]) >= 1 / LOOK.KERB_RADIUS) {
-      const hex = i % 2 ? LOOK.KERB_A : LOOK.KERB_B, e = LOOK.EDGE_WIDTH, kw = LOOK.KERB_WIDTH;
+      const hex = i % 2 ? LOOK.KERB_A : LOOK.KERB_B, e = LOOK.EDGE_INSET + 2 * LOOK.EDGE_WIDTH, kw = LOOK.KERB_WIDTH;
       quad('kerb', i, j, k => F[k].hw - e, k => F[k].hw - e - kw, hex, LOOK.LIFT_KERB);
       quad('kerb', i, j, k => -(F[k].hw - e - kw), k => -(F[k].hw - e), hex, LOOK.LIFT_KERB);
     }
-    const e = LOOK.EDGE_WIDTH;
-    quad('edge', i, j, k => F[k].hw + e, k => F[k].hw - e, LOOK.EDGE, LOOK.LIFT_EDGE);
-    quad('edge', i, j, k => -(F[k].hw - e), k => -(F[k].hw + e), LOOK.EDGE, LOOK.LIFT_EDGE);
+    /* the edge line, wholly inside the road and clear of a barrier standing on its edge */
+    const eo = LOOK.EDGE_INSET, ei = LOOK.EDGE_INSET + 2 * LOOK.EDGE_WIDTH;
+    quad('edge', i, j, k => F[k].hw - eo, k => F[k].hw - ei, LOOK.EDGE, LOOK.LIFT_EDGE);
+    quad('edge', i, j, k => -(F[k].hw - ei), k => -(F[k].hw - eo), LOOK.EDGE, LOOK.LIFT_EDGE);
   }
   /* lines across the road: start, finish, checkpoints */
   const across = (along, hex, depth) => {

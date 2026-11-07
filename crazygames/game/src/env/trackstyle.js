@@ -23,7 +23,7 @@ export const TRACK_STYLE = {
   ROAD_LIFT:     1.5,      // the asphalt's vertex colour is dark; the material brightens the whole road mesh, edge included
   ROUGH_WET:     0.22,     // rain: the road reflects the sky and the lamps
   METAL_WET:     0.08,
-  CLIP_EMISSIVE: 0.9,      // the clipping posts glow a little, more at night
+  CLIP_EMISSIVE: 0.35,     // the clipping zone glows a little, more at night: the generator names the whole judged barrier `clip`, not only its posts, so a stronger glow outshines the edge line
   LINE_EMISSIVE: 0.35,
   RACING_LINE_ALPHA: 0.3,     // black over the asphalt, at most this opaque
   RACING_LINE_WIDTH: 2.6,  // m

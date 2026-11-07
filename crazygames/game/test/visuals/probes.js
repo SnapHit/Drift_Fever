@@ -68,14 +68,14 @@ const PROJECT = `
     const c = C[i], lx = -Math.cos(c.heading), lz = Math.sin(c.heading), hw = c.width / 2;
     for (const sgn of [1, -1]) {
       const wo = wallOff(i, sgn > 0 ? 'left' : 'right');
-      /* the edge line is 0.9 m wide on the road's edge and the barrier
-         (half a metre thick) may stand on it, so its inner part is
-         sampled; the ground beyond the barrier is sampled where the
+      /* the edge line is 0.9 m wide, standing 0.25 m in from the road's
+         edge (mesh.js EDGE_INSET) where a barrier may stand, so its middle,
+         0.7 m in, is sampled; the ground beyond the barrier is sampled where the
          camera sees over the barrier's top (a metre high) */
       const dWall = Math.hypot(c.x + lx * sgn * wo - cam.position.x, c.z + lz * sgn * wo - cam.position.z);
       const over = Math.max(2.5, dWall * 1.0 / Math.max(0.5, cam.position.y - 1.0) + 0.6);
       const cy = c.y || 0;
-      const set = { edge: [sgn * (hw - 0.28), cy + 0.02], road: [sgn * (hw - 2.6), cy], wall: [sgn * wo, cy + 0.5], outside: [sgn * (wo + over), cy] };
+      const set = { edge: [sgn * (hw - 0.7), cy + 0.02], road: [sgn * (hw - 2.6), cy], wall: [sgn * wo, cy + 0.5], outside: [sgn * (wo + over), cy] };
       const row = { along: a, side: sgn };
       let ok = true;
       for (const k of Object.keys(set)) {
@@ -153,8 +153,11 @@ if (run('readability') || run('shots')) {
         const ka = await side.page.evaluate(async () => {
           const mesh = await import('./src/tracks/mesh.js');
           const themes = await import('./src/env/themes.js');
+          const style = await import('./src/env/trackstyle.js');
           const before = mesh.LOOK.EDGE;
+          /* the edge painted the ground's colour, lit like the ground */
           mesh.LOOK.EDGE = themes.THEMES[window.__feel.scene.info().theme].ground[0];
+          style.TRACK_STYLE.EDGE_PAINT = 0x000000;   // and it emits nothing
           window.__feel.scene.setLook({ preset: 'dusk' });
           window.__feel.draw = true;
           return { before, painted: mesh.LOOK.EDGE };
