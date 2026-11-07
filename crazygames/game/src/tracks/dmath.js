@@ -40,6 +40,16 @@ export function dcos(x) {
   return k === 0 ? cosKernel(r) : k === 1 ? -sinKernel(r) : k === 2 ? -cosKernel(r) : sinKernel(r);
 }
 
+/* Arcsine by Newton's method on dsin, from the angle itself as the first
+   guess: six steps reach the last bit for |x| up to 0.99. */
+export function dasin(x) {
+  if (x >= 1) return 1.5707963267948966;
+  if (x <= -1) return -1.5707963267948966;
+  let a = x;
+  for (let i = 0; i < 6; i++) a -= (dsin(a) - x) / dcos(a);
+  return a;
+}
+
 export const TWO_PI = 6.283185307179586;
 
 /* An angle wrapped to [-pi, pi]. */

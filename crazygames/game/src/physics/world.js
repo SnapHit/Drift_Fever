@@ -25,9 +25,13 @@ const OFF_TRACK = 6;           // m past the half width is a respawn
 export { STEP };
 
 /* opts.tune: the car's handling (see vehicle.js), or nothing for the
-   starter. */
+   starter. opts.locate, for the measurements only: 'flat' searches in
+   x and z alone when a full search is made (as the world did before
+   tracks could cross), 'nearest' takes the nearest sample in x and z
+   on every step, which is what the brief calls the old rule. */
 export function createWorld(ground, opts) {
   const tune = (opts && opts.tune) || null;
+  const locateMode = (opts && opts.locate) || '3d';
   const segs = [];
   for (const wall of ground.walls) {
     const p = wall.points;
@@ -39,7 +43,7 @@ export function createWorld(ground, opts) {
       // inward: right of the direction for a left wall, left for a right wall
       const nx = wall.side === 'left' ? -uz : uz;
       const nz = wall.side === 'left' ? ux : -ux;
-      segs.push({ ax: p[i].x, az: p[i].z, ux, uz, len, nx, nz, kind: wall.kind, side: wall.side, index: i, wall });
+      segs.push({ ax: p[i].x, az: p[i].z, ay: p[i].y || 0, by: p[i + 1].y || 0, ux, uz, len, nx, nz, kind: wall.kind, side: wall.side, index: i, wall });
     }
   }
   // a coarse grid over the segments so a step tests a handful, not all
@@ -58,12 +62,16 @@ export function createWorld(ground, opts) {
   }
 
   const car = createVehicle(ground.start.x, ground.start.z, ground.start.yaw, tune);
+  car.y = ground.start.y || 0;
   const cones = ground.cones.map(c => ({ x0: c.x, z0: c.z, x: c.x, z: c.z, vx: 0, vz: 0, knocked: 0, tilt: 0, tiltX: 0, tiltZ: 0 }));
   const pts = new Float64Array(12);
+  const surf = { gx: 0, gz: 0, kv: 0, bank: 0 };     // the road's slope under the car, handed to the vehicle
   const world = {
     ground, car, cones, segs, tune, step: 0, time: 0,
     along: 0, lateral: 0, centreIndex: 0,   // where the car is along the track, and how far left of the centre
-    hit: null,                              // this step's hit, if any: { speed, hard, kind, x, z }
+    layer: 0,                               // the layer of the car's sample: 1 on a bridge and its ramps
+    surface: { y: 0, bank: 0, grade: 0, roll: 0, pitch: 0 },   // the road under the car: height, roll, slope along, and the body's tilt
+    hit: null,                              // this step's hit, if any: { speed, hard, kind, x, z, wy (the wall's height there) }
     respawned: false, recovered: false, stuckT: 0, lastTouch: -1, wallNx: 0, wallNz: 0, touching: false, hits: 0, hardHits: 0, conesKnocked: 0, nearest: Infinity, nearestClip: null,
     stepWorld, reset, hash, locate, clipDistance,
   };
@@ -71,19 +79,23 @@ export function createWorld(ground, opts) {
   function reset() {
     const c = createVehicle(ground.start.x, ground.start.z, ground.start.yaw, tune);
     Object.assign(car, c);
+    car.y = ground.start.y || 0;
     for (const k of cones) { k.x = k.x0; k.z = k.z0; k.vx = 0; k.vz = 0; k.knocked = 0; k.tilt = 0; k.tiltX = 0; k.tiltZ = 0; }
     world.step = 0; world.time = 0; world.hit = null; world.touching = false; world.stuckT = 0; world.lastTouch = -1; world.recovered = false; world.hits = 0; world.hardHits = 0; world.conesKnocked = 0; world.respawned = false;
     world.centreIndex = 0; world.along = 0; world.lateral = 0; world.nearest = Infinity;
     locate(true);
   }
 
-  /* Nearest centre sample, incrementally; a full search when asked or lost. */
+  /* Nearest centre sample, incrementally along the track; a full search
+     when asked or lost, in three dimensions so a crossover's other pass
+     is far away. Then the road under the car. */
   function locate(full) {
     const C = ground.centre, n = C.length;
     if (!n) return;
     let best = world.centreIndex, bd = Infinity;
-    const d2 = i => { const c = C[((i % n) + n) % n]; return (c.x - car.x) ** 2 + (c.z - car.z) ** 2; };
-    if (full) { for (let i = 0; i < n; i++) { const d = d2(i); if (d < bd) { bd = d; best = i; } } }
+    const flat = locateMode !== '3d';
+    const d2 = i => { const c = C[((i % n) + n) % n]; const dy = flat ? 0 : (c.y || 0) - car.y; return (c.x - car.x) ** 2 + (c.z - car.z) ** 2 + dy * dy; };
+    if (full || locateMode === 'nearest') { for (let i = 0; i < n; i++) { const d = d2(i); if (d < bd) { bd = d; best = i; } } }
     else {
       bd = d2(best);
       for (let k = 1; k <= 6; k++) { const d = d2(best + k); if (d < bd) { bd = d; best = ((best + k) % n + n) % n; } }
@@ -95,8 +107,39 @@ export function createWorld(ground, opts) {
     const lx = -Math.cos(c.heading), lz = Math.sin(c.heading);
     const fx = -Math.sin(c.heading), fz = -Math.cos(c.heading);
     world.lateral = (car.x - c.x) * lx + (car.z - c.z) * lz;
-    world.along = best * 2 + (car.x - c.x) * fx + (car.z - c.z) * fz;
+    const off = (car.x - c.x) * fx + (car.z - c.z) * fz;
+    world.along = best * 2 + off;
     world.halfWidth = c.width / 2;
+    world.layer = c.layer || 0;
+    /* the road under the car: height and bank between this sample and
+       the next one the car is towards, the slope along from the same
+       pair, and the vertical curvature from the three around */
+    const closed = ground.kind === 'circuit';
+    const wrap = i => closed ? ((i % n) + n) % n : Math.max(0, Math.min(n - 1, i));
+    const dir = off >= 0 ? 1 : -1;
+    const j = wrap(best + dir);
+    const t = j === best ? 0 : Math.min(1, Math.abs(off) / 2);
+    const cy = c.y || 0, jy = C[j].y || 0;
+    const bank = c.bank + ((C[j].bank || 0) - c.bank) * t;
+    const grade = j === best ? 0 : (jy - cy) / 2 * dir;
+    const tb = Math.tan(bank);
+    const ya = wrap(best + 1), yb = wrap(best - 1);
+    const kv = ya === best || yb === best ? 0 : ((C[ya].y || 0) - 2 * cy + (C[yb].y || 0)) / 4;
+    car.y = cy + (jy - cy) * t - world.lateral * tb;
+    /* the road's gradient in world: grade along, falling to the left by the bank */
+    surf.gx = grade * fx - tb * lx; surf.gz = grade * fz - tb * lz; surf.bank = bank;
+    /* the vertical curvature the car meets: along the road's own line (the
+       car travels near enough along it) */
+    surf.kv = kv;
+    car.surf = surf;
+    /* the body's tilt on the road, about its own axes, for drawing: pitch
+       nose up when climbing, roll the left side down when the road falls
+       to its left */
+    const cfx = -Math.sin(car.yaw), cfz = -Math.cos(car.yaw), clx = -Math.cos(car.yaw), clz = Math.sin(car.yaw);
+    car.pitch = Math.atan(surf.gx * cfx + surf.gz * cfz);
+    car.roll = Math.atan(-(surf.gx * clx + surf.gz * clz));
+    car.layer = world.layer;
+    world.surface.y = car.y; world.surface.bank = bank; world.surface.grade = grade; world.surface.roll = car.roll; world.surface.pitch = car.pitch;
   }
 
   /* Distance from the car's nearest body point to the nearest wall that
@@ -128,6 +171,7 @@ export function createWorld(ground, opts) {
 
   function collideWalls() {
     const S = TUNE.SCORING;
+    const layerH = TUNE.BANK.LAYER_HEIGHT;
     let worst = null, contact = false;
     for (let pass = 0; pass < 2; pass++) {
       bodyPoints(car, pts);
@@ -142,11 +186,14 @@ export function createWorld(ground, opts) {
           if (t < -0.3 || t > s.len + 0.3) continue;
           const d = rx * s.nx + rz * s.nz;          // signed distance inward of the wall line
           if (d >= WALL_HALF || d < -TUNNEL_GUARD) continue;
+          /* a wall on another layer: the bridge's barriers over a car beneath, the road's under a car on the bridge */
+          const wy = s.ay + (s.by - s.ay) * (t < 0 ? 0 : t > s.len ? 1 : t / s.len);
+          if (wy - car.y > layerH || car.y - wy > layerH) continue;
           const depth = WALL_HALF - d;
           car.x += s.nx * depth; car.z += s.nz * depth;
           const removed = applyImpact(car, px, pz, s.nx, s.nz, WALL_RESTITUTION, WALL_FRICTION);
           any = true; contact = true; world.wallNx = s.nx; world.wallNz = s.nz;
-          if (removed > 0 && (!worst || removed > worst.speed)) worst = { speed: removed, kind: s.kind, nx: s.nx, nz: s.nz, x: px, z: pz, hard: removed >= S.HARD_HIT };
+          if (removed > 0 && (!worst || removed > worst.speed)) worst = { speed: removed, kind: s.kind, nx: s.nx, nz: s.nz, x: px, z: pz, wy, hard: removed >= S.HARD_HIT };
           bodyPoints(car, pts);
         }
       }
@@ -226,6 +273,7 @@ export function createWorld(ground, opts) {
     if (ground.centre.length) {
       const c = ground.centre[world.centreIndex];
       Object.assign(car, createVehicle(c.x, c.z, c.heading, tune));
+      car.y = c.y || 0;
       car.wvx = -Math.sin(c.heading) * A.RECOVER_LAUNCH; car.wvz = -Math.cos(c.heading) * A.RECOVER_LAUNCH;
       locate(true);
     } else {
@@ -259,6 +307,7 @@ export function createWorld(ground, opts) {
         // off the track: back on the line, pointing down it, stopped
         const c = ground.centre[world.centreIndex];
         Object.assign(car, createVehicle(c.x, c.z, c.heading, tune));
+        car.y = c.y || 0;
         world.respawned = true;
         locate(true);
       }

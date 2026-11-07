@@ -1,0 +1,506 @@
+{
+ "tracks": [
+  {
+   "kind": "circuit",
+   "seed": 1,
+   "nan": 0,
+   "tris": 6898,
+   "box": [
+    -9,
+    -142,
+    244,
+    48
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 2,
+   "nan": 0,
+   "tris": 12988,
+   "box": [
+    -151,
+    -249,
+    178,
+    97
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 3,
+   "nan": 0,
+   "tris": 8490,
+   "box": [
+    -166,
+    -180,
+    130,
+    51
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 4,
+   "nan": 0,
+   "tris": 8506,
+   "box": [
+    -9,
+    -217,
+    260,
+    62
+   ],
+   "drawCalls": 6,
+   "names": [
+    "road",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 5,
+   "nan": 0,
+   "tris": 8226,
+   "box": [
+    -93,
+    -273,
+    111,
+    52
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 6,
+   "nan": 0,
+   "tris": 7842,
+   "box": [
+    -8,
+    -155,
+    195,
+    91
+   ],
+   "drawCalls": 6,
+   "names": [
+    "road",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 7,
+   "nan": 0,
+   "tris": 7856,
+   "box": [
+    -212,
+    -161,
+    9,
+    91
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 8,
+   "nan": 0,
+   "tris": 7714,
+   "box": [
+    -9,
+    -219,
+    165,
+    72
+   ],
+   "drawCalls": 6,
+   "names": [
+    "road",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 9,
+   "nan": 0,
+   "tris": 6630,
+   "box": [
+    -74,
+    -195,
+    94,
+    59
+   ],
+   "drawCalls": 6,
+   "names": [
+    "road",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 10,
+   "nan": 0,
+   "tris": 8914,
+   "box": [
+    -228,
+    -141,
+    9,
+    84
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 1,
+   "nan": 0,
+   "tris": 7882,
+   "box": [
+    -197,
+    -537,
+    45,
+    1
+   ],
+   "drawCalls": 6,
+   "names": [
+    "road",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 2,
+   "nan": 0,
+   "tris": 11680,
+   "box": [
+    -252,
+    -739,
+    9,
+    1
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 3,
+   "nan": 0,
+   "tris": 11130,
+   "box": [
+    -448,
+    -104,
+    13,
+    218
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 4,
+   "nan": 0,
+   "tris": 8340,
+   "box": [
+    -533,
+    -426,
+    8,
+    1
+   ],
+   "drawCalls": 6,
+   "names": [
+    "road",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 5,
+   "nan": 0,
+   "tris": 11072,
+   "box": [
+    -12,
+    -137,
+    619,
+    62
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 6,
+   "nan": 0,
+   "tris": 8592,
+   "box": [
+    -23,
+    -249,
+    173,
+    38
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 7,
+   "nan": 0,
+   "tris": 11054,
+   "box": [
+    -82,
+    -449,
+    301,
+    1
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 8,
+   "nan": 0,
+   "tris": 10906,
+   "box": [
+    -100,
+    -493,
+    164,
+    1
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 9,
+   "nan": 0,
+   "tris": 11362,
+   "box": [
+    -758,
+    -430,
+    8,
+    1
+   ],
+   "drawCalls": 6,
+   "names": [
+    "road",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "sprint",
+   "seed": 10,
+   "nan": 0,
+   "tris": 7760,
+   "box": [
+    -360,
+    -445,
+    9,
+    1
+   ],
+   "drawCalls": 7,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip"
+   ]
+  },
+  {
+   "kind": "circuit",
+   "seed": 24,
+   "crossover": true,
+   "nan": 0,
+   "tris": 13316,
+   "box": [
+    -269,
+    -160,
+    106,
+    53
+   ],
+   "drawCalls": 10,
+   "names": [
+    "road",
+    "runoff",
+    "kerb",
+    "edge",
+    "line",
+    "wall",
+    "clip",
+    "bridge",
+    "ramp",
+    "cut"
+   ]
+  }
+ ],
+ "testTrack": {
+  "nan": 0,
+  "tris": 7158,
+  "box": [
+   -9,
+   -177,
+   119,
+   16
+  ],
+  "drawCalls": 6,
+  "names": [
+   "road",
+   "kerb",
+   "edge",
+   "line",
+   "wall",
+   "clip"
+  ]
+ },
+ "knownAnswer": {
+  "nan": 18,
+  "tris": 6898,
+  "box": [
+   null,
+   null,
+   null,
+   null
+  ],
+  "drawCalls": 7,
+  "names": [
+   "road",
+   "runoff",
+   "kerb",
+   "edge",
+   "line",
+   "wall",
+   "clip"
+  ]
+ },
+ "flatOption": {
+  "flatMax": 0,
+  "defaultMax": 6.0321
+ }
+}

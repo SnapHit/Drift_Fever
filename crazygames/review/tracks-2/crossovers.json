@@ -1,0 +1,94 @@
+{
+ "share": {
+  "600 to 1200 m": {
+   "circuits": 200,
+   "withACrossover": 25,
+   "share": 0.13,
+   "crossingAngleDeg": {
+    "n": 25,
+    "min": 41.7,
+    "p5": 43.7,
+    "p50": 63.9,
+    "p95": 86.1,
+    "max": 89.5,
+    "mean": 66.48
+   }
+  },
+  "about 600 m": {
+   "circuits": 200,
+   "withACrossover": 0,
+   "share": 0,
+   "crossingAngleDeg": null
+  },
+  "about 900 m": {
+   "circuits": 200,
+   "withACrossover": 19,
+   "share": 0.1,
+   "crossingAngleDeg": {
+    "n": 19,
+    "min": 44.3,
+    "p5": 44.3,
+    "p50": 70.8,
+    "p95": 89.4,
+    "max": 89.4,
+    "mean": 71.247
+   }
+  },
+  "about 1200 m": {
+   "circuits": 200,
+   "withACrossover": 59,
+   "share": 0.3,
+   "crossingAngleDeg": {
+    "n": 59,
+    "min": 40.4,
+    "p5": 40.8,
+    "p50": 67,
+    "p95": 88,
+    "max": 89.5,
+    "mean": 65.247
+   }
+  }
+ },
+ "drives": {
+  "circuits": 200,
+  "seedsScanned": 1637,
+  "notLapped": 0,
+  "respawns": 0,
+  "jumps": 0,
+  "worstJump": 0,
+  "hits": 0,
+  "otherLayerHits": 0,
+  "layerChanges": 400,
+  "layerChangesOnRamps": 400,
+  "seconds": {
+   "n": 200,
+   "min": 43.63,
+   "p5": 47.96,
+   "p50": 65.07,
+   "p95": 78.19,
+   "max": 83.28,
+   "mean": 64.076
+  }
+ },
+ "knownAnswers": {
+  "nearestSample": {
+   "jumps": 712,
+   "tracksWithJumps": 198,
+   "respawns": 0,
+   "notLapped": 0
+  },
+  "flatFullSearch": {
+   "jumps": 0,
+   "tracksWithJumps": 0,
+   "respawns": 0,
+   "notLapped": 0
+  },
+  "layerRuleOff": {
+   "circuits": 50,
+   "otherLayerHits": 11585,
+   "hits": 11594,
+   "respawns": 8851,
+   "notLapped": 50
+  }
+ }
+}

@@ -1,0 +1,118 @@
+[
+ {
+  "spec": "circuit:today",
+  "seed": 1063376414,
+  "kind": "circuit",
+  "length": 836,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "circuit 1063376414 (today)   836 m   10 corners, 0 hairpins, 6 direction changes   74% in corners   longest straight 84 m   tightest 26.4 m   width 16.3 m   10 clips   0 banked corners   no crossover   difficulty 0.37 (asked 0.50)   14 attempts, 192 ms   valid",
+  "errors": [],
+  "file": "shots/circuit-1063376414.png",
+  "ride": "shots/circuit-1063376414-ride.png",
+  "rideAt": {
+   "s": 60,
+   "what": "60 m in"
+  },
+  "bridge": null,
+  "ok": true
+ },
+ {
+  "spec": "sprint:today",
+  "seed": 1063376414,
+  "kind": "sprint",
+  "length": 818,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "sprint 1063376414 (today)   818 m   10 corners, 1 hairpins, 9 direction changes   67% in corners   longest straight 128 m   tightest 17.2 m   width 15.7 m   9 clips   1 banked corner (up to 10 degrees)   no crossover   difficulty 0.47 (asked 0.50)   1 attempt, 59 ms   valid",
+  "errors": [],
+  "file": "shots/sprint-1063376414.png",
+  "ride": "shots/sprint-1063376414-ride.png",
+  "rideAt": {
+   "s": 299,
+   "what": "sweeper banked 9 degrees at 324 m"
+  },
+  "bridge": null,
+  "ok": true
+ },
+ {
+  "spec": "circuit:8:0.5:1200",
+  "seed": 8,
+  "kind": "circuit",
+  "length": 1164,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "circuit 8   1164 m   14 corners, 0 hairpins, 6 direction changes   59% in corners   longest straight 110 m   tightest 21.7 m   width 15.8 m   14 clips   6 banked corners (up to 13 degrees)   crossover at 348 m over 930 m, 46.3 degrees, 5.0 m clear   difficulty 0.39 (asked 0.50)   2 attempts, 95 ms   valid",
+  "errors": [],
+  "file": "shots/circuit-8.png",
+  "ride": "shots/circuit-8-ride.png",
+  "rideAt": {
+   "s": 303.48,
+   "what": "the ramp up to the bridge at 348 m",
+   "bridge": 348.48
+  },
+  "bridge": "shots/circuit-8-bridge.png",
+  "ok": true
+ },
+ {
+  "spec": "circuit:7:0.7",
+  "seed": 7,
+  "kind": "circuit",
+  "length": 976,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "circuit 7   976 m   6 corners, 0 hairpins, 2 direction changes   71% in corners   longest straight 72 m   tightest 24.5 m   width 14.9 m   6 clips   4 banked corners (up to 15 degrees)   crossover at 619 m over 131 m, 73.9 degrees, 5.0 m clear   difficulty 0.25 (asked 0.70)   24 attempts, 1573 ms   valid",
+  "errors": [],
+  "file": "shots/circuit-7.png",
+  "ride": "shots/circuit-7-ride.png",
+  "rideAt": {
+   "s": 574.03,
+   "what": "the ramp up to the bridge at 619 m",
+   "bridge": 619.03
+  },
+  "bridge": "shots/circuit-7-bridge.png",
+  "ok": true
+ },
+ {
+  "spec": "sprint:3:0.8",
+  "seed": 3,
+  "kind": "sprint",
+  "length": 1016,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "sprint 3   1016 m   15 corners, 0 hairpins, 11 direction changes   71% in corners   longest straight 96 m   tightest 21.9 m   width 15.6 m   14 clips   5 banked corners (up to 15 degrees)   no crossover   difficulty 0.49 (asked 0.80)   1 attempt, 37 ms   valid",
+  "errors": [],
+  "file": "shots/sprint-3.png",
+  "ride": "shots/sprint-3-ride.png",
+  "rideAt": {
+   "s": 875,
+   "what": "flow banked 14 degrees at 900 m"
+  },
+  "bridge": null,
+  "ok": true
+ },
+ {
+  "spec": "sprint:6:0.3",
+  "seed": 6,
+  "kind": "sprint",
+  "length": 810,
+  "valid": true,
+  "failed": [],
+  "fail": null,
+  "stats": "sprint 6   810 m   8 corners, 6 hairpins, 6 direction changes   67% in corners   longest straight 120 m   tightest 17.5 m   width 17.0 m   8 clips   3 banked corners (up to 14 degrees)   no crossover   difficulty 0.52 (asked 0.30)   1 attempt, 39 ms   valid",
+  "errors": [],
+  "file": "shots/sprint-6.png",
+  "ride": "shots/sprint-6-ride.png",
+  "rideAt": {
+   "s": 159,
+   "what": "sweeper banked 11 degrees at 184 m"
+  },
+  "bridge": null,
+  "ok": true
+ }
+]

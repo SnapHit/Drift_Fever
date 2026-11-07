@@ -1,0 +1,49 @@
+{
+ "zones": {
+  "Pacific/Kiritimati": {
+   "early": 1976143581,
+   "late": 1976143581,
+   "next": 1113709271,
+   "utcEarly": 1959365962,
+   "utcLate": 1976143581
+  },
+  "Australia/Sydney": {
+   "early": 1976143581,
+   "late": 1976143581,
+   "next": 1113709271,
+   "utcEarly": 1959365962,
+   "utcLate": 1976143581
+  },
+  "Asia/Kolkata": {
+   "early": 1976143581,
+   "late": 1976143581,
+   "next": 1113709271,
+   "utcEarly": 1959365962,
+   "utcLate": 1976143581
+  },
+  "UTC": {
+   "early": 1976143581,
+   "late": 1976143581,
+   "next": 1113709271,
+   "utcEarly": 1976143581,
+   "utcLate": 1976143581
+  },
+  "America/Los_Angeles": {
+   "early": 1976143581,
+   "late": 1976143581,
+   "next": 1113709271,
+   "utcEarly": 1976143581,
+   "utcLate": 1113709271
+  },
+  "Pacific/Pago_Pago": {
+   "early": 1976143581,
+   "late": 1976143581,
+   "next": 1113709271,
+   "utcEarly": 1976143581,
+   "utcLate": 1113709271
+  }
+ },
+ "sameEverywhere": true,
+ "utcVariantSameEverywhere": false,
+ "distinctOver3653Days": 3653
+}

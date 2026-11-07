@@ -1,0 +1,434 @@
+{
+ "seedsPerKind": 200,
+ "before": "ad6cfc6",
+ "kinds": {
+  "circuit": {
+   "before": {
+    "cornersPerKm": {
+     "n": 200,
+     "min": 4.988,
+     "p5": 6.237,
+     "p50": 10.742,
+     "p95": 15.537,
+     "max": 17.903,
+     "mean": 10.701
+    },
+    "cornerShare": {
+     "n": 200,
+     "min": 0.421,
+     "p5": 0.524,
+     "p50": 0.617,
+     "p95": 0.706,
+     "max": 0.737,
+     "mean": 0.618
+    },
+    "directionChangesPerKm": {
+     "n": 200,
+     "min": 0,
+     "p5": 2.331,
+     "p50": 6.623,
+     "p95": 11.65,
+     "max": 15.217,
+     "mean": 6.704
+    },
+    "longestStraight": {
+     "n": 200,
+     "min": 64,
+     "p5": 76,
+     "p50": 120,
+     "p95": 154,
+     "max": 164,
+     "mean": 117.33
+    },
+    "secondStraight": {
+     "n": 200,
+     "min": 30,
+     "p5": 48,
+     "p50": 80,
+     "p95": 128,
+     "max": 144,
+     "mean": 82.9
+    },
+    "meanStraight": {
+     "n": 200,
+     "min": 17.222,
+     "p5": 22.909,
+     "p50": 37.2,
+     "p95": 62.857,
+     "max": 80.8,
+     "mean": 38.569
+    },
+    "straights": {
+     "n": 200,
+     "min": 4,
+     "p5": 5,
+     "p50": 10,
+     "p95": 16,
+     "max": 18,
+     "mean": 10.07
+    },
+    "corners": {
+     "n": 200,
+     "min": 4,
+     "p5": 5,
+     "p50": 10,
+     "p95": 16,
+     "max": 18,
+     "mean": 10.135
+    },
+    "banked": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 0,
+     "p95": 0,
+     "max": 0,
+     "mean": 0
+    },
+    "crossings": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 0,
+     "p95": 0,
+     "max": 0,
+     "mean": 0
+    },
+    "tracksWithACrossover": 0
+   },
+   "after": {
+    "cornersPerKm": {
+     "n": 200,
+     "min": 5.865,
+     "p5": 7.375,
+     "p50": 12.064,
+     "p95": 17.37,
+     "max": 18.056,
+     "mean": 12.022
+    },
+    "cornerShare": {
+     "n": 200,
+     "min": 0.445,
+     "p5": 0.523,
+     "p50": 0.697,
+     "p95": 0.764,
+     "max": 0.802,
+     "mean": 0.678
+    },
+    "directionChangesPerKm": {
+     "n": 200,
+     "min": 0,
+     "p5": 2.674,
+     "p50": 8.043,
+     "p95": 12.658,
+     "max": 15.284,
+     "mean": 7.765
+    },
+    "longestStraight": {
+     "n": 200,
+     "min": 54,
+     "p5": 68,
+     "p50": 102,
+     "p95": 156,
+     "max": 170,
+     "mean": 106.62
+    },
+    "secondStraight": {
+     "n": 200,
+     "min": 8,
+     "p5": 26,
+     "p50": 64,
+     "p95": 112,
+     "max": 162,
+     "mean": 64.61
+    },
+    "meanStraight": {
+     "n": 200,
+     "min": 12.118,
+     "p5": 16.727,
+     "p50": 25.667,
+     "p95": 55.667,
+     "max": 94,
+     "mean": 29.087
+    },
+    "straights": {
+     "n": 200,
+     "min": 4,
+     "p5": 5,
+     "p50": 10,
+     "p95": 16,
+     "max": 18,
+     "mean": 10.285
+    },
+    "corners": {
+     "n": 200,
+     "min": 4,
+     "p5": 5,
+     "p50": 10,
+     "p95": 16,
+     "max": 18,
+     "mean": 10.3
+    },
+    "banked": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 2,
+     "p95": 5,
+     "max": 8,
+     "mean": 2.325
+    },
+    "crossings": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 0,
+     "p95": 1,
+     "max": 1,
+     "mean": 0.125
+    },
+    "bankedCornerShare": 0.23,
+    "tracksWithACrossover": 25,
+    "designedCornerTypes": {
+     "opening": 50,
+     "tight": 235,
+     "multi": 177,
+     "sweeper": 170,
+     "flow": 732,
+     "esses": 410,
+     "double": 108,
+     "tightening": 81,
+     "hairpin": 48,
+     "chicane": 97
+    }
+   }
+  },
+  "sprint": {
+   "before": {
+    "cornersPerKm": {
+     "n": 200,
+     "min": 4.545,
+     "p5": 6.881,
+     "p50": 11.335,
+     "p95": 16.529,
+     "max": 18.389,
+     "mean": 11.427
+    },
+    "cornerShare": {
+     "n": 200,
+     "min": 0.452,
+     "p5": 0.511,
+     "p50": 0.611,
+     "p95": 0.674,
+     "max": 0.717,
+     "mean": 0.603
+    },
+    "directionChangesPerKm": {
+     "n": 200,
+     "min": 1.136,
+     "p5": 4.456,
+     "p50": 8.197,
+     "p95": 12.931,
+     "max": 15.251,
+     "mean": 8.462
+    },
+    "longestStraight": {
+     "n": 200,
+     "min": 80,
+     "p5": 90,
+     "p50": 114,
+     "p95": 152,
+     "max": 164,
+     "mean": 115.69
+    },
+    "secondStraight": {
+     "n": 200,
+     "min": 52,
+     "p5": 56,
+     "p50": 70,
+     "p95": 84,
+     "max": 88,
+     "mean": 69.56
+    },
+    "meanStraight": {
+     "n": 200,
+     "min": 16.588,
+     "p5": 20.462,
+     "p50": 32.545,
+     "p95": 55.143,
+     "max": 72,
+     "mean": 34.367
+    },
+    "straights": {
+     "n": 200,
+     "min": 5,
+     "p5": 7,
+     "p50": 11,
+     "p95": 18,
+     "max": 21,
+     "mean": 11.495
+    },
+    "corners": {
+     "n": 200,
+     "min": 4,
+     "p5": 6,
+     "p50": 10,
+     "p95": 17,
+     "max": 21,
+     "mean": 10.57
+    },
+    "banked": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 0,
+     "p95": 0,
+     "max": 0,
+     "mean": 0
+    },
+    "crossings": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 0,
+     "p95": 0,
+     "max": 0,
+     "mean": 0
+    },
+    "tracksWithACrossover": 0
+   },
+   "after": {
+    "cornersPerKm": {
+     "n": 200,
+     "min": 5.208,
+     "p5": 9.132,
+     "p50": 12.605,
+     "p95": 16.517,
+     "max": 19.33,
+     "mean": 12.649
+    },
+    "cornerShare": {
+     "n": 200,
+     "min": 0.549,
+     "p5": 0.599,
+     "p50": 0.686,
+     "p95": 0.73,
+     "max": 0.748,
+     "mean": 0.676
+    },
+    "directionChangesPerKm": {
+     "n": 200,
+     "min": 1.302,
+     "p5": 5.128,
+     "p50": 9.639,
+     "p95": 14.477,
+     "max": 17.291,
+     "mean": 9.543
+    },
+    "longestStraight": {
+     "n": 200,
+     "min": 78,
+     "p5": 84,
+     "p50": 100,
+     "p95": 132,
+     "max": 148,
+     "mean": 103.17
+    },
+    "secondStraight": {
+     "n": 200,
+     "min": 42,
+     "p5": 46,
+     "p50": 58,
+     "p95": 70,
+     "max": 76,
+     "mean": 57.62
+    },
+    "meanStraight": {
+     "n": 200,
+     "min": 14.706,
+     "p5": 17.059,
+     "p50": 23.846,
+     "p95": 36.444,
+     "max": 59.2,
+     "mean": 24.462
+    },
+    "straights": {
+     "n": 200,
+     "min": 5,
+     "p5": 8,
+     "p50": 12,
+     "p95": 17,
+     "max": 20,
+     "mean": 12.55
+    },
+    "corners": {
+     "n": 200,
+     "min": 4,
+     "p5": 7,
+     "p50": 11,
+     "p95": 16,
+     "max": 20,
+     "mean": 11.565
+    },
+    "banked": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 2,
+     "p95": 6,
+     "max": 8,
+     "mean": 2.36
+    },
+    "crossings": {
+     "n": 200,
+     "min": 0,
+     "p5": 0,
+     "p50": 0,
+     "p95": 0,
+     "max": 1,
+     "mean": 0.03
+    },
+    "bankedCornerShare": 0.2,
+    "tracksWithACrossover": 6,
+    "designedCornerTypes": {
+     "flow": 799,
+     "sweeper": 105,
+     "hairpin": 91,
+     "chicane": 187,
+     "opening": 63,
+     "tight": 133,
+     "tightening": 100,
+     "multi": 334,
+     "esses": 393,
+     "double": 206
+    }
+   }
+  }
+ },
+ "knownAnswer": {
+  "circuit": {
+   "oldLowerOn": [
+    "cornersPerKm",
+    "cornerShare",
+    "directionChangesPerKm"
+   ],
+   "oldHigherOn": [
+    "secondStraight",
+    "meanStraight"
+   ],
+   "caught": true
+  },
+  "sprint": {
+   "oldLowerOn": [
+    "cornersPerKm",
+    "cornerShare",
+    "directionChangesPerKm"
+   ],
+   "oldHigherOn": [
+    "secondStraight",
+    "meanStraight"
+   ],
+   "caught": true
+  }
+ }
+}

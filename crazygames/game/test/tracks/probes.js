@@ -15,15 +15,17 @@
      M  the mesh builder in Node: finite geometry
 
    node game/test/tracks/probes.js [--seeds 1000] [--only 1,2,3,W,D,M] [--no-browser]
-   Writes review/tracks/*.json and prints a summary. Exits non zero if a
-   measurement fails or a known answer is not caught. */
+   Writes review/tracks/*.json (or TRACKS_REVIEW_DIR) and prints a
+   summary. Exits non zero if a measurement fails or a known answer is
+   not caught. The second generator's own measurements (busier corners,
+   banked corners, crossovers) are in tracks2.js beside this. */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import { execFileSync } from 'node:child_process';
 import { generateTrack, dailySeed, trackFromElements, TRACKS } from '../../src/tracks/generate.js';
-import { validateTrack, characterOf, cornersOf } from '../../src/tracks/analyse.js';
+import { validateTrack, characterOf, cornersOf, findCrossings } from '../../src/tracks/analyse.js';
 import { buildTrackMesh } from '../../src/tracks/mesh.js';
 import { createWorld } from '../../src/physics/world.js';
 import { createDriver } from '../../src/physics/driver.js';
@@ -96,7 +98,7 @@ async function determinism() {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tracks-'));
     fs.cpSync(tracksDir, path.join(tmp, 'real'), { recursive: true });
     fs.cpSync(tracksDir, path.join(tmp, 'variant'), { recursive: true });
-    fs.writeFileSync(path.join(tmp, 'variant', 'dmath.js'), 'export const dsin = x => Math.sin(x);\nexport const dcos = x => Math.cos(x);\nexport const TWO_PI = 6.283185307179586;\nexport function wrapAngle(a) { return a - TWO_PI * Math.round(a / TWO_PI); }\n');
+    fs.writeFileSync(path.join(tmp, 'variant', 'dmath.js'), 'export const dsin = x => Math.sin(x);\nexport const dcos = x => Math.cos(x);\nexport const dasin = x => Math.asin(x);\nexport const TWO_PI = 6.283185307179586;\nexport function wrapAngle(a) { return a - TWO_PI * Math.round(a / TWO_PI); }\n');
     fs.cpSync(tracksDir, path.join(tmp, 'nudged'), { recursive: true });
     const dm = fs.readFileSync(path.join(tracksDir, 'dmath.js'), 'utf8');
     fs.writeFileSync(path.join(tmp, 'nudged', 'dmath.js'), dm.replace('export function dsin(x) {', 'export function dsin(x) { return dsinTrue(x) * (1 + 1e-6); }\nfunction dsinTrue(x) {'));
@@ -270,9 +272,12 @@ function brokenTracks() {
     known('2 the part gap measurement on the same track', g.ratio < 1 && g.gap < 3, 'reads ' + g.gap.toFixed(2) + ' m, ' + g.ratio.toFixed(2) + ' of the road width');
   }
   {
+    /* a wall from one part of the track standing in the road of another:
+       five left wall points moved onto the centre line 300 m further on
+       (a wall point moved within its own road is the contract check's) */
     const t = clone(base);
-    for (let i = 40; i <= 44; i++) { const c = t.centre[i], p = t.walls[0].points[i]; p.x = c.x + (p.x - c.x) * 0.4; p.z = c.z + (p.z - c.z) * 0.4; }
-    expect('clearance: five left wall points moved to 40% of the half width', t, all, 'clearance', 'samples 40 to 44');
+    for (let i = 40; i <= 44; i++) { const c = t.centre[(i + 150) % t.centre.length], p = t.walls[0].points[i]; p.x = c.x; p.z = c.z; p.y = c.y; }
+    expect('clearance: five left wall points moved into the road 300 m further on', t, all, 'clearance', 'samples 40 to 44 placed on the centre line at samples 190 to 194');
   }
   {
     const t = clone(base);
@@ -298,13 +303,49 @@ function brokenTracks() {
   }
   {
     const t = clone(base);
-    for (let i = 0; i < t.centre.length; i++) t.centre[i].y += i >= 20 && i <= 40 ? (i - 20) * 2 * 0.08 : i > 40 ? 3.2 : 0;
-    expect('elevation: an 8% ramp', t, all, 'elevation', '40 m at 8%');
+    for (let i = 0; i < t.centre.length; i++) t.centre[i].y += i >= 20 && i <= 40 ? (i - 20) * 2 * 0.10 : i > 40 ? 4.0 : 0;
+    expect('elevation: a 10% ramp', t, all, 'elevation', '40 m at 10%, steeper than a bridge ramp');
   }
   {
     const t = clone(base);
-    for (let i = 50; i <= 55; i++) t.centre[i].bank = 0.15;
-    expect('elevation: 8.6 degrees of bank', t, all, 'elevation', 'samples 50 to 55');
+    for (let i = 50; i <= 55; i++) t.centre[i].bank = 0.35;
+    expect('elevation: 20 degrees of bank', t, all, 'elevation', 'samples 50 to 55, past the banked corners\' limit');
+  }
+  /* crossings: a track that crosses itself at grade, one whose bridge is
+     too low, and one whose bridge is not marked as a layer */
+  {
+    let seed = 1, x = null;
+    while (seed < 2000 && !x) { const t = generateTrack(seed, { kind: 'circuit', difficulty: 0.5 }); if (t.bridges.length) x = t; else seed++; }
+    ka.crossoverSeed = seed;
+    result('2 control: a generated crossover circuit is valid', !!x && validateTrack(x, all).ok, 'circuit ' + seed + (x ? ', bridge at ' + x.bridges[0].along + ' m over ' + x.bridges[0].under + ' m, ' + x.bridges[0].angle + ' degrees' : ', none found'));
+    if (x) {
+      const flat = clone(x);
+      for (const c of flat.centre) c.y = 0;
+      for (const w of flat.walls) for (const p of w.points) p.y = 0;
+      expect('crossover: the same circuit flattened, crossing itself at grade', flat, all, 'overlap', 'every height set to zero');
+      expect('crossover: the flattened circuit against the crossover check', flat, all, 'crossover', 'the passes 0 m apart in height');
+      const low = clone(x);
+      const b = low.bridges[0];
+      for (let i = 0; i < low.centre.length; i++) if (low.centre[i].y > 0) { low.centre[i].y *= 0.5; low.walls[0].points[i].y *= 0.5; low.walls[1].points[i].y *= 0.5; }
+      low.walls[0].points[low.centre.length].y = low.walls[0].points[0].y; low.walls[1].points[low.centre.length].y = low.walls[1].points[0].y;
+      expect('crossover: the bridge at half its height', low, all, 'crossover', 'the deck ' + (b.height * 0.5 + b.depth).toFixed(2) + ' m over the road beneath');
+      const unmarked = clone(x);
+      for (const c of unmarked.centre) c.layer = 0;
+      expect('crossover: the bridge not marked as a layer', unmarked, all, 'crossover', 'layer 0 everywhere');
+      const unlisted = clone(x);
+      unlisted.bridges = [];
+      expect('crossover: the bridge not listed', unlisted, all, 'crossover', 'bridges empty');
+    }
+  }
+  {
+    /* findCrossings on a course built to cross once: a straight, a 270
+       degree corner and a straight back across the first */
+    const t = trackFromElements('sprint', [{ s: 100 }, { c: { R: 30, angle: 270, lt: 0, width: 12 } }, { s: 120 }], { crossover: false });
+    const xs = findCrossings(t);
+    ka.findCrossings = xs.map(c => ({ alongI: Math.round(c.alongI), alongJ: Math.round(c.alongJ), sinAngle: +c.sinAngle.toFixed(3) }));
+    result('2 findCrossings on a course built to cross once at a right angle', xs.length === 1 && Math.abs(xs[0].sinAngle - 1) < 0.01 && Math.abs(xs[0].alongI - 70) < 3, xs.length + ' crossing' + (xs.length === 1 ? ' at ' + Math.round(xs[0].alongI) + ' and ' + Math.round(xs[0].alongJ) + ' m along, sine ' + xs[0].sinAngle.toFixed(3) + ' (expected 1 at 70 m, sine 1)' : 's'));
+    const none = trackFromElements('sprint', [{ s: 100 }, { c: { R: 30, angle: 90, lt: 0, width: 12 } }, { s: 120 }], { crossover: false });
+    known('2 findCrossings on the same course turning 90 degrees', findCrossings(none).length === 0, findCrossings(none).length + ' crossings');
   }
   {
     const t = clone(base);
@@ -412,10 +453,13 @@ function physics() {
     const t = generateTrack(1, { kind: 'circuit', difficulty: 0 });
     const clean = drive(t, 300);
     const b = clone(t);
-    for (let i = 60; i <= 75; i++) { const c = b.centre[i], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); b.walls[1].points[i] = { x: c.x - lx * 0.3, y: c.y, z: c.z - lz * 0.3 }; }
+    /* the barrier moved 2 m past the centre line, which no line through
+       the corner misses (0.3 m short of the centre, as this was, a car
+       running 0.9 m left of the centre slipped past) */
+    for (let i = 60; i <= 75; i++) { const c = b.centre[i], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); b.walls[1].points[i] = { x: c.x + lx * 2, y: c.y, z: c.z + lz * 2 }; }
     const broken = drive(b, 300);
     out.knownAnswers.wallIntoRoad = { clean: { hits: clean.hits, respawns: clean.respawns }, broken: { hits: broken.hits, respawns: broken.respawns, hardHits: broken.hardHits } };
-    known('W a right barrier moved to 0.3 m right of the centre line for 30 m', broken.hits + broken.respawns > clean.hits + clean.respawns, 'touches ' + clean.hits + ' before, ' + broken.hits + ' after (' + broken.hardHits + ' hard), respawns ' + broken.respawns);
+    known('W a right barrier moved to 2 m left of the centre line for 30 m', broken.hits + broken.respawns > clean.hits + clean.respawns, 'touches ' + clean.hits + ' before, ' + broken.hits + ' after (' + broken.hardHits + ' hard), respawns ' + broken.respawns);
   }
   /* clipDistance: a car parked 1.5 m in from a clip wall reads the gap to it */
   {
@@ -435,11 +479,12 @@ function physics() {
     const good = park(t);
     const want = 1.5 - 0.92;
     const b = clone(t);
-    for (const k of [0, 1]) { const p = b.walls[k].points; p.unshift(...p.splice(p.length - 11, 10)); }
+    const half = Math.floor(t.centre.length / 2);
+    for (const k of [0, 1]) { const p = b.walls[k].points; p.unshift(...p.splice(p.length - 1 - half, half)); }
     const bad = park(b);
     out.knownAnswers.clipDistance = { clip, expected: want, aligned: good, misaligned: bad };
     result('W clipDistance at a clip wall', Math.abs(good - want) < 0.1, 'reads ' + good.toFixed(3) + ' m, expected ' + want.toFixed(2) + ' m (1.5 m less the half width)');
-    known('W the same with the barriers misaligned by ten samples', !(Math.abs(bad - want) < 0.1), 'reads ' + (Number.isFinite(bad) ? bad.toFixed(3) + ' m' : 'nothing'));
+    known('W the same with the barriers misaligned by half a lap', !(Math.abs(bad - want) < 0.1), 'reads ' + (Number.isFinite(bad) ? bad.toFixed(3) + ' m' : 'nothing'));
   }
   /* a sprint's end caps stop the car: flat out past the finish, and
      reversing from the start; without the caps it must get past */
@@ -497,12 +542,19 @@ async function meshes() {
     let nan = 0, tris = 0;
     g.traverse(o => { if (!o.geometry) return; const a = o.geometry.attributes.position.array; tris += a.length / 9; for (let i = 0; i < a.length; i++) if (!Number.isFinite(a[i])) nan++; });
     const box = new THREE.Box3().setFromObject(g);
-    return { nan, tris, box: [box.min.x, box.min.z, box.max.x, box.max.z].map(v => Math.round(v)), drawCalls: g.children.length };
+    return { nan, tris, box: [box.min.x, box.min.z, box.max.x, box.max.z].map(v => Math.round(v)), drawCalls: g.children.length, names: g.children.map(m => m.name) };
   };
   for (const kind of KINDS) for (let s = 1; s <= 10; s++) { const t = generateTrack(s, { kind }); const r = check(t); out.tracks.push({ kind, seed: s, ...r }); if (r.nan || !r.tris) bad++; }
+  /* and the first crossover circuit, for the bridge, ramp and cut meshes */
+  for (let s = 1; s < 2000; s++) { const t = generateTrack(s, { kind: 'circuit' }); if (!t.bridges.length) continue; const r = check(t); out.tracks.push({ kind: 'circuit', seed: s, crossover: true, ...r }); if (r.nan || !r.tris) bad++; break; }
   out.testTrack = check(testTrack());
   const tris = out.tracks.map(r => r.tris);
-  result('M buildTrackMesh in Node', bad === 0 && out.testTrack.nan === 0, bad + ' of 20 generated tracks with a non finite vertex; ' + Math.min(...tris) + ' to ' + Math.max(...tris) + ' triangles in 2 draw calls; the hand made test track builds too');
+  const calls = out.tracks.map(r => r.drawCalls);
+  const names = new Set();
+  for (const r of out.tracks) for (const nm of r.names) names.add(nm);
+  const want = ['road', 'edge', 'kerb', 'line', 'wall', 'clip', 'bridge', 'ramp'];
+  const missing = want.filter(nm => !names.has(nm));
+  result('M buildTrackMesh in Node', bad === 0 && out.testTrack.nan === 0 && missing.length === 0, bad + ' of ' + out.tracks.length + ' generated tracks with a non finite vertex; ' + Math.min(...tris) + ' to ' + Math.max(...tris) + ' triangles in ' + Math.min(...calls) + ' to ' + Math.max(...calls) + ' named meshes (' + [...names].join(', ') + '); the hand made test track builds too' + (missing.length ? '; MISSING ' + missing.join(', ') : ''));
   const b = clone(generateTrack(1, {}));
   b.centre[10].x = NaN;
   const quiet = console.error; console.error = () => {};
