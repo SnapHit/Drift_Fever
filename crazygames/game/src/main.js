@@ -34,6 +34,7 @@ import { createSave } from './loop/save.js';
 import { createProgress } from './loop/progress.js';
 import { createRace } from './scoring/race.js';
 import { fullscreenSupported, toggleFullscreen, onFullscreenChange, fullscreenIcon } from './ui/fullscreen.js';
+import { createSound, soundIcon } from './audio/sound.js';
 import { createGhost, compactTape } from './loop/ghost.js';
 import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
@@ -48,6 +49,7 @@ const chase = createChaseCamera();
 const input = createInput(root);
 const hud = createHud(root);
 const screens = createScreens(root, onAction);
+const sound = createSound();
 if (query.has('assist')) TUNE.ASSIST.LEVEL = Math.max(0, Math.min(1, +query.get('assist') || 0));
 let tuned = 0;
 if (query.get('tune') === '1') { tuned = loadSavedTune(); createTunePanel(root, () => { /* applied live; nothing to rebuild */ }); }
@@ -199,6 +201,7 @@ function frame(t) {
   else chase.update(pose, dt, scene.camera, view.w / view.h);
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
   scene.update(pose, world, dt, g);
+  sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev');
   hud.update(scoring, pose, scene.camera, THREE, view, dt);
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;
@@ -212,7 +215,7 @@ function frame(t) {
 /* ---- the states ---- */
 function titleInfo() {
   const d = dailySpec();
-  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, storage: save.status.available, backPay: save.status.backPay || 0 };
+  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -299,6 +302,7 @@ function startFree() {
 function onAction(action, arg) {
   switch (action) {
     case 'fullscreen': toggleFullscreen(); break;
+    case 'sound': sound.setMuted(!sound.muted); soundButton(); showMenu('title'); break;
     case 'title': menuGround(); showMenu('title'); break;
     case 'career': showMenu('career'); break;
     case 'garage': app.picked = null; showMenu('garage'); break;
@@ -330,6 +334,10 @@ hud.exit.addEventListener('click', () => { if (app.state !== 'dev') { menuGround
 /* full screen: a button in the HUD beside the exit, and one on the title */
 if (fullscreenSupported()) { hud.fs.hidden = false; hud.fs.innerHTML = fullscreenIcon(false); }
 hud.fs.addEventListener('click', e => { e.stopPropagation(); toggleFullscreen(); });
+/* sound on or off: a button in the HUD and one on the title */
+function soundButton() { hud.snd.innerHTML = soundIcon(sound.muted); hud.snd.setAttribute('aria-label', sound.muted ? 'sound off' : 'sound on'); }
+if (sound.available) { hud.snd.hidden = false; soundButton(); }
+hud.snd.addEventListener('click', e => { e.stopPropagation(); sound.setMuted(!sound.muted); soundButton(); });
 onFullscreenChange(on => { hud.fs.innerHTML = fullscreenIcon(on); hud.fs.setAttribute('aria-label', on ? 'exit full screen' : 'full screen'); if (app.state === 'title') showMenu('title'); });
 
 /* ---- go ---- */
@@ -383,7 +391,7 @@ window.__feel = {
   onScreen(margin) { scene.camera.updateMatrixWorld(); return carOnScreen(THREE, scene.camera, pose, box, margin || 0); },
 };
 window.__loop = {
-  app, save, LOOP, screens, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
+  app, save, LOOP, screens, sound, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor,
   progress: () => app.progress && app.progress.state,
   results: () => app.results,

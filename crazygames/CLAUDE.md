@@ -282,3 +282,11 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   the exit and on the title (`game/src/ui/fullscreen.js`), shown only
   where the browser allows it (not on an iPhone's Safari). On CrazyGames
   their player has its own.
+- 8 November 2026: sound, first pass: the engine and the tyres,
+  synthesised with Web Audio in `game/src/audio/sound.js` (every level in
+  `SOUND`), nothing downloaded. The engine's note follows the revs through
+  six gears and rises with wheelspin; the tyres squeal and hiss with the
+  drift angle and speed. It starts on the first tap, pauses while the
+  page is hidden, and a sound button in the HUD and on the title mutes it
+  (remembered on the device). Hits, scrapes, score and UI sounds and
+  music are not done.
