@@ -10,9 +10,12 @@
    runs from SHIFT_RPM to MAX_RPM, so the note climbs, drops at a shift,
    and climbs again; wheelspin and a slide add revs.
 
-   The tyres are looped noise through two band passes, a low hiss and a
-   high squeal, whose level grows with the drift angle and the speed,
-   and whose pitch rises with the angle.
+   The tyres are a screech loop (renderScreechLoop: a few inharmonic
+   partials of noise whose pitches wander and which the rubber's stick
+   and slip chops into a rough, ragged squeal, over a broad scrub; after
+   play on 8 November the first, two narrow band passes, sounded like a
+   whistle) and a low hiss, whose level grows with the drift angle and
+   the speed, and whose pitch rises a little with the angle.
 
    Nothing here touches the physics: it reads the car once a frame. The
    AudioContext starts on the first tap or key (browsers allow sound only
@@ -45,7 +48,17 @@ export const SOUND = {
   },
   SQUEAL_FROM:   9,        // degrees of slide before the tyres sing
   SQUEAL_FULL:   38,       // degrees at full voice
-  SQUEAL_HZ:     [1100, 1900],  // the squeal's band, rising with the angle
+  SQUEAL_PITCH:  [0.92, 1.12], // the screech loop's playback rate, from a light slide to a deep one
+  SCREECH: {               // the screech, rendered into one loop by renderScreechLoop
+    seconds:    2.4,       // the loop's length
+    partials:   [[780, 1], [1490, 0.7], [2310, 0.45], [3270, 0.25]],   // Hz and weight: inharmonic, as a tyre's are
+    q:          10,        // each partial's sharpness: high enough to sing, low enough to be ragged
+    wander:     0.07,      // share each partial's pitch wanders, slowly and at random
+    stick:      [35, 110], // Hz: the rubber's stick and slip, the roughness under the squeal
+    stickDepth: 0.75,      // how deep the stick and slip chops the squeal
+    hiss:       0.35,      // broadband scrub under it
+    drive:      1.4,
+  },
   HISS_HZ:       520,      // the low scrub band
   SPEED_FULL:    18,       // m/s at which the tyres reach full voice
   FADE:          0.25,     // s to fade in or out
@@ -97,6 +110,43 @@ export function renderEngineLoop(sr, rpm, o) {
   return out;
 }
 
+/* One seamless loop of tyre screech. Each partial is noise through a
+   resonator whose pitch wanders by a slow random walk; together they are
+   chopped by the stick and slip of the rubber, a jittery envelope at a
+   few tens of hertz, which is what makes a screech ragged rather than a
+   whistle; a little broadband scrub sits under it. The loop's end is
+   faded into its start so it joins without a seam. */
+export function renderScreechLoop(sr, o) {
+  const len = Math.round(o.seconds * sr), fade = Math.round(0.25 * sr), total = len + fade;
+  const raw = new Float32Array(total);
+  let seed = 4242; const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 4294967296; };
+  const parts = o.partials.map(([f, w]) => ({ f, w, y1: 0, y2: 0, walk: 0, vel: 0 }));
+  let stickPhase = 0, stickRate = o.stick[0], stickEnv = 1, hp = 0, hpx = 0;
+  for (let n = 0; n < total; n++) {
+    // the stick and slip: a new rate every cycle, and a sharp attack and decay each cycle
+    stickPhase += stickRate / sr;
+    if (stickPhase >= 1) { stickPhase -= 1; stickRate = o.stick[0] + (o.stick[1] - o.stick[0]) * rand(); }
+    stickEnv = 1 - o.stickDepth * Math.pow(stickPhase, 0.6);
+    let y = 0;
+    for (const p of parts) {
+      p.vel += (rand() - 0.5) * 0.0004 - p.vel * 0.0008; p.walk += p.vel; p.walk *= 0.9995;   // a slow random walk
+      const f = p.f * (1 + o.wander * Math.max(-1, Math.min(1, p.walk * 20)));
+      const R = 1 - Math.PI * f / (o.q * sr), w = 2 * Math.PI * f / sr;
+      const v = (rand() * 2 - 1) * (1 - R) * 4 * p.w + 2 * R * Math.cos(w) * p.y1 - R * R * p.y2;
+      p.y2 = p.y1; p.y1 = v; y += v;
+    }
+    y = y * stickEnv + (rand() * 2 - 1) * o.hiss * 0.12 * (0.5 + 0.5 * stickEnv);
+    hp = 0.995 * (hp + y - hpx); hpx = y;     // no DC
+    raw[n] = Math.tanh(hp * o.drive);
+  }
+  const out = new Float32Array(len);
+  for (let n = 0; n < len; n++) out[n] = raw[n];
+  for (let n = 0; n < fade; n++) { const a = n / fade; out[n] = raw[n] * Math.sqrt(a) + raw[len + n] * Math.sqrt(1 - a); }
+  let pk = 0; for (let n = 0; n < len; n++) pk = Math.max(pk, Math.abs(out[n]));
+  if (pk > 0) for (let n = 0; n < len; n++) out[n] *= 0.9 / pk;
+  return out;
+}
+
 /* The graph, on any AudioContext (a live one, or an OfflineAudioContext
    for a test render). update() sets every level for a moment in time. */
 export function buildVoices(ctx, out) {
@@ -120,14 +170,15 @@ export function buildVoices(ctx, out) {
   const len = Math.floor(ctx.sampleRate * 2), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
   let seed = 12345; for (let i = 0; i < len; i++) { seed = (seed * 1103515245 + 12345) >>> 0; d[i] = seed / 2147483648 - 1; }
   const noise = ctx.createBufferSource(); noise.buffer = buf; noise.loop = true;
-  const squealBand = ctx.createBiquadFilter(); squealBand.type = 'bandpass'; squealBand.Q.value = 9;
-  const squealBand2 = ctx.createBiquadFilter(); squealBand2.type = 'bandpass'; squealBand2.Q.value = 14;
+  const screechData = renderScreechLoop(ctx.sampleRate, SOUND.SCREECH);
+  const screechBuf = ctx.createBuffer(1, screechData.length, ctx.sampleRate); screechBuf.getChannelData(0).set(screechData);
+  const screech = ctx.createBufferSource(); screech.buffer = screechBuf; screech.loop = true;
   const hissBand = ctx.createBiquadFilter(); hissBand.type = 'bandpass'; hissBand.frequency.value = SOUND.HISS_HZ; hissBand.Q.value = 0.8;
   const squeal = ctx.createGain(); squeal.gain.value = 0;
   const hiss = ctx.createGain(); hiss.gain.value = 0;
-  noise.connect(squealBand); squealBand.connect(squealBand2); squealBand2.connect(squeal); squeal.connect(master);
+  screech.connect(squeal); squeal.connect(master);
   noise.connect(hissBand); hissBand.connect(hiss); hiss.connect(master);
-  noise.start();
+  noise.start(); screech.start();
   let rpm = SOUND.IDLE_RPM;
   /* car: { speed m/s, slip rad, rearSlide, spinning, hb }; on: the car is
      being driven (else everything fades); level: the master level; t: the
@@ -153,8 +204,8 @@ export function buildVoices(ctx, out) {
     const v = Math.max(voice, hb);
     squeal.gain.setTargetAtTime(SOUND.TYRES * v, t, 0.04);
     hiss.gain.setTargetAtTime(SOUND.TYRES * 0.8 * Math.max(v, car ? 0.08 * smooth(5, 40, car.speed) : 0), t, 0.05);
-    const sf = SOUND.SQUEAL_HZ[0] + (SOUND.SQUEAL_HZ[1] - SOUND.SQUEAL_HZ[0]) * smooth(SOUND.SQUEAL_FROM, 60, angle);
-    squealBand.frequency.setTargetAtTime(sf, t, 0.05); squealBand2.frequency.setTargetAtTime(sf * 1.01, t, 0.05);
+    const P = SOUND.SQUEAL_PITCH;
+    screech.playbackRate.setTargetAtTime(P[0] + (P[1] - P[0]) * smooth(SOUND.SQUEAL_FROM, 60, angle), t, 0.08);
     master.gain.setTargetAtTime(on ? level : 0, t, SOUND.FADE / 3);
   }
   return { update, master, ready, rpm: () => rpm };

@@ -297,3 +297,9 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   (`renderEngineLoop`, `SOUND.V8`), revs 650 to 3,900. An AudioWorklet
   would be the natural home but hangs in the sandbox's headless
   Chromium, so it could not be tested here.
+  After play the same morning the tyres "sound like a whistle": the
+  squeal is now a pre-rendered screech loop (`renderScreechLoop`,
+  `SOUND.SCREECH`): four inharmonic partials of noise with wandering
+  pitch, chopped by a random stick and slip at 35 to 110 Hz, over a
+  broadband scrub. The author offered to find recordings; a CC0
+  recording would beat any synthesis.
