@@ -40,10 +40,11 @@ export function careerUnlocked(save, index) {
 export function careerStars(save) { let n = 0; for (const k of Object.keys(save.career)) n += save.career[k].stars; return n; }
 
 /* The three targets for a track: the first is STAR_RATE points per
-   metre of the run, the others multiples of it. */
+   metre of the run, eased on harder tracks, the others multiples of it. */
 export function starTargets(track, laps) {
   const metres = track.kind === 'circuit' ? track.length * laps : (track.finish ? track.finish.along : track.length);
-  const base = metres * LOOP.STAR_RATE;
+  const d = track.requested && track.requested.difficulty !== undefined ? track.requested.difficulty : 0.5;
+  const base = metres * LOOP.STAR_RATE * (1 - d * LOOP.STAR_HARD_EASE);
   return LOOP.STAR_LEVELS.map(k => Math.round(base * k / 10) * 10);
 }
 

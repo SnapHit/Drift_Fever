@@ -247,3 +247,9 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   Open: the scripted driver stalls more on the busier, banked tracks
   (0.61 stalls per km against 0.07 on 5 November); nobody has driven a
   bank or a bridge with thumbs yet.
+- 8 November 2026, after play: stars were too hard to earn (four or five
+  goes for one star on career 1, none in four on career 2). The first
+  star now asks about 45 per cent fewer points, eased further on harder
+  tracks (`LOOP.STAR_RATE` 0.3, `STAR_HARD_EASE` 0.3), and the second
+  and third are 2 and 3.5 times the first. Career 1 is now 440, 890 and
+  1,550; career 2 is 210, 420 and 730.
