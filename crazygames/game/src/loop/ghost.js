@@ -11,16 +11,16 @@ import { carTune } from '../garage/roster.js';
 export function createGhost(track, record) {
   const world = createWorld(track, { tune: carTune(record.car) });
   const tape = record.tape;
-  const g = { record, world, entry: 0, left: 0, done: false, steps: 0, prev: { x: world.car.x, z: world.car.z, yaw: world.car.yaw } };
+  const g = { record, world, entry: 0, left: 0, done: false, steps: 0, prev: { x: world.car.x, y: world.car.y || 0, z: world.car.z, yaw: world.car.yaw } };
   const inp = { steer: 0, throttle: 0, brake: 0, handbrake: 0 };
   function reset() {
     world.reset(); g.entry = 0; g.left = tape.length ? tape[0][0] : 0; g.done = !tape.length; g.steps = 0;
-    g.prev.x = world.car.x; g.prev.z = world.car.z; g.prev.yaw = world.car.yaw;
+    g.prev.x = world.car.x; g.prev.y = world.car.y || 0; g.prev.z = world.car.z; g.prev.yaw = world.car.yaw;
   }
   function step() {
     if (g.done) return;
     const c = world.car;
-    g.prev.x = c.x; g.prev.z = c.z; g.prev.yaw = c.yaw;
+    g.prev.x = c.x; g.prev.y = c.y || 0; g.prev.z = c.z; g.prev.yaw = c.yaw;
     const e = tape[g.entry];
     inp.steer = e[1]; inp.throttle = e[2]; inp.brake = e[3]; inp.handbrake = e[4];
     world.stepWorld(inp);
@@ -31,7 +31,7 @@ export function createGhost(track, record) {
   function pose(alpha, out) {
     const c = world.car, p = g.prev;
     let dy = c.yaw - p.yaw; if (dy > Math.PI) dy -= 2 * Math.PI; else if (dy < -Math.PI) dy += 2 * Math.PI;
-    out.x = p.x + (c.x - p.x) * alpha; out.z = p.z + (c.z - p.z) * alpha; out.yaw = p.yaw + dy * alpha; out.car = c;
+    out.x = p.x + (c.x - p.x) * alpha; out.y = p.y + ((c.y || 0) - p.y) * alpha; out.z = p.z + (c.z - p.z) * alpha; out.yaw = p.yaw + dy * alpha; out.car = c;
     return out;
   }
   reset();

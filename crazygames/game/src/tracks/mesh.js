@@ -52,6 +52,7 @@ export const LOOK = {
   BRIDGE:        0x5c5f6b,     // the deck's concrete
   BRIDGE_DARK:   0x44464f,     // its underside
   DECK_THICK:    0.7,          // m, the deck's slab
+  WALL_FOOT:     1.2,          // m a barrier reaches below its base, into the ground the scenery lowers beside the road (env/terrain.js UNDER_ROAD)
   PILLAR:        0.9,          // m square
   RAMP:          0x3f4a3a,     // the embankment's earth
   RAMP_SLOPE:    1.2,          // m out per m up (the embankment's foot)
@@ -147,9 +148,9 @@ export function buildTrackMesh(track, THREE) {
     const dx = q.x - p.x, dz = q.z - p.z, len = Math.hypot(dx, dz);
     if (len < 1e-6) return;
     const nx = -dz / len * t / 2, nz = dx / len * t / 2;
-    const py = p.y || 0, qy = q.y || 0;
-    const A = [p.x + nx, py, p.z + nz], B = [q.x + nx, qy, q.z + nz], Bt = [q.x + nx, qy + h, q.z + nz], At = [p.x + nx, py + h, p.z + nz];
-    const A2 = [p.x - nx, py, p.z - nz], B2 = [q.x - nx, qy, q.z - nz], B2t = [q.x - nx, qy + h, q.z - nz], A2t = [p.x - nx, py + h, p.z - nz];
+    const py = p.y || 0, qy = q.y || 0, f = LOOK.WALL_FOOT;
+    const A = [p.x + nx, py - f, p.z + nz], B = [q.x + nx, qy - f, q.z + nz], Bt = [q.x + nx, qy + h, q.z + nz], At = [p.x + nx, py + h, p.z + nz];
+    const A2 = [p.x - nx, py - f, p.z - nz], B2 = [q.x - nx, qy - f, q.z - nz], B2t = [q.x - nx, qy + h, q.z - nz], A2t = [p.x - nx, py + h, p.z - nz];
     quad4(name, A, B, Bt, At, hex); quad4(name, B2, A2, A2t, B2t, hex); quad4(name, At, Bt, B2t, A2t, hex);
   };
   const kindAt = (w, s) => { for (const sp of w.spans || []) if (s >= sp.from && s < sp.to) return sp.kind; return w.kind || 'concrete'; };

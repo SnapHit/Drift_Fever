@@ -55,6 +55,7 @@ export const SCENERY = {
   LAMP_EVERY:    42,       // m along the road between lamp posts
   FLAG_EVERY:    14,
   BOARD_EVERY:   26,
+  CROSSING_CLEAR: 5,       // m beyond any road edge a prop must stand on a track that crosses itself (the run-off is at most 4)
   MIN_CORNER_ANGLE: 50,    // degrees: corners this big get a grandstand or a tower
   FLAG_COLOURS:  [0x19d8ff, 0xf6e7a1, 0xff8a3c, 0xffffff, 0xff4a6a, 0x7bff6a],
   CONTAINER_COLOURS: [0xb0413e, 0x2f6fa8, 0x4f8a3c, 0xd9a13a, 0x6f6f78, 0xe0e0e0, 0x8a3a8a],
@@ -221,6 +222,16 @@ export function placeScenery(track, theme, terrain, options) {
         add('tyrestack', { x: p.x, y: p.y, z: p.z, ry: rng.range(0, Math.PI), s: 1 });
         tyres++;
       }
+    }
+  }
+  /* On a figure eight the outside of one lobe's corner can be the other
+     lobe's road: trackside furniture placed from one sample is checked
+     against every sample, and dropped if it reaches inside any barrier. */
+  if (track.bridges && track.bridges.length && C.length) {
+    const reach = SCENERY.CROSSING_CLEAR;
+    const clear = (x, z, r) => { for (const q of C) if (Math.hypot(q.x - x, q.z - z) < q.width / 2 + reach + r) return false; return true; };
+    for (const kind of Object.keys(out)) {
+      out[kind] = out[kind].filter(i => footprintPoints(flatten({ [kind]: [i] })[0]).every(p => clear(p.x, p.z, p.r)));
     }
   }
   return out;

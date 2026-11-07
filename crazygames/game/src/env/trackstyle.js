@@ -131,7 +131,7 @@ export function racingLine(THREE, track, makeMaterial) {
   const segs = closed ? n : n - 1;
   for (let i = 0; i < segs; i++) {
     const j = (i + 1) % n;
-    const pt = (k, side) => { const c = C[k], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); const u = lean[k] * TRACK_STYLE.RACING_LINE_LEAN * (c.width / 2 - 1.5) + side * half; return [c.x + lx * u, (c.y || 0) + 0.025, c.z + lz * u]; };
+    const pt = (k, side) => { const c = C[k], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); const u = lean[k] * TRACK_STYLE.RACING_LINE_LEAN * (c.width / 2 - 1.5) + side * half; return [c.x + lx * u, (c.y || 0) - u * Math.tan(c.bank || 0) + 0.025, c.z + lz * u]; };   // on the road as mesh.js lays it, banked
     const a1 = pt(i, -1), a2 = pt(i, 1), b1 = pt(j, -1), b2 = pt(j, 1);
     const ai = Math.abs(lean[i]) * 0.7 + 0.3, aj = Math.abs(lean[j]) * 0.7 + 0.3;
     // three strips: the middle carries the opacity, the sides fade to nothing

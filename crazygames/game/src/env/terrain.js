@@ -25,6 +25,10 @@ export const TERRAIN = {
   FIELD_CELL:   6,        // m, the distance field's grid
   FIELD_REACH:  150,      // m, the distance a node that no sample reaches reports
   BELOW:        -0.03,    // m, the flat ground sits just under the road against z fighting
+  UNDER_ROAD:   1.0,      // m the ground drops under the road and its run-off: a banked corner's low edge or a dip is a valley the grid's triangles would cut across
+  UNDER_FROM:   5,        // m past the road edge the drop starts to ease off (the run-off is at most 4)
+  UNDER_TO:     10,       // m past the road edge it is gone
+  CUT_REACH:    9,        // m beyond a cutting's road edge the ground is held down to the road
   SEA_LEVEL:    -1.5,     // m
   SEA_BEYOND:   { coastal: 40, docks: 30 },   // m past the track's extent the water starts
 };
@@ -44,7 +48,7 @@ export function makeEdgeField(track, extent) {
   if (!n) {
     const b = track.bounds;
     const f = (x, z) => { const dx = Math.max(b.minX - x, 0, x - b.maxX), dz = Math.max(b.minZ - z, 0, z - b.maxZ); return Math.hypot(dx, dz); };
-    return { edge: f, nearest: () => -1, cols, rows, cell, alongField: false };
+    return { edge: f, nearest: () => -1, around: () => [], cols, rows, cell, alongField: false };
   }
   /* dead reckoning: each node remembers its nearest sample so far, seeded
      at the nodes the samples fall in, then two sweeps pass the nearest
@@ -78,7 +82,14 @@ export function makeEdgeField(track, extent) {
     return mix(mix(a, b, tx), mix(cc, d, tx), tz);
   };
   const nearest = (x, z) => { const c = Math.max(0, Math.min(cols - 1, Math.round((x - extent.minX) / cell))), r = Math.max(0, Math.min(rows - 1, Math.round((z - extent.minZ) / cell))); return idx[r * cols + c]; };
-  return { edge: sample, nearest, cols, rows, cell, alongField: true };
+  /* the nearest samples of the four grid nodes around a point: where two
+     parts of the track pass close, they can differ */
+  const around = (x, z) => {
+    const fx = (x - extent.minX) / cell, fz = (z - extent.minZ) / cell;
+    const c0 = Math.max(0, Math.min(cols - 2, Math.floor(fx))), r0 = Math.max(0, Math.min(rows - 2, Math.floor(fz)));
+    return [idx[r0 * cols + c0], idx[r0 * cols + c0 + 1], idx[(r0 + 1) * cols + c0], idx[(r0 + 1) * cols + c0 + 1]];
+  };
+  return { edge: sample, nearest, around, cols, rows, cell, alongField: true };
 }
 
 /* Exact distance from the road edge at a point, for the probe's known
@@ -147,11 +158,43 @@ export function buildTerrain(track, theme, options) {
   const seaS = (x, z) => sea ? (x - centre.x) * sea.dir.x + (z - centre.z) * sea.dir.z - sea.from : -Infinity;
 
   const C = track.centre;
+  /* the lower road through each crossing's cutting: the ground must stay
+     under it even where the bridge's samples are the nearest */
+  const cut = [];
+  for (const b of track.bridges || []) if (b.cut) for (let i = Math.max(0, Math.floor(b.cut[0] / 2)); i <= Math.min(C.length - 1, Math.ceil(b.cut[1] / 2)); i++) cut.push(C[i]);
+  /* the road's height u metres to the left of a sample, as mesh.js lays it:
+     y - u tan(bank), level beyond the edge */
+  const roadAt = (c, x, z) => {
+    const u = (x - c.x) * -Math.cos(c.heading) + (z - c.z) * Math.sin(c.heading), hw = c.width / 2;
+    return (c.y || 0) - Math.max(-hw, Math.min(hw, u)) * Math.tan(c.bank || 0);
+  };
   const heightAt = (x, z) => {
     const d = field.edge(x, z);
     const mask = smooth(theme.flatFrom, theme.flatTo, d);
-    // the flat ground beside the road sits at the road's own height there (zero on a flat track)
-    const base = C.length ? (C[field.nearest(x, z)].y || 0) : 0;
+    /* the flat ground beside the road sits at the road's own height there,
+       tilted with a banked corner (zero on a flat track); beside a bridge
+       and its ramps it stays at the ground's level, where the embankments
+       meet it, or lower where a banked ramp's foot dips under it, and it
+       drops into a cutting under the lower road */
+    let base = 0;
+    if (C.length) {
+      /* the nearest sample, refined over the neighbours of the four grid
+         nodes' nearest: the field's grid is coarse, a bank changes over a
+         few metres, and two parts of the track can pass close by */
+      const n = C.length;
+      let c = C[field.nearest(x, z)], bd = Infinity;
+      for (const i0 of field.around(x, z)) {
+        if (i0 < 0) continue;
+        for (let k = -6; k <= 6; k++) { const q = C[((i0 + k) % n + n) % n], dd = (q.x - x) * (q.x - x) + (q.z - z) * (q.z - z); if (dd < bd) { bd = dd; c = q; } }
+      }
+      base = c.layer ? Math.min(0, roadAt(c, x, z)) : roadAt(c, x, z);
+      /* under the road and its run-off the ground drops away a little: the
+         grid's flat triangles cannot follow a banked or rising road between
+         their corners, and would show through it */
+      const u = Math.abs((x - c.x) * -Math.cos(c.heading) + (z - c.z) * Math.sin(c.heading)), hw = c.width / 2;
+      base -= TERRAIN.UNDER_ROAD * (1 - smooth(hw + TERRAIN.UNDER_FROM, hw + TERRAIN.UNDER_TO, u));
+      for (const q of cut) if (Math.hypot(x - q.x, z - q.z) < q.width / 2 + TERRAIN.CUT_REACH) base = Math.min(base, roadAt(q, x, z));
+    }
     let h = base * (1 - mask);
     if (theme.hill > 0) {
       const f = hillsN.fbm(x * theme.hillScale, z * theme.hillScale, 4, 2.1, 0.5);

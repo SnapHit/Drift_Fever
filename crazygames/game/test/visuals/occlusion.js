@@ -11,8 +11,11 @@
       track's own wall points at the nearest centre sample. Reported as
       the least clearance over every instance.
    b. The terrain never rises onto the road: at every centre sample,
-      across the road and two metres beyond the edge, the ground is at
-      the flat level just under the road's own height there.
+      across the road and two metres beyond the edge, the ground is no
+      higher than just under the road's own height there (tilted by a
+      bank; under a bridge and beside a cutting it is lower, as it should
+      be). The tracks are generated as the game asks for them, banked and
+      with crossovers.
    c. Sight lines: from the chase camera's position at every 10 m along
       the track (TUNE.CAMERA: behind and above the car, on the road's
       heading), lines to the road's centre every 4 m ahead to 60 m. A
@@ -109,14 +112,32 @@ export function checkTrack(track, theme, options) {
     if (d < 0) inside++;
     if (d < worstClear) { worstClear = d; worstKind = it.kind; }
   }
-  /* b. the road is flat */
+  /* b. the road is flat, and the drawn ground (the grid's own triangles,
+     which cut corners a banked road does not) stays under it too */
+  const P = terrain.positions, cols = terrain.cols, rows = terrain.rows, cell = terrain.cell, ex = terrain.extent;
+  const drawnAt = (x, z) => {
+    const fx = (x - ex.minX) / cell, fz = (z - ex.minZ) / cell;
+    const c = Math.max(0, Math.min(cols - 2, Math.floor(fx))), r = Math.max(0, Math.min(rows - 2, Math.floor(fz)));
+    const tx = fx - c, tz = fz - r, h = (cc, rr) => P[((r + rr) * cols + c + cc) * 3 + 1];
+    // the triangles a, cc, bb and bb, cc, dd: split along the diagonal from (c + 1, r) to (c, r + 1)
+    return tx + tz <= 1 ? h(0, 0) + (h(1, 0) - h(0, 0)) * tx + (h(0, 1) - h(0, 0)) * tz
+                        : h(1, 1) + (h(0, 1) - h(1, 1)) * (1 - tx) + (h(1, 0) - h(1, 1)) * (1 - tz);
+  };
   let worstRise = 0;
-  for (const c of C) {
+  for (let idx = 0; idx < C.length; idx++) {
+    const c = C[idx];
     const lx = -Math.cos(c.heading), lz = Math.sin(c.heading);
     for (let u = -c.width / 2 - 2; u <= c.width / 2 + 2; u += 2) {
       const h = (o.terrainLift || 0) + terrain.heightAt(c.x + lx * u, c.z + lz * u);
-      const rise = Math.abs(h - (c.y || 0) - TERRAIN.BELOW);
+      /* the road's height there, as mesh.js lays it: tilted by the bank, level beyond the edge */
+      const road = (c.y || 0) - Math.max(-c.width / 2, Math.min(c.width / 2, u)) * Math.tan(c.bank || 0);
+      const rise = h - road - TERRAIN.BELOW;   // above the road is the failure; under a bridge or beside a cutting the ground is lower, which is right
       if (rise > worstRise) worstRise = rise;
+      /* the drawn ground against the road itself; beyond the edge of the
+         road through a cutting the ground rises to the cutting's walls, as it should */
+      const inCut = (track.bridges || []).some(b => b.cut && idx * 2 >= b.cut[0] && idx * 2 <= b.cut[1]);
+      const drawn = (o.terrainLift || 0) + drawnAt(c.x + lx * u, c.z + lz * u) - road;
+      if (!(inCut && Math.abs(u) > c.width / 2) && drawn > worstRise) worstRise = drawn;
     }
   }
   /* c. sight lines */
@@ -152,11 +173,17 @@ export function checkTrack(track, theme, options) {
 const t0 = Date.now();
 const seeds = [];
 for (let k = 0; k < seedsN; k++) seeds.push([2000 + k * 7, k % 2 ? 'sprint' : 'circuit']);
+/* the tracks as the game asks for them, banked and with crossovers; four
+   figure eights for certain: the career's crossover and three more */
+const extra = [[1303, 'circuit', 820, 0.3], [3014, 'circuit', 1000], [3019, 'circuit', 1000], [3023, 'circuit', 1000]];
+for (const e of extra) seeds.push(e);
 const rows = [];
 let worst = { clear: Infinity, rise: 0, blockedShare: 0, blockedNear: 0, inside: 0 };
 let totalLines = 0, totalBlocked = 0;
-for (const [seed, kind] of seeds) {
-  const track = generateTrack(seed, { kind, elevation: 0 });
+let crossings = 0;
+for (const [seed, kind, length, difficulty] of seeds) {
+  const track = generateTrack(seed, { kind, length, difficulty });
+  crossings += (track.bridges || []).length;
   for (const name of THEME_NAMES) {
     const r = checkTrack(track, THEMES[name]);
     rows.push({ seed, kind, theme: name, ...r });
@@ -168,19 +195,19 @@ for (const [seed, kind] of seeds) {
   }
 }
 /* known answers on the first track, forest */
-const kaTrack = generateTrack(seeds[0][0], { kind: seeds[0][1], elevation: 0 });
+const kaTrack = generateTrack(seeds[0][0], { kind: seeds[0][1] });
 const mid = kaTrack.centre[Math.floor(kaTrack.centre.length / 2)];
 const tree = { kind: 'pine', x: mid.x, y: 0, z: mid.z, r: PROP_DIMS.pine.r, h: PROP_DIMS.pine.h, ry: 0, s: 1, box: null };
 const kaTree = checkTrack(kaTrack, THEMES.forest, { inject: [tree] });
-const kaLift = checkTrack(kaTrack, THEMES.forest, { terrainLift: 0.5 });
+const kaLift = checkTrack(kaTrack, THEMES.forest, { terrainLift: 1.5 });
 const verdicts = [];
 const verdict = (label, ok, detail) => { verdicts.push({ label, ok, detail }); console.log((ok ? 'PASS ' : 'FAIL ') + label + ': ' + detail); };
 verdict('no prop footprint inside the barriers, over ' + rows.length + ' track and theme pairs', worst.inside === 0 && worst.clear >= 0, worst.inside + ' inside, least clearance ' + worst.clear.toFixed(2) + ' m');
-verdict('the terrain is flat under and beside the road', worst.rise <= BUDGET.ROAD_FLAT, 'worst rise ' + worst.rise.toFixed(3) + ' m');
+verdict('the terrain never rises above the road, banked corners and ' + crossings + ' crossings included', worst.rise <= BUDGET.ROAD_FLAT, 'worst rise ' + worst.rise.toFixed(3) + ' m');
 verdict('sight lines to the road ahead: none blocked within ' + BUDGET.CLEAR_AHEAD + ' m, at most ' + (BUDGET.BLOCKED_SHARE * 100) + '% blocked in all', worst.blockedNear === 0 && worst.blockedShare <= BUDGET.BLOCKED_SHARE, totalBlocked + ' of ' + totalLines + ' blocked (' + (100 * totalBlocked / totalLines).toFixed(2) + '%), worst track ' + (100 * worst.blockedShare).toFixed(2) + '%, blocked within ' + BUDGET.CLEAR_AHEAD + ' m: ' + worst.blockedNear);
 verdict('known answer: a pine on the road is inside the barriers', kaTree.inside >= 1 && kaTree.worstClear < 0, 'inside ' + kaTree.inside + ', clearance ' + kaTree.worstClear + ' m (' + kaTree.worstKind + ')');
 verdict('known answer: a pine on the road blocks sight lines', kaTree.blocked > 0 && kaTree.blockedNear > 0, kaTree.blocked + ' blocked, ' + kaTree.blockedNear + ' within ' + BUDGET.CLEAR_AHEAD + ' m, nearest ' + kaTree.nearest + ' m');
-verdict('known answer: the terrain lifted half a metre under the road is caught', kaLift.worstRise > BUDGET.ROAD_FLAT, 'worst rise ' + kaLift.worstRise + ' m');
+verdict('known answer: the terrain lifted a metre and a half under the road is caught', kaLift.worstRise > BUDGET.ROAD_FLAT, 'worst rise ' + kaLift.worstRise + ' m');
 const out = { started: new Date(t0).toISOString(), seconds: +((Date.now() - t0) / 1000).toFixed(1), budget: BUDGET, seeds: seeds.length, themes: THEME_NAMES, summary: { pairs: rows.length, inside: worst.inside, leastClearance: worst.clear, worstRise: worst.rise, lines: totalLines, blocked: totalBlocked, blockedShare: +(totalBlocked / totalLines).toFixed(4), worstTrackBlockedShare: +worst.blockedShare.toFixed(4), blockedNear: worst.blockedNear }, knownAnswers: { treeOnRoad: kaTree, terrainLifted: { worstRise: kaLift.worstRise } }, verdicts, rows };
 const dir = path.join(root, 'review', 'visuals');
 fs.mkdirSync(dir, { recursive: true });

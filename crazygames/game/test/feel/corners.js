@@ -1,17 +1,21 @@
 /* CORNER WALL PROBE, after play on 5 November 2026: too easy to hit the
-   walls in corners and stall. Generated tracks (elevation 0, both kinds,
+   walls in corners and stall. Generated tracks (both kinds,
    difficulty 0.3 and 0.7), the scripted driver drifting every corner
    (corners found from the centre line's curvature: a run tighter than
    CORNER_R metres, padded), one lap or to the finish. Reports wall
    contacts and hard hits per kilometre, stalls (speed under 5 m/s after
    the start), respawns, mean speed and lap time.
 
-   node game/test/feel/corners.js [seeds] [--json] */
+   The tracks are generated as the game asks for them (banked, with
+   crossovers); --flat drives them flat.
+
+   node game/test/feel/corners.js [seeds] [--json] [--flat] */
 import { createWorld, STEP } from '../../src/physics/world.js';
 import { createDriver } from '../../src/physics/driver.js';
 import { generateTrack } from '../../src/tracks/generate.js';
 
 const N = +(process.argv.find(a => /^\d+$/.test(a)) || 20);
+const FLAT = process.argv.includes('--flat');   // the tracks with no height, bank or crossover, as the game drove them before 7 November 2026
 const CORNER_R = 70;
 
 function sectionsOf(t) {
@@ -48,7 +52,7 @@ function drive(t) {
 
 const rows = [];
 for (const kind of ['circuit', 'sprint']) for (const difficulty of [0.3, 0.7]) for (let s = 1; s <= N; s++) {
-  const t = generateTrack(s * 7919 + 11, { kind, difficulty, elevation: 0 });
+  const t = generateTrack(s * 7919 + 11, FLAT ? { kind, difficulty, elevation: 0 } : { kind, difficulty });
   rows.push({ kind, difficulty, seed: s * 7919 + 11, ...drive(t) });
 }
 const sum = (f) => rows.reduce((a, r) => a + f(r), 0);

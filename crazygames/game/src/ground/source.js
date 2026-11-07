@@ -45,9 +45,9 @@ export function trackFor(spec) {
   if (memo && memo.key === memoKey) return memo.track;
   let t;
   if (GENERATOR) {
-    /* The physics and the scene are flat: the generator's elevation and
-       bank are asked off until they are. */
-    t = GENERATOR.generateTrack(s.seed, { kind: s.kind, difficulty: s.difficulty, length: s.length, elevation: 0 });
+    /* The physics follows the road's height and bank and the scene draws
+       them, so the generator's banked corners and crossovers are on. */
+    t = GENERATOR.generateTrack(s.seed, { kind: s.kind, difficulty: s.difficulty, length: s.length });
   } else {
     t = testTrack();
     t.seed = s.seed >>> 0;

@@ -48,7 +48,7 @@ const RUN_BUDGET = 60 * 300;
 
 export const READ = {
   AHEAD:      [4, 40],    // m ahead of the car the edge is sampled
-  STEP:       2,          // m between samples
+  STEP:       1,          // m between samples (every metre: samples hidden behind the track are skipped)
   MARGIN:     1.35,       // the edge's median luminance over the brightest neighbour's median, at least
   HUD_TOP:    0.14,       // share of the frame's height under the HUD, not sampled
   BLOCK:      1,          // pixels either side of a sample averaged
@@ -61,6 +61,13 @@ const PROJECT = `
   cam.updateMatrixWorld(); const THREE = sc.THREE, v = new THREE.Vector3();
   const W = extra.w, H = extra.h, hudTop = extra.hudTop * H;
   const pts = [];
+  /* a sample whose edge point is hidden behind a barrier, a bridge or an
+     embankment nearer the camera is not a sample of the edge: ray cast
+     from the camera against the track itself (a crest or a bank hides
+     road beyond it too) */
+  const solid = []; sc.scene.traverse(o => { if (o.isMesh && /^(wall|clip|barriers|bridge|ramp|cut|road|kerb|runoff)$/.test(o.name)) solid.push(o); });
+  const ray = new THREE.Raycaster(), to = new THREE.Vector3();
+  const hidden = (x, y, z) => { to.set(x, y, z).sub(cam.position); const d = to.length(); ray.set(cam.position, to.normalize()); ray.far = d - 0.3; return ray.intersectObjects(solid, false).length > 0; };
   const wallOff = (i, side) => { const c = C[i], lx = -Math.cos(c.heading), lz = Math.sin(c.heading); const wl = T.walls.find(q => q.side === side && !q.cap); if (!wl || !wl.points[i]) return c.width / 2; const p = wl.points[i]; return Math.abs((p.x - c.x) * lx + (p.z - c.z) * lz); };
   for (let a = extra.from; a <= extra.to; a += extra.step) {
     const i = (Math.round((w.along + a) / 2) % n + n) % n;
@@ -73,11 +80,13 @@ const PROJECT = `
          0.7 m in, is sampled; the ground beyond the barrier is sampled where the
          camera sees over the barrier's top (a metre high) */
       const dWall = Math.hypot(c.x + lx * sgn * wo - cam.position.x, c.z + lz * sgn * wo - cam.position.z);
-      const over = Math.max(2.5, dWall * 1.0 / Math.max(0.5, cam.position.y - 1.0) + 0.6);
-      const cy = c.y || 0;
-      const set = { edge: [sgn * (hw - 0.7), cy + 0.02], road: [sgn * (hw - 2.6), cy], wall: [sgn * wo, cy + 0.5], outside: [sgn * (wo + over), cy] };
+      const over = Math.max(2.5, dWall * 1.0 / Math.max(0.5, cam.position.y - (c.y || 0) - 1.0) + 0.6);
+      /* the road's height u metres to the left, as mesh.js lays it: tilted by the bank, level beyond the edge */
+      const cy = u => (c.y || 0) - Math.max(-hw, Math.min(hw, u)) * Math.tan(c.bank || 0);
+      const set = { edge: [sgn * (hw - 0.7), cy(sgn * (hw - 0.7)) + 0.02], road: [sgn * (hw - 2.6), cy(sgn * (hw - 2.6))], wall: [sgn * wo, cy(sgn * wo) + 0.5], outside: [sgn * (wo + over), cy(sgn * (wo + over))] };
       const row = { along: a, side: sgn };
       let ok = true;
+      if (hidden(c.x + lx * set.edge[0], set.edge[1], c.z + lz * set.edge[0])) continue;
       for (const k of Object.keys(set)) {
         const [u, y] = set[k];
         v.set(c.x + lx * u, y, c.z + lz * u).project(cam);

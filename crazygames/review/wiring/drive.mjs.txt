@@ -1,0 +1,33 @@
+import * as L from '/home/claude/rvt/crazygames/game/test/loop/lib.js';
+const out = '/home/claude/rvt/crazygames/review/wiring/';
+const env = await L.start();
+const results = {};
+for (const [vname, vp] of [['390x844', L.PORTRAIT], ['1280x720', L.LANDSCAPE]]) {
+  const side = await L.openPage(env, vp, 'auto=1', { touch: vp === L.PORTRAIT });
+  await side.page.evaluate(() => { const S = window.__loop.save; S.reset(); for (let i = 0; i < 3; i++) S.careerResult(i, 1, 1000); });
+  await L.beginRun(side.page, 'career', 2);
+  const info = await side.page.evaluate(() => { const g = window.__feel.world.ground; let mb = 0, ma = 0; g.centre.forEach((q, i) => { if (Math.abs(q.bank) > mb) { mb = Math.abs(q.bank); ma = i * 2; } }); return { bridge: g.bridges[0], length: g.length, bankAlong: ma, bankDeg: +(mb * 180 / Math.PI).toFixed(1) }; });
+  const b = info.bridge;
+  const want = { 'on-bridge': [b.deck[0] + 8, b.deck[1]], 'ramp-up': [b.ramps[0][0] + 30, b.ramps[0][1]], 'under-bridge': [b.under - 14, b.under - 2], 'banked': [info.bankAlong - 6, info.bankAlong + 6] };
+  const got = {}; let frames = 0, maxY = 0, resp = 0, layerJumps = 0, lastLayer = 0, state = 'drive', minCamClear = 1e9;
+  while (state !== 'results' && frames < 20000) {
+    const f = await L.runFrames(side.page, 1, 'const w=window.__feel.world,c=w.car; return {along:w.along,y:c.y||0,layer:c.layer||0,resp:w.respawned?1:0,state:window.__loop.app.state,roll:c.roll||0,pitch:c.pitch||0,camY:window.__feel.scene.camera.position.y};');
+    const r = f[0]; frames++; state = r.state; maxY = Math.max(maxY, r.y); resp += r.resp;
+
+    for (const [k, [a0, a1]] of Object.entries(want)) {
+      if (!got[k] && r.along >= a0 && r.along <= a1 && state === 'drive') {
+        await side.page.evaluate(() => { window.__feel.draw = true; });
+        await L.runFrames(side.page, 1);
+        await side.page.screenshot({ path: out + k + '-' + vname + '.png' });
+        await side.page.evaluate(() => { window.__feel.draw = false; });
+        got[k] = { along: +r.along.toFixed(1), y: +r.y.toFixed(2), layer: r.layer, rollDeg: +(r.roll * 180 / Math.PI).toFixed(1), pitchDeg: +(r.pitch * 180 / Math.PI).toFixed(1), camY: +r.camY.toFixed(2) };
+      }
+    }
+    if (frames > 40000) break;
+    if (Object.keys(got).length === 4 && vname === '1280x720') break;
+  }
+  const end = await side.page.evaluate(() => ({ state: window.__loop.app.state, results: window.__loop.app.results, hits: window.__feel.world.hits, hard: window.__feel.world.hardHits }));
+  results[vname] = { info, got, frames, maxY: +maxY.toFixed(2), respawns: resp, end: { state: end.state, score: end.results && end.results.score, seconds: end.results && +end.results.seconds.toFixed(1), hits: end.hits, hard: end.hard } };
+  console.log(vname, JSON.stringify(results[vname]));
+}
+process.exit(0);

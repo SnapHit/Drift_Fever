@@ -8,8 +8,8 @@
   "title": "shots/title-forest-dusk-1280x720.png",
   "tier": "high",
   "bloom": true,
-  "drawCalls": 63,
-  "triangles": 918783,
+  "drawCalls": 70,
+  "triangles": 893117,
   "errors": []
  },
  "1": {
@@ -21,8 +21,8 @@
   "title": "shots/title-coastal-dawn-1280x720.png",
   "tier": "high",
   "bloom": true,
-  "drawCalls": 61,
-  "triangles": 776913,
+  "drawCalls": 66,
+  "triangles": 651663,
   "errors": []
  },
  "2": {
@@ -34,8 +34,8 @@
   "title": "shots/title-docks-night-1280x720.png",
   "tier": "high",
   "bloom": true,
-  "drawCalls": 64,
-  "triangles": 656899,
+  "drawCalls": 70,
+  "triangles": 538027,
   "errors": []
  },
  "3": {
@@ -47,8 +47,8 @@
   "title": "shots/title-mountain-dusk-1280x720.png",
   "tier": "high",
   "bloom": true,
-  "drawCalls": 60,
-  "triangles": 571609,
+  "drawCalls": 64,
+  "triangles": 575433,
   "errors": []
  },
  "4": {
@@ -60,10 +60,10 @@
   "title": "shots/title-desert-rain-1280x720.png",
   "tier": "high",
   "bloom": true,
-  "drawCalls": 58,
-  "triangles": 561235,
+  "drawCalls": 63,
+  "triangles": 525373,
   "errors": []
  },
- "started": "2026-11-05T22:14:11.737Z",
+ "started": "2026-11-07T09:15:42.204Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader; the GPU half of a frame is not measured here"
 }

@@ -23,6 +23,7 @@ import { trackFor, freeGround, STAND_IN as TRACK_STAND_IN } from './ground/sourc
 import { createScene } from './render/scene.js';
 import { STAND_IN as CAR_STAND_IN } from './render/car.js';
 import { createChaseCamera, carOnScreen } from './camera/chase.js';
+import { LOOK as TRACK_LOOK } from './tracks/mesh.js';
 import { createInput } from './input/input.js';
 import { createScoring } from './scoring/drift.js';
 import { createHud } from './ui/hud.js';
@@ -82,10 +83,33 @@ function setGround(ground, carId, paintId) {
   box = carBox(carId);
   scene.setGround(ground);
   scene.setCar(carId, paintId);
+  chase.setCeiling(deckCeiling(ground));
+}
+
+/* The camera's ceiling under a bridge: while the car is on the road
+   beneath (layer 0), the camera stays BRIDGE_CLEAR under the deck's
+   underside, easing down as it nears the deck's edge. null on a track
+   with no bridge. */
+function deckCeiling(ground) {
+  const C = ground.centre || [], decks = [];
+  for (const b of ground.bridges || []) {
+    for (let i = Math.max(0, Math.floor(b.deck[0] / 2)); i <= Math.min(C.length - 1, Math.ceil(b.deck[1] / 2)); i++) decks.push({ x: C[i].x, z: C[i].z, r: C[i].width / 2 + TUNE.CAMERA.BRIDGE_EDGE, under: (C[i].y || 0) - TRACK_LOOK.DECK_THICK });
+  }
+  if (!decks.length) return null;
+  const K = TUNE.CAMERA;
+  return (x, z, pose) => {
+    let top = Infinity;
+    for (const q of decks) {
+      if (pose.layer) continue;    // the car is on the bridge or its ramps: the camera follows it over
+      const out = Math.max(0, Math.hypot(x - q.x, z - q.z) - q.r);
+      top = Math.min(top, q.under - K.BRIDGE_CLEAR + out * K.BRIDGE_EASE);
+    }
+    return top;
+  };
 }
 
 /* ---- the loop ---- */
-const prev = { x: 0, z: 0, yaw: 0 }, pose = { x: 0, z: 0, yaw: 0, slip: 0, speed: 0 }, ghostPose = { x: 0, z: 0, yaw: 0, car: null };
+const prev = { x: 0, y: 0, z: 0, yaw: 0 }, pose = { x: 0, y: 0, z: 0, yaw: 0, slip: 0, speed: 0 }, ghostPose = { x: 0, y: 0, z: 0, yaw: 0, car: null };
 let acc = 0, last = -1;
 const view = { w: 1, h: 1 };
 function resize() {
@@ -103,14 +127,14 @@ function resetRun() {
   if (app.progress) app.progress.reset();
   if (app.ghost) app.ghost.reset();
   tape.length = 0; acc = 0; last = -1; app.runTime = 0;
-  prev.x = world.car.x; prev.z = world.car.z; prev.yaw = world.car.yaw;
+  prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
   chase.reset({ yaw: world.car.yaw });
   if (autoDrive && app.state !== 'dev' && app.ground.centre.length) app.driver = createDriver(app.ground, { drift: '*' });
 }
 
 function stepOnce(rec) {
   const world = app.world, c = world.car;
-  prev.x = c.x; prev.z = c.z; prev.yaw = c.yaw;
+  prev.x = c.x; prev.y = c.y || 0; prev.z = c.z; prev.yaw = c.yaw;
   const inp = app.driver ? quantise(app.driver.input(world)) : rec;
   world.stepWorld(inp);
   record(inp);
@@ -165,8 +189,8 @@ function frame(t) {
   const alpha = stepping ? acc / STEP : 0;
   const c = world.car;
   let dy = c.yaw - prev.yaw; if (dy > Math.PI) dy -= 2 * Math.PI; else if (dy < -Math.PI) dy += 2 * Math.PI;
-  pose.x = prev.x + (c.x - prev.x) * alpha; pose.z = prev.z + (c.z - prev.z) * alpha; pose.yaw = prev.yaw + dy * alpha;
-  pose.slip = c.slip; pose.speed = c.speed; pose.boost = c.boost;
+  pose.x = prev.x + (c.x - prev.x) * alpha; pose.y = prev.y + ((c.y || 0) - prev.y) * alpha; pose.z = prev.z + (c.z - prev.z) * alpha; pose.yaw = prev.yaw + dy * alpha;
+  pose.slip = c.slip; pose.speed = c.speed; pose.boost = c.boost; pose.layer = c.layer || 0;
   if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
   else chase.update(pose, dt, scene.camera, view.w / view.h);
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;

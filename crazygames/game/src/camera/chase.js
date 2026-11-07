@@ -42,7 +42,7 @@ export function createChaseCamera() {
     const dist = (C.DISTANCE + C.DISTANCE_SPEED * pose.speed) * (state.portrait ? C.PORTRAIT_DISTANCE : 1);
     const height = C.HEIGHT * (state.portrait ? C.PORTRAIT_HEIGHT : 1);
     const fx = -Math.sin(state.yaw), fz = -Math.cos(state.yaw);
-    state.px = pose.x - fx * dist; state.py = height; state.pz = pose.z - fz * dist;
+    state.px = pose.x - fx * dist; state.py = (pose.y || 0) + height; state.pz = pose.z - fz * dist;
     // the shake: a decaying sine on the look target, sideways and up
     state.shakeT += dt;
     state.shake *= Math.exp(-dt * C.SHAKE_DECAY);
@@ -54,9 +54,10 @@ export function createChaseCamera() {
     const sy = Math.cos(state.shakeT * C.SHAKE_HZ * Math.PI * 2 * 0.77) * sh * 0.6;
     const lx = -Math.cos(state.yaw), lz = Math.sin(state.yaw);
     const look = C.LOOK_AHEAD * (state.portrait ? C.PORTRAIT_LOOK : 1);
-    state.tx = pose.x + fx * look + lx * sx; state.ty = C.LOOK_UP + sy; state.tz = pose.z + fz * look + lz * sx;
+    state.tx = pose.x + fx * look + lx * sx; state.ty = (pose.y || 0) + C.LOOK_UP + sy; state.tz = pose.z + fz * look + lz * sx;
     state.boostK += ((pose.boost > 0 ? 1 : 0) - state.boostK) * (1 - Math.exp(-dt / Math.max(0.01, C.BOOST_FOV_TIME)));
     state.fov = (state.portrait ? C.FOV_PORTRAIT : C.FOV) + C.FOV_SPEED * pose.speed + C.BOOST_FOV * state.boostK;
+    if (ceiling) state.py = Math.min(state.py, ceiling(state.px, state.pz, pose));
     if (cam) {
       cam.position.set(state.px, state.py, state.pz);
       cam.lookAt(state.tx, state.ty, state.tz);
@@ -70,13 +71,19 @@ export function createChaseCamera() {
     const C = TUNE.CAMERA;
     const portrait = aspect < 1;
     const ang = t * 0.25, dist = portrait ? 11 : 9, height = portrait ? 4.2 : 3.2;
-    cam.position.set(centre.x + Math.sin(ang) * dist, height, centre.z + Math.cos(ang) * dist);
-    cam.lookAt(centre.x, 0.9, centre.z);
+    const y = centre.y || 0;   // the road's height at the start line
+    cam.position.set(centre.x + Math.sin(ang) * dist, y + height, centre.z + Math.cos(ang) * dist);
+    cam.lookAt(centre.x, y + 0.9, centre.z);
     const fov = portrait ? C.FOV_PORTRAIT : C.FOV;
     if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
   }
 
-  return { state, update, reset, hit, orbit };
+  /* A ceiling over the camera, (x, z, pose) => the highest it may be, or
+     null: the game sets one on a track with a bridge so the camera does
+     not pass through the deck when the car drives under it. */
+  let ceiling = null;
+  function setCeiling(fn) { ceiling = fn || null; }
+  return { state, update, reset, hit, orbit, setCeiling };
 }
 
 /* Is the car's whole box on screen? Projects the eight corners of the
@@ -89,7 +96,7 @@ export function carOnScreen(THREE, cam, pose, dims, margin) {
   let worst = -Infinity, worstCorner = null;
   const v = new THREE.Vector3();
   for (const f of [-hl, hl]) for (const l of [-hw, hw]) for (const y of [0, h]) {
-    v.set(pose.x + fx * f + lx * l, y, pose.z + fz * f + lz * l);
+    v.set(pose.x + fx * f + lx * l, (pose.y || 0) + y, pose.z + fz * f + lz * l);
     v.project(cam);
     const ex = Math.max(Math.abs(v.x) - (1 - (margin || 0)), Math.abs(v.y) - (1 - (margin || 0)), v.z > 1 ? 1 : -1);
     if (ex > worst) { worst = ex; worstCorner = { f, l, y, ndcX: v.x, ndcY: v.y }; }

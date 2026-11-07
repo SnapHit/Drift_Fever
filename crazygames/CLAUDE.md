@@ -234,3 +234,16 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   streaks). A drift exit boost is in the physics but off by default
   (`BOOST_MAX` 0). Results in `review/fury/REPORT.md`, the corner probe in
   `game/test/feel/corners.js`.
+- 7 November 2026: busier tracks with banked corners and figure eight
+  crossovers (`briefs/TRACKS-2.md`, `review/tracks-2/REPORT.md`) and the
+  world around them (`briefs/VISUALS.md`, `review/visuals/REPORT.md`) are
+  merged and wired into the game: the car, ghost, camera, marks and
+  effects follow the road's height and tilt, and the game asks for the
+  full track. Career track 3 is now "Crossover", a 772 m figure eight.
+  Fixed on the way, in `review/wiring/REPORT.md`: a bank step of up to 14
+  degrees in two metres (generator version 3), ground showing through
+  banked roads, props on the other lobe of a figure eight, the edge line
+  half hidden under barriers, and saved ghosts from an older generator.
+  Open: the scripted driver stalls more on the busier, banked tracks
+  (0.61 stalls per km against 0.07 on 5 November); nobody has driven a
+  bank or a bridge with thumbs yet.

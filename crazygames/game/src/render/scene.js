@@ -319,17 +319,18 @@ export function createScene(canvas, opts) {
   let markHead = 0, markCount = 0;
   const lastMark = { rl: null, rr: null };
   function clearMarks() { markPos.fill(0); markAlpha.fill(0); markHead = 0; markCount = 0; lastMark.rl = null; lastMark.rr = null; markGeo.attributes.position.needsUpdate = true; markGeo.attributes.alpha.needsUpdate = true; markGeo.setDrawRange(0, 0); }
-  function layMark(name, x, z, hx, hz, strength) {
+  function layMark(name, x, y, z, hx, hz, strength) {
     // hx, hz: the half width vector across the mark
     const prev = lastMark[name];
-    lastMark[name] = { x, z, hx, hz };
+    lastMark[name] = { x, y, z, hx, hz };
     if (!prev) return;
     if (Math.hypot(x - prev.x, z - prev.z) < LOOK.MARK_SPACING * 0.5) { lastMark[name] = prev; return; }
     const limit = T().marks;
     const o = markHead * 18;
     const q = [prev.x - prev.hx, prev.z - prev.hz, prev.x + prev.hx, prev.z + prev.hz, x + hx, z + hz, x - hx, z - hz];
+    const qy = [prev.y, prev.y, y, y];
     const tri = [0, 1, 2, 0, 2, 3];
-    for (let i = 0; i < 6; i++) { markPos[o + i * 3] = q[tri[i] * 2]; markPos[o + i * 3 + 1] = 0; markPos[o + i * 3 + 2] = q[tri[i] * 2 + 1]; markAlpha[markHead * 6 + i] = strength; }
+    for (let i = 0; i < 6; i++) { markPos[o + i * 3] = q[tri[i] * 2]; markPos[o + i * 3 + 1] = qy[tri[i]]; markPos[o + i * 3 + 2] = q[tri[i] * 2 + 1]; markAlpha[markHead * 6 + i] = strength; }
     markHead = (markHead + 1) % limit;
     if (markCount < limit) markCount++;
     markGeo.attributes.position.needsUpdate = true; markGeo.attributes.alpha.needsUpdate = true;
@@ -384,12 +385,12 @@ export function createScene(canvas, opts) {
     /* pose: the interpolated car {x, z, yaw}; world.car for the rest;
        ghost: { x, z, yaw, car } interpolated, or null */
     const c = world.car;
-    car.position.set(pose.x, 0, pose.z);
-    car.rotation.y = pose.yaw;
+    car.position.set(pose.x, pose.y || 0, pose.z);
+    car.rotation.set(c.pitch || 0, pose.yaw, c.roll || 0, 'YXZ');
     poseWheels(model, c);
     if (ghost && ghostModel) {
       ghostRoot.visible = true;
-      ghostRoot.position.set(ghost.x, 0, ghost.z); ghostRoot.rotation.y = ghost.yaw;
+      ghostRoot.position.set(ghost.x, ghost.y || 0, ghost.z); ghostRoot.rotation.set(ghost.car ? ghost.car.pitch || 0 : 0, ghost.yaw, ghost.car ? ghost.car.roll || 0 : 0, 'YXZ');
       if (ghost.car) poseWheels(ghostModel, ghost.car);
     } else ghostRoot.visible = false;
     // marks off the rear wheels while they slide
@@ -399,7 +400,9 @@ export function createScene(canvas, opts) {
     const strength = Math.min(1, Math.max(c.rearSlide / 2, c.hb, c.spinning ? 0.6 : 0));
     for (const [name, side] of [['rl', 1], ['rr', -1]]) {
       const wx = pose.x - fx * bRear + lx * half * side, wz = pose.z - fz * bRear + lz * half * side;
-      if (sliding && c.speed > 1.5) layMark(name, wx, wz, lx * LOOK.MARK_WIDTH * 0.5, lz * LOOK.MARK_WIDTH * 0.5, 0.5 + 0.5 * strength);
+      /* the wheel's height on a banked or sloping road: the car's height plus its roll across and pitch along */
+      const wy = (pose.y || 0) - Math.sin(c.roll || 0) * half * side + Math.sin(c.pitch || 0) * bRear;
+      if (sliding && c.speed > 1.5) layMark(name, wx, wy, wz, lx * LOOK.MARK_WIDTH * 0.5, lz * LOOK.MARK_WIDTH * 0.5, 0.5 + 0.5 * strength);
       else lastMark[name] = null;
     }
     if (query.get('fx') !== '0') effects.update(dt, camera, pose, world, rig);

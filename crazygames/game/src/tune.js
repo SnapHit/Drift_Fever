@@ -148,6 +148,9 @@ export const TUNE = {
     PORTRAIT_DISTANCE:  1.05,    // multiplier on the distance in portrait
     PORTRAIT_HEIGHT:    1.25,    // and on the height
     PORTRAIT_LOOK:      1.30,    // and on the look ahead
+    BRIDGE_CLEAR:       0.6,     // m the camera keeps under a bridge deck's underside while the car is on the road beneath
+    BRIDGE_EDGE:        1.0,     // m past the deck's half width its parapets reach
+    BRIDGE_EASE:        0.3,     // m the camera may rise per m it is outside the deck's edge, so it eases down to pass under
     SHAKE:              0.06,    // m of look target shake per m/s of impact
     SHAKE_MAX:          0.9,     // m
     SHAKE_DECAY:        6.0,     // per second

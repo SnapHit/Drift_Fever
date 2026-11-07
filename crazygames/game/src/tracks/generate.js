@@ -977,7 +977,7 @@ function build(plan, kind, rng, d, opts, always) {
      none on a bridge or in the cut beneath it. */
   const bankRaw = S.map(q => clamp(q.k * T.BANK_RADIUS, -1, 1) * T.BANK_MAX * DEG * elevationScale);
   const bankGentle = moving(bankRaw, T.BANK_SMOOTH, closed);
-  const bank = new Array(n).fill(0);
+  const bankWant = new Array(n).fill(0);
   for (let i = 0; i < n; i++) {
     let b = bankGentle[i];
     const q = S[i], c = q.corner;
@@ -988,6 +988,16 @@ function build(plan, kind, rng, d, opts, always) {
       const win = lt > 1e-6 ? Math.min(smooth((q.s - cc.from) / lt), smooth((cc.to - q.s) / lt)) : 1;
       b += (c.a > 0 ? 1 : -1) * c.bank * DEG * win;
     }
+    bankWant[i] = b;
+  }
+  /* Smoothed once more as a whole: a banked piece with no ramps (the
+     middle of a multi apex corner) meets its neighbour's ramp, which
+     starts from nothing, and left alone that is a step of up to 14
+     degrees in two metres, a twist in the road and a jolt in the car. */
+  const bankSmooth = moving(bankWant, T.BANK_SMOOTH, closed);
+  const bank = new Array(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    let b = bankSmooth[i];
     if (bridge && part[i]) b *= 1 - Math.max(struct[i], cut[i]);
     bank[i] = clamp(b, -T.BANK_CORNER_MAX * DEG, T.BANK_CORNER_MAX * DEG);
   }
@@ -1115,7 +1125,7 @@ export function generateTrack(seed, options) {
 
 function finishTrack(t, seed, kind, d, target, attempts, failures, fallback, eight) {
   return {
-    name: kind + ' ' + seed, seed, version: 2,
+    name: kind + ' ' + seed, seed, version: 3,
     kind: t.kind, length: t.length,
     target: { min: r2(target.min), max: r2(target.max) }, requested: { difficulty: d },
     difficulty: difficultyOf(t),

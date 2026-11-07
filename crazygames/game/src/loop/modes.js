@@ -11,7 +11,7 @@ import { dailySeed, localDate } from '../ground/source.js';
 export const CAREER = [
   { name: 'First slide',   kind: 'circuit', seed: 1101, difficulty: 0.10, length: 560 },
   { name: 'Harbour run',   kind: 'sprint',  seed: 1202, difficulty: 0.20, length: 800 },
-  { name: 'Switchbacks',   kind: 'circuit', seed: 1303, difficulty: 0.30, length: 600 },
+  { name: 'Crossover',     kind: 'circuit', seed: 1303, difficulty: 0.30, length: 820 },   // 772 m, a figure eight over a bridge
   { name: 'Long shadows',  kind: 'sprint',  seed: 1404, difficulty: 0.40, length: 900 },
   { name: 'Tight city',    kind: 'circuit', seed: 1505, difficulty: 0.55, length: 620 },
   { name: 'Ridge road',    kind: 'sprint',  seed: 1606, difficulty: 0.65, length: 1000 },

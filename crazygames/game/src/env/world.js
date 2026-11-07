@@ -16,6 +16,7 @@ export const WORLD = {
   WATER_ROUGH_DRY: 0.25,
   WATER_LEVEL_LIFT: 0.0,
   WATER_SIZE:      2400,     // m, the water plane
+  WATER_NEAR:      20,       // m inland of the cliff the water's near edge sits, under the ground
   LIT_INTENSITY:   { on: 2.4, off: 0.0 },
   BOARD_W:         6.0, BOARD_H: 1.8, BOARD_Y: 2.3,
   FLAG_SWAY:       0,        // flags are still (no per frame work on the low tier)
@@ -47,11 +48,16 @@ export function buildEnvironment(THREE, track, options) {
 
   /* water */
   if (terrain.sea) {
+    /* the water lies only on the sea's side, its near edge under the
+       ground where the coast starts to fall: a plane under the whole track
+       would cover a cutting or a banked corner that dips below sea level */
     const wg = new THREE.PlaneGeometry(WORLD.WATER_SIZE, WORLD.WATER_SIZE, 1, 1);
     const wm = new THREE.MeshStandardMaterial({ color: theme.water, roughness: preset.wet ? 0.12 : WORLD.WATER_ROUGH_DRY, metalness: 0.1, transparent: false });
     const water = new THREE.Mesh(wg, wm);
-    water.rotation.x = -Math.PI / 2;
-    water.position.set(terrain.centre.x, terrain.sea.level + WORLD.WATER_LEVEL_LIFT, terrain.centre.z);
+    const sea = terrain.sea, near = sea.from - sea.cliff - WORLD.WATER_NEAR, mid = near + WORLD.WATER_SIZE / 2;
+    wg.rotateX(-Math.PI / 2);                                   // flat, its edges along x and z
+    water.rotation.y = Math.atan2(sea.dir.x, sea.dir.z);        // its z edge square to the sea's direction
+    water.position.set(terrain.centre.x + sea.dir.x * mid, sea.level + WORLD.WATER_LEVEL_LIFT, terrain.centre.z + sea.dir.z * mid);
     water.name = 'water';
     water.receiveShadow = false;
     group.add(water);
