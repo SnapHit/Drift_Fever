@@ -322,3 +322,6 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   the author's supercar revs recording (four steady stretches flattened
   to one pitch and joined), and the effects are about 5 dB quieter
   (`SOUND.MASTER` 0.4); the music's level stayed.
+  After more play: the engine sounds a further 4.5 dB down, and the
+  DRIFT button reads DRIFT BRAKE (on its own it brakes), with the hints
+  to match.
