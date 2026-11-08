@@ -257,6 +257,7 @@ function startRun(spec) {
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
   hud.setToBeat(rec ? 'best ' + rec.score : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
   app.state = 'countdown'; app.countdown = LOOP.COUNTDOWN; app.settle = 0; app.results = null;
+  sound.engineStart();
   input.setStarted(false);
   screens.hide(); hud.setVisible(true); input.touch.setVisible(true);
   resetRun();

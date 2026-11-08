@@ -34,3 +34,18 @@ Why 0.184.0 and not the newest: 0.185 and 0.186 pass a texture view
 rather than falling back (measured here in the headless Chromium the
 parity test runs). Browsers between the arrival of WebGPU and that spec
 change would get a blank game. 0.184.0 does not send it.
+
+## The new game's sound (November 2026)
+
+Two recordings, chosen by the author on 8 November 2026 from Pixabay,
+cut by the reviewer into the three files the game ships (24 kHz mono
+WAV, so the loops join with no gap). The Pixabay Content License allows
+use free of charge, without attribution, in a work that adds creative
+effort, such as a game; it forbids selling or distributing the content
+on its own. Licence: https://pixabay.com/service/license/
+
+| Asset | Where | Source | Licence |
+|---|---|---|---|
+| Engine starting and idling | `game/assets/audio/engine-start.wav` (0.35 to 2.6 s of the recording), `game/assets/audio/engine-idle.wav` (a seamless loop from 3.5 s) | Pixabay, "car engine" by user soumages, item 335601 (file `soumages-car-engine-335601.mp3`) | Pixabay Content License |
+| A car drifting | `game/assets/audio/drift-loop.wav` (a seamless loop from 0.15 s) | Pixabay, file `drift-om.mp3`, per the author | Pixabay Content License |
+| Road hiss | `game/src/audio/sound.js` | seeded noise through a band pass | this repository |

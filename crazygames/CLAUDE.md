@@ -303,3 +303,9 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   pitch, chopped by a random stick and slip at 35 to 110 Hz, over a
   broadband scrub. The author offered to find recordings; a CC0
   recording would beat any synthesis.
+- 8 November 2026: the synthesis is gone. The author found two Pixabay
+  recordings (engine start and idle, a car drifting), recorded in
+  `ASSETS.md`; `game/assets/audio/` holds the starter, a seamless idle
+  loop and a seamless drift loop cut from them (24 kHz mono WAV, 460 KB,
+  fetched after the first tap). The idle loop is pitched up to 2.1 times
+  with the revs; the starter plays at each countdown.
