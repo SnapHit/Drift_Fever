@@ -1,13 +1,13 @@
 {
- "started": "2026-11-08T04:08:04.091Z",
+ "started": "2026-11-08T07:45:23.607Z",
  "roundTrips": {
   "n": 1000,
   "settingsAndSeedSame": 1000,
   "trackSame": 1000,
   "bad": 0,
   "fallbacks": 0,
-  "worstGenerateMs": 92,
-  "seconds": 16,
+  "worstGenerateMs": 160,
+  "seconds": 23,
   "byStyle": {
    "flowing": {
     "n": 235,
@@ -130,7 +130,7 @@
   "identical": 400,
   "differ": 0,
   "differingSamples": [],
-  "seconds": 6,
+  "seconds": 9,
   "knownAnswer": {
    "weights": "hairpins",
    "compared": 60,

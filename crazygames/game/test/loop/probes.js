@@ -144,6 +144,7 @@ if (run('save')) {
   const sideU = await L.openPage(env, L.PORTRAIT, 'auto=1');
   const unlock = await sideU.page.evaluate(() => {
     const Lp = window.__loop, S = Lp.save; try { localStorage.clear(); } catch (e) {} S.reset();
+    Lp.action('title');   // since the first-run onboarding (8 November 2026) a fresh save lands in a run; this check starts from the title
     const r = {};
     r.lockedAtStart = !Lp.careerUnlocked(S.state, 1) && Lp.careerUnlocked(S.state, 0);
     Lp.action('play-career', '1'); r.refusedWhileLocked = Lp.app.state !== 'countdown';

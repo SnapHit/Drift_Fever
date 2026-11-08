@@ -1,5 +1,5 @@
 {
- "started": "2026-11-08T03:38:15.416Z",
+ "started": "2026-11-08T06:55:37.728Z",
  "note": "review/retention/perf-main.json is review/loop/perf.json as main produced it in this sandbox, kept for the comparison",
  "budgetMs": 16.7,
  "at6": {
@@ -11,35 +11,35 @@
   "allDriving": true,
   "frame": {
    "n": 390,
-   "p50": 22.9,
-   "p95": 272.3,
-   "p99": 1434.4,
-   "worst": 19105.3,
-   "mean": 188.77
+   "p50": 23.2,
+   "p95": 447.8,
+   "p99": 2352.3,
+   "worst": 37779.3,
+   "mean": 337.84
   },
   "jsWithoutSubmit": {
    "n": 390,
-   "p50": 0.9,
-   "p95": 4.4,
-   "p99": 9.4,
-   "worst": 76.3,
-   "mean": 1.43
+   "p50": 1.1,
+   "p95": 4.9,
+   "p99": 9.3,
+   "worst": 92,
+   "mean": 1.61
   },
   "physics": {
    "n": 390,
    "p50": 0.1,
-   "p95": 2.5,
-   "p99": 7.1,
-   "worst": 62.2,
-   "mean": 0.72
+   "p95": 2,
+   "p99": 5.8,
+   "worst": 91.9,
+   "mean": 0.88
   },
   "submit": {
    "n": 390,
-   "p50": 16.6,
-   "p95": 270,
-   "p99": 1434.2,
-   "worst": 19104.2,
-   "mean": 187.34
+   "p50": 20.6,
+   "p95": 447.7,
+   "p99": 2352,
+   "worst": 37776.9,
+   "mean": 336.22
   }
  },
  "baselineAt6": {
@@ -97,9 +97,9 @@
  "withinNoise": true,
  "knownAnswer": {
   "loadMs": 20,
-  "p95Before": 4.4,
-  "p95Loaded": 26.4,
-  "rise": 22,
+  "p95Before": 4.9,
+  "p95Loaded": 26.7,
+  "rise": 21.8,
   "caught": true
  }
 }

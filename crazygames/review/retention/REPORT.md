@@ -45,8 +45,10 @@ this file is what they wrote, and `shots/` holds the screenshots.
 - **Kept.** `physics/`, `audio/` and `assets/` are untouched. The
   generator without the new options is byte identical to main
   (146cbaa) on 400 seeds. Every probe in `game/test/` passes (the table
-  at the end). JavaScript at 6x throttle: p95 4.4 ms against main's 3.6
-  ms measured the same way in this sandbox, inside the noise band.
+  at the end) but one known answer in `tracks2.js` that is missed
+  identically on main. JavaScript at 6x throttle: p95 4.4 and 4.9 ms in
+  two runs against main's 3.6 ms measured the same way in this sandbox,
+  inside the noise band.
 - **For the author to decide:** the mission targets and the 60 coins,
   the Lab's half rate and how many codes to keep are first guesses in
   `LOOP.MISSIONS` and `LOOP.LAB`. Two mission kinds are hard for the
@@ -96,7 +98,8 @@ always has. The prompts read the input record, the scoring state and
 the distance to the next corner once a frame (`LOOP.ONBOARD`): steer is
 done after 0.5 s of steering; the slide prompt comes within 45 m of a
 corner (or 4 s after steering is done) and is done when the car scores
-a drift; the brake prompt a second later, done after 0.3 s of DRIFT /
+a drift with DRIFT / BRAKE held and steering on (a slide off a wall
+with nothing pressed does not count); the brake prompt a second later, done after 0.3 s of DRIFT /
 BRAKE with no steering. Each stays at least 1.2 s so it can be read and
 at most 9 s. The chain explanation waits for a bank worth at least 15
 points. SKIP, or any finished run, writes `onboarded: true`. `?title=1`
@@ -213,6 +216,18 @@ move with no click, one click moves it: counted 1. CAUGHT.
 - Known answer: `onboarded` put back to false in the save (no finished
   run): the next load lands in the countdown with the prompts active.
   CAUGHT.
+- By the player's own input, the scripted driver off. Keyboard at
+  1280x720 with real Playwright key presses: ArrowLeft held completes
+  steer 1.2 s after the prompt (the 1.2 s is the prompt's minimum time
+  on screen); ArrowRight and space held complete the slide 1.2 s after
+  its prompt; space alone completes the brake 1.2 s after its prompt.
+  Each marked `done`, none `timeout`. PASS. Touch at 390x844 on a touch
+  screen, real touches through CDP on the pads: the left pad held, then
+  the right pad and DRIFT / BRAKE together, then DRIFT / BRAKE alone:
+  the same three, each `done` in 1.2 s. PASS. Known answer: no input at
+  all, and steer, slide and brake all end as `timeout`. CAUGHT. (Before
+  the slide prompt required the handbrake, the no input car completed
+  it by sliding off a wall, which is what made the condition stricter.)
 - Touch (390x844, a touch screen): the steer prompt is positioned above
   the steer buttons (`at-left`) with the arrow, its bottom above the
   pad's top, the source read as touch before any touch. PASS.
@@ -322,6 +337,33 @@ after the fifth button and HOW TO PLAY were added (the wordmark and
 lockup a little smaller, the menu in two columns at desktop heights
 and three in short landscape).
 
+The Lab's layout (`lab.json`, `layout`). The first layout had the NEW
+LAYOUT / DRIVE bar sticky inside the scrolling screen, and the review
+of the shots found it over the code row at 390x844 and 800x450 and
+over TIME OF DAY at 844x390. Now the screen does not scroll: the
+controls scroll in their own box (one column in portrait, the right
+column in landscape with the plan filling the left) and the bar sits
+in the flow below it, so no control can be under it at any scroll
+position; the code row comes first. Measured at each size, in the
+page: every one of the 25 controls scrolled into view and
+`document.elementFromPoint` at its centre returning the control
+itself; every scroll box stepped through its range in 24 px steps (5,
+9, 7 and 0 positions) with no visible part of any control meeting the
+bar's box; at the scroll end the lowest control above the bar; the
+code and COPY hit by `elementFromPoint` before any scrolling. PASS at
+all four. Known answer: the old rules (a sticky bar in a scrolling
+screen) injected as a style: 6, 11 and 6 controls unreachable and 18,
+47 and 27 control positions under the bar at 390x844, 844x390 and
+800x450, and 1280x720 clear, as the review saw. CAUGHT.
+
+The career header. The coin badge at the top right overlapped the
+header's tally at 390x844. The header now keeps 112 px clear on its
+right and the tally may wrap. Measured with a five digit count
+(12,345) at each size: the badge's and the tally's boxes do not meet
+(390x844: badge 282 to 374, tally 176 to 262; 844x390: 736 to 828
+against 458 to 574; 800x450: 692 to 784 against 436 to 552; 1280x720:
+1172 to 1264 against 676 to 792). PASS.
+
 ### 7. Frame time at 6x (`perf.json`, `perf-main.json`)
 
 Career 1 with the previous run's ghost stepping, the drifter driving,
@@ -334,18 +376,43 @@ probe (`perf-main.json` is that file).
 | | JS without submit p95 / worst | physics p95 / worst |
 |---|---|---|
 | main (146cbaa), here | 3.6 / 9.6 ms | 1.5 / 7.0 |
-| this branch | 4.4 / 76.3 ms | 2.5 / 62.2 |
+| this branch, first run | 4.4 / 76.3 ms | 2.5 / 62.2 |
+| this branch, final run | 4.9 / 92.0 ms | 2.0 / 91.9 |
 
-The p95 is 0.8 ms up at 6x throttle (about 0.13 ms at 1x), inside the
-noise band the probe allows (1.5 ms; an earlier run of main's own
-probe here, with other work on the machine, read 4.4). The worst
-frames are single SwiftShader stalls (p99 9.4 ms). Under the 16.7 ms
-budget. PASS. Known answer: 20 ms of busy work per frame: p95 4.4 to
-26.4 ms, the verdict flips. CAUGHT.
+The p95 is 0.8 to 1.3 ms up at 6x throttle (0.13 to 0.22 ms at 1x),
+inside the noise band the probe allows (1.5 ms; an earlier run of
+main's own probe here, with other work on the machine, read 4.4). The
+worst frames are single SwiftShader stalls (p99 under 10 ms). Under
+the 16.7 ms budget. PASS. Known answer: 20 ms of busy work per frame:
+p95 to 26.4 and 26.7 ms, the verdict flips. CAUGHT. The loop probe's
+own perf measurement on this branch (below) read 4.5 ms p95 at 6x.
 
 ### Every probe in `game/test/`, rerun on this branch
 
-EXISTING_TABLE
+All rerun on this branch after the last code change, in this sandbox
+(headless Chromium on SwiftShader where a browser is needed). The
+other sessions' `review/` files they rewrite were restored afterwards;
+only `review/retention/` is this branch's.
+
+| probe | result |
+|---|---|
+| `retention/probes.js` (clicks, onboard, missions, lab, saves, perf, shots) | all passed, every known answer caught |
+| `retention/codes.js` | all passed: 1,000 round trips, 2,389 malformed refused, 400 seeds identical to main |
+| `feel/handling.js` | passes: known answers caught (the first prototype's handling spins 8 times, no recovery stays stuck) |
+| `feel/probes.js` (determinism, drive, camera, perf, shots) | all passed, 14 verdicts |
+| `feel/corners.js` | 80 tracks, 80 finished, 3.21 contacts per km, 0.42 stalls per km, 0 respawns, mean 73 km/h |
+| `tracks/probes.js` (1,000 seeds per kind, Node and Chromium) | all measurements pass and every known answer caught, 56 lines |
+| `tracks/tracks2.js` (B, K, X, T) | 19 pass; the known answer "the old generator scores lower on busyness" is MISSED for circuits and sprints. Missed identically on main (146cbaa), run from a worktree: the same numbers (corners per km 10.74 to 10.03, direction changes 6.62 to 6.07), because the 8 November corner widening (generator version 4) made tracks less busy per km than the generator the check compares against. Not from this branch, whose generator is byte identical without its options; the reviewer's call whether the known answer should now read the other way |
+| `visuals/occlusion.js` | all passed in 16 s, known answers caught |
+| `visuals/probes.js` (readability, perf, download, shots) | all passed: edge brightest in 40 shots (worst ratio 1.4, needs 1.35); low tier JavaScript p95 4.3 ms at 6x, 63 draw calls; initial download 2.24 MB over 67 files |
+| `cars/measure.js` | PASS |
+| `loop/probes.js` (ghost, runs, save, perf, shots) | LOOP_ROW |
+
+One probe changed: `loop/probes.js`'s career ladder check cleared the
+save and read the game's state to see a locked track refused. Since
+the first visit now lands in a run, a cleared save puts the page in
+the onboarding countdown, and the check read that as the run it had
+refused. It now returns to the title first; nothing else in it moved.
 
 ## Screenshots
 
@@ -360,7 +427,11 @@ takes longer, the other callouts of those seconds cleared),
 `results-missions`, `lab`, `lab-results` (the code, COPY, LINK, LAB),
 `lab-bad-code` (a refused code), `lab-link` (landed from `?track=`).
 Where a shot shows a black band at the bottom of the 3D view it is the
-software renderer's partial frame, as in the earlier reports.
+software renderer's partial frame, as in the earlier reports. The whole
+set was retaken after the Lab layout and the career header changed and
+looked at: the Lab's code row is the first thing under the plan at
+every size, the bar covers nothing, the career tally sits clear of the
+coin badge.
 
 ## CrazyGames' pages, read on 8 November 2026
 
@@ -390,7 +461,9 @@ in the next one.
 - **The prompts time out.** The brief says each prompt is "shown once
   and gone when done"; a prompt the player never does (a keyboard
   player who never brakes) also goes after `PROMPT_MAX` 9 s so the next
-  can come. Each also stays at least 1.2 s.
+  can come. Each also stays at least 1.2 s. The slide prompt needs
+  DRIFT / BRAKE held with steering while sliding, so a slide the player
+  did not ask for does not complete it.
 - **A `?track=` link lands on the Lab screen, one click from driving,
   not straight into the run.** Both are inside "at most one click"; the
   Lab shows the player what the code is and lets them change it. Easy
@@ -410,6 +483,9 @@ in the next one.
 - **The perturbed tape does not finish.** The brief's measurement asks
   for a tape that changes the outcome, which it does; a perturbation
   that finishes with different missions would show more.
+- **`tracks2.js`'s known answer B is missed on this branch and on
+  main alike** (the table above). Left as it is: the generator is the
+  reviewer's and the check compares against an old commit.
 - **`review/retention/perf-main.json`** is the loop probe's output for
   main, measured here, kept beside this report so the comparison can be
   rerun; it is not a new probe.
