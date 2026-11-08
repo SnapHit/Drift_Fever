@@ -15,7 +15,7 @@ export function createTouch(root, onActive, onRestart) {
       <button type="button" data-b="right" aria-label="steer right"><span>&#9654;</span></button>
     </div>
     <div class="pad right">
-      <button type="button" data-b="hb" aria-label="drift or brake"><span class="two">DRIFT<br>BRAKE</span></button>
+      <button type="button" data-b="hb" aria-label="drift or brake"><span class="two">DRIFT / BRAKE</span></button>
     </div>`;
   root.appendChild(el);
   const buttons = {};

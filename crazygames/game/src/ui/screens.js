@@ -39,7 +39,8 @@ export function createScreens(root, onAction) {
     const total = careerStars(save);
     show('title', `
       ${coins(save)}
-      <h1><span>DRIFT</span><span>FEVER</span></h1>
+      <img class="lockup" src="assets/brand/snaphit-lockup.svg" alt="SnapHit Studios. Instant. Play.">
+      <h1><img class="wordmark" src="assets/brand/drift-fever-wordmark.svg" alt="Drift Fever"></h1>
       <p class="sub">${info.standIn ? 'test track build' : 'CrazyGames edition'}${info.storage ? '' : ' <em>(no memory on this device)</em>'}</p>
       ${info.backPay ? `<p class="sub pay">+${fmt(info.backPay)} coins for the stars you have already won</p>` : ''}
       <div class="menu">
@@ -53,7 +54,7 @@ export function createScreens(root, onAction) {
         ${info.sound ? `<button type="button" class="fsbtn" data-action="sound">${soundIcon(info.sound === 'off')}<span>SOUND ${info.sound === 'on' ? 'ON' : 'OFF'}</span></button>` : ''}
         ${info.sound ? `<button type="button" class="fsbtn" data-action="music"><span>&#9835;</span><span>MUSIC ${info.music === 'on' ? 'ON' : 'OFF'}</span></button>` : ''}
       </div>
-      <p class="hint">Steer left and right. DRIFT/BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.</p>`);
+      <p class="hint">Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.</p>`);
   }
 
   function career(save) {
@@ -110,7 +111,7 @@ export function createScreens(root, onAction) {
         <div class="targets">${targets}</div>
         ${r.parts ? `<div class="parts"><span><b>${fmt(r.parts.drift)}</b><small>drift</small></span><span><b>${fmt(r.parts.clean)}</b><small>clean${r.cleanSectors ? ' ' + r.cleanSectors : ''}</small></span><span><b>${fmt(r.parts.pace)}</b><small>pace</small></span></div>` : ''}
         <div class="facts"><span><b>${fmt(r.best)}</b><small>best chain</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span><b>+${fmt(r.coins)}</b><small>coins${r.newStars ? ' &middot; ' + r.newStars + ' new star' + (r.newStars > 1 ? 's' : '') : ''}</small></span></div>
-        <button type="button" class="big primary" data-action="again"><b>GO AGAIN</b><small>DRIFT/BRAKE, Enter or R</small></button>
+        <button type="button" class="big primary" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>

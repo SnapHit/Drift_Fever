@@ -53,3 +53,10 @@ on its own. Licence: https://pixabay.com/service/license/
 | A second hard hit | `game/assets/audio/hit-hard-2.wav` (0.25 to 1.35 s) | Pixabay, "car crash" by user pwlpl, item 377290 (file `pwlpl-car_crash-377290.mp3`), per the author and the file name | Pixabay Content License |
 | Music, four tracks | copied from the repository's `music/` folder into `dist/music/` at build time, streamed after the first tap | the live game's own original tracks (see the root `README.md`) | this repository |
 | Road hiss, the barrier grind, the score and menu sounds (countdown, GO, chain banked, chain lost, clean sector, stars, coins, taps) | `game/src/audio/sound.js` | seeded noise through filters, and short synthesised tones | this repository |
+
+## The brand on the new game's title (8 November 2026)
+
+| Asset | Where | Source | Licence |
+|---|---|---|---|
+| SnapHit Studios lockup | `game/assets/brand/snaphit-lockup.svg` | a byte copy of the repository's `brand/snaphit-lockup.svg` | this repository |
+| Drift Fever wordmark in the live game's orange and red | `game/assets/brand/drift-fever-wordmark.svg` | built from the repository's `brand/wordmark-path-data.txt` with its stated treatment (shadow #a8300a, outline #ef5a17, fill #fbbf45) | this repository |

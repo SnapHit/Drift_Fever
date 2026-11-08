@@ -325,3 +325,10 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   After more play: the engine sounds a further 4.5 dB down, and the
   DRIFT button reads DRIFT BRAKE (on its own it brakes), with the hints
   to match.
+- 8 November 2026: the button reads DRIFT / BRAKE. The title carries the
+  SnapHit Studios lockup at the top and the live game's orange and red
+  Drift Fever wordmark (`game/assets/brand/`), sized by screen height so
+  it fits 390x844, 1280x720 and CrazyGames' 800x450 without scrolling;
+  the primary button is orange to match. The full screen button hides
+  inside another page's frame: CrazyGames' requirements forbid a custom
+  one (docs.crazygames.com/requirements/gameplay, checked 8 November).

@@ -1,10 +1,14 @@
 /* FULL SCREEN. The Fullscreen API on the whole page, with the webkit
    prefix for older Safari and Chromium. Not every browser offers it (an
    iPhone's Safari does not, for anything but video), so the buttons are
-   shown only where it works. Entering must happen inside a tap. */
+   shown only where it works, and never inside another page's frame.
+   Entering must happen inside a tap. */
 const doc = document, root = document.documentElement;
 
 export function fullscreenSupported() {
+  /* inside another page's frame (CrazyGames' player) there is no button:
+     their player has its own, and their rules allow no other */
+  try { if (window.self !== window.top) return false; } catch (e) { return false; }
   try { return !!(doc.fullscreenEnabled || doc.webkitFullscreenEnabled) && !!(root.requestFullscreen || root.webkitRequestFullscreen); } catch (e) { return false; }
 }
 export function isFullscreen() { return !!(doc.fullscreenElement || doc.webkitFullscreenElement); }
