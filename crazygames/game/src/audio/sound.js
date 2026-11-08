@@ -24,7 +24,12 @@
    they arrive, and silent for good if they cannot be), it is suspended
    while the page is hidden, and a mute switch sets the master level to
    nothing and is remembered on the device (localStorage, in try/catch).
-   Every number of taste is in SOUND. */
+   Wall hits play one of the author's two crash recordings by force; the
+   engine blends from the idle loop into a loop cut from his roar
+   recording as the revs rise, and the whole roar plays once at GO; a
+   grind (filtered noise) runs while the car slides along a barrier; the
+   score and menu sounds are short synthesised tones; the music is the
+   live game's own four tracks. Every number of taste is in SOUND. */
 
 export const SOUND = {
   MASTER:        1.0,      // the overall level
@@ -47,7 +52,19 @@ export const SOUND = {
   HISS_HZ:       520,
   SPEED_FULL:    18,       // m/s at which the tyres reach full voice
   FADE:          0.25,     // s to fade in or out
-  FILES:         { start: 'engine-start.wav', idle: 'engine-idle.wav', drift: 'drift-loop.wav' },
+  LOAD:          0.42,     // the engine under load (the roar recording's loop) at the limiter
+  LOAD_FROM:     [0.3, 0.75],   // share of the rev range over which the load loop takes over from the idle
+  LOAD_RATE:     [0.55, 0.85],  // the load loop's playback rate across the rev range (it was recorded high)
+  LAUNCH:        0.55,     // the whole roar, once, at GO
+  HIT:           [0.25, 0.9],   // a wall hit's level from a touch to a hard hit
+  HIT_FULL:      14,       // m/s of speed lost at which a hit is at full level
+  HIT_GAP:       0.18,     // s at least between two hit sounds
+  SCRAPE:        0.16,     // the grind while the car slides along a barrier
+  UI:            0.35,     // score and menu sounds
+  MUSIC:         0.32,     // the music's level
+  MUSIC_FILES:   ['music/track-1.m4a', 'music/track-2.m4a', 'music/track-3.m4a', 'music/track-4.m4a'],   // the live game's own tracks, beside the page
+  MUSIC_KEY:     'driftfever.cg.music.v1',
+  FILES:         { start: 'engine-start.wav', idle: 'engine-idle.wav', drift: 'drift-loop.wav', load: 'engine-load.wav', launch: 'engine-launch.wav', hitLight: 'hit-light.wav', hitHard: 'hit-hard.wav', hitHard2: 'hit-hard-2.wav' },
   KEY:           'driftfever.cg.sound.v1',
 };
 
@@ -79,12 +96,26 @@ export async function loadBuffers(ctx, fetchBytes) {
    for a test render), from the decoded recordings. update() sets every
    level for a moment in time; start() plays the starter. */
 export function buildVoices(ctx, out, buffers) {
-  const master = ctx.createGain(); master.gain.value = 0; master.connect(out);
+  /* a gentle limiter last, so a crash over a full slide never clips */
+  const limiter = ctx.createDynamicsCompressor(); limiter.threshold.value = -8; limiter.knee.value = 6; limiter.ratio.value = 8; limiter.attack.value = 0.003; limiter.release.value = 0.15;
+  limiter.connect(out);
+  const master = ctx.createGain(); master.gain.value = 0; master.connect(limiter);
   // engine: the idle loop, pitched and opened up with the revs
   const idle = ctx.createBufferSource(); idle.buffer = buffers.idle; idle.loop = true;
+  const idleGain = ctx.createGain(); idleGain.gain.value = 1;
   const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.7; lp.frequency.value = SOUND.CUTOFF[0];
   const engine = ctx.createGain(); engine.gain.value = 0;
-  idle.connect(lp); lp.connect(engine); engine.connect(master);
+  idle.connect(idleGain); idleGain.connect(lp); lp.connect(engine); engine.connect(master);
+  const loadSrc = ctx.createBufferSource(); loadSrc.buffer = buffers.load; loadSrc.loop = true;
+  const load = ctx.createGain(); load.gain.value = 0;
+  loadSrc.connect(load); load.connect(lp);
+  // the grind along a barrier
+  const scrapeBand = ctx.createBiquadFilter(); scrapeBand.type = 'bandpass'; scrapeBand.frequency.value = 1700; scrapeBand.Q.value = 1.3;
+  const scrapeChop = ctx.createGain(); scrapeChop.gain.value = 0.6;
+  const chop = ctx.createOscillator(); chop.type = 'square'; chop.frequency.value = 23;
+  const chopDepth = ctx.createGain(); chopDepth.gain.value = 0.35; chop.connect(chopDepth); chopDepth.connect(scrapeChop.gain);
+  const scrape = ctx.createGain(); scrape.gain.value = 0;
+  scrapeBand.connect(scrapeChop); scrapeChop.connect(scrape); scrape.connect(master);
   // tyres: the drift loop
   const drift = ctx.createBufferSource(); drift.buffer = buffers.drift; drift.loop = true;
   const squeal = ctx.createGain(); squeal.gain.value = 0;
@@ -96,7 +127,8 @@ export function buildVoices(ctx, out, buffers) {
   const hissBand = ctx.createBiquadFilter(); hissBand.type = 'bandpass'; hissBand.frequency.value = SOUND.HISS_HZ; hissBand.Q.value = 0.8;
   const hiss = ctx.createGain(); hiss.gain.value = 0;
   noise.connect(hissBand); hissBand.connect(hiss); hiss.connect(master);
-  idle.start(); drift.start(); noise.start();
+  noise.connect(scrapeBand);
+  idle.start(); drift.start(); noise.start(); loadSrc.start(); chop.start();
   let rpm = SOUND.IDLE_RPM, startedAt = -1;
   /* the starter, once: the idle loop stays down while it plays */
   function start(t) {
@@ -108,17 +140,23 @@ export function buildVoices(ctx, out, buffers) {
   /* car: { speed m/s, slip rad, rearSlide, spinning, hb }; on: the car is
      being driven (else everything fades); level: the master level; t: the
      context time this is for; dt: seconds since the last update */
-  function update(car, on, level, t, dt) {
+  function update(car, on, level, t, dt, touching) {
     const k = 1 - Math.exp(-dt / SOUND.RPM_EASE);
     const slide = car ? Math.max(clamp01((car.rearSlide || 0) - 0.6), car.spinning ? 1 : 0) : 0;
     const want = car ? rpmFor(car.speed).rpm + slide * SOUND.SLIDE_RPM : SOUND.IDLE_RPM;
     rpm += (Math.min(SOUND.MAX_RPM + 300, want) - rpm) * k;
     const r = clamp01((rpm - SOUND.IDLE_RPM) / (SOUND.MAX_RPM - SOUND.IDLE_RPM)), tc = 0.03;
     idle.playbackRate.setTargetAtTime(1 + (SOUND.PITCH_MAX - 1) * r, t, tc);
+    const L = smooth(SOUND.LOAD_FROM[0], SOUND.LOAD_FROM[1], r);
+    loadSrc.playbackRate.setTargetAtTime(SOUND.LOAD_RATE[0] + (SOUND.LOAD_RATE[1] - SOUND.LOAD_RATE[0]) * r, t, tc);
+    load.gain.setTargetAtTime(SOUND.LOAD / SOUND.ENGINE * L, t, tc);
     lp.frequency.setTargetAtTime(SOUND.CUTOFF[0] + (SOUND.CUTOFF[1] - SOUND.CUTOFF[0]) * r, t, tc);
     // while the starter plays, the idle loop waits, then swells in as the engine catches
     const sinceStart = startedAt < 0 ? 99 : t - startedAt, catchUp = smooth(1.4, 2.0, sinceStart);
     engine.gain.setTargetAtTime((SOUND.ENGINE + SOUND.ENGINE_REV * r) * catchUp, t, tc);
+    // the idle fades as the load takes over (the load loop runs through the same gain and filter)
+    idleGain.gain.setTargetAtTime(1 - 0.85 * L, t, tc);
+    scrape.gain.setTargetAtTime(car && touching ? SOUND.SCRAPE * smooth(2, 15, car.speed) : 0, t, 0.03);
     const angle = car ? Math.abs(car.slip || 0) * 180 / Math.PI : 0;
     const voice = car ? smooth(SOUND.SQUEAL_FROM, SOUND.SQUEAL_FULL, angle) * smooth(2, SOUND.SPEED_FULL, car.speed) : 0;
     const hb = car && car.hb > 0.5 && car.speed > 3 ? 0.6 : 0;
@@ -129,7 +167,40 @@ export function buildVoices(ctx, out, buffers) {
     hiss.gain.setTargetAtTime(car ? SOUND.HISS * smooth(5, 40, car.speed) : 0, t, 0.05);
     master.gain.setTargetAtTime(on ? level : 0, t, SOUND.FADE / 3);
   }
-  return { update, start, master, rpm: () => rpm };
+  function oneShot(buf, level, t, rate) {
+    const s = ctx.createBufferSource(); s.buffer = buf; if (rate) s.playbackRate.value = rate;
+    const g = ctx.createGain(); g.gain.value = level;
+    s.connect(g); g.connect(master); s.start(t);
+  }
+  let lastHit = -1, hitTurn = 0;
+  /* a wall hit: speed is the speed it took off, hard as the physics judged it */
+  function hit(speed, hard, t) {
+    if (t - lastHit < SOUND.HIT_GAP) return;
+    lastHit = t;
+    const v = SOUND.HIT[0] + (SOUND.HIT[1] - SOUND.HIT[0]) * clamp01(speed / SOUND.HIT_FULL);
+    const buf = hard ? ((hitTurn++ & 1) ? buffers.hitHard2 : buffers.hitHard) : buffers.hitLight;
+    oneShot(buf, v, t, 0.94 + 0.12 * ((hitTurn * 0.618) % 1));
+  }
+  function launch(t) { oneShot(buffers.launch, SOUND.LAUNCH, t); }
+  /* the score and menu sounds: short synthesised tones */
+  function tone(t, f, dur, type, level, slideTo) {
+    const o = ctx.createOscillator(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(level, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function ui(kind, n, t) {
+    const U = SOUND.UI;
+    if (kind === 'tick') tone(t, 660, 0.12, 'triangle', U);
+    else if (kind === 'go') { tone(t, 990, 0.35, 'triangle', U); tone(t, 1485, 0.3, 'sine', U * 0.4); }
+    else if (kind === 'bank') { const up = Math.min(5, n || 1); tone(t, 784, 0.12, 'triangle', U * 0.8); tone(t + 0.07, 1046 * Math.pow(2, up / 24), 0.22, 'triangle', U * 0.8); }
+    else if (kind === 'clean') tone(t, 1318, 0.16, 'sine', U * 0.6);
+    else if (kind === 'lost') { tone(t, 330, 0.28, 'square', U * 0.35, 165); }
+    else if (kind === 'star') { const base = [784, 988, 1175][Math.max(0, Math.min(2, (n || 1) - 1))]; tone(t, base, 0.3, 'triangle', U); tone(t + 0.06, base * 1.5, 0.35, 'sine', U * 0.5); }
+    else if (kind === 'coin') { tone(t, 1976, 0.08, 'square', U * 0.25); tone(t + 0.07, 2637, 0.2, 'square', U * 0.25); }
+    else if (kind === 'tap') tone(t, 1200, 0.045, 'sine', U * 0.5);
+  }
+  return { update, start, hit, launch, ui, master, rpm: () => rpm };
 }
 
 export function createSound() {
@@ -154,18 +225,57 @@ export function createSound() {
     try { if (document.hidden) ctx.suspend(); else ctx.resume(); } catch (e) {}
   });
   let last = 0;
-  function update(car, on) {
+  function update(car, on, touching) {
     if (!voices || !ctx || ctx.state !== 'running') return;
     const t = ctx.currentTime, dt = Math.min(0.1, Math.max(0.001, t - last || 0.016)); last = t;
-    voices.update(car, on && !muted, SOUND.MASTER, t, dt);
+    voices.update(car, on && !muted, SOUND.MASTER, t, dt, touching);
   }
   /* the engine starting, at a run's countdown */
   function engineStart() {
     if (muted) return;
     if (voices && ctx) voices.start(ctx.currentTime); else startWanted = performance.now();   // the recordings are still on their way
   }
-  function setMuted(m) { muted = !!m; try { localStorage.setItem(SOUND.KEY, muted ? 'off' : 'on'); } catch (e) {} if (voices && ctx) voices.master.gain.setTargetAtTime(0, ctx.currentTime, 0.02); }
-  return { update, engineStart, setMuted, get muted() { return muted; }, get available() { return !!AC; }, get running() { return !!ctx && ctx.state === 'running'; }, get loaded() { return !!voices; } };
+  function setMuted(m) { muted = !!m; try { localStorage.setItem(SOUND.KEY, muted ? 'off' : 'on'); } catch (e) {} if (voices && ctx) voices.master.gain.setTargetAtTime(0, ctx.currentTime, 0.02); music.sync(); }
+  const live = () => voices && ctx && ctx.state === 'running' && !muted;
+  function hit(speed, hard) { if (live()) voices.hit(speed, hard, ctx.currentTime); }
+  function launch() { if (live()) voices.launch(ctx.currentTime); }
+  /* ui(kind, n, delay): a score or menu sound, delay seconds from now */
+  function ui(kind, n, delay) { if (live()) voices.ui(kind, n, ctx.currentTime + (delay || 0)); }
+
+  /* THE MUSIC: the live game's four tracks, in order, looping round,
+     streamed by one audio element (nothing is fetched before the first
+     tap, and a track that will not load is skipped). Its own switch, as
+     well as the sound switch, both remembered. */
+  const music = (() => {
+    let on = true, el = null, idx = 0, fails = 0;
+    try { on = localStorage.getItem(SOUND.MUSIC_KEY) !== 'off'; } catch (e) { on = true; }
+    function play() {
+      if (!el) {
+        if (typeof Audio === 'undefined') return;
+        el = new Audio(); el.preload = 'auto'; el.volume = SOUND.MUSIC;
+        el.addEventListener('ended', () => { idx = (idx + 1) % SOUND.MUSIC_FILES.length; el.src = SOUND.MUSIC_FILES[idx]; sync(); });
+        el.addEventListener('error', () => { if (++fails > SOUND.MUSIC_FILES.length) return; idx = (idx + 1) % SOUND.MUSIC_FILES.length; el.src = SOUND.MUSIC_FILES[idx]; sync(); });
+        el.src = SOUND.MUSIC_FILES[idx];
+      }
+      const p = el.play(); if (p && p.catch) p.catch(() => {});
+    }
+    function sync() {
+      const want = on && !muted && unlocked && !(typeof document !== 'undefined' && document.hidden);
+      if (want) play(); else if (el) el.pause();
+    }
+    return {
+      sync,
+      get on() { return on; },
+      set(v) { on = !!v; try { localStorage.setItem(SOUND.MUSIC_KEY, on ? 'on' : 'off'); } catch (e) {} sync(); },
+    };
+  })();
+  let unlocked = false;
+  const unlockMusic = () => { unlocked = true; music.sync(); };
+  for (const ev of ['pointerdown', 'touchend', 'keydown']) window.addEventListener(ev, unlockMusic, { capture: true, passive: true });
+  document.addEventListener('visibilitychange', () => music.sync());
+
+  return { update, engineStart, setMuted, hit, launch, ui, get muted() { return muted; }, get available() { return !!AC; }, get running() { return !!ctx && ctx.state === 'running'; }, get loaded() { return !!voices; },
+    get music() { return music.on; }, setMusic: v => music.set(v) };
 }
 
 /* the speaker icon, crossed when muted */

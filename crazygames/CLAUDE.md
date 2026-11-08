@@ -309,3 +309,12 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   loop and a seamless drift loop cut from them (24 kHz mono WAV, 460 KB,
   fetched after the first tap). The idle loop is pitched up to 2.1 times
   with the revs; the starter plays at each countdown.
+- 8 November 2026: the rest of the sound. Three more Pixabay recordings
+  from the author (an engine roaring, two crashes): the engine blends
+  from the idle loop into a load loop cut from the roar as the revs rise,
+  the whole roar plays at GO, and wall hits play a crash by force. The
+  barrier grind and the score and menu sounds (countdown, GO, chain
+  banked and lost, clean sector, stars, coins, taps) are synthesised.
+  The music is the live game's four tracks, copied to `dist/music/` and
+  streamed after the first tap, with its own switch on the title. A
+  limiter sits last so nothing clips.

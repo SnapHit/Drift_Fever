@@ -37,8 +37,8 @@ change would get a blank game. 0.184.0 does not send it.
 
 ## The new game's sound (November 2026)
 
-Two recordings, chosen by the author on 8 November 2026 from Pixabay,
-cut by the reviewer into the three files the game ships (24 kHz mono
+Five recordings, chosen by the author on 8 November 2026 from Pixabay,
+cut by the reviewer into the eight files the game ships (24 kHz mono
 WAV, so the loops join with no gap). The Pixabay Content License allows
 use free of charge, without attribution, in a work that adds creative
 effort, such as a game; it forbids selling or distributing the content
@@ -48,4 +48,8 @@ on its own. Licence: https://pixabay.com/service/license/
 |---|---|---|---|
 | Engine starting and idling | `game/assets/audio/engine-start.wav` (0.35 to 2.6 s of the recording), `game/assets/audio/engine-idle.wav` (a seamless loop from 3.5 s) | Pixabay, "car engine" by user soumages, item 335601 (file `soumages-car-engine-335601.mp3`) | Pixabay Content License |
 | A car drifting | `game/assets/audio/drift-loop.wav` (a seamless loop from 0.15 s) | Pixabay, file `drift-om.mp3`, per the author | Pixabay Content License |
-| Road hiss | `game/src/audio/sound.js` | seeded noise through a band pass | this repository |
+| The engine under load, and the launch | `game/assets/audio/engine-load.wav` (0.40 to 0.63 s, its rising pitch flattened and looped), `game/assets/audio/engine-launch.wav` (the whole recording) | Pixabay, "car engine roaring" by user dragon-studio, item 376881 (file `dragon-studio-car-engine-roaring-376881.mp3`), per the author and the file name | Pixabay Content License |
+| Wall hits, light and hard | `game/assets/audio/hit-light.wav` (the first 0.45 s), `game/assets/audio/hit-hard.wav` (the first 1.6 s) | Pixabay, "car crash sound effect" by user dragon-studio, item 376874 (file `dragon-studio-car-crash-sound-effect-376874.mp3`), per the author and the file name | Pixabay Content License |
+| A second hard hit | `game/assets/audio/hit-hard-2.wav` (0.25 to 1.35 s) | Pixabay, "car crash" by user pwlpl, item 377290 (file `pwlpl-car_crash-377290.mp3`), per the author and the file name | Pixabay Content License |
+| Music, four tracks | copied from the repository's `music/` folder into `dist/music/` at build time, streamed after the first tap | the live game's own original tracks (see the root `README.md`) | this repository |
+| Road hiss, the barrier grind, the score and menu sounds (countdown, GO, chain banked, chain lost, clean sector, stars, coins, taps) | `game/src/audio/sound.js` | seeded noise through filters, and short synthesised tones | this repository |

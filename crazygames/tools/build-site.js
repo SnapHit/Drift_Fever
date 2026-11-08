@@ -6,6 +6,8 @@
                 simulation module under sim/, three.js under vendor/, and
                 the four tracks under music/, copied read only from the
                 repository's music/ folder
+   /music/      the same four tracks for the new game, streamed after the
+                first tap, not counted in its initial download
    /status/     the parity status page with the last stamped report
 
    Prints the initial download: every file the page loads before its first
@@ -63,7 +65,13 @@ gameInitial += fs.statSync(path.join(dist, 'vendor', 'three.webgpu.min.js')).siz
 /* The music, from the repository, read only. */
 const musicDir = path.join(root, '..', 'music');
 let music = 0, tracks = 0;
-if (fs.existsSync(musicDir)) for (const f of fs.readdirSync(musicDir)) { if (!/\.(mp3|m4a|ogg)$/i.test(f)) continue; fs.copyFileSync(path.join(musicDir, f), path.join(gb, 'music', f)); music += fs.statSync(path.join(musicDir, f)).size; tracks++; }
+fs.mkdirSync(path.join(dist, 'music'), { recursive: true });
+if (fs.existsSync(musicDir)) for (const f of fs.readdirSync(musicDir)) {
+  if (!/\.(mp3|m4a|ogg)$/i.test(f)) continue;
+  fs.copyFileSync(path.join(musicDir, f), path.join(gb, 'music', f));
+  fs.copyFileSync(path.join(musicDir, f), path.join(dist, 'music', f));   // the new game's music, streamed after the first tap
+  music += fs.statSync(path.join(musicDir, f)).size; tracks++;
+}
 
 /* The status page. */
 let stamp = null, report = '';

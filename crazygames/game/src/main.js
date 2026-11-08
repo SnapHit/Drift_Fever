@@ -148,6 +148,7 @@ function stepOnce(rec) {
   if (app.race) app.race.step(world, app.progress.state);
   if (app.ghost) app.ghost.step();
   if (world.hit) chase.hit(world.hit.speed);
+  if (world.hit && (!app.frameHit || world.hit.speed > app.frameHit.speed)) app.frameHit = { speed: world.hit.speed, hard: world.hit.hard };
 }
 
 const STOP = { steer: 0, throttle: 0, brake: 0, handbrake: 1 };   // DRIFT with no steering: the car stops
@@ -168,8 +169,10 @@ function frame(t) {
   let steps = 0;
   if (S === 'countdown') {
     app.countdown -= dt;
-    hud.setCount(String(Math.max(1, Math.ceil(app.countdown))), false);
-    if (app.countdown <= 0) { app.state = 'drive'; input.setStarted(true); app.goShown = LOOP.GO_SHOWN; hud.setCount('GO', true); acc = 0; }
+    const n = Math.max(1, Math.ceil(app.countdown));
+    hud.setCount(String(n), false);
+    if (n !== app.lastTick) { app.lastTick = n; sound.ui('tick'); }
+    if (app.countdown <= 0) { app.state = 'drive'; input.setStarted(true); app.goShown = LOOP.GO_SHOWN; hud.setCount('GO', true); acc = 0; sound.ui('go'); sound.launch(); }
   }
   const stepping = S === 'drive' || S === 'results' || S === 'free' || S === 'dev';
   if (stepping) {
@@ -201,7 +204,19 @@ function frame(t) {
   else chase.update(pose, dt, scene.camera, view.w / view.h);
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
   scene.update(pose, world, dt, g);
-  sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev');
+  sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev', world.touching);
+  if (app.frameHit) { sound.hit(app.frameHit.speed, app.frameHit.hard); app.frameHit = null; }
+  /* the score's sounds, from the callouts it queued this frame */
+  const sc = scoring.state;
+  if ((app.heardCallouts || 0) > sc.calloutCount) app.heardCallouts = 0;   // the score was reset
+  if (sc.calloutCount !== app.heardCallouts) {
+    const fresh = Math.min(sc.callouts.length, sc.calloutCount - (app.heardCallouts || 0));
+    for (const co of sc.callouts.slice(-fresh)) {
+      if (co.kind === 'lost') sound.ui('lost');
+      else if (co.kind === 'bank') sound.ui(/^(CLEAN|PACE)/.test(co.text) ? 'clean' : 'bank', sc.lastBankMult);
+    }
+    app.heardCallouts = sc.calloutCount;
+  }
   hud.update(scoring, pose, scene.camera, THREE, view, dt);
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;
@@ -215,7 +230,7 @@ function frame(t) {
 /* ---- the states ---- */
 function titleInfo() {
   const d = dailySpec();
-  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null };
+  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -257,7 +272,7 @@ function startRun(spec) {
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
   hud.setToBeat(rec ? 'best ' + rec.score : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
   app.state = 'countdown'; app.countdown = LOOP.COUNTDOWN; app.settle = 0; app.results = null;
-  sound.engineStart();
+  sound.engineStart(); app.lastTick = 0; app.heardCallouts = 0;
   input.setStarted(false);
   screens.hide(); hud.setVisible(true); input.touch.setVisible(true);
   resetRun();
@@ -285,6 +300,8 @@ function finishRun() {
   }
   app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
+  for (let i = 0; i < stars; i++) sound.ui('star', i + 1, 0.35 + i * 0.28);
+  sound.ui('coin', 0, 0.45 + stars * 0.28);
   hud.setCount('', false); hud.setVisible(false); input.touch.setVisible(false);
   screens.results(app.results);
 }
@@ -301,7 +318,9 @@ function startFree() {
 }
 
 function onAction(action, arg) {
+  sound.ui('tap');
   switch (action) {
+    case 'music': sound.setMusic(!sound.music); showMenu('title'); break;
     case 'fullscreen': toggleFullscreen(); break;
     case 'sound': sound.setMuted(!sound.muted); soundButton(); showMenu('title'); break;
     case 'title': menuGround(); showMenu('title'); break;
