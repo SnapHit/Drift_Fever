@@ -40,14 +40,14 @@ export function createOnboarding(root, onSkip) {
   const O = LOOP.ONBOARD;
   const st = {
     active: false, step: null, stepT: 0, steerT: 0, hbT: 0, waitT: 0,
-    done: { steer: false, drift: false, brake: false }, shown: [], infoT: 0, infoKind: null,
+    done: { steer: false, drift: false, brake: false }, how: {}, shown: [], infoT: 0, infoKind: null,
     chainShown: false, cleanShown: false, skipped: false, source: 'keys',
   };
   let lastPrompt = '', lastInfo = '', lastPos = '';
 
   function start(source) {
     st.active = true; st.step = null; st.stepT = 0; st.steerT = 0; st.hbT = 0; st.waitT = 0;
-    st.done.steer = st.done.drift = st.done.brake = false; st.shown.length = 0; st.infoT = 0; st.infoKind = null;
+    st.done.steer = st.done.drift = st.done.brake = false; st.how = {}; st.shown.length = 0; st.infoT = 0; st.infoKind = null;
     st.chainShown = st.cleanShown = false; st.skipped = false; st.source = source || 'keys';
     el.hidden = false; skip.hidden = false;
     setPrompt('', '');
@@ -70,7 +70,8 @@ export function createOnboarding(root, onSkip) {
     const arrow = touch ? '<span class="arrow">&#9660;</span>' : '';
     setPrompt('<b>' + text + '</b>' + keys + arrow, touch ? (step === 'steer' ? 'at-left' : 'at-right') : 'centre');
   }
-  function finish(step) { st.done[step] = true; st.step = null; st.waitT = 0; setPrompt('', ''); }
+  /* how: 'done' when the player did it, 'timeout' when it was left */
+  function finish(step, how) { st.done[step] = true; st.how[step] = how; st.step = null; st.waitT = 0; setPrompt('', ''); }
 
   /* ctx: { driving, record (the input record), source, scoring (its
      state), cornerAhead (m to the next corner, or Infinity) } */
@@ -87,10 +88,10 @@ export function createOnboarding(root, onSkip) {
     if (st.step) {
       st.stepT += dt;
       const readable = st.stepT >= O.PROMPT_MIN;
-      if (st.step === 'steer') { if (r.steer !== 0) st.steerT += dt; if (readable && st.steerT >= O.STEER_HOLD) finish('steer'); }
-      else if (st.step === 'drift') { if (s.drifting) st.hbT += dt; if (readable && st.hbT > 0) finish('drift'); }
-      else if (st.step === 'brake') { if (r.handbrake && r.steer === 0) st.hbT += dt; else st.hbT = 0; if (readable && st.hbT >= O.BRAKE_HOLD) finish('brake'); }
-      if (st.step && st.stepT >= O.PROMPT_MAX) finish(st.step);
+      if (st.step === 'steer') { if (r.steer !== 0) st.steerT += dt; if (readable && st.steerT >= O.STEER_HOLD) finish('steer', 'done'); }
+      else if (st.step === 'drift') { if (s.drifting && r.handbrake && r.steer !== 0) st.hbT += dt; if (readable && st.hbT > 0) finish('drift', 'done'); }   // the player doing what it says, not a slide off a wall
+      else if (st.step === 'brake') { if (r.handbrake && r.steer === 0) st.hbT += dt; else st.hbT = 0; if (readable && st.hbT >= O.BRAKE_HOLD) finish('brake', 'done'); }
+      if (st.step && st.stepT >= O.PROMPT_MAX) finish(st.step, 'timeout');
     } else if (!st.done.steer) show('steer');
     else if (!st.done.drift) { st.waitT += dt; if (ctx.cornerAhead <= O.DRIFT_LEAD || st.waitT >= O.DRIFT_WAIT) show('drift'); }
     else if (!st.done.brake) { st.waitT += dt; if (st.waitT >= O.BRAKE_AFTER) show('brake'); }

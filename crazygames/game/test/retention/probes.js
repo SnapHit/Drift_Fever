@@ -15,7 +15,12 @@
    2. Onboarding: the prompts show on the first visit, SKIP (a real
       click) ends them without stopping the car, and they are not shown
       on the next visit. Known answer: the save's onboarded flag put back
-      to false (with no finished run) brings them back.
+      to false (with no finished run) brings them back. The steer, slide
+      and brake prompts are completed by the player's own input: real key
+      presses (arrows, then space with an arrow, then space alone) and,
+      at 390x844 on a touch screen, real touches on the pads through CDP,
+      each marked done and not timed out. Known answer: with no input all
+      three time out.
    3. Missions: every career track and the daily driven by the scripted
       drifter and by the careful driver; every mission kind is completed
       somewhere, and no kind is completed on every track by both drivers
@@ -153,7 +158,42 @@ if (run('onboard')) {
   out.onboard.errors = sk.errors;
   await sk.close();
 
-  // c. the touch prompts point at the buttons
+  // c. the prompts completed by the player: real keys, then real touches
+  const byInput = async (name, viewport, touch, press) => {
+    const pg = await R.openPage(env, viewport, { firstVisit: true, touch, query: '' });
+    await pg.page.evaluate(() => { window.__feel.draw = false; });
+    const cdp = touch ? await pg.context.newCDPSession(pg.page) : null;
+    const pads = touch ? await pg.page.evaluate(() => { const c = s => { const r = document.querySelector(s).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }; return { left: c('#touch button[data-b="left"]'), right: c('#touch button[data-b="right"]'), hb: c('#touch button[data-b="hb"]') }; }) : null;
+    const hold = async (what) => { if (cdp) await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: what.map((k, i) => ({ x: pads[k].x, y: pads[k].y, id: i + 1 })) }); else for (const k of what) await pg.page.keyboard.down(k); };
+    const release = async (what) => { if (cdp) await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); else for (const k of what) await pg.page.keyboard.up(k); };
+    const steps = [];
+    for (const [step, keys] of press) {
+      const at = await R.untilStep(pg.page, new Function('return window.__loop.onboard.state.step === ' + JSON.stringify(step)), 60 * 12);
+      await hold(keys);
+      const took = await R.untilStep(pg.page, new Function('return window.__loop.onboard.state.done.' + step), 60 * 12);
+      await release(keys);
+      steps.push({ step, promptAtFrame: at, doneAfterFrames: took, input: keys });
+    }
+    const st = await R.onboardState(pg.page);
+    await pg.close();
+    return { name, steps, how: st.how, done: st.done, errors: pg.errors };
+  };
+  const keys = await byInput('keyboard 1280x720', R.LANDSCAPE, false, [['steer', ['ArrowLeft']], ['drift', ['ArrowRight', ' ']], ['brake', [' ']]]);
+  const taps = await byInput('touch 390x844', R.PORTRAIT, true, [['steer', ['left']], ['drift', ['right', 'hb']], ['brake', ['hb']]]);
+  const allDone = r => ['steer', 'drift', 'brake'].every(k => r.done[k] && r.how[k] === 'done') && r.steps.every(x => x.promptAtFrame >= 0 && x.doneAfterFrames >= 0) && r.errors.length === 0;
+  out.onboard.byInput = { keyboard: keys, touch: taps };
+  verdict('real key presses complete steer, slide and brake, each done and none timed out', allDone(keys), keys.steps.map(x => x.step + ' done ' + (x.doneAfterFrames / 60).toFixed(1) + ' s after ' + x.input.join('+')).join(', '));
+  verdict('real touches on the pads complete steer, slide and brake, each done and none timed out', allDone(taps), taps.steps.map(x => x.step + ' done ' + (x.doneAfterFrames / 60).toFixed(1) + ' s after ' + x.input.join('+')).join(', '));
+  // the known answer: no input, and every prompt times out
+  const idle = await R.openPage(env, R.LANDSCAPE, { firstVisit: true, query: '' });
+  await idle.page.evaluate(() => { window.__feel.draw = false; });
+  await R.untilStep(idle.page, () => window.__loop.onboard.state.done.brake, 60 * 40);
+  const idleSt = await R.onboardState(idle.page);
+  out.onboard.knownAnswerNoInput = { how: idleSt.how, done: idleSt.done, caught: ['steer', 'drift', 'brake'].every(k => idleSt.done[k] && idleSt.how[k] === 'timeout') };
+  verdict('known answer: with no input all three prompts time out', out.onboard.knownAnswerNoInput.caught, JSON.stringify(idleSt.how));
+  await idle.close();
+
+  // d. the touch prompts point at the buttons
   const tp = await R.openPage(env, R.PORTRAIT, { firstVisit: true, touch: true, query: 'auto=1' });
   await tp.page.evaluate(() => { window.__feel.draw = false; });
   await R.runFrames(tp.page, 60 * 5);

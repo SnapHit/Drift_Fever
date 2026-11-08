@@ -56,7 +56,9 @@ export async function framesUntilMoving(page, budget) {
 }
 
 export const clicks = page => page.evaluate(() => window.__clicks);
-export const onboardState = page => page.evaluate(() => { const o = window.__loop.onboard; return { active: o.active, visible: o.visible(), step: o.state.step, shown: o.state.shown.slice(), done: { ...o.state.done }, skipped: o.state.skipped, skipShown: !document.getElementById('skip').hidden && !o.el.hidden }; });
+export const onboardState = page => page.evaluate(() => { const o = window.__loop.onboard; return { active: o.active, visible: o.visible(), step: o.state.step, shown: o.state.shown.slice(), done: { ...o.state.done }, how: { ...o.state.how }, skipped: o.state.skipped, skipShown: !document.getElementById('skip').hidden && !o.el.hidden }; });
+/* run frames until the onboarding is at a step (or past it), with a frame budget */
+export async function untilStep(page, cond, maxFrames) { for (let k = 0; k < maxFrames; k += 10) { await runFrames(page, 10); if (await page.evaluate(cond)) return k + 10; } return -1; }
 
 /* A TEST DRIVER THAT HUGS THE CLIP WALLS. The game's scripted drivers
    (physics/driver.js, which this brief leaves alone) follow the centre

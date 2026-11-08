@@ -1,13 +1,13 @@
 {
- "started": "2026-11-08T03:38:15.416Z",
+ "started": "2026-11-08T06:54:39.052Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader",
  "sequence": {
   "shown": [
    "steer",
    "clean",
    "drift",
-   "brake",
-   "chain"
+   "chain",
+   "brake"
   ],
   "done": {
    "steer": true,
@@ -66,31 +66,11 @@
     "active": true
    },
    {
-    "t": 13.18,
-    "s": "drive",
-    "step": null,
-    "vis": true,
-    "txt": "",
-    "info": "Clean sector. A sector with no wall hits pays a clean bonus.",
-    "v": 22.6,
-    "active": true
-   },
-   {
-    "t": 14.2,
-    "s": "drive",
-    "step": "brake",
-    "vis": true,
-    "txt": "SPACE on its own brakesSPACE",
-    "info": "Clean sector. A sector with no wall hits pays a clean bonus.",
-    "v": 23.3,
-    "active": true
-   },
-   {
     "t": 14.67,
     "s": "drive",
-    "step": "brake",
+    "step": "drift",
     "vis": true,
-    "txt": "SPACE on its own brakesSPACE",
+    "txt": "Hold SPACE while steering to slideSPACE+◀▶",
     "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
     "v": 23.8,
     "active": true
@@ -98,21 +78,41 @@
    {
     "t": 19.17,
     "s": "drive",
-    "step": "brake",
+    "step": "drift",
     "vis": true,
-    "txt": "SPACE on its own brakesSPACE",
+    "txt": "Hold SPACE while steering to slideSPACE+◀▶",
     "info": "",
     "v": 27.4,
     "active": true
    },
    {
-    "t": 23.2,
+    "t": 20.97,
     "s": "drive",
     "step": null,
     "vis": false,
     "txt": "",
     "info": "",
-    "v": 22.1,
+    "v": 21,
+    "active": true
+   },
+   {
+    "t": 21.97,
+    "s": "drive",
+    "step": "brake",
+    "vis": true,
+    "txt": "SPACE on its own brakesSPACE",
+    "info": "",
+    "v": 20.7,
+    "active": true
+   },
+   {
+    "t": 30.97,
+    "s": "drive",
+    "step": null,
+    "vis": false,
+    "txt": "",
+    "info": "",
+    "v": 22.8,
     "active": true
    }
   ],
@@ -132,6 +132,7 @@
     "drift": false,
     "brake": false
    },
+   "how": {},
    "skipped": false,
    "skipShown": true
   },
@@ -147,6 +148,7 @@
     "drift": false,
     "brake": false
    },
+   "how": {},
    "skipped": true,
    "skipShown": false
   },
@@ -168,6 +170,103 @@
   "caught": true
  },
  "errors": [],
+ "byInput": {
+  "keyboard": {
+   "name": "keyboard 1280x720",
+   "steps": [
+    {
+     "step": "steer",
+     "promptAtFrame": 180,
+     "doneAfterFrames": 70,
+     "input": [
+      "ArrowLeft"
+     ]
+    },
+    {
+     "step": "drift",
+     "promptAtFrame": 130,
+     "doneAfterFrames": 70,
+     "input": [
+      "ArrowRight",
+      " "
+     ]
+    },
+    {
+     "step": "brake",
+     "promptAtFrame": 60,
+     "doneAfterFrames": 70,
+     "input": [
+      " "
+     ]
+    }
+   ],
+   "how": {
+    "steer": "done",
+    "drift": "done",
+    "brake": "done"
+   },
+   "done": {
+    "steer": true,
+    "drift": true,
+    "brake": true
+   },
+   "errors": []
+  },
+  "touch": {
+   "name": "touch 390x844",
+   "steps": [
+    {
+     "step": "steer",
+     "promptAtFrame": 180,
+     "doneAfterFrames": 70,
+     "input": [
+      "left"
+     ]
+    },
+    {
+     "step": "drift",
+     "promptAtFrame": 130,
+     "doneAfterFrames": 70,
+     "input": [
+      "right",
+      "hb"
+     ]
+    },
+    {
+     "step": "brake",
+     "promptAtFrame": 60,
+     "doneAfterFrames": 70,
+     "input": [
+      "hb"
+     ]
+    }
+   ],
+   "how": {
+    "steer": "done",
+    "drift": "done",
+    "brake": "done"
+   },
+   "done": {
+    "steer": true,
+    "drift": true,
+    "brake": true
+   },
+   "errors": []
+  }
+ },
+ "knownAnswerNoInput": {
+  "how": {
+   "steer": "timeout",
+   "drift": "timeout",
+   "brake": "timeout"
+  },
+  "done": {
+   "steer": true,
+   "drift": true,
+   "brake": true
+  },
+  "caught": true
+ },
  "touch": {
   "cls": "prompt at-left",
   "text": "Steer with the left and right buttons▼",
