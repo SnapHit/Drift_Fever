@@ -406,7 +406,7 @@ only `review/retention/` is this branch's.
 | `visuals/occlusion.js` | all passed in 16 s, known answers caught |
 | `visuals/probes.js` (readability, perf, download, shots) | all passed: edge brightest in 40 shots (worst ratio 1.4, needs 1.35); low tier JavaScript p95 4.3 ms at 6x, 63 draw calls; initial download 2.24 MB over 67 files |
 | `cars/measure.js` | PASS |
-| `loop/probes.js` (ghost, runs, save, perf, shots) | LOOP_ROW |
+| `loop/probes.js` (ghost, runs, save, perf, shots) | all 22 verdicts pass, rerun by the reviewer after the free drift fix (7a6e826): the ghost replays frame for frame (4,139 frames, 0 differ), career 1 to 6 and the daily to a results screen with 0 respawns, the ladder unlocks in order, saves survive throwing storage and corrupt saves, JavaScript p95 3.5 ms at 6x |
 
 One probe changed: `loop/probes.js`'s career ladder check cleared the
 save and read the game's state to see a locked track refused. Since

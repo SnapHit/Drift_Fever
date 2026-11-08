@@ -332,3 +332,18 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   the primary button is orange to match. The full screen button hides
   inside another page's frame: CrazyGames' requirements forbid a custom
   one (docs.crazygames.com/requirements/gameplay, checked 8 November).
+- 9 November 2026: a reason to come back (`briefs/RETENTION.md`,
+  `review/retention/REPORT.md`). A first visit lands in a run of career
+  track 1 with no click, with prompts for steer, slide and brake at the
+  moments they apply and one SKIP (`game/src/ui/onboard.js`); HOW TO PLAY
+  on the title runs it again. Every career track and the daily has three
+  missions from its seed and features, judged at the physics rate, 60
+  coins each the first time (`LOOP.MISSIONS`). Track Lab builds a track
+  from settings, gives it a twelve character code and a `?track=` link,
+  keeps a best and a ghost for the last six codes and pays half rate
+  (`LOOP.LAB`). Saves are additive; the generator is unchanged without
+  the new options. Open: mission targets, coins and the Lab rate are
+  first guesses for play; the hold and chain missions were reached by
+  the scripted drivers on 1 and 2 of 9 tracks; WASD does not follow an
+  AZERTY layout (CrazyGames' quality page asks for it); `tracks2.js`'s
+  busyness known answer misses on main too since generator version 4.
