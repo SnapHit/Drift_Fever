@@ -1,0 +1,141 @@
+{
+ "started": "2026-11-08T03:10:36.016Z",
+ "roundTrips": {
+  "n": 1000,
+  "settingsAndSeedSame": 1000,
+  "trackSame": 1000,
+  "bad": 0,
+  "fallbacks": 0,
+  "worstGenerateMs": 86,
+  "seconds": 16,
+  "byStyle": {
+   "flowing": {
+    "n": 235,
+    "fallbacks": 0,
+    "corners": 2125,
+    "hairpins": 0,
+    "sweepers": 1446,
+    "cornersPerTrack": 9,
+    "hairpinShare": 0,
+    "sweeperShare": 0.68
+   },
+   "hairpins": {
+    "n": 254,
+    "fallbacks": 0,
+    "corners": 1807,
+    "hairpins": 832,
+    "sweepers": 461,
+    "cornersPerTrack": 7.1,
+    "hairpinShare": 0.46,
+    "sweeperShare": 0.26
+   },
+   "mixed": {
+    "n": 255,
+    "fallbacks": 0,
+    "corners": 2370,
+    "hairpins": 284,
+    "sweepers": 1090,
+    "cornersPerTrack": 9.3,
+    "hairpinShare": 0.12,
+    "sweeperShare": 0.46
+   },
+   "technical": {
+    "n": 256,
+    "fallbacks": 0,
+    "corners": 2600,
+    "hairpins": 185,
+    "sweepers": 660,
+    "cornersPerTrack": 10.2,
+    "hairpinShare": 0.07,
+    "sweeperShare": 0.25
+   }
+  },
+  "byLength": {
+   "circuit short": {
+    "n": 175,
+    "fallbacks": 0,
+    "metres": 99658,
+    "bridges": 0,
+    "meanMetres": 569
+   },
+   "circuit long": {
+    "n": 78,
+    "fallbacks": 0,
+    "metres": 78040,
+    "bridges": 0,
+    "meanMetres": 1001
+   },
+   "sprint medium": {
+    "n": 174,
+    "fallbacks": 0,
+    "metres": 176162,
+    "bridges": 0,
+    "meanMetres": 1012
+   },
+   "circuit long crossover": {
+    "n": 89,
+    "fallbacks": 0,
+    "metres": 90882,
+    "bridges": 89,
+    "meanMetres": 1021
+   },
+   "sprint long": {
+    "n": 153,
+    "fallbacks": 0,
+    "metres": 200392,
+    "bridges": 0,
+    "meanMetres": 1310
+   },
+   "circuit medium": {
+    "n": 158,
+    "fallbacks": 0,
+    "metres": 120740,
+    "bridges": 0,
+    "meanMetres": 764
+   },
+   "sprint short": {
+    "n": 173,
+    "fallbacks": 0,
+    "metres": 121766,
+    "bridges": 0,
+    "meanMetres": 704
+   }
+  },
+  "knownAnswer": {
+   "cases": 50,
+   "rejected": 50,
+   "sameTrack": 0
+  }
+ },
+ "malformed": {
+  "set": 2389,
+  "rejected": 2389,
+  "accepted": 0,
+  "threw": 0,
+  "sameAsValid": 0,
+  "reasons": {
+   "no code": 8,
+   "a code has twelve characters": 6,
+   "a code from another version of the game": 1911,
+   "that is not a track code (a character may be wrong)": 463,
+   "the character U is not in a code": 1
+  },
+  "acceptedSamples": [],
+  "validStillDecodes": true
+ },
+ "generator": {
+  "base": "origin/main",
+  "baseCommit": "146cbaaec889f0f90488782f1a71d71ea4f11517",
+  "n": 400,
+  "identical": 400,
+  "differ": 0,
+  "differingSamples": [],
+  "seconds": 6,
+  "knownAnswer": {
+   "weights": "hairpins",
+   "compared": 60,
+   "differ": 60,
+   "same": 0
+  }
+ }
+}

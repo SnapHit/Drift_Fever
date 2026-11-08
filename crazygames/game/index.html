@@ -152,6 +152,38 @@
   .results .targets { display: flex; gap: 14px; font-size: 13px; font-weight: 700; } .results .targets .on { color: #ffd34d; } .results .targets .off { opacity: 0.45; }
   .results .facts { display: flex; gap: 18px; justify-content: center; width: 100%; } .results .facts span { display: flex; flex-direction: column; align-items: center; } .results .facts b { font-size: 20px; } .results .facts small { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.1em; }
   .results .row2 { display: flex; gap: 8px; width: 100%; } .results .row2 button { min-height: 52px; }
+  /* the Track Lab */
+  .lab { max-width: 980px; }
+  .labgrid { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
+  .planbox { position: relative; width: 100%; aspect-ratio: 1.25 / 1; max-height: 34vh; border-radius: 14px; overflow: hidden; border: 2px solid rgba(255,255,255,0.18); background: #24252b; }
+  .planbox canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .planinfo { position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 10px; font-size: 12px; font-weight: 700; background: rgba(10,14,30,0.6); text-align: center; } .planinfo em { color: #ffb81c; font-style: normal; }
+  .labctl { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .segrow small { display: block; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.6; margin: 0 0 3px 4px; }
+  .seg { display: flex; gap: 6px; }
+  .seg button, .tog, .mini { min-height: 40px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); background: rgba(10,14,30,0.6); color: #fff; font: inherit; font-weight: 800; font-size: 12px; letter-spacing: 0.06em; padding: 6px 4px; -webkit-tap-highlight-color: transparent; }
+  .seg button { flex: 1; min-width: 0; font-size: clamp(10px, 2.8vw, 12px); padding: 6px 2px; }
+  .lab .row2 { display: flex; gap: 8px; width: 100%; position: sticky; bottom: 0; z-index: 1; padding: 8px 0 4px; background: linear-gradient(180deg, rgba(14,16,30,0), rgba(14,16,30,0.92) 35%); } .lab .row2 .big { min-height: 52px; }
+  .seg button.on, .tog.on { background: rgba(25,216,255,0.2); border-color: var(--cyan); }
+  .togs { display: flex; gap: 6px; }
+  .tog { flex: 1; display: flex; align-items: center; gap: 8px; padding: 6px 10px; text-align: left; } .tog b { font-size: 12px; } .tog small { margin-left: auto; opacity: 0.7; font-weight: 700; } .tog:disabled { opacity: 0.45; }
+  .tog .sw { width: 30px; height: 16px; border-radius: 8px; background: rgba(255,255,255,0.2); position: relative; flex: none; } .tog .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 6px; background: #fff; transition: left 0.15s; } .tog.on .sw { background: var(--cyan); } .tog.on .sw::after { left: 16px; }
+  .coderow { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 10px; border-radius: 12px; background: rgba(255,255,255,0.06); box-sizing: border-box; }
+  .codelabel { font-size: 10px; letter-spacing: 0.2em; opacity: 0.6; font-weight: 800; }
+  .code { flex: 1; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: clamp(15px, 2.6vw, 20px); font-weight: 800; letter-spacing: 0.08em; color: var(--edge); user-select: text; -webkit-user-select: text; }
+  .mini { padding: 6px 12px; min-height: 36px; font-size: 11px; }
+  .coderow.entry input { flex: 1; min-width: 0; min-height: 36px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); background: rgba(10,14,30,0.6); color: #fff; font: inherit; font-size: 14px; padding: 4px 10px; text-transform: uppercase; -webkit-user-select: text; user-select: text; }
+  .status { margin: 0; font-size: 13px; font-weight: 700; color: var(--cyan); text-align: center; } .status.bad { color: #ff8a8a; }
+  .results .coderow { padding: 4px 10px; }
+  @media (min-aspect-ratio: 6/5) {
+    .labgrid { grid-template-columns: minmax(220px, 40%) 1fr; align-items: start; }
+    .planbox { aspect-ratio: auto; height: min(70vh, 520px); max-height: none; }
+    .lab header { width: 100%; }
+  }
+  @media (orientation: landscape) and (max-height: 500px) {
+    .lab .big { min-height: 48px; } .labctl { gap: 6px; } .seg button, .tog { min-height: 34px; font-size: 11px; }
+    .planbox { height: min(78vh, 360px); }
+  }
   .results .missions { display: flex; flex-direction: column; gap: 3px; width: 100%; font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,0.06); }
   .results .missions .done { color: #ffd34d; } .results .missions .fresh b { color: #ffd34d; margin-left: 4px; }
   .pips.m i { width: 10px; height: 10px; border-radius: 5px; } .pips.m i.on { background: #ffd34d; }

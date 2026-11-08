@@ -78,7 +78,11 @@
    the rise and fall and the gentle bank every corner gets, and at 0 the
    course is flat with no banked corners and no crossovers, for a host
    whose car and camera do not follow the road's height; bank: false
-   and crossover: false switch those off on their own. */
+   and crossover: false switch those off on their own; crossover:
+   'always' plans every attempt as a figure eight (on a lap long enough
+   for one), for the Track Lab. weights: { feature: [easy, hard] } picks
+   the features by other weights than TRACKS.WEIGHTS (the Lab's styles);
+   left out, the track is exactly what it was. */
 import { dsin, dcos, dasin, wrapAngle, TWO_PI } from './dmath.js';
 import { validateTrack, difficultyOf, findCrossings } from './analyse.js';
 
@@ -325,7 +329,7 @@ function makeFeature(type, dir, rng, d) {
 
 /* A sequence of elements: { s: length, adj, min, max } straights and
    { c } corners. eight: plan a figure eight, one full turn and back. */
-function planCircuit(rng, d, goal) {
+function planCircuit(rng, d, goal, weights) {
   const T = TRACKS;
   const sgn = rng() < 0.5 ? 1 : -1;
   /* the one longer run, scaled down on a short lap */
@@ -335,7 +339,7 @@ function planCircuit(rng, d, goal) {
   const budget = goal * T.PLAN_SHARE;
   let guard = 0;
   while (est < budget && guard++ < 60) {
-    const type = weightedPick(rng, T.WEIGHTS, d);
+    const type = weightedPick(rng, weights || T.WEIGHTS, d);
     const u = Math.min(1, (est + 80) / budget);
     const want = sgn * TWO_PI * u;
     const toward = want - H >= 0 ? 1 : -1;
@@ -372,7 +376,7 @@ function planCircuit(rng, d, goal) {
    is its mirror image, turning the other way, which lands exactly on the
    start. The lobes must cross on the mirror line, where the bridge goes.
    The start straight is drawn shorter, since each lobe has one. */
-function planEight(rng, d, goal, target) {
+function planEight(rng, d, goal, target, weights) {
   const T = TRACKS;
   const sgn = rng() < 0.5 ? 1 : -1;
   const ss = T.START_STRAIGHT.circuit, scale = Math.min(1, goal / T.START_STRAIGHT.lap) * T.CROSS.eightStart;
@@ -381,7 +385,7 @@ function planEight(rng, d, goal, target) {
   const budget = goal / 2 * T.PLAN_SHARE;
   let guard = 0;
   while (est < budget && guard++ < 60) {
-    const type = weightedPick(rng, T.WEIGHTS, d);
+    const type = weightedPick(rng, weights || T.WEIGHTS, d);
     const u = Math.min(1, (est + 80) / budget);
     const want = sgn * TWO_PI * u;
     const toward = want - H >= 0 ? 1 : -1;
@@ -440,7 +444,7 @@ function trimTurning(els, D) {
   return true;
 }
 
-function planSprint(rng, d, goal) {
+function planSprint(rng, d, goal, weights) {
   const T = TRACKS;
   const ss = T.START_STRAIGHT.sprint;
   const els = [{ s: between(rng, ss[0], ss[1]), adj: false, start: true }];
@@ -448,7 +452,7 @@ function planSprint(rng, d, goal) {
   const finishMin = T.FINISH_STRAIGHT[0] + T.FINISH_RUNOUT;
   let guard = 0;
   while (est < goal - finishMin - 60 && guard++ < 60) {
-    const type = weightedPick(rng, T.WEIGHTS, d);
+    const type = weightedPick(rng, weights || T.WEIGHTS, d);
     /* Wander, but lean back towards the first heading the further off it
        the course has turned, so a sprint does not curl into itself. */
     const back = H > 0 ? -1 : 1;
@@ -1099,11 +1103,13 @@ export function generateTrack(seed, options) {
   const rng = createRng(seedN, kind === 'circuit' ? 0x51c0 : 0x5b71);
   const elevationOn = o.elevation === undefined || (clamp(+o.elevation || 0, 0, 1) > 0);
   const eights = kind === 'circuit' && elevationOn && o.crossover !== false && o.crossover !== 0;
+  const always = o.crossover === 'always';
+  const weights = o.weights && typeof o.weights === 'object' ? o.weights : null;
   let failures = {};
   for (let attempt = 1; attempt <= TRACKS.ATTEMPTS; attempt++) {
     const goal = between(rng, target.min, target.max);
-    const eight = eights && goal >= TRACKS.CROSS.minLap && rng() < lerp(TRACKS.CROSS.chance[0], TRACKS.CROSS.chance[1], d);
-    const plan = kind === 'sprint' ? planSprint(rng, d, goal) : eight ? planEight(rng, d, goal, target) : planCircuit(rng, d, goal);
+    const eight = eights && goal >= TRACKS.CROSS.minLap && (always || rng() < lerp(TRACKS.CROSS.chance[0], TRACKS.CROSS.chance[1], d));
+    const plan = kind === 'sprint' ? planSprint(rng, d, goal, weights) : eight ? planEight(rng, d, goal, target, weights) : planCircuit(rng, d, goal, weights);
     if (!plan) { failures.turning = (failures.turning || 0) + 1; continue; }
     if (kind === 'circuit' && !closePosition(plan.els, target, null, goal)) { failures.closure = (failures.closure || 0) + 1; continue; }
     /* the length (after closure on a circuit), before the cost of a build */

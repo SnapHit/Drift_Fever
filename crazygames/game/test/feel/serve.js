@@ -17,6 +17,7 @@ export function resolveGame(url) {
   const u = decodeURIComponent(url.split('?')[0]);
   if (u === '/' || u === '/index.html') return path.join(gameDir, 'index.html');
   if (u.startsWith('/vendor/')) return path.join(root, 'public', 'vendor', u.slice(8));
+  if (u.startsWith('/music/')) return path.join(root, '..', 'music', u.slice(7));   // as the build copies it: streamed after the first tap
   if (/^\/(test|tests)\//.test(u)) return null;
   const p = path.normalize(path.join(gameDir, u));
   if (!p.startsWith(gameDir)) return null;

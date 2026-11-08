@@ -1,0 +1,93 @@
+{
+ "started": "2026-11-08T03:14:06.820Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader",
+ "mainShape": {
+  "keys": [
+   "v",
+   "coins",
+   "car",
+   "cars",
+   "career",
+   "daily",
+   "ghosts",
+   "starPay"
+  ],
+  "loadedKeys": [
+   "v",
+   "coins",
+   "car",
+   "cars",
+   "career",
+   "daily",
+   "ghosts",
+   "starPay",
+   "onboarded",
+   "missions",
+   "lab"
+  ],
+  "kept": true,
+  "fixes": 0,
+  "onboarded": false,
+  "missions": {},
+  "lab": {
+   "codes": {},
+   "last": ""
+  },
+  "landed": "title",
+  "coins": 1564,
+  "ghosts": [
+   "career:0"
+  ]
+ },
+ "corrupted": {
+  "fixes": 7,
+  "state": {
+   "coins": 0,
+   "onboarded": false,
+   "missions": {
+    "career:2": [
+     1,
+     1,
+     1
+    ]
+   },
+   "lab": {
+    "codes": {
+     "ABCDEFGH5678": {
+      "best": 50,
+      "stars": 3,
+      "when": 5
+     }
+    },
+    "last": ""
+   }
+  },
+  "runFinished": true,
+  "labOk": true,
+  "errors": [],
+  "knownAnswer": {
+   "rawPasses": false,
+   "repairedPasses": true,
+   "fixes": 7,
+   "caught": true
+  }
+ },
+ "throwing": {
+  "state": "countdown",
+  "onboard": true,
+  "available": false,
+  "runFinished": true,
+  "missions": [
+   true,
+   false,
+   true
+  ],
+  "lab": {
+   "state": "lab",
+   "code": "H19FNJE3S5CB",
+   "failedWrites": 0,
+   "writes": 7
+  },
+  "errors": []
+ }
+}

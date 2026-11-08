@@ -295,6 +295,21 @@ export const LOOP = {
     MULT:             [2, 3],  // the multiplier to reach, easy and hard tracks (x4 was never reached by a scripted driver)
     SHOWN:            2.5,     // s the mission list stays after GO
   },
+  /* TRACK LAB (briefs/RETENTION.md 3): a player's own tracks by code.
+     What the length words mean to the generator, the feature weights of
+     each style (TRACKS.WEIGHTS is 'mixed'), how many codes are kept, and
+     what a Lab run pays. First guesses. */
+  LAB: {
+    DIFFICULTY:       0.5,     // the difficulty every Lab track is asked at; the style shapes it
+    LENGTH:           { circuit: { short: 560, medium: 760, long: 1000 }, sprint: { short: 700, medium: 1000, long: 1300 } },   // m asked of the generator
+    STYLES: {                  // feature weights [easy, hard], as TRACKS.WEIGHTS
+      flowing:   { hairpin: [0, 0], tight: [1, 1], sweeper: [4, 3], esses: [2, 2], chicane: [0, 0], flow: [4, 4], multi: [3, 3], double: [0, 0], tightening: [1, 1], opening: [2, 2] },
+      technical: { hairpin: [1, 1], tight: [3, 3], sweeper: [0, 0], esses: [3, 3], chicane: [3, 3], flow: [2, 2], multi: [0, 0], double: [1, 1], tightening: [2, 2], opening: [1, 1] },
+      hairpins:  { hairpin: [4, 4], tight: [2, 2], sweeper: [1, 1], esses: [0, 0], chicane: [0, 0], flow: [0, 0], multi: [1, 1], double: [3, 3], tightening: [1, 1], opening: [1, 1] },
+    },
+    KEEP:             6,       // codes whose best and ghost are kept, the most recently driven
+    COIN_RATE:        0.5,     // a Lab run's coins as a share of a career run's; no new star bonus
+  },
   /* FIRST-RUN ONBOARDING (briefs/RETENTION.md 1): the first visit skips
      the title and lands in career track 1, with short prompts at the
      moments they apply. The car is never paused to explain. */

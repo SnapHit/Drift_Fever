@@ -9,6 +9,8 @@ import { missionTally } from '../loop/missions.js';
 import { LOOP } from '../tune.js';
 import { fullscreenSupported, isFullscreen, fullscreenIcon } from './fullscreen.js';
 import { soundIcon } from '../audio/sound.js';
+import { FIELDS } from '../lab/code.js';
+import { crossoverOffered, format as formatCode } from '../lab/lab.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
@@ -22,10 +24,12 @@ export function createScreens(root, onAction) {
   root.appendChild(el);
   el.addEventListener('click', e => {
     const b = e.target.closest('[data-action]');
-    if (!b || b.disabled) return;
+    if (!b || b.disabled || b.tagName === 'FORM') return;
     e.preventDefault();
     onAction(b.dataset.action, b.dataset.arg);
   });
+  /* a form (the code entry) submits by its button or by Enter in its field */
+  el.addEventListener('submit', e => { const f = e.target.closest('form[data-action]'); if (!f) return; e.preventDefault(); onAction(f.dataset.action, (f.querySelector('input') || {}).value); });
   let current = null;
 
   function show(name, html) {
@@ -51,6 +55,7 @@ export function createScreens(root, onAction) {
         <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total} of ${CAREER.length * 3} stars &middot; ${info.missions} of ${info.missionsOf} missions</small></button>
         <button type="button" class="big" data-action="free"><b>FREE DRIFT</b><small>the car park, no timer</small></button>
         <button type="button" class="big" data-action="garage"><b>GARAGE</b><small>${esc(carById(save.car).name)}</small></button>
+        <button type="button" class="big" data-action="lab"><b>TRACK LAB</b><small>${info.labCodes ? info.labCodes + ' of your tracks saved' : 'make a track, share its code'}</small></button>
       </div>
       <div class="opts">
         ${fullscreenSupported() ? `<button type="button" class="fsbtn" data-action="fullscreen">${fullscreenIcon(isFullscreen())}<span>${isFullscreen() ? 'EXIT FULL SCREEN' : 'FULL SCREEN'}</span></button>` : ''}
@@ -105,7 +110,42 @@ export function createScreens(root, onAction) {
       <div class="detail"><h3>${esc(car.name)}</h3><p>${esc(car.character)}</p><div class="paints">${paints}</div>${owned ? upgrades(save, sel) : ''}${action}</div>`);
   }
 
-  /* r: { score, best, stars, targets, coins, improved, mode, name, seconds, nextIndex, laps, kind } */
+  /* THE TRACK LAB. L: { settings, seed, code, track, best, ghost, message,
+     error, link }. The plan canvas is drawn by the host after show(),
+     because it needs to be in the DOM to have a size. */
+  const LABELS = { kind: { circuit: 'CIRCUIT', sprint: 'SPRINT' }, length: { short: 'SHORT', medium: 'MEDIUM', long: 'LONG' }, style: { flowing: 'FLOWING', technical: 'TECHNICAL', hairpins: 'HAIRPINS', mixed: 'MIXED' }, theme: { forest: 'FOREST', coastal: 'COAST', desert: 'DESERT', docks: 'DOCKS', mountain: 'MOUNTAIN' }, time: { dusk: 'DUSK', night: 'NIGHT', dawn: 'DAWN', rain: 'RAIN' } };
+  function seg(name, s, title) {
+    const field = FIELDS.find(f => f[0] === name);
+    return `<div class="segrow"><small>${title}</small><div class="seg">${field[2].map(v => `<button type="button" class="${s[name] === v ? 'on' : ''}" data-action="lab-set" data-arg="${name}=${v}">${LABELS[name][v]}</button>`).join('')}</div></div>`;
+  }
+  function toggle(name, s, title, offered) {
+    return `<button type="button" class="tog${s[name] ? ' on' : ''}" data-action="lab-set" data-arg="${name}=${s[name] ? 'off' : 'on'}" ${offered === false ? 'disabled' : ''}><span class="sw"></span><b>${title}</b><small>${offered === false ? 'needs a long circuit' : s[name] ? 'on' : 'off'}</small></button>`;
+  }
+  function lab(save, L) {
+    const s = L.settings, t = L.track;
+    const facts = t ? `${fmt(t.length)} m${t.kind === 'circuit' ? ' lap' : ''} &middot; ${t.corners.length} corners${t.corners.filter(c => c.bank > 0).length ? ' &middot; ' + t.corners.filter(c => c.bank > 0).length + ' banked' : ''}${t.bridges && t.bridges.length ? ' &middot; crossover' : ''}${t.fallback ? ' &middot; <em>plain layout</em>' : ''}` : '';
+    show('lab', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>TRACK LAB</h2></header>
+      <div class="labgrid">
+        <div class="planbox"><canvas id="plan"></canvas><div class="planinfo">${facts}</div></div>
+        <div class="labctl">
+          ${seg('kind', s, 'track')}
+          ${seg('length', s, 'length')}
+          ${seg('style', s, 'style')}
+          <div class="togs">${toggle('bank', s, 'BANKED CORNERS')}${toggle('cross', s, 'CROSSOVER', crossoverOffered(s))}</div>
+          ${seg('theme', s, 'scenery')}
+          ${seg('time', s, 'time of day')}
+          <div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(L.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>
+          ${L.message ? `<p class="status${L.error ? ' bad' : ''}">${esc(L.message)}</p>` : ''}
+          <div class="row2">
+            <button type="button" class="big" data-action="lab-new"><b>NEW LAYOUT</b><small>same settings, another seed</small></button>
+            <button type="button" class="big primary" data-action="lab-drive"><b>DRIVE</b><small>${L.best ? 'best ' + fmt(L.best.best) + (L.ghost ? ' &middot; ghost' : '') : t && t.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint'}</small></button>
+          </div>
+          <form class="coderow entry" data-action="lab-code"><input id="codeIn" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="have a code? type it here" maxlength="16" aria-label="track code"><button type="submit" class="mini" data-action="lab-code">GO</button></form>
+        </div>
+      </div>`);
+  }
+
+  /* r: { score, best, stars, targets, coins, improved, mode, name, seconds, nextIndex, laps, kind, missions, code } */
   function results(r) {
     const targets = r.targets.map((t, i) => `<span class="${r.score >= t ? 'on' : 'off'}">&#9733; ${fmt(t)}</span>`).join('');
     show('results', `
@@ -117,15 +157,17 @@ export function createScreens(root, onAction) {
         ${r.parts ? `<div class="parts"><span><b>${fmt(r.parts.drift)}</b><small>drift</small></span><span><b>${fmt(r.parts.clean)}</b><small>clean${r.cleanSectors ? ' ' + r.cleanSectors : ''}</small></span><span><b>${fmt(r.parts.pace)}</b><small>pace</small></span></div>` : ''}
         <div class="facts"><span><b>${fmt(r.best)}</b><small>best chain</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span><b>+${fmt(r.coins)}</b><small>coins${r.newStars ? ' &middot; ' + r.newStars + ' new star' + (r.newStars > 1 ? 's' : '') : ''}</small></span></div>
         ${r.missions ? `<div class="missions">${r.missions.map(m => `<span class="${m.done ? 'done' : ''}${m.fresh ? ' fresh' : ''}">${m.done ? '&#10003;' : '&#9671;'} ${esc(m.text)}${m.fresh ? ' <b>+' + m.coins + '</b>' : ''}</span>`).join('')}</div>` : ''}
+        ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         <button type="button" class="big primary" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
+          ${r.code ? `<button type="button" class="big" data-action="lab"><b>LAB</b><small>change the track</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>
         </div>
       </div>`);
   }
 
-  return { el, show, hide, title, career, garage, results, get current() { return current; } };
+  return { el, show, hide, title, career, garage, lab, results, get current() { return current; } };
 }
 
 export { fmt };

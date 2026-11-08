@@ -41,13 +41,17 @@ export function dailySeed(date) {
 let memo = null;   // the last track generated, so going again does not generate it twice
 export function trackFor(spec) {
   const s = spec || {};
-  const memoKey = [s.seed, s.kind, s.difficulty, s.length].join('|');
+  const memoKey = [s.seed, s.kind, s.difficulty, s.length, s.options ? JSON.stringify(s.options) : '', s.theme || '', s.preset || ''].join('|');
   if (memo && memo.key === memoKey) return memo.track;
   let t;
   if (GENERATOR) {
     /* The physics follows the road's height and bank and the scene draws
-       them, so the generator's banked corners and crossovers are on. */
-    t = GENERATOR.generateTrack(s.seed, { kind: s.kind, difficulty: s.difficulty, length: s.length });
+       them, so the generator's banked corners and crossovers are on. A
+       Lab spec adds the generator options its settings mean (weights,
+       bank, crossover) and names the scene's theme and time of day. */
+    t = GENERATOR.generateTrack(s.seed, { kind: s.kind, difficulty: s.difficulty, length: s.length, ...(s.options || {}) });
+    if (s.theme) t.theme = s.theme;
+    if (s.preset) t.preset = s.preset;
   } else {
     t = testTrack();
     t.seed = s.seed >>> 0;

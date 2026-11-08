@@ -34,7 +34,9 @@ export function createInput(root) {
   /* The car drives itself once the player has pressed anything (DESIGN:
      no brake; DRIFT slows it). Until then it waits on the line. */
   let started = false;
+  const typing = e => e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
   window.addEventListener('keydown', e => {
+    if (typing(e)) return;   // a text field (the Lab's code entry) keeps its keys
     if (e.key === 'r' || e.key === 'R') { if (!e.repeat) { restartEdge = true; actionEdge = true; } lastKey = now; e.preventDefault(); return; }
     if (e.key === 'Enter') { if (!e.repeat) actionEdge = true; lastKey = now; return; }
     const k = keyMap[e.key];

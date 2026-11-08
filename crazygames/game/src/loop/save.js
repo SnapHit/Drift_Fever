@@ -20,8 +20,10 @@ export function defaults() {
      onboarded: the first-run onboarding has been seen or skipped (added
      8 November 2026; a save from before it has finished runs, which also
      counts, see needsOnboarding). missions: per track key, which of its
-     three missions have been done (added 8 November 2026). */
-  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {} };
+     three missions have been done. lab: the Track Lab's best per code for
+     the last LOOP.LAB.KEEP codes driven, and the last code shown (both
+     added 8 November 2026). */
+  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {}, lab: { codes: {}, last: '' } };
 }
 
 /* Has this save ever finished a run: a career result or a daily result. */
@@ -86,6 +88,16 @@ export function repair(raw) {
       s.missions[k] = e.slice();
     }
   } else if (raw.missions !== undefined) fix();
+  if (isObj(raw.lab)) {
+    if (isObj(raw.lab.codes)) {
+      for (const k of Object.keys(raw.lab.codes)) {
+        const e = raw.lab.codes[k];
+        if (!/^[0-9A-Z]{12}$/.test(k) || !isObj(e) || !isNum(e.best) || !isNum(e.when)) { fix(); continue; }
+        s.lab.codes[k] = { best: Math.max(0, Math.floor(e.best)), stars: isNum(e.stars) ? Math.max(0, Math.min(3, Math.floor(e.stars))) : 0, when: e.when };
+      }
+    } else if (raw.lab.codes !== undefined) fix();
+    if (typeof raw.lab.last === 'string' && /^([0-9A-Z]{12})?$/.test(raw.lab.last)) s.lab.last = raw.lab.last; else if (raw.lab.last !== undefined) fix();
+  } else if (raw.lab !== undefined) fix();
   return { state: s, fixes };
 }
 
@@ -113,6 +125,13 @@ export function createSave(opts) {
       state.coins += status.backPay; state.starPay = true; write();
     }
     return state;
+  }
+  /* the Lab keeps the last LOOP.LAB.KEEP codes driven: older bests and
+     their ghosts are dropped, so the save stays small */
+  function trimLab() {
+    const codes = Object.keys(state.lab.codes).sort((a, b) => state.lab.codes[b].when - state.lab.codes[a].when);
+    for (const k of codes.slice(LOOP.LAB.KEEP)) { delete state.lab.codes[k]; delete state.ghosts['lab:' + k]; }
+    for (const k of Object.keys(state.ghosts)) if (k.startsWith('lab:') && !state.lab.codes[k.slice(4)]) delete state.ghosts[k];
   }
   function write() {
     status.writes++;
@@ -166,13 +185,26 @@ export function createSave(opts) {
       state.missions[key] = next; write();
       return fresh;
     },
+    /* a Lab run's best for its code; the oldest codes beyond LOOP.LAB.KEEP go, ghosts and all */
+    labResult(code, stars, score) {
+      const e = state.lab.codes[code] || { best: 0, stars: 0, when: 0 };
+      const improved = score > e.best;
+      e.best = Math.max(e.best, Math.floor(score)); e.stars = Math.max(e.stars, stars); e.when = Date.now();
+      state.lab.codes[code] = e;
+      trimLab(); write();
+      return improved;
+    },
+    labBest(code) { return state.lab.codes[code] || null; },
+    setLabLast(code) { if (state.lab.last !== code) { state.lab.last = code; write(); } },
     ghost(key) { return state.ghosts[key] || null; },
     setGhost(key, record) {
       const g = validGhost(record);
       if (!g) return false;
       /* only one daily ghost is kept: today's */
       if (key.startsWith('daily:')) for (const k of Object.keys(state.ghosts)) if (k.startsWith('daily:') && k !== key) delete state.ghosts[k];
-      state.ghosts[key] = g; write();
+      state.ghosts[key] = g;
+      if (key.startsWith('lab:')) trimLab();
+      write();
       return true;
     },
   };

@@ -16,7 +16,8 @@
    dev drive; ?tune=1 the tuning panel; ?debug=1 the readout; ?assist=0..1
    the hidden assist level; ?auto=1 the scripted driver drives every run;
    ?title=1 shows the title even on a first visit (the probes' known
-   answer for the clicks to gameplay). */
+   answer for the clicks to gameplay); ?track=CODE opens the Track Lab on
+   that track, one click from driving it. */
 import { TUNE, LOOP } from './tune.js';
 import { createWorld, STEP } from './physics/world.js';
 import { createDriver } from './physics/driver.js';
@@ -41,6 +42,8 @@ import { createSound, soundIcon } from './audio/sound.js';
 import { createGhost, compactTape } from './loop/ghost.js';
 import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
+import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered } from './lab/lab.js';
+import { drawPlan } from './tracks/plan.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
 
 const query = new URLSearchParams(location.search);
@@ -71,6 +74,7 @@ const app = {
   spec: null, track: null, laps: 0, targets: null, key: null, missions: null,
   countdown: 0, goShown: 0, runTime: 0, menuT: 0, settle: 0, lockout: 0,
   results: null, picked: null,
+  lab: null,     // the Track Lab's state: { settings, seed, code, spec, track, message, error }
 };
 let box = carBox('starter');
 
@@ -178,7 +182,7 @@ function frame(t) {
   if (window.__feel.inject) Object.assign(raw, window.__feel.inject);   // the probes' input
   const world = app.world;
   const S = app.state;
-  const menu = S === 'title' || S === 'career' || S === 'garage';
+  const menu = S === 'title' || S === 'career' || S === 'garage' || S === 'lab';
   if (raw.restart && !menu) { if (S === 'dev' || S === 'free') resetRun(); else if (S === 'drive' || S === 'countdown') startRun(app.spec, { onboard: onboard.active }); }
   let rec = quantise(raw);
   let steps = 0;
@@ -251,7 +255,7 @@ function frame(t) {
 /* ---- the states ---- */
 function titleInfo() {
   const d = dailySpec();
-  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
+  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, labCodes: Object.keys(save.state.lab.codes).length, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -260,6 +264,58 @@ function showMenu(name) {
   if (name === 'title') screens.title(save.state, titleInfo());
   else if (name === 'career') screens.career(save.state);
   else if (name === 'garage') screens.garage(save.state, app.picked);
+  else if (name === 'lab') showLab();
+}
+
+/* ---- the Track Lab ---- */
+/* The Lab's current track from its settings and seed: the spec, the
+   track generated (memoised by trackFor), the code, and the backdrop
+   switched to it so the theme and the time of day show behind the
+   screen. message is shown once under the code. */
+function setLab(settings, seed, message, error) {
+  const spec = labSpec(settings, seed);
+  if (!spec) { app.lab = { settings: tidySettings(settings), seed, code: '', spec: null, track: null, message: message || 'those settings do not make a code', error: true }; return; }
+  const track = trackFor(spec);
+  app.lab = { settings: spec.settings, seed, code: spec.code, spec, track, message: message || '', error: !!error };
+  save.setLabLast(spec.code);
+  app.spec = spec; app.track = track;
+  setGround(track, save.state.car, save.state.cars[save.state.car].paint);
+  app.progress = null; app.race = null; app.ghost = null; app.missions = null; scene.setGhost(null);
+  resetRun(); app.driver = null;
+}
+/* The Lab opened from the title: the last code shown, or a fresh track. */
+function openLab() {
+  if (app.lab && app.lab.spec) return;
+  const last = save.state.lab.last ? specFromCode(save.state.lab.last) : null;
+  if (last && last.spec) setLab(last.spec.settings, last.spec.seed);
+  else setLab(DEFAULT_SETTINGS, randomSeed());
+}
+function showLab() {
+  openLab();
+  const L = app.lab;
+  const best = L.code ? save.labBest(L.code) : null;
+  const ghost = L.code && L.track ? !!ghostFor('lab:' + L.code, L.track) : false;
+  screens.lab(save.state, { ...L, best, ghost, link: L.code ? linkFor(L.code) : '' });
+  const canvas = document.getElementById('plan');
+  if (canvas && L.track) drawPlan(canvas, L.track, { labels: Math.min(view.w, view.h) >= 600 });
+  L.message = ''; L.error = false;   // shown once
+}
+/* one setting changed: name=value */
+function labSet(arg) {
+  const [name, value] = String(arg || '').split('=');
+  const s = { ...app.lab.settings };
+  if (name === 'bank' || name === 'cross') s[name] = value === 'on'; else s[name] = value;
+  if (!crossoverOffered(s)) s.cross = false;
+  setLab(tidySettings(s), app.lab.seed);
+  showMenu('lab');
+}
+async function copyText(text, what) {
+  let ok = false;
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; } } catch (e) { ok = false; }
+  if (!ok) {
+    try { const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); } catch (e) { ok = false; }
+  }
+  return ok ? what + ' copied' : what + ': ' + text;
 }
 /* The title's backdrop: the chosen car on the daily track's line. */
 function menuGround() {
@@ -306,7 +362,7 @@ function startRun(spec, opts) {
   const rec = ghostFor(spec.key, app.track);
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
-  hud.setToBeat(rec ? 'best ' + rec.score : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
+  hud.setToBeat(rec ? 'best ' + rec.score : spec.mode === 'lab' ? (save.labBest(spec.code) ? 'best ' + save.labBest(spec.code).best : '') : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
   app.state = 'countdown'; app.countdown = LOOP.COUNTDOWN; app.settle = 0; app.results = null;
   sound.engineStart(); app.lastTick = 0; app.heardCallouts = 0;
   input.setStarted(false);
@@ -324,7 +380,8 @@ function finishRun() {
   const had = spec.mode === 'career' ? ((save.state.career[String(spec.index)] || {}).stars || 0)
     : spec.mode === 'daily' && save.state.daily.date === spec.date ? (save.state.daily.stars || 0) : spec.mode === 'daily' ? 0 : stars;
   const newStars = Math.max(0, stars - had);
-  let coins = coinsFor(score, stars, spec.mode) + newStars * LOOP.NEW_STAR_BONUS;
+  /* a Lab run pays at the Lab's rate and no new star bonus, so the Lab is not a coin farm */
+  let coins = spec.mode === 'lab' ? Math.floor(coinsFor(score, stars, spec.mode) * LOOP.LAB.COIN_RATE) : coinsFor(score, stars, spec.mode) + newStars * LOOP.NEW_STAR_BONUS;
   /* the missions: those newly done pay once */
   let missions = null;
   if (app.missions) {
@@ -338,6 +395,7 @@ function finishRun() {
   let improved = false, nextIndex = null;
   if (spec.mode === 'career') { improved = save.careerResult(spec.index, stars, score); if (spec.index + 1 < CAREER.length && careerUnlocked(save.state, spec.index + 1)) nextIndex = spec.index + 1; }
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
+  else if (spec.mode === 'lab') improved = save.labResult(spec.code, stars, score);
   save.addCoins(coins);
   const steps = tape.reduce((s, e) => s + e.n, 0);
   const prevGhost = ghostFor(spec.key, app.track);
@@ -345,7 +403,7 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length) };
+  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();
@@ -379,6 +437,27 @@ function onAction(action, arg) {
     case 'free': startFree(); break;
     case 'daily': startRun(dailySpec()); break;
     case 'onboard': startRun(careerSpec(0), { onboard: true }); break;
+    case 'lab': showMenu('lab'); break;
+    case 'lab-set': labSet(arg); break;
+    case 'lab-new': setLab(app.lab.settings, randomSeed()); showMenu('lab'); break;
+    case 'lab-drive': if (app.lab && app.lab.spec) startRun(app.lab.spec); break;
+    case 'lab-copy': case 'lab-link': {
+      const L = app.lab, code = app.state === 'results' && app.results && app.results.code ? app.results.code : L && L.code;
+      if (!code) break;
+      copyText(action === 'lab-link' ? linkFor(code) : code, action === 'lab-link' ? 'link' : 'code').then(msg => {
+        if (app.state === 'lab') { L.message = msg; showMenu('lab'); }
+        else if (app.state === 'results' && app.results) { app.results.message = msg; screens.results(app.results); }
+      });
+      break;
+    }
+    case 'lab-code': {
+      const field = document.getElementById('codeIn');
+      const text = arg !== undefined && arg !== null && arg !== '' ? arg : field ? field.value : '';
+      const r = specFromCode(text);
+      if (r.error) { if (app.lab) { app.lab.message = 'Not a track code: ' + r.error + '.'; app.lab.error = true; } showMenu('lab'); }
+      else { setLab(r.spec.settings, r.spec.seed, 'Track ' + r.spec.code.slice(0, 4) + '... loaded'); showMenu('lab'); }
+      break;
+    }
     case 'play-career': { const i = +arg; if (careerUnlocked(save.state, i)) startRun(careerSpec(i)); break; }
     case 'again': if (app.spec && app.spec.mode !== 'free') startRun(app.spec); break;
     case 'pick-car': app.picked = arg; previewCar(); screens.garage(save.state, app.picked); break;
@@ -424,6 +503,13 @@ scene.ready.then(() => {
     hud.setVisible(true); hud.setRun(devGround === 'park' ? 'car park' : 'test track', ''); input.touch.setVisible(true); hud.exit.hidden = true;
     resetRun();
     if (autoDrive) app.driver = createDriver(app.track, { drift: app.track.kind === 'circuit' ? 'sweeper' : null });
+  } else if (query.has('track')) {
+    /* a track link: the Lab on that track, one click from driving it; a
+       bad code is a plain message on the Lab, never a crash */
+    const r = specFromCode(query.get('track'));
+    if (r.error) { openLab(); app.lab.message = 'That link is not a track code: ' + r.error + '.'; app.lab.error = true; }
+    else setLab(r.spec.settings, r.spec.seed, 'A shared track: ' + r.spec.code.slice(0, 4) + '-' + r.spec.code.slice(4, 8) + '-' + r.spec.code.slice(8));
+    showMenu('lab');
   } else if (save.needsOnboarding() && query.get('title') !== '1') {
     /* the first visit: no title, no click, straight into career track 1
        with the prompts (RETENTION.md 1; CrazyGames asks for gameplay at
@@ -468,6 +554,7 @@ window.__feel = {
 };
 window.__loop = {
   app, save, LOOP, screens, sound, onboard, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
+  lab: { setLab, labSpec, specFromCode, state: () => app.lab && { settings: app.lab.settings, seed: app.lab.seed, code: app.lab.code, message: app.lab.message, error: app.lab.error, track: app.lab.track && { name: app.lab.track.name, length: app.lab.track.length, kind: app.lab.track.kind, corners: app.lab.track.corners.length, bridges: (app.lab.track.bridges || []).length, fallback: !!app.lab.track.fallback, theme: app.lab.track.theme, preset: app.lab.track.preset } } },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor,
   progress: () => app.progress && app.progress.state,
   results: () => app.results,

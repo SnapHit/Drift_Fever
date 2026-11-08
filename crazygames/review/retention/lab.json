@@ -1,0 +1,267 @@
+{
+ "started": "2026-11-08T03:14:06.820Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader",
+ "settings": {
+  "opened": {
+   "state": "lab",
+   "lab": {
+    "settings": {
+     "kind": "circuit",
+     "length": "medium",
+     "style": "mixed",
+     "bank": true,
+     "cross": false,
+     "theme": "forest",
+     "time": "dusk"
+    },
+    "seed": 14132764,
+    "code": "1ERMQPE02365",
+    "message": "",
+    "error": false,
+    "track": {
+     "name": "circuit 14132764",
+     "length": 702,
+     "kind": "circuit",
+     "corners": 5,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "forest",
+     "preset": "dusk"
+    }
+   },
+   "planDrawn": true
+  },
+  "clicks": [
+   {
+    "click": "kind=sprint",
+    "got": "sprint",
+    "want": "sprint",
+    "code": "1ERMQYE0N7YN",
+    "track": {
+     "name": "sprint 14132764",
+     "length": 998,
+     "kind": "sprint",
+     "corners": 10,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "forest",
+     "preset": "dusk"
+    },
+    "scene": {
+     "preset": "dusk",
+     "theme": "forest"
+    }
+   },
+   {
+    "click": "length=long",
+    "got": "long",
+    "want": "long",
+    "code": "1ERMQEF04W3T",
+    "track": {
+     "name": "sprint 14132764",
+     "length": 1296,
+     "kind": "sprint",
+     "corners": 12,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "forest",
+     "preset": "dusk"
+    },
+    "scene": {
+     "preset": "dusk",
+     "theme": "forest"
+    }
+   },
+   {
+    "click": "style=technical",
+    "got": "technical",
+    "want": "technical",
+    "code": "1ERMQEB0783T",
+    "track": {
+     "name": "sprint 14132764",
+     "length": 1284,
+     "kind": "sprint",
+     "corners": 16,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "forest",
+     "preset": "dusk"
+    },
+    "scene": {
+     "preset": "dusk",
+     "theme": "forest"
+    }
+   },
+   {
+    "click": "bank=off",
+    "got": false,
+    "want": false,
+    "code": "1ERMQE309G3T",
+    "track": {
+     "name": "sprint 14132764",
+     "length": 1284,
+     "kind": "sprint",
+     "corners": 16,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "forest",
+     "preset": "dusk"
+    },
+    "scene": {
+     "preset": "dusk",
+     "theme": "forest"
+    }
+   },
+   {
+    "click": "theme=desert",
+    "got": "desert",
+    "want": "desert",
+    "code": "1ERMQE32SQXS",
+    "track": {
+     "name": "sprint 14132764",
+     "length": 1284,
+     "kind": "sprint",
+     "corners": 16,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "desert",
+     "preset": "dusk"
+    },
+    "scene": {
+     "preset": "dusk",
+     "theme": "desert"
+    }
+   },
+   {
+    "click": "time=night",
+    "got": "night",
+    "want": "night",
+    "code": "1ERMQE3ASXQT",
+    "track": {
+     "name": "sprint 14132764",
+     "length": 1284,
+     "kind": "sprint",
+     "corners": 16,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "desert",
+     "preset": "night"
+    },
+    "scene": {
+     "preset": "night",
+     "theme": "desert"
+    }
+   },
+   {
+    "click": "kind=circuit",
+    "got": "circuit",
+    "want": "circuit",
+    "code": "1ERMQ63ACGV8",
+    "track": {
+     "name": "circuit 14132764",
+     "length": 1096,
+     "kind": "circuit",
+     "corners": 12,
+     "bridges": 0,
+     "fallback": false,
+     "theme": "desert",
+     "preset": "night"
+    },
+    "scene": {
+     "preset": "night",
+     "theme": "desert"
+    }
+   },
+   {
+    "click": "cross=on",
+    "got": true,
+    "want": true,
+    "code": "1ERMQ6KAR0T8",
+    "track": {
+     "name": "circuit 14132764",
+     "length": 1092,
+     "kind": "circuit",
+     "corners": 14,
+     "bridges": 1,
+     "fallback": false,
+     "theme": "desert",
+     "preset": "night"
+    },
+    "scene": {
+     "preset": "night",
+     "theme": "desert"
+    }
+   }
+  ],
+  "settingsOk": true,
+  "sceneOk": true
+ },
+ "run": {
+  "started": {
+   "state": "countdown",
+   "key": "lab:1ERMQ6KAR0T8",
+   "missions": null
+  },
+  "finished": true,
+  "score": 1354,
+  "stars": 1,
+  "coins": 82,
+  "expectedCoins": 82,
+  "code": "1ERMQ6KAR0T8",
+  "shown": {
+   "code": "1ERM-Q6KA-R0T8",
+   "lab": true,
+   "next": false
+  },
+  "copied": "code copied",
+  "saved": {
+   "best": 1354,
+   "stars": 1,
+   "when": 1794107656576
+  },
+  "ghostKept": true,
+  "ghostKeys": [
+   "lab:1ERMQ6KAR0T8"
+  ]
+ },
+ "again": {
+  "ghostRunning": true,
+  "finished": true,
+  "improved": false
+ },
+ "typed": {
+  "code": "H4C0088HV6CA",
+  "loaded": true,
+  "badTyped": {
+   "status": "Not a track code: that is not a track code (a character may be wrong).",
+   "bad": true,
+   "code": "H4C0088HV6CA"
+  }
+ },
+ "cap": {
+  "keep": 6,
+  "codes": 6,
+  "labGhosts": 6,
+  "oldestDropped": true,
+  "saveBytes": 358958
+ },
+ "errors": [],
+ "link": {
+  "code": "H3TTJ0XBEKQE",
+  "landed": {
+   "state": "lab",
+   "code": "H3TTJ0XBEKQE",
+   "message": "A shared track: H3TT-J0XB-EKQE",
+   "bridges": 1
+  },
+  "movedAt": 186,
+  "clicks": 1,
+  "errors": []
+ },
+ "badLink": {
+  "state": "lab",
+  "message": "That link is not a track code: that is not a track code (a character may be wrong).",
+  "hasTrack": true,
+  "errors": []
+ }
+}

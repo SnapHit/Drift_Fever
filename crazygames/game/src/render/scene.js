@@ -130,7 +130,8 @@ export function createScene(canvas, opts) {
   function setGround(ground) {
     currentGround = ground;
     const seed = (ground.seed >>> 0) || (ground.centre.length ? 7 : 3);
-    const p = presetFor(seed, overrides.preset), th = ground.centre.length ? themeFor(seed, overrides.theme) : (overrides.theme && THEMES[overrides.theme] ? THEMES[overrides.theme] : THEMES.docks);
+    /* a track may name its own preset and theme (the Lab's); the query's override wins over the seed's pick */
+    const p = presetFor(seed, overrides.preset || ground.preset), th = ground.centre.length ? themeFor(seed, overrides.theme || ground.theme) : (overrides.theme && THEMES[overrides.theme] ? THEMES[overrides.theme] : THEMES.docks);
     applyPreset(p);
     theme = th;
     if (groundGroup) { scene.remove(groundGroup); groundGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
