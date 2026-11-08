@@ -52,10 +52,10 @@ export function createScreens(root, onAction) {
       ${info.backPay ? `<p class="sub pay">+${fmt(info.backPay)} coins for the stars you have already won</p>` : ''}
       <div class="menu">
         <button type="button" class="big primary" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
-        <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total} of ${CAREER.length * 3} stars &middot; ${info.missions} of ${info.missionsOf} missions</small></button>
+        <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total}/${CAREER.length * 3} stars &middot; ${info.missions}/${info.missionsOf} missions</small></button>
         <button type="button" class="big" data-action="free"><b>FREE DRIFT</b><small>the car park, no timer</small></button>
         <button type="button" class="big" data-action="garage"><b>GARAGE</b><small>${esc(carById(save.car).name)}</small></button>
-        <button type="button" class="big" data-action="lab"><b>TRACK LAB</b><small>${info.labCodes ? info.labCodes + ' of your tracks saved' : 'make a track, share its code'}</small></button>
+        <button type="button" class="big" data-action="lab"><b>TRACK LAB</b><small>${info.labCodes ? info.labCodes + ' of your tracks saved' : 'make and share tracks'}</small></button>
       </div>
       <div class="opts">
         ${fullscreenSupported() ? `<button type="button" class="fsbtn" data-action="fullscreen">${fullscreenIcon(isFullscreen())}<span>${isFullscreen() ? 'EXIT FULL SCREEN' : 'FULL SCREEN'}</span></button>` : ''}

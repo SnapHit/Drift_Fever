@@ -80,7 +80,7 @@ export function createOnboarding(root, onSkip) {
     const s = ctx.scoring;
     /* the explanations, when the thing first happens */
     if (st.infoKind) { st.infoT -= dt; if (st.infoT <= 0) { st.infoKind = null; setInfo(''); } }
-    if (!st.chainShown && s.lastBank > 0 && !st.infoKind) { st.chainShown = true; st.shown.push('chain'); st.infoKind = 'chain'; st.infoT = O.INFO_SHOWN; setInfo('<b>+' + s.lastBank + (s.lastBankMult > 1 ? ' x' + s.lastBankMult : '') + ' banked.</b> ' + TEXT.chain); }
+    if (!st.chainShown && s.lastBank >= O.INFO_CHAIN_MIN && !st.infoKind) { st.chainShown = true; st.shown.push('chain'); st.infoKind = 'chain'; st.infoT = O.INFO_SHOWN; setInfo('<b>+' + s.lastBank + (s.lastBankMult > 1 ? ' x' + s.lastBankMult : '') + ' banked.</b> ' + TEXT.chain); }
     else if (!st.cleanShown && s.clean > 0 && !st.infoKind) { st.cleanShown = true; st.shown.push('clean'); st.infoKind = 'clean'; st.infoT = O.INFO_SHOWN; setInfo('<b>Clean sector.</b> ' + TEXT.clean); }
     if (!ctx.driving) return;
     const r = ctx.record;

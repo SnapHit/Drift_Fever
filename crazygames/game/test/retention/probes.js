@@ -477,9 +477,13 @@ if (run('shots')) {
     await shot(side, 'mission-complete', async () => {
       await R.beginRun(side.page, 'career', 3, { drift: '*' });
       await R.installClipper(side.page);
-      await side.page.evaluate(() => { window.__feel.draw = false; });
+      /* a callout lives 1.5 s of real time and fades by a CSS animation; a
+         software rendered screenshot takes longer than that, so for this
+         shot the removal is held off and the animation frozen mid way */
+      await side.page.evaluate(() => { window.__feel.draw = false; const st = window.setTimeout; window.__setTimeout = st; window.setTimeout = (fn, ms) => st(fn, ms >= 1500 ? 60000 : ms); document.head.insertAdjacentHTML('beforeend', '<style id="hold">.callout { animation-delay: -0.4s !important; animation-play-state: paused !important; }</style>'); });
       await until(side, () => window.__loop.missions() && window.__loop.missions().completed > 0 && document.querySelector('.callout.mission') !== null, 60 * 120);
     });
+    await side.page.evaluate(() => { window.setTimeout = window.__setTimeout; const h = document.getElementById('hold'); if (h) h.remove(); });
     await shot(side, 'results-missions', async () => { await R.driveToResults(side.page, RUN_BUDGET); });
     await shot(side, 'lab', async () => { await side.page.evaluate(code => { const Lp = window.__loop, r = Lp.lab.specFromCode(code); Lp.lab.setLab(r.spec.settings, r.spec.seed); Lp.action('lab'); }, labCode); });
     await shot(side, 'lab-results', async () => {

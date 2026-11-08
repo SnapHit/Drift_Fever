@@ -322,5 +322,6 @@ export const LOOP = {
     PROMPT_MIN:       1.2,     // s a prompt stays at least, so it can be read even when the player is already doing it
     PROMPT_MAX:       9,       // s a prompt the player ignores stays before the next one comes
     INFO_SHOWN:       4.5,     // s the chain and clean explanations stay
+    INFO_CHAIN_MIN:   15,      // points a banked chain must be worth before it is the one explained (a one point bank teaches nothing)
   },
 };

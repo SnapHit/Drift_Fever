@@ -357,8 +357,10 @@ function startRun(spec, opts) {
   const missions = spec.mode === 'career' || spec.mode === 'daily' ? missionsFor(app.track, app.laps) : null;
   app.missions = missions ? createMissionJudge(missions, app.track, app.laps) : null;
   app.heardMissions = 0;
-  hud.setMissions(missions ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null);
-  app.missionsShown = missions ? LOOP.MISSIONS.SHOWN : 0;
+  /* the list over the countdown; not on the onboarding run, which teaches the core and nothing else (the missions are still judged and paid) */
+  const listed = missions && !(opts && opts.onboard);
+  hud.setMissions(listed ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null);
+  app.missionsShown = listed ? LOOP.MISSIONS.SHOWN : 0;
   const rec = ghostFor(spec.key, app.track);
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
@@ -437,7 +439,7 @@ function onAction(action, arg) {
     case 'free': startFree(); break;
     case 'daily': startRun(dailySpec()); break;
     case 'onboard': startRun(careerSpec(0), { onboard: true }); break;
-    case 'lab': showMenu('lab'); break;
+    case 'lab': if (app.state !== 'lab' && app.lab && app.lab.spec) setLab(app.lab.settings, app.lab.seed); showMenu('lab'); break;   // back from a run: the car to the line, the backdrop as the Lab left it
     case 'lab-set': labSet(arg); break;
     case 'lab-new': setLab(app.lab.settings, randomSeed()); showMenu('lab'); break;
     case 'lab-drive': if (app.lab && app.lab.spec) startRun(app.lab.spec); break;
