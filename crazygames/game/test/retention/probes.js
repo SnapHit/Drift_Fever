@@ -280,6 +280,14 @@ if (run('missions')) {
   const kaDone = kaNumeric.filter(x => x.doneNow).length;
   out.missions.knownAnswer = { targets: kaList, numericDone: kaDone, numericOffered: kaNumeric.length, caught: kaRun.finished && kaNumeric.length >= 4 && kaDone === 0 };
   verdict('known answer: with every numeric target a hundred times larger the clipper completes none of them', out.missions.knownAnswer.caught, kaList.join('; ') + ' -> ' + kaDone + ' of ' + kaNumeric.length + ' done');
+  // free drift straight after a mission run: no judge, no progress, no error (the loop probe's shots found this one)
+  const errBefore = side.errors.length;
+  await side.page.evaluate(() => { window.__loop.action('free'); window.__feel.inject = { steer: 1, throttle: 1, brake: 0, handbrake: 1 }; });
+  await R.runFrames(side.page, 180);
+  const free = await side.page.evaluate(() => ({ state: window.__loop.app.state, judge: window.__loop.missions(), speed: window.__feel.world.car.speed }));
+  await side.page.evaluate(() => { window.__feel.inject = null; });
+  out.missions.freeAfterRun = { ...free, judge: !!free.judge, errors: side.errors.slice(errBefore) };
+  verdict('free drift after a mission run has no judge and runs without error', free.state === 'free' && !free.judge && side.errors.length === errBefore && free.speed > 1, 'state ' + free.state + ', speed ' + free.speed.toFixed(1));
   out.missions.errors = side.errors;
   await side.close();
 }

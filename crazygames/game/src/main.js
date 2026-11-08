@@ -156,7 +156,7 @@ function stepOnce(rec) {
   scoring.step(world, STEP);
   if (app.progress) app.progress.step(world);
   if (app.race) app.race.step(world, app.progress.state);
-  if (app.missions) app.missions.step(world, scoring.state, app.race, app.progress.state);
+  if (app.missions && app.progress) app.missions.step(world, scoring.state, app.race, app.progress.state);
   if (app.ghost) app.ghost.step();
   if (world.hit) chase.hit(world.hit.speed);
   if (world.hit && (!app.frameHit || world.hit.speed > app.frameHit.speed)) app.frameHit = { speed: world.hit.speed, hard: world.hit.hard };
@@ -322,7 +322,7 @@ function menuGround() {
   const spec = dailySpec();
   app.spec = spec; app.track = trackFor(spec);
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
-  app.progress = null; app.race = null; app.ghost = null; scene.setGhost(null);
+  app.progress = null; app.race = null; app.ghost = null; app.missions = null; scene.setGhost(null);
   resetRun(); app.driver = null;
 }
 
@@ -420,7 +420,7 @@ function startFree() {
   app.spec = { mode: 'free', key: 'free', name: 'Free drift' };
   app.track = freeGround();
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
-  app.progress = null; app.race = null; app.ghost = null; scene.setGhost(null);
+  app.progress = null; app.race = null; app.ghost = null; app.missions = null; hud.setMissions(null); scene.setGhost(null);
   app.state = 'free';
   input.setStarted(false);
   screens.hide(); hud.setVisible(true); hud.setRun('', ''); hud.setToBeat(''); input.touch.setVisible(true);
