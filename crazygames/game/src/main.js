@@ -40,6 +40,7 @@ import { fullscreenSupported, toggleFullscreen, onFullscreenChange, fullscreenIc
 import { createSound, soundIcon } from './audio/sound.js';
 import { createGhost, compactTape } from './loop/ghost.js';
 import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
+import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
 
 const query = new URLSearchParams(location.search);
@@ -67,7 +68,7 @@ const devGround = query.get('ground');
 const app = {
   state: 'title',
   ground: null, world: null, progress: null, ghost: null, driver: null,
-  spec: null, track: null, laps: 0, targets: null, key: null,
+  spec: null, track: null, laps: 0, targets: null, key: null, missions: null,
   countdown: 0, goShown: 0, runTime: 0, menuT: 0, settle: 0, lockout: 0,
   results: null, picked: null,
 };
@@ -134,6 +135,7 @@ function resetRun() {
   world.reset(); scoring.reset(); hud.reset(); scene.clearMarks();
   if (app.progress) app.progress.reset();
   if (app.race) app.race.reset();
+  if (app.missions) app.missions.reset();
   if (app.ghost) app.ghost.reset();
   tape.length = 0; acc = 0; last = -1; app.runTime = 0;
   prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
@@ -150,9 +152,18 @@ function stepOnce(rec) {
   scoring.step(world, STEP);
   if (app.progress) app.progress.step(world);
   if (app.race) app.race.step(world, app.progress.state);
+  if (app.missions) app.missions.step(world, scoring.state, app.race, app.progress.state);
   if (app.ghost) app.ghost.step();
   if (world.hit) chase.hit(world.hit.speed);
   if (world.hit && (!app.frameHit || world.hit.speed > app.frameHit.speed)) app.frameHit = { speed: world.hit.speed, hard: world.hit.hard };
+}
+
+/* One physics step of a run in 'drive': the clock, and the line. The
+   frame loop and the probes' tape replay both go through here. */
+function driveStep(rec) {
+  stepOnce(rec);
+  app.runTime += STEP;
+  if (app.progress.state.finished && app.settle === 0) { app.settle = LOOP.FINISH_SETTLE; scoring.bank(); if (app.race) app.race.finish(app.runTime); }
 }
 
 const STOP = { steer: 0, throttle: 0, brake: 0, handbrake: 1 };   // DRIFT with no steering: the car stops
@@ -190,10 +201,7 @@ function frame(t) {
     steps = Math.floor(acc / STEP + 1e-6);
     if (steps > MAX_STEPS) { steps = MAX_STEPS; acc = steps * STEP; }
     const p0 = performance.now();
-    for (let i = 0; i < steps; i++) {
-      stepOnce(rec);
-      if (S === 'drive') { app.runTime += STEP; if (app.progress.state.finished && app.settle === 0) { app.settle = LOOP.FINISH_SETTLE; scoring.bank(); if (app.race) app.race.finish(app.runTime); } }
-    }
+    for (let i = 0; i < steps; i++) { if (S === 'drive') driveStep(rec); else stepOnce(rec); }
     acc = Math.max(0, acc - steps * STEP);
     physMs = performance.now() - p0; lastSteps = steps;
     if (S === 'drive' && app.settle > 0) { app.settle -= dt; if (app.settle <= 0) finishRun(); }
@@ -221,6 +229,14 @@ function frame(t) {
     }
     app.heardCallouts = sc.calloutCount;
   }
+  /* a mission done this frame: a callout and a cue */
+  if (app.missions && app.missions.state.completed !== app.heardMissions) {
+    const ev = app.missions.state.events;
+    for (let i = app.heardMissions || 0; i < ev.length; i++) hud.notice('MISSION: ' + app.missions.missions[ev[i]].text, 'mission');
+    app.heardMissions = app.missions.state.completed;
+    sound.ui('star', 3); sound.ui('coin', 0, 0.2);
+  }
+  if (app.missionsShown > 0 && S === 'drive') { app.missionsShown -= dt; if (app.missionsShown <= 0) hud.setMissions(null); }
   hud.update(scoring, pose, scene.camera, THREE, view, dt);
   if (onboard.active) onboard.update(dt, { driving: S === 'drive', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity });
   if (S === 'drive' || S === 'countdown') {
@@ -235,7 +251,7 @@ function frame(t) {
 /* ---- the states ---- */
 function titleInfo() {
   const d = dailySpec();
-  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
+  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -281,6 +297,12 @@ function startRun(spec, opts) {
   app.targets = starTargets(app.track, app.laps);
   app.progress = createProgress(app.track, app.laps);
   app.race = createRace(app.track, app.laps, scoring);
+  /* the career tracks and the daily carry missions; the Lab does not */
+  const missions = spec.mode === 'career' || spec.mode === 'daily' ? missionsFor(app.track, app.laps) : null;
+  app.missions = missions ? createMissionJudge(missions, app.track, app.laps) : null;
+  app.heardMissions = 0;
+  hud.setMissions(missions ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null);
+  app.missionsShown = missions ? LOOP.MISSIONS.SHOWN : 0;
   const rec = ghostFor(spec.key, app.track);
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
@@ -302,7 +324,17 @@ function finishRun() {
   const had = spec.mode === 'career' ? ((save.state.career[String(spec.index)] || {}).stars || 0)
     : spec.mode === 'daily' && save.state.daily.date === spec.date ? (save.state.daily.stars || 0) : spec.mode === 'daily' ? 0 : stars;
   const newStars = Math.max(0, stars - had);
-  const coins = coinsFor(score, stars, spec.mode) + newStars * LOOP.NEW_STAR_BONUS;
+  let coins = coinsFor(score, stars, spec.mode) + newStars * LOOP.NEW_STAR_BONUS;
+  /* the missions: those newly done pay once */
+  let missions = null;
+  if (app.missions) {
+    app.missions.finish(app.runTime, app.world.step);
+    const done = app.missions.state.done.slice();
+    const fresh = app.missions.probe ? [] : save.missionResult(spec.key, done);   // a probe's judge over every kind is not saved
+    coins += fresh.length * LOOP.MISSIONS.COINS;
+    const was = save.state.missions[spec.key] || [];
+    missions = app.missions.missions.map((m, i) => ({ text: m.text, kind: m.kind, target: m.target, done: !!was[i], doneNow: done[i], fresh: fresh.includes(i), coins: fresh.includes(i) ? LOOP.MISSIONS.COINS : 0, progress: app.missions.state.progress[i], doneAt: app.missions.state.doneAt[i] }));
+  }
   let improved = false, nextIndex = null;
   if (spec.mode === 'career') { improved = save.careerResult(spec.index, stars, score); if (spec.index + 1 < CAREER.length && careerUnlocked(save.state, spec.index + 1)) nextIndex = spec.index + 1; }
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
@@ -313,13 +345,13 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
+  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length) };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();
   for (let i = 0; i < stars; i++) sound.ui('star', i + 1, 0.35 + i * 0.28);
   sound.ui('coin', 0, 0.45 + stars * 0.28);
-  hud.setCount('', false); hud.setVisible(false); input.touch.setVisible(false);
+  hud.setCount('', false); hud.setVisible(false); hud.setMissions(null); input.touch.setVisible(false);
   screens.results(app.results);
 }
 
@@ -442,4 +474,18 @@ window.__loop = {
   ghostHash: () => app.ghost ? app.ghost.hash() : null,
   ghostState: () => app.ghost ? { steps: app.ghost.state.steps, done: app.ghost.state.done, x: app.ghost.world.car.x, z: app.ghost.world.car.z, yaw: app.ghost.world.car.yaw } : null,
   skipCountdown() { if (app.state === 'countdown') { app.countdown = 0; } },
+  missions: () => app.missions && { list: app.missions.missions, ...JSON.parse(JSON.stringify(app.missions.state)) },
+  /* the probes: judge every mission the current track could carry, not only its three */
+  judgeAll() { app.missions = createMissionJudge(allMissionsFor(app.track, app.laps), app.track, app.laps); app.missions.probe = true; app.heardMissions = 0; return app.missions.missions; },
+  missionsFor: (track, laps) => missionsFor(track, laps),
+  /* Replay a tape through the real run structure on the spec: the
+     countdown skipped, every step a drive step, the results computed as
+     the run's would be. No drawing. Returns the results. */
+  replayRun(spec, t, keepJudge) {
+    if (!keepJudge) startRun(spec);
+    app.driver = null; app.countdown = 0; app.state = 'drive'; input.setStarted(true);
+    for (const e of t) { for (let i = 0; i < e.n; i++) { if (app.settle > 0) break; driveStep({ steer: e.s, throttle: e.t, brake: e.b, handbrake: e.h }); } if (app.settle > 0) break; }
+    if (app.settle > 0) finishRun(); else { app.state = 'results'; app.results = null; }
+    return app.results;
+  },
 };

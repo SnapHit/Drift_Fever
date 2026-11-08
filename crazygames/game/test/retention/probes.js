@@ -14,7 +14,15 @@
    2. Onboarding: the prompts show on the first visit, SKIP (a real
       click) ends them without stopping the car, and they are not shown
       on the next visit. Known answer: the save's onboarded flag put back
-      to false (with no finished run) brings them back. */
+      to false (with no finished run) brings them back.
+   3. Missions: every career track and the daily driven by the scripted
+      drifter and by the careful driver; every mission kind is completed
+      somewhere, and no kind is completed on every track by both drivers
+      (not trivial). The drifter's tape on career 1 replayed through the
+      run structure completes the same missions at the same steps; the
+      same tape with the handbrake taken out changes the outcome. Known
+      answer: every target a hundred times larger, and the drifter
+      completes none. */
 import path from 'node:path';
 import fs from 'node:fs';
 import * as R from './lib.js';
@@ -126,6 +134,87 @@ if (run('onboard')) {
   out.onboard.touch = touch;
   verdict('on touch the steer prompt sits above the steer buttons with an arrow', touch.source === 'touch' && touch.cls.includes('at-left') && touch.hasArrow && touch.promptBottom < touch.padTop, touch.text + ' (' + touch.cls + ')');
   await tp.close();
+}
+
+/* ---- 3. missions ---- */
+if (run('missions')) {
+  console.log('\n== 3. missions');
+  out.missions = { runs: [], offered: [] };
+  const side = await R.openPage(env, R.LANDSCAPE, { firstVisit: true, query: 'auto=1&title=1' });
+  await side.page.evaluate(() => { window.__feel.draw = false; });
+  const list = [];
+  for (let i = 0; i < 8; i++) list.push(['career', i]);
+  list.push(['daily', null]);
+  /* what each track offers (its three) */
+  for (const [how, arg] of list) {
+    await R.beginRun(side.page, how, arg, null);
+    const offered = await side.page.evaluate(() => ({ key: window.__loop.app.spec.key, track: window.__loop.app.track.name, length: window.__loop.app.track.length, missions: window.__loop.missions().list.map(m => m.text) }));
+    out.missions.offered.push(offered);
+  }
+  /* every kind judged on every track, three drivers: the game's drifter,
+     the game's careful driver, and the test's wall hugging clipper */
+  const byKind = {};
+  const drivers = [['drifter', { drift: '*' }], ['careful', { drift: null }], ['clipper', 'clipper']];
+  for (const [name, driver] of drivers) {
+    for (const [how, arg] of list) {
+      await R.beginRun(side.page, how, arg, driver === 'clipper' ? { drift: '*' } : driver);
+      if (driver === 'clipper') await R.installClipper(side.page);
+      await side.page.evaluate(() => window.__loop.judgeAll());
+      const r = await R.driveToResults(side.page, RUN_BUDGET);
+      const m = r.results && r.results.missions;
+      const last = r.frames[r.frames.length - 1];
+      const row = { driver: name, run: how + (arg === null ? '' : ' ' + (arg + 1)), finished: r.finished, score: r.results && r.results.score, bestChain: r.results && r.results.best, seconds: r.results && +r.results.seconds.toFixed(1), contacts: last.hits, respawns: r.frames.reduce((s, f) => s + f.resp, 0), missions: m && m.map(x => ({ kind: x.kind, target: x.target, text: x.text, done: x.doneNow, progress: +(+x.progress).toFixed(2), doneAt: x.doneAt })) };
+      out.missions.runs.push(row);
+      if (m) for (const x of m) { const k = byKind[x.kind] = byKind[x.kind] || { offered: 0, drifter: 0, careful: 0, clipper: 0, tracks: {} }; if (name === 'drifter') k.offered++; if (x.doneNow) { k[name]++; k.tracks[row.run] = (k.tracks[row.run] || []).concat(name); } }
+      console.log('  ' + name.padEnd(8) + row.run.padEnd(10) + (m ? m.map(x => (x.doneNow ? '[done] ' : '[    ] ') + x.kind + ' ' + x.target + ' (' + (+x.progress).toFixed(1) + ')').join('; ') : 'no missions'));
+    }
+  }
+  out.missions.byKind = byKind;
+  const KINDS = ['hold', 'chain', 'clean', 'clip', 'time', 'mult'];
+  const everyKindDone = KINDS.every(k => byKind[k] && Object.keys(byKind[k].tracks).length > 0);
+  const everywhere = KINDS.filter(k => byKind[k] && Object.keys(byKind[k].tracks).length === byKind[k].offered && Object.values(byKind[k].tracks).every(d => d.length === drivers.length));
+  verdict('every mission kind is completed by a scripted driver on some track', everyKindDone, KINDS.map(k => k + ' on ' + (byKind[k] ? Object.keys(byKind[k].tracks).length : 0) + ' of ' + (byKind[k] ? byKind[k].offered : 0)).join(', '));
+  verdict('no mission kind is completed on every track by every driver', everywhere.length === 0, everywhere.length ? 'trivial: ' + everywhere.join(', ') : 'none trivial');
+  // the replay: the drifter's tape on career 1 through the run structure, every kind judged
+  await R.beginRun(side.page, 'career', 0, { drift: '*' });
+  await R.installClipper(side.page);
+  await side.page.evaluate(() => window.__loop.judgeAll());
+  const live = await R.driveToResults(side.page, RUN_BUDGET);
+  const tape = await side.page.evaluate(() => window.__feel.tapeCopy());
+  const pick = x => ({ kind: x.kind, done: x.doneNow, doneAt: x.doneAt, progress: +(+x.progress).toFixed(3) });
+  const liveM = live.results.missions.map(pick);
+  const replayOn = (t) => side.page.evaluate(t => {
+    const Lp = window.__loop, spec = Lp.careerSpec(0);
+    /* replayRun starts the run and the probe's judge over every kind must be in place before the steps: start, swap, then step */
+    Lp.startRun(spec); Lp.judgeAll();
+    const r = Lp.replayRun(spec, t, true);
+    return r && { score: r.score, seconds: r.seconds, hash: r.hash, missions: r.missions.map(x => ({ kind: x.kind, done: x.doneNow, doneAt: x.doneAt, progress: +(+x.progress).toFixed(3) })) };
+  }, t);
+  const replay = await replayOn(tape);
+  const same = replay && JSON.stringify(replay.missions) === JSON.stringify(liveM) && replay.score === live.results.score;
+  const noHb = tape.map(e => ({ ...e, h: 0 }));
+  const perturbed = await replayOn(noHb);
+  const changed = !perturbed || JSON.stringify(perturbed.missions) !== JSON.stringify(liveM);
+  out.missions.replay = { live: { score: live.results.score, seconds: live.results.seconds, missions: liveM, tapeEntries: tape.length, steps: live.results.steps }, replay, identical: same, perturbed: { handbrakeRemoved: true, result: perturbed, outcomeChanged: changed } };
+  verdict('the tape replayed completes the same missions at the same steps, with the same score', same && liveM.some(m => m.done), liveM.filter(m => m.done).map(m => m.kind + '@' + m.doneAt).join(', ') + '; score ' + live.results.score + ' -> ' + (replay && replay.score));
+  verdict('the tape with the handbrake taken out changes the outcome', changed, perturbed ? perturbed.missions.filter(m => m.done).map(m => m.kind + '@' + m.doneAt).join(', ') + '; score ' + perturbed.score : 'did not finish');
+  // the known answer: every numeric target a hundred times larger
+  const keep = await side.page.evaluate(() => {
+    const M = window.__loop.LOOP.MISSIONS, keep = JSON.parse(JSON.stringify(M));
+    M.HOLD_RANGE = [200, 400]; M.CHAIN_MIN = 10000; M.CHAIN_SHARE = 25; M.CLIP_SHARE = 50; M.TIME_FACTOR = 0.0095; M.MULT = [200, 300];
+    return keep;
+  });
+  await R.beginRun(side.page, 'career', 0, { drift: '*' });
+  await R.installClipper(side.page);
+  const kaList = await side.page.evaluate(() => window.__loop.judgeAll().map(m => m.text));
+  const kaRun = await R.driveToResults(side.page, RUN_BUDGET);
+  await side.page.evaluate(keep => { Object.assign(window.__loop.LOOP.MISSIONS, keep); }, keep);
+  const kaNumeric = kaRun.results ? kaRun.results.missions.filter(x => x.kind !== 'clean') : [];
+  const kaDone = kaNumeric.filter(x => x.doneNow).length;
+  out.missions.knownAnswer = { targets: kaList, numericDone: kaDone, numericOffered: kaNumeric.length, caught: kaRun.finished && kaNumeric.length >= 4 && kaDone === 0 };
+  verdict('known answer: with every numeric target a hundred times larger the clipper completes none of them', out.missions.knownAnswer.caught, kaList.join('; ') + ' -> ' + kaDone + ' of ' + kaNumeric.length + ' done');
+  out.missions.errors = side.errors;
+  await side.close();
 }
 
 await env.close();

@@ -14,6 +14,7 @@ export function createHud(root) {
     <div id="readout"><span id="speed">0</span><span class="u">km/h</span><span id="angle">0</span><span class="u">deg</span></div>
     <div id="runinfo"><span id="lap"></span><span id="clock"></span></div>
     <div id="count"></div>
+    <div id="missions" hidden></div>
     <canvas id="streaks"></canvas>
     <div id="boost">BOOST</div>
     <button type="button" id="exit" aria-label="back to the title">&#10005;</button>
@@ -22,7 +23,8 @@ export function createHud(root) {
   root.appendChild(el);
   const total = el.querySelector('#totalN'), live = el.querySelector('#live'), liveN = el.querySelector('#liveN'), liveM = el.querySelector('#liveM');
   const callouts = el.querySelector('#callouts'), speed = el.querySelector('#speed'), angle = el.querySelector('#angle');
-  const lapEl = el.querySelector('#lap'), clockEl = el.querySelector('#clock'), countEl = el.querySelector('#count'), toBeat = el.querySelector('#toBeat'), exit = el.querySelector('#exit'), fs = el.querySelector('#fs'), snd = el.querySelector('#snd');
+  const lapEl = el.querySelector('#lap'), clockEl = el.querySelector('#clock'), countEl = el.querySelector('#count'), toBeat = el.querySelector('#toBeat'), exit = el.querySelector('#exit'), fs = el.querySelector('#fs'), snd = el.querySelector('#snd'), missionsEl = el.querySelector('#missions');
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   let lastTotal = -1, lastLive = -1, lastMult = -1, lastSpeed = -1, lastAngle = -1, lastNear = null, lastVisible = null, lastLap = '', lastClock = '', lastCount = '', lastBeat = '';
   let shown = 0;
   const v = { x: 0, y: 0, z: 0 };
@@ -65,6 +67,20 @@ export function createHud(root) {
       if (clock !== lastClock) { lastClock = clock; clockEl.textContent = clock; }
     },
     setToBeat(text) { if (text !== lastBeat) { lastBeat = text; toBeat.textContent = text; } },
+    /* the track's missions, over the countdown: [{ text, done }] or null to hide */
+    setMissions(list) {
+      if (!list) { if (!missionsEl.hidden) { missionsEl.hidden = true; missionsEl.innerHTML = ''; } return; }
+      missionsEl.innerHTML = '<b>MISSIONS</b>' + list.map(m => '<span class="' + (m.done ? 'done' : '') + '">' + (m.done ? '&#10003;' : '&#9671;') + ' ' + esc(m.text) + '</span>').join('');
+      missionsEl.hidden = false;
+    },
+    /* a one line notice that rises and fades like the score's callouts */
+    notice(text, kind) {
+      const d = document.createElement('div');
+      d.className = 'callout ' + (kind || 'good');
+      d.textContent = text;
+      callouts.appendChild(d);
+      setTimeout(() => d.remove(), 1500);
+    },
     /* '' for none, else the big number or GO */
     setCount(text, go) {
       if (text !== lastCount) { lastCount = text; countEl.textContent = text; countEl.classList.toggle('on', !!text); countEl.classList.toggle('go', !!go); if (text) { countEl.classList.remove('pop'); void countEl.offsetWidth; countEl.classList.add('pop'); } }

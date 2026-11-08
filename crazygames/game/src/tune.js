@@ -277,6 +277,24 @@ export const LOOP = {
   GHOST_MIN_STEPS:    120,     // a run shorter than a second is not a ghost
   SAVE_VERSION:       1,
   FREE_TRACK:         'park',
+  /* TRACK MISSIONS (briefs/RETENTION.md 2): three per career track and
+     per daily, chosen from the track's seed and features, paid in coins
+     the first time each is done. First guesses for the author to tune.
+     Targets scale with the track: a hold from its longest corner, a
+     chain and a time from its first star and par pace, clips from its
+     clipping zones. */
+  MISSIONS: {
+    COINS:            60,      // coins the first time a mission is done
+    HOLD_SPEED:       24,      // m/s a drift settles to (ASSIST.DRIFT_CRUISE): a corner of L metres is L / this seconds of slide
+    HOLD_SHARE:       0.6,     // share of the longest corner's slide time to hold
+    HOLD_RANGE:       [2, 4],  // s, the hold target is kept inside this
+    CHAIN_SHARE:      0.25,    // one banked chain worth this share of the first star
+    CHAIN_MIN:        100,     // points, at least
+    CLIP_SHARE:       0.5,     // share of the track's clipping zones to clip (drift close to), at least 2 where there are 2
+    TIME_FACTOR:      0.95,    // finish inside this share of par time (run metres at SCORING.PAR_SPEED)
+    MULT:             [2, 3],  // the multiplier to reach, easy and hard tracks (x4 was never reached by a scripted driver)
+    SHOWN:            2.5,     // s the mission list stays after GO
+  },
   /* FIRST-RUN ONBOARDING (briefs/RETENTION.md 1): the first visit skips
      the title and lands in career track 1, with short prompts at the
      moments they apply. The car is never paused to explain. */

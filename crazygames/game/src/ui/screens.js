@@ -5,6 +5,7 @@
    390x844 portrait and in landscape. No images, no fonts, system text. */
 import { ROSTER, PAINTS, carById, upgradeLevels, UPGRADE_STATS, UPGRADE_NAMES } from '../garage/roster.js';
 import { CAREER, careerUnlocked, careerStars } from '../loop/modes.js';
+import { missionTally } from '../loop/missions.js';
 import { LOOP } from '../tune.js';
 import { fullscreenSupported, isFullscreen, fullscreenIcon } from './fullscreen.js';
 import { soundIcon } from '../audio/sound.js';
@@ -12,6 +13,8 @@ import { soundIcon } from '../audio/sound.js';
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
 const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+/* a track's three missions as pips */
+const pips = done => '<span class="pips m">' + [0, 1, 2].map(i => '<i class="' + (done && done[i] ? 'on' : '') + '"></i>').join('') + '</span>';
 
 export function createScreens(root, onAction) {
   const el = document.createElement('div');
@@ -45,7 +48,7 @@ export function createScreens(root, onAction) {
       ${info.backPay ? `<p class="sub pay">+${fmt(info.backPay)} coins for the stars you have already won</p>` : ''}
       <div class="menu">
         <button type="button" class="big primary" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
-        <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total} of ${CAREER.length * 3} stars</small></button>
+        <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total} of ${CAREER.length * 3} stars &middot; ${info.missions} of ${info.missionsOf} missions</small></button>
         <button type="button" class="big" data-action="free"><b>FREE DRIFT</b><small>the car park, no timer</small></button>
         <button type="button" class="big" data-action="garage"><b>GARAGE</b><small>${esc(carById(save.car).name)}</small></button>
       </div>
@@ -64,10 +67,11 @@ export function createScreens(root, onAction) {
       return `<button type="button" class="row${open ? '' : ' locked'}" data-action="play-career" data-arg="${i}" ${open ? '' : 'disabled'}>
         <span class="n">${i + 1}</span>
         <span class="name"><b>${esc(c.name)}</b><small>${c.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint'}${e && e.best ? ' &middot; best ' + fmt(e.best) : ''}</small></span>
-        ${open ? stars(e ? e.stars : 0) : '<span class="lock">&#128274;</span>'}
+        ${open ? '<span class="col">' + stars(e ? e.stars : 0) + pips(save.missions && save.missions['career:' + i]) + '</span>' : '<span class="lock">&#128274;</span>'}
       </button>`;
     }).join('');
-    show('career', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>CAREER</h2></header><div class="list">${rows}</div>`);
+    const tally = missionTally(save, CAREER.length);
+    show('career', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>CAREER</h2><span class="tally">${careerStars(save)} &#9733; &middot; ${tally} of ${CAREER.length * 3} missions</span></header><div class="list">${rows}</div>`);
   }
 
   /* the upgrades of an owned car: a row per stat, its steps as pips and
@@ -112,6 +116,7 @@ export function createScreens(root, onAction) {
         <div class="targets">${targets}</div>
         ${r.parts ? `<div class="parts"><span><b>${fmt(r.parts.drift)}</b><small>drift</small></span><span><b>${fmt(r.parts.clean)}</b><small>clean${r.cleanSectors ? ' ' + r.cleanSectors : ''}</small></span><span><b>${fmt(r.parts.pace)}</b><small>pace</small></span></div>` : ''}
         <div class="facts"><span><b>${fmt(r.best)}</b><small>best chain</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span><b>+${fmt(r.coins)}</b><small>coins${r.newStars ? ' &middot; ' + r.newStars + ' new star' + (r.newStars > 1 ? 's' : '') : ''}</small></span></div>
+        ${r.missions ? `<div class="missions">${r.missions.map(m => `<span class="${m.done ? 'done' : ''}${m.fresh ? ' fresh' : ''}">${m.done ? '&#10003;' : '&#9671;'} ${esc(m.text)}${m.fresh ? ' <b>+' + m.coins + '</b>' : ''}</span>`).join('')}</div>` : ''}
         <button type="button" class="big primary" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}

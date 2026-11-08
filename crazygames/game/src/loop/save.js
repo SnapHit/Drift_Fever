@@ -19,8 +19,9 @@ export function defaults() {
      before it existed (8 November 2026) has been made, or was never owed.
      onboarded: the first-run onboarding has been seen or skipped (added
      8 November 2026; a save from before it has finished runs, which also
-     counts, see needsOnboarding). */
-  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false };
+     counts, see needsOnboarding). missions: per track key, which of its
+     three missions have been done (added 8 November 2026). */
+  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {} };
 }
 
 /* Has this save ever finished a run: a career result or a daily result. */
@@ -78,6 +79,13 @@ export function repair(raw) {
   } else if (raw.ghosts !== undefined) fix();
   s.starPay = raw.starPay === true;   // a save from before the back pay has not had it
   s.onboarded = raw.onboarded === true;   // missing on a save from before onboarding: not a fix, see finishedRuns
+  if (isObj(raw.missions)) {
+    for (const k of Object.keys(raw.missions)) {
+      const e = raw.missions[k];
+      if (!/^(career:\d+|daily:\d{4}-\d{2}-\d{2})$/.test(k) || !Array.isArray(e) || e.length !== 3 || !e.every(v => v === 0 || v === 1)) { fix(); continue; }
+      s.missions[k] = e.slice();
+    }
+  } else if (raw.missions !== undefined) fix();
   return { state: s, fixes };
 }
 
@@ -148,6 +156,16 @@ export function createSave(opts) {
     /* the first visit: no run ever finished and the onboarding not yet seen or skipped */
     needsOnboarding() { return !state.onboarded && !finishedRuns(state); },
     setOnboarded() { if (!state.onboarded) { state.onboarded = true; write(); } },
+    /* a run's missions: done is [bool x3]; returns the indices newly done,
+       which are the ones that pay. Only today's daily is kept. */
+    missionResult(key, done) {
+      const prev = state.missions[key] || [0, 0, 0];
+      const fresh = [];
+      const next = prev.map((v, i) => { const now = v || done[i] ? 1 : 0; if (now && !v) fresh.push(i); return now; });
+      if (key.startsWith('daily:')) for (const k of Object.keys(state.missions)) if (k.startsWith('daily:') && k !== key) delete state.missions[k];
+      state.missions[key] = next; write();
+      return fresh;
+    },
     ghost(key) { return state.ghosts[key] || null; },
     setGhost(key, record) {
       const g = validGhost(record);

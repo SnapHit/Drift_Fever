@@ -57,3 +57,60 @@ export async function framesUntilMoving(page, budget) {
 
 export const clicks = page => page.evaluate(() => window.__clicks);
 export const onboardState = page => page.evaluate(() => { const o = window.__loop.onboard; return { active: o.active, visible: o.visible(), step: o.state.step, shown: o.state.shown.slice(), done: { ...o.state.done }, skipped: o.state.skipped, skipShown: !document.getElementById('skip').hidden && !o.el.hidden }; });
+
+/* A TEST DRIVER THAT HUGS THE CLIP WALLS. The game's scripted drivers
+   (physics/driver.js, which this brief leaves alone) follow the centre
+   line, so they never come within the proximity distance of a clipping
+   zone. This one is pure pursuit like them, but inside a clipping zone
+   (and a little before it) it aims at a line clipGap metres off the
+   judged wall, throws the car into a slide with the handbrake at the
+   zone's entry and holds the throttle through it, steering by the
+   direction of travel as the drifter does. It runs in the page, written
+   over window.__loop.app.driver, and writes the same input record. */
+export const CLIPPER_SRC = `
+  const ground = window.__loop.app.ground, C = ground.centre, n = C.length;
+  const o = Object.assign({ lead: 14, hb: 0.45, clipGap: 1.0, vmax: 30, ay: 7, entry: 19, plan: 1.6 }, opts || {});
+  const curvature = new Float64Array(n), turn = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    const a = C[(i - 1 + n) % n], b = C[(i + 1) % n];
+    let d = b.heading - a.heading; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    curvature[i] = Math.abs(d) / 4; turn[i] = d > 0 ? 1 : d < 0 ? -1 : 0;
+  }
+  let hbUntil = -1, inZone = false;
+  const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
+  return { input(world) {
+    const car = world.car, v = car.speed, s = world.along;
+    let clip = null;
+    for (const c of ground.clips) if (s >= c.from - o.lead && s <= c.to) { clip = c; break; }
+    const active = !!clip;
+    if (active && !inZone) hbUntil = world.time + o.hb;
+    inZone = active;
+    const look = 5 + (active ? 0.3 : 0.42) * v;
+    const ti = (world.centreIndex + Math.round(look / 2)) % n, t = C[ti];
+    let tx = t.x, tz = t.z;
+    if (active) { const off = Math.max(0, t.width / 2 - 0.92 - o.clipGap) * (clip.side === 'left' ? 1 : -1); tx += -Math.cos(t.heading) * off; tz += Math.sin(t.heading) * off; }
+    const fx = -Math.sin(car.yaw), fz = -Math.cos(car.yaw), lx = -Math.cos(car.yaw), lz = Math.sin(car.yaw);
+    const dx = tx - car.x, dz = tz - car.z;
+    let steer = clamp(-Math.atan2(dx * lx + dz * lz, dx * fx + dz * fz) * 2.4, -1, 1);
+    const planM = Math.max(14, v * o.plan);
+    let kmax = 0;
+    for (let k = 0; k <= planM / 2; k++) { const c = curvature[(world.centreIndex + k) % n]; if (c > kmax) kmax = c; }
+    const vDes = Math.min(o.vmax, kmax > 1e-4 ? Math.sqrt(o.ay / kmax) : o.vmax);
+    let throttle = v < vDes ? 1 : 0, brake = v > vDes + 1.5 ? Math.min(1, (v - vDes - 1.5) / 4) : 0, handbrake = 0;
+    if (!active) {
+      let ahead = Infinity;
+      for (const c of ground.clips) { let a = c.from - o.lead - s; if (ground.kind === 'circuit') a = ((a % ground.length) + ground.length) % ground.length; if (a >= 0 && a < ahead) ahead = a; }
+      if (ahead < 60) { if (v > o.entry + 1) { throttle = 0; brake = 0.5; } else if (v < o.entry - 1) { throttle = 1; brake = 0; } }
+    } else {
+      const psiV = Math.atan2(-car.wvx, -car.wvz), psiT = Math.atan2(-dx, -dz);
+      let diff = psiT - psiV; while (diff > Math.PI) diff -= 2 * Math.PI; while (diff < -Math.PI) diff += 2 * Math.PI;
+      let ds = -diff * 3;
+      const into = -turn[world.centreIndex];
+      if (ds * into > 0 && Math.abs(ds) < 0.3) ds = into * 0.3;
+      steer = clamp(ds, -1, 1); throttle = 1; brake = 0;
+      if (world.time < hbUntil) { handbrake = 1; steer = into || (steer > 0 ? 1 : -1); }
+    }
+    return { steer, throttle, brake, handbrake };
+  } };
+`;
+export const installClipper = (page, opts) => page.evaluate(([src, opts]) => { window.__loop.app.driver = new Function('opts', src)(opts); }, [CLIPPER_SRC, opts || null]);

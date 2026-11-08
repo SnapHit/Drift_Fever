@@ -1,0 +1,1997 @@
+{
+ "started": "2026-11-08T02:59:34.969Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader",
+ "runs": [
+  {
+   "driver": "drifter",
+   "run": "career 1",
+   "finished": true,
+   "score": 895,
+   "bestChain": 87,
+   "seconds": 70,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 1.41,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 110,
+     "text": "Bank a chain of 110 points",
+     "done": false,
+     "progress": 87,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": true,
+     "progress": 4,
+     "doneAt": 2908
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 82,
+     "text": "Finish under 82 s",
+     "done": true,
+     "progress": 69.63,
+     "doneAt": 8355
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": true,
+     "progress": 2,
+     "doneAt": 1512
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "career 2",
+   "finished": true,
+   "score": 309,
+   "bestChain": 61,
+   "seconds": 32.5,
+   "contacts": 2,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 3,
+     "text": "Hold one drift for 3 s",
+     "done": false,
+     "progress": 0.76,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 61,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": false,
+     "progress": 2,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 42,
+     "text": "Finish under 42 s",
+     "done": true,
+     "progress": 32.15,
+     "doneAt": 3858
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": true,
+     "progress": 2,
+     "doneAt": 2662
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "career 3",
+   "finished": true,
+   "score": 1128,
+   "bestChain": 76,
+   "seconds": 105.8,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 1.29,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 170,
+     "text": "Bank a chain of 170 points",
+     "done": false,
+     "progress": 76,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": true,
+     "progress": 4,
+     "doneAt": 4330
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 134,
+     "text": "Finish under 134 s",
+     "done": true,
+     "progress": 105.43,
+     "doneAt": 12652
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": true,
+     "progress": 2,
+     "doneAt": 2855
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "career 4",
+   "finished": true,
+   "score": 448,
+   "bestChain": 155,
+   "seconds": 38.4,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 1.37,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": true,
+     "progress": 155,
+     "doneAt": 969
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": true,
+     "progress": 3,
+     "doneAt": 4564
+    },
+    {
+     "kind": "clip",
+     "target": 4,
+     "text": "Clip 4 clipping zones",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 45,
+     "text": "Finish under 45 s",
+     "done": true,
+     "progress": 38.03,
+     "doneAt": 4564
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": true,
+     "progress": 2,
+     "doneAt": 644
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "career 5",
+   "finished": true,
+   "score": 1028,
+   "bestChain": 139,
+   "seconds": 101.6,
+   "contacts": 4,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 1.25,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 130,
+     "text": "Bank a chain of 130 points",
+     "done": true,
+     "progress": 137,
+     "doneAt": 1285
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 3,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 4,
+     "text": "Clip 4 clipping zones",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 107,
+     "text": "Finish under 107 s",
+     "done": true,
+     "progress": 101.27,
+     "doneAt": 12152
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": true,
+     "progress": 3,
+     "doneAt": 1015
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "career 6",
+   "finished": true,
+   "score": 389,
+   "bestChain": 85,
+   "seconds": 42.1,
+   "contacts": 5,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 1.52,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 85,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 5,
+     "text": "Clip 5 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 52,
+     "text": "Finish under 52 s",
+     "done": true,
+     "progress": 41.78,
+     "doneAt": 5014
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 2,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "career 7",
+   "finished": true,
+   "score": 589,
+   "bestChain": 11,
+   "seconds": 90.4,
+   "contacts": 3,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 0.62,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 120,
+     "text": "Bank a chain of 120 points",
+     "done": false,
+     "progress": 11,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 3,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 3,
+     "text": "Clip 3 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 109,
+     "text": "Finish under 109 s",
+     "done": true,
+     "progress": 90.04,
+     "doneAt": 10805
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "career 8",
+   "finished": true,
+   "score": 300,
+   "bestChain": 73,
+   "seconds": 47.2,
+   "contacts": 2,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": true,
+     "progress": 2,
+     "doneAt": 657
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 73,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": false,
+     "progress": 2,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 7,
+     "text": "Clip 7 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 54,
+     "text": "Finish under 54 s",
+     "done": true,
+     "progress": 46.85,
+     "doneAt": 5622
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": true,
+     "progress": 3,
+     "doneAt": 706
+    }
+   ]
+  },
+  {
+   "driver": "drifter",
+   "run": "daily",
+   "finished": true,
+   "score": 760,
+   "bestChain": 12,
+   "seconds": 115,
+   "contacts": 3,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 1.33,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 160,
+     "text": "Bank a chain of 160 points",
+     "done": false,
+     "progress": 12,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 3,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 5,
+     "text": "Clip 5 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 133,
+     "text": "Finish under 133 s",
+     "done": true,
+     "progress": 114.68,
+     "doneAt": 13762
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": true,
+     "progress": 2,
+     "doneAt": 4001
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 1",
+   "finished": true,
+   "score": 491,
+   "bestChain": 0,
+   "seconds": 77.3,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 110,
+     "text": "Bank a chain of 110 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": true,
+     "progress": 4,
+     "doneAt": 3193
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 82,
+     "text": "Finish under 82 s",
+     "done": true,
+     "progress": 76.92,
+     "doneAt": 9231
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 2",
+   "finished": true,
+   "score": 252,
+   "bestChain": 0,
+   "seconds": 38.4,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 3,
+     "text": "Hold one drift for 3 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": true,
+     "progress": 3,
+     "doneAt": 4565
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 42,
+     "text": "Finish under 42 s",
+     "done": true,
+     "progress": 38.04,
+     "doneAt": 4565
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 3",
+   "finished": true,
+   "score": 723,
+   "bestChain": 0,
+   "seconds": 139.6,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 170,
+     "text": "Bank a chain of 170 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": true,
+     "progress": 4,
+     "doneAt": 5681
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 134,
+     "text": "Finish under 134 s",
+     "done": false,
+     "progress": 139.22,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 4",
+   "finished": true,
+   "score": 240,
+   "bestChain": 0,
+   "seconds": 46.6,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": true,
+     "progress": 3,
+     "doneAt": 5556
+    },
+    {
+     "kind": "clip",
+     "target": 4,
+     "text": "Clip 4 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 45,
+     "text": "Finish under 45 s",
+     "done": false,
+     "progress": 46.3,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 5",
+   "finished": true,
+   "score": 523,
+   "bestChain": 0,
+   "seconds": 123.6,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 130,
+     "text": "Bank a chain of 130 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": true,
+     "progress": 4,
+     "doneAt": 5035
+    },
+    {
+     "kind": "clip",
+     "target": 4,
+     "text": "Clip 4 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 107,
+     "text": "Finish under 107 s",
+     "done": false,
+     "progress": 123.22,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 6",
+   "finished": true,
+   "score": 252,
+   "bestChain": 0,
+   "seconds": 52.3,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": true,
+     "progress": 3,
+     "doneAt": 6240
+    },
+    {
+     "kind": "clip",
+     "target": 5,
+     "text": "Clip 5 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 52,
+     "text": "Finish under 52 s",
+     "done": true,
+     "progress": 52,
+     "doneAt": 6240
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 7",
+   "finished": true,
+   "score": 488,
+   "bestChain": 0,
+   "seconds": 115.4,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 120,
+     "text": "Bank a chain of 120 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": true,
+     "progress": 4,
+     "doneAt": 4722
+    },
+    {
+     "kind": "clip",
+     "target": 3,
+     "text": "Clip 3 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 109,
+     "text": "Finish under 109 s",
+     "done": false,
+     "progress": 115.03,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "career 8",
+   "finished": true,
+   "score": 225,
+   "bestChain": 0,
+   "seconds": 62.6,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": true,
+     "progress": 3,
+     "doneAt": 7475
+    },
+    {
+     "kind": "clip",
+     "target": 7,
+     "text": "Clip 7 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 54,
+     "text": "Finish under 54 s",
+     "done": false,
+     "progress": 62.29,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "careful",
+   "run": "daily",
+   "finished": true,
+   "score": 663,
+   "bestChain": 0,
+   "seconds": 149.3,
+   "contacts": 0,
+   "respawns": 0,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 160,
+     "text": "Bank a chain of 160 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": true,
+     "progress": 4,
+     "doneAt": 6081
+    },
+    {
+     "kind": "clip",
+     "target": 5,
+     "text": "Clip 5 clipping zones",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "time",
+     "target": 133,
+     "text": "Finish under 133 s",
+     "done": false,
+     "progress": 148.89,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 1",
+   "finished": true,
+   "score": 183,
+   "bestChain": 0,
+   "seconds": 85.8,
+   "contacts": 28,
+   "respawns": 3,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 1.01,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 110,
+     "text": "Bank a chain of 110 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": true,
+     "progress": 2,
+     "doneAt": 2589
+    },
+    {
+     "kind": "time",
+     "target": 82,
+     "text": "Finish under 82 s",
+     "done": false,
+     "progress": 85.48,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 2",
+   "finished": true,
+   "score": 93,
+   "bestChain": 3,
+   "seconds": 44.9,
+   "contacts": 8,
+   "respawns": 2,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 3,
+     "text": "Hold one drift for 3 s",
+     "done": false,
+     "progress": 0.82,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 3,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": true,
+     "progress": 2,
+     "doneAt": 1432
+    },
+    {
+     "kind": "time",
+     "target": 42,
+     "text": "Finish under 42 s",
+     "done": false,
+     "progress": 44.53,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 3",
+   "finished": true,
+   "score": 241,
+   "bestChain": 0,
+   "seconds": 161.8,
+   "contacts": 18,
+   "respawns": 6,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 0.87,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 170,
+     "text": "Bank a chain of 170 points",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 2,
+     "text": "Clip 2 clipping zones",
+     "done": true,
+     "progress": 2,
+     "doneAt": 2255
+    },
+    {
+     "kind": "time",
+     "target": 134,
+     "text": "Finish under 134 s",
+     "done": false,
+     "progress": 161.45,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 4",
+   "finished": true,
+   "score": 376,
+   "bestChain": 280,
+   "seconds": 49.5,
+   "contacts": 24,
+   "respawns": 2,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 2.82,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": true,
+     "progress": 280,
+     "doneAt": 3350
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 4,
+     "text": "Clip 4 clipping zones",
+     "done": true,
+     "progress": 4,
+     "doneAt": 4106
+    },
+    {
+     "kind": "time",
+     "target": 45,
+     "text": "Finish under 45 s",
+     "done": false,
+     "progress": 49.17,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": true,
+     "progress": 2,
+     "doneAt": 2144
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 5",
+   "finished": true,
+   "score": 180,
+   "bestChain": 3,
+   "seconds": 134.8,
+   "contacts": 29,
+   "respawns": 6,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 1.5,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 130,
+     "text": "Bank a chain of 130 points",
+     "done": false,
+     "progress": 3,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 4,
+     "text": "Clip 4 clipping zones",
+     "done": true,
+     "progress": 4,
+     "doneAt": 3292
+    },
+    {
+     "kind": "time",
+     "target": 107,
+     "text": "Finish under 107 s",
+     "done": false,
+     "progress": 134.43,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 2,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 6",
+   "finished": true,
+   "score": 111,
+   "bestChain": 7,
+   "seconds": 57,
+   "contacts": 35,
+   "respawns": 1,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 4,
+     "text": "Hold one drift for 4 s",
+     "done": false,
+     "progress": 1.47,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 7,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 5,
+     "text": "Clip 5 clipping zones",
+     "done": true,
+     "progress": 5,
+     "doneAt": 5256
+    },
+    {
+     "kind": "time",
+     "target": 52,
+     "text": "Finish under 52 s",
+     "done": false,
+     "progress": 56.62,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 2,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 7",
+   "finished": true,
+   "score": 224,
+   "bestChain": 12,
+   "seconds": 122.2,
+   "contacts": 24,
+   "respawns": 5,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 1.14,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 120,
+     "text": "Bank a chain of 120 points",
+     "done": false,
+     "progress": 12,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 3,
+     "text": "Clip 3 clipping zones",
+     "done": true,
+     "progress": 3,
+     "doneAt": 2332
+    },
+    {
+     "kind": "time",
+     "target": 109,
+     "text": "Finish under 109 s",
+     "done": false,
+     "progress": 121.9,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 1,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "career 8",
+   "finished": true,
+   "score": 91,
+   "bestChain": 7,
+   "seconds": 66.9,
+   "contacts": 23,
+   "respawns": 4,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 1.48,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 100,
+     "text": "Bank a chain of 100 points",
+     "done": false,
+     "progress": 7,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 0,
+     "text": "Drive a clean run",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 7,
+     "text": "Clip 7 clipping zones",
+     "done": true,
+     "progress": 7,
+     "doneAt": 4956
+    },
+    {
+     "kind": "time",
+     "target": 54,
+     "text": "Finish under 54 s",
+     "done": false,
+     "progress": 66.56,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 3,
+     "text": "Reach a x3 multiplier",
+     "done": false,
+     "progress": 2,
+     "doneAt": -1
+    }
+   ]
+  },
+  {
+   "driver": "clipper",
+   "run": "daily",
+   "finished": true,
+   "score": 232,
+   "bestChain": 4,
+   "seconds": 169.3,
+   "contacts": 42,
+   "respawns": 8,
+   "missions": [
+    {
+     "kind": "hold",
+     "target": 2,
+     "text": "Hold one drift for 2 s",
+     "done": false,
+     "progress": 1.93,
+     "doneAt": -1
+    },
+    {
+     "kind": "chain",
+     "target": 160,
+     "text": "Bank a chain of 160 points",
+     "done": false,
+     "progress": 4,
+     "doneAt": -1
+    },
+    {
+     "kind": "clean",
+     "target": 1,
+     "text": "Drive a clean lap",
+     "done": false,
+     "progress": 0,
+     "doneAt": -1
+    },
+    {
+     "kind": "clip",
+     "target": 5,
+     "text": "Clip 5 clipping zones",
+     "done": true,
+     "progress": 5,
+     "doneAt": 4754
+    },
+    {
+     "kind": "time",
+     "target": 133,
+     "text": "Finish under 133 s",
+     "done": false,
+     "progress": 168.97,
+     "doneAt": -1
+    },
+    {
+     "kind": "mult",
+     "target": 2,
+     "text": "Reach a x2 multiplier",
+     "done": true,
+     "progress": 2,
+     "doneAt": 772
+    }
+   ]
+  }
+ ],
+ "offered": [
+  {
+   "key": "career:0",
+   "track": "circuit 1101",
+   "length": 518,
+   "missions": [
+    "Drive a clean lap",
+    "Hold one drift for 4 s",
+    "Finish under 82 s"
+   ]
+  },
+  {
+   "key": "career:1",
+   "track": "sprint 1202",
+   "length": 840,
+   "missions": [
+    "Clip 2 clipping zones",
+    "Finish under 42 s",
+    "Bank a chain of 100 points"
+   ]
+  },
+  {
+   "key": "career:2",
+   "track": "circuit 1327",
+   "length": 844,
+   "missions": [
+    "Clip 2 clipping zones",
+    "Reach a x2 multiplier",
+    "Bank a chain of 170 points"
+   ]
+  },
+  {
+   "key": "career:3",
+   "track": "sprint 1404",
+   "length": 898,
+   "missions": [
+    "Reach a x2 multiplier",
+    "Clip 4 clipping zones",
+    "Hold one drift for 4 s"
+   ]
+  },
+  {
+   "key": "career:4",
+   "track": "circuit 1505",
+   "length": 678,
+   "missions": [
+    "Drive a clean lap",
+    "Reach a x3 multiplier",
+    "Hold one drift for 2 s"
+   ]
+  },
+  {
+   "key": "career:5",
+   "track": "sprint 1606",
+   "length": 1018,
+   "missions": [
+    "Reach a x3 multiplier",
+    "Drive a clean run",
+    "Clip 5 clipping zones"
+   ]
+  },
+  {
+   "key": "career:6",
+   "track": "circuit 1707",
+   "length": 688,
+   "missions": [
+    "Reach a x3 multiplier",
+    "Finish under 109 s",
+    "Clip 3 clipping zones"
+   ]
+  },
+  {
+   "key": "career:7",
+   "track": "sprint 1808",
+   "length": 1066,
+   "missions": [
+    "Bank a chain of 100 points",
+    "Finish under 54 s",
+    "Hold one drift for 2 s"
+   ]
+  },
+  {
+   "key": "daily:2026-11-08",
+   "track": "circuit 962710700",
+   "length": 842,
+   "missions": [
+    "Bank a chain of 160 points",
+    "Finish under 133 s",
+    "Clip 5 clipping zones"
+   ]
+  }
+ ],
+ "byKind": {
+  "hold": {
+   "offered": 9,
+   "drifter": 1,
+   "careful": 0,
+   "clipper": 0,
+   "tracks": {
+    "career 8": [
+     "drifter"
+    ]
+   }
+  },
+  "chain": {
+   "offered": 9,
+   "drifter": 2,
+   "careful": 0,
+   "clipper": 1,
+   "tracks": {
+    "career 4": [
+     "drifter",
+     "clipper"
+    ],
+    "career 5": [
+     "drifter"
+    ]
+   }
+  },
+  "clean": {
+   "offered": 9,
+   "drifter": 3,
+   "careful": 9,
+   "clipper": 0,
+   "tracks": {
+    "career 1": [
+     "drifter",
+     "careful"
+    ],
+    "career 3": [
+     "drifter",
+     "careful"
+    ],
+    "career 4": [
+     "drifter",
+     "careful"
+    ],
+    "career 2": [
+     "careful"
+    ],
+    "career 5": [
+     "careful"
+    ],
+    "career 6": [
+     "careful"
+    ],
+    "career 7": [
+     "careful"
+    ],
+    "career 8": [
+     "careful"
+    ],
+    "daily": [
+     "careful"
+    ]
+   }
+  },
+  "clip": {
+   "offered": 9,
+   "drifter": 0,
+   "careful": 0,
+   "clipper": 9,
+   "tracks": {
+    "career 1": [
+     "clipper"
+    ],
+    "career 2": [
+     "clipper"
+    ],
+    "career 3": [
+     "clipper"
+    ],
+    "career 4": [
+     "clipper"
+    ],
+    "career 5": [
+     "clipper"
+    ],
+    "career 6": [
+     "clipper"
+    ],
+    "career 7": [
+     "clipper"
+    ],
+    "career 8": [
+     "clipper"
+    ],
+    "daily": [
+     "clipper"
+    ]
+   }
+  },
+  "time": {
+   "offered": 9,
+   "drifter": 9,
+   "careful": 3,
+   "clipper": 0,
+   "tracks": {
+    "career 1": [
+     "drifter",
+     "careful"
+    ],
+    "career 2": [
+     "drifter",
+     "careful"
+    ],
+    "career 3": [
+     "drifter"
+    ],
+    "career 4": [
+     "drifter"
+    ],
+    "career 5": [
+     "drifter"
+    ],
+    "career 6": [
+     "drifter",
+     "careful"
+    ],
+    "career 7": [
+     "drifter"
+    ],
+    "career 8": [
+     "drifter"
+    ],
+    "daily": [
+     "drifter"
+    ]
+   }
+  },
+  "mult": {
+   "offered": 9,
+   "drifter": 7,
+   "careful": 0,
+   "clipper": 2,
+   "tracks": {
+    "career 1": [
+     "drifter"
+    ],
+    "career 2": [
+     "drifter"
+    ],
+    "career 3": [
+     "drifter"
+    ],
+    "career 4": [
+     "drifter",
+     "clipper"
+    ],
+    "career 5": [
+     "drifter"
+    ],
+    "career 8": [
+     "drifter"
+    ],
+    "daily": [
+     "drifter",
+     "clipper"
+    ]
+   }
+  }
+ },
+ "replay": {
+  "live": {
+   "score": 183,
+   "seconds": 85.81666666668103,
+   "missions": [
+    {
+     "kind": "hold",
+     "done": false,
+     "doneAt": -1,
+     "progress": 1.008
+    },
+    {
+     "kind": "chain",
+     "done": false,
+     "doneAt": -1,
+     "progress": 0
+    },
+    {
+     "kind": "clean",
+     "done": false,
+     "doneAt": -1,
+     "progress": 0
+    },
+    {
+     "kind": "clip",
+     "done": true,
+     "doneAt": 2589,
+     "progress": 2
+    },
+    {
+     "kind": "time",
+     "done": false,
+     "doneAt": -1,
+     "progress": 85.483
+    },
+    {
+     "kind": "mult",
+     "done": false,
+     "doneAt": -1,
+     "progress": 1
+    }
+   ],
+   "tapeEntries": 6685,
+   "steps": 10298
+  },
+  "replay": {
+   "score": 183,
+   "seconds": 85.48333333334743,
+   "hash": "-1.4716797897169216,-8.067671254720363,-0.1825361311883586,5.9624959556549415,-28.778744292328398,0.3110096109457521,0.05260524700517929,-4.013610102521368,0,0,0,-7.963506550477748,2.3981430382887976|10258,27,9",
+   "missions": [
+    {
+     "kind": "hold",
+     "done": false,
+     "doneAt": -1,
+     "progress": 1.008
+    },
+    {
+     "kind": "chain",
+     "done": false,
+     "doneAt": -1,
+     "progress": 0
+    },
+    {
+     "kind": "clean",
+     "done": false,
+     "doneAt": -1,
+     "progress": 0
+    },
+    {
+     "kind": "clip",
+     "done": true,
+     "doneAt": 2589,
+     "progress": 2
+    },
+    {
+     "kind": "time",
+     "done": false,
+     "doneAt": -1,
+     "progress": 85.483
+    },
+    {
+     "kind": "mult",
+     "done": false,
+     "doneAt": -1,
+     "progress": 1
+    }
+   ]
+  },
+  "identical": true,
+  "perturbed": {
+   "handbrakeRemoved": true,
+   "result": null,
+   "outcomeChanged": true
+  }
+ },
+ "knownAnswer": {
+  "targets": [
+   "Hold one drift for 200 s",
+   "Bank a chain of 11250 points",
+   "Drive a clean lap",
+   "Clip 150 clipping zones",
+   "Finish under 1 s",
+   "Reach a x200 multiplier"
+  ],
+  "numericDone": 0,
+  "numericOffered": 5,
+  "caught": true
+ },
+ "errors": []
+}

@@ -56,6 +56,13 @@
   #boost { position: absolute; left: 0; right: 0; top: 22%; text-align: center; font-weight: 900; font-style: italic; font-size: clamp(28px, 8vw, 56px); letter-spacing: 0.08em; color: #ffd23f; text-shadow: 0 0 18px rgba(255,140,0,0.8), 0 3px 10px rgba(0,0,0,0.6); opacity: 0; transform: scale(0.8); transition: opacity 0.15s, transform 0.15s; pointer-events: none; }
   #boost.on { opacity: 1; transform: scale(1); }
   #count.on { display: block; }
+  /* the track's missions over the countdown */
+  #missions { position: absolute; left: max(12px, env(safe-area-inset-left)); top: 27%; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 16px; border-radius: 14px; background: rgba(10,14,30,0.7); border: 2px solid rgba(255,255,255,0.22); font-size: clamp(13px, 2vw, 16px); font-weight: 700; white-space: nowrap; max-width: 92vw; animation: promptIn 0.3s ease-out; }
+  #missions[hidden] { display: none; }
+  @media (orientation: portrait) { #missions { left: 50%; top: 13%; transform: translateX(-50%); --tx: -50%; } }
+  #missions b { align-self: center; font-size: 11px; letter-spacing: 0.2em; opacity: 0.7; }
+  #missions span.done { opacity: 0.55; text-decoration: line-through; }
+  .callout.mission { color: #ffd34d; font-size: clamp(18px, 3.6vw, 30px); }
   #count.go { color: var(--cyan); }
   #count.pop { animation: pop 0.5s ease-out; }
   @keyframes pop { from { transform: scale(1.5); opacity: 0.4; } to { transform: scale(1); opacity: 1; } }
@@ -145,6 +152,11 @@
   .results .targets { display: flex; gap: 14px; font-size: 13px; font-weight: 700; } .results .targets .on { color: #ffd34d; } .results .targets .off { opacity: 0.45; }
   .results .facts { display: flex; gap: 18px; justify-content: center; width: 100%; } .results .facts span { display: flex; flex-direction: column; align-items: center; } .results .facts b { font-size: 20px; } .results .facts small { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.1em; }
   .results .row2 { display: flex; gap: 8px; width: 100%; } .results .row2 button { min-height: 52px; }
+  .results .missions { display: flex; flex-direction: column; gap: 3px; width: 100%; font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,0.06); }
+  .results .missions .done { color: #ffd34d; } .results .missions .fresh b { color: #ffd34d; margin-left: 4px; }
+  .pips.m i { width: 10px; height: 10px; border-radius: 5px; } .pips.m i.on { background: #ffd34d; }
+  .row .col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .screen header .tally { margin-left: auto; font-size: 12px; opacity: 0.75; font-weight: 700; white-space: nowrap; }
   @media (orientation: landscape) and (max-height: 500px) {
     .screen h1 { margin-top: 2vh; font-size: 40px; }
     .screen .lockup { height: 9vh; margin-top: 0; }
