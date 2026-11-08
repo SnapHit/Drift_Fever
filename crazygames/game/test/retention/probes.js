@@ -482,6 +482,7 @@ if (run('shots')) {
          shot the removal is held off and the animation frozen mid way */
       await side.page.evaluate(() => { window.__feel.draw = false; const st = window.setTimeout; window.__setTimeout = st; window.setTimeout = (fn, ms) => st(fn, ms >= 1500 ? 60000 : ms); document.head.insertAdjacentHTML('beforeend', '<style id="hold">.callout { animation-delay: -0.4s !important; animation-play-state: paused !important; }</style>'); });
       await until(side, () => window.__loop.missions() && window.__loop.missions().completed > 0 && document.querySelector('.callout.mission') !== null, 60 * 120);
+      await side.page.evaluate(() => { for (const e of document.querySelectorAll('.callout:not(.mission)')) e.remove(); });   // the held score callouts of the last seconds, which in play have faded
     });
     await side.page.evaluate(() => { window.setTimeout = window.__setTimeout; const h = document.getElementById('hold'); if (h) h.remove(); });
     await shot(side, 'results-missions', async () => { await R.driveToResults(side.page, RUN_BUDGET); });

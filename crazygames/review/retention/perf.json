@@ -1,0 +1,105 @@
+{
+ "started": "2026-11-08T03:38:15.416Z",
+ "note": "review/retention/perf-main.json is review/loop/perf.json as main produced it in this sandbox, kept for the comparison",
+ "budgetMs": 16.7,
+ "at6": {
+  "throttle": 6,
+  "loadMs": 0,
+  "frames": 420,
+  "ghostRunningFrames": 390,
+  "missionsJudged": true,
+  "allDriving": true,
+  "frame": {
+   "n": 390,
+   "p50": 22.9,
+   "p95": 272.3,
+   "p99": 1434.4,
+   "worst": 19105.3,
+   "mean": 188.77
+  },
+  "jsWithoutSubmit": {
+   "n": 390,
+   "p50": 0.9,
+   "p95": 4.4,
+   "p99": 9.4,
+   "worst": 76.3,
+   "mean": 1.43
+  },
+  "physics": {
+   "n": 390,
+   "p50": 0.1,
+   "p95": 2.5,
+   "p99": 7.1,
+   "worst": 62.2,
+   "mean": 0.72
+  },
+  "submit": {
+   "n": 390,
+   "p50": 16.6,
+   "p95": 270,
+   "p99": 1434.2,
+   "worst": 19104.2,
+   "mean": 187.34
+  }
+ },
+ "baselineAt6": {
+  "throttle": 6,
+  "loadMs": 0,
+  "frames": 420,
+  "track": {
+   "name": "circuit 1101",
+   "length": 518
+  },
+  "hasGhost": true,
+  "ghostRunningFrames": 390,
+  "allDriving": true,
+  "backend": "webgl2",
+  "tier": "low",
+  "frame": {
+   "n": 390,
+   "p50": 17.5,
+   "p95": 264.5,
+   "p99": 1327.4,
+   "worst": 19833.3,
+   "mean": 186.9
+  },
+  "jsWithoutSubmit": {
+   "n": 390,
+   "p50": 0.8,
+   "p95": 3.6,
+   "p99": 6.1,
+   "worst": 9.6,
+   "mean": 1.05
+  },
+  "physics": {
+   "n": 390,
+   "p50": 0.1,
+   "p95": 1.5,
+   "p99": 3.6,
+   "worst": 7,
+   "mean": 0.35
+  },
+  "submit": {
+   "n": 390,
+   "p50": 16.1,
+   "p95": 263,
+   "p99": 1327.3,
+   "worst": 19829.9,
+   "mean": 185.85
+  },
+  "stepsPerFrame": 2,
+  "firstFrames": {
+   "worst": 1931.7
+  },
+  "errors": []
+ },
+ "noiseMs": 1.5,
+ "withinNoise": true,
+ "knownAnswer": {
+  "loadMs": 20,
+  "p95Before": 4.4,
+  "p95Loaded": 26.4,
+  "rise": 22,
+  "caught": true
+ }
+}

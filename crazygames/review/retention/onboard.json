@@ -1,13 +1,13 @@
 {
- "started": "2026-11-08T02:49:42.395Z",
+ "started": "2026-11-08T03:38:15.416Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader",
  "sequence": {
   "shown": [
    "steer",
    "clean",
-   "chain",
    "drift",
-   "brake"
+   "brake",
+   "chain"
   ],
   "done": {
    "steer": true,
@@ -46,22 +46,12 @@
     "active": true
    },
    {
-    "t": 11.05,
-    "s": "drive",
-    "step": "steer",
-    "vis": true,
-    "txt": "Steer◀▶orAD",
-    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
-    "v": 25.5,
-    "active": true
-   },
-   {
     "t": 11.95,
     "s": "drive",
     "step": null,
     "vis": true,
     "txt": "",
-    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "info": "Clean sector. A sector with no wall hits pays a clean bonus.",
     "v": 21,
     "active": true
    },
@@ -71,7 +61,7 @@
     "step": "drift",
     "vis": true,
     "txt": "Hold SPACE while steering to slideSPACE+◀▶",
-    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "info": "Clean sector. A sector with no wall hits pays a clean bonus.",
     "v": 21,
     "active": true
    },
@@ -81,7 +71,7 @@
     "step": null,
     "vis": true,
     "txt": "",
-    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "info": "Clean sector. A sector with no wall hits pays a clean bonus.",
     "v": 22.6,
     "active": true
    },
@@ -91,18 +81,28 @@
     "step": "brake",
     "vis": true,
     "txt": "SPACE on its own brakesSPACE",
-    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "info": "Clean sector. A sector with no wall hits pays a clean bonus.",
     "v": 23.3,
     "active": true
    },
    {
-    "t": 15.57,
+    "t": 14.67,
+    "s": "drive",
+    "step": "brake",
+    "vis": true,
+    "txt": "SPACE on its own brakesSPACE",
+    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "v": 23.8,
+    "active": true
+   },
+   {
+    "t": 19.17,
     "s": "drive",
     "step": "brake",
     "vis": true,
     "txt": "SPACE on its own brakesSPACE",
     "info": "",
-    "v": 21.5,
+    "v": 27.4,
     "active": true
    },
    {

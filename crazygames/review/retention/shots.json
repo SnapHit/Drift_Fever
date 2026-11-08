@@ -1,0 +1,284 @@
+{
+ "0": {
+  "file": "shots/onboard-steer-390x844.png",
+  "viewport": "390x844",
+  "screen": "onboard-steer"
+ },
+ "1": {
+  "file": "shots/onboard-drift-390x844.png",
+  "viewport": "390x844",
+  "screen": "onboard-drift"
+ },
+ "2": {
+  "file": "shots/onboard-brake-390x844.png",
+  "viewport": "390x844",
+  "screen": "onboard-brake"
+ },
+ "3": {
+  "file": "shots/onboard-chain-390x844.png",
+  "viewport": "390x844",
+  "screen": "onboard-chain"
+ },
+ "4": {
+  "file": "shots/onboard-clean-390x844.png",
+  "viewport": "390x844",
+  "screen": "onboard-clean"
+ },
+ "5": {
+  "file": "shots/title-390x844.png",
+  "viewport": "390x844",
+  "screen": "title"
+ },
+ "6": {
+  "file": "shots/career-390x844.png",
+  "viewport": "390x844",
+  "screen": "career"
+ },
+ "7": {
+  "file": "shots/countdown-missions-390x844.png",
+  "viewport": "390x844",
+  "screen": "countdown-missions"
+ },
+ "8": {
+  "file": "shots/mission-complete-390x844.png",
+  "viewport": "390x844",
+  "screen": "mission-complete"
+ },
+ "9": {
+  "file": "shots/results-missions-390x844.png",
+  "viewport": "390x844",
+  "screen": "results-missions"
+ },
+ "10": {
+  "file": "shots/lab-390x844.png",
+  "viewport": "390x844",
+  "screen": "lab"
+ },
+ "11": {
+  "file": "shots/lab-results-390x844.png",
+  "viewport": "390x844",
+  "screen": "lab-results"
+ },
+ "12": {
+  "file": "shots/lab-bad-code-390x844.png",
+  "viewport": "390x844",
+  "screen": "lab-bad-code"
+ },
+ "13": {
+  "file": "shots/lab-link-390x844.png",
+  "viewport": "390x844",
+  "screen": "lab-link"
+ },
+ "14": {
+  "file": "shots/onboard-steer-844x390.png",
+  "viewport": "844x390",
+  "screen": "onboard-steer"
+ },
+ "15": {
+  "file": "shots/onboard-drift-844x390.png",
+  "viewport": "844x390",
+  "screen": "onboard-drift"
+ },
+ "16": {
+  "file": "shots/onboard-brake-844x390.png",
+  "viewport": "844x390",
+  "screen": "onboard-brake"
+ },
+ "17": {
+  "file": "shots/onboard-chain-844x390.png",
+  "viewport": "844x390",
+  "screen": "onboard-chain"
+ },
+ "18": {
+  "file": "shots/onboard-clean-844x390.png",
+  "viewport": "844x390",
+  "screen": "onboard-clean"
+ },
+ "19": {
+  "file": "shots/title-844x390.png",
+  "viewport": "844x390",
+  "screen": "title"
+ },
+ "20": {
+  "file": "shots/career-844x390.png",
+  "viewport": "844x390",
+  "screen": "career"
+ },
+ "21": {
+  "file": "shots/countdown-missions-844x390.png",
+  "viewport": "844x390",
+  "screen": "countdown-missions"
+ },
+ "22": {
+  "file": "shots/mission-complete-844x390.png",
+  "viewport": "844x390",
+  "screen": "mission-complete"
+ },
+ "23": {
+  "file": "shots/results-missions-844x390.png",
+  "viewport": "844x390",
+  "screen": "results-missions"
+ },
+ "24": {
+  "file": "shots/lab-844x390.png",
+  "viewport": "844x390",
+  "screen": "lab"
+ },
+ "25": {
+  "file": "shots/lab-results-844x390.png",
+  "viewport": "844x390",
+  "screen": "lab-results"
+ },
+ "26": {
+  "file": "shots/lab-bad-code-844x390.png",
+  "viewport": "844x390",
+  "screen": "lab-bad-code"
+ },
+ "27": {
+  "file": "shots/lab-link-844x390.png",
+  "viewport": "844x390",
+  "screen": "lab-link"
+ },
+ "28": {
+  "file": "shots/onboard-steer-800x450.png",
+  "viewport": "800x450",
+  "screen": "onboard-steer"
+ },
+ "29": {
+  "file": "shots/onboard-drift-800x450.png",
+  "viewport": "800x450",
+  "screen": "onboard-drift"
+ },
+ "30": {
+  "file": "shots/onboard-brake-800x450.png",
+  "viewport": "800x450",
+  "screen": "onboard-brake"
+ },
+ "31": {
+  "file": "shots/onboard-chain-800x450.png",
+  "viewport": "800x450",
+  "screen": "onboard-chain"
+ },
+ "32": {
+  "file": "shots/onboard-clean-800x450.png",
+  "viewport": "800x450",
+  "screen": "onboard-clean"
+ },
+ "33": {
+  "file": "shots/title-800x450.png",
+  "viewport": "800x450",
+  "screen": "title"
+ },
+ "34": {
+  "file": "shots/career-800x450.png",
+  "viewport": "800x450",
+  "screen": "career"
+ },
+ "35": {
+  "file": "shots/countdown-missions-800x450.png",
+  "viewport": "800x450",
+  "screen": "countdown-missions"
+ },
+ "36": {
+  "file": "shots/mission-complete-800x450.png",
+  "viewport": "800x450",
+  "screen": "mission-complete"
+ },
+ "37": {
+  "file": "shots/results-missions-800x450.png",
+  "viewport": "800x450",
+  "screen": "results-missions"
+ },
+ "38": {
+  "file": "shots/lab-800x450.png",
+  "viewport": "800x450",
+  "screen": "lab"
+ },
+ "39": {
+  "file": "shots/lab-results-800x450.png",
+  "viewport": "800x450",
+  "screen": "lab-results"
+ },
+ "40": {
+  "file": "shots/lab-bad-code-800x450.png",
+  "viewport": "800x450",
+  "screen": "lab-bad-code"
+ },
+ "41": {
+  "file": "shots/lab-link-800x450.png",
+  "viewport": "800x450",
+  "screen": "lab-link"
+ },
+ "42": {
+  "file": "shots/onboard-steer-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "onboard-steer"
+ },
+ "43": {
+  "file": "shots/onboard-drift-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "onboard-drift"
+ },
+ "44": {
+  "file": "shots/onboard-brake-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "onboard-brake"
+ },
+ "45": {
+  "file": "shots/onboard-chain-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "onboard-chain"
+ },
+ "46": {
+  "file": "shots/onboard-clean-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "onboard-clean"
+ },
+ "47": {
+  "file": "shots/title-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "title"
+ },
+ "48": {
+  "file": "shots/career-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "career"
+ },
+ "49": {
+  "file": "shots/countdown-missions-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "countdown-missions"
+ },
+ "50": {
+  "file": "shots/mission-complete-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "mission-complete"
+ },
+ "51": {
+  "file": "shots/results-missions-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "results-missions"
+ },
+ "52": {
+  "file": "shots/lab-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "lab"
+ },
+ "53": {
+  "file": "shots/lab-results-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "lab-results"
+ },
+ "54": {
+  "file": "shots/lab-bad-code-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "lab-bad-code"
+ },
+ "55": {
+  "file": "shots/lab-link-1280x720.png",
+  "viewport": "1280x720",
+  "screen": "lab-link"
+ },
+ "started": "2026-11-08T03:38:15.416Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader"
+}

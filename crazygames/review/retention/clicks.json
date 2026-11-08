@@ -1,5 +1,5 @@
 {
- "started": "2026-11-08T02:49:42.395Z",
+ "started": "2026-11-08T03:38:15.416Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader",
  "firstVisit": {
   "stateAtLoad": "countdown",
@@ -15,9 +15,7 @@
   "clicks": 1,
   "movingAtFrameAfterClick": 186
  },
- "errors": [
-  "console: Failed to load resource: the server responded with a status of 404 (Not Found)"
- ],
+ "errors": [],
  "knownAnswer": {
   "query": "title=1",
   "stateAtLoad": "title",

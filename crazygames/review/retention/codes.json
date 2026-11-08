@@ -1,12 +1,12 @@
 {
- "started": "2026-11-08T03:10:36.016Z",
+ "started": "2026-11-08T04:08:04.091Z",
  "roundTrips": {
   "n": 1000,
   "settingsAndSeedSame": 1000,
   "trackSame": 1000,
   "bad": 0,
   "fallbacks": 0,
-  "worstGenerateMs": 86,
+  "worstGenerateMs": 92,
   "seconds": 16,
   "byStyle": {
    "flowing": {
