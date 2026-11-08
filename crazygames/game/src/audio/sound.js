@@ -25,14 +25,15 @@
    while the page is hidden, and a mute switch sets the master level to
    nothing and is remembered on the device (localStorage, in try/catch).
    Wall hits play one of the author's two crash recordings by force; the
-   engine blends from the idle loop into a loop cut from his roar
-   recording as the revs rise, and the whole roar plays once at GO; a
+   engine blends from the idle loop into a loop cut from his supercar
+   revs recording as the revs rise (four steady stretches, flattened to
+   one pitch and joined), and its first rev plays once at GO; a
    grind (filtered noise) runs while the car slides along a barrier; the
    score and menu sounds are short synthesised tones; the music is the
    live game's own four tracks. Every number of taste is in SOUND. */
 
 export const SOUND = {
-  MASTER:        1.0,      // the overall level
+  MASTER:        0.4,      // the overall level of the sound effects (about 5 dB down after play on 8 November: too loud against the music)
   ENGINE:        0.42,     // the engine's level at idle
   ENGINE_REV:    0.22,     // and how much louder at the limiter
   START:         0.6,      // the starter and catch at a countdown
@@ -52,10 +53,10 @@ export const SOUND = {
   HISS_HZ:       520,
   SPEED_FULL:    18,       // m/s at which the tyres reach full voice
   FADE:          0.25,     // s to fade in or out
-  LOAD:          0.42,     // the engine under load (the roar recording's loop) at the limiter
+  LOAD:          0.42,     // the engine under load (a loop from the supercar revs recording) at the limiter
   LOAD_FROM:     [0.3, 0.75],   // share of the rev range over which the load loop takes over from the idle
-  LOAD_RATE:     [0.55, 0.85],  // the load loop's playback rate across the rev range (it was recorded high)
-  LAUNCH:        0.55,     // the whole roar, once, at GO
+  LOAD_RATE:     [0.6, 1.0],  // the load loop's playback rate across the rev range (it was recorded high)
+  LAUNCH:        0.55,     // the first rev of the supercar recording, once, at GO
   HIT:           [0.25, 0.9],   // a wall hit's level from a touch to a hard hit
   HIT_FULL:      14,       // m/s of speed lost at which a hit is at full level
   HIT_GAP:       0.18,     // s at least between two hit sounds

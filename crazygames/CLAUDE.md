@@ -318,3 +318,7 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   The music is the live game's four tracks, copied to `dist/music/` and
   streamed after the first tap, with its own switch on the title. A
   limiter sits last so nothing clips.
+  After play the same day: the load loop and the launch now come from
+  the author's supercar revs recording (four steady stretches flattened
+  to one pitch and joined), and the effects are about 5 dB quieter
+  (`SOUND.MASTER` 0.4); the music's level stayed.
