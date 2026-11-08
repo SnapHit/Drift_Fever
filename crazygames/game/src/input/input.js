@@ -93,5 +93,5 @@ export function createInput(root) {
     return record;
   }
 
-  return { read, touch, record, setStarted(v) { started = !!v; }, get started() { return started; } };
+  return { read, touch, record, setStarted(v) { started = !!v; }, get started() { return started; }, get keyUsed() { return lastKey > 0; } };
 }

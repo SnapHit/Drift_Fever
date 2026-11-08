@@ -277,4 +277,17 @@ export const LOOP = {
   GHOST_MIN_STEPS:    120,     // a run shorter than a second is not a ghost
   SAVE_VERSION:       1,
   FREE_TRACK:         'park',
+  /* FIRST-RUN ONBOARDING (briefs/RETENTION.md 1): the first visit skips
+     the title and lands in career track 1, with short prompts at the
+     moments they apply. The car is never paused to explain. */
+  ONBOARD: {
+    STEER_HOLD:       0.5,     // s of steering held before the steer prompt counts as done
+    DRIFT_LEAD:       45,      // m before the next corner the drift prompt comes up (once steering is done)
+    DRIFT_WAIT:       4,       // s after steering is done the drift prompt comes up anyway
+    BRAKE_AFTER:      1.0,     // s after a drift is done before the brake prompt
+    BRAKE_HOLD:       0.3,     // s of DRIFT / BRAKE with no steering before the brake prompt counts as done
+    PROMPT_MIN:       1.2,     // s a prompt stays at least, so it can be read even when the player is already doing it
+    PROMPT_MAX:       9,       // s a prompt the player ignores stays before the next one comes
+    INFO_SHOWN:       4.5,     // s the chain and clean explanations stay
+  },
 };

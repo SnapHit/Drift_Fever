@@ -53,6 +53,7 @@ export function createScreens(root, onAction) {
         ${fullscreenSupported() ? `<button type="button" class="fsbtn" data-action="fullscreen">${fullscreenIcon(isFullscreen())}<span>${isFullscreen() ? 'EXIT FULL SCREEN' : 'FULL SCREEN'}</span></button>` : ''}
         ${info.sound ? `<button type="button" class="fsbtn" data-action="sound">${soundIcon(info.sound === 'off')}<span>SOUND ${info.sound === 'on' ? 'ON' : 'OFF'}</span></button>` : ''}
         ${info.sound ? `<button type="button" class="fsbtn" data-action="music"><span>&#9835;</span><span>MUSIC ${info.music === 'on' ? 'ON' : 'OFF'}</span></button>` : ''}
+        <button type="button" class="fsbtn" data-action="onboard"><span>?</span><span>HOW TO PLAY</span></button>
       </div>
       <p class="hint">Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.</p>`);
   }

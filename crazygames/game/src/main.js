@@ -14,7 +14,9 @@
 
    Query: ?renderer=webgl2 forces the fallback; ?ground=park or track the
    dev drive; ?tune=1 the tuning panel; ?debug=1 the readout; ?assist=0..1
-   the hidden assist level; ?auto=1 the scripted driver drives every run. */
+   the hidden assist level; ?auto=1 the scripted driver drives every run;
+   ?title=1 shows the title even on a first visit (the probes' known
+   answer for the clicks to gameplay). */
 import { TUNE, LOOP } from './tune.js';
 import { createWorld, STEP } from './physics/world.js';
 import { createDriver } from './physics/driver.js';
@@ -28,6 +30,7 @@ import { createInput } from './input/input.js';
 import { createScoring } from './scoring/drift.js';
 import { createHud } from './ui/hud.js';
 import { createScreens } from './ui/screens.js';
+import { createOnboarding, cornerAhead } from './ui/onboard.js';
 import { createTunePanel, loadSavedTune } from './ui/tune.js';
 import { createDebug } from './ui/debug.js';
 import { createSave } from './loop/save.js';
@@ -49,6 +52,7 @@ const chase = createChaseCamera();
 const input = createInput(root);
 const hud = createHud(root);
 const screens = createScreens(root, onAction);
+const onboard = createOnboarding(root, () => { save.setOnboarded(); sound.ui('tap'); });
 const sound = createSound();
 if (query.has('assist')) TUNE.ASSIST.LEVEL = Math.max(0, Math.min(1, +query.get('assist') || 0));
 let tuned = 0;
@@ -164,7 +168,7 @@ function frame(t) {
   const world = app.world;
   const S = app.state;
   const menu = S === 'title' || S === 'career' || S === 'garage';
-  if (raw.restart && !menu) { if (S === 'dev' || S === 'free') resetRun(); else if (S === 'drive' || S === 'countdown') startRun(app.spec); }
+  if (raw.restart && !menu) { if (S === 'dev' || S === 'free') resetRun(); else if (S === 'drive' || S === 'countdown') startRun(app.spec, { onboard: onboard.active }); }
   let rec = quantise(raw);
   let steps = 0;
   if (S === 'countdown') {
@@ -218,6 +222,7 @@ function frame(t) {
     app.heardCallouts = sc.calloutCount;
   }
   hud.update(scoring, pose, scene.camera, THREE, view, dt);
+  if (onboard.active) onboard.update(dt, { driving: S === 'drive', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity });
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;
     hud.setRun(app.track.kind === 'circuit' ? 'LAP ' + Math.min(p.laps, p.lap + 1) + '/' + p.laps : Math.round(p.remaining) + ' m', app.runTime.toFixed(1));
@@ -234,6 +239,7 @@ function titleInfo() {
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
+  if (onboard.active) onboard.stop(false);
   hud.setVisible(false); hud.setCount('', false); input.touch.setVisible(false);
   if (name === 'title') screens.title(save.state, titleInfo());
   else if (name === 'career') screens.career(save.state);
@@ -258,7 +264,15 @@ function ghostFor(key, track) {
   return rec && rec.gen === (track.version || 1) && rec.rev === carRev(rec.car) ? rec : null;
 }
 
-function startRun(spec) {
+/* Which controls the prompts should draw: the source that moved last,
+   or, before anything has, the touch pad if it is showing. */
+function inputSource() {
+  const src = input.record.source;
+  if (src === 'keys' && !input.keyUsed && input.touch.el.classList.contains('on')) return 'touch';
+  return src;
+}
+
+function startRun(spec, opts) {
   app.spec = spec; app.key = spec.key;
   app.track = trackFor(spec);
   const carId = save.state.car, paint = save.state.cars[carId].paint;
@@ -278,6 +292,7 @@ function startRun(spec) {
   resetRun();
   hud.setRun(app.track.kind === 'circuit' ? 'LAP 1/' + app.laps : Math.round(app.progress.total()) + ' m', '0.0');
   hud.setCount(String(Math.ceil(LOOP.COUNTDOWN)), false);
+  if (opts && opts.onboard) onboard.start(inputSource()); else if (onboard.active) onboard.stop(false);
 }
 
 function finishRun() {
@@ -300,6 +315,8 @@ function finishRun() {
   }
   app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash() };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
+  if (onboard.active) onboard.stop(false);
+  save.setOnboarded();
   for (let i = 0; i < stars; i++) sound.ui('star', i + 1, 0.35 + i * 0.28);
   sound.ui('coin', 0, 0.45 + stars * 0.28);
   hud.setCount('', false); hud.setVisible(false); input.touch.setVisible(false);
@@ -307,6 +324,7 @@ function finishRun() {
 }
 
 function startFree() {
+  if (onboard.active) onboard.stop(false);
   app.spec = { mode: 'free', key: 'free', name: 'Free drift' };
   app.track = freeGround();
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
@@ -328,6 +346,7 @@ function onAction(action, arg) {
     case 'garage': app.picked = null; showMenu('garage'); break;
     case 'free': startFree(); break;
     case 'daily': startRun(dailySpec()); break;
+    case 'onboard': startRun(careerSpec(0), { onboard: true }); break;
     case 'play-career': { const i = +arg; if (careerUnlocked(save.state, i)) startRun(careerSpec(i)); break; }
     case 'again': if (app.spec && app.spec.mode !== 'free') startRun(app.spec); break;
     case 'pick-car': app.picked = arg; previewCar(); screens.garage(save.state, app.picked); break;
@@ -373,6 +392,11 @@ scene.ready.then(() => {
     hud.setVisible(true); hud.setRun(devGround === 'park' ? 'car park' : 'test track', ''); input.touch.setVisible(true); hud.exit.hidden = true;
     resetRun();
     if (autoDrive) app.driver = createDriver(app.track, { drift: app.track.kind === 'circuit' ? 'sweeper' : null });
+  } else if (save.needsOnboarding() && query.get('title') !== '1') {
+    /* the first visit: no title, no click, straight into career track 1
+       with the prompts (RETENTION.md 1; CrazyGames asks for gameplay at
+       once). The title comes after that run's results. */
+    startRun(careerSpec(0), { onboard: true });
   } else {
     menuGround();
     showMenu('title');
@@ -411,7 +435,7 @@ window.__feel = {
   onScreen(margin) { scene.camera.updateMatrixWorld(); return carOnScreen(THREE, scene.camera, pose, box, margin || 0); },
 };
 window.__loop = {
-  app, save, LOOP, screens, sound, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
+  app, save, LOOP, screens, sound, onboard, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor,
   progress: () => app.progress && app.progress.state,
   results: () => app.results,

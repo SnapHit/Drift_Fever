@@ -1,0 +1,179 @@
+{
+ "started": "2026-11-08T02:49:42.395Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader",
+ "sequence": {
+  "shown": [
+   "steer",
+   "clean",
+   "chain",
+   "drift",
+   "brake"
+  ],
+  "done": {
+   "steer": true,
+   "drift": true,
+   "brake": true
+  },
+  "timeline": [
+   {
+    "t": 0,
+    "s": "countdown",
+    "step": null,
+    "vis": false,
+    "txt": "",
+    "info": "",
+    "v": 0,
+    "active": true
+   },
+   {
+    "t": 2.93,
+    "s": "drive",
+    "step": "steer",
+    "vis": true,
+    "txt": "Steer◀▶orAD",
+    "info": "",
+    "v": 0.2,
+    "active": true
+   },
+   {
+    "t": 10.15,
+    "s": "drive",
+    "step": "steer",
+    "vis": true,
+    "txt": "Steer◀▶orAD",
+    "info": "Clean sector. A sector with no wall hits pays a clean bonus.",
+    "v": 19.5,
+    "active": true
+   },
+   {
+    "t": 11.05,
+    "s": "drive",
+    "step": "steer",
+    "vis": true,
+    "txt": "Steer◀▶orAD",
+    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "v": 25.5,
+    "active": true
+   },
+   {
+    "t": 11.95,
+    "s": "drive",
+    "step": null,
+    "vis": true,
+    "txt": "",
+    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "v": 21,
+    "active": true
+   },
+   {
+    "t": 11.97,
+    "s": "drive",
+    "step": "drift",
+    "vis": true,
+    "txt": "Hold SPACE while steering to slideSPACE+◀▶",
+    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "v": 21,
+    "active": true
+   },
+   {
+    "t": 13.18,
+    "s": "drive",
+    "step": null,
+    "vis": true,
+    "txt": "",
+    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "v": 22.6,
+    "active": true
+   },
+   {
+    "t": 14.2,
+    "s": "drive",
+    "step": "brake",
+    "vis": true,
+    "txt": "SPACE on its own brakesSPACE",
+    "info": "+16 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier.",
+    "v": 23.3,
+    "active": true
+   },
+   {
+    "t": 15.57,
+    "s": "drive",
+    "step": "brake",
+    "vis": true,
+    "txt": "SPACE on its own brakesSPACE",
+    "info": "",
+    "v": 21.5,
+    "active": true
+   },
+   {
+    "t": 23.2,
+    "s": "drive",
+    "step": null,
+    "vis": false,
+    "txt": "",
+    "info": "",
+    "v": 22.1,
+    "active": true
+   }
+  ],
+  "carStoppedWhilePrompting": 0,
+  "errors": []
+ },
+ "skip": {
+  "before": {
+   "active": true,
+   "visible": true,
+   "step": "steer",
+   "shown": [
+    "steer"
+   ],
+   "done": {
+    "steer": false,
+    "drift": false,
+    "brake": false
+   },
+   "skipped": false,
+   "skipShown": true
+  },
+  "after": {
+   "active": false,
+   "visible": false,
+   "step": null,
+   "shown": [
+    "steer"
+   ],
+   "done": {
+    "steer": false,
+    "drift": false,
+    "brake": false
+   },
+   "skipped": true,
+   "skipShown": false
+  },
+  "speedBefore": 20.989923004544355,
+  "speedAfter": 19.07125404551163,
+  "stateAfterSkip": "drive",
+  "savedOnboarded": true,
+  "clicks": 1
+ },
+ "nextVisit": {
+  "state": "title",
+  "active": false,
+  "promptsSeenInDaily": 0
+ },
+ "knownAnswer": {
+  "state": "countdown",
+  "active": true,
+  "needs": true,
+  "caught": true
+ },
+ "errors": [],
+ "touch": {
+  "cls": "prompt at-left",
+  "text": "Steer with the left and right buttons▼",
+  "hasArrow": true,
+  "promptBottom": 706.609375,
+  "padTop": 728.609375,
+  "source": "touch"
+ }
+}

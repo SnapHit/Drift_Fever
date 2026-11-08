@@ -16,9 +16,15 @@ export const KEY = 'driftfever.cg.save.v' + LOOP.SAVE_VERSION;
 
 export function defaults() {
   /* starPay: the one-off back pay of the new star bonus for stars won
-     before it existed (8 November 2026) has been made, or was never owed */
-  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true };
+     before it existed (8 November 2026) has been made, or was never owed.
+     onboarded: the first-run onboarding has been seen or skipped (added
+     8 November 2026; a save from before it has finished runs, which also
+     counts, see needsOnboarding). */
+  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false };
 }
+
+/* Has this save ever finished a run: a career result or a daily result. */
+export function finishedRuns(state) { return Object.keys(state.career).length > 0 || typeof state.daily.date === 'string'; }
 
 const isNum = v => typeof v === 'number' && isFinite(v);
 const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -71,6 +77,7 @@ export function repair(raw) {
     for (const k of Object.keys(raw.ghosts)) { const g = validGhost(raw.ghosts[k]); if (g) s.ghosts[k] = g; else fix(); }
   } else if (raw.ghosts !== undefined) fix();
   s.starPay = raw.starPay === true;   // a save from before the back pay has not had it
+  s.onboarded = raw.onboarded === true;   // missing on a save from before onboarding: not a fix, see finishedRuns
   return { state: s, fixes };
 }
 
@@ -138,6 +145,9 @@ export function createSave(opts) {
       write();
       return improved;
     },
+    /* the first visit: no run ever finished and the onboarding not yet seen or skipped */
+    needsOnboarding() { return !state.onboarded && !finishedRuns(state); },
+    setOnboarded() { if (!state.onboarded) { state.onboarded = true; write(); } },
     ghost(key) { return state.ghosts[key] || null; },
     setGhost(key, record) {
       const g = validGhost(record);

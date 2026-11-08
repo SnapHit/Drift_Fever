@@ -62,6 +62,32 @@
   .hidden { display: none !important; }
   #hud.hidden { display: none; }
 
+  /* first-run onboarding: a prompt where it applies, an explanation, SKIP */
+  #onboard { position: absolute; inset: 0; pointer-events: none; }
+  #onboard[hidden] { display: none; }
+  #onboard .prompt { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 14px; background: rgba(10,14,30,0.78); border: 2px solid var(--cyan); color: #fff; text-align: center; max-width: min(86vw, 420px); box-shadow: 0 4px 18px rgba(0,0,0,0.45); animation: promptIn 0.3s ease-out; }
+  #onboard .prompt[hidden], #onboard .info[hidden] { display: none; }
+  #onboard .prompt b { font-size: clamp(15px, 2.4vw, 20px); font-weight: 800; letter-spacing: 0.02em; }
+  #onboard .prompt.centre { left: 50%; bottom: 9%; transform: translateX(-50%); }
+  #onboard .prompt.at-left { left: max(12px, env(safe-area-inset-left)); bottom: calc(max(14px, env(safe-area-inset-bottom)) + min(22vw, 120px) + 22px); }
+  #onboard .prompt.at-right { right: max(12px, env(safe-area-inset-right)); bottom: calc(max(14px, env(safe-area-inset-bottom)) + min(22vw, 120px) + 22px); }
+  @media (orientation: portrait) { #onboard .prompt.at-left, #onboard .prompt.at-right { bottom: calc(max(14px, env(safe-area-inset-bottom)) + min(26vw, 130px) + 22px); } }
+  #onboard .arrow { position: absolute; bottom: -26px; font-size: 22px; color: var(--cyan); text-shadow: 0 2px 6px rgba(0,0,0,0.7); animation: nudge 0.8s ease-in-out infinite alternate; }
+  #onboard .prompt.at-left .arrow { left: min(11vw, 60px); transform: translateX(-50%); }
+  #onboard .prompt.at-right .arrow { right: min(18vw, 90px); transform: translateX(50%); }
+  @keyframes nudge { from { margin-bottom: 0; } to { margin-bottom: -6px; } }
+  @keyframes promptIn { from { opacity: 0; transform: translate(var(--tx, 0), calc(var(--ty, 0) + 10px)); } }
+  #onboard .prompt.centre { --tx: -50%; }
+  #onboard .keys { display: flex; align-items: center; gap: 6px; }
+  #onboard .keys i { font-style: normal; opacity: 0.7; font-size: 13px; margin: 0 2px; }
+  #onboard kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; padding: 0 8px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.7); border-bottom-width: 4px; background: rgba(255,255,255,0.12); font: inherit; font-weight: 800; font-size: 15px; color: #fff; }
+  #onboard kbd.wide { min-width: 96px; }
+  #onboard kbd.round { border-radius: 17px; }
+  #onboard .info { position: absolute; left: 50%; top: 33%; transform: translateX(-50%); width: min(86vw, 460px); padding: 10px 16px; border-radius: 14px; background: rgba(10,14,30,0.78); border: 2px solid var(--edge); color: #fff; text-align: center; font-size: clamp(13px, 2vw, 16px); line-height: 1.35; box-shadow: 0 4px 18px rgba(0,0,0,0.45); animation: promptIn 0.3s ease-out; --tx: -50%; }
+  #onboard .info b { color: var(--edge); }
+  #skip { position: absolute; right: max(12px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 80px); min-width: 72px; height: 40px; padding: 0 16px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.4); background: rgba(10,14,30,0.6); color: #fff; font: inherit; font-weight: 800; font-size: 13px; letter-spacing: 0.1em; pointer-events: auto; }
+  #skip[hidden] { display: none; }
+
   /* the screens */
   #screens { position: absolute; inset: 0; display: none; overflow: auto; -webkit-overflow-scrolling: touch; background: linear-gradient(180deg, rgba(14,16,30,0.72), rgba(14,16,30,0.86)); }
   #screens.on { display: block; }

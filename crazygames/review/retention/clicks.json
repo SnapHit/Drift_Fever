@@ -1,0 +1,29 @@
+{
+ "started": "2026-11-08T02:49:42.395Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader",
+ "firstVisit": {
+  "stateAtLoad": "countdown",
+  "clicks": 0,
+  "movingAtFrame": 180,
+  "movingAtSeconds": 3,
+  "track": "career:0"
+ },
+ "returningVisit": {
+  "firstRunFinished": true,
+  "stateAtLoad": "title",
+  "movedWithNoClick": false,
+  "clicks": 1,
+  "movingAtFrameAfterClick": 186
+ },
+ "errors": [
+  "console: Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "knownAnswer": {
+  "query": "title=1",
+  "stateAtLoad": "title",
+  "movedWithNoClick": false,
+  "clicks": 1,
+  "movedAfterClick": true,
+  "caught": true
+ }
+}
