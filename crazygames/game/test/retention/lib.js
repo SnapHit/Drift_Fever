@@ -114,3 +114,38 @@ export const CLIPPER_SRC = `
   } };
 `;
 export const installClipper = (page, opts) => page.evaluate(([src, opts]) => { window.__loop.app.driver = new Function('opts', src)(opts); }, [CLIPPER_SRC, opts || null]);
+
+/* THE LAB'S LAYOUT. Every control on the Lab screen must be reachable
+   and never under the NEW LAYOUT / DRIVE bar at any scroll position.
+   Runs in the page: for every control, scroll it into view and ask
+   document.elementFromPoint at its centre for the control itself; then
+   step every scroll box through its range and look for any control
+   whose box meets the bar's; then at the scroll end check the last
+   control clears the bar. Also: is the code row (the code and COPY) on
+   screen before any scrolling. */
+export const LAB_LAYOUT_SRC = `
+  const screen = document.querySelector('.screen.lab');
+  const bar = document.querySelector('.screen.lab .row2');
+  const controls = [...screen.querySelectorAll('[data-action], input')].filter(el => el.tagName !== 'FORM' && !bar.contains(el));
+  const scrollers = [...screen.querySelectorAll('*'), document.getElementById('screens')].filter(el => el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY));
+  const rect = el => { const r = el.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, w: r.width, h: r.height }; };
+  const meets = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  /* the part of a control that can be seen: its box cut to every scroll box it is inside (a control scrolled out of its box is clipped, not under the bar) */
+  const seen = el => { let r = rect(el); for (let a = el.parentElement; a; a = a.parentElement) { if (!scrollers.includes(a)) continue; const c = rect(a); r = { left: Math.max(r.left, c.left), top: Math.max(r.top, c.top), right: Math.min(r.right, c.right), bottom: Math.min(r.bottom, c.bottom) }; } return r.right > r.left && r.bottom > r.top ? r : null; };
+  for (const s of scrollers) s.scrollTop = 0;
+  const vis = el => { const r = rect(el); const hit = document.elementFromPoint(r.left + r.w / 2, r.top + r.h / 2); return !!hit && (hit === el || el.contains(hit)); };
+  const codeVisible = vis(screen.querySelector('.code')) && vis(screen.querySelector('[data-action="lab-copy"]'));
+  const reach = controls.map(el => { el.scrollIntoView({ block: 'nearest', inline: 'nearest' }); const ok = vis(el); return { what: el.dataset.action || el.id || el.tagName, arg: el.dataset.arg || '', ok }; });
+  const barRect = rect(bar);
+  let underBar = 0;
+  const positions = [];
+  for (const s of scrollers) { for (let y = 0; y <= s.scrollHeight - s.clientHeight + 1; y += 24) { s.scrollTop = y; positions.push(y); for (const el of controls) { const v = seen(el); if (v && meets(v, rect(bar))) underBar++; } } s.scrollTop = s.scrollHeight; }
+  if (!scrollers.length) for (const el of controls) if (meets(rect(el), rect(bar))) underBar++;
+  const lowest = Math.max(...controls.map(el => { const v = seen(el); return v ? v.bottom : -Infinity; }));
+  const clearsBar = lowest <= rect(bar).top + 0.5;
+  for (const s of scrollers) s.scrollTop = 0;
+  return { controls: controls.length, scrollers: scrollers.length, positionsTried: positions.length, codeVisible, unreachable: reach.filter(r => !r.ok), underBar, clearsBar, lowestControlBottom: +lowest.toFixed(1), barTop: +barRect.top.toFixed(1), ok: codeVisible && reach.every(r => r.ok) && underBar === 0 && clearsBar };
+`;
+export const labLayout = page => page.evaluate(new Function(LAB_LAYOUT_SRC));
+/* the layout before 9 November 2026: a sticky bar inside the scrolling screen, which covered the controls under it */
+export const OLD_LAB_CSS = `.screen.lab { height: auto !important; overflow: visible !important; } .labgrid { overflow: visible !important; flex: none !important; display: grid !important; grid-template-rows: none !important; } .labctl { overflow: visible !important; height: auto !important; } .planbox { height: auto !important; aspect-ratio: 1.25 / 1 !important; max-height: 34vh !important; } .lab .row2 { position: sticky !important; bottom: 0 !important; z-index: 1 !important; padding: 8px 0 4px !important; background: rgba(14,16,30,0.92) !important; }`;

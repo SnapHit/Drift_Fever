@@ -1,6 +1,144 @@
 {
- "started": "2026-11-08T03:38:15.416Z",
+ "started": "2026-11-08T06:51:33.999Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader",
+ "layout": [
+  {
+   "viewport": "390x844",
+   "header": {
+    "coins": [
+     282,
+     374
+    ],
+    "tally": [
+     176,
+     262
+    ],
+    "text": "● 12,345",
+    "overlap": false
+   },
+   "layout": {
+    "controls": 25,
+    "scrollers": 1,
+    "positionsTried": 5,
+    "codeVisible": true,
+    "unreachable": [],
+    "underBar": 0,
+    "clearsBar": true,
+    "lowestControlBottom": 731.2,
+    "barTop": 751,
+    "ok": true
+   },
+   "oldLayout": {
+    "ok": false,
+    "codeVisible": true,
+    "unreachable": 6,
+    "underBar": 18,
+    "clearsBar": true
+   }
+  },
+  {
+   "viewport": "844x390",
+   "header": {
+    "coins": [
+     736,
+     828
+    ],
+    "tally": [
+     458,
+     574
+    ],
+    "text": "● 12,345",
+    "overlap": false
+   },
+   "layout": {
+    "controls": 25,
+    "scrollers": 1,
+    "positionsTried": 9,
+    "codeVisible": true,
+    "unreachable": [],
+    "underBar": 0,
+    "clearsBar": true,
+    "lowestControlBottom": 292,
+    "barTop": 312,
+    "ok": true
+   },
+   "oldLayout": {
+    "ok": false,
+    "codeVisible": true,
+    "unreachable": 11,
+    "underBar": 47,
+    "clearsBar": true
+   }
+  },
+  {
+   "viewport": "800x450",
+   "header": {
+    "coins": [
+     692,
+     784
+    ],
+    "tally": [
+     436,
+     552
+    ],
+    "text": "● 12,345",
+    "overlap": false
+   },
+   "layout": {
+    "controls": 25,
+    "scrollers": 1,
+    "positionsTried": 7,
+    "codeVisible": true,
+    "unreachable": [],
+    "underBar": 0,
+    "clearsBar": true,
+    "lowestControlBottom": 352,
+    "barTop": 372,
+    "ok": true
+   },
+   "oldLayout": {
+    "ok": false,
+    "codeVisible": true,
+    "unreachable": 6,
+    "underBar": 27,
+    "clearsBar": true
+   }
+  },
+  {
+   "viewport": "1280x720",
+   "header": {
+    "coins": [
+     1172,
+     1264
+    ],
+    "tally": [
+     676,
+     792
+    ],
+    "text": "● 12,345",
+    "overlap": false
+   },
+   "layout": {
+    "controls": 25,
+    "scrollers": 0,
+    "positionsTried": 0,
+    "codeVisible": true,
+    "unreachable": [],
+    "underBar": 0,
+    "clearsBar": true,
+    "lowestControlBottom": 549,
+    "barTop": 642,
+    "ok": true
+   },
+   "oldLayout": {
+    "ok": true,
+    "codeVisible": true,
+    "unreachable": 0,
+    "underBar": 0,
+    "clearsBar": true
+   }
+  }
+ ],
  "settings": {
   "opened": {
    "state": "lab",
@@ -14,15 +152,15 @@
      "theme": "forest",
      "time": "dusk"
     },
-    "seed": 14030539,
-    "code": "H5V2PPE0ZJMD",
+    "seed": 15689983,
+    "code": "HZ3DFQE00TTS",
     "message": "",
     "error": false,
     "track": {
-     "name": "circuit 14030539",
-     "length": 804,
+     "name": "circuit 15689983",
+     "length": 750,
      "kind": "circuit",
-     "corners": 5,
+     "corners": 8,
      "bridges": 0,
      "fallback": false,
      "theme": "forest",
@@ -36,12 +174,12 @@
     "click": "kind=sprint",
     "got": "sprint",
     "want": "sprint",
-    "code": "H5V2PYE0DPXW",
+    "code": "HZ3DFZE0FP19",
     "track": {
-     "name": "sprint 14030539",
-     "length": 994,
+     "name": "sprint 15689983",
+     "length": 1046,
      "kind": "sprint",
-     "corners": 10,
+     "corners": 12,
      "bridges": 0,
      "fallback": false,
      "theme": "forest",
@@ -56,10 +194,10 @@
     "click": "length=long",
     "got": "long",
     "want": "long",
-    "code": "H5V2PEF0YMTR",
+    "code": "HZ3DFFF089P7",
     "track": {
-     "name": "sprint 14030539",
-     "length": 1372,
+     "name": "sprint 15689983",
+     "length": 1380,
      "kind": "sprint",
      "corners": 15,
      "bridges": 0,
@@ -76,12 +214,12 @@
     "click": "style=technical",
     "got": "technical",
     "want": "technical",
-    "code": "H5V2PEB0X7VR",
+    "code": "HZ3DFFB0QZP7",
     "track": {
-     "name": "sprint 14030539",
-     "length": 1308,
+     "name": "sprint 15689983",
+     "length": 1426,
      "kind": "sprint",
-     "corners": 18,
+     "corners": 17,
      "bridges": 0,
      "fallback": false,
      "theme": "forest",
@@ -96,12 +234,12 @@
     "click": "bank=off",
     "got": false,
     "want": false,
-    "code": "H5V2PE30VSTR",
+    "code": "HZ3DFF30DNQ7",
     "track": {
-     "name": "sprint 14030539",
-     "length": 1308,
+     "name": "sprint 15689983",
+     "length": 1426,
      "kind": "sprint",
-     "corners": 18,
+     "corners": 17,
      "bridges": 0,
      "fallback": false,
      "theme": "forest",
@@ -116,12 +254,12 @@
     "click": "theme=desert",
     "got": "desert",
     "want": "desert",
-    "code": "H5V2PE32BFGR",
+    "code": "HZ3DFF32XMW7",
     "track": {
-     "name": "sprint 14030539",
-     "length": 1308,
+     "name": "sprint 15689983",
+     "length": 1426,
      "kind": "sprint",
-     "corners": 18,
+     "corners": 17,
      "bridges": 0,
      "fallback": false,
      "theme": "desert",
@@ -136,12 +274,12 @@
     "click": "time=night",
     "got": "night",
     "want": "night",
-    "code": "H5V2PE3ABHVQ",
+    "code": "HZ3DFF3AXJM8",
     "track": {
-     "name": "sprint 14030539",
-     "length": 1308,
+     "name": "sprint 15689983",
+     "length": 1426,
      "kind": "sprint",
-     "corners": 18,
+     "corners": 17,
      "bridges": 0,
      "fallback": false,
      "theme": "desert",
@@ -156,12 +294,12 @@
     "click": "kind=circuit",
     "got": "circuit",
     "want": "circuit",
-    "code": "H5V2P63AX4CA",
+    "code": "HZ3DF73A81FQ",
     "track": {
-     "name": "circuit 14030539",
-     "length": 1096,
+     "name": "circuit 15689983",
+     "length": 956,
      "kind": "circuit",
-     "corners": 15,
+     "corners": 10,
      "bridges": 0,
      "fallback": false,
      "theme": "desert",
@@ -176,12 +314,12 @@
     "click": "cross=on",
     "got": true,
     "want": true,
-    "code": "H5V2P6KA9MKA",
+    "code": "HZ3DF7KAMHDQ",
     "track": {
-     "name": "circuit 14030539",
-     "length": 1020,
+     "name": "circuit 15689983",
+     "length": 920,
      "kind": "circuit",
-     "corners": 10,
+     "corners": 6,
      "bridges": 1,
      "fallback": false,
      "theme": "desert",
@@ -199,29 +337,29 @@
  "run": {
   "started": {
    "state": "countdown",
-   "key": "lab:H5V2P6KA9MKA",
+   "key": "lab:HZ3DF7KAMHDQ",
    "missions": null
   },
   "finished": true,
-  "score": 1184,
-  "stars": 1,
-  "coins": 74,
-  "expectedCoins": 74,
-  "code": "H5V2P6KA9MKA",
+  "score": 1817,
+  "stars": 2,
+  "coins": 120,
+  "expectedCoins": 120,
+  "code": "HZ3DF7KAMHDQ",
   "shown": {
-   "code": "H5V2-P6KA-9MKA",
+   "code": "HZ3D-F7KA-MHDQ",
    "lab": true,
    "next": false
   },
   "copied": "code copied",
   "saved": {
-   "best": 1184,
-   "stars": 1,
-   "when": 1794109176043
+   "best": 1817,
+   "stars": 2,
+   "when": 1794120720561
   },
   "ghostKept": true,
   "ghostKeys": [
-   "lab:H5V2P6KA9MKA"
+   "lab:HZ3DF7KAMHDQ"
   ]
  },
  "again": {

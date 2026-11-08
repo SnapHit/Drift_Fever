@@ -24,7 +24,15 @@
       same tape with the handbrake taken out changes the outcome. Known
       answer: every target a hundred times larger, and the drifter
       completes none.
-   4. Lab (the browser half): the Lab from the title, every setting by
+   4. Lab (the browser half): at all four sizes, every Lab control is
+      reachable (scrolled into view, document.elementFromPoint at its
+      centre is the control) and never under the NEW LAYOUT / DRIVE bar
+      at any scroll position, the scroll end clears the bar, and the
+      code and COPY are on screen without scrolling; the coin badge and
+      the career header's tally never overlap with a five digit count
+      (known answer for the first: the layout before 9 November, a
+      sticky bar inside the scrolling screen, fails at three sizes).
+      Then the Lab from the title, every setting by
       real clicks with the backdrop following the theme and the time of
       day, a run to results with the code shown, the best and the ghost
       kept per code, coins at the Lab's rate, a code typed, a ?track=
@@ -239,7 +247,23 @@ if (run('missions')) {
 /* ---- 4. the Lab in the browser ---- */
 if (run('lab')) {
   console.log('\n== 4. the Track Lab');
-  out.lab = {};
+  out.lab = { layout: [] };
+  // the layout at four sizes, and the coin badge against the career header
+  for (const [vname, vp, touch] of [['390x844', R.PORTRAIT, true], ['844x390', R.PHONE_LANDSCAPE, true], ['800x450', R.SMALL, false], ['1280x720', R.LANDSCAPE, false]]) {
+    const pg = await R.openPage(env, vp, { firstVisit: true, touch, query: 'auto=1&title=1' });
+    await pg.page.evaluate(() => { window.__loop.save.addCoins(12345); window.__loop.save.careerResult(0, 3, 900); window.__loop.save.missionResult('career:0', [true, true, true]); window.__loop.action('career'); });
+    const header = await pg.page.evaluate(() => { const r = e => e.getBoundingClientRect(); const a = r(document.querySelector('.coins')), b = r(document.querySelector('header .tally')); return { coins: [Math.round(a.left), Math.round(a.right)], tally: [Math.round(b.left), Math.round(b.right)], text: document.querySelector('.coins').textContent.trim(), overlap: a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top }; });
+    await pg.page.evaluate(() => { window.__loop.action('lab'); });
+    const lay = await R.labLayout(pg.page);
+    await pg.page.evaluate(css => { document.head.insertAdjacentHTML('beforeend', '<style id="old">' + css + '</style>'); }, R.OLD_LAB_CSS);
+    const old = await R.labLayout(pg.page);
+    out.lab.layout.push({ viewport: vname, header, layout: lay, oldLayout: { ok: old.ok, codeVisible: old.codeVisible, unreachable: old.unreachable.length, underBar: old.underBar, clearsBar: old.clearsBar } });
+    verdict(vname + ': every Lab control reachable, none under the bar at ' + lay.positionsTried + ' scroll positions, the scroll end clears the bar, the code and COPY on screen unscrolled', lay.ok, lay.controls + ' controls, ' + lay.scrollers + ' scroll box' + (lay.scrollers === 1 ? '' : 'es') + ', unreachable ' + lay.unreachable.map(u => u.what).join(',') + ', under the bar ' + lay.underBar);
+    verdict(vname + ': the coin badge (' + header.text + ') and the career tally do not overlap', !header.overlap, 'badge ' + header.coins.join('-') + ', tally ' + header.tally.join('-'));
+    await pg.close();
+  }
+  const oldFails = out.lab.layout.filter(l => !l.oldLayout.ok).map(l => l.viewport);
+  verdict('known answer: the sticky bar layout fails the same check at the three smaller sizes', ['390x844', '844x390', '800x450'].every(v => oldFails.includes(v)), 'fails at ' + oldFails.join(', '));
   const side = await R.openPage(env, R.SMALL, { firstVisit: true, query: 'auto=1&title=1' });
   await side.page.evaluate(() => { window.__feel.draw = false; });
   await side.page.click('button[data-action="lab"]');

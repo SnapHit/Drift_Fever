@@ -76,7 +76,7 @@ export function createScreens(root, onAction) {
       </button>`;
     }).join('');
     const tally = missionTally(save, CAREER.length);
-    show('career', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>CAREER</h2><span class="tally">${careerStars(save)} &#9733; &middot; ${tally} of ${CAREER.length * 3} missions</span></header><div class="list">${rows}</div>`);
+    show('career', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>CAREER</h2><span class="tally">${careerStars(save)} &#9733; &middot; ${tally}/${CAREER.length * 3} missions</span></header><div class="list">${rows}</div>`);
   }
 
   /* the upgrades of an owned car: a row per stat, its steps as pips and
@@ -113,7 +113,7 @@ export function createScreens(root, onAction) {
   /* THE TRACK LAB. L: { settings, seed, code, track, best, ghost, message,
      error, link }. The plan canvas is drawn by the host after show(),
      because it needs to be in the DOM to have a size. */
-  const LABELS = { kind: { circuit: 'CIRCUIT', sprint: 'SPRINT' }, length: { short: 'SHORT', medium: 'MEDIUM', long: 'LONG' }, style: { flowing: 'FLOWING', technical: 'TECHNICAL', hairpins: 'HAIRPINS', mixed: 'MIXED' }, theme: { forest: 'FOREST', coastal: 'COAST', desert: 'DESERT', docks: 'DOCKS', mountain: 'MOUNTAIN' }, time: { dusk: 'DUSK', night: 'NIGHT', dawn: 'DAWN', rain: 'RAIN' } };
+  const LABELS = { kind: { circuit: 'CIRCUIT', sprint: 'SPRINT' }, length: { short: 'SHORT', medium: 'MEDIUM', long: 'LONG' }, style: { flowing: 'FLOWING', technical: 'TECHNICAL', hairpins: 'HAIRPINS', mixed: 'MIXED' }, theme: { forest: 'FOREST', coastal: 'COAST', desert: 'DESERT', docks: 'DOCKS', mountain: 'ALPINE' }, time: { dusk: 'DUSK', night: 'NIGHT', dawn: 'DAWN', rain: 'RAIN' } };
   function seg(name, s, title) {
     const field = FIELDS.find(f => f[0] === name);
     return `<div class="segrow"><small>${title}</small><div class="seg">${field[2].map(v => `<button type="button" class="${s[name] === v ? 'on' : ''}" data-action="lab-set" data-arg="${name}=${v}">${LABELS[name][v]}</button>`).join('')}</div></div>`;
@@ -128,20 +128,20 @@ export function createScreens(root, onAction) {
       <div class="labgrid">
         <div class="planbox"><canvas id="plan"></canvas><div class="planinfo">${facts}</div></div>
         <div class="labctl">
+          <div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(L.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>
+          ${L.message ? `<p class="status${L.error ? ' bad' : ''}">${esc(L.message)}</p>` : ''}
           ${seg('kind', s, 'track')}
           ${seg('length', s, 'length')}
           ${seg('style', s, 'style')}
           <div class="togs">${toggle('bank', s, 'BANKED CORNERS')}${toggle('cross', s, 'CROSSOVER', crossoverOffered(s))}</div>
           ${seg('theme', s, 'scenery')}
           ${seg('time', s, 'time of day')}
-          <div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(L.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>
-          ${L.message ? `<p class="status${L.error ? ' bad' : ''}">${esc(L.message)}</p>` : ''}
-          <div class="row2">
-            <button type="button" class="big" data-action="lab-new"><b>NEW LAYOUT</b><small>same settings, another seed</small></button>
-            <button type="button" class="big primary" data-action="lab-drive"><b>DRIVE</b><small>${L.best ? 'best ' + fmt(L.best.best) + (L.ghost ? ' &middot; ghost' : '') : t && t.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint'}</small></button>
-          </div>
           <form class="coderow entry" data-action="lab-code"><input id="codeIn" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="have a code? type it here" maxlength="16" aria-label="track code"><button type="submit" class="mini" data-action="lab-code">GO</button></form>
         </div>
+      </div>
+      <div class="row2">
+        <button type="button" class="big" data-action="lab-new"><b>NEW LAYOUT</b><small>same settings, another seed</small></button>
+        <button type="button" class="big primary" data-action="lab-drive"><b>DRIVE</b><small>${L.best ? 'best ' + fmt(L.best.best) + (L.ghost ? ' &middot; ghost' : '') : t && t.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint'}</small></button>
       </div>`);
   }
 
