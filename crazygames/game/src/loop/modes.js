@@ -19,7 +19,8 @@ import { dailySeed, localDate } from '../ground/source.js';
    measurement (game/test/chapters/seeds.js, review/chapters/seeds.json):
    each is the first candidate for its slot that both scripted drivers
    finish with no respawn, that the careful driver drives clean to a star,
-   and that generates in under 600 ms. */
+   that generates in under 600 ms, that nothing occludes (the readability
+   rule, in every theme) and that has its chapter's least banked corners. */
 export const CAREER = [
   /* Rookie */
   { name: 'First slide',   kind: 'circuit', seed: 1101, difficulty: 0.10, length: 560 },
@@ -33,7 +34,7 @@ export const CAREER = [
   /* Pro */
   { name: 'Upper deck',    kind: 'circuit', seed: 2105, difficulty: 0.50, length: [770, 840],  style: 'flowing',   crossover: 'always' },
   { name: 'Quarry cut',    kind: 'sprint',  seed: 2213, difficulty: 0.55, length: 1100, style: 'technical' },
-  { name: 'Pin drop',      kind: 'circuit', seed: 2305, difficulty: 0.60, length: 720,  style: 'hairpins' },
+  { name: 'Pin drop',      kind: 'circuit', seed: 2314, difficulty: 0.60, length: 720,  style: 'hairpins' },
   { name: 'Breakwater',    kind: 'sprint',  seed: 2406, difficulty: 0.65, length: 1150 },
   { name: 'Tangle',        kind: 'circuit', seed: 2510, difficulty: 0.70, length: [770, 860],  style: 'technical', crossover: 'always' },
   { name: 'Switchbacks',   kind: 'sprint',  seed: 2606, difficulty: 0.75, length: 1200, style: 'hairpins' },
@@ -45,7 +46,7 @@ export const CAREER = [
   { name: 'High wire',     kind: 'circuit', seed: 3303, difficulty: 0.80, length: [780, 880],  style: 'hairpins',  crossover: 'always' },
   { name: 'Needle run',    kind: 'sprint',  seed: 3404, difficulty: 0.85, length: 1300, style: 'technical' },
   { name: 'Endless eight', kind: 'circuit', seed: 3505, difficulty: 0.85, length: [780, 880],  crossover: 'always' },
-  { name: 'Thousand turns', kind: 'sprint', seed: 3609, difficulty: 0.90, length: 1350, style: 'hairpins' },
+  { name: 'Thousand turns', kind: 'sprint', seed: 3611, difficulty: 0.90, length: 1350, style: 'hairpins' },
   { name: 'The vice',      kind: 'circuit', seed: 3707, difficulty: 0.95, length: [780, 880],  style: 'technical', crossover: 'always' },
   { name: 'The last bend', kind: 'sprint',  seed: 3808, difficulty: 1.00, length: 1400, style: 'technical' },
 ];

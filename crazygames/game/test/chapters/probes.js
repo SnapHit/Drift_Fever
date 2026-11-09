@@ -15,7 +15,8 @@
       the page (the worst of three); the corner and feature mix and the
       run length. The check is seeds.js's, the one the seeds were chosen
       by. Known answer: seeds the search rejected, driven the same way,
-      fail it.
+      fail it. The readability rule (nothing occludes the road, in every
+   theme) is checked on the same tracks in Node, as occlusion.js does.
    2. ladder: careerUnlocked against the rules written out again here,
       on fixed cases and 2,000 random saves, and the career screen's rows
       against them on 40 of those saves. Known answers: Pro stays locked
@@ -26,7 +27,8 @@
       Rookie stars Pro is open on the first visit after this ships, with
       11 it is not, and everything in them is kept with 0 fixes; a Pro
       track then plays and opens the next; a corrupted save and storage
-      that throws still play and still show the career.
+      that throws still play and still show the career. And the size of
+      a save with a scripted ghost on every one of the 24 tracks.
    4. screens: the career screen (three saves: Rookie, Pro and Legend
       current), a Pro countdown heading, and the results of a run that
       opens Pro and of one that leaves Rookie short, at 390x844, 844x390,
@@ -42,7 +44,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as R from '../retention/lib.js';
-import { check, features, GEN_MS, BANKED_MIN } from './seeds.js';
+import { check, features, occlusionOf, GEN_MS, BANKED_MIN } from './seeds.js';
+import { generateTrack } from '../../src/tracks/generate.js';
 import { CAREER, CHAPTERS, careerSpec } from '../../src/loop/modes.js';
 import { LOOP } from '../../src/tune.js';
 
@@ -122,6 +125,8 @@ if (run('tracks')) {
     const spec = specs[k], f = gen.feat[k];
     const t = { kind: f.kind, length: f.length, finish: f.finishAlong === null ? null : { along: f.finishAlong }, corners: f.corners, bridges: Array(f.bridges).fill(0), clips: Array(f.clips).fill(0), difficulty: f.difficulty, attempts: f.attempts, fallback: f.fallback };
     const m = { seed: spec.seed, genMs: Math.round(gen.worst[k]), ...features(t) };
+    /* the readability rule is plain data: checked in Node on the same generator output */
+    m.occlusion = occlusionOf(generateTrack(spec.seed, { kind: spec.kind, difficulty: spec.difficulty, length: spec.length, ...(spec.options || {}) }));
     m.careful = await drive(page, spec, DRIVERS.careful);
     m.drifter = await drive(page, spec, DRIVERS.drifter);
     const fails = check(m, spec);
@@ -137,8 +142,8 @@ if (run('tracks')) {
     return { chapter: ch.name, circuitRunMetres: Math.round(circ.reduce((a, r) => a + r.runMetres, 0) / circ.length), sprintRunMetres: Math.round(spr.reduce((a, r) => a + r.runMetres, 0) / spr.length), corners: sum(r => r.corners), banked: sum(r => r.banked), bankedShare: +(sum(r => r.banked) / sum(r => r.corners)).toFixed(2), bridges: sum(r => r.bridges), figureEights: rs.filter(r => r.kind === 'circuit' && r.bridges > 0).length, hairpins: sum(r => r.hairpins), technicalOrHairpinStyles: rs.filter(r => /technical|hairpins/.test(r.settings.style)).length, askedDifficulty: mean(r => r.settings.difficulty), measuredDifficulty: +(sum(r => r.measuredDifficulty) / rs.length).toFixed(2), carefulSeconds: mean(r => r.careful.seconds), drifterSeconds: mean(r => r.drifter.seconds), worstGenMs: Math.max(...rs.map(r => r.genMs)) };
   });
   console.log(JSON.stringify(byChapter));
-  R.writeJson(path.join(reviewDir, 'tracks.json'), { started, rule: 'seeds.js check: no plain layout, a bridge where a crossover is asked, generation under ' + GEN_MS + ' ms, both drivers finish with 0 respawns, the careful driver clean with a star, banked corners at least ' + BANKED_MIN.join(' / ') + ' by chapter', tracks: career, byChapter, knownAnswer: known, errors: side.errors });
-  verdict('all 24 career tracks pass the check in the page (both drivers finish with 0 respawns, the careful driver clean with at least one star, generated under 600 ms)', career.every(r => r.fails.length === 0), career.filter(r => r.fails.length).map(r => r.index + ' ' + r.name + ': ' + r.fails.join(', ')).join('; ') || career.length + ' of 24');
+  R.writeJson(path.join(reviewDir, 'tracks.json'), { started, rule: 'seeds.js check: nothing occludes the road in any theme, no plain layout, a bridge where a crossover is asked, generation under ' + GEN_MS + ' ms, both drivers finish with 0 respawns, the careful driver clean with a star, banked corners at least ' + BANKED_MIN.join(' / ') + ' by chapter', tracks: career, byChapter, knownAnswer: known, errors: side.errors });
+  verdict('all 24 career tracks pass the check in the page (both drivers finish with 0 respawns, the careful driver clean with at least one star, generated under 600 ms, nothing occluding the road, the chapter\'s banks)', career.every(r => r.fails.length === 0), career.filter(r => r.fails.length).map(r => r.index + ' ' + r.name + ': ' + r.fails.join(', ')).join('; ') || career.length + ' of 24');
   verdict('known answer: every seed the search rejected fails the check in the page too', known.length >= 2 && known.every(r => r.fails.length > 0), known.map(r => r.seed + ' (' + r.name + '): ' + (r.fails.join(', ') || 'PASSED')).join('; '));
   const step = (a, b, f) => f(byChapter[b]) > f(byChapter[a]);
   verdict('each chapter a step up from the one before: longer runs, more banks, more figure eights, more technical and hairpin styles, harder asked', [0, 1].every(a => step(a, a + 1, c => c.circuitRunMetres + c.sprintRunMetres) && step(a, a + 1, c => c.banked) && step(a, a + 1, c => c.figureEights) && step(a, a + 1, c => c.technicalOrHairpinStyles) && step(a, a + 1, c => c.askedDifficulty)), byChapter.map(c => c.chapter + ' runs ' + c.circuitRunMetres + ' / ' + c.sprintRunMetres + ' m, banked ' + c.banked + ', eights ' + c.figureEights + ', styles ' + c.technicalOrHairpinStyles + ', difficulty ' + c.askedDifficulty).join('; '));
@@ -277,6 +282,16 @@ if (run('saves')) {
     const rows = await page.evaluate(() => [...document.querySelectorAll('.career .row')].map(b => b.disabled ? 0 : 1).join(''));
     out.throwing = { first, run: runR, rows, errors: side.errors };
     verdict('storage that throws: the first visit lands in a run, a run finishes, the career shows 24 rows with the next track open, no page errors', first.state === 'countdown' && !first.available && runR.finished && rows.length === 24 && (runR.stars < 1 || rows[1] === '1') && side.errors.length === 0, 'stars ' + runR.stars + ', rows ' + rows);
+    await side.close();
+  }
+  /* the save with a ghost on every one of the 24 tracks: the scripted drifter's tapes, which change the steering every step and compress worst (thumbs hold a button for seconds) */
+  {
+    const side = await openWith(R.SMALL, { query: 'title=1' });
+    const { page } = side;
+    for (let i = 0; i < CAREER.length; i++) await drive(page, careerSpec(i), DRIVERS.drifter, i === 0);
+    const size = await page.evaluate(() => { const S = window.__loop.save; const blob = localStorage.getItem(S.KEY) || ''; return { ghosts: Object.keys(S.state.ghosts).filter(k => k.startsWith('career:')).length, chars: blob.length, stored: blob.length > 0 && blob === JSON.stringify(S.state), failedWrites: S.status.failedWrites, writes: S.status.writes }; });
+    out.fullCareer = { ...size, errors: side.errors };
+    verdict('a ghost on all 24 tracks: the save is written whole, no write failed (' + (size.chars / 1e6).toFixed(2) + ' million characters)', size.ghosts === 24 && size.stored && size.failedWrites === 0 && side.errors.length === 0, size.writes + ' writes, ' + size.ghosts + ' career ghosts');
     await side.close();
   }
   R.writeJson(path.join(reviewDir, 'saves.json'), { started, ...out });

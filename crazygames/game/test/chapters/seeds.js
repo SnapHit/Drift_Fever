@@ -10,6 +10,11 @@
        with 0 respawns (off the track or stuck)
      - the careful driver drives it clean (no wall contact) and earns at
        least one star
+     - nothing occludes the road (the readability rule, checked as
+       game/test/visuals/occlusion.js checks it, in every theme): no
+       prop inside the barriers, the terrain never above the road, no
+       sight line blocked within CLEAR_AHEAD and at most BLOCKED_SHARE
+       blocked
      - it has at least BANKED_MIN[chapter] banked corners, so each chapter
        has more banks than the one before (Rookie has 18 in 8 tracks,
        2.25 a track; Pro asks 3 a track and Legend 4)
@@ -28,6 +33,8 @@ import { CAREER, CHAPTERS, careerSpec, chapterOf, runMetres, lapsFor } from '../
 import { generateTrack } from '../../src/tracks/generate.js';
 import { trackFor } from '../../src/ground/source.js';
 import { driveRun } from './run.js';
+import { checkTrack, BUDGET } from '../visuals/occlusion.js';
+import { THEMES, THEME_NAMES } from '../../src/env/themes.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const reviewDir = path.resolve(here, '..', '..', '..', 'review', 'chapters');
@@ -49,6 +56,18 @@ export function features(t) {
   return { kind: t.kind, length: t.length, runMetres: Math.round(runMetres(t, laps)), laps, corners: t.corners.length, banked: t.corners.filter(c => c.bank > 0).length, bridges: (t.bridges || []).length, hairpins: (types.hairpin || 0) + (types.double || 0), clips: (t.clips || []).length, types, measuredDifficulty: +(+t.difficulty).toFixed(2), attempts: t.attempts, fallback: !!t.fallback };
 }
 
+/* The readability rule over every theme: the worst of each measure. */
+export function occlusionOf(track) {
+  const o = { inside: 0, leastClear: Infinity, worstRise: 0, lines: 0, blocked: 0, blockedNear: 0, worstShare: 0 };
+  for (const name of THEME_NAMES) {
+    const r = checkTrack(track, THEMES[name]);
+    o.inside += r.inside; o.leastClear = Math.min(o.leastClear, r.worstClear); o.worstRise = Math.max(o.worstRise, r.worstRise);
+    o.lines += r.lines; o.blocked += r.blocked; o.blockedNear += r.blockedNear; o.worstShare = Math.max(o.worstShare, r.blocked / r.lines);
+  }
+  o.leastClear = +o.leastClear.toFixed(2); o.worstRise = +o.worstRise.toFixed(3); o.worstShare = +o.worstShare.toFixed(4);
+  return o;
+}
+
 /* Measure one spec: generation time, the features, both drivers. */
 export function measure(spec) {
   const opts = { kind: spec.kind, difficulty: spec.difficulty, length: spec.length, ...(spec.options || {}) };
@@ -57,7 +76,7 @@ export function measure(spec) {
   const t = trackFor(spec);
   const f = features(t);
   const careful = driveRun(t, 'careful'), drifter = driveRun(t, 'drifter');
-  return { seed: spec.seed, genMs: Math.round(worst), ...f, careful, drifter };
+  return { seed: spec.seed, genMs: Math.round(worst), ...f, careful, drifter, occlusion: occlusionOf(generateTrack(spec.seed, opts)) };
 }
 
 /* The check, and what failed. */
@@ -71,6 +90,12 @@ export function check(m, spec) {
     if (m[d].respawns) fails.push(d + ' ' + m[d].respawns + ' respawns');
   }
   if (m.careful.contacts) fails.push('careful ' + m.careful.contacts + ' wall contacts');
+  if (m.occlusion) {
+    const o = m.occlusion;
+    if (o.inside > 0) fails.push(o.inside + ' props inside the barriers');
+    if (o.worstRise > BUDGET.ROAD_FLAT) fails.push('terrain ' + o.worstRise + ' m above the road');
+    if (o.blockedNear > 0 || o.worstShare > BUDGET.BLOCKED_SHARE) fails.push('sight lines blocked');
+  }
   if (spec.chapter !== undefined && m.banked < BANKED_MIN[spec.chapter]) fails.push(m.banked + ' banked corners, under ' + BANKED_MIN[spec.chapter]);
   if (m.careful.stars < 1) fails.push('careful ' + m.careful.score + ' under the first star ' + m.careful.targets[0]);
   return fails;

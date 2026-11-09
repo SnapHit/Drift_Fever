@@ -1,5 +1,5 @@
 {
- "started": "2026-11-09T20:15:06.181Z",
+ "started": "2026-11-09T20:36:32.677Z",
  "stars12": {
   "from": "main 561d97a9a1e5c3b384235b109385d63c54644f95",
   "rookieStars": 12,
@@ -179,6 +179,14 @@
    "nextIndex": 1
   },
   "rows": "110000000000000000000000",
+  "errors": []
+ },
+ "fullCareer": {
+  "ghosts": 24,
+  "chars": 2202566,
+  "stored": true,
+  "failedWrites": 0,
+  "writes": 98,
   "errors": []
  }
 }

@@ -58,6 +58,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import * as R from './lib.js';
+import { CAREER } from '../../src/loop/modes.js';
 
 const want = process.argv.slice(2).filter(a => !a.startsWith('-'));
 const run = name => want.length === 0 || want.includes(name);
@@ -210,7 +211,7 @@ if (run('missions')) {
   const side = await R.openPage(env, R.LANDSCAPE, { firstVisit: true, query: 'auto=1&title=1' });
   await side.page.evaluate(() => { window.__feel.draw = false; });
   const list = [];
-  for (let i = 0; i < 8; i++) list.push(['career', i]);
+  for (let i = 0; i < CAREER.length; i++) list.push(['career', i]);   // every career track carries missions: 24 since the chapters (was the first 8)
   list.push(['daily', null]);
   /* what each track offers (its three) */
   for (const [how, arg] of list) {

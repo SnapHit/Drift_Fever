@@ -6,7 +6,7 @@
    "index": 0,
    "name": "First slide",
    "seed": 1101,
-   "genMs": 90,
+   "genMs": 83,
    "kind": "circuit",
    "length": 518,
    "runMetres": 1554,
@@ -60,13 +60,22 @@
     "cleanSectors": "12/12",
     "meanKmh": 81.1
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.8,
+    "worstRise": 0,
+    "lines": 3900,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   },
   {
    "index": 1,
    "name": "Harbour run",
    "seed": 1202,
-   "genMs": 18,
+   "genMs": 19,
    "kind": "sprint",
    "length": 840,
    "runMetres": 800,
@@ -120,13 +129,22 @@
     "cleanSectors": "2/3",
     "meanKmh": 90.4
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 5700,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   },
   {
    "index": 2,
    "name": "Crossover",
    "seed": 1327,
-   "genMs": 54,
+   "genMs": 34,
    "kind": "circuit",
    "length": 844,
    "runMetres": 2532,
@@ -178,13 +196,22 @@
     "cleanSectors": "12/12",
     "meanKmh": 86.2
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.32,
+    "worstRise": 0,
+    "lines": 6375,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   },
   {
    "index": 3,
    "name": "Long shadows",
    "seed": 1404,
-   "genMs": 17,
+   "genMs": 21,
    "kind": "sprint",
    "length": 898,
    "runMetres": 858,
@@ -238,13 +265,22 @@
     "cleanSectors": "3/3",
     "meanKmh": 82.8
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 6150,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   },
   {
    "index": 4,
    "name": "Tight city",
    "seed": 1505,
-   "genMs": 38,
+   "genMs": 16,
    "kind": "circuit",
    "length": 678,
    "runMetres": 2034,
@@ -300,13 +336,22 @@
     "cleanSectors": "9/12",
     "meanKmh": 74.3
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 5100,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   },
   {
    "index": 5,
    "name": "Ridge road",
    "seed": 1606,
-   "genMs": 6,
+   "genMs": 10,
    "kind": "sprint",
    "length": 1018,
    "runMetres": 978,
@@ -363,13 +408,22 @@
     "cleanSectors": "1/3",
     "meanKmh": 84.4
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 7050,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   },
   {
    "index": 6,
    "name": "Hairpin heaven",
    "seed": 1707,
-   "genMs": 9,
+   "genMs": 24,
    "kind": "circuit",
    "length": 688,
    "runMetres": 2064,
@@ -424,13 +478,22 @@
     "cleanSectors": "9/12",
     "meanKmh": 82.9
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 5175,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   },
   {
    "index": 7,
    "name": "The gauntlet",
    "seed": 1808,
-   "genMs": 11,
+   "genMs": 8,
    "kind": "sprint",
    "length": 1066,
    "runMetres": 1026,
@@ -486,6 +549,15 @@
     "cleanSectors": "2/3",
     "meanKmh": 79.5
    },
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.14,
+    "worstRise": 0,
+    "lines": 7425,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "fails": []
   }
  ],
@@ -510,7 +582,7 @@
    "tried": [
     {
      "seed": 2101,
-     "genMs": 248,
+     "genMs": 280,
      "kind": "circuit",
      "length": 814,
      "runMetres": 2442,
@@ -563,13 +635,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 77.9
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.23,
+      "worstRise": 0,
+      "lines": 6150,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2102,
-     "genMs": 35,
+     "genMs": 36,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -622,13 +703,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 77.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.21,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "0 banked corners, under 3"
      ]
     },
     {
      "seed": 2103,
-     "genMs": 49,
+     "genMs": 74,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -682,13 +772,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 82.2
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.17,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2104,
-     "genMs": 119,
+     "genMs": 122,
      "kind": "circuit",
      "length": 808,
      "runMetres": 2424,
@@ -741,13 +840,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 79.7
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 4.1,
+      "worstRise": 0,
+      "lines": 6075,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2105,
-     "genMs": 60,
+     "genMs": 73,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -801,6 +909,15 @@
       "cleanSectors": "12/12",
       "meanKmh": 77.6
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.21,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -822,7 +939,7 @@
    "tried": [
     {
      "seed": 2202,
-     "genMs": 9,
+     "genMs": 8,
      "kind": "sprint",
      "length": 1126,
      "runMetres": 1086,
@@ -878,13 +995,22 @@
       "cleanSectors": "3/3",
       "meanKmh": 76.2
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 7875,
+      "blocked": 10,
+      "blockedNear": 0,
+      "worstShare": 0.0013
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2203,
-     "genMs": 10,
+     "genMs": 5,
      "kind": "sprint",
      "length": 1202,
      "runMetres": 1162,
@@ -939,13 +1065,22 @@
       "cleanSectors": "2/3",
       "meanKmh": 78.5
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 8475,
+      "blocked": 2,
+      "blockedNear": 0,
+      "worstShare": 0.0012
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
     },
     {
      "seed": 2204,
-     "genMs": 14,
+     "genMs": 5,
      "kind": "sprint",
      "length": 1096,
      "runMetres": 1056,
@@ -999,13 +1134,22 @@
       "cleanSectors": "2/3",
       "meanKmh": 88.4
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 7650,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2205,
-     "genMs": 5,
+     "genMs": 12,
      "kind": "sprint",
      "length": 1104,
      "runMetres": 1064,
@@ -1062,13 +1206,22 @@
       "cleanSectors": "3/3",
       "meanKmh": 78.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 7725,
+      "blocked": 5,
+      "blockedNear": 0,
+      "worstShare": 0.0006
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
     },
     {
      "seed": 2206,
-     "genMs": 4,
+     "genMs": 5,
      "kind": "sprint",
      "length": 1140,
      "runMetres": 1100,
@@ -1123,6 +1276,15 @@
       "cleanSectors": "2/3",
       "meanKmh": 75.8
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 7950,
+      "blocked": 1,
+      "blockedNear": 0,
+      "worstShare": 0.0006
+     },
      "fails": [
       "drifter 1 respawns",
       "2 banked corners, under 3"
@@ -1130,7 +1292,7 @@
     },
     {
      "seed": 2207,
-     "genMs": 6,
+     "genMs": 16,
      "kind": "sprint",
      "length": 1142,
      "runMetres": 1102,
@@ -1185,6 +1347,15 @@
       "cleanSectors": "1/3",
       "meanKmh": 75
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 8025,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "0 banked corners, under 3",
       "careful 279 under the first star 280"
@@ -1192,7 +1363,7 @@
     },
     {
      "seed": 2208,
-     "genMs": 4,
+     "genMs": 6,
      "kind": "sprint",
      "length": 1010,
      "runMetres": 970,
@@ -1246,13 +1417,22 @@
       "cleanSectors": "2/3",
       "meanKmh": 80.4
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.84,
+      "worstRise": 0,
+      "lines": 6975,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2209,
-     "genMs": 4,
+     "genMs": 11,
      "kind": "sprint",
      "length": 1146,
      "runMetres": 1106,
@@ -1305,6 +1485,15 @@
       "stuck": 0,
       "cleanSectors": "2/3",
       "meanKmh": 80.8
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 8025,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
      },
      "fails": [
       "2 banked corners, under 3"
@@ -1369,13 +1558,22 @@
       "cleanSectors": "0/3",
       "meanKmh": 75.6
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.87,
+      "worstRise": 0,
+      "lines": 6975,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2211,
-     "genMs": 7,
+     "genMs": 11,
      "kind": "sprint",
      "length": 1080,
      "runMetres": 1040,
@@ -1430,13 +1628,22 @@
       "cleanSectors": "1/3",
       "meanKmh": 78.8
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.83,
+      "worstRise": 0,
+      "lines": 7500,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "drifter 1 respawns"
      ]
     },
     {
      "seed": 2212,
-     "genMs": 8,
+     "genMs": 6,
      "kind": "sprint",
      "length": 1078,
      "runMetres": 1038,
@@ -1491,13 +1698,22 @@
       "cleanSectors": "2/3",
       "meanKmh": 74.2
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 7500,
+      "blocked": 5,
+      "blockedNear": 0,
+      "worstShare": 0.0007
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2213,
-     "genMs": 5,
+     "genMs": 10,
      "kind": "sprint",
      "length": 1114,
      "runMetres": 1074,
@@ -1552,6 +1768,15 @@
       "cleanSectors": "2/3",
       "meanKmh": 80.7
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 7800,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -1567,13 +1792,13 @@
     "style": "hairpins",
     "crossover": "default"
    },
-   "inCareer": 2305,
-   "chosen": 2305,
+   "inCareer": 2314,
+   "chosen": 2314,
    "agrees": true,
    "tried": [
     {
      "seed": 2303,
-     "genMs": 9,
+     "genMs": 7,
      "kind": "circuit",
      "length": 722,
      "runMetres": 2166,
@@ -1628,13 +1853,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 76.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 5475,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
     },
     {
      "seed": 2304,
-     "genMs": 6,
+     "genMs": 11,
      "kind": "circuit",
      "length": 728,
      "runMetres": 2184,
@@ -1689,13 +1923,22 @@
       "cleanSectors": "10/12",
       "meanKmh": 75.5
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 5475,
+      "blocked": 10,
+      "blockedNear": 0,
+      "worstShare": 0.0018
+     },
      "fails": [
       "0 banked corners, under 3"
      ]
     },
     {
      "seed": 2305,
-     "genMs": 20,
+     "genMs": 18,
      "kind": "circuit",
      "length": 788,
      "runMetres": 2364,
@@ -1750,6 +1993,644 @@
       "cleanSectors": "8/12",
       "meanKmh": 78
      },
+     "occlusion": {
+      "inside": 5,
+      "leastClear": -5.32,
+      "worstRise": 0,
+      "lines": 5925,
+      "blocked": 95,
+      "blockedNear": 0,
+      "worstShare": 0.016
+     },
+     "fails": [
+      "5 props inside the barriers"
+     ]
+    },
+    {
+     "seed": 2306,
+     "genMs": 7,
+     "kind": "circuit",
+     "length": 732,
+     "runMetres": 2196,
+     "laps": 3,
+     "corners": 6,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 5,
+     "clips": 6,
+     "types": {
+      "hairpin": 1,
+      "double": 4,
+      "tight": 1
+     },
+     "measuredDifficulty": 0.47,
+     "attempts": 3,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 137.78,
+      "score": 539,
+      "stars": 0,
+      "targets": [
+       540,
+       1080,
+       1890
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 56
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 110.56,
+      "score": 784,
+      "stars": 1,
+      "targets": [
+       540,
+       1080,
+       1890
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 73.7
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 5550,
+      "blocked": 25,
+      "blockedNear": 0,
+      "worstShare": 0.0081
+     },
+     "fails": [
+      "0 banked corners, under 3",
+      "careful 539 under the first star 540"
+     ]
+    },
+    {
+     "seed": 2307,
+     "genMs": 19,
+     "kind": "circuit",
+     "length": 686,
+     "runMetres": 2058,
+     "laps": 3,
+     "corners": 7,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 3,
+     "clips": 5,
+     "types": {
+      "multi": 3,
+      "tight": 1,
+      "hairpin": 1,
+      "double": 2
+     },
+     "measuredDifficulty": 0.38,
+     "attempts": 10,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 117.24,
+      "score": 521,
+      "stars": 1,
+      "targets": [
+       510,
+       1010,
+       1770
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 100.41,
+      "score": 1263,
+      "stars": 2,
+      "targets": [
+       510,
+       1010,
+       1770
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 74.8
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 5175,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
+     "fails": [
+      "0 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2308,
+     "genMs": 6,
+     "kind": "circuit",
+     "length": 686,
+     "runMetres": 2058,
+     "laps": 3,
+     "corners": 5,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 3,
+     "clips": 5,
+     "types": {
+      "tightening": 1,
+      "sweeper": 1,
+      "double": 2,
+      "hairpin": 1
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 6,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 119.34,
+      "score": 518,
+      "stars": 1,
+      "targets": [
+       510,
+       1010,
+       1770
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 61
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 105.2,
+      "score": 1185,
+      "stars": 2,
+      "targets": [
+       510,
+       1010,
+       1770
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 73.2
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.84,
+      "worstRise": 0,
+      "lines": 5175,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
+     "fails": [
+      "0 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2309,
+     "genMs": 13,
+     "kind": "circuit",
+     "length": 660,
+     "runMetres": 1980,
+     "laps": 3,
+     "corners": 6,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 4,
+     "types": {
+      "opening": 1,
+      "hairpin": 2,
+      "multi": 3
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 5,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 112.93,
+      "score": 502,
+      "stars": 1,
+      "targets": [
+       490,
+       970,
+       1700
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.1
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 85.97,
+      "score": 1981,
+      "stars": 3,
+      "targets": [
+       490,
+       970,
+       1700
+      ],
+      "contacts": 4,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "9/12",
+      "meanKmh": 83.3
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 4950,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
+     "fails": [
+      "0 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2310,
+     "genMs": 13,
+     "kind": "circuit",
+     "length": 788,
+     "runMetres": 2364,
+     "laps": 3,
+     "corners": 7,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 7,
+     "types": {
+      "sweeper": 1,
+      "tight": 4,
+      "double": 2
+     },
+     "measuredDifficulty": 0.37,
+     "attempts": 24,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 133.8,
+      "score": 612,
+      "stars": 1,
+      "targets": [
+       580,
+       1160,
+       2040
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.6
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 110.2,
+      "score": 1999,
+      "stars": 2,
+      "targets": [
+       580,
+       1160,
+       2040
+      ],
+      "contacts": 6,
+      "hard": 3,
+      "respawns": 1,
+      "offTrack": 0,
+      "stuck": 1,
+      "cleanSectors": "8/12",
+      "meanKmh": 78.2
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 5925,
+      "blocked": 1,
+      "blockedNear": 0,
+      "worstShare": 0.0008
+     },
+     "fails": [
+      "drifter 1 respawns",
+      "0 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2311,
+     "genMs": 10,
+     "kind": "circuit",
+     "length": 704,
+     "runMetres": 2112,
+     "laps": 3,
+     "corners": 5,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 3,
+     "clips": 5,
+     "types": {
+      "hairpin": 1,
+      "tight": 1,
+      "opening": 1,
+      "double": 2
+     },
+     "measuredDifficulty": 0.44,
+     "attempts": 25,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 124.1,
+      "score": 532,
+      "stars": 1,
+      "targets": [
+       520,
+       1040,
+       1820
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 60.2
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 102.73,
+      "score": 1537,
+      "stars": 2,
+      "targets": [
+       520,
+       1040,
+       1820
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 74.8
+     },
+     "occlusion": {
+      "inside": 5,
+      "leastClear": -3.52,
+      "worstRise": 0,
+      "lines": 5325,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
+     "fails": [
+      "5 props inside the barriers",
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2312,
+     "genMs": 16,
+     "kind": "circuit",
+     "length": 762,
+     "runMetres": 2286,
+     "laps": 3,
+     "corners": 7,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 7,
+     "types": {
+      "tight": 4,
+      "hairpin": 2,
+      "opening": 1
+     },
+     "measuredDifficulty": 0.51,
+     "attempts": 12,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 142.08,
+      "score": 561,
+      "stars": 1,
+      "targets": [
+       560,
+       1120,
+       1970
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 56.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 109.1,
+      "score": 1682,
+      "stars": 2,
+      "targets": [
+       560,
+       1120,
+       1970
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 75.4
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 1.94,
+      "worstRise": 0.029,
+      "lines": 5775,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2313,
+     "genMs": 5,
+     "kind": "circuit",
+     "length": 698,
+     "runMetres": 2094,
+     "laps": 3,
+     "corners": 7,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 1,
+     "clips": 5,
+     "types": {
+      "multi": 3,
+      "tight": 2,
+      "hairpin": 1,
+      "tightening": 1
+     },
+     "measuredDifficulty": 0.38,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 117.43,
+      "score": 540,
+      "stars": 1,
+      "targets": [
+       520,
+       1030,
+       1800
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 63.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 99.8,
+      "score": 1037,
+      "stars": 2,
+      "targets": [
+       520,
+       1030,
+       1800
+      ],
+      "contacts": 4,
+      "hard": 3,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "9/12",
+      "meanKmh": 76.6
+     },
+     "occlusion": {
+      "inside": 2,
+      "leastClear": -4.61,
+      "worstRise": 0,
+      "lines": 5250,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
+     "fails": [
+      "2 props inside the barriers",
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2314,
+     "genMs": 17,
+     "kind": "circuit",
+     "length": 712,
+     "runMetres": 2136,
+     "laps": 3,
+     "corners": 8,
+     "banked": 4,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 6,
+     "types": {
+      "hairpin": 2,
+      "tight": 2,
+      "multi": 4
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 34,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 128.69,
+      "score": 530,
+      "stars": 1,
+      "targets": [
+       530,
+       1050,
+       1840
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 58.8
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 107.88,
+      "score": 953,
+      "stars": 1,
+      "targets": [
+       530,
+       1050,
+       1840
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 72.7
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 5400,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -1771,7 +2652,7 @@
    "tried": [
     {
      "seed": 2404,
-     "genMs": 9,
+     "genMs": 15,
      "kind": "sprint",
      "length": 1062,
      "runMetres": 1022,
@@ -1826,13 +2707,22 @@
       "cleanSectors": "3/3",
       "meanKmh": 78.5
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 7425,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2405,
-     "genMs": 10,
+     "genMs": 11,
      "kind": "sprint",
      "length": 1070,
      "runMetres": 1030,
@@ -1888,13 +2778,22 @@
       "cleanSectors": "1/3",
       "meanKmh": 78
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 7425,
+      "blocked": 1,
+      "blockedNear": 0,
+      "worstShare": 0.0007
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
     },
     {
      "seed": 2406,
-     "genMs": 6,
+     "genMs": 5,
      "kind": "sprint",
      "length": 1252,
      "runMetres": 1212,
@@ -1950,6 +2849,15 @@
       "cleanSectors": "1/3",
       "meanKmh": 79.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 8850,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -1974,7 +2882,7 @@
    "tried": [
     {
      "seed": 2505,
-     "genMs": 11,
+     "genMs": 10,
      "kind": "circuit",
      "length": 850,
      "runMetres": 2550,
@@ -2027,13 +2935,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 78.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.29,
+      "worstRise": 0,
+      "lines": 6375,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2506,
-     "genMs": 16,
+     "genMs": 26,
      "kind": "circuit",
      "length": 852,
      "runMetres": 2556,
@@ -2087,13 +3004,22 @@
       "cleanSectors": "6/12",
       "meanKmh": 72.4
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.23,
+      "worstRise": 0,
+      "lines": 6450,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2507,
-     "genMs": 260,
+     "genMs": 297,
      "kind": "circuit",
      "length": 816,
      "runMetres": 2448,
@@ -2145,6 +3071,15 @@
       "cleanSectors": "3/12",
       "meanKmh": 91.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 6150,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "plain layout",
       "no bridge",
@@ -2153,7 +3088,7 @@
     },
     {
      "seed": 2508,
-     "genMs": 48,
+     "genMs": 46,
      "kind": "circuit",
      "length": 816,
      "runMetres": 2448,
@@ -2206,13 +3141,22 @@
       "cleanSectors": "9/12",
       "meanKmh": 75.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.3,
+      "worstRise": 0,
+      "lines": 6150,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2509,
-     "genMs": 22,
+     "genMs": 28,
      "kind": "circuit",
      "length": 784,
      "runMetres": 2352,
@@ -2266,13 +3210,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 75.9
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 5925,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 3"
      ]
     },
     {
      "seed": 2510,
-     "genMs": 8,
+     "genMs": 9,
      "kind": "circuit",
      "length": 846,
      "runMetres": 2538,
@@ -2326,6 +3279,15 @@
       "cleanSectors": "12/12",
       "meanKmh": 76.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 3.7,
+      "worstRise": 0,
+      "lines": 6375,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -2347,7 +3309,7 @@
    "tried": [
     {
      "seed": 2606,
-     "genMs": 13,
+     "genMs": 16,
      "kind": "sprint",
      "length": 1130,
      "runMetres": 1090,
@@ -2402,11 +3364,20 @@
       "cleanSectors": "2/3",
       "meanKmh": 71.6
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 7875,
+      "blocked": 16,
+      "blockedNear": 0,
+      "worstShare": 0.0051
+     },
      "fails": []
     },
     {
      "seed": 2607,
-     "genMs": 6,
+     "genMs": 9,
      "kind": "sprint",
      "length": 1088,
      "runMetres": 1048,
@@ -2462,13 +3433,22 @@
       "cleanSectors": "0/3",
       "meanKmh": 77.2
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.83,
+      "worstRise": 0,
+      "lines": 7575,
+      "blocked": 3,
+      "blockedNear": 0,
+      "worstShare": 0.002
+     },
      "fails": [
       "drifter 1 respawns"
      ]
     },
     {
      "seed": 2608,
-     "genMs": 11,
+     "genMs": 7,
      "kind": "sprint",
      "length": 1224,
      "runMetres": 1184,
@@ -2524,6 +3504,15 @@
       "cleanSectors": "1/3",
       "meanKmh": 72.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 8625,
+      "blocked": 28,
+      "blockedNear": 0,
+      "worstShare": 0.0046
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
@@ -2547,7 +3536,7 @@
    "tried": [
     {
      "seed": 2707,
-     "genMs": 7,
+     "genMs": 20,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -2603,13 +3592,22 @@
       "cleanSectors": "8/12",
       "meanKmh": 78.5
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
     },
     {
      "seed": 2708,
-     "genMs": 6,
+     "genMs": 7,
      "kind": "circuit",
      "length": 700,
      "runMetres": 2100,
@@ -2664,11 +3662,20 @@
       "cleanSectors": "12/12",
       "meanKmh": 83.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 5250,
+      "blocked": 4,
+      "blockedNear": 0,
+      "worstShare": 0.0038
+     },
      "fails": []
     },
     {
      "seed": 2709,
-     "genMs": 10,
+     "genMs": 20,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -2722,6 +3729,15 @@
       "cleanSectors": "9/12",
       "meanKmh": 83.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
@@ -2745,7 +3761,7 @@
    "tried": [
     {
      "seed": 2808,
-     "genMs": 6,
+     "genMs": 7,
      "kind": "sprint",
      "length": 1204,
      "runMetres": 1164,
@@ -2803,13 +3819,22 @@
       "cleanSectors": "1/3",
       "meanKmh": 74.2
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.83,
+      "worstRise": 0,
+      "lines": 8475,
+      "blocked": 5,
+      "blockedNear": 0,
+      "worstShare": 0.0029
+     },
      "fails": [
       "1 banked corners, under 3"
      ]
     },
     {
      "seed": 2809,
-     "genMs": 5,
+     "genMs": 7,
      "kind": "sprint",
      "length": 1294,
      "runMetres": 1254,
@@ -2865,11 +3890,20 @@
       "cleanSectors": "2/3",
       "meanKmh": 75.4
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 9150,
+      "blocked": 1,
+      "blockedNear": 0,
+      "worstShare": 0.0005
+     },
      "fails": []
     },
     {
      "seed": 2810,
-     "genMs": 6,
+     "genMs": 14,
      "kind": "sprint",
      "length": 1350,
      "runMetres": 1310,
@@ -2926,6 +3960,15 @@
       "cleanSectors": "1/3",
       "meanKmh": 78.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 9525,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -2950,7 +3993,7 @@
    "tried": [
     {
      "seed": 3101,
-     "genMs": 121,
+     "genMs": 117,
      "kind": "circuit",
      "length": 834,
      "runMetres": 2502,
@@ -3003,13 +4046,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 77.7
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.16,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "0 banked corners, under 4"
      ]
     },
     {
      "seed": 3102,
-     "genMs": 128,
+     "genMs": 123,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -3061,11 +4113,20 @@
       "cleanSectors": "12/12",
       "meanKmh": 72.2
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.25,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     },
     {
      "seed": 3103,
-     "genMs": 215,
+     "genMs": 216,
      "kind": "circuit",
      "length": 860,
      "runMetres": 2580,
@@ -3119,6 +4180,15 @@
       "cleanSectors": "0/12",
       "meanKmh": 74.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.24,
+      "worstRise": 0,
+      "lines": 6450,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -3140,7 +4210,7 @@
    "tried": [
     {
      "seed": 3202,
-     "genMs": 33,
+     "genMs": 46,
      "kind": "sprint",
      "length": 1210,
      "runMetres": 1170,
@@ -3195,11 +4265,20 @@
       "cleanSectors": "2/3",
       "meanKmh": 78.5
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 8475,
+      "blocked": 5,
+      "blockedNear": 0,
+      "worstShare": 0.0006
+     },
      "fails": []
     },
     {
      "seed": 3203,
-     "genMs": 13,
+     "genMs": 34,
      "kind": "sprint",
      "length": 1174,
      "runMetres": 1134,
@@ -3255,11 +4334,20 @@
       "cleanSectors": "2/3",
       "meanKmh": 78.4
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 8250,
+      "blocked": 6,
+      "blockedNear": 0,
+      "worstShare": 0.0012
+     },
      "fails": []
     },
     {
      "seed": 3204,
-     "genMs": 7,
+     "genMs": 8,
      "kind": "sprint",
      "length": 1216,
      "runMetres": 1176,
@@ -3316,6 +4404,15 @@
       "cleanSectors": "3/3",
       "meanKmh": 73.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 8550,
+      "blocked": 11,
+      "blockedNear": 0,
+      "worstShare": 0.0018
+     },
      "fails": [
       "2 banked corners, under 4"
      ]
@@ -3342,7 +4439,7 @@
    "tried": [
     {
      "seed": 3303,
-     "genMs": 4,
+     "genMs": 9,
      "kind": "circuit",
      "length": 804,
      "runMetres": 2412,
@@ -3394,6 +4491,15 @@
       "stuck": 0,
       "cleanSectors": "12/12",
       "meanKmh": 81
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.09,
+      "worstRise": 0,
+      "lines": 6075,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
      },
      "fails": []
     },
@@ -3452,11 +4558,20 @@
       "cleanSectors": "12/12",
       "meanKmh": 83.4
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.31,
+      "worstRise": 0,
+      "lines": 6450,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     },
     {
      "seed": 3305,
-     "genMs": 7,
+     "genMs": 20,
      "kind": "circuit",
      "length": 872,
      "runMetres": 2616,
@@ -3509,6 +4624,15 @@
       "cleanSectors": "12/12",
       "meanKmh": 80.9
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 6600,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     }
    ]
@@ -3530,7 +4654,7 @@
    "tried": [
     {
      "seed": 3404,
-     "genMs": 6,
+     "genMs": 5,
      "kind": "sprint",
      "length": 1286,
      "runMetres": 1246,
@@ -3586,11 +4710,20 @@
       "cleanSectors": "2/3",
       "meanKmh": 80.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 9075,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     },
     {
      "seed": 3405,
-     "genMs": 5,
+     "genMs": 13,
      "kind": "sprint",
      "length": 1208,
      "runMetres": 1168,
@@ -3647,13 +4780,24 @@
       "cleanSectors": "2/3",
       "meanKmh": 75.3
      },
+     "occlusion": {
+      "inside": 5,
+      "leastClear": -4.37,
+      "worstRise": 0,
+      "lines": 8475,
+      "blocked": 290,
+      "blockedNear": 110,
+      "worstShare": 0.0342
+     },
      "fails": [
+      "5 props inside the barriers",
+      "sight lines blocked",
       "1 banked corners, under 4"
      ]
     },
     {
      "seed": 3406,
-     "genMs": 9,
+     "genMs": 18,
      "kind": "sprint",
      "length": 1234,
      "runMetres": 1194,
@@ -3710,6 +4854,15 @@
       "cleanSectors": "1/3",
       "meanKmh": 77.9
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.83,
+      "worstRise": 0,
+      "lines": 8700,
+      "blocked": 5,
+      "blockedNear": 0,
+      "worstShare": 0.0006
+     },
      "fails": [
       "3 banked corners, under 4",
       "careful 267 under the first star 270"
@@ -3737,7 +4890,7 @@
    "tried": [
     {
      "seed": 3505,
-     "genMs": 30,
+     "genMs": 52,
      "kind": "circuit",
      "length": 824,
      "runMetres": 2472,
@@ -3790,11 +4943,20 @@
       "cleanSectors": "12/12",
       "meanKmh": 82.3
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 6225,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     },
     {
      "seed": 3506,
-     "genMs": 29,
+     "genMs": 40,
      "kind": "circuit",
      "length": 812,
      "runMetres": 2436,
@@ -3847,13 +5009,22 @@
       "cleanSectors": "12/12",
       "meanKmh": 81.1
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.88,
+      "worstRise": 0,
+      "lines": 6150,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "0 banked corners, under 4"
      ]
     },
     {
      "seed": 3507,
-     "genMs": 39,
+     "genMs": 60,
      "kind": "circuit",
      "length": 836,
      "runMetres": 2508,
@@ -3906,6 +5077,15 @@
       "cleanSectors": "12/12",
       "meanKmh": 73.7
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.53,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "0 banked corners, under 4"
      ]
@@ -3923,13 +5103,13 @@
     "style": "hairpins",
     "crossover": "default"
    },
-   "inCareer": 3609,
-   "chosen": 3609,
+   "inCareer": 3611,
+   "chosen": 3611,
    "agrees": true,
    "tried": [
     {
      "seed": 3606,
-     "genMs": 9,
+     "genMs": 16,
      "kind": "sprint",
      "length": 1264,
      "runMetres": 1224,
@@ -3986,6 +5166,15 @@
       "cleanSectors": "0/3",
       "meanKmh": 73.9
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 8925,
+      "blocked": 18,
+      "blockedNear": 0,
+      "worstShare": 0.0022
+     },
      "fails": [
       "drifter 1 respawns",
       "2 banked corners, under 4"
@@ -3993,7 +5182,7 @@
     },
     {
      "seed": 3607,
-     "genMs": 13,
+     "genMs": 24,
      "kind": "sprint",
      "length": 1320,
      "runMetres": 1280,
@@ -4048,14 +5237,24 @@
       "cleanSectors": "1/3",
       "meanKmh": 72.9
      },
+     "occlusion": {
+      "inside": 2,
+      "leastClear": -3.15,
+      "worstRise": 0,
+      "lines": 9300,
+      "blocked": 34,
+      "blockedNear": 0,
+      "worstShare": 0.0075
+     },
      "fails": [
+      "2 props inside the barriers",
       "2 banked corners, under 4",
       "careful 277 under the first star 280"
      ]
     },
     {
      "seed": 3608,
-     "genMs": 8,
+     "genMs": 6,
      "kind": "sprint",
      "length": 1290,
      "runMetres": 1250,
@@ -4110,13 +5309,22 @@
       "cleanSectors": "3/3",
       "meanKmh": 69.7
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.82,
+      "worstRise": 0,
+      "lines": 9075,
+      "blocked": 14,
+      "blockedNear": 0,
+      "worstShare": 0.0033
+     },
      "fails": [
       "careful 264 under the first star 270"
      ]
     },
     {
      "seed": 3609,
-     "genMs": 5,
+     "genMs": 15,
      "kind": "sprint",
      "length": 1294,
      "runMetres": 1254,
@@ -4171,6 +5379,156 @@
       "cleanSectors": "3/3",
       "meanKmh": 71.7
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.35,
+      "worstRise": 0.237,
+      "lines": 9150,
+      "blocked": 34,
+      "blockedNear": 0,
+      "worstShare": 0.0055
+     },
+     "fails": [
+      "terrain 0.237 m above the road"
+     ]
+    },
+    {
+     "seed": 3610,
+     "genMs": 6,
+     "kind": "sprint",
+     "length": 1450,
+     "runMetres": 1410,
+     "laps": 1,
+     "corners": 14,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 9,
+     "clips": 14,
+     "types": {
+      "double": 6,
+      "hairpin": 3,
+      "tight": 3,
+      "sweeper": 2
+     },
+     "measuredDifficulty": 0.49,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 91.3,
+      "score": 307,
+      "stars": 0,
+      "targets": [
+       310,
+       620,
+       1080
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 53.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 71.96,
+      "score": 1137,
+      "stars": 3,
+      "targets": [
+       310,
+       620,
+       1080
+      ],
+      "contacts": 2,
+      "hard": 2,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 72.2
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 10275,
+      "blocked": 31,
+      "blockedNear": 0,
+      "worstShare": 0.0034
+     },
+     "fails": [
+      "careful 307 under the first star 310"
+     ]
+    },
+    {
+     "seed": 3611,
+     "genMs": 13,
+     "kind": "sprint",
+     "length": 1332,
+     "runMetres": 1292,
+     "laps": 1,
+     "corners": 13,
+     "banked": 5,
+     "bridges": 0,
+     "hairpins": 8,
+     "clips": 13,
+     "types": {
+      "hairpin": 2,
+      "double": 6,
+      "tight": 2,
+      "tightening": 1,
+      "sweeper": 2
+     },
+     "measuredDifficulty": 0.5,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 82.88,
+      "score": 281,
+      "stars": 1,
+      "targets": [
+       280,
+       570,
+       990
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 54.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 67.37,
+      "score": 1779,
+      "stars": 3,
+      "targets": [
+       280,
+       570,
+       990
+      ],
+      "contacts": 2,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 70
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.84,
+      "worstRise": 0,
+      "lines": 9450,
+      "blocked": 30,
+      "blockedNear": 0,
+      "worstShare": 0.0053
+     },
      "fails": []
     }
    ]
@@ -4195,7 +5553,7 @@
    "tried": [
     {
      "seed": 3707,
-     "genMs": 66,
+     "genMs": 55,
      "kind": "circuit",
      "length": 836,
      "runMetres": 2508,
@@ -4248,11 +5606,20 @@
       "cleanSectors": "10/12",
       "meanKmh": 73.5
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.3,
+      "worstRise": 0,
+      "lines": 6300,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": []
     },
     {
      "seed": 3708,
-     "genMs": 147,
+     "genMs": 131,
      "kind": "circuit",
      "length": 872,
      "runMetres": 2616,
@@ -4306,6 +5673,15 @@
       "cleanSectors": "7/12",
       "meanKmh": 71.7
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 5.14,
+      "worstRise": 0,
+      "lines": 6600,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 4",
       "careful 556 under the first star 560"
@@ -4313,7 +5689,7 @@
     },
     {
      "seed": 3709,
-     "genMs": 17,
+     "genMs": 25,
      "kind": "circuit",
      "length": 804,
      "runMetres": 2412,
@@ -4367,6 +5743,15 @@
       "cleanSectors": "9/12",
       "meanKmh": 69.9
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 4.1,
+      "worstRise": 0.044,
+      "lines": 6075,
+      "blocked": 0,
+      "blockedNear": 0,
+      "worstShare": 0
+     },
      "fails": [
       "2 banked corners, under 4"
      ]
@@ -4390,7 +5775,7 @@
    "tried": [
     {
      "seed": 3808,
-     "genMs": 8,
+     "genMs": 20,
      "kind": "sprint",
      "length": 1412,
      "runMetres": 1372,
@@ -4445,11 +5830,20 @@
       "cleanSectors": "2/3",
       "meanKmh": 79.5
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 10050,
+      "blocked": 1,
+      "blockedNear": 0,
+      "worstShare": 0.0005
+     },
      "fails": []
     },
     {
      "seed": 3809,
-     "genMs": 7,
+     "genMs": 14,
      "kind": "sprint",
      "length": 1490,
      "runMetres": 1450,
@@ -4504,13 +5898,22 @@
       "cleanSectors": "0/3",
       "meanKmh": 78.6
      },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.81,
+      "worstRise": 0,
+      "lines": 10575,
+      "blocked": 2,
+      "blockedNear": 0,
+      "worstShare": 0.0009
+     },
      "fails": [
       "drifter 1 respawns"
      ]
     },
     {
      "seed": 3810,
-     "genMs": 12,
+     "genMs": 13,
      "kind": "sprint",
      "length": 1440,
      "runMetres": 1400,
@@ -4565,6 +5968,15 @@
       "stuck": 1,
       "cleanSectors": "2/3",
       "meanKmh": 80.7
+     },
+     "occlusion": {
+      "inside": 0,
+      "leastClear": 2.8,
+      "worstRise": 0,
+      "lines": 10200,
+      "blocked": 4,
+      "blockedNear": 0,
+      "worstShare": 0.002
      },
      "fails": [
       "drifter 1 respawns",

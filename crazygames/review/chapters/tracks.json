@@ -1,6 +1,6 @@
 {
- "started": "2026-11-09T20:14:35.720Z",
- "rule": "seeds.js check: no plain layout, a bridge where a crossover is asked, generation under 600 ms, both drivers finish with 0 respawns, the careful driver clean with a star, banked corners at least 0 / 3 / 4 by chapter",
+ "started": "2026-11-09T20:35:25.646Z",
+ "rule": "seeds.js check: nothing occludes the road in any theme, no plain layout, a bridge where a crossover is asked, generation under 600 ms, both drivers finish with 0 respawns, the careful driver clean with a star, banked corners at least 0 / 3 / 4 by chapter",
  "tracks": [
   {
    "index": 0,
@@ -14,7 +14,7 @@
    },
    "rejectedSeed": false,
    "seed": 1101,
-   "genMs": 64,
+   "genMs": 100,
    "kind": "circuit",
    "length": 518,
    "runMetres": 1554,
@@ -32,6 +32,15 @@
    "measuredDifficulty": 0.21,
    "attempts": 46,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.8,
+    "worstRise": 0,
+    "lines": 3900,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 4818,
@@ -98,7 +107,7 @@
    },
    "rejectedSeed": false,
    "seed": 1202,
-   "genMs": 23,
+   "genMs": 15,
    "kind": "sprint",
    "length": 840,
    "runMetres": 800,
@@ -116,6 +125,15 @@
    "measuredDifficulty": 0.15,
    "attempts": 2,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 5700,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 2486,
@@ -182,7 +200,7 @@
    },
    "rejectedSeed": false,
    "seed": 1327,
-   "genMs": 53,
+   "genMs": 48,
    "kind": "circuit",
    "length": 844,
    "runMetres": 2532,
@@ -198,6 +216,15 @@
    "measuredDifficulty": 0.35,
    "attempts": 13,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.32,
+    "worstRise": 0,
+    "lines": 6375,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8556,
@@ -264,7 +291,7 @@
    },
    "rejectedSeed": false,
    "seed": 1404,
-   "genMs": 13,
+   "genMs": 23,
    "kind": "sprint",
    "length": 898,
    "runMetres": 858,
@@ -282,6 +309,15 @@
    "measuredDifficulty": 0.36,
    "attempts": 4,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 6150,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 2980,
@@ -348,7 +384,7 @@
    },
    "rejectedSeed": false,
    "seed": 1505,
-   "genMs": 23,
+   "genMs": 29,
    "kind": "circuit",
    "length": 678,
    "runMetres": 2034,
@@ -368,6 +404,15 @@
    "measuredDifficulty": 0.47,
    "attempts": 15,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 5100,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 7596,
@@ -434,7 +479,7 @@
    },
    "rejectedSeed": false,
    "seed": 1606,
-   "genMs": 10,
+   "genMs": 12,
    "kind": "sprint",
    "length": 1018,
    "runMetres": 978,
@@ -455,6 +500,15 @@
    "measuredDifficulty": 0.35,
    "attempts": 1,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 7050,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 3323,
@@ -521,7 +575,7 @@
    },
    "rejectedSeed": false,
    "seed": 1707,
-   "genMs": 16,
+   "genMs": 14,
    "kind": "circuit",
    "length": 688,
    "runMetres": 2064,
@@ -540,6 +594,15 @@
    "measuredDifficulty": 0.43,
    "attempts": 16,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 5175,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 7105,
@@ -606,7 +669,7 @@
    },
    "rejectedSeed": false,
    "seed": 1808,
-   "genMs": 9,
+   "genMs": 13,
    "kind": "sprint",
    "length": 1066,
    "runMetres": 1026,
@@ -626,6 +689,15 @@
    "measuredDifficulty": 0.5,
    "attempts": 2,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.14,
+    "worstRise": 0,
+    "lines": 7425,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 3939,
@@ -689,7 +761,7 @@
    },
    "rejectedSeed": false,
    "seed": 2105,
-   "genMs": 77,
+   "genMs": 116,
    "kind": "circuit",
    "length": 832,
    "runMetres": 2496,
@@ -707,6 +779,15 @@
    "measuredDifficulty": 0.32,
    "attempts": 329,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.21,
+    "worstRise": 0,
+    "lines": 6300,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8338,
@@ -773,7 +854,7 @@
    },
    "rejectedSeed": false,
    "seed": 2213,
-   "genMs": 6,
+   "genMs": 10,
    "kind": "sprint",
    "length": 1114,
    "runMetres": 1074,
@@ -792,6 +873,15 @@
    "measuredDifficulty": 0.42,
    "attempts": 1,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.82,
+    "worstRise": 0,
+    "lines": 7800,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 3947,
@@ -857,36 +947,44 @@
     "crossover": "default"
    },
    "rejectedSeed": false,
-   "seed": 2305,
-   "genMs": 31,
+   "seed": 2314,
+   "genMs": 46,
    "kind": "circuit",
-   "length": 788,
-   "runMetres": 2364,
+   "length": 712,
+   "runMetres": 2136,
    "laps": 3,
    "corners": 8,
-   "banked": 5,
-   "bridges": 0,
+   "banked": 4,
+   "bridges": 1,
    "hairpins": 2,
    "clips": 6,
    "types": {
-    "multi": 3,
-    "tightening": 1,
-    "sweeper": 2,
-    "double": 2
+    "hairpin": 2,
+    "tight": 2,
+    "multi": 4
    },
-   "measuredDifficulty": 0.32,
-   "attempts": 38,
+   "measuredDifficulty": 0.41,
+   "attempts": 34,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 5400,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
-    "frames": 8026,
-    "seconds": 130.75,
-    "score": 618,
+    "frames": 7922,
+    "seconds": 129.02,
+    "score": 530,
     "stars": 1,
     "targets": [
-     580,
-     1160,
-     2040
+     530,
+     1050,
+     1840
     ],
     "cleanSectors": "12 of 12",
     "contacts": 0,
@@ -905,18 +1003,18 @@
    },
    "drifter": {
     "finished": true,
-    "frames": 6874,
-    "seconds": 111.55,
-    "score": 792,
+    "frames": 6665,
+    "seconds": 108.07,
+    "score": 941,
     "stars": 1,
     "targets": [
-     580,
-     1160,
-     2040
+     530,
+     1050,
+     1840
     ],
-    "cleanSectors": "7 of 12",
-    "contacts": 7,
-    "hard": 4,
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
     "offTrack": 0,
     "stuck": 0,
     "respawns": 0,
@@ -943,7 +1041,7 @@
    },
    "rejectedSeed": false,
    "seed": 2406,
-   "genMs": 6,
+   "genMs": 35,
    "kind": "sprint",
    "length": 1252,
    "runMetres": 1212,
@@ -963,6 +1061,15 @@
    "measuredDifficulty": 0.4,
    "attempts": 1,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.82,
+    "worstRise": 0,
+    "lines": 8850,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 4454,
@@ -1032,7 +1139,7 @@
    },
    "rejectedSeed": false,
    "seed": 2510,
-   "genMs": 11,
+   "genMs": 47,
    "kind": "circuit",
    "length": 846,
    "runMetres": 2538,
@@ -1050,6 +1157,15 @@
    "measuredDifficulty": 0.42,
    "attempts": 17,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 3.7,
+    "worstRise": 0,
+    "lines": 6375,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8747,
@@ -1116,7 +1232,7 @@
    },
    "rejectedSeed": false,
    "seed": 2606,
-   "genMs": 54,
+   "genMs": 28,
    "kind": "sprint",
    "length": 1130,
    "runMetres": 1090,
@@ -1135,6 +1251,15 @@
    "measuredDifficulty": 0.5,
    "attempts": 6,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 7875,
+    "blocked": 16,
+    "blockedNear": 0,
+    "worstShare": 0.0051
+   },
    "careful": {
     "finished": true,
     "frames": 4299,
@@ -1201,7 +1326,7 @@
    },
    "rejectedSeed": false,
    "seed": 2708,
-   "genMs": 14,
+   "genMs": 10,
    "kind": "circuit",
    "length": 700,
    "runMetres": 2100,
@@ -1220,6 +1345,15 @@
    "measuredDifficulty": 0.41,
    "attempts": 4,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.82,
+    "worstRise": 0,
+    "lines": 5250,
+    "blocked": 4,
+    "blockedNear": 0,
+    "worstShare": 0.0038
+   },
    "careful": {
     "finished": true,
     "frames": 7550,
@@ -1286,7 +1420,7 @@
    },
    "rejectedSeed": false,
    "seed": 2809,
-   "genMs": 10,
+   "genMs": 13,
    "kind": "sprint",
    "length": 1294,
    "runMetres": 1254,
@@ -1306,6 +1440,15 @@
    "measuredDifficulty": 0.55,
    "attempts": 1,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 9150,
+    "blocked": 1,
+    "blockedNear": 0,
+    "worstShare": 0.0005
+   },
    "careful": {
     "finished": true,
     "frames": 5040,
@@ -1369,7 +1512,7 @@
    },
    "rejectedSeed": false,
    "seed": 3102,
-   "genMs": 133,
+   "genMs": 171,
    "kind": "circuit",
    "length": 832,
    "runMetres": 2496,
@@ -1385,6 +1528,15 @@
    "measuredDifficulty": 0.45,
    "attempts": 364,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.25,
+    "worstRise": 0,
+    "lines": 6300,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8591,
@@ -1447,7 +1599,7 @@
    },
    "rejectedSeed": false,
    "seed": 3202,
-   "genMs": 43,
+   "genMs": 47,
    "kind": "sprint",
    "length": 1210,
    "runMetres": 1170,
@@ -1466,6 +1618,15 @@
    "measuredDifficulty": 0.39,
    "attempts": 16,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 8475,
+    "blocked": 5,
+    "blockedNear": 0,
+    "worstShare": 0.0006
+   },
    "careful": {
     "finished": true,
     "frames": 4153,
@@ -1531,7 +1692,7 @@
    },
    "rejectedSeed": false,
    "seed": 3303,
-   "genMs": 8,
+   "genMs": 4,
    "kind": "circuit",
    "length": 804,
    "runMetres": 2412,
@@ -1548,6 +1709,15 @@
    "measuredDifficulty": 0.37,
    "attempts": 1,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.09,
+    "worstRise": 0,
+    "lines": 6075,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8251,
@@ -1610,7 +1780,7 @@
    },
    "rejectedSeed": false,
    "seed": 3404,
-   "genMs": 12,
+   "genMs": 9,
    "kind": "sprint",
    "length": 1286,
    "runMetres": 1246,
@@ -1630,6 +1800,15 @@
    "measuredDifficulty": 0.5,
    "attempts": 1,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.82,
+    "worstRise": 0,
+    "lines": 9075,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 4740,
@@ -1695,7 +1874,7 @@
    },
    "rejectedSeed": false,
    "seed": 3505,
-   "genMs": 53,
+   "genMs": 44,
    "kind": "circuit",
    "length": 824,
    "runMetres": 2472,
@@ -1712,6 +1891,15 @@
    "measuredDifficulty": 0.41,
    "attempts": 68,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.81,
+    "worstRise": 0,
+    "lines": 6225,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8415,
@@ -1773,36 +1961,46 @@
     "crossover": "default"
    },
    "rejectedSeed": false,
-   "seed": 3609,
-   "genMs": 6,
+   "seed": 3611,
+   "genMs": 11,
    "kind": "sprint",
-   "length": 1294,
-   "runMetres": 1254,
+   "length": 1332,
+   "runMetres": 1292,
    "laps": 1,
    "corners": 13,
-   "banked": 4,
+   "banked": 5,
    "bridges": 0,
-   "hairpins": 10,
-   "clips": 12,
+   "hairpins": 8,
+   "clips": 13,
    "types": {
-    "double": 8,
     "hairpin": 2,
-    "multi": 2,
-    "tightening": 1
+    "double": 6,
+    "tight": 2,
+    "tightening": 1,
+    "sweeper": 2
    },
-   "measuredDifficulty": 0.55,
+   "measuredDifficulty": 0.5,
    "attempts": 1,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.84,
+    "worstRise": 0,
+    "lines": 9450,
+    "blocked": 30,
+    "blockedNear": 0,
+    "worstShare": 0.0053
+   },
    "careful": {
     "finished": true,
-    "frames": 5275,
-    "seconds": 84.88,
-    "score": 271,
+    "frames": 5176,
+    "seconds": 83.23,
+    "score": 281,
     "stars": 1,
     "targets": [
-     270,
-     550,
-     960
+     280,
+     570,
+     990
     ],
     "cleanSectors": "3 of 3",
     "contacts": 0,
@@ -1819,18 +2017,18 @@
    },
    "drifter": {
     "finished": true,
-    "frames": 4085,
-    "seconds": 65.05,
-    "score": 865,
-    "stars": 2,
+    "frames": 4176,
+    "seconds": 66.57,
+    "score": 2125,
+    "stars": 3,
     "targets": [
-     270,
-     550,
-     960
+     280,
+     570,
+     990
     ],
-    "cleanSectors": "3 of 3",
-    "contacts": 0,
-    "hard": 0,
+    "cleanSectors": "2 of 3",
+    "contacts": 2,
+    "hard": 1,
     "offTrack": 0,
     "stuck": 0,
     "respawns": 0,
@@ -1858,7 +2056,7 @@
    },
    "rejectedSeed": false,
    "seed": 3707,
-   "genMs": 109,
+   "genMs": 65,
    "kind": "circuit",
    "length": 836,
    "runMetres": 2508,
@@ -1875,6 +2073,15 @@
    "measuredDifficulty": 0.43,
    "attempts": 132,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.3,
+    "worstRise": 0,
+    "lines": 6300,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8721,
@@ -1937,7 +2144,7 @@
    },
    "rejectedSeed": false,
    "seed": 3808,
-   "genMs": 6,
+   "genMs": 7,
    "kind": "sprint",
    "length": 1412,
    "runMetres": 1372,
@@ -1956,6 +2163,15 @@
    "measuredDifficulty": 0.49,
    "attempts": 2,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.8,
+    "worstRise": 0,
+    "lines": 10050,
+    "blocked": 1,
+    "blockedNear": 0,
+    "worstShare": 0.0005
+   },
    "careful": {
     "finished": true,
     "frames": 5135,
@@ -2017,41 +2233,41 @@
    "measuredDifficulty": 0.35,
    "carefulSeconds": 82,
    "drifterSeconds": 66,
-   "worstGenMs": 64
+   "worstGenMs": 100
   },
   {
    "chapter": "Pro",
-   "circuitRunMetres": 2375,
+   "circuitRunMetres": 2318,
    "sprintRunMetres": 1158,
    "corners": 88,
-   "banked": 33,
-   "bankedShare": 0.38,
-   "bridges": 3,
-   "figureEights": 2,
+   "banked": 32,
+   "bankedShare": 0.36,
+   "bridges": 4,
+   "figureEights": 3,
    "hairpins": 14,
    "technicalOrHairpinStyles": 5,
    "askedDifficulty": 0.7,
-   "measuredDifficulty": 0.42,
-   "carefulSeconds": 102,
-   "drifterSeconds": 82.7,
-   "worstGenMs": 77
+   "measuredDifficulty": 0.43,
+   "carefulSeconds": 101.8,
+   "drifterSeconds": 82.3,
+   "worstGenMs": 116
   },
   {
    "chapter": "Legend",
    "circuitRunMetres": 2472,
-   "sprintRunMetres": 1261,
+   "sprintRunMetres": 1270,
    "corners": 90,
-   "banked": 34,
-   "bankedShare": 0.38,
+   "banked": 35,
+   "bankedShare": 0.39,
    "bridges": 4,
    "figureEights": 4,
-   "hairpins": 19,
+   "hairpins": 17,
    "technicalOrHairpinStyles": 7,
    "askedDifficulty": 0.9,
-   "measuredDifficulty": 0.45,
-   "carefulSeconds": 108,
-   "drifterSeconds": 88.7,
-   "worstGenMs": 133
+   "measuredDifficulty": 0.44,
+   "carefulSeconds": 107.8,
+   "drifterSeconds": 88.9,
+   "worstGenMs": 171
   }
  ],
  "knownAnswer": [
@@ -2071,7 +2287,7 @@
     "2 banked corners, under 3"
    ],
    "seed": 2206,
-   "genMs": 7,
+   "genMs": 4,
    "kind": "sprint",
    "length": 1140,
    "runMetres": 1100,
@@ -2090,6 +2306,15 @@
    "measuredDifficulty": 0.48,
    "attempts": 3,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.82,
+    "worstRise": 0,
+    "lines": 7950,
+    "blocked": 1,
+    "blockedNear": 0,
+    "worstShare": 0.0006
+   },
    "careful": {
     "finished": true,
     "frames": 4193,
@@ -2148,6 +2373,105 @@
    ]
   },
   {
+   "index": 10,
+   "name": "Pin drop",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.6,
+    "length": 720,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "rejectedSeed": true,
+   "nodeFails": [
+    "5 props inside the barriers"
+   ],
+   "seed": 2305,
+   "genMs": 20,
+   "kind": "circuit",
+   "length": 788,
+   "runMetres": 2364,
+   "laps": 3,
+   "corners": 8,
+   "banked": 5,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 6,
+   "types": {
+    "multi": 3,
+    "tightening": 1,
+    "sweeper": 2,
+    "double": 2
+   },
+   "measuredDifficulty": 0.32,
+   "attempts": 38,
+   "fallback": false,
+   "occlusion": {
+    "inside": 5,
+    "leastClear": -5.32,
+    "worstRise": 0,
+    "lines": 5925,
+    "blocked": 95,
+    "blockedNear": 0,
+    "worstShare": 0.016
+   },
+   "careful": {
+    "finished": true,
+    "frames": 8026,
+    "seconds": 130.75,
+    "score": 618,
+    "stars": 1,
+    "targets": [
+     580,
+     1160,
+     2040
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Breakwater"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 11
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 6874,
+    "seconds": 111.55,
+    "score": 792,
+    "stars": 1,
+    "targets": [
+     580,
+     1160,
+     2040
+    ],
+    "cleanSectors": "7 of 12",
+    "contacts": 7,
+    "hard": 4,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Breakwater"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 11
+   },
+   "fails": [
+    "5 props inside the barriers"
+   ]
+  },
+  {
    "index": 12,
    "name": "Tangle",
    "chapter": "Pro",
@@ -2167,7 +2491,7 @@
     "0 banked corners, under 3"
    ],
    "seed": 2507,
-   "genMs": 318,
+   "genMs": 376,
    "kind": "circuit",
    "length": 816,
    "runMetres": 2448,
@@ -2183,6 +2507,15 @@
    "measuredDifficulty": 0.21,
    "attempts": 1000,
    "fallback": true,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.8,
+    "worstRise": 0,
+    "lines": 6150,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 6548,
@@ -2256,7 +2589,7 @@
     "drifter 1 respawns"
    ],
    "seed": 2607,
-   "genMs": 6,
+   "genMs": 7,
    "kind": "sprint",
    "length": 1088,
    "runMetres": 1048,
@@ -2276,6 +2609,15 @@
    "measuredDifficulty": 0.37,
    "attempts": 3,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 2.83,
+    "worstRise": 0,
+    "lines": 7575,
+    "blocked": 3,
+    "blockedNear": 0,
+    "worstShare": 0.002
+   },
    "careful": {
     "finished": true,
     "frames": 3625,
@@ -2333,96 +2675,6 @@
    ]
   },
   {
-   "index": 19,
-   "name": "Needle run",
-   "chapter": "Legend",
-   "settings": {
-    "difficulty": 0.85,
-    "length": 1300,
-    "style": "technical",
-    "crossover": "default"
-   },
-   "rejectedSeed": true,
-   "nodeFails": [
-    "3 banked corners, under 4",
-    "careful 267 under the first star 270"
-   ],
-   "seed": 3406,
-   "genMs": 10,
-   "kind": "sprint",
-   "length": 1234,
-   "runMetres": 1194,
-   "laps": 1,
-   "corners": 17,
-   "banked": 3,
-   "bridges": 0,
-   "hairpins": 3,
-   "clips": 12,
-   "types": {
-    "chicane": 8,
-    "tight": 2,
-    "esses": 3,
-    "hairpin": 1,
-    "opening": 1,
-    "double": 2
-   },
-   "measuredDifficulty": 0.54,
-   "attempts": 2,
-   "fallback": false,
-   "careful": {
-    "finished": true,
-    "frames": 4753,
-    "seconds": 76.2,
-    "score": 267,
-    "stars": 0,
-    "targets": [
-     270,
-     530,
-     930
-    ],
-    "cleanSectors": "3 of 3",
-    "contacts": 0,
-    "hard": 0,
-    "offTrack": 0,
-    "stuck": 0,
-    "respawns": 0,
-    "unlock": {
-     "done": false,
-     "text": "Win a star to unlock track 5 of 8"
-    },
-    "note": null,
-    "nextIndex": null
-   },
-   "drifter": {
-    "finished": true,
-    "frames": 3565,
-    "seconds": 56.4,
-    "score": 581,
-    "stars": 2,
-    "targets": [
-     270,
-     530,
-     930
-    ],
-    "cleanSectors": "2 of 3",
-    "contacts": 1,
-    "hard": 1,
-    "offTrack": 0,
-    "stuck": 0,
-    "respawns": 0,
-    "unlock": {
-     "done": true,
-     "text": "Track 5 of 8 unlocked: Endless eight"
-    },
-    "note": null,
-    "nextIndex": 20
-   },
-   "fails": [
-    "3 banked corners, under 4",
-    "careful 267 under the first star 270"
-   ]
-  },
-  {
    "index": 8,
    "name": "Upper deck",
    "chapter": "Pro",
@@ -2440,7 +2692,7 @@
     "2 banked corners, under 3"
    ],
    "seed": 2101,
-   "genMs": 184,
+   "genMs": 244,
    "kind": "circuit",
    "length": 814,
    "runMetres": 2442,
@@ -2457,6 +2709,15 @@
    "measuredDifficulty": 0.38,
    "attempts": 766,
    "fallback": false,
+   "occlusion": {
+    "inside": 0,
+    "leastClear": 5.23,
+    "worstRise": 0,
+    "lines": 6150,
+    "blocked": 0,
+    "blockedNear": 0,
+    "worstShare": 0
+   },
    "careful": {
     "finished": true,
     "frames": 8408,

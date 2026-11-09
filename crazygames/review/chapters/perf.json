@@ -1,0 +1,286 @@
+{
+ "started": "2026-11-09T20:20:10.575Z",
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, low tier; JS without submit is the frame less renderer.render",
+ "longest": {
+  "index": 22,
+  "name": "The vice",
+  "runMetres": 2508
+ },
+ "runs": [
+  {
+   "index": 0,
+   "name": "First slide",
+   "throttle": 6,
+   "loadMs": 0,
+   "skipSeconds": 0,
+   "track": {
+    "name": "circuit 1101",
+    "length": 518,
+    "kind": "circuit"
+   },
+   "along": [
+    7,
+    132
+   ],
+   "hasGhost": true,
+   "ghostFrames": 390,
+   "driving": 390,
+   "backend": "webgl2",
+   "tier": "low",
+   "drawCalls": 74,
+   "jsWithoutSubmit": {
+    "n": 390,
+    "p50": 1,
+    "p95": 4.3,
+    "p99": 10.1,
+    "worst": 60.8,
+    "mean": 1.5
+   },
+   "physics": {
+    "n": 390,
+    "p50": 0.1,
+    "p95": 2,
+    "p99": 7.7,
+    "worst": 60.6,
+    "mean": 0.71
+   },
+   "frame": {
+    "n": 390,
+    "p50": 269,
+    "p95": 366.6,
+    "p99": 1467.3,
+    "worst": 25406.2,
+    "mean": 267.43
+   },
+   "submit": {
+    "n": 390,
+    "p50": 267.6,
+    "p95": 365,
+    "p99": 1466,
+    "worst": 25405.9,
+    "mean": 265.94
+   },
+   "errors": []
+  },
+  {
+   "index": 22,
+   "name": "The vice",
+   "throttle": 6,
+   "loadMs": 0,
+   "skipSeconds": 0,
+   "track": {
+    "name": "circuit 3707",
+    "length": 836,
+    "kind": "circuit"
+   },
+   "along": [
+    6,
+    141
+   ],
+   "hasGhost": true,
+   "ghostFrames": 390,
+   "driving": 390,
+   "backend": "webgl2",
+   "tier": "low",
+   "drawCalls": 72,
+   "jsWithoutSubmit": {
+    "n": 390,
+    "p50": 1.3,
+    "p95": 3.9,
+    "p99": 10,
+    "worst": 65.2,
+    "mean": 1.6
+   },
+   "physics": {
+    "n": 390,
+    "p50": 0.1,
+    "p95": 1.6,
+    "p99": 5.2,
+    "worst": 10,
+    "mean": 0.5
+   },
+   "frame": {
+    "n": 390,
+    "p50": 21.5,
+    "p95": 384.2,
+    "p99": 2170.9,
+    "worst": 31082.5,
+    "mean": 267.85
+   },
+   "submit": {
+    "n": 390,
+    "p50": 19.1,
+    "p95": 383.1,
+    "p99": 2168.7,
+    "worst": 31076.6,
+    "mean": 266.25
+   },
+   "errors": []
+  },
+  {
+   "index": 0,
+   "name": "First slide",
+   "throttle": 6,
+   "loadMs": 0,
+   "skipSeconds": 40,
+   "track": {
+    "name": "circuit 1101",
+    "length": 518,
+    "kind": "circuit"
+   },
+   "along": [
+    383,
+    26
+   ],
+   "hasGhost": true,
+   "ghostFrames": 390,
+   "driving": 390,
+   "backend": "webgl2",
+   "tier": "low",
+   "drawCalls": 77,
+   "jsWithoutSubmit": {
+    "n": 390,
+    "p50": 1.1,
+    "p95": 4.8,
+    "p99": 6.7,
+    "worst": 71.5,
+    "mean": 1.45
+   },
+   "physics": {
+    "n": 390,
+    "p50": 0.1,
+    "p95": 1.5,
+    "p99": 4.9,
+    "worst": 6,
+    "mean": 0.39
+   },
+   "frame": {
+    "n": 390,
+    "p50": 235.7,
+    "p95": 370,
+    "p99": 1916.8,
+    "worst": 13324.7,
+    "mean": 245.29
+   },
+   "submit": {
+    "n": 390,
+    "p50": 233.9,
+    "p95": 369.7,
+    "p99": 1915.5,
+    "worst": 13324.5,
+    "mean": 243.83
+   },
+   "errors": []
+  },
+  {
+   "index": 22,
+   "name": "The vice",
+   "throttle": 6,
+   "loadMs": 0,
+   "skipSeconds": 60,
+   "track": {
+    "name": "circuit 3707",
+    "length": 836,
+    "kind": "circuit"
+   },
+   "along": [
+    390,
+    523
+   ],
+   "hasGhost": true,
+   "ghostFrames": 390,
+   "driving": 390,
+   "backend": "webgl2",
+   "tier": "low",
+   "drawCalls": 72,
+   "jsWithoutSubmit": {
+    "n": 390,
+    "p50": 0.7,
+    "p95": 2.6,
+    "p99": 5.6,
+    "worst": 7.6,
+    "mean": 0.96
+   },
+   "physics": {
+    "n": 390,
+    "p50": 0,
+    "p95": 1,
+    "p99": 2.6,
+    "worst": 7.4,
+    "mean": 0.19
+   },
+   "frame": {
+    "n": 390,
+    "p50": 33.5,
+    "p95": 521,
+    "p99": 2279.3,
+    "worst": 29003.9,
+    "mean": 304.67
+   },
+   "submit": {
+    "n": 390,
+    "p50": 31.9,
+    "p95": 518.9,
+    "p99": 2278,
+    "worst": 29002.3,
+    "mean": 303.71
+   },
+   "errors": []
+  }
+ ],
+ "knownAnswer": {
+  "index": 22,
+  "name": "The vice",
+  "throttle": 6,
+  "loadMs": 20,
+  "skipSeconds": 0,
+  "track": {
+   "name": "circuit 3707",
+   "length": 836,
+   "kind": "circuit"
+  },
+  "along": [
+   6,
+   141
+  ],
+  "hasGhost": true,
+  "ghostFrames": 390,
+  "driving": 390,
+  "backend": "webgl2",
+  "tier": "low",
+  "drawCalls": 72,
+  "jsWithoutSubmit": {
+   "n": 390,
+   "p50": 22.5,
+   "p95": 26.6,
+   "p99": 30.7,
+   "worst": 36,
+   "mean": 22.98
+  },
+  "physics": {
+   "n": 390,
+   "p50": 21.4,
+   "p95": 25.3,
+   "p99": 29.2,
+   "worst": 34.4,
+   "mean": 22.01
+  },
+  "frame": {
+   "n": 390,
+   "p50": 44.1,
+   "p95": 385.5,
+   "p99": 2224.2,
+   "worst": 31585.9,
+   "mean": 266.74
+  },
+  "submit": {
+   "n": 390,
+   "p50": 20.3,
+   "p95": 361.9,
+   "p99": 2199.2,
+   "worst": 31565.1,
+   "mean": 243.76
+  },
+  "errors": []
+ }
+}

@@ -3,7 +3,10 @@
    terrain.js and scenery.js), so the same placement the scene draws is
    checked here over many generated tracks and every theme.
 
-   node game/test/visuals/occlusion.js [--seeds N] [--quick]
+   node game/test/visuals/occlusion.js [--seeds N] [--quick] [--career]
+
+   --career checks the 24 career tracks instead, as the game asks for
+   them (briefs/CHAPTERS.md), and writes review/chapters/occlusion.json.
 
    Three checks, each over every track and theme:
    a. Inside the barriers: no prop's footprint (a circle's rim, or a
@@ -33,11 +36,13 @@ import { buildTerrain, TERRAIN } from '../../src/env/terrain.js';
 import { placeScenery, flatten, footprintPoints, PROP_DIMS } from '../../src/env/scenery.js';
 import { THEMES, THEME_NAMES } from '../../src/env/themes.js';
 import { TUNE } from '../../src/tune.js';
+import { CAREER, careerSpec } from '../../src/loop/modes.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..', '..');
 const args = process.argv.slice(2);
 const quick = args.includes('--quick');
+const careerOnly = args.includes('--career');
 const seedsN = args.includes('--seeds') ? +args[args.indexOf('--seeds') + 1] : (quick ? 4 : 24);
 
 export const BUDGET = {
@@ -170,19 +175,22 @@ export function checkTrack(track, theme, options) {
   return { instances: list.length, inside, worstClear: +worstClear.toFixed(2), worstKind, worstRise: +worstRise.toFixed(3), lines, blocked, blockedNear, nearest: isFinite(nearest) ? nearest : null, byTerrain, byProp, blockers };
 }
 
+/* run as a script; imported (by the chapters' seed search, for checkTrack) it does nothing */
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 const t0 = Date.now();
 const seeds = [];
-for (let k = 0; k < seedsN; k++) seeds.push([2000 + k * 7, k % 2 ? 'sprint' : 'circuit']);
+if (careerOnly) for (let i = 0; i < CAREER.length; i++) { const c = careerSpec(i); seeds.push([c.seed, c.kind, c.length, c.difficulty, c.options]); }
+else for (let k = 0; k < seedsN; k++) seeds.push([2000 + k * 7, k % 2 ? 'sprint' : 'circuit']);
 /* the tracks as the game asks for them, banked and with crossovers; four
    figure eights for certain: the career's crossover and three more */
 const extra = [[1327, 'circuit', 820, 0.3], [3007, 'circuit', 1000], [3016, 'circuit', 1000], [3029, 'circuit', 1000]];
-for (const e of extra) seeds.push(e);
+if (!careerOnly) for (const e of extra) seeds.push(e);
 const rows = [];
 let worst = { clear: Infinity, rise: 0, blockedShare: 0, blockedNear: 0, inside: 0 };
 let totalLines = 0, totalBlocked = 0;
 let crossings = 0;
-for (const [seed, kind, length, difficulty] of seeds) {
-  const track = generateTrack(seed, { kind, length, difficulty });
+for (const [seed, kind, length, difficulty, options] of seeds) {
+  const track = generateTrack(seed, { kind, length, difficulty, ...(options || {}) });
   crossings += (track.bridges || []).length;
   for (const name of THEME_NAMES) {
     const r = checkTrack(track, THEMES[name]);
@@ -209,9 +217,10 @@ verdict('known answer: a pine on the road is inside the barriers', kaTree.inside
 verdict('known answer: a pine on the road blocks sight lines', kaTree.blocked > 0 && kaTree.blockedNear > 0, kaTree.blocked + ' blocked, ' + kaTree.blockedNear + ' within ' + BUDGET.CLEAR_AHEAD + ' m, nearest ' + kaTree.nearest + ' m');
 verdict('known answer: the terrain lifted a metre and a half under the road is caught', kaLift.worstRise > BUDGET.ROAD_FLAT, 'worst rise ' + kaLift.worstRise + ' m');
 const out = { started: new Date(t0).toISOString(), seconds: +((Date.now() - t0) / 1000).toFixed(1), budget: BUDGET, seeds: seeds.length, themes: THEME_NAMES, summary: { pairs: rows.length, inside: worst.inside, leastClearance: worst.clear, worstRise: worst.rise, lines: totalLines, blocked: totalBlocked, blockedShare: +(totalBlocked / totalLines).toFixed(4), worstTrackBlockedShare: +worst.blockedShare.toFixed(4), blockedNear: worst.blockedNear }, knownAnswers: { treeOnRoad: kaTree, terrainLifted: { worstRise: kaLift.worstRise } }, verdicts, rows };
-const dir = path.join(root, 'review', 'visuals');
+const dir = path.join(root, 'review', careerOnly ? 'chapters' : 'visuals');
 fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(path.join(dir, 'occlusion.json'), JSON.stringify(out, null, 1));
 const failed = verdicts.filter(v => !v.ok).length;
-console.log((failed ? failed + ' FAILED' : 'all passed') + ' in ' + out.seconds + ' s; wrote review/visuals/occlusion.json');
+console.log((failed ? failed + ' FAILED' : 'all passed') + ' in ' + out.seconds + ' s; wrote review/' + (careerOnly ? 'chapters' : 'visuals') + '/occlusion.json');
 process.exit(failed ? 1 : 0);
+}
