@@ -40,7 +40,7 @@ import { createRace } from './scoring/race.js';
 import { fullscreenSupported, toggleFullscreen, onFullscreenChange, fullscreenIcon } from './ui/fullscreen.js';
 import { createSound, soundIcon } from './audio/sound.js';
 import { createGhost, compactTape } from './loop/ghost.js';
-import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
+import { CAREER, CHAPTERS, chapterOf, chapterOpen, starsToOpen, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
@@ -345,12 +345,37 @@ function inputSource() {
 }
 
 /* which run this is, over the countdown, so a new player landed in a
-   run knows it is the first of a career */
+   run knows it is the first of a career, and a player in Pro knows it */
 function runHead(spec) {
-  if (spec.mode === 'career') return { label: 'CAREER \u00b7 TRACK ' + (spec.index + 1) + ' OF ' + CAREER.length, name: spec.name };
+  if (spec.mode === 'career') { const ch = CHAPTERS[chapterOf(spec.index)]; return { label: 'CAREER \u00b7 ' + ch.name.toUpperCase() + ' \u00b7 TRACK ' + (spec.index - ch.from + 1) + ' OF ' + (ch.to - ch.from), name: spec.name }; }
   if (spec.mode === 'daily') return { label: 'DAILY DRIFT', name: 'A new track every day' };
   if (spec.mode === 'lab') return { label: 'TRACK LAB', name: formatCode(spec.code) };
   return null;
+}
+
+/* What a career run did to the ladder, for the results card: unlock is
+   the main line (a chapter or a track just opened, or what opens the next
+   track), note a second line (another track opened by the same run, or
+   how many more stars open the next chapter), nextIndex the track NEXT
+   plays. wasOpen and nextChapterWasOpen are the next track and the next
+   chapter as they were before the run's result was saved. */
+function careerNews(index, wasOpen, nextChapterWasOpen) {
+  const c = chapterOf(index), ch = CHAPTERS[c], n = index + 1, size = ch.to - ch.from, up = CHAPTERS[c + 1];
+  let unlock = null, note = null, nextIndex = null;
+  const trackLine = () => n < ch.to && !wasOpen
+    ? careerUnlocked(save.state, n) ? { done: true, text: 'Track ' + (n - ch.from + 1) + ' of ' + size + ' unlocked: ' + CAREER[n].name } : { done: false, text: 'Win a star to unlock track ' + (n - ch.from + 1) + ' of ' + size }
+    : null;
+  if (up && !nextChapterWasOpen && chapterOpen(save.state, c + 1)) {
+    /* this run opened the next chapter: NEXT goes to its first track */
+    unlock = { done: true, chapter: up.id, text: up.name + ' unlocked: ' + CAREER[up.from].name };
+    nextIndex = up.from;
+    const t = trackLine(); if (t && t.done) note = { text: t.text };
+  } else {
+    if (n < CAREER.length && careerUnlocked(save.state, n)) nextIndex = n;
+    unlock = trackLine();
+    if (up && !chapterOpen(save.state, c + 1)) { const k = starsToOpen(save.state, c + 1); note = { text: k + ' more ' + ch.name + ' star' + (k === 1 ? '' : 's') + ' to open ' + up.name }; }
+  }
+  return { unlock, note, nextIndex };
 }
 
 function startRun(spec, opts) {
@@ -404,15 +429,13 @@ function finishRun() {
     const was = save.state.missions[spec.key] || [];
     missions = app.missions.missions.map((m, i) => ({ text: m.text, kind: m.kind, target: m.target, done: !!was[i], doneNow: done[i], fresh: fresh.includes(i), coins: fresh.includes(i) ? LOOP.MISSIONS.COINS : 0, progress: app.missions.state.progress[i], doneAt: app.missions.state.doneAt[i] }));
   }
-  let improved = false, nextIndex = null, unlock = null;
+  let improved = false, nextIndex = null, unlock = null, note = null;
   if (spec.mode === 'career') {
-    const n = spec.index + 1, wasOpen = n < CAREER.length && careerUnlocked(save.state, n);
+    /* say what the career is: a chapter or a track just opened, what opens the next, and how far the next chapter is */
+    const n = spec.index + 1, c = chapterOf(spec.index);
+    const wasOpen = n < CAREER.length && careerUnlocked(save.state, n), nextChapterWasOpen = c + 1 < CHAPTERS.length && chapterOpen(save.state, c + 1);
     improved = save.careerResult(spec.index, stars, score);
-    if (n < CAREER.length && careerUnlocked(save.state, n)) nextIndex = n;
-    /* say what the career is: a track just opened, or what opens the next */
-    if (n < CAREER.length && !wasOpen) unlock = nextIndex === n
-      ? { done: true, text: 'Track ' + (n + 1) + ' of ' + CAREER.length + ' unlocked: ' + CAREER[n].name }
-      : { done: false, text: 'Win a star to unlock track ' + (n + 1) + ' of ' + CAREER.length };
+    ({ unlock, note, nextIndex } = careerNews(spec.index, wasOpen, nextChapterWasOpen));
   }
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
   else if (spec.mode === 'lab') improved = save.labResult(spec.code, stars, score);
@@ -423,7 +446,7 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
+  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();

@@ -4,7 +4,7 @@
    to the host. Big targets for thumbs: everything is reachable in
    390x844 portrait and in landscape. No images, no fonts, system text. */
 import { ROSTER, PAINTS, carById, upgradeLevels, UPGRADE_STATS, UPGRADE_NAMES } from '../garage/roster.js';
-import { CAREER, careerUnlocked, careerStars } from '../loop/modes.js';
+import { CAREER, CHAPTERS, careerUnlocked, careerStars, chapterStars, chapterOpen, starsToOpen } from '../loop/modes.js';
 import { missionTally } from '../loop/missions.js';
 import { LOOP } from '../tune.js';
 import { fullscreenSupported, isFullscreen, fullscreenIcon } from './fullscreen.js';
@@ -66,17 +66,34 @@ export function createScreens(root, onAction) {
       <p class="hint">Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.</p>`);
   }
 
+  /* THE CAREER: three chapters of eight, each a header (its stars and
+     missions, or how many more stars open it) over its tracks. The list
+     scrolls in its own box under the screen's header, and opens scrolled
+     to the player's current chapter: the furthest one open. */
   function career(save) {
-    const rows = CAREER.map((c, i) => {
-      const e = save.career[String(i)], open = careerUnlocked(save, i);
-      return `<button type="button" class="row${open ? '' : ' locked'}" data-action="play-career" data-arg="${i}" ${open ? '' : 'disabled'}>
-        <span class="n">${i + 1}</span>
-        <span class="name"><b>${esc(c.name)}</b><small>${c.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint'}${e && e.best ? ' &middot; best ' + fmt(e.best) : ''}</small></span>
-        ${open ? '<span class="col">' + stars(e ? e.stars : 0) + pips(save.missions && save.missions['career:' + i]) + '</span>' : '<span class="lock">&#128274;</span>'}
+    const chapters = CHAPTERS.map((ch, c) => {
+      const open = chapterOpen(save, c), size = ch.to - ch.from;
+      let done = 0;
+      for (let i = ch.from; i < ch.to; i++) { const e = save.missions && save.missions['career:' + i]; if (e) for (const v of e) if (v) done++; }
+      const rows = CAREER.slice(ch.from, ch.to).map((t, k) => {
+        const i = ch.from + k, e = save.career[String(i)], playable = careerUnlocked(save, i);
+        return `<button type="button" class="row${playable ? '' : ' locked'}" data-action="play-career" data-arg="${i}" ${playable ? '' : 'disabled'}>
+        <span class="n">${k + 1}</span>
+        <span class="name"><b>${esc(t.name)}</b><small>${t.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint'}${e && e.best ? ' &middot; best ' + fmt(e.best) : ''}</small></span>
+        ${playable ? '<span class="col">' + stars(e ? e.stars : 0) + pips(save.missions && save.missions['career:' + i]) + '</span>' : '<span class="lock">&#128274;</span>'}
       </button>`;
+      }).join('');
+      const k = starsToOpen(save, c);
+      const sub = open ? `${chapterStars(save, c)}/${size * 3} &#9733; &middot; ${done}/${size * 3} missions` : `${k} more ${esc(CHAPTERS[c - 1].name)} star${k === 1 ? '' : 's'} to open ${esc(ch.name)}`;
+      return `<section class="chapter${open ? '' : ' locked'}" data-chapter="${c}"><div class="chead"><b>${esc(ch.name.toUpperCase())}</b><small>${sub}</small></div>${rows}</section>`;
     }).join('');
     const tally = missionTally(save, CAREER.length);
-    show('career', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>CAREER</h2><span class="tally">${careerStars(save)} &#9733; &middot; ${tally}/${CAREER.length * 3} missions</span></header><div class="list">${rows}</div>`);
+    show('career', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>CAREER</h2><span class="tally">${careerStars(save)}/${CAREER.length * 3} &#9733; &middot; ${tally}/${CAREER.length * 3} missions</span></header><div class="list">${chapters}</div>`);
+    /* the current chapter at the top of the list */
+    let current = 0;
+    for (let c = 0; c < CHAPTERS.length; c++) if (chapterOpen(save, c)) current = c;
+    const list = el.querySelector('.career .list'), sec = el.querySelector('.career .chapter[data-chapter="' + current + '"]');
+    if (list && sec) list.scrollTop = Math.max(0, sec.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop);
   }
 
   /* the upgrades of an owned car: a row per stat, its steps as pips and
@@ -145,7 +162,7 @@ export function createScreens(root, onAction) {
       </div>`);
   }
 
-  /* r: { score, best, stars, targets, coins, improved, mode, name, label, seconds, nextIndex, unlock, laps, kind, missions, code } */
+  /* r: { score, best, stars, targets, coins, improved, mode, name, label, seconds, nextIndex, unlock, note, laps, kind, missions, code } */
   function results(r) {
     const targets = r.targets.map((t, i) => `<span class="${r.score >= t ? 'on' : 'off'}">&#9733; ${fmt(t)}</span>`).join('');
     show('results', `
@@ -159,6 +176,7 @@ export function createScreens(root, onAction) {
         ${r.missions ? `<div class="missions">${r.missions.map(m => `<span class="${m.done ? 'done' : ''}${m.fresh ? ' fresh' : ''}">${m.done ? '&#10003;' : '&#9671;'} ${esc(m.text)}${m.fresh ? ' <b>+' + m.coins + '</b>' : ''}</span>`).join('')}</div>` : ''}
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
+        ${r.note ? `<p class="chapnote">${esc(r.note.text)}</p>` : ''}
         <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
