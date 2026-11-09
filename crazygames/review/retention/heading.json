@@ -1,0 +1,178 @@
+{
+ "390x844": {
+  "run": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 651.21875,
+    "scroll": false,
+    "H": 844
+   },
+   "finished": true
+  },
+  "known": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 651.21875,
+    "scroll": false,
+    "H": 844
+   },
+   "finished": true
+  }
+ },
+ "844x390": {
+  "run": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 525.890625,
+    "scroll": false,
+    "H": 390
+   },
+   "finished": true
+  },
+  "known": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 525.890625,
+    "scroll": false,
+    "H": 390
+   },
+   "finished": true
+  }
+ },
+ "800x450": {
+  "run": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 526.5,
+    "scroll": false,
+    "H": 450
+   },
+   "finished": true
+  },
+  "known": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 526.5,
+    "scroll": false,
+    "H": 450
+   },
+   "finished": true
+  }
+ },
+ "1280x720": {
+  "run": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 669.1875,
+    "scroll": false,
+    "H": 720
+   },
+   "finished": true
+  },
+  "known": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · TRACK 1 OF 8",
+    "name": "First slide",
+    "state": "countdown"
+   },
+   "results": {
+    "label": "CAREER · TRACK 1 OF 8",
+    "unlock": "🔓 Track 2 of 8 unlocked: Harbour run",
+    "unlockDone": true,
+    "next": true,
+    "nextPrimary": true,
+    "againPrimary": false,
+    "stars": 1,
+    "cardBottom": 669.1875,
+    "scroll": false,
+    "H": 720
+   },
+   "finished": true
+  }
+ }
+}

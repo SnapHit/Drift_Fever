@@ -67,10 +67,13 @@ export function createHud(root) {
       if (clock !== lastClock) { lastClock = clock; clockEl.textContent = clock; }
     },
     setToBeat(text) { if (text !== lastBeat) { lastBeat = text; toBeat.textContent = text; } },
-    /* the track's missions, over the countdown: [{ text, done }] or null to hide */
-    setMissions(list) {
-      if (!list) { if (!missionsEl.hidden) { missionsEl.hidden = true; missionsEl.innerHTML = ''; } return; }
-      missionsEl.innerHTML = '<b>MISSIONS</b>' + list.map(m => '<span class="' + (m.done ? 'done' : '') + '">' + (m.done ? '&#10003;' : '&#9671;') + ' ' + esc(m.text) + '</span>').join('');
+    /* over the countdown: which run this is (head: { label, name }) and
+       the track's missions ([{ text, done }]); neither hides the box */
+    setMissions(list, head) {
+      if (!list && !head) { if (!missionsEl.hidden) { missionsEl.hidden = true; missionsEl.innerHTML = ''; } return; }
+      missionsEl.innerHTML = (head ? '<i>' + esc(head.label) + '</i><strong>' + esc(head.name) + '</strong>' : '')
+        + (list && list.length ? '<b>MISSIONS</b>' + list.map(m => '<span class="' + (m.done ? 'done' : '') + '">' + (m.done ? '&#10003;' : '&#9671;') + ' ' + esc(m.text) + '</span>').join('') : '');
+      missionsEl.classList.toggle('headed', !!head);
       missionsEl.hidden = false;
     },
     /* a one line notice that rises and fades like the score's callouts */

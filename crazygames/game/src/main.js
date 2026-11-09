@@ -42,7 +42,7 @@ import { createSound, soundIcon } from './audio/sound.js';
 import { createGhost, compactTape } from './loop/ghost.js';
 import { CAREER, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
-import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered } from './lab/lab.js';
+import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
 
@@ -344,6 +344,15 @@ function inputSource() {
   return src;
 }
 
+/* which run this is, over the countdown, so a new player landed in a
+   run knows it is the first of a career */
+function runHead(spec) {
+  if (spec.mode === 'career') return { label: 'CAREER \u00b7 TRACK ' + (spec.index + 1) + ' OF ' + CAREER.length, name: spec.name };
+  if (spec.mode === 'daily') return { label: 'DAILY DRIFT', name: 'A new track every day' };
+  if (spec.mode === 'lab') return { label: 'TRACK LAB', name: formatCode(spec.code) };
+  return null;
+}
+
 function startRun(spec, opts) {
   app.spec = spec; app.key = spec.key;
   app.track = trackFor(spec);
@@ -359,8 +368,9 @@ function startRun(spec, opts) {
   app.heardMissions = 0;
   /* the list over the countdown; not on the onboarding run, which teaches the core and nothing else (the missions are still judged and paid) */
   const listed = missions && !(opts && opts.onboard);
-  hud.setMissions(listed ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null);
-  app.missionsShown = listed ? LOOP.MISSIONS.SHOWN : 0;
+  const head = runHead(spec);
+  hud.setMissions(listed ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null, head);
+  app.missionsShown = listed || head ? LOOP.MISSIONS.SHOWN : 0;
   const rec = ghostFor(spec.key, app.track);
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
@@ -394,8 +404,16 @@ function finishRun() {
     const was = save.state.missions[spec.key] || [];
     missions = app.missions.missions.map((m, i) => ({ text: m.text, kind: m.kind, target: m.target, done: !!was[i], doneNow: done[i], fresh: fresh.includes(i), coins: fresh.includes(i) ? LOOP.MISSIONS.COINS : 0, progress: app.missions.state.progress[i], doneAt: app.missions.state.doneAt[i] }));
   }
-  let improved = false, nextIndex = null;
-  if (spec.mode === 'career') { improved = save.careerResult(spec.index, stars, score); if (spec.index + 1 < CAREER.length && careerUnlocked(save.state, spec.index + 1)) nextIndex = spec.index + 1; }
+  let improved = false, nextIndex = null, unlock = null;
+  if (spec.mode === 'career') {
+    const n = spec.index + 1, wasOpen = n < CAREER.length && careerUnlocked(save.state, n);
+    improved = save.careerResult(spec.index, stars, score);
+    if (n < CAREER.length && careerUnlocked(save.state, n)) nextIndex = n;
+    /* say what the career is: a track just opened, or what opens the next */
+    if (n < CAREER.length && !wasOpen) unlock = nextIndex === n
+      ? { done: true, text: 'Track ' + (n + 1) + ' of ' + CAREER.length + ' unlocked: ' + CAREER[n].name }
+      : { done: false, text: 'Win a star to unlock track ' + (n + 1) + ' of ' + CAREER.length };
+  }
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
   else if (spec.mode === 'lab') improved = save.labResult(spec.code, stars, score);
   save.addCoins(coins);
@@ -405,7 +423,7 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), code: spec.mode === 'lab' ? spec.code : null };
+  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();

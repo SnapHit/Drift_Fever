@@ -145,12 +145,12 @@ export function createScreens(root, onAction) {
       </div>`);
   }
 
-  /* r: { score, best, stars, targets, coins, improved, mode, name, seconds, nextIndex, laps, kind, missions, code } */
+  /* r: { score, best, stars, targets, coins, improved, mode, name, label, seconds, nextIndex, unlock, laps, kind, missions, code } */
   function results(r) {
     const targets = r.targets.map((t, i) => `<span class="${r.score >= t ? 'on' : 'off'}">&#9733; ${fmt(t)}</span>`).join('');
     show('results', `
       <div class="card">
-        <h2>${esc(r.name)}</h2>
+        ${r.label ? `<p class="runlabel">${esc(r.label)}</p>` : ''}<h2>${esc(r.name)}</h2>
         <div class="score"><span class="n">${fmt(r.score)}</span><span class="l">points${r.improved ? ' &middot; NEW BEST' : ''}</span></div>
         ${stars(r.stars)}
         <div class="targets">${targets}</div>
@@ -158,9 +158,10 @@ export function createScreens(root, onAction) {
         <div class="facts"><span><b>${fmt(r.best)}</b><small>best chain</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span><b>+${fmt(r.coins)}</b><small>coins${r.newStars ? ' &middot; ' + r.newStars + ' new star' + (r.newStars > 1 ? 's' : '') : ''}</small></span></div>
         ${r.missions ? `<div class="missions">${r.missions.map(m => `<span class="${m.done ? 'done' : ''}${m.fresh ? ' fresh' : ''}">${m.done ? '&#10003;' : '&#9671;'} ${esc(m.text)}${m.fresh ? ' <b>+' + m.coins + '</b>' : ''}</span>`).join('')}</div>` : ''}
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
-        <button type="button" class="big primary" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
+        ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
+        <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
-          ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
+          ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
           ${r.code ? `<button type="button" class="big" data-action="lab"><b>LAB</b><small>change the track</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>
         </div>
