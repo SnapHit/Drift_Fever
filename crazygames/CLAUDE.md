@@ -354,3 +354,18 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   included, and a career run's results say "Track 2 of 8 unlocked" with
   NEXT as the main button, or "Win a star to unlock track 2 of 8".
   Measured at four sizes by `game/test/retention/heading.js`.
+- 10 November 2026, career chapters (`briefs/CHAPTERS.md`,
+  `review/chapters/REPORT.md`): the career is 24 tracks in three chapters
+  of eight, Rookie (the old eight, unchanged, indices 0 to 7), Pro and
+  Legend, one flat `CAREER` list so every save key keeps its meaning.
+  Pro opens with 12 Rookie stars and Legend with 14 Pro stars
+  (`LOOP.CHAPTERS.OPEN`, first guesses). The sixteen new seeds were
+  chosen by measurement: both scripted drivers finish with 0 respawns,
+  the careful driver earns a star clean, nothing occludes the road, and
+  each chapter has more banks, hairpins and figure eights than the last.
+  "Tangle" was renamed "Over and under" (CrazyGames lists Tangle Master).
+  Open: the thresholds want play; the new circuits run 91 to 143 s,
+  over DESIGN.md's 60 to 120 s; a save with a scripted ghost on all 24
+  tracks is 2.2 million characters, and a failed write saves nothing
+  after it; at 844x390 the results card scrolls to reach its buttons (as
+  it did before chapters).
