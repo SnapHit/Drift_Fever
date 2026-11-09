@@ -36,7 +36,7 @@ export const CAREER = [
   { name: 'Quarry cut',    kind: 'sprint',  seed: 2213, difficulty: 0.55, length: 1100, style: 'technical' },
   { name: 'Pin drop',      kind: 'circuit', seed: 2314, difficulty: 0.60, length: 720,  style: 'hairpins' },
   { name: 'Breakwater',    kind: 'sprint',  seed: 2406, difficulty: 0.65, length: 1150 },
-  { name: 'Tangle',        kind: 'circuit', seed: 2510, difficulty: 0.70, length: [770, 860],  style: 'technical', crossover: 'always' },
+  { name: 'Over and under', kind: 'circuit', seed: 2510, difficulty: 0.70, length: [770, 860],  style: 'technical', crossover: 'always' },
   { name: 'Switchbacks',   kind: 'sprint',  seed: 2606, difficulty: 0.75, length: 1200, style: 'hairpins' },
   { name: 'Smoke ring',    kind: 'circuit', seed: 2708, difficulty: 0.80, length: 760 },
   { name: 'Razor wire',    kind: 'sprint',  seed: 2809, difficulty: 0.90, length: 1250, style: 'technical' },

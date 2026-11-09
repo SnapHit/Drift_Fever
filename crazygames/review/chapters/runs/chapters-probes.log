@@ -1,0 +1,144 @@
+
+== 1. tracks
+0 First slide seed 1101: ok [gen 86 ms, 1554 m, 3 corners, 0 banked, 0 bridges; careful 77.27 s 491/450 1 stars 0 contacts 0 resp; drifter 69.98 s 895 1 stars 0 resp]
+1 Harbour run seed 1202: ok [gen 18 ms, 800 m, 8 corners, 5 banked, 0 bridges; careful 38.4 s 252/230 1 stars 0 contacts 0 resp; drifter 32.5 s 309 1 stars 0 resp]
+2 Crossover seed 1327: ok [gen 54 ms, 2532 m, 12 corners, 6 banked, 1 bridges; careful 139.57 s 723/690 1 stars 0 contacts 0 resp; drifter 105.77 s 1128 1 stars 0 resp]
+3 Long shadows seed 1404: ok [gen 18 ms, 858 m, 8 corners, 0 banked, 0 bridges; careful 46.65 s 240/230 1 stars 0 contacts 0 resp; drifter 38.38 s 448 1 stars 0 resp]
+4 Tight city seed 1505: ok [gen 30 ms, 2034 m, 7 corners, 2 banked, 0 bridges; careful 123.57 s 523/510 1 stars 0 contacts 0 resp; drifter 101.62 s 1028 2 stars 0 resp]
+5 Ridge road seed 1606: ok [gen 8 ms, 978 m, 12 corners, 3 banked, 0 bridges; careful 52.35 s 252/240 1 stars 0 contacts 0 resp; drifter 42.13 s 389 1 stars 0 resp]
+6 Hairpin heaven seed 1707: ok [gen 14 ms, 2064 m, 7 corners, 1 banked, 0 bridges; careful 115.38 s 488/470 1 stars 0 contacts 0 resp; drifter 90.38 s 589 1 stars 0 resp]
+7 The gauntlet seed 1808: ok [gen 11 ms, 1026 m, 16 corners, 1 banked, 1 bridges; careful 62.63 s 225/220 1 stars 0 contacts 0 resp; drifter 47.18 s 300 1 stars 0 resp]
+8 Upper deck seed 2105: ok [gen 107 ms, 2496 m, 10 corners, 6 banked, 1 bridges; careful 135.95 s 668/640 1 stars 0 contacts 0 resp; drifter 118.17 s 1921 2 stars 0 resp]
+9 Quarry cut seed 2213: ok [gen 13 ms, 1074 m, 15 corners, 3 banked, 0 bridges; careful 62.77 s 277/270 1 stars 0 contacts 0 resp; drifter 48.57 s 410 1 stars 0 resp]
+10 Pin drop seed 2314: ok [gen 27 ms, 2136 m, 8 corners, 4 banked, 1 bridges; careful 129.02 s 530/530 1 stars 0 contacts 0 resp; drifter 108.07 s 941 1 stars 0 resp]
+11 Breakwater seed 2406: ok [gen 10 ms, 1212 m, 13 corners, 3 banked, 1 bridges; careful 71.22 s 300/290 1 stars 0 contacts 0 resp; drifter 55.67 s 872 2 stars 0 resp]
+12 Over and under seed 2510: ok [gen 20 ms, 2538 m, 6 corners, 6 banked, 1 bridges; careful 142.77 s 634/600 1 stars 0 contacts 0 resp; drifter 120.12 s 1207 2 stars 0 resp]
+13 Switchbacks seed 2606: ok [gen 20 ms, 1090 m, 10 corners, 3 banked, 0 bridges; careful 68.62 s 255/250 1 stars 0 contacts 0 resp; drifter 56.58 s 416 1 stars 0 resp]
+14 Smoke ring seed 2708: ok [gen 20 ms, 2100 m, 8 corners, 4 banked, 0 bridges; careful 122.8 s 494/480 1 stars 0 contacts 0 resp; drifter 91.3 s 2060 3 stars 0 resp]
+15 Razor wire seed 2809: ok [gen 9 ms, 1254 m, 18 corners, 3 banked, 0 bridges; careful 80.97 s 275/270 1 stars 0 contacts 0 resp; drifter 59.82 s 476 1 stars 0 resp]
+16 Knot yard seed 3102: ok [gen 165 ms, 2496 m, 6 corners, 4 banked, 1 bridges; careful 140.15 s 619/590 1 stars 0 contacts 0 resp; drifter 128.32 s 2358 3 stars 0 resp]
+17 Serpent spine seed 3202: ok [gen 41 ms, 1170 m, 13 corners, 4 banked, 0 bridges; careful 66.18 s 284/270 1 stars 0 contacts 0 resp; drifter 53.48 s 906 2 stars 0 resp]
+18 High wire seed 3303: ok [gen 5 ms, 2412 m, 6 corners, 4 banked, 1 bridges; careful 134.48 s 580/550 1 stars 0 contacts 0 resp; drifter 109.87 s 959 1 stars 0 resp]
+19 Needle run seed 3404: ok [gen 9 ms, 1246 m, 21 corners, 4 banked, 0 bridges; careful 75.97 s 282/280 1 stars 0 contacts 0 resp; drifter 56.52 s 394 1 stars 0 resp]
+20 Endless eight seed 3505: ok [gen 40 ms, 2472 m, 8 corners, 6 banked, 1 bridges; careful 137.22 s 582/550 1 stars 0 contacts 0 resp; drifter 108.42 s 2167 3 stars 0 resp]
+21 Thousand turns seed 3611: ok [gen 13 ms, 1292 m, 13 corners, 5 banked, 0 bridges; careful 83.23 s 281/280 1 stars 0 contacts 0 resp; drifter 66.57 s 2125 3 stars 0 resp]
+22 The vice seed 3707: ok [gen 84 ms, 2508 m, 6 corners, 4 banked, 1 bridges; careful 142.32 s 559/540 1 stars 0 contacts 0 resp; drifter 125.52 s 1678 2 stars 0 resp]
+23 The last bend seed 3808: ok [gen 18 ms, 1372 m, 17 corners, 4 banked, 0 bridges; careful 82.57 s 293/290 1 stars 0 contacts 0 resp; drifter 62.73 s 1366 3 stars 0 resp]
+rejected 9 Quarry cut seed 2206: drifter 1 respawns, 2 banked corners, under 3 [gen 8 ms, 1100 m, 13 corners, 2 banked, 0 bridges; careful 66.87 s 281/280 1 stars 0 contacts 0 resp; drifter 53.97 s 472 1 stars 1 resp]
+rejected 10 Pin drop seed 2305: 5 props inside the barriers [gen 25 ms, 2364 m, 8 corners, 5 banked, 0 bridges; careful 130.75 s 618/580 1 stars 0 contacts 0 resp; drifter 111.55 s 792 1 stars 0 resp]
+rejected 12 Over and under seed 2507: plain layout, no bridge, 0 banked corners, under 3 [gen 362 ms, 2448 m, 4 corners, 0 banked, 0 bridges; careful 106.12 s 670/580 1 stars 0 contacts 0 resp; drifter 95.65 s 557 0 stars 0 resp]
+rejected 13 Switchbacks seed 2607: drifter 1 respawns [gen 8 ms, 1048 m, 9 corners, 4 banked, 0 bridges; careful 57.4 s 258/240 1 stars 0 contacts 0 resp; drifter 49.92 s 520 2 stars 1 resp]
+rejected 8 Upper deck seed 2101: 2 banked corners, under 3 [gen 197 ms, 2442 m, 6 corners, 2 banked, 1 bridges; careful 137.12 s 655/620 1 stars 0 contacts 0 resp; drifter 113.32 s 998 1 stars 0 resp]
+[{"chapter":"Rookie","circuitRunMetres":2046,"sprintRunMetres":916,"corners":73,"banked":18,"bankedShare":0.25,"bridges":2,"figureEights":1,"hairpins":5,"technicalOrHairpinStyles":0,"askedDifficulty":0.5,"measuredDifficulty":0.35,"carefulSeconds":82,"drifterSeconds":66,"worstGenMs":86},{"chapter":"Pro","circuitRunMetres":2318,"sprintRunMetres":1158,"corners":88,"banked":32,"bankedShare":0.36,"bridges":4,"figureEights":3,"hairpins":14,"technicalOrHairpinStyles":5,"askedDifficulty":0.7,"measuredDifficulty":0.43,"carefulSeconds":101.8,"drifterSeconds":82.3,"worstGenMs":107},{"chapter":"Legend","circuitRunMetres":2472,"sprintRunMetres":1270,"corners":90,"banked":35,"bankedShare":0.39,"bridges":4,"figureEights":4,"hairpins":17,"technicalOrHairpinStyles":7,"askedDifficulty":0.9,"measuredDifficulty":0.44,"carefulSeconds":107.8,"drifterSeconds":88.9,"worstGenMs":165}]
+PASS all 24 career tracks pass the check in the page (both drivers finish with 0 respawns, the careful driver clean with at least one star, generated under 600 ms, nothing occluding the road, the chapter's banks): 24 of 24
+PASS known answer: every seed the search rejected fails the check in the page too: 2206 (Quarry cut): drifter 1 respawns, 2 banked corners, under 3; 2305 (Pin drop): 5 props inside the barriers; 2507 (Over and under): plain layout, no bridge, 0 banked corners, under 3; 2607 (Switchbacks): drifter 1 respawns; 2101 (Upper deck): 2 banked corners, under 3
+PASS each chapter a step up from the one before: longer runs, more banks, more figure eights, more technical and hairpin styles, harder asked: Rookie runs 2046 / 916 m, banked 18, eights 1, styles 0, difficulty 0.5; Pro runs 2318 / 1158 m, banked 32, eights 3, styles 5, difficulty 0.7; Legend runs 2472 / 1270 m, banked 35, eights 4, styles 7, difficulty 0.9
+PASS known answer: the same comparison read backwards (Legend, then Pro, then Rookie) fails
+PASS no page errors
+
+== 2. ladder
+PASS fixed cases: a fresh save opens track 1 only; 11 Rookie stars keep Pro locked and its first track refuses to play; 12 open Pro 1 and only it; a star on Pro 1 opens Pro 2; 13 Pro stars keep Legend locked, 14 open it and it plays: {"fresh":[true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],"proShort":{"track8":false,"track9":false},"refused":true,"proOpen":{"track8":true,"track9":false,"track16":false},"inChapter":{"track9":true,"track10":false},"legendShort":{"track16":false},"legendOpen":{"track16":true,"track17":false},"startsWhenOpen":true}
+PASS 2,000 random saves: careerUnlocked agrees with the rules on every track: 0 disagreements of 48,000; Pro open in 427, Legend in 206
+PASS known answer: the rules with OPEN one higher disagree with the game: 204 disagreements
+PASS the career screen on 40 random saves: every row enabled exactly when the rules open it, every locked chapter says how many more stars: 0 rows wrong of 960, 0 chapter heads wrong
+PASS no page errors
+
+== 3. saves
+PASS a save from main with 12 Rookie stars loads with everything kept, 0 fixes, the title first: changed: [], fixes 0, the career button "12/72 stars · 5/72 missions"
+PASS and Pro is open on the first visit: Pro 1 playable, Pro 2 not, Legend locked with "14 more Pro stars to open Legend", the screen opened at Pro: 111111101000000000000000
+PASS then Pro 1 plays to a star and opens Pro 2, the Rookie results kept and the old ghost still driving: score 668, stars 1, unlock "Track 2 of 8 unlocked: Quarry cut", note "13 more Pro stars to open Legend"
+PASS no page errors (12 stars)
+PASS known answer: the save from main with 11 Rookie stars keeps Pro locked ("1 more Rookie star to open Pro"), everything kept, the screen at Rookie: 111111100000000000000000
+PASS no page errors (11 stars)
+PASS a corrupted save loads repaired, the career shows 24 rows (Pro locked on 3 Rookie stars), a track plays to its results, no page errors: 4 fixes, rows 110000000100000000000000, run 252
+PASS storage that throws: the first visit lands in a run, a run finishes, the career shows 24 rows with the next track open, no page errors: stars 1, rows 110000000000000000000000
+PASS a ghost on all 24 tracks: the save is written whole, no write failed (2.20 million characters): 98 writes, 24 career ghosts
+
+== 4. screens
+PASS 390x844 career, rookie current: no boxes meet at any of 42 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 758 px list
+PASS 390x844 career, rookie current: its head and first row in view as the screen opens: {"scrollTop":0,"head":true,"firstRow":true}
+PASS 390x844 the title's career button: "5/72 stars · 18/72 missions": want "5/72 stars · 18/72 missions"
+PASS 390x844 career, pro current: no boxes meet at any of 42 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 758 px list
+PASS 390x844 career, pro current: its head and first row in view as the screen opens: {"scrollTop":583,"head":true,"firstRow":true}
+PASS 390x844 the title's career button: "17/72 stars · 18/72 missions": want "17/72 stars · 18/72 missions"
+PASS 390x844 career, legend current: no boxes meet at any of 42 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 758 px list
+PASS 390x844 career, legend current: its head and first row in view as the screen opens: {"scrollTop":977,"head":true,"firstRow":true}
+PASS 390x844 known answer: the list left at the top does not show Legend: {"scrollTop":0,"head":false,"firstRow":false}
+PASS 390x844 known answer: chapter heads pulled onto their rows are seen to meet: 50 meetings
+PASS 390x844 the title's career button: "44/72 stars · 18/72 missions": want "44/72 stars · 18/72 missions"
+PASS 390x844 the countdown heading names the chapter: "CAREER · PRO · TRACK 3 OF 8" "Pin drop"
+PASS 390x844 and it lies inside the view, clear of the score, the lap and clock, the speed, the pads and the exit: []
+PASS 390x844 a star that makes 12 Rookie stars: "🔓 Pro unlocked: Upper deck", "Track 6 of 8 unlocked: Ridge road", NEXT to Pro 1 and primary: track 5
+PASS 390x844 the card's parts do not meet and every button is reachable: [] [], scrolls false
+PASS 390x844 known answer, one star fewer: "🔓 Track 6 of 8 unlocked: Ridge road", "1 more Rookie star to open Pro", NEXT to the next Rookie track: track 5
+PASS 390x844 the card's parts do not meet and every button is reachable (short): [] [], scrolls false
+PASS 390x844 the last Rookie track with Pro locked: "8 more Rookie stars to open Pro", no NEXT: []
+PASS 390x844 no page errors
+PASS 844x390 career, rookie current: no boxes meet at any of 61 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 304 px list
+PASS 844x390 career, rookie current: its head and first row in view as the screen opens: {"scrollTop":0,"head":true,"firstRow":true}
+PASS 844x390 the title's career button: "5/72 stars · 18/72 missions": want "5/72 stars · 18/72 missions"
+PASS 844x390 career, pro current: no boxes meet at any of 61 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 304 px list
+PASS 844x390 career, pro current: its head and first row in view as the screen opens: {"scrollTop":583,"head":true,"firstRow":true}
+PASS 844x390 the title's career button: "17/72 stars · 18/72 missions": want "17/72 stars · 18/72 missions"
+PASS 844x390 career, legend current: no boxes meet at any of 61 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 304 px list
+PASS 844x390 career, legend current: its head and first row in view as the screen opens: {"scrollTop":1166,"head":true,"firstRow":true}
+PASS 844x390 known answer: the list left at the top does not show Legend: {"scrollTop":0,"head":false,"firstRow":false}
+PASS 844x390 known answer: chapter heads pulled onto their rows are seen to meet: 29 meetings
+PASS 844x390 the title's career button: "44/72 stars · 18/72 missions": want "44/72 stars · 18/72 missions"
+PASS 844x390 the countdown heading names the chapter: "CAREER · PRO · TRACK 3 OF 8" "Pin drop"
+PASS 844x390 and it lies inside the view, clear of the score, the lap and clock, the speed, the pads and the exit: []
+PASS 844x390 a star that makes 12 Rookie stars: "🔓 Pro unlocked: Upper deck", "Track 6 of 8 unlocked: Ridge road", NEXT to Pro 1 and primary: track 5
+PASS 844x390 the card's parts do not meet and every button is reachable: [] [], scrolls true
+PASS 844x390 known answer, one star fewer: "🔓 Track 6 of 8 unlocked: Ridge road", "1 more Rookie star to open Pro", NEXT to the next Rookie track: track 5
+PASS 844x390 the card's parts do not meet and every button is reachable (short): [] [], scrolls true
+PASS 844x390 the last Rookie track with Pro locked: "8 more Rookie stars to open Pro", no NEXT: []
+PASS 844x390 no page errors
+PASS 800x450 career, rookie current: no boxes meet at any of 59 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 364 px list
+PASS 800x450 career, rookie current: its head and first row in view as the screen opens: {"scrollTop":0,"head":true,"firstRow":true}
+PASS 800x450 the title's career button: "5/72 stars · 18/72 missions": want "5/72 stars · 18/72 missions"
+PASS 800x450 career, pro current: no boxes meet at any of 59 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 364 px list
+PASS 800x450 career, pro current: its head and first row in view as the screen opens: {"scrollTop":583,"head":true,"firstRow":true}
+PASS 800x450 the title's career button: "17/72 stars · 18/72 missions": want "17/72 stars · 18/72 missions"
+PASS 800x450 career, legend current: no boxes meet at any of 59 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 364 px list
+PASS 800x450 career, legend current: its head and first row in view as the screen opens: {"scrollTop":1166,"head":true,"firstRow":true}
+PASS 800x450 known answer: the list left at the top does not show Legend: {"scrollTop":0,"head":false,"firstRow":false}
+PASS 800x450 known answer: chapter heads pulled onto their rows are seen to meet: 33 meetings
+PASS 800x450 the title's career button: "44/72 stars · 18/72 missions": want "44/72 stars · 18/72 missions"
+PASS 800x450 the countdown heading names the chapter: "CAREER · PRO · TRACK 3 OF 8" "Pin drop"
+PASS 800x450 and it lies inside the view, clear of the score, the lap and clock, the speed, the pads and the exit: []
+PASS 800x450 a star that makes 12 Rookie stars: "🔓 Pro unlocked: Upper deck", "Track 6 of 8 unlocked: Ridge road", NEXT to Pro 1 and primary: track 5
+PASS 800x450 the card's parts do not meet and every button is reachable: [] [], scrolls true
+PASS 800x450 known answer, one star fewer: "🔓 Track 6 of 8 unlocked: Ridge road", "1 more Rookie star to open Pro", NEXT to the next Rookie track: track 5
+PASS 800x450 the card's parts do not meet and every button is reachable (short): [] [], scrolls true
+PASS 800x450 the last Rookie track with Pro locked: "8 more Rookie stars to open Pro", no NEXT: []
+PASS 800x450 no page errors
+PASS 1280x720 career, rookie current: no boxes meet at any of 47 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 634 px list
+PASS 1280x720 career, rookie current: its head and first row in view as the screen opens: {"scrollTop":0,"head":true,"firstRow":true}
+PASS 1280x720 the title's career button: "5/72 stars · 18/72 missions": want "5/72 stars · 18/72 missions"
+PASS 1280x720 career, pro current: no boxes meet at any of 47 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 634 px list
+PASS 1280x720 career, pro current: its head and first row in view as the screen opens: {"scrollTop":583,"head":true,"firstRow":true}
+PASS 1280x720 the title's career button: "17/72 stars · 18/72 missions": want "17/72 stars · 18/72 missions"
+PASS 1280x720 career, legend current: no boxes meet at any of 47 scroll positions, all 24 rows reachable: 0 meetings [], unreachable [], rows 60 px in a 634 px list
+PASS 1280x720 career, legend current: its head and first row in view as the screen opens: {"scrollTop":1101,"head":true,"firstRow":true}
+PASS 1280x720 known answer: the list left at the top does not show Legend: {"scrollTop":0,"head":false,"firstRow":false}
+PASS 1280x720 known answer: chapter heads pulled onto their rows are seen to meet: 49 meetings
+PASS 1280x720 the title's career button: "44/72 stars · 18/72 missions": want "44/72 stars · 18/72 missions"
+PASS 1280x720 the countdown heading names the chapter: "CAREER · PRO · TRACK 3 OF 8" "Pin drop"
+PASS 1280x720 and it lies inside the view, clear of the score, the lap and clock, the speed, the pads and the exit: []
+PASS 1280x720 a star that makes 12 Rookie stars: "🔓 Pro unlocked: Upper deck", "Track 6 of 8 unlocked: Ridge road", NEXT to Pro 1 and primary: track 5
+PASS 1280x720 the card's parts do not meet and every button is reachable: [] [], scrolls false
+PASS 1280x720 known answer, one star fewer: "🔓 Track 6 of 8 unlocked: Ridge road", "1 more Rookie star to open Pro", NEXT to the next Rookie track: track 5
+PASS 1280x720 the card's parts do not meet and every button is reachable (short): [] [], scrolls false
+PASS 1280x720 the last Rookie track with Pro locked: "8 more Rookie stars to open Pro", no NEXT: []
+PASS 1280x720 no page errors
+
+== 5. perf
+First slide (from GO) at 6x: JS without submit p95 5.6 worst 14.8 ms; physics p95 2.5; ghost in 390 frames; along 7 to 132 m; webgl2 low, 74 draw calls
+The vice (from GO) at 6x: JS without submit p95 3.4 worst 26.9 ms; physics p95 1.7; ghost in 390 frames; along 6 to 141 m; webgl2 low, 72 draw calls
+First slide (after 40 s) at 6x: JS without submit p95 3.5 worst 9.3 ms; physics p95 1.4; ghost in 390 frames; along 383 to 26 m; webgl2 low, 77 draw calls
+The vice (after 60 s) at 6x: JS without submit p95 5.1 worst 19.6 ms; physics p95 1.5; ghost in 390 frames; along 390 to 523 m; webgl2 low, 72 draw calls
+PASS JavaScript p95 at 6x on the longest Legend track (The vice, 2508 m of run) under 16.7 ms with a ghost running: 3.4 ms (worst 26.9), 5.1 ms (worst 19.6)
+PASS and within 1.5 ms of Rookie 1 measured the same way: Legend 5.1 against Rookie 1 5.6 ms
+PASS known answer: 20 ms of busy work per frame fails the budget: 27.6 ms
+
+all passed

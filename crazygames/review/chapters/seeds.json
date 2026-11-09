@@ -6,7 +6,7 @@
    "index": 0,
    "name": "First slide",
    "seed": 1101,
-   "genMs": 83,
+   "genMs": 96,
    "kind": "circuit",
    "length": 518,
    "runMetres": 1554,
@@ -75,7 +75,7 @@
    "index": 1,
    "name": "Harbour run",
    "seed": 1202,
-   "genMs": 19,
+   "genMs": 17,
    "kind": "sprint",
    "length": 840,
    "runMetres": 800,
@@ -211,7 +211,7 @@
    "index": 3,
    "name": "Long shadows",
    "seed": 1404,
-   "genMs": 21,
+   "genMs": 23,
    "kind": "sprint",
    "length": 898,
    "runMetres": 858,
@@ -280,7 +280,7 @@
    "index": 4,
    "name": "Tight city",
    "seed": 1505,
-   "genMs": 16,
+   "genMs": 28,
    "kind": "circuit",
    "length": 678,
    "runMetres": 2034,
@@ -351,7 +351,7 @@
    "index": 5,
    "name": "Ridge road",
    "seed": 1606,
-   "genMs": 10,
+   "genMs": 6,
    "kind": "sprint",
    "length": 1018,
    "runMetres": 978,
@@ -423,7 +423,7 @@
    "index": 6,
    "name": "Hairpin heaven",
    "seed": 1707,
-   "genMs": 24,
+   "genMs": 10,
    "kind": "circuit",
    "length": 688,
    "runMetres": 2064,
@@ -493,7 +493,7 @@
    "index": 7,
    "name": "The gauntlet",
    "seed": 1808,
-   "genMs": 8,
+   "genMs": 24,
    "kind": "sprint",
    "length": 1066,
    "runMetres": 1026,
@@ -582,7 +582,7 @@
    "tried": [
     {
      "seed": 2101,
-     "genMs": 280,
+     "genMs": 283,
      "kind": "circuit",
      "length": 814,
      "runMetres": 2442,
@@ -650,7 +650,7 @@
     },
     {
      "seed": 2102,
-     "genMs": 36,
+     "genMs": 47,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -718,7 +718,7 @@
     },
     {
      "seed": 2103,
-     "genMs": 74,
+     "genMs": 55,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -787,7 +787,7 @@
     },
     {
      "seed": 2104,
-     "genMs": 122,
+     "genMs": 133,
      "kind": "circuit",
      "length": 808,
      "runMetres": 2424,
@@ -855,7 +855,7 @@
     },
     {
      "seed": 2105,
-     "genMs": 73,
+     "genMs": 60,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -939,7 +939,7 @@
    "tried": [
     {
      "seed": 2202,
-     "genMs": 8,
+     "genMs": 16,
      "kind": "sprint",
      "length": 1126,
      "runMetres": 1086,
@@ -1080,7 +1080,7 @@
     },
     {
      "seed": 2204,
-     "genMs": 5,
+     "genMs": 11,
      "kind": "sprint",
      "length": 1096,
      "runMetres": 1056,
@@ -1149,7 +1149,7 @@
     },
     {
      "seed": 2205,
-     "genMs": 12,
+     "genMs": 10,
      "kind": "sprint",
      "length": 1104,
      "runMetres": 1064,
@@ -1292,7 +1292,7 @@
     },
     {
      "seed": 2207,
-     "genMs": 16,
+     "genMs": 13,
      "kind": "sprint",
      "length": 1142,
      "runMetres": 1102,
@@ -1363,7 +1363,7 @@
     },
     {
      "seed": 2208,
-     "genMs": 6,
+     "genMs": 4,
      "kind": "sprint",
      "length": 1010,
      "runMetres": 970,
@@ -1432,7 +1432,7 @@
     },
     {
      "seed": 2209,
-     "genMs": 11,
+     "genMs": 12,
      "kind": "sprint",
      "length": 1146,
      "runMetres": 1106,
@@ -1573,7 +1573,7 @@
     },
     {
      "seed": 2211,
-     "genMs": 11,
+     "genMs": 13,
      "kind": "sprint",
      "length": 1080,
      "runMetres": 1040,
@@ -1798,7 +1798,7 @@
    "tried": [
     {
      "seed": 2303,
-     "genMs": 7,
+     "genMs": 6,
      "kind": "circuit",
      "length": 722,
      "runMetres": 2166,
@@ -1868,7 +1868,7 @@
     },
     {
      "seed": 2304,
-     "genMs": 11,
+     "genMs": 16,
      "kind": "circuit",
      "length": 728,
      "runMetres": 2184,
@@ -2008,7 +2008,7 @@
     },
     {
      "seed": 2306,
-     "genMs": 7,
+     "genMs": 10,
      "kind": "circuit",
      "length": 732,
      "runMetres": 2196,
@@ -2078,7 +2078,7 @@
     },
     {
      "seed": 2307,
-     "genMs": 19,
+     "genMs": 8,
      "kind": "circuit",
      "length": 686,
      "runMetres": 2058,
@@ -2218,7 +2218,7 @@
     },
     {
      "seed": 2309,
-     "genMs": 13,
+     "genMs": 5,
      "kind": "circuit",
      "length": 660,
      "runMetres": 1980,
@@ -2287,7 +2287,7 @@
     },
     {
      "seed": 2310,
-     "genMs": 13,
+     "genMs": 18,
      "kind": "circuit",
      "length": 788,
      "runMetres": 2364,
@@ -2357,7 +2357,7 @@
     },
     {
      "seed": 2311,
-     "genMs": 10,
+     "genMs": 12,
      "kind": "circuit",
      "length": 704,
      "runMetres": 2112,
@@ -2428,7 +2428,7 @@
     },
     {
      "seed": 2312,
-     "genMs": 16,
+     "genMs": 10,
      "kind": "circuit",
      "length": 762,
      "runMetres": 2286,
@@ -2497,7 +2497,7 @@
     },
     {
      "seed": 2313,
-     "genMs": 5,
+     "genMs": 11,
      "kind": "circuit",
      "length": 698,
      "runMetres": 2094,
@@ -2568,7 +2568,7 @@
     },
     {
      "seed": 2314,
-     "genMs": 17,
+     "genMs": 25,
      "kind": "circuit",
      "length": 712,
      "runMetres": 2136,
@@ -2652,7 +2652,7 @@
    "tried": [
     {
      "seed": 2404,
-     "genMs": 15,
+     "genMs": 7,
      "kind": "sprint",
      "length": 1062,
      "runMetres": 1022,
@@ -2722,7 +2722,7 @@
     },
     {
      "seed": 2405,
-     "genMs": 11,
+     "genMs": 23,
      "kind": "sprint",
      "length": 1070,
      "runMetres": 1030,
@@ -2793,7 +2793,7 @@
     },
     {
      "seed": 2406,
-     "genMs": 5,
+     "genMs": 7,
      "kind": "sprint",
      "length": 1252,
      "runMetres": 1212,
@@ -2864,7 +2864,7 @@
   },
   {
    "index": 12,
-   "name": "Tangle",
+   "name": "Over and under",
    "chapter": "Pro",
    "settings": {
     "kind": "circuit",
@@ -2950,7 +2950,7 @@
     },
     {
      "seed": 2506,
-     "genMs": 26,
+     "genMs": 32,
      "kind": "circuit",
      "length": 852,
      "runMetres": 2556,
@@ -3019,7 +3019,7 @@
     },
     {
      "seed": 2507,
-     "genMs": 297,
+     "genMs": 308,
      "kind": "circuit",
      "length": 816,
      "runMetres": 2448,
@@ -3088,7 +3088,7 @@
     },
     {
      "seed": 2508,
-     "genMs": 46,
+     "genMs": 39,
      "kind": "circuit",
      "length": 816,
      "runMetres": 2448,
@@ -3156,7 +3156,7 @@
     },
     {
      "seed": 2509,
-     "genMs": 28,
+     "genMs": 27,
      "kind": "circuit",
      "length": 784,
      "runMetres": 2352,
@@ -3309,7 +3309,7 @@
    "tried": [
     {
      "seed": 2606,
-     "genMs": 16,
+     "genMs": 19,
      "kind": "sprint",
      "length": 1130,
      "runMetres": 1090,
@@ -3377,7 +3377,7 @@
     },
     {
      "seed": 2607,
-     "genMs": 9,
+     "genMs": 12,
      "kind": "sprint",
      "length": 1088,
      "runMetres": 1048,
@@ -3448,7 +3448,7 @@
     },
     {
      "seed": 2608,
-     "genMs": 7,
+     "genMs": 8,
      "kind": "sprint",
      "length": 1224,
      "runMetres": 1184,
@@ -3536,7 +3536,7 @@
    "tried": [
     {
      "seed": 2707,
-     "genMs": 20,
+     "genMs": 8,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -3607,7 +3607,7 @@
     },
     {
      "seed": 2708,
-     "genMs": 7,
+     "genMs": 13,
      "kind": "circuit",
      "length": 700,
      "runMetres": 2100,
@@ -3675,7 +3675,7 @@
     },
     {
      "seed": 2709,
-     "genMs": 20,
+     "genMs": 19,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -3761,7 +3761,7 @@
    "tried": [
     {
      "seed": 2808,
-     "genMs": 7,
+     "genMs": 13,
      "kind": "sprint",
      "length": 1204,
      "runMetres": 1164,
@@ -3834,7 +3834,7 @@
     },
     {
      "seed": 2809,
-     "genMs": 7,
+     "genMs": 6,
      "kind": "sprint",
      "length": 1294,
      "runMetres": 1254,
@@ -3903,7 +3903,7 @@
     },
     {
      "seed": 2810,
-     "genMs": 14,
+     "genMs": 16,
      "kind": "sprint",
      "length": 1350,
      "runMetres": 1310,
@@ -3993,7 +3993,7 @@
    "tried": [
     {
      "seed": 3101,
-     "genMs": 117,
+     "genMs": 146,
      "kind": "circuit",
      "length": 834,
      "runMetres": 2502,
@@ -4061,7 +4061,7 @@
     },
     {
      "seed": 3102,
-     "genMs": 123,
+     "genMs": 117,
      "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
@@ -4126,7 +4126,7 @@
     },
     {
      "seed": 3103,
-     "genMs": 216,
+     "genMs": 245,
      "kind": "circuit",
      "length": 860,
      "runMetres": 2580,
@@ -4210,7 +4210,7 @@
    "tried": [
     {
      "seed": 3202,
-     "genMs": 46,
+     "genMs": 33,
      "kind": "sprint",
      "length": 1210,
      "runMetres": 1170,
@@ -4278,7 +4278,7 @@
     },
     {
      "seed": 3203,
-     "genMs": 34,
+     "genMs": 25,
      "kind": "sprint",
      "length": 1174,
      "runMetres": 1134,
@@ -4439,7 +4439,7 @@
    "tried": [
     {
      "seed": 3303,
-     "genMs": 9,
+     "genMs": 14,
      "kind": "circuit",
      "length": 804,
      "runMetres": 2412,
@@ -4571,7 +4571,7 @@
     },
     {
      "seed": 3305,
-     "genMs": 20,
+     "genMs": 15,
      "kind": "circuit",
      "length": 872,
      "runMetres": 2616,
@@ -4723,7 +4723,7 @@
     },
     {
      "seed": 3405,
-     "genMs": 13,
+     "genMs": 11,
      "kind": "sprint",
      "length": 1208,
      "runMetres": 1168,
@@ -4797,7 +4797,7 @@
     },
     {
      "seed": 3406,
-     "genMs": 18,
+     "genMs": 12,
      "kind": "sprint",
      "length": 1234,
      "runMetres": 1194,
@@ -4890,7 +4890,7 @@
    "tried": [
     {
      "seed": 3505,
-     "genMs": 52,
+     "genMs": 54,
      "kind": "circuit",
      "length": 824,
      "runMetres": 2472,
@@ -4956,7 +4956,7 @@
     },
     {
      "seed": 3506,
-     "genMs": 40,
+     "genMs": 56,
      "kind": "circuit",
      "length": 812,
      "runMetres": 2436,
@@ -5024,7 +5024,7 @@
     },
     {
      "seed": 3507,
-     "genMs": 60,
+     "genMs": 38,
      "kind": "circuit",
      "length": 836,
      "runMetres": 2508,
@@ -5109,7 +5109,7 @@
    "tried": [
     {
      "seed": 3606,
-     "genMs": 16,
+     "genMs": 18,
      "kind": "sprint",
      "length": 1264,
      "runMetres": 1224,
@@ -5182,7 +5182,7 @@
     },
     {
      "seed": 3607,
-     "genMs": 24,
+     "genMs": 15,
      "kind": "sprint",
      "length": 1320,
      "runMetres": 1280,
@@ -5254,7 +5254,7 @@
     },
     {
      "seed": 3608,
-     "genMs": 6,
+     "genMs": 5,
      "kind": "sprint",
      "length": 1290,
      "runMetres": 1250,
@@ -5464,7 +5464,7 @@
     },
     {
      "seed": 3611,
-     "genMs": 13,
+     "genMs": 18,
      "kind": "sprint",
      "length": 1332,
      "runMetres": 1292,
@@ -5553,7 +5553,7 @@
    "tried": [
     {
      "seed": 3707,
-     "genMs": 55,
+     "genMs": 61,
      "kind": "circuit",
      "length": 836,
      "runMetres": 2508,
@@ -5619,7 +5619,7 @@
     },
     {
      "seed": 3708,
-     "genMs": 131,
+     "genMs": 138,
      "kind": "circuit",
      "length": 872,
      "runMetres": 2616,
@@ -5689,7 +5689,7 @@
     },
     {
      "seed": 3709,
-     "genMs": 25,
+     "genMs": 18,
      "kind": "circuit",
      "length": 804,
      "runMetres": 2412,
@@ -5775,7 +5775,7 @@
    "tried": [
     {
      "seed": 3808,
-     "genMs": 20,
+     "genMs": 21,
      "kind": "sprint",
      "length": 1412,
      "runMetres": 1372,
@@ -5843,7 +5843,7 @@
     },
     {
      "seed": 3809,
-     "genMs": 14,
+     "genMs": 21,
      "kind": "sprint",
      "length": 1490,
      "runMetres": 1450,

@@ -1,0 +1,61 @@
+
+== 1. ghost
+PASS the recorded run was saved as the ghost: 8396 steps, 3950 tape entries, score 895
+PASS the ghost ends in exactly the recorded state: ghost steps 8396, done true
+PASS the ghost matches the recording frame for frame: 4139 frames compared, 0 differ, worst 0, lockstep broken 0
+PASS known answer: one perturbed tape entry changes the ghost's end state: entry 1975
+
+== 2. runs
+PASS run career 1 (circuit, 518 m) finishes with a results screen: 70.0 s, score 895, stars 1, 0 contacts, 0 respawns
+PASS run career 2 (sprint, 840 m) finishes with a results screen: 32.5 s, score 309, stars 1, 2 contacts, 0 respawns
+PASS run career 3 (circuit, 844 m) finishes with a results screen: 105.8 s, score 1128, stars 1, 0 contacts, 0 respawns
+PASS run career 4 (sprint, 898 m) finishes with a results screen: 38.4 s, score 448, stars 1, 0 contacts, 0 respawns
+PASS run career 5 (circuit, 678 m) finishes with a results screen: 101.6 s, score 1028, stars 2, 4 contacts, 0 respawns
+PASS run career 6 (sprint, 1018 m) finishes with a results screen: 42.1 s, score 389, stars 1, 5 contacts, 0 respawns
+PASS run daily (sprint, 772 m) finishes with a results screen: 35.3 s, score 222, stars 1, 1 contacts, 0 respawns
+PASS three generated circuits and three generated sprints completed: 3 circuits, 4 sprints
+PASS known answer: with 99 laps the run does not finish in the budget: 6 laps done, state drive
+
+== 3. save
+PASS saved progress survives a reload: coins 4320, car hatch, paint lime, ghost steps 3900
+PASS the career ladder unlocks in order, one star at a time: {"lockedAtStart":true,"refusedWhileLocked":true,"stillLockedWithNoStar":true,"openAfterOneStar":true,"startsWhenOpen":true}
+PASS the game runs to a results screen with localStorage's property throwing: score 895, failed writes 0 of 5, page errors 0
+PASS the game runs to a results screen with localStorage's methods throwing: score 895, failed writes 5 of 5, page errors 0
+PASS a save that is not JSON loads to a valid state and the game runs: repaired 1, coins 0, car starter, ghosts kept 0
+PASS a save that is JSON of the wrong shape loads to a valid state and the game runs: repaired 7, coins 0, car starter, ghosts kept 1
+PASS known answer: the wrong shaped save fails the invariants raw and passes them repaired: 7 fixes, ghosts kept career:1
+
+== 4. perf
+throttle 1x: frame p95 194.9 worst 14200.9 ms; js without submit p95 0.4 worst 13; physics p95 0.2 worst 12.7 (2 steps, ghost in 390 frames); submit p95 194.7; first frames worst 798.9; webgl2 low
+throttle 4x: frame p95 337.7 worst 23865.7 ms; js without submit p95 2.4 worst 27.7; physics p95 1.1 worst 6.1 (2 steps, ghost in 390 frames); submit p95 334.7; first frames worst 552.2; webgl2 low
+throttle 6x: frame p95 346 worst 25782 ms; js without submit p95 4.3 worst 25; physics p95 1.7 worst 24.1 (2 steps, ghost in 390 frames); submit p95 345.4; first frames worst 632.1; webgl2 low
+PASS JavaScript frame p95 at 6x throttle under 16.7 ms, on a generated circuit with a ghost: 4.3 ms, worst 25, ghost running in 390 of 390 frames
+PASS known answer: 20 ms of busy work per frame raises the p95 by about 20 ms and fails the budget: p95 2.4 -> 25.2 ms at 4x
+
+== shots
+wrote /home/claude/chapters/crazygames/review/loop/shots/title-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/career-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/garage-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/countdown-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/drive-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/results-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/ghost-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/free-1280x720.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/title-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/career-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/garage-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/countdown-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/drive-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/results-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/ghost-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/free-390x844.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/title-844x390.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/career-844x390.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/garage-844x390.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/countdown-844x390.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/drive-844x390.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/results-844x390.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/ghost-844x390.png
+wrote /home/claude/chapters/crazygames/review/loop/shots/free-844x390.png
+
+all passed; wrote review/loop/ghost.json, runs.json, save.json, perf.json, shots.json

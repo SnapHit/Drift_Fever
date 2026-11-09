@@ -1,5 +1,5 @@
 {
- "started": "2026-11-09T20:35:25.646Z",
+ "started": "2026-11-09T22:42:20.905Z",
  "rule": "seeds.js check: nothing occludes the road in any theme, no plain layout, a bridge where a crossover is asked, generation under 600 ms, both drivers finish with 0 respawns, the careful driver clean with a star, banked corners at least 0 / 3 / 4 by chapter",
  "tracks": [
   {
@@ -14,7 +14,7 @@
    },
    "rejectedSeed": false,
    "seed": 1101,
-   "genMs": 100,
+   "genMs": 86,
    "kind": "circuit",
    "length": 518,
    "runMetres": 1554,
@@ -107,7 +107,7 @@
    },
    "rejectedSeed": false,
    "seed": 1202,
-   "genMs": 15,
+   "genMs": 18,
    "kind": "sprint",
    "length": 840,
    "runMetres": 800,
@@ -200,7 +200,7 @@
    },
    "rejectedSeed": false,
    "seed": 1327,
-   "genMs": 48,
+   "genMs": 54,
    "kind": "circuit",
    "length": 844,
    "runMetres": 2532,
@@ -291,7 +291,7 @@
    },
    "rejectedSeed": false,
    "seed": 1404,
-   "genMs": 23,
+   "genMs": 18,
    "kind": "sprint",
    "length": 898,
    "runMetres": 858,
@@ -384,7 +384,7 @@
    },
    "rejectedSeed": false,
    "seed": 1505,
-   "genMs": 29,
+   "genMs": 30,
    "kind": "circuit",
    "length": 678,
    "runMetres": 2034,
@@ -479,7 +479,7 @@
    },
    "rejectedSeed": false,
    "seed": 1606,
-   "genMs": 12,
+   "genMs": 8,
    "kind": "sprint",
    "length": 1018,
    "runMetres": 978,
@@ -669,7 +669,7 @@
    },
    "rejectedSeed": false,
    "seed": 1808,
-   "genMs": 13,
+   "genMs": 11,
    "kind": "sprint",
    "length": 1066,
    "runMetres": 1026,
@@ -761,7 +761,7 @@
    },
    "rejectedSeed": false,
    "seed": 2105,
-   "genMs": 116,
+   "genMs": 107,
    "kind": "circuit",
    "length": 832,
    "runMetres": 2496,
@@ -854,7 +854,7 @@
    },
    "rejectedSeed": false,
    "seed": 2213,
-   "genMs": 10,
+   "genMs": 13,
    "kind": "sprint",
    "length": 1114,
    "runMetres": 1074,
@@ -948,7 +948,7 @@
    },
    "rejectedSeed": false,
    "seed": 2314,
-   "genMs": 46,
+   "genMs": 27,
    "kind": "circuit",
    "length": 712,
    "runMetres": 2136,
@@ -1041,7 +1041,7 @@
    },
    "rejectedSeed": false,
    "seed": 2406,
-   "genMs": 35,
+   "genMs": 10,
    "kind": "sprint",
    "length": 1252,
    "runMetres": 1212,
@@ -1089,7 +1089,7 @@
     "respawns": 0,
     "unlock": {
      "done": true,
-     "text": "Track 5 of 8 unlocked: Tangle"
+     "text": "Track 5 of 8 unlocked: Over and under"
     },
     "note": {
      "text": "13 more Pro stars to open Legend"
@@ -1115,7 +1115,7 @@
     "respawns": 0,
     "unlock": {
      "done": true,
-     "text": "Track 5 of 8 unlocked: Tangle"
+     "text": "Track 5 of 8 unlocked: Over and under"
     },
     "note": {
      "text": "12 more Pro stars to open Legend"
@@ -1126,7 +1126,7 @@
   },
   {
    "index": 12,
-   "name": "Tangle",
+   "name": "Over and under",
    "chapter": "Pro",
    "settings": {
     "difficulty": 0.7,
@@ -1139,7 +1139,7 @@
    },
    "rejectedSeed": false,
    "seed": 2510,
-   "genMs": 47,
+   "genMs": 20,
    "kind": "circuit",
    "length": 846,
    "runMetres": 2538,
@@ -1232,7 +1232,7 @@
    },
    "rejectedSeed": false,
    "seed": 2606,
-   "genMs": 28,
+   "genMs": 20,
    "kind": "sprint",
    "length": 1130,
    "runMetres": 1090,
@@ -1326,7 +1326,7 @@
    },
    "rejectedSeed": false,
    "seed": 2708,
-   "genMs": 10,
+   "genMs": 20,
    "kind": "circuit",
    "length": 700,
    "runMetres": 2100,
@@ -1420,7 +1420,7 @@
    },
    "rejectedSeed": false,
    "seed": 2809,
-   "genMs": 13,
+   "genMs": 9,
    "kind": "sprint",
    "length": 1294,
    "runMetres": 1254,
@@ -1512,7 +1512,7 @@
    },
    "rejectedSeed": false,
    "seed": 3102,
-   "genMs": 171,
+   "genMs": 165,
    "kind": "circuit",
    "length": 832,
    "runMetres": 2496,
@@ -1599,7 +1599,7 @@
    },
    "rejectedSeed": false,
    "seed": 3202,
-   "genMs": 47,
+   "genMs": 41,
    "kind": "sprint",
    "length": 1210,
    "runMetres": 1170,
@@ -1692,7 +1692,7 @@
    },
    "rejectedSeed": false,
    "seed": 3303,
-   "genMs": 4,
+   "genMs": 5,
    "kind": "circuit",
    "length": 804,
    "runMetres": 2412,
@@ -1874,7 +1874,7 @@
    },
    "rejectedSeed": false,
    "seed": 3505,
-   "genMs": 44,
+   "genMs": 40,
    "kind": "circuit",
    "length": 824,
    "runMetres": 2472,
@@ -1962,7 +1962,7 @@
    },
    "rejectedSeed": false,
    "seed": 3611,
-   "genMs": 11,
+   "genMs": 13,
    "kind": "sprint",
    "length": 1332,
    "runMetres": 1292,
@@ -2056,7 +2056,7 @@
    },
    "rejectedSeed": false,
    "seed": 3707,
-   "genMs": 65,
+   "genMs": 84,
    "kind": "circuit",
    "length": 836,
    "runMetres": 2508,
@@ -2144,7 +2144,7 @@
    },
    "rejectedSeed": false,
    "seed": 3808,
-   "genMs": 7,
+   "genMs": 18,
    "kind": "sprint",
    "length": 1412,
    "runMetres": 1372,
@@ -2233,7 +2233,7 @@
    "measuredDifficulty": 0.35,
    "carefulSeconds": 82,
    "drifterSeconds": 66,
-   "worstGenMs": 100
+   "worstGenMs": 86
   },
   {
    "chapter": "Pro",
@@ -2250,7 +2250,7 @@
    "measuredDifficulty": 0.43,
    "carefulSeconds": 101.8,
    "drifterSeconds": 82.3,
-   "worstGenMs": 116
+   "worstGenMs": 107
   },
   {
    "chapter": "Legend",
@@ -2267,7 +2267,7 @@
    "measuredDifficulty": 0.44,
    "carefulSeconds": 107.8,
    "drifterSeconds": 88.9,
-   "worstGenMs": 171
+   "worstGenMs": 165
   }
  ],
  "knownAnswer": [
@@ -2287,7 +2287,7 @@
     "2 banked corners, under 3"
    ],
    "seed": 2206,
-   "genMs": 4,
+   "genMs": 8,
    "kind": "sprint",
    "length": 1140,
    "runMetres": 1100,
@@ -2387,7 +2387,7 @@
     "5 props inside the barriers"
    ],
    "seed": 2305,
-   "genMs": 20,
+   "genMs": 25,
    "kind": "circuit",
    "length": 788,
    "runMetres": 2364,
@@ -2473,7 +2473,7 @@
   },
   {
    "index": 12,
-   "name": "Tangle",
+   "name": "Over and under",
    "chapter": "Pro",
    "settings": {
     "difficulty": 0.7,
@@ -2491,7 +2491,7 @@
     "0 banked corners, under 3"
    ],
    "seed": 2507,
-   "genMs": 376,
+   "genMs": 362,
    "kind": "circuit",
    "length": 816,
    "runMetres": 2448,
@@ -2589,7 +2589,7 @@
     "drifter 1 respawns"
    ],
    "seed": 2607,
-   "genMs": 7,
+   "genMs": 8,
    "kind": "sprint",
    "length": 1088,
    "runMetres": 1048,
@@ -2692,7 +2692,7 @@
     "2 banked corners, under 3"
    ],
    "seed": 2101,
-   "genMs": 244,
+   "genMs": 197,
    "kind": "circuit",
    "length": 814,
    "runMetres": 2442,
