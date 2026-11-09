@@ -1,0 +1,184 @@
+{
+ "started": "2026-11-09T20:15:06.181Z",
+ "stars12": {
+  "from": "main 561d97a9a1e5c3b384235b109385d63c54644f95",
+  "rookieStars": 12,
+  "title": "title",
+  "button": "12/72 stars · 5/72 missions",
+  "repaired": 0,
+  "changed": [],
+  "rows": "111111101000000000000000",
+  "heads": [
+   {
+    "locked": false,
+    "text": "12/24 ★ · 5/24 missions",
+    "inView": false
+   },
+   {
+    "locked": false,
+    "text": "0/24 ★ · 0/24 missions",
+    "inView": true
+   },
+   {
+    "locked": true,
+    "text": "14 more Pro stars to open Legend",
+    "inView": false
+   }
+  ],
+  "pro": {
+   "finished": true,
+   "frames": 8340,
+   "seconds": 135.97,
+   "score": 668,
+   "stars": 1,
+   "targets": [
+    640,
+    1270,
+    2230
+   ],
+   "cleanSectors": "12 of 12",
+   "contacts": 0,
+   "hard": 0,
+   "offTrack": 0,
+   "stuck": 0,
+   "respawns": 0,
+   "unlock": {
+    "done": true,
+    "text": "Track 2 of 8 unlocked: Quarry cut"
+   },
+   "note": {
+    "text": "13 more Pro stars to open Legend"
+   },
+   "nextIndex": 9,
+   "open9": true,
+   "oldGhostDrives": true
+  },
+  "errors": []
+ },
+ "stars11": {
+  "from": "main 561d97a9a1e5c3b384235b109385d63c54644f95",
+  "rookieStars": 11,
+  "title": "title",
+  "button": "11/72 stars · 5/72 missions",
+  "repaired": 0,
+  "changed": [],
+  "rows": "111111100000000000000000",
+  "heads": [
+   {
+    "locked": false,
+    "text": "11/24 ★ · 5/24 missions",
+    "inView": true
+   },
+   {
+    "locked": true,
+    "text": "1 more Rookie star to open Pro",
+    "inView": false
+   },
+   {
+    "locked": true,
+    "text": "14 more Pro stars to open Legend",
+    "inView": false
+   }
+  ],
+  "errors": []
+ },
+ "corrupted": {
+  "status": {
+   "available": true,
+   "loaded": true,
+   "repaired": 4,
+   "lastError": null,
+   "writes": 0,
+   "failedWrites": 0
+  },
+  "career": {
+   "0": {
+    "stars": 3,
+    "best": 900
+   },
+   "8": {
+    "stars": 3,
+    "best": 200
+   },
+   "30": {
+    "stars": 3,
+    "best": 10
+   }
+  },
+  "missions": {
+   "career:9": [
+    1,
+    0,
+    1
+   ],
+   "career:99": [
+    1,
+    1,
+    1
+   ]
+  },
+  "rows": "110000000100000000000000",
+  "run": {
+   "finished": true,
+   "frames": 2486,
+   "seconds": 38.4,
+   "score": 252,
+   "stars": 1,
+   "targets": [
+    230,
+    450,
+    790
+   ],
+   "cleanSectors": "3 of 3",
+   "contacts": 0,
+   "hard": 0,
+   "offTrack": 0,
+   "stuck": 0,
+   "respawns": 0,
+   "unlock": {
+    "done": true,
+    "text": "Track 3 of 8 unlocked: Crossover"
+   },
+   "note": {
+    "text": "8 more Rookie stars to open Pro"
+   },
+   "nextIndex": 2
+  },
+  "rowsAfter": 24,
+  "errors": []
+ },
+ "throwing": {
+  "first": {
+   "state": "countdown",
+   "available": false
+  },
+  "run": {
+   "finished": true,
+   "frames": 4380,
+   "seconds": 69.97,
+   "score": 895,
+   "stars": 1,
+   "targets": [
+    450,
+    900,
+    1580
+   ],
+   "cleanSectors": "12 of 12",
+   "contacts": 0,
+   "hard": 0,
+   "offTrack": 0,
+   "stuck": 0,
+   "respawns": 0,
+   "unlock": {
+    "done": true,
+    "text": "Track 2 of 8 unlocked: Harbour run"
+   },
+   "note": {
+    "text": "11 more Rookie stars to open Pro"
+   },
+   "nextIndex": 1
+  },
+  "rows": "110000000000000000000000",
+  "errors": []
+ }
+}

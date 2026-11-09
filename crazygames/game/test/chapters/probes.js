@@ -395,16 +395,17 @@ if (run('screens')) {
     /* the heading over a Pro countdown */
     await page.evaluate(() => { window.__loop.save.reset(); window.__loop.startRun(window.__loop.careerSpec(10)); });
     await R.runFrames(page, 60, 'return 0;');
+    await page.waitForTimeout(600);   // the box fades in over 0.3 s of real time
     const box = sel => page.evaluate(s => { const e = document.querySelector(s); if (!e || e.hidden || (!e.offsetParent && getComputedStyle(e).position !== 'fixed')) return null; const r = e.getBoundingClientRect(); return r.width && r.height ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null; }, sel);
     const head = await page.evaluate(() => { const m = document.getElementById('missions'); return { shown: !m.hidden, label: (m.querySelector('i') || {}).textContent || '', name: (m.querySelector('strong') || {}).textContent || '', state: window.__loop.app.state }; });
-    const hb = await box('#missions'), others = { score: await box('#total'), left: await box('#touch button[data-b="left"]'), right: await box('#touch button[data-b="right"]'), hb: await box('#touch button[data-b="hb"]'), exit: await box('#exit') };
+    const hb = await box('#missions'), others = { score: await box('#total'), left: await box('#touch button[data-b="left"]'), right: await box('#touch button[data-b="right"]'), hb: await box('#touch button[data-b="hb"]'), exit: await box('#exit'), lap: await box('#runinfo'), speed: await box('#readout') };
     const meet = (a, b) => a && b && a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
     const hits = Object.entries(others).filter(([, b]) => meet(hb, b)).map(([k]) => k);
     const inside = hb && hb.left >= 0 && hb.top >= 0 && hb.right <= vp.width && hb.bottom <= vp.height;
     await shot(page, 'heading-pro-' + tag);
     o.heading = { head, box: hb, hits };
     verdict(tag + ' the countdown heading names the chapter: "' + head.label + '" "' + head.name + '"', head.shown && head.state === 'countdown' && head.label === 'CAREER · PRO · TRACK 3 OF 8' && head.name === CAREER[10].name, '');
-    verdict(tag + ' and it lies inside the view, clear of the score, the pads and the exit', inside && hits.length === 0, JSON.stringify(hits));
+    verdict(tag + ' and it lies inside the view, clear of the score, the lap and clock, the speed, the pads and the exit', inside && hits.length === 0, JSON.stringify(hits));
     /* the results of a run that opens Pro: OPEN[1] - 1 Rookie stars on the first tracks, then a careful clean run on the next open one */
     for (const known of [false, true]) {
       const short = known ? 2 : 1;

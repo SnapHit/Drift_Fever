@@ -1,0 +1,579 @@
+{
+ "started": "2026-11-09T20:17:58.295Z",
+ "390x844": {
+  "career-rookie": {
+   "current": {
+    "scrollTop": 0,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 42,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 758,
+    "ok": true
+   }
+  },
+  "title-rookie": "5/72 stars · 18/72 missions",
+  "career-pro": {
+   "current": {
+    "scrollTop": 583,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 42,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 758,
+    "ok": true
+   }
+  },
+  "title-pro": "17/72 stars · 18/72 missions",
+  "career-legend": {
+   "current": {
+    "scrollTop": 977,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 42,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 758,
+    "ok": true
+   }
+  },
+  "knownCurrent": {
+   "scrollTop": 0,
+   "head": false,
+   "firstRow": false
+  },
+  "knownLayout": {
+   "meetingCount": 50,
+   "sample": [
+    "at 0: ROOKIE24/24 ★ · 8/24 / 1\n        First slid",
+    "at 0: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck",
+    "at 24: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck"
+   ]
+  },
+  "title-legend": "44/72 stars · 18/72 missions",
+  "heading": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · PRO · TRACK 3 OF 8",
+    "name": "Pin drop",
+    "state": "countdown"
+   },
+   "box": {
+    "left": 70.109375,
+    "top": 109.71875,
+    "right": 319.890625,
+    "bottom": 256.71875
+   },
+   "hits": []
+  },
+  "resultsPro": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Pro unlocked: Upper deck",
+    "unlockDone": true,
+    "note": "Track 6 of 8 unlocked: Ridge road",
+    "next": "8",
+    "nextPrimary": true,
+    "scrolls": false,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsShort": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Track 6 of 8 unlocked: Ridge road",
+    "unlockDone": true,
+    "note": "1 more Rookie star to open Pro",
+    "next": "5",
+    "nextPrimary": true,
+    "scrolls": false,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsLast": {
+   "run": {
+    "score": 225,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 8 OF 8",
+    "unlock": "",
+    "unlockDone": null,
+    "note": "8 more Rookie stars to open Pro",
+    "next": null,
+    "nextPrimary": false,
+    "scrolls": false,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "errors": []
+ },
+ "844x390": {
+  "career-rookie": {
+   "current": {
+    "scrollTop": 0,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 61,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 304,
+    "ok": true
+   }
+  },
+  "title-rookie": "5/72 stars · 18/72 missions",
+  "career-pro": {
+   "current": {
+    "scrollTop": 583,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 61,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 304,
+    "ok": true
+   }
+  },
+  "title-pro": "17/72 stars · 18/72 missions",
+  "career-legend": {
+   "current": {
+    "scrollTop": 1166,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 61,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 304,
+    "ok": true
+   }
+  },
+  "knownCurrent": {
+   "scrollTop": 0,
+   "head": false,
+   "firstRow": false
+  },
+  "knownLayout": {
+   "meetingCount": 29,
+   "sample": [
+    "at 0: ROOKIE24/24 ★ · 8/24 / 1\n        First slid",
+    "at 264: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck",
+    "at 288: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck"
+   ]
+  },
+  "title-legend": "44/72 stars · 18/72 missions",
+  "heading": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · PRO · TRACK 3 OF 8",
+    "name": "Pin drop",
+    "state": "countdown"
+   },
+   "box": {
+    "left": 12,
+    "top": 93.59375,
+    "right": 257.78125,
+    "bottom": 239.59375
+   },
+   "hits": []
+  },
+  "resultsPro": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Pro unlocked: Upper deck",
+    "unlockDone": true,
+    "note": "Track 6 of 8 unlocked: Ridge road",
+    "next": "8",
+    "nextPrimary": true,
+    "scrolls": true,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsShort": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Track 6 of 8 unlocked: Ridge road",
+    "unlockDone": true,
+    "note": "1 more Rookie star to open Pro",
+    "next": "5",
+    "nextPrimary": true,
+    "scrolls": true,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsLast": {
+   "run": {
+    "score": 225,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 8 OF 8",
+    "unlock": "",
+    "unlockDone": null,
+    "note": "8 more Rookie stars to open Pro",
+    "next": null,
+    "nextPrimary": false,
+    "scrolls": true,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "errors": []
+ },
+ "800x450": {
+  "career-rookie": {
+   "current": {
+    "scrollTop": 0,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 59,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 364,
+    "ok": true
+   }
+  },
+  "title-rookie": "5/72 stars · 18/72 missions",
+  "career-pro": {
+   "current": {
+    "scrollTop": 583,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 59,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 364,
+    "ok": true
+   }
+  },
+  "title-pro": "17/72 stars · 18/72 missions",
+  "career-legend": {
+   "current": {
+    "scrollTop": 1166,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 59,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 364,
+    "ok": true
+   }
+  },
+  "knownCurrent": {
+   "scrollTop": 0,
+   "head": false,
+   "firstRow": false
+  },
+  "knownLayout": {
+   "meetingCount": 33,
+   "sample": [
+    "at 0: ROOKIE24/24 ★ · 8/24 / 1\n        First slid",
+    "at 216: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck",
+    "at 240: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck"
+   ]
+  },
+  "title-legend": "44/72 stars · 18/72 missions",
+  "heading": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · PRO · TRACK 3 OF 8",
+    "name": "Pin drop",
+    "state": "countdown"
+   },
+   "box": {
+    "left": 12,
+    "top": 108,
+    "right": 257.78125,
+    "bottom": 253
+   },
+   "hits": []
+  },
+  "resultsPro": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Pro unlocked: Upper deck",
+    "unlockDone": true,
+    "note": "Track 6 of 8 unlocked: Ridge road",
+    "next": "8",
+    "nextPrimary": true,
+    "scrolls": true,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsShort": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Track 6 of 8 unlocked: Ridge road",
+    "unlockDone": true,
+    "note": "1 more Rookie star to open Pro",
+    "next": "5",
+    "nextPrimary": true,
+    "scrolls": true,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsLast": {
+   "run": {
+    "score": 225,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 8 OF 8",
+    "unlock": "",
+    "unlockDone": null,
+    "note": "8 more Rookie stars to open Pro",
+    "next": null,
+    "nextPrimary": false,
+    "scrolls": true,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "errors": []
+ },
+ "1280x720": {
+  "career-rookie": {
+   "current": {
+    "scrollTop": 0,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 47,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 634,
+    "ok": true
+   }
+  },
+  "title-rookie": "5/72 stars · 18/72 missions",
+  "career-pro": {
+   "current": {
+    "scrollTop": 583,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 47,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 634,
+    "ok": true
+   }
+  },
+  "title-pro": "17/72 stars · 18/72 missions",
+  "career-legend": {
+   "current": {
+    "scrollTop": 1101,
+    "head": true,
+    "firstRow": true
+   },
+   "layout": {
+    "positions": 47,
+    "meetings": [],
+    "meetingCount": 0,
+    "fixedOutside": 0,
+    "unreachable": [],
+    "rows": 24,
+    "rowHeight": 60,
+    "listHeight": 634,
+    "ok": true
+   }
+  },
+  "knownCurrent": {
+   "scrollTop": 0,
+   "head": false,
+   "firstRow": false
+  },
+  "knownLayout": {
+   "meetingCount": 49,
+   "sample": [
+    "at 0: ROOKIE24/24 ★ · 8/24 / 1\n        First slid",
+    "at 0: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck",
+    "at 24: PRO18/24 ★ · 7/24 mi / 1\n        Upper deck"
+   ]
+  },
+  "title-legend": "44/72 stars · 18/72 missions",
+  "heading": {
+   "head": {
+    "shown": true,
+    "label": "CAREER · PRO · TRACK 3 OF 8",
+    "name": "Pin drop",
+    "state": "countdown"
+   },
+   "box": {
+    "left": 12,
+    "top": 194.390625,
+    "right": 261.78125,
+    "bottom": 358.390625
+   },
+   "hits": []
+  },
+  "resultsPro": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Pro unlocked: Upper deck",
+    "unlockDone": true,
+    "note": "Track 6 of 8 unlocked: Ridge road",
+    "next": "8",
+    "nextPrimary": true,
+    "scrolls": false,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsShort": {
+   "track": 4,
+   "run": {
+    "score": 523,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 5 OF 8",
+    "unlock": "🔓 Track 6 of 8 unlocked: Ridge road",
+    "unlockDone": true,
+    "note": "1 more Rookie star to open Pro",
+    "next": "5",
+    "nextPrimary": true,
+    "scrolls": false,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "resultsLast": {
+   "run": {
+    "score": 225,
+    "stars": 1
+   },
+   "card": {
+    "label": "CAREER · ROOKIE · TRACK 8 OF 8",
+    "unlock": "",
+    "unlockDone": null,
+    "note": "8 more Rookie stars to open Pro",
+    "next": null,
+    "nextPrimary": false,
+    "scrolls": false,
+    "meetings": [],
+    "unreachable": [],
+    "ok": true
+   }
+  },
+  "errors": []
+ }
+}

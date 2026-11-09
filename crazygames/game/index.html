@@ -59,6 +59,7 @@
   /* the track's missions over the countdown */
   #missions { position: absolute; left: max(12px, env(safe-area-inset-left)); top: 27%; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 16px; border-radius: 14px; background: rgba(10,14,30,0.7); border: 2px solid rgba(255,255,255,0.22); font-size: clamp(13px, 2vw, 16px); font-weight: 700; white-space: nowrap; max-width: 92vw; animation: promptIn 0.3s ease-out; }
   #missions[hidden] { display: none; }
+  @media (orientation: landscape) and (max-height: 500px) { #missions { top: 24%; padding: 6px 14px; gap: 2px; } #missions strong + b { margin-top: 3px; } }   /* a phone on its side: clear of the steer pads under it (measured, game/test/chapters/probes.js) */
   @media (orientation: portrait) { #missions { left: 50%; top: 13%; transform: translateX(-50%); --tx: -50%; } }
   #missions b { align-self: center; font-size: 11px; letter-spacing: 0.2em; opacity: 0.7; }
   #missions i { align-self: center; font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: var(--brand-line); }
@@ -86,7 +87,7 @@
   #onboard .prompt.at-left .arrow { left: min(11vw, 60px); transform: translateX(-50%); }
   #onboard .prompt.at-right .arrow { right: min(18vw, 90px); transform: translateX(50%); }
   @keyframes nudge { from { margin-bottom: 0; } to { margin-bottom: -6px; } }
-  @keyframes promptIn { from { opacity: 0; transform: translate(var(--tx, 0), calc(var(--ty, 0) + 10px)); } }
+  @keyframes promptIn { from { opacity: 0; transform: translate(var(--tx, 0px), calc(var(--ty, 0px) + 10px)); } }   /* 0px, not 0: calc(0 + 10px) is invalid and dropped the whole transform while the box faded in */
   #onboard .prompt.centre { --tx: -50%; }
   #onboard .keys { display: flex; align-items: center; gap: 6px; }
   #onboard .keys i { font-style: normal; opacity: 0.7; font-size: 13px; margin: 0 2px; }

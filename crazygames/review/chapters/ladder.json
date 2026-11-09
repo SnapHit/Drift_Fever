@@ -1,0 +1,74 @@
+{
+ "started": "2026-11-09T20:15:06.181Z",
+ "open": [
+  0,
+  12,
+  14
+ ],
+ "fixed": {
+  "fresh": [
+   true,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "proShort": {
+   "track8": false,
+   "track9": false
+  },
+  "refused": true,
+  "proOpen": {
+   "track8": true,
+   "track9": false,
+   "track16": false
+  },
+  "inChapter": {
+   "track9": true,
+   "track10": false
+  },
+  "legendShort": {
+   "track16": false
+  },
+  "legendOpen": {
+   "track16": true,
+   "track17": false
+  },
+  "startsWhenOpen": true
+ },
+ "random": {
+  "saves": 2000,
+  "disagree": 0,
+  "offByOne": 204,
+  "opened": {
+   "pro": 427,
+   "legend": 206
+  }
+ },
+ "screen": {
+  "saves": 40,
+  "rowsChecked": 960,
+  "rowsWrong": 0,
+  "headsWrong": 0
+ },
+ "errors": []
+}
