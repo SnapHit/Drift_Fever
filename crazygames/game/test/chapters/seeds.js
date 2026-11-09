@@ -46,7 +46,7 @@ export function features(t) {
   const types = {};
   for (const c of t.corners) types[c.type] = (types[c.type] || 0) + 1;
   const laps = lapsFor(t);
-  return { length: t.length, runMetres: Math.round(runMetres(t, laps)), laps, corners: t.corners.length, banked: t.corners.filter(c => c.bank > 0).length, bridges: (t.bridges || []).length, hairpins: (types.hairpin || 0) + (types.double || 0), clips: (t.clips || []).length, types, measuredDifficulty: +(+t.difficulty).toFixed(2), attempts: t.attempts, fallback: !!t.fallback };
+  return { kind: t.kind, length: t.length, runMetres: Math.round(runMetres(t, laps)), laps, corners: t.corners.length, banked: t.corners.filter(c => c.bank > 0).length, bridges: (t.bridges || []).length, hairpins: (types.hairpin || 0) + (types.double || 0), clips: (t.clips || []).length, types, measuredDifficulty: +(+t.difficulty).toFixed(2), attempts: t.attempts, fallback: !!t.fallback };
 }
 
 /* Measure one spec: generation time, the features, both drivers. */

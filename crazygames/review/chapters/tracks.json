@@ -1,0 +1,2518 @@
+{
+ "started": "2026-11-09T20:14:35.720Z",
+ "rule": "seeds.js check: no plain layout, a bridge where a crossover is asked, generation under 600 ms, both drivers finish with 0 respawns, the careful driver clean with a star, banked corners at least 0 / 3 / 4 by chapter",
+ "tracks": [
+  {
+   "index": 0,
+   "name": "First slide",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.1,
+    "length": 560,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1101,
+   "genMs": 64,
+   "kind": "circuit",
+   "length": 518,
+   "runMetres": 1554,
+   "laps": 3,
+   "corners": 3,
+   "banked": 0,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 3,
+   "types": {
+    "tight": 1,
+    "sweeper": 1,
+    "opening": 1
+   },
+   "measuredDifficulty": 0.21,
+   "attempts": 46,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 4818,
+    "seconds": 77.27,
+    "score": 491,
+    "stars": 1,
+    "targets": [
+     450,
+     900,
+     1580
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Harbour run"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 1
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 4380,
+    "seconds": 69.98,
+    "score": 895,
+    "stars": 1,
+    "targets": [
+     450,
+     900,
+     1580
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Harbour run"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 1
+   },
+   "fails": []
+  },
+  {
+   "index": 1,
+   "name": "Harbour run",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.2,
+    "length": 800,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1202,
+   "genMs": 23,
+   "kind": "sprint",
+   "length": 840,
+   "runMetres": 800,
+   "laps": 1,
+   "corners": 8,
+   "banked": 5,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 4,
+   "types": {
+    "chicane": 2,
+    "multi": 5,
+    "sweeper": 1
+   },
+   "measuredDifficulty": 0.15,
+   "attempts": 2,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 2486,
+    "seconds": 38.4,
+    "score": 252,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: Crossover"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 2
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 2132,
+    "seconds": 32.5,
+    "score": 309,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 2,
+    "hard": 1,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: Crossover"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 2
+   },
+   "fails": []
+  },
+  {
+   "index": 2,
+   "name": "Crossover",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.3,
+    "length": 820,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1327,
+   "genMs": 53,
+   "kind": "circuit",
+   "length": 844,
+   "runMetres": 2532,
+   "laps": 3,
+   "corners": 12,
+   "banked": 6,
+   "bridges": 1,
+   "hairpins": 0,
+   "clips": 4,
+   "types": {
+    "multi": 12
+   },
+   "measuredDifficulty": 0.35,
+   "attempts": 13,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8556,
+    "seconds": 139.57,
+    "score": 723,
+    "stars": 1,
+    "targets": [
+     690,
+     1380,
+     2420
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Long shadows"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 3
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 6527,
+    "seconds": 105.77,
+    "score": 1128,
+    "stars": 1,
+    "targets": [
+     690,
+     1380,
+     2420
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Long shadows"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 3
+   },
+   "fails": []
+  },
+  {
+   "index": 3,
+   "name": "Long shadows",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.4,
+    "length": 900,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1404,
+   "genMs": 13,
+   "kind": "sprint",
+   "length": 898,
+   "runMetres": 858,
+   "laps": 1,
+   "corners": 8,
+   "banked": 0,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 8,
+   "types": {
+    "sweeper": 1,
+    "flow": 5,
+    "hairpin": 2
+   },
+   "measuredDifficulty": 0.36,
+   "attempts": 4,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 2980,
+    "seconds": 46.65,
+    "score": 240,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 5 of 8 unlocked: Tight city"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 4
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 2485,
+    "seconds": 38.38,
+    "score": 448,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 5 of 8 unlocked: Tight city"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 4
+   },
+   "fails": []
+  },
+  {
+   "index": 4,
+   "name": "Tight city",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.55,
+    "length": 620,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1505,
+   "genMs": 23,
+   "kind": "circuit",
+   "length": 678,
+   "runMetres": 2034,
+   "laps": 3,
+   "corners": 7,
+   "banked": 2,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 7,
+   "types": {
+    "tightening": 1,
+    "esses": 2,
+    "opening": 1,
+    "double": 2,
+    "tight": 1
+   },
+   "measuredDifficulty": 0.47,
+   "attempts": 15,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 7596,
+    "seconds": 123.57,
+    "score": 523,
+    "stars": 1,
+    "targets": [
+     510,
+     1020,
+     1780
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 6 of 8 unlocked: Ridge road"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 5
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 6279,
+    "seconds": 101.62,
+    "score": 1028,
+    "stars": 2,
+    "targets": [
+     510,
+     1020,
+     1780
+    ],
+    "cleanSectors": "9 of 12",
+    "contacts": 4,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 6 of 8 unlocked: Ridge road"
+    },
+    "note": {
+     "text": "10 more Rookie stars to open Pro"
+    },
+    "nextIndex": 5
+   },
+   "fails": []
+  },
+  {
+   "index": 5,
+   "name": "Ridge road",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.65,
+    "length": 1000,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1606,
+   "genMs": 10,
+   "kind": "sprint",
+   "length": 1018,
+   "runMetres": 978,
+   "laps": 1,
+   "corners": 12,
+   "banked": 3,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 10,
+   "types": {
+    "tight": 1,
+    "tightening": 1,
+    "multi": 3,
+    "sweeper": 1,
+    "esses": 2,
+    "flow": 4
+   },
+   "measuredDifficulty": 0.35,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 3323,
+    "seconds": 52.35,
+    "score": 252,
+    "stars": 1,
+    "targets": [
+     240,
+     470,
+     830
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: Hairpin heaven"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 6
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 2710,
+    "seconds": 42.13,
+    "score": 389,
+    "stars": 1,
+    "targets": [
+     240,
+     470,
+     830
+    ],
+    "cleanSectors": "1 of 3",
+    "contacts": 5,
+    "hard": 2,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: Hairpin heaven"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 6
+   },
+   "fails": []
+  },
+  {
+   "index": 6,
+   "name": "Hairpin heaven",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.8,
+    "length": 660,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1707,
+   "genMs": 16,
+   "kind": "circuit",
+   "length": 688,
+   "runMetres": 2064,
+   "laps": 3,
+   "corners": 7,
+   "banked": 1,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 6,
+   "types": {
+    "opening": 1,
+    "esses": 3,
+    "tight": 1,
+    "chicane": 2
+   },
+   "measuredDifficulty": 0.43,
+   "attempts": 16,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 7105,
+    "seconds": 115.38,
+    "score": 488,
+    "stars": 1,
+    "targets": [
+     470,
+     940,
+     1650
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 8 of 8 unlocked: The gauntlet"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 7
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 5605,
+    "seconds": 90.38,
+    "score": 589,
+    "stars": 1,
+    "targets": [
+     470,
+     940,
+     1650
+    ],
+    "cleanSectors": "9 of 12",
+    "contacts": 3,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 8 of 8 unlocked: The gauntlet"
+    },
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": 7
+   },
+   "fails": []
+  },
+  {
+   "index": 7,
+   "name": "The gauntlet",
+   "chapter": "Rookie",
+   "settings": {
+    "difficulty": 0.95,
+    "length": 1100,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 1808,
+   "genMs": 9,
+   "kind": "sprint",
+   "length": 1066,
+   "runMetres": 1026,
+   "laps": 1,
+   "corners": 16,
+   "banked": 1,
+   "bridges": 1,
+   "hairpins": 1,
+   "clips": 14,
+   "types": {
+    "hairpin": 1,
+    "chicane": 3,
+    "flow": 10,
+    "opening": 1,
+    "tight": 1
+   },
+   "measuredDifficulty": 0.5,
+   "attempts": 2,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 3939,
+    "seconds": 62.63,
+    "score": 225,
+    "stars": 1,
+    "targets": [
+     220,
+     440,
+     770
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": null,
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": null
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3012,
+    "seconds": 47.18,
+    "score": 300,
+    "stars": 1,
+    "targets": [
+     220,
+     440,
+     770
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 2,
+    "hard": 2,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": null,
+    "note": {
+     "text": "11 more Rookie stars to open Pro"
+    },
+    "nextIndex": null
+   },
+   "fails": []
+  },
+  {
+   "index": 8,
+   "name": "Upper deck",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.5,
+    "length": [
+     770,
+     840
+    ],
+    "style": "flowing",
+    "crossover": "always"
+   },
+   "rejectedSeed": false,
+   "seed": 2105,
+   "genMs": 77,
+   "kind": "circuit",
+   "length": 832,
+   "runMetres": 2496,
+   "laps": 3,
+   "corners": 10,
+   "banked": 6,
+   "bridges": 1,
+   "hairpins": 0,
+   "clips": 6,
+   "types": {
+    "tight": 2,
+    "opening": 2,
+    "multi": 6
+   },
+   "measuredDifficulty": 0.32,
+   "attempts": 329,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8338,
+    "seconds": 135.95,
+    "score": 668,
+    "stars": 1,
+    "targets": [
+     640,
+     1270,
+     2230
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Quarry cut"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 9
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 7271,
+    "seconds": 118.17,
+    "score": 1921,
+    "stars": 2,
+    "targets": [
+     640,
+     1270,
+     2230
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Quarry cut"
+    },
+    "note": {
+     "text": "12 more Pro stars to open Legend"
+    },
+    "nextIndex": 9
+   },
+   "fails": []
+  },
+  {
+   "index": 9,
+   "name": "Quarry cut",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.55,
+    "length": 1100,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 2213,
+   "genMs": 6,
+   "kind": "sprint",
+   "length": 1114,
+   "runMetres": 1074,
+   "laps": 1,
+   "corners": 15,
+   "banked": 3,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 14,
+   "types": {
+    "tight": 3,
+    "chicane": 2,
+    "flow": 4,
+    "esses": 6
+   },
+   "measuredDifficulty": 0.42,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 3947,
+    "seconds": 62.77,
+    "score": 277,
+    "stars": 1,
+    "targets": [
+     270,
+     540,
+     940
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: Pin drop"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 10
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3095,
+    "seconds": 48.57,
+    "score": 410,
+    "stars": 1,
+    "targets": [
+     270,
+     540,
+     940
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 2,
+    "hard": 1,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: Pin drop"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 10
+   },
+   "fails": []
+  },
+  {
+   "index": 10,
+   "name": "Pin drop",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.6,
+    "length": 720,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 2305,
+   "genMs": 31,
+   "kind": "circuit",
+   "length": 788,
+   "runMetres": 2364,
+   "laps": 3,
+   "corners": 8,
+   "banked": 5,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 6,
+   "types": {
+    "multi": 3,
+    "tightening": 1,
+    "sweeper": 2,
+    "double": 2
+   },
+   "measuredDifficulty": 0.32,
+   "attempts": 38,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8026,
+    "seconds": 130.75,
+    "score": 618,
+    "stars": 1,
+    "targets": [
+     580,
+     1160,
+     2040
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Breakwater"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 11
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 6874,
+    "seconds": 111.55,
+    "score": 792,
+    "stars": 1,
+    "targets": [
+     580,
+     1160,
+     2040
+    ],
+    "cleanSectors": "7 of 12",
+    "contacts": 7,
+    "hard": 4,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Breakwater"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 11
+   },
+   "fails": []
+  },
+  {
+   "index": 11,
+   "name": "Breakwater",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.65,
+    "length": 1150,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 2406,
+   "genMs": 6,
+   "kind": "sprint",
+   "length": 1252,
+   "runMetres": 1212,
+   "laps": 1,
+   "corners": 13,
+   "banked": 3,
+   "bridges": 1,
+   "hairpins": 2,
+   "clips": 12,
+   "types": {
+    "hairpin": 2,
+    "opening": 2,
+    "multi": 2,
+    "esses": 5,
+    "tight": 2
+   },
+   "measuredDifficulty": 0.4,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 4454,
+    "seconds": 71.22,
+    "score": 300,
+    "stars": 1,
+    "targets": [
+     290,
+     590,
+     1020
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 5 of 8 unlocked: Tangle"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 12
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3521,
+    "seconds": 55.67,
+    "score": 872,
+    "stars": 2,
+    "targets": [
+     290,
+     590,
+     1020
+    ],
+    "cleanSectors": "1 of 3",
+    "contacts": 2,
+    "hard": 1,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 5 of 8 unlocked: Tangle"
+    },
+    "note": {
+     "text": "12 more Pro stars to open Legend"
+    },
+    "nextIndex": 12
+   },
+   "fails": []
+  },
+  {
+   "index": 12,
+   "name": "Tangle",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.7,
+    "length": [
+     770,
+     860
+    ],
+    "style": "technical",
+    "crossover": "always"
+   },
+   "rejectedSeed": false,
+   "seed": 2510,
+   "genMs": 11,
+   "kind": "circuit",
+   "length": 846,
+   "runMetres": 2538,
+   "laps": 3,
+   "corners": 6,
+   "banked": 6,
+   "bridges": 1,
+   "hairpins": 0,
+   "clips": 6,
+   "types": {
+    "tight": 2,
+    "tightening": 2,
+    "opening": 2
+   },
+   "measuredDifficulty": 0.42,
+   "attempts": 17,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8747,
+    "seconds": 142.77,
+    "score": 634,
+    "stars": 1,
+    "targets": [
+     600,
+     1200,
+     2110
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 6 of 8 unlocked: Switchbacks"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 13
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 7389,
+    "seconds": 120.12,
+    "score": 1207,
+    "stars": 2,
+    "targets": [
+     600,
+     1200,
+     2110
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 6 of 8 unlocked: Switchbacks"
+    },
+    "note": {
+     "text": "12 more Pro stars to open Legend"
+    },
+    "nextIndex": 13
+   },
+   "fails": []
+  },
+  {
+   "index": 13,
+   "name": "Switchbacks",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.75,
+    "length": 1200,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 2606,
+   "genMs": 54,
+   "kind": "sprint",
+   "length": 1130,
+   "runMetres": 1090,
+   "laps": 1,
+   "corners": 10,
+   "banked": 3,
+   "bridges": 0,
+   "hairpins": 6,
+   "clips": 10,
+   "types": {
+    "hairpin": 2,
+    "tightening": 3,
+    "double": 4,
+    "sweeper": 1
+   },
+   "measuredDifficulty": 0.5,
+   "attempts": 6,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 4299,
+    "seconds": 68.62,
+    "score": 255,
+    "stars": 1,
+    "targets": [
+     250,
+     510,
+     890
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: Smoke ring"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 14
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3577,
+    "seconds": 56.58,
+    "score": 416,
+    "stars": 1,
+    "targets": [
+     250,
+     510,
+     890
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 2,
+    "hard": 1,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: Smoke ring"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 14
+   },
+   "fails": []
+  },
+  {
+   "index": 14,
+   "name": "Smoke ring",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.8,
+    "length": 760,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 2708,
+   "genMs": 14,
+   "kind": "circuit",
+   "length": 700,
+   "runMetres": 2100,
+   "laps": 3,
+   "corners": 8,
+   "banked": 4,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 6,
+   "types": {
+    "multi": 3,
+    "double": 2,
+    "esses": 2,
+    "tight": 1
+   },
+   "measuredDifficulty": 0.41,
+   "attempts": 4,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 7550,
+    "seconds": 122.8,
+    "score": 494,
+    "stars": 1,
+    "targets": [
+     480,
+     960,
+     1680
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 8 of 8 unlocked: Razor wire"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 15
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 5660,
+    "seconds": 91.3,
+    "score": 2060,
+    "stars": 3,
+    "targets": [
+     480,
+     960,
+     1680
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 8 of 8 unlocked: Razor wire"
+    },
+    "note": {
+     "text": "11 more Pro stars to open Legend"
+    },
+    "nextIndex": 15
+   },
+   "fails": []
+  },
+  {
+   "index": 15,
+   "name": "Razor wire",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.9,
+    "length": 1250,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 2809,
+   "genMs": 10,
+   "kind": "sprint",
+   "length": 1294,
+   "runMetres": 1254,
+   "laps": 1,
+   "corners": 18,
+   "banked": 3,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 13,
+   "types": {
+    "tight": 5,
+    "chicane": 8,
+    "tightening": 1,
+    "opening": 2,
+    "double": 2
+   },
+   "measuredDifficulty": 0.55,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 5040,
+    "seconds": 80.97,
+    "score": 275,
+    "stars": 1,
+    "targets": [
+     270,
+     550,
+     960
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": null,
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": null
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3771,
+    "seconds": 59.82,
+    "score": 476,
+    "stars": 1,
+    "targets": [
+     270,
+     550,
+     960
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 1,
+    "hard": 1,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": null,
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": null
+   },
+   "fails": []
+  },
+  {
+   "index": 16,
+   "name": "Knot yard",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.7,
+    "length": [
+     780,
+     880
+    ],
+    "style": "technical",
+    "crossover": "always"
+   },
+   "rejectedSeed": false,
+   "seed": 3102,
+   "genMs": 133,
+   "kind": "circuit",
+   "length": 832,
+   "runMetres": 2496,
+   "laps": 3,
+   "corners": 6,
+   "banked": 4,
+   "bridges": 1,
+   "hairpins": 0,
+   "clips": 6,
+   "types": {
+    "tightening": 6
+   },
+   "measuredDifficulty": 0.45,
+   "attempts": 364,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8591,
+    "seconds": 140.15,
+    "score": 619,
+    "stars": 1,
+    "targets": [
+     590,
+     1180,
+     2070
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Serpent spine"
+    },
+    "note": null,
+    "nextIndex": 17
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 7881,
+    "seconds": 128.32,
+    "score": 2358,
+    "stars": 3,
+    "targets": [
+     590,
+     1180,
+     2070
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Serpent spine"
+    },
+    "note": null,
+    "nextIndex": 17
+   },
+   "fails": []
+  },
+  {
+   "index": 17,
+   "name": "Serpent spine",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.75,
+    "length": 1250,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 3202,
+   "genMs": 43,
+   "kind": "sprint",
+   "length": 1210,
+   "runMetres": 1170,
+   "laps": 1,
+   "corners": 13,
+   "banked": 4,
+   "bridges": 0,
+   "hairpins": 3,
+   "clips": 9,
+   "types": {
+    "sweeper": 3,
+    "hairpin": 1,
+    "double": 2,
+    "multi": 7
+   },
+   "measuredDifficulty": 0.39,
+   "attempts": 16,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 4153,
+    "seconds": 66.18,
+    "score": 284,
+    "stars": 1,
+    "targets": [
+     270,
+     540,
+     950
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: High wire"
+    },
+    "note": null,
+    "nextIndex": 18
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3391,
+    "seconds": 53.48,
+    "score": 906,
+    "stars": 2,
+    "targets": [
+     270,
+     540,
+     950
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 1,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: High wire"
+    },
+    "note": null,
+    "nextIndex": 18
+   },
+   "fails": []
+  },
+  {
+   "index": 18,
+   "name": "High wire",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.8,
+    "length": [
+     780,
+     880
+    ],
+    "style": "hairpins",
+    "crossover": "always"
+   },
+   "rejectedSeed": false,
+   "seed": 3303,
+   "genMs": 8,
+   "kind": "circuit",
+   "length": 804,
+   "runMetres": 2412,
+   "laps": 3,
+   "corners": 6,
+   "banked": 4,
+   "bridges": 1,
+   "hairpins": 2,
+   "clips": 4,
+   "types": {
+    "multi": 4,
+    "hairpin": 2
+   },
+   "measuredDifficulty": 0.37,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8251,
+    "seconds": 134.48,
+    "score": 580,
+    "stars": 1,
+    "targets": [
+     550,
+     1100,
+     1920
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Needle run"
+    },
+    "note": null,
+    "nextIndex": 19
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 6774,
+    "seconds": 109.87,
+    "score": 959,
+    "stars": 1,
+    "targets": [
+     550,
+     1100,
+     1920
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 4 of 8 unlocked: Needle run"
+    },
+    "note": null,
+    "nextIndex": 19
+   },
+   "fails": []
+  },
+  {
+   "index": 19,
+   "name": "Needle run",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.85,
+    "length": 1300,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 3404,
+   "genMs": 12,
+   "kind": "sprint",
+   "length": 1286,
+   "runMetres": 1246,
+   "laps": 1,
+   "corners": 21,
+   "banked": 4,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 17,
+   "types": {
+    "tight": 2,
+    "flow": 5,
+    "esses": 6,
+    "tightening": 1,
+    "chicane": 7
+   },
+   "measuredDifficulty": 0.5,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 4740,
+    "seconds": 75.97,
+    "score": 282,
+    "stars": 1,
+    "targets": [
+     280,
+     560,
+     970
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 5 of 8 unlocked: Endless eight"
+    },
+    "note": null,
+    "nextIndex": 20
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3573,
+    "seconds": 56.52,
+    "score": 394,
+    "stars": 1,
+    "targets": [
+     280,
+     560,
+     970
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 2,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 5 of 8 unlocked: Endless eight"
+    },
+    "note": null,
+    "nextIndex": 20
+   },
+   "fails": []
+  },
+  {
+   "index": 20,
+   "name": "Endless eight",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.85,
+    "length": [
+     780,
+     880
+    ],
+    "style": "mixed",
+    "crossover": "always"
+   },
+   "rejectedSeed": false,
+   "seed": 3505,
+   "genMs": 53,
+   "kind": "circuit",
+   "length": 824,
+   "runMetres": 2472,
+   "laps": 3,
+   "corners": 8,
+   "banked": 6,
+   "bridges": 1,
+   "hairpins": 2,
+   "clips": 4,
+   "types": {
+    "multi": 6,
+    "hairpin": 2
+   },
+   "measuredDifficulty": 0.41,
+   "attempts": 68,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8415,
+    "seconds": 137.22,
+    "score": 582,
+    "stars": 1,
+    "targets": [
+     550,
+     1100,
+     1930
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 6 of 8 unlocked: Thousand turns"
+    },
+    "note": null,
+    "nextIndex": 21
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 6687,
+    "seconds": 108.42,
+    "score": 2167,
+    "stars": 3,
+    "targets": [
+     550,
+     1100,
+     1930
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 6 of 8 unlocked: Thousand turns"
+    },
+    "note": null,
+    "nextIndex": 21
+   },
+   "fails": []
+  },
+  {
+   "index": 21,
+   "name": "Thousand turns",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.9,
+    "length": 1350,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 3609,
+   "genMs": 6,
+   "kind": "sprint",
+   "length": 1294,
+   "runMetres": 1254,
+   "laps": 1,
+   "corners": 13,
+   "banked": 4,
+   "bridges": 0,
+   "hairpins": 10,
+   "clips": 12,
+   "types": {
+    "double": 8,
+    "hairpin": 2,
+    "multi": 2,
+    "tightening": 1
+   },
+   "measuredDifficulty": 0.55,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 5275,
+    "seconds": 84.88,
+    "score": 271,
+    "stars": 1,
+    "targets": [
+     270,
+     550,
+     960
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: The vice"
+    },
+    "note": null,
+    "nextIndex": 22
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 4085,
+    "seconds": 65.05,
+    "score": 865,
+    "stars": 2,
+    "targets": [
+     270,
+     550,
+     960
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: The vice"
+    },
+    "note": null,
+    "nextIndex": 22
+   },
+   "fails": []
+  },
+  {
+   "index": 22,
+   "name": "The vice",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.95,
+    "length": [
+     780,
+     880
+    ],
+    "style": "technical",
+    "crossover": "always"
+   },
+   "rejectedSeed": false,
+   "seed": 3707,
+   "genMs": 109,
+   "kind": "circuit",
+   "length": 836,
+   "runMetres": 2508,
+   "laps": 3,
+   "corners": 6,
+   "banked": 4,
+   "bridges": 1,
+   "hairpins": 0,
+   "clips": 6,
+   "types": {
+    "tightening": 4,
+    "tight": 2
+   },
+   "measuredDifficulty": 0.43,
+   "attempts": 132,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8721,
+    "seconds": 142.32,
+    "score": 559,
+    "stars": 1,
+    "targets": [
+     540,
+     1080,
+     1880
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 8 of 8 unlocked: The last bend"
+    },
+    "note": null,
+    "nextIndex": 23
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 7713,
+    "seconds": 125.52,
+    "score": 1678,
+    "stars": 2,
+    "targets": [
+     540,
+     1080,
+     1880
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 8 of 8 unlocked: The last bend"
+    },
+    "note": null,
+    "nextIndex": 23
+   },
+   "fails": []
+  },
+  {
+   "index": 23,
+   "name": "The last bend",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 1,
+    "length": 1400,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "rejectedSeed": false,
+   "seed": 3808,
+   "genMs": 6,
+   "kind": "sprint",
+   "length": 1412,
+   "runMetres": 1372,
+   "laps": 1,
+   "corners": 17,
+   "banked": 4,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 17,
+   "types": {
+    "tight": 1,
+    "tightening": 4,
+    "esses": 10,
+    "double": 2
+   },
+   "measuredDifficulty": 0.49,
+   "attempts": 2,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 5135,
+    "seconds": 82.57,
+    "score": 293,
+    "stars": 1,
+    "targets": [
+     290,
+     580,
+     1010
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": null,
+    "note": null,
+    "nextIndex": null
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3945,
+    "seconds": 62.73,
+    "score": 1366,
+    "stars": 3,
+    "targets": [
+     290,
+     580,
+     1010
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 1,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": null,
+    "note": null,
+    "nextIndex": null
+   },
+   "fails": []
+  }
+ ],
+ "byChapter": [
+  {
+   "chapter": "Rookie",
+   "circuitRunMetres": 2046,
+   "sprintRunMetres": 916,
+   "corners": 73,
+   "banked": 18,
+   "bankedShare": 0.25,
+   "bridges": 2,
+   "figureEights": 1,
+   "hairpins": 5,
+   "technicalOrHairpinStyles": 0,
+   "askedDifficulty": 0.5,
+   "measuredDifficulty": 0.35,
+   "carefulSeconds": 82,
+   "drifterSeconds": 66,
+   "worstGenMs": 64
+  },
+  {
+   "chapter": "Pro",
+   "circuitRunMetres": 2375,
+   "sprintRunMetres": 1158,
+   "corners": 88,
+   "banked": 33,
+   "bankedShare": 0.38,
+   "bridges": 3,
+   "figureEights": 2,
+   "hairpins": 14,
+   "technicalOrHairpinStyles": 5,
+   "askedDifficulty": 0.7,
+   "measuredDifficulty": 0.42,
+   "carefulSeconds": 102,
+   "drifterSeconds": 82.7,
+   "worstGenMs": 77
+  },
+  {
+   "chapter": "Legend",
+   "circuitRunMetres": 2472,
+   "sprintRunMetres": 1261,
+   "corners": 90,
+   "banked": 34,
+   "bankedShare": 0.38,
+   "bridges": 4,
+   "figureEights": 4,
+   "hairpins": 19,
+   "technicalOrHairpinStyles": 7,
+   "askedDifficulty": 0.9,
+   "measuredDifficulty": 0.45,
+   "carefulSeconds": 108,
+   "drifterSeconds": 88.7,
+   "worstGenMs": 133
+  }
+ ],
+ "knownAnswer": [
+  {
+   "index": 9,
+   "name": "Quarry cut",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.55,
+    "length": 1100,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "rejectedSeed": true,
+   "nodeFails": [
+    "drifter 1 respawns",
+    "2 banked corners, under 3"
+   ],
+   "seed": 2206,
+   "genMs": 7,
+   "kind": "sprint",
+   "length": 1140,
+   "runMetres": 1100,
+   "laps": 1,
+   "corners": 13,
+   "banked": 2,
+   "bridges": 0,
+   "hairpins": 4,
+   "clips": 12,
+   "types": {
+    "double": 4,
+    "tight": 1,
+    "esses": 6,
+    "chicane": 2
+   },
+   "measuredDifficulty": 0.48,
+   "attempts": 3,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 4193,
+    "seconds": 66.87,
+    "score": 281,
+    "stars": 1,
+    "targets": [
+     280,
+     550,
+     960
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: Pin drop"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 10
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3419,
+    "seconds": 53.97,
+    "score": 472,
+    "stars": 1,
+    "targets": [
+     280,
+     550,
+     960
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 2,
+    "hard": 1,
+    "offTrack": 0,
+    "stuck": 1,
+    "respawns": 1,
+    "unlock": {
+     "done": true,
+     "text": "Track 3 of 8 unlocked: Pin drop"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 10
+   },
+   "fails": [
+    "drifter 1 respawns",
+    "2 banked corners, under 3"
+   ]
+  },
+  {
+   "index": 12,
+   "name": "Tangle",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.7,
+    "length": [
+     770,
+     860
+    ],
+    "style": "technical",
+    "crossover": "always"
+   },
+   "rejectedSeed": true,
+   "nodeFails": [
+    "plain layout",
+    "no bridge",
+    "0 banked corners, under 3"
+   ],
+   "seed": 2507,
+   "genMs": 318,
+   "kind": "circuit",
+   "length": 816,
+   "runMetres": 2448,
+   "laps": 3,
+   "corners": 4,
+   "banked": 0,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 4,
+   "types": {
+    "sweeper": 4
+   },
+   "measuredDifficulty": 0.21,
+   "attempts": 1000,
+   "fallback": true,
+   "careful": {
+    "finished": true,
+    "frames": 6548,
+    "seconds": 106.12,
+    "score": 670,
+    "stars": 1,
+    "targets": [
+     580,
+     1160,
+     2030
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 6 of 8 unlocked: Switchbacks"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 13
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 5920,
+    "seconds": 95.65,
+    "score": 557,
+    "stars": 0,
+    "targets": [
+     580,
+     1160,
+     2030
+    ],
+    "cleanSectors": "1 of 12",
+    "contacts": 13,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": false,
+     "text": "Win a star to unlock track 6 of 8"
+    },
+    "note": {
+     "text": "14 more Pro stars to open Legend"
+    },
+    "nextIndex": null
+   },
+   "fails": [
+    "plain layout",
+    "no bridge",
+    "0 banked corners, under 3"
+   ]
+  },
+  {
+   "index": 13,
+   "name": "Switchbacks",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.75,
+    "length": 1200,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "rejectedSeed": true,
+   "nodeFails": [
+    "drifter 1 respawns"
+   ],
+   "seed": 2607,
+   "genMs": 6,
+   "kind": "sprint",
+   "length": 1088,
+   "runMetres": 1048,
+   "laps": 1,
+   "corners": 9,
+   "banked": 4,
+   "bridges": 0,
+   "hairpins": 1,
+   "clips": 9,
+   "types": {
+    "tightening": 2,
+    "tight": 2,
+    "hairpin": 1,
+    "sweeper": 3,
+    "opening": 1
+   },
+   "measuredDifficulty": 0.37,
+   "attempts": 3,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 3625,
+    "seconds": 57.4,
+    "score": 258,
+    "stars": 1,
+    "targets": [
+     240,
+     490,
+     850
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: Smoke ring"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 14
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3176,
+    "seconds": 49.92,
+    "score": 520,
+    "stars": 2,
+    "targets": [
+     240,
+     490,
+     850
+    ],
+    "cleanSectors": "0 of 3",
+    "contacts": 5,
+    "hard": 2,
+    "offTrack": 0,
+    "stuck": 1,
+    "respawns": 1,
+    "unlock": {
+     "done": true,
+     "text": "Track 7 of 8 unlocked: Smoke ring"
+    },
+    "note": {
+     "text": "12 more Pro stars to open Legend"
+    },
+    "nextIndex": 14
+   },
+   "fails": [
+    "drifter 1 respawns"
+   ]
+  },
+  {
+   "index": 19,
+   "name": "Needle run",
+   "chapter": "Legend",
+   "settings": {
+    "difficulty": 0.85,
+    "length": 1300,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "rejectedSeed": true,
+   "nodeFails": [
+    "3 banked corners, under 4",
+    "careful 267 under the first star 270"
+   ],
+   "seed": 3406,
+   "genMs": 10,
+   "kind": "sprint",
+   "length": 1234,
+   "runMetres": 1194,
+   "laps": 1,
+   "corners": 17,
+   "banked": 3,
+   "bridges": 0,
+   "hairpins": 3,
+   "clips": 12,
+   "types": {
+    "chicane": 8,
+    "tight": 2,
+    "esses": 3,
+    "hairpin": 1,
+    "opening": 1,
+    "double": 2
+   },
+   "measuredDifficulty": 0.54,
+   "attempts": 2,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 4753,
+    "seconds": 76.2,
+    "score": 267,
+    "stars": 0,
+    "targets": [
+     270,
+     530,
+     930
+    ],
+    "cleanSectors": "3 of 3",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": false,
+     "text": "Win a star to unlock track 5 of 8"
+    },
+    "note": null,
+    "nextIndex": null
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 3565,
+    "seconds": 56.4,
+    "score": 581,
+    "stars": 2,
+    "targets": [
+     270,
+     530,
+     930
+    ],
+    "cleanSectors": "2 of 3",
+    "contacts": 1,
+    "hard": 1,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 5 of 8 unlocked: Endless eight"
+    },
+    "note": null,
+    "nextIndex": 20
+   },
+   "fails": [
+    "3 banked corners, under 4",
+    "careful 267 under the first star 270"
+   ]
+  },
+  {
+   "index": 8,
+   "name": "Upper deck",
+   "chapter": "Pro",
+   "settings": {
+    "difficulty": 0.5,
+    "length": [
+     770,
+     840
+    ],
+    "style": "flowing",
+    "crossover": "always"
+   },
+   "rejectedSeed": true,
+   "nodeFails": [
+    "2 banked corners, under 3"
+   ],
+   "seed": 2101,
+   "genMs": 184,
+   "kind": "circuit",
+   "length": 814,
+   "runMetres": 2442,
+   "laps": 3,
+   "corners": 6,
+   "banked": 2,
+   "bridges": 1,
+   "hairpins": 0,
+   "clips": 6,
+   "types": {
+    "tight": 4,
+    "opening": 2
+   },
+   "measuredDifficulty": 0.38,
+   "attempts": 766,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "frames": 8408,
+    "seconds": 137.12,
+    "score": 655,
+    "stars": 1,
+    "targets": [
+     620,
+     1250,
+     2180
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Quarry cut"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 9
+   },
+   "drifter": {
+    "finished": true,
+    "frames": 6980,
+    "seconds": 113.32,
+    "score": 998,
+    "stars": 1,
+    "targets": [
+     620,
+     1250,
+     2180
+    ],
+    "cleanSectors": "12 of 12",
+    "contacts": 0,
+    "hard": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "respawns": 0,
+    "unlock": {
+     "done": true,
+     "text": "Track 2 of 8 unlocked: Quarry cut"
+    },
+    "note": {
+     "text": "13 more Pro stars to open Legend"
+    },
+    "nextIndex": 9
+   },
+   "fails": [
+    "2 banked corners, under 3"
+   ]
+  }
+ ],
+ "errors": []
+}

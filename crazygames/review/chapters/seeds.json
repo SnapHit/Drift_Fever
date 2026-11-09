@@ -6,7 +6,8 @@
    "index": 0,
    "name": "First slide",
    "seed": 1101,
-   "genMs": 93,
+   "genMs": 90,
+   "kind": "circuit",
    "length": 518,
    "runMetres": 1554,
    "laps": 3,
@@ -65,7 +66,8 @@
    "index": 1,
    "name": "Harbour run",
    "seed": 1202,
-   "genMs": 12,
+   "genMs": 18,
+   "kind": "sprint",
    "length": 840,
    "runMetres": 800,
    "laps": 1,
@@ -125,6 +127,7 @@
    "name": "Crossover",
    "seed": 1327,
    "genMs": 54,
+   "kind": "circuit",
    "length": 844,
    "runMetres": 2532,
    "laps": 3,
@@ -181,7 +184,8 @@
    "index": 3,
    "name": "Long shadows",
    "seed": 1404,
-   "genMs": 22,
+   "genMs": 17,
+   "kind": "sprint",
    "length": 898,
    "runMetres": 858,
    "laps": 1,
@@ -240,7 +244,8 @@
    "index": 4,
    "name": "Tight city",
    "seed": 1505,
-   "genMs": 39,
+   "genMs": 38,
+   "kind": "circuit",
    "length": 678,
    "runMetres": 2034,
    "laps": 3,
@@ -302,6 +307,7 @@
    "name": "Ridge road",
    "seed": 1606,
    "genMs": 6,
+   "kind": "sprint",
    "length": 1018,
    "runMetres": 978,
    "laps": 1,
@@ -363,7 +369,8 @@
    "index": 6,
    "name": "Hairpin heaven",
    "seed": 1707,
-   "genMs": 15,
+   "genMs": 9,
+   "kind": "circuit",
    "length": 688,
    "runMetres": 2064,
    "laps": 3,
@@ -424,6 +431,7 @@
    "name": "The gauntlet",
    "seed": 1808,
    "genMs": 11,
+   "kind": "sprint",
    "length": 1066,
    "runMetres": 1026,
    "laps": 1,
@@ -502,7 +510,8 @@
    "tried": [
     {
      "seed": 2101,
-     "genMs": 225,
+     "genMs": 248,
+     "kind": "circuit",
      "length": 814,
      "runMetres": 2442,
      "laps": 3,
@@ -560,7 +569,8 @@
     },
     {
      "seed": 2102,
-     "genMs": 59,
+     "genMs": 35,
+     "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
      "laps": 3,
@@ -618,7 +628,8 @@
     },
     {
      "seed": 2103,
-     "genMs": 48,
+     "genMs": 49,
+     "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
      "laps": 3,
@@ -677,7 +688,8 @@
     },
     {
      "seed": 2104,
-     "genMs": 114,
+     "genMs": 119,
+     "kind": "circuit",
      "length": 808,
      "runMetres": 2424,
      "laps": 3,
@@ -735,7 +747,8 @@
     },
     {
      "seed": 2105,
-     "genMs": 65,
+     "genMs": 60,
+     "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
      "laps": 3,
@@ -810,6 +823,7 @@
     {
      "seed": 2202,
      "genMs": 9,
+     "kind": "sprint",
      "length": 1126,
      "runMetres": 1086,
      "laps": 1,
@@ -870,7 +884,8 @@
     },
     {
      "seed": 2203,
-     "genMs": 11,
+     "genMs": 10,
+     "kind": "sprint",
      "length": 1202,
      "runMetres": 1162,
      "laps": 1,
@@ -930,7 +945,8 @@
     },
     {
      "seed": 2204,
-     "genMs": 5,
+     "genMs": 14,
+     "kind": "sprint",
      "length": 1096,
      "runMetres": 1056,
      "laps": 1,
@@ -990,6 +1006,7 @@
     {
      "seed": 2205,
      "genMs": 5,
+     "kind": "sprint",
      "length": 1104,
      "runMetres": 1064,
      "laps": 1,
@@ -1051,7 +1068,8 @@
     },
     {
      "seed": 2206,
-     "genMs": 5,
+     "genMs": 4,
+     "kind": "sprint",
      "length": 1140,
      "runMetres": 1100,
      "laps": 1,
@@ -1113,6 +1131,7 @@
     {
      "seed": 2207,
      "genMs": 6,
+     "kind": "sprint",
      "length": 1142,
      "runMetres": 1102,
      "laps": 1,
@@ -1174,6 +1193,7 @@
     {
      "seed": 2208,
      "genMs": 4,
+     "kind": "sprint",
      "length": 1010,
      "runMetres": 970,
      "laps": 1,
@@ -1233,6 +1253,7 @@
     {
      "seed": 2209,
      "genMs": 4,
+     "kind": "sprint",
      "length": 1146,
      "runMetres": 1106,
      "laps": 1,
@@ -1291,7 +1312,8 @@
     },
     {
      "seed": 2210,
-     "genMs": 6,
+     "genMs": 4,
+     "kind": "sprint",
      "length": 1002,
      "runMetres": 962,
      "laps": 1,
@@ -1353,7 +1375,8 @@
     },
     {
      "seed": 2211,
-     "genMs": 5,
+     "genMs": 7,
+     "kind": "sprint",
      "length": 1080,
      "runMetres": 1040,
      "laps": 1,
@@ -1413,7 +1436,8 @@
     },
     {
      "seed": 2212,
-     "genMs": 6,
+     "genMs": 8,
+     "kind": "sprint",
      "length": 1078,
      "runMetres": 1038,
      "laps": 1,
@@ -1473,7 +1497,8 @@
     },
     {
      "seed": 2213,
-     "genMs": 4,
+     "genMs": 5,
+     "kind": "sprint",
      "length": 1114,
      "runMetres": 1074,
      "laps": 1,
@@ -1548,7 +1573,8 @@
    "tried": [
     {
      "seed": 2303,
-     "genMs": 6,
+     "genMs": 9,
+     "kind": "circuit",
      "length": 722,
      "runMetres": 2166,
      "laps": 3,
@@ -1608,7 +1634,8 @@
     },
     {
      "seed": 2304,
-     "genMs": 5,
+     "genMs": 6,
+     "kind": "circuit",
      "length": 728,
      "runMetres": 2184,
      "laps": 3,
@@ -1669,6 +1696,7 @@
     {
      "seed": 2305,
      "genMs": 20,
+     "kind": "circuit",
      "length": 788,
      "runMetres": 2364,
      "laps": 3,
@@ -1743,7 +1771,8 @@
    "tried": [
     {
      "seed": 2404,
-     "genMs": 10,
+     "genMs": 9,
+     "kind": "sprint",
      "length": 1062,
      "runMetres": 1022,
      "laps": 1,
@@ -1803,7 +1832,8 @@
     },
     {
      "seed": 2405,
-     "genMs": 8,
+     "genMs": 10,
+     "kind": "sprint",
      "length": 1070,
      "runMetres": 1030,
      "laps": 1,
@@ -1864,7 +1894,8 @@
     },
     {
      "seed": 2406,
-     "genMs": 5,
+     "genMs": 6,
+     "kind": "sprint",
      "length": 1252,
      "runMetres": 1212,
      "laps": 1,
@@ -1943,7 +1974,8 @@
    "tried": [
     {
      "seed": 2505,
-     "genMs": 5,
+     "genMs": 11,
+     "kind": "circuit",
      "length": 850,
      "runMetres": 2550,
      "laps": 3,
@@ -2002,6 +2034,7 @@
     {
      "seed": 2506,
      "genMs": 16,
+     "kind": "circuit",
      "length": 852,
      "runMetres": 2556,
      "laps": 3,
@@ -2060,7 +2093,8 @@
     },
     {
      "seed": 2507,
-     "genMs": 287,
+     "genMs": 260,
+     "kind": "circuit",
      "length": 816,
      "runMetres": 2448,
      "laps": 3,
@@ -2119,7 +2153,8 @@
     },
     {
      "seed": 2508,
-     "genMs": 51,
+     "genMs": 48,
+     "kind": "circuit",
      "length": 816,
      "runMetres": 2448,
      "laps": 3,
@@ -2177,7 +2212,8 @@
     },
     {
      "seed": 2509,
-     "genMs": 20,
+     "genMs": 22,
+     "kind": "circuit",
      "length": 784,
      "runMetres": 2352,
      "laps": 3,
@@ -2236,7 +2272,8 @@
     },
     {
      "seed": 2510,
-     "genMs": 9,
+     "genMs": 8,
+     "kind": "circuit",
      "length": 846,
      "runMetres": 2538,
      "laps": 3,
@@ -2310,7 +2347,8 @@
    "tried": [
     {
      "seed": 2606,
-     "genMs": 17,
+     "genMs": 13,
+     "kind": "sprint",
      "length": 1130,
      "runMetres": 1090,
      "laps": 1,
@@ -2369,6 +2407,7 @@
     {
      "seed": 2607,
      "genMs": 6,
+     "kind": "sprint",
      "length": 1088,
      "runMetres": 1048,
      "laps": 1,
@@ -2429,7 +2468,8 @@
     },
     {
      "seed": 2608,
-     "genMs": 6,
+     "genMs": 11,
+     "kind": "sprint",
      "length": 1224,
      "runMetres": 1184,
      "laps": 1,
@@ -2508,6 +2548,7 @@
     {
      "seed": 2707,
      "genMs": 7,
+     "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
      "laps": 3,
@@ -2568,7 +2609,8 @@
     },
     {
      "seed": 2708,
-     "genMs": 5,
+     "genMs": 6,
+     "kind": "circuit",
      "length": 700,
      "runMetres": 2100,
      "laps": 3,
@@ -2627,6 +2669,7 @@
     {
      "seed": 2709,
      "genMs": 10,
+     "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
      "laps": 3,
@@ -2703,6 +2746,7 @@
     {
      "seed": 2808,
      "genMs": 6,
+     "kind": "sprint",
      "length": 1204,
      "runMetres": 1164,
      "laps": 1,
@@ -2765,7 +2809,8 @@
     },
     {
      "seed": 2809,
-     "genMs": 6,
+     "genMs": 5,
+     "kind": "sprint",
      "length": 1294,
      "runMetres": 1254,
      "laps": 1,
@@ -2824,7 +2869,8 @@
     },
     {
      "seed": 2810,
-     "genMs": 13,
+     "genMs": 6,
+     "kind": "sprint",
      "length": 1350,
      "runMetres": 1310,
      "laps": 1,
@@ -2904,7 +2950,8 @@
    "tried": [
     {
      "seed": 3101,
-     "genMs": 124,
+     "genMs": 121,
+     "kind": "circuit",
      "length": 834,
      "runMetres": 2502,
      "laps": 3,
@@ -2962,7 +3009,8 @@
     },
     {
      "seed": 3102,
-     "genMs": 118,
+     "genMs": 128,
+     "kind": "circuit",
      "length": 832,
      "runMetres": 2496,
      "laps": 3,
@@ -3017,7 +3065,8 @@
     },
     {
      "seed": 3103,
-     "genMs": 227,
+     "genMs": 215,
+     "kind": "circuit",
      "length": 860,
      "runMetres": 2580,
      "laps": 3,
@@ -3091,7 +3140,8 @@
    "tried": [
     {
      "seed": 3202,
-     "genMs": 42,
+     "genMs": 33,
+     "kind": "sprint",
      "length": 1210,
      "runMetres": 1170,
      "laps": 1,
@@ -3149,7 +3199,8 @@
     },
     {
      "seed": 3203,
-     "genMs": 17,
+     "genMs": 13,
+     "kind": "sprint",
      "length": 1174,
      "runMetres": 1134,
      "laps": 1,
@@ -3208,7 +3259,8 @@
     },
     {
      "seed": 3204,
-     "genMs": 8,
+     "genMs": 7,
+     "kind": "sprint",
      "length": 1216,
      "runMetres": 1176,
      "laps": 1,
@@ -3291,6 +3343,7 @@
     {
      "seed": 3303,
      "genMs": 4,
+     "kind": "circuit",
      "length": 804,
      "runMetres": 2412,
      "laps": 3,
@@ -3347,6 +3400,7 @@
     {
      "seed": 3304,
      "genMs": 5,
+     "kind": "circuit",
      "length": 852,
      "runMetres": 2556,
      "laps": 3,
@@ -3403,6 +3457,7 @@
     {
      "seed": 3305,
      "genMs": 7,
+     "kind": "circuit",
      "length": 872,
      "runMetres": 2616,
      "laps": 3,
@@ -3475,7 +3530,8 @@
    "tried": [
     {
      "seed": 3404,
-     "genMs": 8,
+     "genMs": 6,
+     "kind": "sprint",
      "length": 1286,
      "runMetres": 1246,
      "laps": 1,
@@ -3534,7 +3590,8 @@
     },
     {
      "seed": 3405,
-     "genMs": 9,
+     "genMs": 5,
+     "kind": "sprint",
      "length": 1208,
      "runMetres": 1168,
      "laps": 1,
@@ -3597,6 +3654,7 @@
     {
      "seed": 3406,
      "genMs": 9,
+     "kind": "sprint",
      "length": 1234,
      "runMetres": 1194,
      "laps": 1,
@@ -3679,7 +3737,8 @@
    "tried": [
     {
      "seed": 3505,
-     "genMs": 31,
+     "genMs": 30,
+     "kind": "circuit",
      "length": 824,
      "runMetres": 2472,
      "laps": 3,
@@ -3735,7 +3794,8 @@
     },
     {
      "seed": 3506,
-     "genMs": 60,
+     "genMs": 29,
+     "kind": "circuit",
      "length": 812,
      "runMetres": 2436,
      "laps": 3,
@@ -3793,7 +3853,8 @@
     },
     {
      "seed": 3507,
-     "genMs": 40,
+     "genMs": 39,
+     "kind": "circuit",
      "length": 836,
      "runMetres": 2508,
      "laps": 3,
@@ -3869,6 +3930,7 @@
     {
      "seed": 3606,
      "genMs": 9,
+     "kind": "sprint",
      "length": 1264,
      "runMetres": 1224,
      "laps": 1,
@@ -3932,6 +3994,7 @@
     {
      "seed": 3607,
      "genMs": 13,
+     "kind": "sprint",
      "length": 1320,
      "runMetres": 1280,
      "laps": 1,
@@ -3992,7 +4055,8 @@
     },
     {
      "seed": 3608,
-     "genMs": 12,
+     "genMs": 8,
+     "kind": "sprint",
      "length": 1290,
      "runMetres": 1250,
      "laps": 1,
@@ -4053,6 +4117,7 @@
     {
      "seed": 3609,
      "genMs": 5,
+     "kind": "sprint",
      "length": 1294,
      "runMetres": 1254,
      "laps": 1,
@@ -4130,7 +4195,8 @@
    "tried": [
     {
      "seed": 3707,
-     "genMs": 52,
+     "genMs": 66,
+     "kind": "circuit",
      "length": 836,
      "runMetres": 2508,
      "laps": 3,
@@ -4186,7 +4252,8 @@
     },
     {
      "seed": 3708,
-     "genMs": 118,
+     "genMs": 147,
+     "kind": "circuit",
      "length": 872,
      "runMetres": 2616,
      "laps": 3,
@@ -4246,7 +4313,8 @@
     },
     {
      "seed": 3709,
-     "genMs": 20,
+     "genMs": 17,
+     "kind": "circuit",
      "length": 804,
      "runMetres": 2412,
      "laps": 3,
@@ -4322,7 +4390,8 @@
    "tried": [
     {
      "seed": 3808,
-     "genMs": 6,
+     "genMs": 8,
+     "kind": "sprint",
      "length": 1412,
      "runMetres": 1372,
      "laps": 1,
@@ -4380,7 +4449,8 @@
     },
     {
      "seed": 3809,
-     "genMs": 6,
+     "genMs": 7,
+     "kind": "sprint",
      "length": 1490,
      "runMetres": 1450,
      "laps": 1,
@@ -4440,7 +4510,8 @@
     },
     {
      "seed": 3810,
-     "genMs": 13,
+     "genMs": 12,
+     "kind": "sprint",
      "length": 1440,
      "runMetres": 1400,
      "laps": 1,
