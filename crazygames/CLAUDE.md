@@ -347,3 +347,10 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   the scripted drivers on 1 and 2 of 9 tracks; WASD does not follow an
   AZERTY layout (CrazyGames' quality page asks for it); `tracks2.js`'s
   busyness known answer misses on main too since generator version 4.
+- 10 November 2026, after play: a new player landed in career track 1
+  did not know it was a career. Every run's countdown now carries a
+  heading over the missions ("CAREER · TRACK 1 OF 8" and the track's
+  name; DAILY DRIFT; TRACK LAB and the code), the onboarding run
+  included, and a career run's results say "Track 2 of 8 unlocked" with
+  NEXT as the main button, or "Win a star to unlock track 2 of 8".
+  Measured at four sizes by `game/test/retention/heading.js`.
