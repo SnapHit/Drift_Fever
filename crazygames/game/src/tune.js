@@ -310,6 +310,13 @@ export const LOOP = {
     KEEP:             6,       // codes whose best and ghost are kept, the most recently driven
     COIN_RATE:        0.5,     // a Lab run's coins as a share of a career run's; no new star bonus
   },
+  /* CAREER CHAPTERS (briefs/CHAPTERS.md): Rookie, Pro and Legend, eight
+     tracks each (modes.js). OPEN[c] is the stars won in chapter c - 1
+     that open chapter c's first track; the first chapter is always open.
+     First guesses, out of 24 in each chapter. */
+  CHAPTERS: {
+    OPEN:             [0, 12, 14],
+  },
   /* FIRST-RUN ONBOARDING (briefs/RETENTION.md 1): the first visit skips
      the title and lands in career track 1, with short prompts at the
      moments they apply. The car is never paused to explain. */

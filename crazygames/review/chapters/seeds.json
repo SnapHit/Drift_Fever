@@ -1,0 +1,4506 @@
+{
+ "rule": "the first candidate seed that passes every check is the slot's seed",
+ "genMs": 600,
+ "rookie": [
+  {
+   "index": 0,
+   "name": "First slide",
+   "seed": 1101,
+   "genMs": 93,
+   "length": 518,
+   "runMetres": 1554,
+   "laps": 3,
+   "corners": 3,
+   "banked": 0,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 3,
+   "types": {
+    "tight": 1,
+    "sweeper": 1,
+    "opening": 1
+   },
+   "measuredDifficulty": 0.21,
+   "attempts": 46,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 76.93,
+    "score": 491,
+    "stars": 1,
+    "targets": [
+     450,
+     900,
+     1580
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "12/12",
+    "meanKmh": 72.4
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 69.68,
+    "score": 901,
+    "stars": 2,
+    "targets": [
+     450,
+     900,
+     1580
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "12/12",
+    "meanKmh": 81.1
+   },
+   "fails": []
+  },
+  {
+   "index": 1,
+   "name": "Harbour run",
+   "seed": 1202,
+   "genMs": 12,
+   "length": 840,
+   "runMetres": 800,
+   "laps": 1,
+   "corners": 8,
+   "banked": 5,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 4,
+   "types": {
+    "chicane": 2,
+    "multi": 5,
+    "sweeper": 1
+   },
+   "measuredDifficulty": 0.15,
+   "attempts": 2,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 38.03,
+    "score": 252,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "3/3",
+    "meanKmh": 75
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 31.8,
+    "score": 313,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "contacts": 2,
+    "hard": 1,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "2/3",
+    "meanKmh": 90.4
+   },
+   "fails": []
+  },
+  {
+   "index": 2,
+   "name": "Crossover",
+   "seed": 1327,
+   "genMs": 54,
+   "length": 844,
+   "runMetres": 2532,
+   "laps": 3,
+   "corners": 12,
+   "banked": 6,
+   "bridges": 1,
+   "hairpins": 0,
+   "clips": 4,
+   "types": {
+    "multi": 12
+   },
+   "measuredDifficulty": 0.35,
+   "attempts": 13,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 139.22,
+    "score": 723,
+    "stars": 1,
+    "targets": [
+     690,
+     1380,
+     2420
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "12/12",
+    "meanKmh": 64.7
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 105.4,
+    "score": 1128,
+    "stars": 1,
+    "targets": [
+     690,
+     1380,
+     2420
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "12/12",
+    "meanKmh": 86.2
+   },
+   "fails": []
+  },
+  {
+   "index": 3,
+   "name": "Long shadows",
+   "seed": 1404,
+   "genMs": 22,
+   "length": 898,
+   "runMetres": 858,
+   "laps": 1,
+   "corners": 8,
+   "banked": 0,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 8,
+   "types": {
+    "sweeper": 1,
+    "flow": 5,
+    "hairpin": 2
+   },
+   "measuredDifficulty": 0.36,
+   "attempts": 4,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 46.3,
+    "score": 240,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "3/3",
+    "meanKmh": 65.8
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 38.01,
+    "score": 448,
+    "stars": 1,
+    "targets": [
+     230,
+     450,
+     790
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "3/3",
+    "meanKmh": 82.8
+   },
+   "fails": []
+  },
+  {
+   "index": 4,
+   "name": "Tight city",
+   "seed": 1505,
+   "genMs": 39,
+   "length": 678,
+   "runMetres": 2034,
+   "laps": 3,
+   "corners": 7,
+   "banked": 2,
+   "bridges": 0,
+   "hairpins": 2,
+   "clips": 7,
+   "types": {
+    "tightening": 1,
+    "esses": 2,
+    "opening": 1,
+    "double": 2,
+    "tight": 1
+   },
+   "measuredDifficulty": 0.47,
+   "attempts": 15,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 123.22,
+    "score": 523,
+    "stars": 1,
+    "targets": [
+     510,
+     1020,
+     1780
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "12/12",
+    "meanKmh": 58.3
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 101.11,
+    "score": 1030,
+    "stars": 2,
+    "targets": [
+     510,
+     1020,
+     1780
+    ],
+    "contacts": 4,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "9/12",
+    "meanKmh": 74.3
+   },
+   "fails": []
+  },
+  {
+   "index": 5,
+   "name": "Ridge road",
+   "seed": 1606,
+   "genMs": 6,
+   "length": 1018,
+   "runMetres": 978,
+   "laps": 1,
+   "corners": 12,
+   "banked": 3,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 10,
+   "types": {
+    "tight": 1,
+    "tightening": 1,
+    "multi": 3,
+    "sweeper": 1,
+    "esses": 2,
+    "flow": 4
+   },
+   "measuredDifficulty": 0.35,
+   "attempts": 1,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 52,
+    "score": 252,
+    "stars": 1,
+    "targets": [
+     240,
+     470,
+     830
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "3/3",
+    "meanKmh": 66.9
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 42.36,
+    "score": 369,
+    "stars": 1,
+    "targets": [
+     240,
+     470,
+     830
+    ],
+    "contacts": 5,
+    "hard": 3,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "1/3",
+    "meanKmh": 84.4
+   },
+   "fails": []
+  },
+  {
+   "index": 6,
+   "name": "Hairpin heaven",
+   "seed": 1707,
+   "genMs": 15,
+   "length": 688,
+   "runMetres": 2064,
+   "laps": 3,
+   "corners": 7,
+   "banked": 1,
+   "bridges": 0,
+   "hairpins": 0,
+   "clips": 6,
+   "types": {
+    "opening": 1,
+    "esses": 3,
+    "tight": 1,
+    "chicane": 2
+   },
+   "measuredDifficulty": 0.43,
+   "attempts": 16,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 115.05,
+    "score": 488,
+    "stars": 1,
+    "targets": [
+     470,
+     940,
+     1650
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "12/12",
+    "meanKmh": 63.9
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 90.05,
+    "score": 590,
+    "stars": 1,
+    "targets": [
+     470,
+     940,
+     1650
+    ],
+    "contacts": 3,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "9/12",
+    "meanKmh": 82.9
+   },
+   "fails": []
+  },
+  {
+   "index": 7,
+   "name": "The gauntlet",
+   "seed": 1808,
+   "genMs": 11,
+   "length": 1066,
+   "runMetres": 1026,
+   "laps": 1,
+   "corners": 16,
+   "banked": 1,
+   "bridges": 1,
+   "hairpins": 1,
+   "clips": 14,
+   "types": {
+    "hairpin": 1,
+    "chicane": 3,
+    "flow": 10,
+    "opening": 1,
+    "tight": 1
+   },
+   "measuredDifficulty": 0.5,
+   "attempts": 2,
+   "fallback": false,
+   "careful": {
+    "finished": true,
+    "seconds": 62.29,
+    "score": 225,
+    "stars": 1,
+    "targets": [
+     220,
+     440,
+     770
+    ],
+    "contacts": 0,
+    "hard": 0,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "3/3",
+    "meanKmh": 58.2
+   },
+   "drifter": {
+    "finished": true,
+    "seconds": 46.84,
+    "score": 292,
+    "stars": 1,
+    "targets": [
+     220,
+     440,
+     770
+    ],
+    "contacts": 2,
+    "hard": 2,
+    "respawns": 0,
+    "offTrack": 0,
+    "stuck": 0,
+    "cleanSectors": "2/3",
+    "meanKmh": 79.5
+   },
+   "fails": []
+  }
+ ],
+ "slots": [
+  {
+   "index": 8,
+   "name": "Upper deck",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.5,
+    "length": [
+     770,
+     840
+    ],
+    "style": "flowing",
+    "crossover": "always"
+   },
+   "inCareer": 2105,
+   "chosen": 2105,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2101,
+     "genMs": 225,
+     "length": 814,
+     "runMetres": 2442,
+     "laps": 3,
+     "corners": 6,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tight": 4,
+      "opening": 2
+     },
+     "measuredDifficulty": 0.38,
+     "attempts": 766,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 136.77,
+      "score": 655,
+      "stars": 1,
+      "targets": [
+       620,
+       1250,
+       2180
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 63.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 113,
+      "score": 987,
+      "stars": 1,
+      "targets": [
+       620,
+       1250,
+       2180
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 77.9
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2102,
+     "genMs": 59,
+     "length": 832,
+     "runMetres": 2496,
+     "laps": 3,
+     "corners": 6,
+     "banked": 0,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tight": 4,
+      "opening": 2
+     },
+     "measuredDifficulty": 0.36,
+     "attempts": 172,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 138.02,
+      "score": 664,
+      "stars": 1,
+      "targets": [
+       640,
+       1270,
+       2230
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 64.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 117.33,
+      "score": 901,
+      "stars": 1,
+      "targets": [
+       640,
+       1270,
+       2230
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 77.1
+     },
+     "fails": [
+      "0 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2103,
+     "genMs": 48,
+     "length": 832,
+     "runMetres": 2496,
+     "laps": 3,
+     "corners": 10,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "opening": 2,
+      "multi": 6,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.32,
+     "attempts": 189,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 137.11,
+      "score": 665,
+      "stars": 1,
+      "targets": [
+       640,
+       1270,
+       2230
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 64.8
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 108.58,
+      "score": 1319,
+      "stars": 2,
+      "targets": [
+       640,
+       1270,
+       2230
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 82.2
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2104,
+     "genMs": 114,
+     "length": 808,
+     "runMetres": 2424,
+     "laps": 3,
+     "corners": 10,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "opening": 4,
+      "multi": 6
+     },
+     "measuredDifficulty": 0.4,
+     "attempts": 507,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 138.53,
+      "score": 636,
+      "stars": 1,
+      "targets": [
+       620,
+       1240,
+       2160
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.2
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 109.43,
+      "score": 880,
+      "stars": 1,
+      "targets": [
+       620,
+       1240,
+       2160
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 79.7
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2105,
+     "genMs": 65,
+     "length": 832,
+     "runMetres": 2496,
+     "laps": 3,
+     "corners": 10,
+     "banked": 6,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tight": 2,
+      "opening": 2,
+      "multi": 6
+     },
+     "measuredDifficulty": 0.32,
+     "attempts": 329,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 135.62,
+      "score": 668,
+      "stars": 1,
+      "targets": [
+       640,
+       1270,
+       2230
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 65.6
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 116.69,
+      "score": 1889,
+      "stars": 2,
+      "targets": [
+       640,
+       1270,
+       2230
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 77.6
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 9,
+   "name": "Quarry cut",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 0.55,
+    "length": 1100,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "inCareer": 2213,
+   "chosen": 2213,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2202,
+     "genMs": 9,
+     "length": 1126,
+     "runMetres": 1086,
+     "laps": 1,
+     "corners": 12,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 12,
+     "types": {
+      "flow": 3,
+      "tightening": 2,
+      "tight": 3,
+      "hairpin": 2,
+      "esses": 2
+     },
+     "measuredDifficulty": 0.46,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 65.28,
+      "score": 278,
+      "stars": 1,
+      "targets": [
+       270,
+       540,
+       950
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.6
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 52.42,
+      "score": 856,
+      "stars": 2,
+      "targets": [
+       270,
+       540,
+       950
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 76.2
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2203,
+     "genMs": 11,
+     "length": 1202,
+     "runMetres": 1162,
+     "laps": 1,
+     "corners": 20,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 13,
+     "types": {
+      "chicane": 12,
+      "double": 2,
+      "tight": 1,
+      "flow": 5
+     },
+     "measuredDifficulty": 0.52,
+     "attempts": 3,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 72.13,
+      "score": 293,
+      "stars": 1,
+      "targets": [
+       290,
+       580,
+       1020
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 56.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 53.87,
+      "score": 778,
+      "stars": 2,
+      "targets": [
+       290,
+       580,
+       1020
+      ],
+      "contacts": 1,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 78.5
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2204,
+     "genMs": 5,
+     "length": 1096,
+     "runMetres": 1056,
+     "laps": 1,
+     "corners": 12,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 12,
+     "types": {
+      "flow": 4,
+      "tightening": 1,
+      "esses": 7
+     },
+     "measuredDifficulty": 0.36,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 57,
+      "score": 280,
+      "stars": 1,
+      "targets": [
+       260,
+       530,
+       930
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 65.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 43.76,
+      "score": 329,
+      "stars": 1,
+      "targets": [
+       260,
+       530,
+       930
+      ],
+      "contacts": 1,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 88.4
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2205,
+     "genMs": 5,
+     "length": 1104,
+     "runMetres": 1064,
+     "laps": 1,
+     "corners": 12,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 11,
+     "types": {
+      "tight": 2,
+      "flow": 3,
+      "double": 2,
+      "esses": 2,
+      "chicane": 2,
+      "tightening": 1
+     },
+     "measuredDifficulty": 0.42,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 62.16,
+      "score": 275,
+      "stars": 1,
+      "targets": [
+       270,
+       530,
+       930
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 60.6
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 49.55,
+      "score": 587,
+      "stars": 2,
+      "targets": [
+       270,
+       530,
+       930
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 78.1
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2206,
+     "genMs": 5,
+     "length": 1140,
+     "runMetres": 1100,
+     "laps": 1,
+     "corners": 13,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 4,
+     "clips": 12,
+     "types": {
+      "double": 4,
+      "tight": 1,
+      "esses": 6,
+      "chicane": 2
+     },
+     "measuredDifficulty": 0.48,
+     "attempts": 3,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 66.53,
+      "score": 281,
+      "stars": 1,
+      "targets": [
+       280,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 53.62,
+      "score": 476,
+      "stars": 1,
+      "targets": [
+       280,
+       550,
+       960
+      ],
+      "contacts": 2,
+      "hard": 1,
+      "respawns": 1,
+      "offTrack": 0,
+      "stuck": 1,
+      "cleanSectors": "2/3",
+      "meanKmh": 75.8
+     },
+     "fails": [
+      "drifter 1 respawns",
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2207,
+     "genMs": 6,
+     "length": 1142,
+     "runMetres": 1102,
+     "laps": 1,
+     "corners": 18,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 11,
+     "types": {
+      "hairpin": 2,
+      "chicane": 12,
+      "tightening": 1,
+      "flow": 3
+     },
+     "measuredDifficulty": 0.52,
+     "attempts": 3,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 68,
+      "score": 279,
+      "stars": 0,
+      "targets": [
+       280,
+       550,
+       970
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 57.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 53.97,
+      "score": 682,
+      "stars": 2,
+      "targets": [
+       280,
+       550,
+       970
+      ],
+      "contacts": 2,
+      "hard": 2,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 75
+     },
+     "fails": [
+      "0 banked corners, under 3",
+      "careful 279 under the first star 280"
+     ]
+    },
+    {
+     "seed": 2208,
+     "genMs": 4,
+     "length": 1010,
+     "runMetres": 970,
+     "laps": 1,
+     "corners": 14,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 14,
+     "types": {
+      "tight": 2,
+      "flow": 10,
+      "esses": 2
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 56.44,
+      "score": 252,
+      "stars": 1,
+      "targets": [
+       240,
+       490,
+       850
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 60.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 43.85,
+      "score": 564,
+      "stars": 2,
+      "targets": [
+       240,
+       490,
+       850
+      ],
+      "contacts": 1,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 80.4
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2209,
+     "genMs": 4,
+     "length": 1146,
+     "runMetres": 1106,
+     "laps": 1,
+     "corners": 15,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 1,
+     "clips": 15,
+     "types": {
+      "hairpin": 1,
+      "flow": 8,
+      "esses": 6
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 63.52,
+      "score": 287,
+      "stars": 1,
+      "targets": [
+       280,
+       550,
+       970
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 61.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 50.52,
+      "score": 420,
+      "stars": 1,
+      "targets": [
+       280,
+       550,
+       970
+      ],
+      "contacts": 3,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 80.8
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2210,
+     "genMs": 6,
+     "length": 1002,
+     "runMetres": 962,
+     "laps": 1,
+     "corners": 15,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 12,
+     "types": {
+      "tightening": 1,
+      "flow": 3,
+      "opening": 1,
+      "chicane": 5,
+      "tight": 2,
+      "esses": 3
+     },
+     "measuredDifficulty": 0.5,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 56.61,
+      "score": 247,
+      "stars": 1,
+      "targets": [
+       240,
+       480,
+       840
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 60.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 46.77,
+      "score": 458,
+      "stars": 1,
+      "targets": [
+       240,
+       480,
+       840
+      ],
+      "contacts": 4,
+      "hard": 2,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "0/3",
+      "meanKmh": 75.6
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2211,
+     "genMs": 5,
+     "length": 1080,
+     "runMetres": 1040,
+     "laps": 1,
+     "corners": 17,
+     "banked": 3,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 14,
+     "types": {
+      "esses": 3,
+      "flow": 8,
+      "chicane": 5,
+      "tightening": 1
+     },
+     "measuredDifficulty": 0.46,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 59.49,
+      "score": 269,
+      "stars": 1,
+      "targets": [
+       260,
+       520,
+       910
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 62.1
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 48.12,
+      "score": 275,
+      "stars": 1,
+      "targets": [
+       260,
+       520,
+       910
+      ],
+      "contacts": 3,
+      "hard": 2,
+      "respawns": 1,
+      "offTrack": 0,
+      "stuck": 1,
+      "cleanSectors": "1/3",
+      "meanKmh": 78.8
+     },
+     "fails": [
+      "drifter 1 respawns"
+     ]
+    },
+    {
+     "seed": 2212,
+     "genMs": 6,
+     "length": 1078,
+     "runMetres": 1038,
+     "laps": 1,
+     "corners": 16,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 1,
+     "clips": 10,
+     "types": {
+      "hairpin": 1,
+      "tightening": 2,
+      "chicane": 11,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.55,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 63.62,
+      "score": 262,
+      "stars": 1,
+      "targets": [
+       260,
+       520,
+       910
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 57.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 51.07,
+      "score": 467,
+      "stars": 1,
+      "targets": [
+       260,
+       520,
+       910
+      ],
+      "contacts": 1,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 74.2
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2213,
+     "genMs": 4,
+     "length": 1114,
+     "runMetres": 1074,
+     "laps": 1,
+     "corners": 15,
+     "banked": 3,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 14,
+     "types": {
+      "tight": 3,
+      "chicane": 2,
+      "flow": 4,
+      "esses": 6
+     },
+     "measuredDifficulty": 0.42,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 62.43,
+      "score": 277,
+      "stars": 1,
+      "targets": [
+       270,
+       540,
+       940
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 61
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 48.27,
+      "score": 411,
+      "stars": 1,
+      "targets": [
+       270,
+       540,
+       940
+      ],
+      "contacts": 2,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 80.7
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 10,
+   "name": "Pin drop",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.6,
+    "length": 720,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "inCareer": 2305,
+   "chosen": 2305,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2303,
+     "genMs": 6,
+     "length": 722,
+     "runMetres": 2166,
+     "laps": 3,
+     "corners": 7,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 5,
+     "types": {
+      "tight": 1,
+      "tightening": 1,
+      "double": 2,
+      "multi": 3
+     },
+     "measuredDifficulty": 0.39,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 124.4,
+      "score": 554,
+      "stars": 1,
+      "targets": [
+       530,
+       1070,
+       1860
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 61.8
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 103.92,
+      "score": 968,
+      "stars": 1,
+      "targets": [
+       530,
+       1070,
+       1860
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 76.3
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2304,
+     "genMs": 5,
+     "length": 728,
+     "runMetres": 2184,
+     "laps": 3,
+     "corners": 8,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 6,
+     "types": {
+      "double": 2,
+      "multi": 3,
+      "tightening": 1,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.44,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 131.21,
+      "score": 547,
+      "stars": 1,
+      "targets": [
+       540,
+       1070,
+       1880
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 58.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 105.28,
+      "score": 2181,
+      "stars": 3,
+      "targets": [
+       540,
+       1070,
+       1880
+      ],
+      "contacts": 2,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "10/12",
+      "meanKmh": 75.5
+     },
+     "fails": [
+      "0 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2305,
+     "genMs": 20,
+     "length": 788,
+     "runMetres": 2364,
+     "laps": 3,
+     "corners": 8,
+     "banked": 5,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 6,
+     "types": {
+      "multi": 3,
+      "tightening": 1,
+      "sweeper": 2,
+      "double": 2
+     },
+     "measuredDifficulty": 0.32,
+     "attempts": 38,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 130.41,
+      "score": 618,
+      "stars": 1,
+      "targets": [
+       580,
+       1160,
+       2040
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 64.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 111.65,
+      "score": 1090,
+      "stars": 1,
+      "targets": [
+       580,
+       1160,
+       2040
+      ],
+      "contacts": 5,
+      "hard": 3,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "8/12",
+      "meanKmh": 78
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 11,
+   "name": "Breakwater",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 0.65,
+    "length": 1150,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "inCareer": 2406,
+   "chosen": 2406,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2404,
+     "genMs": 10,
+     "length": 1062,
+     "runMetres": 1022,
+     "laps": 1,
+     "corners": 13,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 13,
+     "types": {
+      "flow": 9,
+      "double": 2,
+      "tightening": 1,
+      "opening": 1
+     },
+     "measuredDifficulty": 0.51,
+     "attempts": 3,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 61.37,
+      "score": 250,
+      "stars": 1,
+      "targets": [
+       250,
+       490,
+       860
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.8
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 47.62,
+      "score": 592,
+      "stars": 2,
+      "targets": [
+       250,
+       490,
+       860
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 78.5
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2405,
+     "genMs": 8,
+     "length": 1070,
+     "runMetres": 1030,
+     "laps": 1,
+     "corners": 13,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 12,
+     "types": {
+      "tightening": 2,
+      "hairpin": 2,
+      "flow": 4,
+      "multi": 2,
+      "esses": 3
+     },
+     "measuredDifficulty": 0.47,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 61.84,
+      "score": 254,
+      "stars": 1,
+      "targets": [
+       250,
+       500,
+       870
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 48.87,
+      "score": 497,
+      "stars": 1,
+      "targets": [
+       250,
+       500,
+       870
+      ],
+      "contacts": 3,
+      "hard": 2,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 78
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2406,
+     "genMs": 5,
+     "length": 1252,
+     "runMetres": 1212,
+     "laps": 1,
+     "corners": 13,
+     "banked": 3,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 12,
+     "types": {
+      "hairpin": 2,
+      "opening": 2,
+      "multi": 2,
+      "esses": 5,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.4,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 70.88,
+      "score": 300,
+      "stars": 1,
+      "targets": [
+       290,
+       590,
+       1020
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 60.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 55.37,
+      "score": 825,
+      "stars": 2,
+      "targets": [
+       290,
+       590,
+       1020
+      ],
+      "contacts": 3,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 79.1
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 12,
+   "name": "Tangle",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.7,
+    "length": [
+     770,
+     860
+    ],
+    "style": "technical",
+    "crossover": "always"
+   },
+   "inCareer": 2510,
+   "chosen": 2510,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2505,
+     "genMs": 5,
+     "length": 850,
+     "runMetres": 2550,
+     "laps": 3,
+     "corners": 6,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tight": 4,
+      "opening": 2
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 143.64,
+      "score": 634,
+      "stars": 1,
+      "targets": [
+       600,
+       1210,
+       2120
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 63
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 118.08,
+      "score": 873,
+      "stars": 1,
+      "targets": [
+       600,
+       1210,
+       2120
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 78.1
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2506,
+     "genMs": 16,
+     "length": 852,
+     "runMetres": 2556,
+     "laps": 3,
+     "corners": 10,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 8,
+     "types": {
+      "tightening": 4,
+      "chicane": 4,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.5,
+     "attempts": 23,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 153.62,
+      "score": 620,
+      "stars": 1,
+      "targets": [
+       610,
+       1210,
+       2120
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 59
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 131.7,
+      "score": 1390,
+      "stars": 2,
+      "targets": [
+       610,
+       1210,
+       2120
+      ],
+      "contacts": 9,
+      "hard": 4,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "6/12",
+      "meanKmh": 72.4
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2507,
+     "genMs": 287,
+     "length": 816,
+     "runMetres": 2448,
+     "laps": 3,
+     "corners": 4,
+     "banked": 0,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 4,
+     "types": {
+      "sweeper": 4
+     },
+     "measuredDifficulty": 0.21,
+     "attempts": 1000,
+     "fallback": true,
+     "careful": {
+      "finished": true,
+      "seconds": 105.78,
+      "score": 670,
+      "stars": 1,
+      "targets": [
+       580,
+       1160,
+       2030
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 83.1
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 96.92,
+      "score": 778,
+      "stars": 1,
+      "targets": [
+       580,
+       1160,
+       2030
+      ],
+      "contacts": 11,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/12",
+      "meanKmh": 91.1
+     },
+     "fails": [
+      "plain layout",
+      "no bridge",
+      "0 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2508,
+     "genMs": 51,
+     "length": 816,
+     "runMetres": 2448,
+     "laps": 3,
+     "corners": 6,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tightening": 4,
+      "opening": 2
+     },
+     "measuredDifficulty": 0.39,
+     "attempts": 111,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 135.11,
+      "score": 606,
+      "stars": 1,
+      "targets": [
+       580,
+       1160,
+       2030
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 64.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 118.94,
+      "score": 1711,
+      "stars": 2,
+      "targets": [
+       580,
+       1160,
+       2030
+      ],
+      "contacts": 3,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "9/12",
+      "meanKmh": 75.3
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2509,
+     "genMs": 20,
+     "length": 784,
+     "runMetres": 2352,
+     "laps": 3,
+     "corners": 6,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 6,
+     "types": {
+      "hairpin": 2,
+      "tightening": 2,
+      "opening": 2
+     },
+     "measuredDifficulty": 0.42,
+     "attempts": 95,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 134.39,
+      "score": 577,
+      "stars": 1,
+      "targets": [
+       560,
+       1110,
+       1950
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.1
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 111.6,
+      "score": 1435,
+      "stars": 2,
+      "targets": [
+       560,
+       1110,
+       1950
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 75.9
+     },
+     "fails": [
+      "2 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2510,
+     "genMs": 9,
+     "length": 846,
+     "runMetres": 2538,
+     "laps": 3,
+     "corners": 6,
+     "banked": 6,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tight": 2,
+      "tightening": 2,
+      "opening": 2
+     },
+     "measuredDifficulty": 0.42,
+     "attempts": 17,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 142.41,
+      "score": 634,
+      "stars": 1,
+      "targets": [
+       600,
+       1200,
+       2110
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 63.2
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 119.88,
+      "score": 1206,
+      "stars": 2,
+      "targets": [
+       600,
+       1200,
+       2110
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 76.3
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 13,
+   "name": "Switchbacks",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 0.75,
+    "length": 1200,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "inCareer": 2606,
+   "chosen": 2606,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2606,
+     "genMs": 17,
+     "length": 1130,
+     "runMetres": 1090,
+     "laps": 1,
+     "corners": 10,
+     "banked": 3,
+     "bridges": 0,
+     "hairpins": 6,
+     "clips": 10,
+     "types": {
+      "hairpin": 2,
+      "tightening": 3,
+      "double": 4,
+      "sweeper": 1
+     },
+     "measuredDifficulty": 0.5,
+     "attempts": 6,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 68.27,
+      "score": 255,
+      "stars": 1,
+      "targets": [
+       250,
+       510,
+       890
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 55.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 56.73,
+      "score": 418,
+      "stars": 1,
+      "targets": [
+       250,
+       510,
+       890
+      ],
+      "contacts": 1,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 71.6
+     },
+     "fails": []
+    },
+    {
+     "seed": 2607,
+     "genMs": 6,
+     "length": 1088,
+     "runMetres": 1048,
+     "laps": 1,
+     "corners": 9,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 1,
+     "clips": 9,
+     "types": {
+      "tightening": 2,
+      "tight": 2,
+      "hairpin": 1,
+      "sweeper": 3,
+      "opening": 1
+     },
+     "measuredDifficulty": 0.37,
+     "attempts": 3,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 57.06,
+      "score": 258,
+      "stars": 1,
+      "targets": [
+       240,
+       490,
+       850
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 65
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 49.43,
+      "score": 520,
+      "stars": 2,
+      "targets": [
+       240,
+       490,
+       850
+      ],
+      "contacts": 5,
+      "hard": 2,
+      "respawns": 1,
+      "offTrack": 0,
+      "stuck": 1,
+      "cleanSectors": "0/3",
+      "meanKmh": 77.2
+     },
+     "fails": [
+      "drifter 1 respawns"
+     ]
+    },
+    {
+     "seed": 2608,
+     "genMs": 6,
+     "length": 1224,
+     "runMetres": 1184,
+     "laps": 1,
+     "corners": 11,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 5,
+     "clips": 11,
+     "types": {
+      "tight": 2,
+      "double": 2,
+      "sweeper": 3,
+      "hairpin": 3,
+      "tightening": 1
+     },
+     "measuredDifficulty": 0.47,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 71.76,
+      "score": 281,
+      "stars": 1,
+      "targets": [
+       280,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 57.8
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 60.63,
+      "score": 1769,
+      "stars": 3,
+      "targets": [
+       280,
+       550,
+       960
+      ],
+      "contacts": 8,
+      "hard": 2,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 72.3
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    }
+   ]
+  },
+  {
+   "index": 14,
+   "name": "Smoke ring",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.8,
+    "length": 760,
+    "style": "mixed",
+    "crossover": "default"
+   },
+   "inCareer": 2708,
+   "chosen": 2708,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2707,
+     "genMs": 7,
+     "length": 832,
+     "runMetres": 2496,
+     "laps": 3,
+     "corners": 10,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 10,
+     "types": {
+      "flow": 3,
+      "tightening": 2,
+      "esses": 3,
+      "tight": 1,
+      "sweeper": 1
+     },
+     "measuredDifficulty": 0.45,
+     "attempts": 5,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 141.26,
+      "score": 595,
+      "stars": 1,
+      "targets": [
+       570,
+       1140,
+       1990
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.8
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 118.11,
+      "score": 881,
+      "stars": 1,
+      "targets": [
+       570,
+       1140,
+       1990
+      ],
+      "contacts": 5,
+      "hard": 3,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "8/12",
+      "meanKmh": 78.5
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2708,
+     "genMs": 5,
+     "length": 700,
+     "runMetres": 2100,
+     "laps": 3,
+     "corners": 8,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 6,
+     "types": {
+      "multi": 3,
+      "double": 2,
+      "esses": 2,
+      "tight": 1
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 4,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 122.45,
+      "score": 494,
+      "stars": 1,
+      "targets": [
+       480,
+       960,
+       1680
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 60.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 91.03,
+      "score": 2063,
+      "stars": 3,
+      "targets": [
+       480,
+       960,
+       1680
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 83.1
+     },
+     "fails": []
+    },
+    {
+     "seed": 2709,
+     "genMs": 10,
+     "length": 832,
+     "runMetres": 2496,
+     "laps": 3,
+     "corners": 11,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 11,
+     "types": {
+      "esses": 3,
+      "flow": 7,
+      "tight": 1
+     },
+     "measuredDifficulty": 0.43,
+     "attempts": 27,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 144.33,
+      "score": 591,
+      "stars": 1,
+      "targets": [
+       570,
+       1140,
+       1990
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 61.5
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 110.68,
+      "score": 849,
+      "stars": 1,
+      "targets": [
+       570,
+       1140,
+       1990
+      ],
+      "contacts": 6,
+      "hard": 4,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "9/12",
+      "meanKmh": 83.3
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    }
+   ]
+  },
+  {
+   "index": 15,
+   "name": "Razor wire",
+   "chapter": "Pro",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 0.9,
+    "length": 1250,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "inCareer": 2809,
+   "chosen": 2809,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 2808,
+     "genMs": 6,
+     "length": 1204,
+     "runMetres": 1164,
+     "laps": 1,
+     "corners": 16,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 3,
+     "clips": 14,
+     "types": {
+      "chicane": 4,
+      "tightening": 1,
+      "hairpin": 1,
+      "double": 2,
+      "esses": 3,
+      "flow": 4,
+      "tight": 1
+     },
+     "measuredDifficulty": 0.54,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 73.69,
+      "score": 254,
+      "stars": 1,
+      "targets": [
+       250,
+       510,
+       890
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 55.5
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 58.25,
+      "score": 365,
+      "stars": 1,
+      "targets": [
+       250,
+       510,
+       890
+      ],
+      "contacts": 2,
+      "hard": 2,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 74.2
+     },
+     "fails": [
+      "1 banked corners, under 3"
+     ]
+    },
+    {
+     "seed": 2809,
+     "genMs": 6,
+     "length": 1294,
+     "runMetres": 1254,
+     "laps": 1,
+     "corners": 18,
+     "banked": 3,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 13,
+     "types": {
+      "tight": 5,
+      "chicane": 8,
+      "tightening": 1,
+      "opening": 2,
+      "double": 2
+     },
+     "measuredDifficulty": 0.55,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 80.61,
+      "score": 275,
+      "stars": 1,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 54.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 59.42,
+      "score": 477,
+      "stars": 1,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 1,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 75.4
+     },
+     "fails": []
+    },
+    {
+     "seed": 2810,
+     "genMs": 13,
+     "length": 1350,
+     "runMetres": 1310,
+     "laps": 1,
+     "corners": 17,
+     "banked": 5,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 16,
+     "types": {
+      "tight": 2,
+      "esses": 5,
+      "opening": 3,
+      "tightening": 2,
+      "chicane": 2,
+      "flow": 3
+     },
+     "measuredDifficulty": 0.47,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 77.61,
+      "score": 294,
+      "stars": 1,
+      "targets": [
+       290,
+       570,
+       1000
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 59.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 60.62,
+      "score": 404,
+      "stars": 1,
+      "targets": [
+       290,
+       570,
+       1000
+      ],
+      "contacts": 5,
+      "hard": 2,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 78.3
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 16,
+   "name": "Knot yard",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.7,
+    "length": [
+     780,
+     880
+    ],
+    "style": "technical",
+    "crossover": "always"
+   },
+   "inCareer": 3102,
+   "chosen": 3102,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3101,
+     "genMs": 124,
+     "length": 834,
+     "runMetres": 2502,
+     "laps": 3,
+     "corners": 6,
+     "banked": 0,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tight": 4,
+      "opening": 2
+     },
+     "measuredDifficulty": 0.37,
+     "attempts": 424,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 139.89,
+      "score": 620,
+      "stars": 1,
+      "targets": [
+       590,
+       1190,
+       2080
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 63.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 116.59,
+      "score": 852,
+      "stars": 1,
+      "targets": [
+       590,
+       1190,
+       2080
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 77.7
+     },
+     "fails": [
+      "0 banked corners, under 4"
+     ]
+    },
+    {
+     "seed": 3102,
+     "genMs": 118,
+     "length": 832,
+     "runMetres": 2496,
+     "laps": 3,
+     "corners": 6,
+     "banked": 4,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tightening": 6
+     },
+     "measuredDifficulty": 0.45,
+     "attempts": 364,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 139.8,
+      "score": 619,
+      "stars": 1,
+      "targets": [
+       590,
+       1180,
+       2070
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 63.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 128.02,
+      "score": 2518,
+      "stars": 3,
+      "targets": [
+       590,
+       1180,
+       2070
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 72.2
+     },
+     "fails": []
+    },
+    {
+     "seed": 3103,
+     "genMs": 227,
+     "length": 860,
+     "runMetres": 2580,
+     "laps": 3,
+     "corners": 10,
+     "banked": 6,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 8,
+     "types": {
+      "opening": 4,
+      "chicane": 4,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.51,
+     "attempts": 658,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 157.12,
+      "score": 619,
+      "stars": 1,
+      "targets": [
+       610,
+       1220,
+       2140
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 58.2
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 125.52,
+      "score": 410,
+      "stars": 0,
+      "targets": [
+       610,
+       1220,
+       2140
+      ],
+      "contacts": 16,
+      "hard": 6,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "0/12",
+      "meanKmh": 74.1
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 17,
+   "name": "Serpent spine",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 0.75,
+    "length": 1250,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "inCareer": 3202,
+   "chosen": 3202,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3202,
+     "genMs": 42,
+     "length": 1210,
+     "runMetres": 1170,
+     "laps": 1,
+     "corners": 13,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 3,
+     "clips": 9,
+     "types": {
+      "sweeper": 3,
+      "hairpin": 1,
+      "double": 2,
+      "multi": 7
+     },
+     "measuredDifficulty": 0.39,
+     "attempts": 16,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 65.82,
+      "score": 284,
+      "stars": 1,
+      "targets": [
+       270,
+       540,
+       950
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 62.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 54.71,
+      "score": 888,
+      "stars": 2,
+      "targets": [
+       270,
+       540,
+       950
+      ],
+      "contacts": 2,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 78.5
+     },
+     "fails": []
+    },
+    {
+     "seed": 3203,
+     "genMs": 17,
+     "length": 1174,
+     "runMetres": 1134,
+     "laps": 1,
+     "corners": 11,
+     "banked": 5,
+     "bridges": 0,
+     "hairpins": 6,
+     "clips": 9,
+     "types": {
+      "hairpin": 2,
+      "opening": 1,
+      "multi": 3,
+      "double": 4,
+      "sweeper": 1
+     },
+     "measuredDifficulty": 0.44,
+     "attempts": 5,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 68.12,
+      "score": 269,
+      "stars": 1,
+      "targets": [
+       260,
+       530,
+       920
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.5
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 53.1,
+      "score": 939,
+      "stars": 3,
+      "targets": [
+       260,
+       530,
+       920
+      ],
+      "contacts": 1,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 78.4
+     },
+     "fails": []
+    },
+    {
+     "seed": 3204,
+     "genMs": 8,
+     "length": 1216,
+     "runMetres": 1176,
+     "laps": 1,
+     "corners": 11,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 4,
+     "clips": 10,
+     "types": {
+      "tightening": 2,
+      "hairpin": 2,
+      "sweeper": 2,
+      "multi": 2,
+      "tight": 1,
+      "double": 2
+     },
+     "measuredDifficulty": 0.45,
+     "attempts": 4,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 68.76,
+      "score": 281,
+      "stars": 1,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 60.2
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 58.67,
+      "score": 797,
+      "stars": 2,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 73.3
+     },
+     "fails": [
+      "2 banked corners, under 4"
+     ]
+    }
+   ]
+  },
+  {
+   "index": 18,
+   "name": "High wire",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.8,
+    "length": [
+     780,
+     880
+    ],
+    "style": "hairpins",
+    "crossover": "always"
+   },
+   "inCareer": 3303,
+   "chosen": 3303,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3303,
+     "genMs": 4,
+     "length": 804,
+     "runMetres": 2412,
+     "laps": 3,
+     "corners": 6,
+     "banked": 4,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 4,
+     "types": {
+      "multi": 4,
+      "hairpin": 2
+     },
+     "measuredDifficulty": 0.37,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 134.12,
+      "score": 580,
+      "stars": 1,
+      "targets": [
+       550,
+       1100,
+       1920
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 63.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 109.29,
+      "score": 958,
+      "stars": 1,
+      "targets": [
+       550,
+       1100,
+       1920
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 81
+     },
+     "fails": []
+    },
+    {
+     "seed": 3304,
+     "genMs": 5,
+     "length": 852,
+     "runMetres": 2556,
+     "laps": 3,
+     "corners": 8,
+     "banked": 6,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 4,
+     "types": {
+      "multi": 6,
+      "hairpin": 2
+     },
+     "measuredDifficulty": 0.4,
+     "attempts": 17,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 138.98,
+      "score": 622,
+      "stars": 1,
+      "targets": [
+       580,
+       1170,
+       2040
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 65.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 112.21,
+      "score": 1025,
+      "stars": 1,
+      "targets": [
+       580,
+       1170,
+       2040
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 83.4
+     },
+     "fails": []
+    },
+    {
+     "seed": 3305,
+     "genMs": 7,
+     "length": 872,
+     "runMetres": 2616,
+     "laps": 3,
+     "corners": 8,
+     "banked": 6,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 4,
+     "types": {
+      "hairpin": 2,
+      "multi": 6
+     },
+     "measuredDifficulty": 0.36,
+     "attempts": 10,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 140.18,
+      "score": 631,
+      "stars": 1,
+      "targets": [
+       600,
+       1190,
+       2090
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 66.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 117.2,
+      "score": 2819,
+      "stars": 3,
+      "targets": [
+       600,
+       1190,
+       2090
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 80.9
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 19,
+   "name": "Needle run",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 0.85,
+    "length": 1300,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "inCareer": 3404,
+   "chosen": 3404,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3404,
+     "genMs": 8,
+     "length": 1286,
+     "runMetres": 1246,
+     "laps": 1,
+     "corners": 21,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 17,
+     "types": {
+      "tight": 2,
+      "flow": 5,
+      "esses": 6,
+      "tightening": 1,
+      "chicane": 7
+     },
+     "measuredDifficulty": 0.5,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 75.63,
+      "score": 282,
+      "stars": 1,
+      "targets": [
+       280,
+       560,
+       970
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 56.17,
+      "score": 400,
+      "stars": 1,
+      "targets": [
+       280,
+       560,
+       970
+      ],
+      "contacts": 2,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 80.3
+     },
+     "fails": []
+    },
+    {
+     "seed": 3405,
+     "genMs": 9,
+     "length": 1208,
+     "runMetres": 1168,
+     "laps": 1,
+     "corners": 15,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 3,
+     "clips": 14,
+     "types": {
+      "tightening": 1,
+      "hairpin": 3,
+      "flow": 5,
+      "tight": 3,
+      "opening": 1,
+      "chicane": 2
+     },
+     "measuredDifficulty": 0.54,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 74.46,
+      "score": 262,
+      "stars": 1,
+      "targets": [
+       260,
+       520,
+       910
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 55.1
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 56.84,
+      "score": 347,
+      "stars": 1,
+      "targets": [
+       260,
+       520,
+       910
+      ],
+      "contacts": 1,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 75.3
+     },
+     "fails": [
+      "1 banked corners, under 4"
+     ]
+    },
+    {
+     "seed": 3406,
+     "genMs": 9,
+     "length": 1234,
+     "runMetres": 1194,
+     "laps": 1,
+     "corners": 17,
+     "banked": 3,
+     "bridges": 0,
+     "hairpins": 3,
+     "clips": 12,
+     "types": {
+      "chicane": 8,
+      "tight": 2,
+      "esses": 3,
+      "hairpin": 1,
+      "opening": 1,
+      "double": 2
+     },
+     "measuredDifficulty": 0.54,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 75.87,
+      "score": 267,
+      "stars": 0,
+      "targets": [
+       270,
+       530,
+       930
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 55.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 56.05,
+      "score": 497,
+      "stars": 1,
+      "targets": [
+       270,
+       530,
+       930
+      ],
+      "contacts": 2,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 77.9
+     },
+     "fails": [
+      "3 banked corners, under 4",
+      "careful 267 under the first star 270"
+     ]
+    }
+   ]
+  },
+  {
+   "index": 20,
+   "name": "Endless eight",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.85,
+    "length": [
+     780,
+     880
+    ],
+    "style": "mixed",
+    "crossover": "always"
+   },
+   "inCareer": 3505,
+   "chosen": 3505,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3505,
+     "genMs": 31,
+     "length": 824,
+     "runMetres": 2472,
+     "laps": 3,
+     "corners": 8,
+     "banked": 6,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 4,
+     "types": {
+      "multi": 6,
+      "hairpin": 2
+     },
+     "measuredDifficulty": 0.41,
+     "attempts": 68,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 136.87,
+      "score": 582,
+      "stars": 1,
+      "targets": [
+       550,
+       1100,
+       1930
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 64.1
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 108.53,
+      "score": 1910,
+      "stars": 2,
+      "targets": [
+       550,
+       1100,
+       1930
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 82.3
+     },
+     "fails": []
+    },
+    {
+     "seed": 3506,
+     "genMs": 60,
+     "length": 812,
+     "runMetres": 2436,
+     "laps": 3,
+     "corners": 8,
+     "banked": 0,
+     "bridges": 1,
+     "hairpins": 2,
+     "clips": 4,
+     "types": {
+      "hairpin": 2,
+      "multi": 6
+     },
+     "measuredDifficulty": 0.36,
+     "attempts": 64,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 133.96,
+      "score": 568,
+      "stars": 1,
+      "targets": [
+       540,
+       1090,
+       1910
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 64.6
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 110.6,
+      "score": 940,
+      "stars": 1,
+      "targets": [
+       540,
+       1090,
+       1910
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 81.1
+     },
+     "fails": [
+      "0 banked corners, under 4"
+     ]
+    },
+    {
+     "seed": 3507,
+     "genMs": 40,
+     "length": 836,
+     "runMetres": 2508,
+     "laps": 3,
+     "corners": 6,
+     "banked": 0,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tight": 4,
+      "tightening": 2
+     },
+     "measuredDifficulty": 0.42,
+     "attempts": 110,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 143.08,
+      "score": 578,
+      "stars": 1,
+      "targets": [
+       560,
+       1120,
+       1960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 125.32,
+      "score": 807,
+      "stars": 1,
+      "targets": [
+       560,
+       1120,
+       1960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 73.7
+     },
+     "fails": [
+      "0 banked corners, under 4"
+     ]
+    }
+   ]
+  },
+  {
+   "index": 21,
+   "name": "Thousand turns",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 0.9,
+    "length": 1350,
+    "style": "hairpins",
+    "crossover": "default"
+   },
+   "inCareer": 3609,
+   "chosen": 3609,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3606,
+     "genMs": 9,
+     "length": 1264,
+     "runMetres": 1224,
+     "laps": 1,
+     "corners": 13,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 5,
+     "clips": 11,
+     "types": {
+      "sweeper": 3,
+      "hairpin": 3,
+      "tight": 1,
+      "double": 2,
+      "multi": 3,
+      "tightening": 1
+     },
+     "measuredDifficulty": 0.46,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 71.48,
+      "score": 276,
+      "stars": 1,
+      "targets": [
+       270,
+       540,
+       940
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 60.2
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 61.6,
+      "score": 1231,
+      "stars": 3,
+      "targets": [
+       270,
+       540,
+       940
+      ],
+      "contacts": 5,
+      "hard": 2,
+      "respawns": 1,
+      "offTrack": 0,
+      "stuck": 1,
+      "cleanSectors": "0/3",
+      "meanKmh": 73.9
+     },
+     "fails": [
+      "drifter 1 respawns",
+      "2 banked corners, under 4"
+     ]
+    },
+    {
+     "seed": 3607,
+     "genMs": 13,
+     "length": 1320,
+     "runMetres": 1280,
+     "laps": 1,
+     "corners": 13,
+     "banked": 2,
+     "bridges": 0,
+     "hairpins": 10,
+     "clips": 12,
+     "types": {
+      "hairpin": 4,
+      "double": 6,
+      "multi": 2,
+      "opening": 1
+     },
+     "measuredDifficulty": 0.53,
+     "attempts": 4,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 84.98,
+      "score": 277,
+      "stars": 0,
+      "targets": [
+       280,
+       560,
+       980
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 52.4
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 66.05,
+      "score": 1063,
+      "stars": 3,
+      "targets": [
+       280,
+       560,
+       980
+      ],
+      "contacts": 6,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "1/3",
+      "meanKmh": 72.9
+     },
+     "fails": [
+      "2 banked corners, under 4",
+      "careful 277 under the first star 280"
+     ]
+    },
+    {
+     "seed": 3608,
+     "genMs": 12,
+     "length": 1290,
+     "runMetres": 1250,
+     "laps": 1,
+     "corners": 14,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 11,
+     "clips": 13,
+     "types": {
+      "double": 6,
+      "opening": 1,
+      "hairpin": 5,
+      "multi": 2
+     },
+     "measuredDifficulty": 0.56,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 87.73,
+      "score": 264,
+      "stars": 0,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 49.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 66.02,
+      "score": 1504,
+      "stars": 3,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 69.7
+     },
+     "fails": [
+      "careful 264 under the first star 270"
+     ]
+    },
+    {
+     "seed": 3609,
+     "genMs": 5,
+     "length": 1294,
+     "runMetres": 1254,
+     "laps": 1,
+     "corners": 13,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 10,
+     "clips": 12,
+     "types": {
+      "double": 8,
+      "hairpin": 2,
+      "multi": 2,
+      "tightening": 1
+     },
+     "measuredDifficulty": 0.55,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 84.54,
+      "score": 271,
+      "stars": 1,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 51.5
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 64.12,
+      "score": 1326,
+      "stars": 3,
+      "targets": [
+       270,
+       550,
+       960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 71.7
+     },
+     "fails": []
+    }
+   ]
+  },
+  {
+   "index": 22,
+   "name": "The vice",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "circuit",
+    "difficulty": 0.95,
+    "length": [
+     780,
+     880
+    ],
+    "style": "technical",
+    "crossover": "always"
+   },
+   "inCareer": 3707,
+   "chosen": 3707,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3707,
+     "genMs": 52,
+     "length": 836,
+     "runMetres": 2508,
+     "laps": 3,
+     "corners": 6,
+     "banked": 4,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 6,
+     "types": {
+      "tightening": 4,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.43,
+     "attempts": 132,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 141.97,
+      "score": 559,
+      "stars": 1,
+      "targets": [
+       540,
+       1080,
+       1880
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 62.7
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 125.07,
+      "score": 1615,
+      "stars": 2,
+      "targets": [
+       540,
+       1080,
+       1880
+      ],
+      "contacts": 2,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "10/12",
+      "meanKmh": 73.5
+     },
+     "fails": []
+    },
+    {
+     "seed": 3708,
+     "genMs": 118,
+     "length": 872,
+     "runMetres": 2616,
+     "laps": 3,
+     "corners": 12,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 8,
+     "types": {
+      "tight": 4,
+      "tightening": 2,
+      "chicane": 6
+     },
+     "measuredDifficulty": 0.59,
+     "attempts": 342,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 166.52,
+      "score": 556,
+      "stars": 0,
+      "targets": [
+       560,
+       1120,
+       1960
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 55.5
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 135.08,
+      "score": 1737,
+      "stars": 2,
+      "targets": [
+       560,
+       1120,
+       1960
+      ],
+      "contacts": 8,
+      "hard": 1,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "7/12",
+      "meanKmh": 71.7
+     },
+     "fails": [
+      "2 banked corners, under 4",
+      "careful 556 under the first star 560"
+     ]
+    },
+    {
+     "seed": 3709,
+     "genMs": 20,
+     "length": 804,
+     "runMetres": 2412,
+     "laps": 3,
+     "corners": 10,
+     "banked": 2,
+     "bridges": 1,
+     "hairpins": 0,
+     "clips": 8,
+     "types": {
+      "tightening": 4,
+      "chicane": 4,
+      "tight": 2
+     },
+     "measuredDifficulty": 0.54,
+     "attempts": 48,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 149.04,
+      "score": 522,
+      "stars": 1,
+      "targets": [
+       520,
+       1030,
+       1810
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "12/12",
+      "meanKmh": 57.3
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 130.33,
+      "score": 904,
+      "stars": 1,
+      "targets": [
+       520,
+       1030,
+       1810
+      ],
+      "contacts": 9,
+      "hard": 5,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "9/12",
+      "meanKmh": 69.9
+     },
+     "fails": [
+      "2 banked corners, under 4"
+     ]
+    }
+   ]
+  },
+  {
+   "index": 23,
+   "name": "The last bend",
+   "chapter": "Legend",
+   "settings": {
+    "kind": "sprint",
+    "difficulty": 1,
+    "length": 1400,
+    "style": "technical",
+    "crossover": "default"
+   },
+   "inCareer": 3808,
+   "chosen": 3808,
+   "agrees": true,
+   "tried": [
+    {
+     "seed": 3808,
+     "genMs": 6,
+     "length": 1412,
+     "runMetres": 1372,
+     "laps": 1,
+     "corners": 17,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 2,
+     "clips": 17,
+     "types": {
+      "tight": 1,
+      "tightening": 4,
+      "esses": 10,
+      "double": 2
+     },
+     "measuredDifficulty": 0.49,
+     "attempts": 2,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 82.23,
+      "score": 293,
+      "stars": 1,
+      "targets": [
+       290,
+       580,
+       1010
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.9
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 62.52,
+      "score": 1363,
+      "stars": 3,
+      "targets": [
+       290,
+       580,
+       1010
+      ],
+      "contacts": 1,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "2/3",
+      "meanKmh": 79.5
+     },
+     "fails": []
+    },
+    {
+     "seed": 3809,
+     "genMs": 6,
+     "length": 1490,
+     "runMetres": 1450,
+     "laps": 1,
+     "corners": 24,
+     "banked": 4,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 18,
+     "types": {
+      "flow": 5,
+      "tightening": 2,
+      "chicane": 9,
+      "esses": 8
+     },
+     "measuredDifficulty": 0.52,
+     "attempts": 1,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 89.06,
+      "score": 308,
+      "stars": 1,
+      "targets": [
+       300,
+       610,
+       1070
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 57.5
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 67.72,
+      "score": 253,
+      "stars": 0,
+      "targets": [
+       300,
+       610,
+       1070
+      ],
+      "contacts": 9,
+      "hard": 3,
+      "respawns": 1,
+      "offTrack": 0,
+      "stuck": 1,
+      "cleanSectors": "0/3",
+      "meanKmh": 78.6
+     },
+     "fails": [
+      "drifter 1 respawns"
+     ]
+    },
+    {
+     "seed": 3810,
+     "genMs": 13,
+     "length": 1440,
+     "runMetres": 1400,
+     "laps": 1,
+     "corners": 21,
+     "banked": 1,
+     "bridges": 0,
+     "hairpins": 0,
+     "clips": 20,
+     "types": {
+      "flow": 10,
+      "tight": 2,
+      "opening": 3,
+      "esses": 4,
+      "chicane": 2
+     },
+     "measuredDifficulty": 0.5,
+     "attempts": 3,
+     "fallback": false,
+     "careful": {
+      "finished": true,
+      "seconds": 84.27,
+      "score": 301,
+      "stars": 1,
+      "targets": [
+       290,
+       590,
+       1030
+      ],
+      "contacts": 0,
+      "hard": 0,
+      "respawns": 0,
+      "offTrack": 0,
+      "stuck": 0,
+      "cleanSectors": "3/3",
+      "meanKmh": 58.8
+     },
+     "drifter": {
+      "finished": true,
+      "seconds": 62.69,
+      "score": 582,
+      "stars": 1,
+      "targets": [
+       290,
+       590,
+       1030
+      ],
+      "contacts": 2,
+      "hard": 1,
+      "respawns": 1,
+      "offTrack": 0,
+      "stuck": 1,
+      "cleanSectors": "2/3",
+      "meanKmh": 80.7
+     },
+     "fails": [
+      "drifter 1 respawns",
+      "1 banked corners, under 4"
+     ]
+    }
+   ]
+  }
+ ]
+}
