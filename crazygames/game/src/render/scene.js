@@ -63,6 +63,12 @@ export const LOOK = {
      stay for the whole run (quads per tier) */
   MARK_SHOW:    { width: 0.27, opacity: 0.85, low: 6000, high: 12000 },
   RUBBER_SHOW:  0.46,
+  /* the rival in the player's lights (briefs/RIVALS.md): the scene's
+     headlight washed him to white a few metres ahead, so his materials
+     see their own copy of it instead, which lights him no more brightly
+     than the real one would REF metres ahead (the beam falls off by its
+     decay) */
+  RIVAL_BEAM:   { ref: 26 },
         // the rubber laid down the racing line, at most this opaque (TRACK_STYLE.RACING_LINE_ALPHA is 0.3)
   TONE_MAPPING: 'aces',
   BLOOM:        { threshold: 0.85, strength: 0.55, radius: 0.012, taps: 12 },
@@ -361,6 +367,9 @@ export function createScene(canvas, opts) {
   scene.add(rivalRoot);
   let rivalModel = null, rivalLamps = { tails: [], exhaust: null }, rivalFx = null, rivalShow = null, rivalFaded = 1;
   const rivalRig = { bRear: TUNE.VEHICLE.WHEELBASE - TUNE.VEHICLE.CG_TO_FRONT, half: TUNE.VEHICLE.TRACK / 2 };
+  /* his copy of the player's headlight: not in the scene, so only his materials see it; placed by hand every frame */
+  const rivalBeam = new THREE.SpotLight(LOOK.HEADLIGHT.colour, 0, LOOK.HEADLIGHT.distance, LOOK.HEADLIGHT.angle, LOOK.HEADLIGHT.penumbra, LOOK.HEADLIGHT.decay);
+  rivalBeam.castShadow = false;
   /* Where the rear wheels are from the physics origin, for the marks. */
   const rig = { bRear: TUNE.VEHICLE.WHEELBASE - TUNE.VEHICLE.CG_TO_FRONT, half: TUNE.VEHICLE.TRACK / 2 };
   /* Mount a model at the physics origin: the model's origin is the middle
@@ -413,7 +422,7 @@ export function createScene(canvas, opts) {
     /* the player's headlights never light him: a few metres behind him
        in a tandem they washed his paint to white. The sky and the sun
        still do, so he reads as his colour, lit as the scene is */
-    const lit = THREE.TSL.lights([hemi, sun]);
+    const lit = THREE.TSL.lights([hemi, sun, rivalBeam]);
     rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
     if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
     rivalLamps = carLamps(rivalModel);
@@ -611,6 +620,19 @@ export function createScene(canvas, opts) {
       show.update(dt, camera, pose, world, rig, showCtx);
     } else if (FX_PARTICLES) effects.update(dt, camera, pose, world, rig);
     updateRival(extra && extra.rival, dt);
+    /* his copy of the beam: where the headlight is, dimmed by how near he is */
+    if (rivalModel && rivalRoot.visible) {
+      const rv = extra && extra.rival;
+      let k = 0;
+      if (rv && headlight.visible) {
+        const dx = rv.pose.x - pose.x, dz = rv.pose.z - pose.z, ahead = dx * -Math.sin(pose.yaw) + dz * -Math.cos(pose.yaw);
+        k = ahead > 0 ? Math.min(1, Math.pow(Math.max(1, ahead) / LOOK.RIVAL_BEAM.ref, headlight.decay || 1.6)) : 1;
+      }
+      car.updateMatrixWorld();
+      headlight.getWorldPosition(rivalBeam.position); headlight.target.getWorldPosition(rivalBeam.target.position);
+      rivalBeam.intensity = headlight.intensity * k; rivalBeam.angle = headlight.angle; rivalBeam.distance = headlight.distance; rivalBeam.decay = headlight.decay; rivalBeam.penumbra = headlight.penumbra;
+      rivalBeam.updateMatrixWorld(); rivalBeam.target.updateMatrixWorld();
+    }
     followSun(pose);
     if (cones) {
       for (let i = 0; i < world.cones.length; i++) {
