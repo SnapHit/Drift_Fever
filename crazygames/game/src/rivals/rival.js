@@ -18,7 +18,7 @@ import { createWorld, STEP } from '../physics/world.js';
 import { createScoring } from '../scoring/drift.js';
 import { createProgress } from '../loop/progress.js';
 import { createRace } from '../scoring/race.js';
-import { carTune } from '../garage/roster.js';
+import { carTune, carBox } from '../garage/roster.js';
 import { TUNE, TANDEM } from '../tune.js';
 import { createRivalDriver } from './driver.js';
 
@@ -50,12 +50,12 @@ export function createRival(track, def, laps, opts) {
   const progress = createProgress(track, laps);
   const race = createRace(track, laps, scoring);
   const driver = createRivalDriver(ground, def.drive, o.driveOverride);
-  const st = { input: null, steps: 0, runTime: 0, finished: false, finishStep: -1, finishTime: 0, fade: 0, done: false, total: 0, sliding: false };
+  const st = { dist: start.along, along: world.along, input: null, steps: 0, runTime: 0, finished: false, finishStep: -1, finishTime: 0, fade: 0, done: false, total: 0, sliding: false };
   const prev = { x: world.car.x, y: world.car.y || 0, z: world.car.z, yaw: world.car.yaw };
 
   function reset() {
     world.reset(); scoring.reset(); progress.reset(); race.reset(); driver.reset();
-    st.steps = 0; st.runTime = 0; st.finished = false; st.finishStep = -1; st.finishTime = 0; st.fade = 0; st.done = false; st.total = 0; st.sliding = false;
+    st.steps = 0; st.runTime = 0; st.finished = false; st.finishStep = -1; st.finishTime = 0; st.fade = 0; st.done = false; st.total = 0; st.sliding = false; st.finishHash = null; st.dist = start.along; st.along = world.along;
     prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
   }
   /* one step, in lockstep with the player's */
@@ -66,13 +66,15 @@ export function createRival(track, def, laps, opts) {
     st.input = inp;
     world.stepWorld(inp);
     st.steps++;
+    let dd = world.along - st.along; if (track.kind === 'circuit') { if (dd < -track.length / 2) dd += track.length; else if (dd > track.length / 2) dd -= track.length; }
+    st.dist += dd; st.along = world.along;
     if (st.finished) { st.fade = Math.min(1, st.fade + STEP / TANDEM.FADE); if (st.fade >= 1) st.done = true; return; }
     scoring.step(world, STEP);
     progress.step(world);
     race.step(world, progress.state);
     st.runTime += STEP;
     st.sliding = scoring.state.drifting && scoring.state.gap === 0;
-    if (progress.state.finished) { scoring.bank(); race.finish(st.runTime); st.finished = true; st.finishStep = st.steps; st.finishTime = st.runTime; st.sliding = false; }
+    if (progress.state.finished) { scoring.bank(); race.finish(st.runTime); st.finished = true; st.finishStep = st.steps; st.finishTime = st.runTime; st.sliding = false; st.finishHash = world.hash() + '|' + scoring.state.total + ',' + st.finishStep; }
     st.total = scoring.state.total;
   }
   /* run him on to his line (the player finished first); at most maxSteps */
@@ -86,15 +88,22 @@ export function createRival(track, def, laps, opts) {
     out.x = p.x + (c.x - p.x) * alpha; out.y = p.y + ((c.y || 0) - p.y) * alpha; out.z = p.z + (c.z - p.z) * alpha; out.yaw = p.yaw + dy * alpha; out.car = c;
     return out;
   }
-  /* how far into the run he is, in metres from his start, for the zone and the HUD */
-  function runDistance() {
-    const p = progress.state;
-    return track.kind === 'circuit' ? p.lap * track.length + p.pos : p.pos;
-  }
-  /* solid until his finish */
+  /* how far into the run he is: metres along the track from its zero,
+     unwrapped over the laps (the player's is counted the same way), for
+     the zone, the HUD and the chase driver */
+  function runDistance() { return st.dist; }
+  /* solid until his finish; his body for the player's world (physics/world.js obstacle) */
   const solid = () => !st.finished;
-  const hash = () => world.hash() + '|' + scoring.state.total + ',' + st.finishStep;
-  return { def, world, scoring, progress, race, driver, driverMode: () => driver.mode, state: st, reset, step, finishRun, pose, runDistance, solid, hash };
+  const box = carBox(def.car), bodyOut = { x: 0, z: 0, yaw: 0, hl: box.halfLength, hw: box.halfWidth, wvx: 0, wvz: 0, r: 0 };
+  function body() {
+    if (!solid()) return null;
+    const c = world.car;
+    bodyOut.x = c.x; bodyOut.z = c.z; bodyOut.yaw = c.yaw; bodyOut.wvx = c.wvx; bodyOut.wvz = c.wvz; bodyOut.r = c.r;
+    return bodyOut;
+  }
+  /* his run's hash: the world at his finish, and his total (before it, the world now) */
+  const hash = () => st.finishHash || world.hash() + '|' + scoring.state.total + ',' + st.finishStep;
+  return { def, world, scoring, progress, race, driver, driverMode: () => driver.mode, state: st, box, reset, step, finishRun, pose, runDistance, solid, body, hash };
 }
 
 /* the measurements' grip disturbance: the rival's car with both axles'

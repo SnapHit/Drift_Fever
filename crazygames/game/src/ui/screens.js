@@ -163,8 +163,36 @@ export function createScreens(root, onAction) {
       </div>`);
   }
 
+  /* A battle's results (briefs/RIVALS.md 3): who won, both totals, what
+     the tandem was worth, the coins, and REMATCH and the next thing to
+     do. r: { won, score, rival: { name, total }, margin, tandem, parts,
+     coins, prize, offer, label, name, seconds, best2 } */
+  function battleResults(r) {
+    const a = '<div class="col a">', b = '</div><div class="col b">', z = '</div>';
+    const who = r.won ? 'YOU WIN' : esc(r.rival.name.toUpperCase()) + ' WINS';
+    const top = Math.max(1, r.score, r.rival.total), bar = n => Math.max(2, Math.round(n / top * 100));
+    const coinsN = FX_ON ? `<b class="coinsN" data-to="${Math.round(r.coins)}">+${fmt(r.coins)}</b>` : `<b>+${fmt(r.coins)}</b>`;
+    const next = r.offer ? `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="battle" data-arg="${esc(r.offer.id)}"><b>NEXT RIVAL</b><small>${esc(r.offer.name)}</small></button>`
+      : `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="career"><b>CAREER</b><small>${r.won ? 'the next rival opens on the career' : 'win a star, then come back'}</small></button>`;
+    show('results', `
+      <div class="card split battle${r.won ? ' won' : ' lost'}">${a}
+        <p class="runlabel">${esc(r.label)}</p><h2 class="who">${who}</h2><p class="trackname">${esc(r.name)}</p>
+        <div class="duel">
+          <div class="side you"><span class="nm">YOU</span><span class="n">${fmt(r.score)}</span><i style="width:${bar(r.score)}%"></i></div>
+          <div class="side him"><span class="nm">${esc(r.rival.name.toUpperCase())}</span><span class="n">${fmt(r.rival.total)}</span><i style="width:${bar(r.rival.total)}%"></i></div>
+        </div>
+        <p class="margin">${r.won ? 'by ' + fmt(r.margin) : fmt(-r.margin) + ' short'}</p>
+        <div class="parts"><span><b>+${fmt(r.tandem)}</b><small>tandem</small></span><span><b>${Math.round(r.zoneShare * 100)}%</b><small>of his slides close</small></span><span><b>${fmt(r.parts.drift)}</b><small>drift</small></span></div>${b}
+        <div class="facts"><span>${coinsN}<small>coins${r.prize ? ' &middot; first win +' + fmt(r.prize) : ''}</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span><b>${r.best2 !== undefined && r.best2 > -1e9 ? (r.best2 >= 0 ? '+' : '') + fmt(r.best2) : ''}</b><small>best margin</small></span></div>
+        ${r.offer ? `<p class="unlock done">&#128275; Next rival open: ${esc(r.offer.name)}</p>` : ''}
+        <button type="button" class="big${r.won ? '' : ' primary'}" data-action="again"><b>REMATCH</b><small>DRIFT / BRAKE, Enter or R</small></button>
+        <div class="row2">${next}<button type="button" class="big" data-action="title"><b>MENU</b></button></div>${z}
+      </div>`);
+  }
+
   /* r: { score, best, stars, targets, coins, improved, mode, name, label, seconds, nextIndex, unlock, note, laps, kind, missions, code } */
   function results(r) {
+    if (r.battle) return battleResults(r);
     const targets = r.targets.map((t, i) => `<span class="${r.score >= t ? 'on' : 'off'}">&#9733; ${fmt(t)}</span>`).join('');
     /* with the spectacle round on, the card is two columns that sit side
        by side on a short landscape screen (the score on the left, the
@@ -185,9 +213,10 @@ export function createScreens(root, onAction) {
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
         ${r.note ? `<p class="chapnote">${esc(r.note.text)}</p>` : ''}
-        <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
+        ${r.offer ? `<button type="button" class="big primary rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RIVAL: ${esc(r.offer.name.toUpperCase())}</b><small>a tandem battle is open</small></button>` : ''}
+        <button type="button" class="big${r.unlock && r.unlock.done || r.offer ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
-          ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
+          ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done && !r.offer ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
           ${r.code ? `<button type="button" class="big" data-action="lab"><b>LAB</b><small>change the track</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>
         </div>${z}

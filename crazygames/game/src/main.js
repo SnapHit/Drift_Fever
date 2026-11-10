@@ -47,6 +47,12 @@ import { drawPlan } from './tracks/plan.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
 import { FX_ON } from './fx.js';
 import { createDirector } from './camera/director.js';
+import { TANDEM } from './tune.js';
+import { createRival } from './rivals/rival.js';
+import { RIVALS, rivalById, rivalOpen, openRivals, rivalPaint } from './rivals/roster.js';
+import { battleSpec, battleLaps } from './loop/modes.js';
+import { createTandem } from './scoring/tandem.js';
+import { createChaseDriver } from './rivals/chase.js';
 
 const query = new URLSearchParams(location.search);
 const MAX_STEPS = 8;              // steps per frame before time is dropped
@@ -78,7 +84,11 @@ const app = {
   countdown: 0, goShown: 0, runTime: 0, menuT: 0, settle: 0, lockout: 0,
   results: null, picked: null,
   lab: null,     // the Track Lab's state: { settings, seed, code, spec, track, message, error }
+  rival: null,   // in a battle: the rival (rivals/rival.js), else null
+  tandem: createTandem(),   // the tandem's zone and bonus, stepped only in a battle
+  dist: 0, distAlong: 0,    // in a battle: the player's metres into the run, unwrapped
 };
+const rivalPose = { x: 0, y: 0, z: 0, yaw: 0, car: null };
 let box = carBox('starter');
 
 /* ---- the recorder: every step's input, run length encoded ---- */
@@ -95,6 +105,7 @@ function quantise(rec) {
 /* ---- the world for a ground, with the chosen car ---- */
 function setGround(ground, carId, paintId) {
   app.ground = ground;
+  app.rival = null; scene.setRival(null);
   app.world = createWorld(ground, { tune: carTune(carId, save.state.cars[carId] && save.state.cars[carId].up) });
   box = carBox(carId);
   scene.setGround(ground);
@@ -144,20 +155,31 @@ function resetRun() {
   if (app.race) app.race.reset();
   if (app.missions) app.missions.reset();
   if (app.ghost) app.ghost.reset();
+  if (app.rival) app.rival.reset();
+  app.tandem.reset(); app.dist = app.ground.start ? app.ground.start.along || 0 : 0; app.distAlong = app.world.along;
   tape.length = 0; acc = 0; last = -1; app.runTime = 0;
   prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
   chase.reset({ yaw: world.car.yaw });
   if (director) director.reset();
-  if (autoDrive && app.state !== 'dev' && app.ground.centre.length) app.driver = createDriver(app.ground, { drift: '*' });
+  if (autoDrive && app.state !== 'dev' && app.ground.centre.length) app.driver = app.rival ? createChaseDriver(app.ground, app.rival) : createDriver(app.ground, { drift: '*' });
 }
 
 function stepOnce(rec) {
   const world = app.world, c = world.car;
   prev.x = c.x; prev.y = c.y || 0; prev.z = c.z; prev.yaw = c.yaw;
   const inp = app.driver ? quantise(app.driver.input(world)) : rec;
+  if (app.rival) app.rival.step();   // his step first: the player's world meets him where he now is
   world.stepWorld(inp);
   record(inp);
-  scoring.step(world, STEP);
+  if (app.rival) {
+    /* the tandem: the player's metres into the run, unwrapped, and whether his slide scores this step (as the scoring judges it) */
+    let d = world.along - app.distAlong; const Lt = app.ground.length || 0;
+    if (app.ground.kind === 'circuit') { if (d < -Lt / 2) d += Lt; else if (d > Lt / 2) d -= Lt; }
+    app.dist += d; app.distAlong = world.along;
+    const S = TUNE.SCORING, c = world.car, ang = Math.abs(c.slip) * 180 / Math.PI;
+    app.tandem.step(world, app.rival, app.dist, ang >= S.MIN_ANGLE && c.speed >= S.MIN_SPEED && c.vx > 0);
+    scoring.step(world, STEP, app.tandem.state);
+  } else scoring.step(world, STEP);
   if (app.progress) app.progress.step(world);
   if (app.race) app.race.step(world, app.progress.state);
   if (app.missions && app.progress) app.missions.step(world, scoring.state, app.race, app.progress.state);
@@ -231,7 +253,12 @@ function frame(t) {
     if (director) director.apply(S === 'countdown' ? 'countdown' : finishing ? 'finish' : 'drive', pose, scene.camera, dt, S === 'countdown' ? 1 - Math.max(0, app.countdown) / LOOP.COUNTDOWN : 0, chase.state);
   }
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
-  scene.update(pose, world, dt * ts, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1 });
+  let rv = null;
+  if (app.rival && (S === 'drive' || S === 'countdown' || S === 'results')) {
+    const rs = app.rival.scoring.state;
+    rv = { pose: app.rival.pose(alpha, rivalPose), world: app.rival.world, mult: rs.chain > 0 ? rs.mult : 1, fade: S === 'results' && app.rivalRanOn ? 1 : app.rival.state.fade };
+  }
+  scene.update(pose, world, dt * ts, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1, rival: rv });
   sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev', world.touching);
   if (app.frameHit) { sound.hit(app.frameHit.speed, app.frameHit.hard); if (director && app.frameHit.hard) director.hardHit(); app.frameHit = null; }
   /* the score's sounds, from the callouts it queued this frame */
@@ -254,6 +281,17 @@ function frame(t) {
   }
   if (app.missionsShown > 0 && S === 'drive') { app.missionsShown -= dt; if (app.missionsShown <= 0) hud.setMissions(null); }
   hud.update(scoring, pose, scene.camera, THREE, view, dt);
+  if (app.rival && (S === 'drive' || S === 'countdown')) {
+    hud.battle(app.tandem.state, app.rival, scoring.state, rv, scene.camera, THREE, view, dt);
+    /* the first battle ever: one prompt, as he starts his first slide */
+    if (app.battleIntro && app.rival.state.sliding && S === 'drive') { app.battleIntro = false; hud.prompt('Stay close behind him while you both slide', 3.2); }
+    const tc = app.tandem.state;
+    if ((app.heardTandem || 0) > tc.calloutCount) app.heardTandem = 0;
+    if (tc.calloutCount !== app.heardTandem) {
+      for (const co of tc.callouts.slice(-Math.min(tc.callouts.length, tc.calloutCount - (app.heardTandem || 0)))) { hud.notice(co.text, co.kind); if (co.kind === 'tandem') sound.ui('clean'); }
+      app.heardTandem = tc.calloutCount;
+    }
+  }
   if (onboard.active) onboard.update(dt, { driving: S === 'drive', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity });
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;
@@ -362,6 +400,7 @@ function runHead(spec) {
   if (spec.mode === 'career') { const ch = CHAPTERS[chapterOf(spec.index)]; return { label: 'CAREER \u00b7 ' + ch.name.toUpperCase() + ' \u00b7 TRACK ' + (spec.index - ch.from + 1) + ' OF ' + (ch.to - ch.from), name: spec.name }; }
   if (spec.mode === 'daily') return { label: 'DAILY DRIFT', name: 'A new track every day' };
   if (spec.mode === 'lab') return { label: 'TRACK LAB', name: formatCode(spec.code) };
+  if (spec.mode === 'battle') { const d = rivalById(spec.rival); return { label: 'TANDEM BATTLE \u00b7 ' + d.name.toUpperCase(), name: 'Stay close while you both slide. Outscore him.' }; }
   return null;
 }
 
@@ -395,7 +434,7 @@ function startRun(spec, opts) {
   app.track = trackFor(spec);
   const carId = save.state.car, paint = save.state.cars[carId].paint;
   setGround(app.track, carId, paint);
-  app.laps = lapsFor(app.track);
+  app.laps = spec.mode === 'battle' ? battleLaps(app.track) : lapsFor(app.track);
   app.targets = starTargets(app.track, app.laps);
   app.progress = createProgress(app.track, app.laps);
   app.race = createRace(app.track, app.laps, scoring);
@@ -408,10 +447,21 @@ function startRun(spec, opts) {
   const head = runHead(spec);
   hud.setMissions(listed ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null, head);
   app.missionsShown = listed || head ? LOOP.MISSIONS.SHOWN : 0;
-  const rec = ghostFor(spec.key, app.track);
+  const rec = spec.mode === 'battle' ? null : ghostFor(spec.key, app.track);   // no ghost is kept for a battle
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
   hud.setToBeat(rec ? 'best ' + rec.score : spec.mode === 'lab' ? (save.labBest(spec.code) ? 'best ' + save.labBest(spec.code).best : '') : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
+  /* a battle: the rival on the grid ahead, solid */
+  if (spec.mode === 'battle') {
+    const def = rivalById(spec.rival);
+    app.rival = createRival(app.track, def, app.laps);
+    app.world.obstacle = () => app.rival.body();
+    scene.setRival(def.car, rivalPaint(def, paint));
+    app.battleIntro = Object.keys(save.state.rivals).length === 0;
+    hud.setBattle({ name: def.name });
+    hud.setToBeat('');
+  } else hud.setBattle(null);
+  app.rivalRanOn = false; app.heardTandem = 0;
   app.state = 'countdown'; app.countdown = LOOP.COUNTDOWN; app.settle = 0; app.results = null;
   sound.engineStart(); app.lastTick = 0; app.heardCallouts = 0;
   input.setStarted(false);
@@ -423,6 +473,7 @@ function startRun(spec, opts) {
 }
 
 function finishRun() {
+  if (app.spec.mode === 'battle') return finishBattle();
   const spec = app.spec, score = scoring.state.total, best = scoring.state.best;
   const stars = starsFor(score, app.targets);
   /* the stars this track (or today's daily) had before, for the new star bonus */
@@ -441,12 +492,14 @@ function finishRun() {
     const was = save.state.missions[spec.key] || [];
     missions = app.missions.missions.map((m, i) => ({ text: m.text, kind: m.kind, target: m.target, done: !!was[i], doneNow: done[i], fresh: fresh.includes(i), coins: fresh.includes(i) ? LOOP.MISSIONS.COINS : 0, progress: app.missions.state.progress[i], doneAt: app.missions.state.doneAt[i] }));
   }
-  let improved = false, nextIndex = null, unlock = null, note = null;
+  let improved = false, nextIndex = null, unlock = null, note = null, offer = null;
   if (spec.mode === 'career') {
     /* say what the career is: a chapter or a track just opened, what opens the next, and how far the next chapter is */
     const n = spec.index + 1, c = chapterOf(spec.index);
     const wasOpen = n < CAREER.length && careerUnlocked(save.state, n), nextChapterWasOpen = c + 1 < CHAPTERS.length && chapterOpen(save.state, c + 1);
+    const rivalsBefore = openRivals(save.state);
     improved = save.careerResult(spec.index, stars, score);
+    offer = openRivals(save.state).find(id => !rivalsBefore.includes(id)) || null;
     ({ unlock, note, nextIndex } = careerNews(spec.index, wasOpen, nextChapterWasOpen));
   }
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
@@ -458,7 +511,7 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
+  app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer: offer ? { id: offer, name: rivalById(offer).name } : null, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();
@@ -468,6 +521,34 @@ function finishRun() {
   hud.setCount('', false); hud.setVisible(false); hud.setMissions(null); input.touch.setVisible(false);
   screens.results(app.results);
   if (FX_ON) countCoins(0.45 + stars * 0.28);
+}
+/* A battle's end (briefs/RIVALS.md): the rival run on to his line if
+   the player finished first, both totals, who won, what the tandem was
+   worth, the coins (the run's at the career rate with no stars, and the
+   prize the first time he is beaten), and the next thing to do. No
+   stars, no ghost, no missions, nothing in the career: battles gate
+   nothing that exists. */
+function finishBattle() {
+  const spec = app.spec, def = rivalById(spec.rival), R = app.rival;
+  if (!R.state.finished) { R.finishRun(); app.rivalRanOn = true; }
+  const score = scoring.state.total, them = R.scoring.state.total, won = score >= them, margin = score - them;
+  const before = openRivals(save.state);
+  const first = save.rivalResult(def.id, won, margin);
+  const opened = openRivals(save.state).find(id => !before.includes(id)) || null;
+  const coins = Math.floor(score * LOOP.COIN_PER_POINT) + (first ? def.prize : 0);
+  save.addCoins(coins);
+  save.setOnboarded();
+  const t = app.tandem.state;
+  app.results = { finished: true, battle: true, mode: 'battle', score, best: scoring.state.best, rival: { id: def.id, name: def.name, total: them, seconds: R.state.finishTime }, won, margin, first, prize: first ? def.prize : 0,
+    tandem: scoring.state.tandem, zoneShare: t.rivalSlideT > 0 ? t.zoneT / t.rivalSlideT : 0, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, coins, name: spec.name, label: runHead(spec).label, seconds: app.runTime, laps: app.laps, kind: app.track.kind, steps: tape.reduce((n, e) => n + e.n, 0), hash: app.world.hash(), rivalHash: R.hash(),
+    offer: opened ? { id: opened, name: rivalById(opened).name } : null, nextIndex: null, best2: (save.state.rivals[def.id] || {}).best };
+  app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
+  if (FX_ON && won) scene.fireworks(3);
+  if (won) for (let i = 0; i < 3; i++) sound.ui('star', i + 1, 0.35 + i * 0.28);
+  sound.ui('coin', 0, 0.45 + (won ? 3 : 0) * 0.28);
+  hud.setCount('', false); hud.setVisible(false); hud.setMissions(null); input.touch.setVisible(false);
+  screens.results(app.results);
+  if (FX_ON) countCoins(0.45 + (won ? 3 : 0) * 0.28);
 }
 /* the results' coins count up from nothing, starting with the coin sound */
 let coinTimer = 0;
@@ -532,6 +613,7 @@ function onAction(action, arg) {
       break;
     }
     case 'play-career': { const i = +arg; if (careerUnlocked(save.state, i)) startRun(careerSpec(i)); break; }
+    case 'battle': { const d = rivalById(arg); if (d && rivalOpen(save.state, d.id)) startRun(battleSpec(d)); break; }
     case 'again': if (app.spec && app.spec.mode !== 'free') startRun(app.spec); break;
     case 'pick-car': app.picked = arg; previewCar(); screens.garage(save.state, app.picked); break;
     case 'buy-car': if (save.buyCar(arg, carById(arg).price)) { save.chooseCar(arg); app.picked = arg; menuGround(); } screens.garage(save.state, app.picked); break;
@@ -618,7 +700,7 @@ window.__feel = {
   frame, restart: resetRun,
   hash: () => app.world.hash(),
   info: () => ({ ...scene.info(), running, physMs, steps: lastSteps, frameMs, state: app.state }),
-  setDriver(opts) { app.driver = opts ? createDriver(app.ground, opts) : null; return app.driver; },
+  setDriver(opts) { app.driver = opts ? (opts.chase && app.rival ? createChaseDriver(app.ground, app.rival, opts.chase === true ? null : opts.chase) : createDriver(app.ground, opts)) : null; return app.driver; },
   /* Replay a tape (run length entries) from a fresh start, no drawing. Returns the hash. */
   replay(t) {
     resetRun();
@@ -633,7 +715,8 @@ window.__feel = {
 window.__loop = {
   app, save, LOOP, screens, sound, onboard, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
   lab: { setLab, labSpec, specFromCode, state: () => app.lab && { settings: app.lab.settings, seed: app.lab.seed, code: app.lab.code, message: app.lab.message, error: app.lab.error, track: app.lab.track && { name: app.lab.track.name, length: app.lab.track.length, kind: app.lab.track.kind, corners: app.lab.track.corners.length, bridges: (app.lab.track.bridges || []).length, fallback: !!app.lab.track.fallback, theme: app.lab.track.theme, preset: app.lab.track.preset } } },
-  action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor,
+  action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor, battleSpec: id => battleSpec(rivalById(id)), RIVALS, TANDEM,
+  rival: () => app.rival, tandem: () => app.tandem.state,
   progress: () => app.progress && app.progress.state,
   results: () => app.results,
   ghostHash: () => app.ghost ? app.ghost.hash() : null,

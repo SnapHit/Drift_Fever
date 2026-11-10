@@ -13,3 +13,21 @@ export const RIVALS = [
 
 export function rivalById(id) { return RIVALS.find(r => r.id === id) || null; }
 export function rivalOnTrack(index) { return RIVALS.find(r => r.track === index) || null; }
+
+/* A rival opens with a star on his track and a win over the rival
+   before him (briefs/RIVALS.md). Battles gate nothing that exists. */
+export function rivalIndex(id) { return RIVALS.findIndex(r => r.id === id); }
+export function rivalOpen(save, id) {
+  const k = rivalIndex(id);
+  if (k < 0) return false;
+  const e = save.career[String(RIVALS[k].track)];
+  if (!e || e.stars < 1) return false;
+  if (k === 0) return true;
+  const prev = save.rivals && save.rivals[RIVALS[k - 1].id];
+  return !!(prev && prev.won);
+}
+export function openRivals(save) { return RIVALS.filter(r => rivalOpen(save, r.id)).map(r => r.id); }
+
+/* The rival's paint, never the player's (the readability rule: the
+   player's car is the most findable). */
+export function rivalPaint(def, playerPaint) { return def.paint !== playerPaint ? def.paint : def.altPaint || 'white'; }

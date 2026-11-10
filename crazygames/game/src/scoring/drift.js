@@ -28,12 +28,14 @@ export function createScoring() {
     drift: 0,          // of the total, from drifting
     clean: 0,          // from clean sectors
     pace: 0,           // from the pace at the finish
+    tandem: 0,         // of the total, what the tandem bonus added (briefs/RIVALS.md; 0 with no rival)
+    tandemChain: 0,    // the bonus's share of the open chain, before the multiplier
   };
   function callout(text, kind) { s.callouts.push({ text, kind }); s.calloutCount++; if (s.callouts.length > 6) s.callouts.shift(); }
   function reset() {
     s.total = 0; s.chain = 0; s.mult = 1; s.driftTime = 0; s.gap = 0; s.drifting = false; s.near = false; s.best = 0; s.angle = 0; s.lastBank = 0; s.lost = 0;
     s.callouts.length = 0; s.calloutCount = 0; s.bigAngleSaid = false; s.longChainSaid = false; s.nearSaid = false;
-    s.drift = 0; s.clean = 0; s.pace = 0;
+    s.drift = 0; s.clean = 0; s.pace = 0; s.tandem = 0; s.tandemChain = 0;
   }
   /* points for driving, not drifting: kind is 'clean' or 'pace' */
   function award(v, kind, text) {
@@ -47,16 +49,20 @@ export function createScoring() {
       const v = Math.round(s.chain * s.mult);
       s.total += v; s.drift += v; s.lastBank = v; s.lastBankMult = s.mult;
       if (v > s.best) s.best = v;
+      if (s.tandemChain > 0) { s.tandem += Math.min(v, Math.round(s.tandemChain * s.mult)); s.tandemChain = 0; }
       callout('+' + v + (s.mult > 1 ? '  x' + s.mult : ''), 'bank');
     }
     s.chain = 0; s.mult = 1; s.driftTime = 0; s.bigAngleSaid = false; s.longChainSaid = false; s.nearSaid = false;
   }
   function lose() {
     if (s.chain > 0) { s.lost = Math.round(s.chain * s.mult); callout('CHAIN LOST', 'lost'); }
-    s.chain = 0; s.mult = 1; s.driftTime = 0; s.drifting = false; s.gap = 0; s.bigAngleSaid = false; s.longChainSaid = false; s.nearSaid = false;
+    s.chain = 0; s.tandemChain = 0; s.mult = 1; s.driftTime = 0; s.drifting = false; s.gap = 0; s.bigAngleSaid = false; s.longChainSaid = false; s.nearSaid = false;
   }
-  /* world: the physics world after its step; dt the step. */
-  function step(world, dt) {
+  /* world: the physics world after its step; dt the step; tandem, only
+     in a battle: { mult }, the tandem's multiplier on this step's drift
+     points (scoring/tandem.js). Without it the arithmetic is exactly as
+     it always was. */
+  function step(world, dt, tandem) {
     const S = TUNE.SCORING;
     const car = world.car;
     const angle = Math.abs(car.slip) * DEG;
@@ -70,7 +76,9 @@ export function createScoring() {
       s.drifting = true; s.gap = 0;
       s.driftTime += dt;
       s.mult = Math.min(S.CHAIN_MAX, 1 + Math.floor(s.driftTime / S.CHAIN_STEP));
-      s.chain += angle * kmh * S.RATE * dt * (s.near ? S.PROX_BONUS : 1);
+      const pts = angle * kmh * S.RATE * dt * (s.near ? S.PROX_BONUS : 1);
+      if (tandem && tandem.mult > 1) { s.chain += pts * tandem.mult; s.tandemChain += pts * (tandem.mult - 1); tandem.counted = true; }
+      else s.chain += pts;
       if (angle >= S.BIG_ANGLE && !s.bigAngleSaid) { s.bigAngleSaid = true; callout('BIG ANGLE', 'good'); }
       if (s.driftTime >= S.LONG_CHAIN && !s.longChainSaid) { s.longChainSaid = true; callout('LONG CHAIN', 'good'); }
       if (s.near && !s.nearSaid) { s.nearSaid = true; callout(world.nearestClip ? 'CLIP' : 'NEAR MISS', 'good'); }

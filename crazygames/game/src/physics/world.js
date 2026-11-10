@@ -10,7 +10,7 @@
    speed. Cones are knocked and roll away, for the look of it and the
    near miss bonus; they are part of the run's state so a replay knocks
    the same cones. */
-import { TUNE } from '../tune.js';
+import { TUNE, TANDEM } from '../tune.js';
 import { createVehicle, stepVehicle, applyImpact, bodyPoints, vehicleHash, STEP } from './vehicle.js';
 
 const WALL_HALF = 0.25;        // m, half the wall's thickness
@@ -74,6 +74,13 @@ export function createWorld(ground, opts) {
     hit: null,                              // this step's hit, if any: { speed, hard, kind, x, z, wy (the wall's height there) }
     respawned: false, recovered: false, stuckT: 0, lastTouch: -1, wallNx: 0, wallNz: 0, touching: false, hits: 0, hardHits: 0, conesKnocked: 0, nearest: Infinity, nearestClip: null,
     stepWorld, reset, hash, locate, clipDistance,
+    /* another car the player's cannot drive through (briefs/RIVALS.md):
+       null, or a function returning that car's body this step ({ x, z,
+       yaw, hl, hw, wvx, wvz, r }) or null when it is not solid. It is
+       never moved: the contact acts on this world's car alone. With no
+       obstacle nothing here runs, so a run with no rival is exactly as
+       before. */
+    obstacle: null, bodyTouching: false, bodyHits: 0, bodyHardHits: 0, bodyDepth: 0, passThrough: false,
   };
 
   function reset() {
@@ -83,6 +90,7 @@ export function createWorld(ground, opts) {
     for (const k of cones) { k.x = k.x0; k.z = k.z0; k.vx = 0; k.vz = 0; k.knocked = 0; k.tilt = 0; k.tiltX = 0; k.tiltZ = 0; }
     world.step = 0; world.time = 0; world.hit = null; world.touching = false; world.stuckT = 0; world.lastTouch = -1; world.recovered = false; world.hits = 0; world.hardHits = 0; world.conesKnocked = 0; world.respawned = false;
     world.centreIndex = 0; world.along = 0; world.lateral = 0; world.nearest = Infinity;
+    world.bodyTouching = false; world.bodyHits = 0; world.bodyHardHits = 0; world.bodyDepth = 0; world.passThrough = false;
     locate(true);
   }
 
@@ -212,6 +220,85 @@ export function createWorld(ground, opts) {
     world.touching = contact;
   }
 
+  /* THE OTHER CAR. Two boxes on the road's plane, separated along the
+     axis of least overlap (the four edge normals of the two boxes): the
+     player's car is moved out by that overlap and takes an impulse at
+     the deepest corner, worked in the other car's frame (its velocity
+     at that point taken away and given back), so a car standing still
+     on his line is pushed on by him, not driven through. A contact
+     harder than TANDEM.HARD_HIT along the normal is a hard one: as a
+     wall hit, the chain is lost (the scoring reads world.hit) and the
+     player keeps only HIT_SPEED_KEEP of his speed relative to the other
+     car. Returns the hit, or null. */
+  const bodyPts = new Float64Array(8), axes = new Float64Array(8);
+  function corners(x, z, yaw, hl, hw, out) {
+    const fx = -Math.sin(yaw), fz = -Math.cos(yaw), lx = -Math.cos(yaw), lz = Math.sin(yaw);
+    out[0] = x + fx * hl + lx * hw; out[1] = z + fz * hl + lz * hw; out[2] = x + fx * hl - lx * hw; out[3] = z + fz * hl - lz * hw;
+    out[4] = x - fx * hl - lx * hw; out[5] = z - fz * hl - lz * hw; out[6] = x - fx * hl + lx * hw; out[7] = z - fz * hl + lz * hw;
+  }
+  const mine = new Float64Array(8);
+  function collideBody() {
+    const o = world.obstacle();
+    world.bodyDepth = 0;
+    if (!o) { world.bodyTouching = false; world.passThrough = false; return null; }
+    const T = TANDEM;
+    const V = tune ? tune.VEHICLE : TUNE.VEHICLE;
+    corners(car.x, car.z, car.yaw, V.HALF_LENGTH, V.HALF_WIDTH, mine);
+    corners(o.x, o.z, o.yaw, o.hl, o.hw, bodyPts);
+    axes[0] = -Math.sin(car.yaw); axes[1] = -Math.cos(car.yaw); axes[2] = -Math.cos(car.yaw); axes[3] = Math.sin(car.yaw);
+    axes[4] = -Math.sin(o.yaw); axes[5] = -Math.cos(o.yaw); axes[6] = -Math.cos(o.yaw); axes[7] = Math.sin(o.yaw);
+    let depth = Infinity, nx = 0, nz = 0;
+    for (let a = 0; a < 4; a++) {
+      const ax = axes[a * 2], az = axes[a * 2 + 1];
+      let p0 = Infinity, p1 = -Infinity, q0 = Infinity, q1 = -Infinity;
+      for (let k = 0; k < 4; k++) { const p = mine[k * 2] * ax + mine[k * 2 + 1] * az; if (p < p0) p0 = p; if (p > p1) p1 = p; const q = bodyPts[k * 2] * ax + bodyPts[k * 2 + 1] * az; if (q < q0) q0 = q; if (q > q1) q1 = q; }
+      const d = Math.min(p1 - q0, q1 - p0);
+      if (d <= 0) { world.bodyTouching = false; world.passThrough = false; return null; }
+      if (d < depth) { depth = d; const sgn = (p1 - q0) < (q1 - p0) ? -1 : 1; nx = ax * sgn; nz = az * sgn; }
+    }
+    world.bodyDepth = depth;
+    if (world.passThrough) return null;   // held inside him by a wall: let through until apart
+    /* out of him along n (n points from him to the player) */
+    car.x += nx * depth; car.z += nz * depth;
+    /* the contact point: the player's corner deepest towards him, or his deepest towards the player */
+    let px = car.x, pz = car.z, best = Infinity;
+    corners(car.x, car.z, car.yaw, V.HALF_LENGTH, V.HALF_WIDTH, mine);
+    for (let k = 0; k < 4; k++) { const p = mine[k * 2] * nx + mine[k * 2 + 1] * nz; if (p < best) { best = p; px = mine[k * 2]; pz = mine[k * 2 + 1]; } }
+    /* his velocity at that point, taken away and given back */
+    const vrx = o.wvx + o.r * (pz - o.z), vrz = o.wvz - o.r * (px - o.x);
+    car.wvx -= vrx; car.wvz -= vrz;
+    const removed = applyImpact(car, px, pz, nx, nz, T.RESTITUTION, T.FRICTION);
+    const hard = removed >= T.HARD_HIT;
+    if (hard) { car.wvx *= T.HIT_SPEED_KEEP; car.wvz *= T.HIT_SPEED_KEEP; car.r *= T.HIT_SPEED_KEEP; }
+    car.wvx += vrx; car.wvz += vrz;
+    let hit = null;
+    if (removed >= HIT_MIN && (!world.bodyTouching || hard)) {
+      world.bodyHits++; world.hits++;
+      if (hard) { world.bodyHardHits++; world.hardHits++; }
+      hit = { speed: removed, kind: 'rival', nx, nz, x: px, z: pz, wy: car.y, hard };
+    }
+    world.bodyTouching = true;
+    return hit;
+  }
+  /* after the walls: still this deep inside him means a wall holds the player there */
+  function pinned() {
+    const o = world.obstacle();
+    if (!o) return;
+    const V = tune ? tune.VEHICLE : TUNE.VEHICLE;
+    corners(car.x, car.z, car.yaw, V.HALF_LENGTH, V.HALF_WIDTH, mine);
+    corners(o.x, o.z, o.yaw, o.hl, o.hw, bodyPts);
+    let depth = Infinity;
+    for (let a = 0; a < 4; a++) {
+      const ax = a < 2 ? (a === 0 ? -Math.sin(car.yaw) : -Math.cos(car.yaw)) : (a === 2 ? -Math.sin(o.yaw) : -Math.cos(o.yaw));
+      const az = a < 2 ? (a === 0 ? -Math.cos(car.yaw) : Math.sin(car.yaw)) : (a === 2 ? -Math.cos(o.yaw) : Math.sin(o.yaw));
+      let p0 = Infinity, p1 = -Infinity, q0 = Infinity, q1 = -Infinity;
+      for (let k = 0; k < 4; k++) { const p = mine[k * 2] * ax + mine[k * 2 + 1] * az; if (p < p0) p0 = p; if (p > p1) p1 = p; const q = bodyPts[k * 2] * ax + bodyPts[k * 2 + 1] * az; if (q < q0) q0 = q; if (q > q1) q1 = q; }
+      depth = Math.min(depth, Math.min(p1 - q0, q1 - p0));
+    }
+    world.bodyDepth = Math.max(0, depth);
+    if (depth > TANDEM.PIN_SLACK) world.passThrough = true;
+  }
+
   function collideCones(dt) {
     const V = tune ? tune.VEHICLE : TUNE.VEHICLE;
     const fx = -Math.sin(car.yaw), fz = -Math.cos(car.yaw);
@@ -287,7 +374,10 @@ export function createWorld(ground, opts) {
     world.hit = null; world.respawned = false; world.recovered = false; world.boosted = 0;
     const wasDrifting = car.drifting;
     stepVehicle(car, input, STEP);
+    const bodyHit = world.obstacle ? collideBody() : null;
     collideWalls();
+    if (bodyHit && (!world.hit || bodyHit.speed > world.hit.speed)) world.hit = bodyHit;
+    if (world.obstacle) pinned();
     /* the slingshot: a drift's time is its credit; the exit pays it out */
     {
       const V = car.tune ? car.tune.VEHICLE : TUNE.VEHICLE;

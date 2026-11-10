@@ -11,6 +11,7 @@
    as the recorder's run length entries. */
 import { LOOP } from '../tune.js';
 import { ROSTER, PAINTS, upgradeLevels, UPGRADE_STATS } from '../garage/roster.js';
+import { RIVALS } from '../rivals/roster.js';
 
 export const KEY = 'driftfever.cg.save.v' + LOOP.SAVE_VERSION;
 
@@ -23,7 +24,12 @@ export function defaults() {
      three missions have been done. lab: the Track Lab's best per code for
      the last LOOP.LAB.KEEP codes driven, and the last code shown (both
      added 8 November 2026). */
-  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {}, lab: { codes: {}, last: '' } };
+  /* rivals (added 11 November 2026, briefs/RIVALS.md): per rival id,
+     { won, best, when }: whether he has been beaten, the best margin
+     over him in any battle (negative while never beaten), and when the
+     last battle was. A save from before it has none, which is not a
+     fix. */
+  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {}, lab: { codes: {}, last: '' }, rivals: {} };
 }
 
 /* Has this save ever finished a run: a career result or a daily result. */
@@ -33,6 +39,7 @@ const isNum = v => typeof v === 'number' && isFinite(v);
 const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
 const carIds = new Set(ROSTER.map(c => c.id));
 const paintIds = new Set(PAINTS.map(p => p.id));
+const rivalIds = new Set(RIVALS.map(r => r.id));
 
 /* A ghost record, or null if it is not one. */
 export function validGhost(g) {
@@ -98,6 +105,13 @@ export function repair(raw) {
     } else if (raw.lab.codes !== undefined) fix();
     if (typeof raw.lab.last === 'string' && /^([0-9A-Z]{12})?$/.test(raw.lab.last)) s.lab.last = raw.lab.last; else if (raw.lab.last !== undefined) fix();
   } else if (raw.lab !== undefined) fix();
+  if (isObj(raw.rivals)) {
+    for (const k of Object.keys(raw.rivals)) {
+      const e = raw.rivals[k];
+      if (!rivalIds.has(k) || !isObj(e) || typeof e.won !== 'boolean' || !isNum(e.best) || !isNum(e.when)) { fix(); continue; }
+      s.rivals[k] = { won: e.won, best: Math.round(e.best), when: e.when };
+    }
+  } else if (raw.rivals !== undefined) fix();
   return { state: s, fixes };
 }
 
@@ -215,6 +229,14 @@ export function createSave(opts) {
       return improved;
     },
     labBest(code) { return state.lab.codes[code] || null; },
+    /* a battle's result: won once is won for good; best is the best margin (player less rival) */
+    rivalResult(id, won, margin) {
+      const e = state.rivals[id] || { won: false, best: -Infinity, when: 0 };
+      const first = won && !e.won;
+      e.won = e.won || !!won; e.best = Math.round(Math.max(e.best, margin)); e.when = Date.now();
+      state.rivals[id] = e; write();
+      return first;
+    },
     setLabLast(code) { if (state.lab.last !== code) { state.lab.last = code; write(); } },
     ghost(key) { return state.ghosts[key] || null; },
     setGhost(key, record) {
