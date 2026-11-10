@@ -1,11 +1,11 @@
 {
- "started": "2026-11-09T19:55:56.354Z",
+ "started": "2026-11-10T06:52:18.130Z",
  "note": "headless Chromium, forced WebGL 2 on SwiftShader",
  "firstVisit": {
   "stateAtLoad": "countdown",
   "clicks": 0,
-  "movingAtFrame": 180,
-  "movingAtSeconds": 3,
+  "movingAtFrame": 186,
+  "movingAtSeconds": 3.1,
   "track": "career:0"
  },
  "returningVisit": {

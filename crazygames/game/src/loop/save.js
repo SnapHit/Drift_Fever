@@ -103,7 +103,7 @@ export function repair(raw) {
 
 export function createSave(opts) {
   const o = opts || {};
-  const status = { available: false, loaded: false, repaired: 0, lastError: null, writes: 0, failedWrites: 0 };
+  const status = { available: false, loaded: false, repaired: 0, lastError: null, writes: 0, failedWrites: 0, ghostsDropped: 0 };
   /* even reading the localStorage property can throw (a sandboxed frame,
      storage switched off), so the store itself is taken inside a try */
   let store = null;
@@ -133,9 +133,29 @@ export function createSave(opts) {
     for (const k of codes.slice(LOOP.LAB.KEEP)) { delete state.lab.codes[k]; delete state.ghosts['lab:' + k]; }
     for (const k of Object.keys(state.ghosts)) if (k.startsWith('lab:') && !state.lab.codes[k.slice(4)]) delete state.ghosts[k];
   }
+  /* Storage that is full refuses the whole save, and then nothing after
+     it is remembered, coins and stars included (a ghost on every career
+     track came to 2.2 million characters, review/chapters/REPORT.md). So
+     when a write is refused the oldest ghosts go, one at a time, until
+     it fits (10 November 2026, the author's decision). Stars, coins,
+     cars and missions are never touched. A ghost is only dropped once a
+     write without it has succeeded: if the save is refused even with no
+     ghosts the storage is broken, not full, and nothing is dropped. */
   function write() {
     status.writes++;
-    try { if (store) store.setItem(KEY, JSON.stringify(state)); } catch (e) { status.failedWrites++; status.lastError = String(e); }
+    if (!store) return;
+    try { store.setItem(KEY, JSON.stringify(state)); return; } catch (e) { status.lastError = String(e); }
+    const oldest = Object.keys(state.ghosts).sort((a, b) => state.ghosts[a].when - state.ghosts[b].when || (a < b ? -1 : 1));
+    const kept = Object.assign({}, state.ghosts);
+    for (let n = 0; n < oldest.length; n++) {
+      delete kept[oldest[n]];
+      try {
+        store.setItem(KEY, JSON.stringify(Object.assign({}, state, { ghosts: kept })));
+        state.ghosts = kept; status.ghostsDropped += n + 1;
+        return;
+      } catch (e) { status.lastError = String(e); }
+    }
+    status.failedWrites++;
   }
   load();
   return {

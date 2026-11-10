@@ -369,3 +369,10 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   tracks is 2.2 million characters, and a failed write saves nothing
   after it; at 844x390 the results card scrolls to reach its buttons (as
   it did before chapters).
+- 10 November 2026: the save survives full storage. A refused write
+  used to leave nothing after it remembered, coins and stars included.
+  Now the oldest ghosts go, one at a time, until the save fits
+  (`write` in `game/src/loop/save.js`, the author's decision); stars,
+  coins, cars and missions are never touched, and nothing is dropped
+  when the storage is broken, not full. Measured in Node by
+  `game/test/loop/quota.js`.
