@@ -67,9 +67,14 @@ export const LOOK = {
   BLOOM:        { threshold: 0.85, strength: 0.55, radius: 0.012, taps: 12 },
   LOW_TIER_CORES: 4,
   /* QUALITY THAT ADAPTS (the spectacle round): sustained slow frames
-     step the quality down, one level at a time, and nothing ever steps
-     it back up. Measured on the browser's own frame clock, so a probe's
-     fixed 60 Hz clock never trips it. ?adapt=0 turns it off. */
+     step the quality down, one level at a time, and fast frames never
+     step it back up. Measured on the browser's own frame clock, so a
+     probe's fixed 60 Hz clock never trips it. ?adapt=0 turns it off.
+     One exception, once: if frames are still slow after the last step
+     and no shorter than before the first, the quality was never the
+     reason (a phone saving its battery draws 30 frames a second
+     whatever it is given), so everything is given back and the
+     adaptation stops. */
   ADAPT: {
     SLOW_MS:    22,       // a frame longer than this is slow (under 45 fps)
     WINDOW:     90,       // frames looked at
@@ -78,6 +83,7 @@ export const LOOK = {
     IGNORE_MS:  250,      // a gap this long is the tab hidden or a load, not a slow frame
     DENSITY:    0.55,     // level 1: the effects' spawn rates times this
     PIXEL:      [0.8, 0.65],   // levels 3 and 4: the pixel ratio times these (level 2 is the bloom off)
+    GAIN:       0.1,      // after the last step frames must be this share shorter than before the first, or it is all given back
   },
   TIERS: {
     low:  { pixelRatio: 1.0, shadow: 1024, shadowRange: 36, terrainCell: 8, sceneryShare: 0.4, shadowMinHeight: 2.5, smoke: 48, dust: 32, sparks: 60, rain: 140, marks: 1400, bloom: false, headlight: true },
@@ -117,29 +123,44 @@ export function createScene(canvas, opts) {
     setPost(T().bloom && !(adapt.level >= 2));
   }
   /* the adaptation's state: level 0 is the tier as chosen */
-  const adapt = { level: 0, ring: new Uint8Array(LOOK.ADAPT.WINDOW), at: 0, filled: 0, slow: 0, wait: LOOK.ADAPT.COOLDOWN, steps: [] };
+  const adapt = { level: 0, ring: new Uint8Array(LOOK.ADAPT.WINDOW), ms: new Float32Array(LOOK.ADAPT.WINDOW), sum: 0, at: 0, filled: 0, slow: 0, wait: LOOK.ADAPT.COOLDOWN, steps: [], base: 0, done: false, gaveBack: false };
   const adaptOn = FX_ON && query.get('adapt') !== '0';
   function pixelScale() { const P = LOOK.ADAPT.PIXEL; return adapt.level >= 4 ? P[1] : adapt.level >= 3 ? P[0] : 1; }
   function density() { return adapt.level >= 1 ? LOOK.ADAPT.DENSITY : 1; }
   /* one frame's length, from the browser's frame clock */
   function frameTime(ms) {
-    if (!adaptOn || !(ms > 0) || ms > LOOK.ADAPT.IGNORE_MS) return adapt.level;
-    const A = LOOK.ADAPT, slow = ms > A.SLOW_MS ? 1 : 0;
-    adapt.slow += slow - (adapt.filled >= A.WINDOW ? adapt.ring[adapt.at] : 0);
-    adapt.ring[adapt.at] = slow; adapt.at = (adapt.at + 1) % A.WINDOW; adapt.filled = Math.min(A.WINDOW, adapt.filled + 1);
+    if (!adaptOn || adapt.done || !(ms > 0) || ms > LOOK.ADAPT.IGNORE_MS) return adapt.level;
+    const A = LOOK.ADAPT, slow = ms > A.SLOW_MS ? 1 : 0, full = adapt.filled >= A.WINDOW;
+    adapt.slow += slow - (full ? adapt.ring[adapt.at] : 0);
+    adapt.sum += ms - (full ? adapt.ms[adapt.at] : 0);
+    adapt.ring[adapt.at] = slow; adapt.ms[adapt.at] = ms; adapt.at = (adapt.at + 1) % A.WINDOW; adapt.filled = Math.min(A.WINDOW, adapt.filled + 1);
     if (adapt.wait > 0) { adapt.wait--; return adapt.level; }
-    if (adapt.filled >= A.WINDOW && adapt.slow >= A.SHARE * A.WINDOW && adapt.level < 4) stepDown();
+    if (adapt.filled >= A.WINDOW && adapt.slow >= A.SHARE * A.WINDOW) {
+      const mean = adapt.sum / A.WINDOW;
+      if (adapt.level < 4) { if (!adapt.base) adapt.base = mean; stepDown(); }
+      else { adapt.done = true; if (mean > adapt.base * (1 - A.GAIN)) giveBack(); }   // still slow at the last level: did any of it help?
+    }
     return adapt.level;
   }
+  function clearWindow() { adapt.wait = LOOK.ADAPT.COOLDOWN; adapt.ring.fill(0); adapt.ms.fill(0); adapt.sum = 0; adapt.slow = 0; adapt.filled = 0; }
+  function applyPixels() { renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio) * pixelScale()); renderer.setSize(view.w, view.h, false); }
   function stepDown() {
     adapt.level++;
     /* the bloom is only there to lose on the high tier: a low tier goes straight on to the pixels */
     if (adapt.level === 2 && !post) adapt.level = 3;
     adapt.steps.push({ level: adapt.level, at: performance.now() });
-    adapt.wait = LOOK.ADAPT.COOLDOWN; adapt.ring.fill(0); adapt.slow = 0; adapt.filled = 0;
+    clearWindow();
     if (effects && effects.setDensity) effects.setDensity(density());
     if (adapt.level === 2) post = null;
-    if (adapt.level >= 3) { renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio) * pixelScale()); renderer.setSize(view.w, view.h, false); }
+    if (adapt.level >= 3) applyPixels();
+  }
+  /* nothing that was taken away made the frames shorter: put it all back, for good */
+  function giveBack() {
+    adapt.level = 0; adapt.gaveBack = true;
+    adapt.steps.push({ level: 0, at: performance.now() });
+    if (effects && effects.setDensity) effects.setDensity(1);
+    setPost(T().bloom);
+    applyPixels();
   }
 
   const scene = new THREE.Scene();
@@ -563,7 +584,7 @@ export function createScene(canvas, opts) {
   return {
     THREE, renderer, scene, camera, car, ready, show: () => show, effects: () => effects, setGround, setCar, setGhost, update, resize, render, clearMarks, setLook,
     carModel: () => model,
-    frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
+    frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, done: adapt.done, gaveBack: adapt.gaveBack, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
     info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
     environment: () => env, dressing: () => dressing,
     fireworks: stars => { if (dressing) dressing.fireworks(stars); },

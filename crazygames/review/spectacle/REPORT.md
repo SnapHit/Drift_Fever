@@ -45,9 +45,11 @@ on `main`.
   names.
 - **Quality adapts.** If at least half of the last 90 frames took more
   than 22 ms, the quality steps down one level: fewer particles, then
-  no bloom, then 80 and then 65 per cent pixel ratio. It never steps
-  back up. The low tier gets the whole show except the bloom and the
-  swinging flags.
+  no bloom, then 80 and then 65 per cent pixel ratio. Fast frames never
+  step it back up. If the last step made the frames no shorter (a phone
+  saving its battery draws 30 frames a second whatever it is given),
+  everything is given back once and the adaptation stops. The low tier
+  gets the whole show except the bloom and the swinging flags.
 - **Measured and holding:**
   - Tapes replay to the same hash and score with the round on and with
     `?fx=0`.
@@ -262,13 +264,23 @@ The sandbox cannot measure this. In order of likely cost:
 ### 5. Adaptation (`adapt.json`)
 
 `node game/test/spectacle/adapt.js`. The probe feeds the game's frame
-function the clock a browser would give it.
+function the clock a browser would give it. Changed in review (see
+"Changed in review" at the end): a slow device is now modelled as one
+whose frames get shorter as the quality drops, and a capped device as
+one that draws 30 frames a second whatever it is given.
 
-- 1,200 frames at 25 fps step the quality down to level 4: in three
-  steps on the low tier (it has no bloom to drop) and four on the high
-  tier. Density goes to 0.55, the pixel ratio from 1 to 0.65, and the
-  bloom turns off on the high tier. PASS.
+- A slow device (40 ms a frame at full quality, 24 ms at the last
+  level) is stepped down to level 4 and left there: in three steps on
+  the low tier (it has no bloom to drop) and four on the high tier.
+  Density goes to 0.55, the pixel ratio from 1 to 0.65, and the bloom
+  turns off on the high tier. Nothing is given back. PASS.
 - 900 fast frames afterwards do not step it back up. PASS.
+- A device capped at 30 fps is stepped down like any slow device. When
+  the last step has made its frames no shorter, everything is given
+  back, once, and the adaptation stops: level 0, the pixel ratio, the
+  bloom and the density as they began, and 1,200 slow frames later it
+  is still level 0. PASS on both tiers. Known answer: the slow device
+  above, whose frames did get shorter, is given nothing back. CAUGHT.
 - One slow frame in six for 1,500 frames is a hitch and leaves it at
   level 0. PASS.
 - With `?fx=0` nothing adapts. PASS.
@@ -435,3 +447,42 @@ drawing only and touches no gameplay path.
   asked, and the car's own pixels, with the same bar on both.
 - **`app.results` has a new field**, `finished: true`, set with the
   round on or off. The director reads it.
+
+## Changed in review (10 November 2026)
+
+The reviewer read the branch against the brief, looked at the frames
+and reran the probes. Two things were changed before the merge.
+
+- **The adaptation gives back what bought nothing.** A phone saving its
+  battery draws 30 frames a second whatever it is given, and so does a
+  30 Hz screen. The adaptation read that as a slow device and took it
+  down to 65 per cent pixel ratio for the rest of the session, for no
+  gain. Now, when frames are still slow after the last step and no more
+  than 10 per cent shorter than before the first
+  (`LOOK.ADAPT.GAIN`), everything is given back once and the adaptation
+  stops. A device that the steps do help is left stepped down, as
+  before. `game/test/spectacle/adapt.js` models both devices; section 5
+  has the results.
+- **The countdown's number no longer sits on the car.** The sweep looked
+  at the car's waist, which put the car behind the 3 and the 2 on a
+  wide screen. It now looks over the roof (`DIRECTOR.SWEEP_LOOK_UP`
+  1.6 m, was 0.8), so the car sits under the number. Checked on career
+  1 and 18 at 1280x720 and 390x844. The `countdown` pairs in `pairs/`
+  were drawn before this change.
+
+Also checked in review, with nothing to change:
+- **The results card in the cases the layout probe does not reach**: a
+  new player's first result (an unlock line and a chapter note) and a
+  Track Lab result (the code row and a status line), at all four sizes.
+  No scrolling, no overlaps, every button inside the view; at 844x390
+  the buttons end at 317 and 303 px of 390.
+- **The sweep and the finish on five tracks** (career 1, 3, 10, 18 and
+  23, both orientations for the sweep): in the four frames drawn of
+  each, the camera stays over the road and is inside nothing. That is
+  five tracks of 24, and stills, not motion.
+- **Slow motion from the line** is accepted. `scoring.bank()` and the
+  race's finish time are both taken at the line, and the settle takes
+  the same steps either way.
+- **Every new material is a node material**, so the WebGPU path gets the
+  same shaders as the WebGL 2 path the probes ran on. It is still
+  unseen on a real GPU.

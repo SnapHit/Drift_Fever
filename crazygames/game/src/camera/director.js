@@ -26,7 +26,7 @@ export const DIRECTOR = {
   SWEEP_LOW:      1.2,     // m above the road there
   SWEEP_RISE:     1.5,     // m it rises as it swings round beside the car (kept under a start gantry's banner, 2.9 m up)
   SWEEP_SIDE:     4.2,     // m out to the side halfway round, staying over the road
-  SWEEP_LOOK_UP:  0.8,     // m above the road the sweep looks at the car
+  SWEEP_LOOK_UP:  1.6,     // m above the road the sweep looks, over the roof, so the car sits under the countdown's number and not behind it
   /* the kick when a chain is banked */
   KICK_FROM:      3,       // the multiplier a banked chain needs
   KICK_BACK:      [0.9, 2.2],   // m the view pulls back, at KICK_FROM and at x8
