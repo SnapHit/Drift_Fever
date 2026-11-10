@@ -109,7 +109,7 @@ export function buildEnvironment(THREE, track, options) {
     const list = placed.board;
     const posts = new THREE.InstancedMesh(props.board.body, bodyMat, list.length);
     posts.name = 'prop:board'; posts.castShadow = true; posts.frustumCulled = false;
-    const atlas = sponsorAtlas(THREE);
+    const atlas = sponsorAtlas(THREE, o.sponsors);
     const fp = [], fuv = [];
     list.forEach((it, i) => {
       e.set(0, it.ry || 0, 0); q.setFromEuler(e); v.set(it.x, it.y, it.z); s3.set(1, 1, 1);

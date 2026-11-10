@@ -77,11 +77,17 @@ export function concreteTexture(THREE, size) {
   return t;
 }
 
+/* The spectacle round's banners (briefs/SPECTACLE.md 5: invented names
+   only, no real brand, place or game): two of the boards above carried
+   a real place's name and a plain word, and are made up names instead. */
+export const SPONSORS_SHOW = SPONSORS.map(([name, bg, fg]) => [name === 'NULLARBOR' ? 'ZOOMBAT PARTS' : name === 'SOUTHERLY' ? 'SLIDEWAYS SODA' : name, bg, fg]);
+
 /* The sponsor atlas: ROWS panels stacked, each a full width strip. */
-export function sponsorAtlas(THREE) {
-  const W = 512, H = 64, rows = SPONSORS.length, c = canvas(W, H * rows), ctx = c.getContext('2d');
+export function sponsorAtlas(THREE, list) {
+  const L = list || SPONSORS;
+  const W = 512, H = 64, rows = L.length, c = canvas(W, H * rows), ctx = c.getContext('2d');
   const hex = n => '#' + n.toString(16).padStart(6, '0');
-  SPONSORS.forEach(([name, bg, fg], i) => {
+  L.forEach(([name, bg, fg], i) => {
     ctx.fillStyle = hex(bg); ctx.fillRect(0, i * H, W, H);
     ctx.fillStyle = hex(fg);
     ctx.font = '900 44px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';

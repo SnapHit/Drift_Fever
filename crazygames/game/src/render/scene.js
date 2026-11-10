@@ -26,7 +26,7 @@ import { THEMES, themeFor } from '../env/themes.js';
 import { buildEnvironment } from '../env/world.js';
 import { styleTrack, racingLine, TRACK_STYLE } from '../env/trackstyle.js';
 import { createEffects } from '../env/effects.js';
-import { bannerTexture, concreteTexture } from '../env/textures.js';
+import { bannerTexture, concreteTexture, SPONSORS_SHOW } from '../env/textures.js';
 import { createShow, SHOW } from '../env/show.js';
 import { FX_ON, FX_PARTICLES } from '../fx.js';
 
@@ -62,9 +62,23 @@ export const LOOK = {
   /* the spectacle round's marks: wider, darker, and enough of them to
      stay for the whole run (quads per tier) */
   MARK_SHOW:    { width: 0.27, opacity: 0.85, low: 6000, high: 12000 },
+  RUBBER_SHOW:  0.46,         // the rubber laid down the racing line, at most this opaque (TRACK_STYLE.RACING_LINE_ALPHA is 0.3)
   TONE_MAPPING: 'aces',
   BLOOM:        { threshold: 0.85, strength: 0.55, radius: 0.012, taps: 12 },
   LOW_TIER_CORES: 4,
+  /* QUALITY THAT ADAPTS (the spectacle round): sustained slow frames
+     step the quality down, one level at a time, and nothing ever steps
+     it back up. Measured on the browser's own frame clock, so a probe's
+     fixed 60 Hz clock never trips it. ?adapt=0 turns it off. */
+  ADAPT: {
+    SLOW_MS:    22,       // a frame longer than this is slow (under 45 fps)
+    WINDOW:     90,       // frames looked at
+    SHARE:      0.5,      // share of them slow before a step down
+    COOLDOWN:   150,      // frames after a step (or a new track) before the next can come
+    IGNORE_MS:  250,      // a gap this long is the tab hidden or a load, not a slow frame
+    DENSITY:    0.55,     // level 1: the effects' spawn rates times this
+    PIXEL:      [0.8, 0.65],   // levels 3 and 4: the pixel ratio times these (level 2 is the bloom off)
+  },
   TIERS: {
     low:  { pixelRatio: 1.0, shadow: 1024, shadowRange: 36, terrainCell: 8, sceneryShare: 0.4, shadowMinHeight: 2.5, smoke: 48, dust: 32, sparks: 60, rain: 140, marks: 1400, bloom: false, headlight: true },
     high: { pixelRatio: 2.0, shadow: 2048, shadowRange: 52, terrainCell: 5, sceneryShare: 1.0, shadowMinHeight: 0,   smoke: 120, dust: 80, sparks: 160, rain: 400, marks: 4000, bloom: true,  headlight: true },
@@ -92,7 +106,7 @@ export function createScene(canvas, opts) {
   });
   function T() { return LOOK.TIERS[tier]; }
   function applyTier() {
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio) * pixelScale());
     renderer.setSize(view.w, view.h, false);
     sun.shadow.mapSize.set(T().shadow, T().shadow);
     sun.shadow.camera.left = -T().shadowRange; sun.shadow.camera.right = T().shadowRange; sun.shadow.camera.top = T().shadowRange; sun.shadow.camera.bottom = -T().shadowRange;
@@ -100,7 +114,32 @@ export function createScene(canvas, opts) {
     if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
     headlight.visible = !!(T().headlight && preset.headlights);
     rebuildEffects();
-    setPost(T().bloom);
+    setPost(T().bloom && !(adapt.level >= 2));
+  }
+  /* the adaptation's state: level 0 is the tier as chosen */
+  const adapt = { level: 0, ring: new Uint8Array(LOOK.ADAPT.WINDOW), at: 0, filled: 0, slow: 0, wait: LOOK.ADAPT.COOLDOWN, steps: [] };
+  const adaptOn = FX_ON && query.get('adapt') !== '0';
+  function pixelScale() { const P = LOOK.ADAPT.PIXEL; return adapt.level >= 4 ? P[1] : adapt.level >= 3 ? P[0] : 1; }
+  function density() { return adapt.level >= 1 ? LOOK.ADAPT.DENSITY : 1; }
+  /* one frame's length, from the browser's frame clock */
+  function frameTime(ms) {
+    if (!adaptOn || !(ms > 0) || ms > LOOK.ADAPT.IGNORE_MS) return adapt.level;
+    const A = LOOK.ADAPT, slow = ms > A.SLOW_MS ? 1 : 0;
+    adapt.slow += slow - (adapt.filled >= A.WINDOW ? adapt.ring[adapt.at] : 0);
+    adapt.ring[adapt.at] = slow; adapt.at = (adapt.at + 1) % A.WINDOW; adapt.filled = Math.min(A.WINDOW, adapt.filled + 1);
+    if (adapt.wait > 0) { adapt.wait--; return adapt.level; }
+    if (adapt.filled >= A.WINDOW && adapt.slow >= A.SHARE * A.WINDOW && adapt.level < 4) stepDown();
+    return adapt.level;
+  }
+  function stepDown() {
+    adapt.level++;
+    /* the bloom is only there to lose on the high tier: a low tier goes straight on to the pixels */
+    if (adapt.level === 2 && !post) adapt.level = 3;
+    adapt.steps.push({ level: adapt.level, at: performance.now() });
+    adapt.wait = LOOK.ADAPT.COOLDOWN; adapt.ring.fill(0); adapt.slow = 0; adapt.filled = 0;
+    if (effects && effects.setDensity) effects.setDensity(density());
+    if (adapt.level === 2) post = null;
+    if (adapt.level >= 3) { renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio) * pixelScale()); renderer.setSize(view.w, view.h, false); }
   }
 
   const scene = new THREE.Scene();
@@ -175,7 +214,7 @@ export function createScene(canvas, opts) {
     const key = [seed, ground.name, p.name, th.name, tier].join('|');
     if (env && envKey !== key) { scene.remove(env.group); scene.remove(env.sky); env.dispose(); env = null; }
     if (!env) {
-      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T() });
+      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), sponsors: FX_ON ? SPONSORS_SHOW : null });
       scene.add(env.group); scene.add(env.sky);
       envKey = key;
       if (dressing) { scene.remove(dressing.group); dressing.dispose(); dressing = null; }
@@ -246,7 +285,7 @@ export function createScene(canvas, opts) {
     const TSL = THREE.TSL;
     const m = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
     m.colorNode = TSL.vec3(((LOOK.MARK >> 16) & 255) / 255, ((LOOK.MARK >> 8) & 255) / 255, (LOOK.MARK & 255) / 255);
-    m.opacityNode = TSL.attribute('alpha', 'float').mul(TSL.float(TRACK_STYLE.RACING_LINE_ALPHA));
+    m.opacityNode = TSL.attribute('alpha', 'float').mul(TSL.float(FX_ON ? LOOK.RUBBER_SHOW : TRACK_STYLE.RACING_LINE_ALPHA));
     return m;
   }
 
@@ -380,6 +419,7 @@ export function createScene(canvas, opts) {
   function rebuildEffects() {
     if (effects) { scene.remove(effects.group); effects.dispose(); }
     effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON });
+    if (FX_ON) effects.setDensity(density());
     scene.add(effects.group);
     if (FX_ON) {
       if (show) { scene.remove(show.group); show.dispose(); }
@@ -471,7 +511,7 @@ export function createScene(canvas, opts) {
       clearOf.x = pose.x; clearOf.y = (pose.y || 0) + 0.7; clearOf.z = pose.z; clearOf.r = C.r; clearOf.keep = C.keep; clearOf.near = C.near; clearOf.far = C.far;
       effects.update(dt, camera, pose, world, rig, show.state.heat, clearOf);
       const sliding = c.rearSlide >= 0.9 || c.hb > 0.5 || c.drifting;
-      show.update(dt, camera, pose, world, rig, { mult: extra ? extra.mult : 1, car, tails: lamps.tails, exhaust: lamps.exhaust, lights: model && model.lights, pools: effects.pools, density: 1,
+      show.update(dt, camera, pose, world, rig, { mult: extra ? extra.mult : 1, car, tails: lamps.tails, exhaust: lamps.exhaust, lights: model && model.lights, pools: effects.pools, density: density(),
         extraGlows: g => { if (dressing) dressing.update(dt, camera, pose, show.state.heat, sliding, g); } });
     } else if (FX_PARTICLES) effects.update(dt, camera, pose, world, rig);
     followSun(pose);
@@ -516,7 +556,8 @@ export function createScene(canvas, opts) {
   return {
     THREE, renderer, scene, camera, car, ready, show: () => show, effects: () => effects, setGround, setCar, setGhost, update, resize, render, clearMarks, setLook,
     carModel: () => model,
-    info: () => ({ backend, tier, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
+    frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
+    info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
     environment: () => env, dressing: () => dressing,
     fireworks: stars => { if (dressing) dressing.fireworks(stars); },
     setTier: t => { if (LOOK.TIERS[t]) { tier = t; applyTier(); if (currentGround) setGround(currentGround); } },
