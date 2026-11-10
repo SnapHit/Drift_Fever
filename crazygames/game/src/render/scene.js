@@ -53,7 +53,7 @@ export const LOOK = {
   SHADOW_NORMAL_BIAS: 0.03,
   SHADOW_AHEAD: 0.35,         // share of the shadow range the box leads the car by
   HEADLIGHT:    { colour: 0xfff2d0, intensity: 900, angle: 0.42, penumbra: 0.6, distance: 70, decay: 1.6, y: 0.75, z: -1.6 },
-  HEADLIGHT_SHOW: { intensity: 2200, angle: 0.5, distance: 130, decay: 1.4, aim: -45 },   // the spectacle round: the headlights reach (aim: m ahead the beam points)
+  HEADLIGHT_SHOW: { intensity: 1300, angle: 0.48, distance: 110, decay: 1.6, aim: -40 },   // the spectacle round: the headlights reach (aim: m ahead the beam points)
   MARK:         0x000000,     // the marks and the racing line darken the road: black at an opacity
   MARK_WIDTH:   0.22,
   MARK_MIN_SLIDE: 0.9,        // rear slide (as a share of the peak) before a mark is laid
@@ -274,6 +274,8 @@ export function createScene(canvas, opts) {
       // only the bright, saturated paint glows: the asphalt (dark) stays dark
       const lum = vc.r.max(vc.g).max(vc.b);
       nm.emissiveNode = vc.mul(TSL.smoothstep(0.45, 0.8, lum)).mul(TSL.float(k));
+      /* the spectacle round's night: the asphalt itself gives back a little light (moonlight on the surface, baked), so the road reads between the lamps' pools */
+      if (FX_ON && preset.roadGlow) nm.emissiveNode = nm.emissiveNode.add(vc.mul(TSL.float(1).sub(TSL.smoothstep(0.45, 0.8, lum))).mul(TSL.float(preset.roadGlow)));
       m.material = nm;
       old.dispose();
     });

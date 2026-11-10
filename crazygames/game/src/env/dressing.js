@@ -31,10 +31,10 @@ export const DRESS = {
   LAMP_SKIP:      14,       // m: no new lamp this close to a lamp the theme already placed
   LAMP_PRESETS:   { night: 1, rain: 1 },
   /* the pools of light on the road */
-  POOL_RADIUS:    { lamp: 10, tower: 17 },   // m
-  POOL_IN:        2.5,      // m inside the road's edge the pool is centred, on the lamp's side
+  POOL_RADIUS:    { lamp: 12, tower: 18 },   // m
+  POOL_IN:        0.3,      // share of the road's width inside its edge the pool is centred, on the lamp's side (away from the edge line, which must stay the brightest thing)
   POOL_COLOUR:    { night: [1.0, 0.78, 0.5], rain: [0.9, 0.82, 0.7] },   // linear, additive
-  POOL_GAIN:      { night: 0.42, rain: 0.26 },
+  POOL_GAIN:      { night: 0.035, rain: 0.022 },   // linear light added at the pool's heart (dusk's sunlit asphalt is about 0.005)
   POOL_GRID:      6,        // vertices a side, so a pool follows a banked road
   POOL_LIFT:      0.045,    // m over the road
   /* reflective tape on the barriers' faces */
@@ -107,7 +107,7 @@ export function buildDressing(THREE, ground, o) {
   const lights = [];   // { kind, x, y, z, foot: { x, y, z } }: every lamp head and tower lamp, for the flares and the reflections
   const stands = [];   // the grandstands' crowd boxes, for the flashes
   const info = { drawCalls: 0, triangles: 0, lamps: 0, pools: 0 };
-  if (!n) return { group, update() {}, dispose() {}, info, fireworks: () => {} };
+  if (!n) return { group, update() {}, clear() {}, dispose() {}, info, lights, fireworks: () => {} };
   const closed = ground.kind === 'circuit';
   const left = ground.walls && ground.walls[0], right = ground.walls && ground.walls[1];
   const wallOff = (i, sgn) => { const w = sgn > 0 ? left : right, c = C[i]; if (!w || !w.points[i]) return c.width / 2; const p = w.points[i]; return Math.abs((p.x - c.x) * -Math.cos(c.heading) + (p.z - c.z) * Math.sin(c.heading)); };
@@ -152,7 +152,7 @@ export function buildDressing(THREE, ground, o) {
     for (const t of placed.tower || []) { const i = nearestSample(C, t.x, t.z); lights.push({ kind: 'tower', x: t.x, y: t.y + 14.8, z: t.z, i, sgn: side(C[i], t.x, t.z) }); }
   }
   function side(c, x, z) { return ((x - c.x) * -Math.cos(c.heading) + (z - c.z) * Math.sin(c.heading)) >= 0 ? 1 : -1; }
-  for (const l of lights) { const c = C[l.i]; const u = l.sgn * (c.width / 2 - DRESS.POOL_IN), lx = -Math.cos(c.heading), lz = Math.sin(c.heading); l.foot = { x: c.x + lx * u, z: c.z + lz * u }; l.foot.y = roadY(c, l.foot.x, l.foot.z); }
+  for (const l of lights) { const c = C[l.i]; const u = l.sgn * (c.width / 2 - c.width * DRESS.POOL_IN), lx = -Math.cos(c.heading), lz = Math.sin(c.heading); l.foot = { x: c.x + lx * u, z: c.z + lz * u }; l.foot.y = roadY(c, l.foot.x, l.foot.z); }
 
   /* ---- the pools of light on the road ---- */
   if (dark && lights.length) {
