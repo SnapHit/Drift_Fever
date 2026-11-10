@@ -74,7 +74,7 @@ export function search(def, opts) {
   log('start ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
   const N = o.n || 300;
   for (let k = 0; k < N; k++) {
-    const local = k > N * 0.4;
+    const local = k > N * (o.localFrom === undefined ? 0.4 : o.localFrom);
     const drive = Object.assign({}, local ? best.drive : {});
     for (const key of Object.keys(ranges)) {
       if (local) { if (rnd() < 0.3) { const [a, b] = ranges[key], cur = drive[key] !== undefined ? drive[key] : RIVAL_DRIVE[key]; drive[key] = round(key, Math.max(a, Math.min(b, cur + (rnd() - 0.5) * (b - a) * 0.25))); } }
@@ -93,7 +93,14 @@ if (process.argv[1] && process.argv[1].endsWith('search.js')) {
   const n = args.includes('--n') ? +args[args.indexOf('--n') + 1] : 300, seed = args.includes('--seed') ? +args[args.indexOf('--seed') + 1] : 1;
   const ch = CHARACTERS[def.id] || {};
   if (args.includes('--track')) def.track = +args[args.indexOf('--track') + 1];
-  const best = search(def, { n, seed, want: ch.want, ranges: ch.ranges });
+  /* --screened: start from the track the screen chose (tracks.js) and the best driving it found there */
+  if (args.includes('--screened')) {
+    const fs = await import('node:fs'), p = await import('node:path');
+    const t = JSON.parse(fs.readFileSync(p.resolve(p.dirname(new URL(import.meta.url).pathname), '..', '..', '..', 'review', 'rivals', 'tracks.json'), 'utf8'))[def.id];
+    if (t) { def.track = t.chosen; def.drive = t.rows.find(r => r.index === t.chosen).drive; console.log('screened: track ' + (def.track + 1) + ', from ' + JSON.stringify(def.drive)); }
+  }
+  const best = search(def, { n, seed, want: ch.want, ranges: ch.ranges, localFrom: args.includes('--screened') ? 0.15 : 0.4 });
   console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
+  console.log('track: ' + def.track);
   console.log('drive: ' + JSON.stringify(best.drive));
 }
