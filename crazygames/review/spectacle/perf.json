@@ -1,0 +1,660 @@
+{
+ "budgetMs": 16.7,
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, 6x CPU throttle through CDP; the GPU is not measured here",
+ "runs": [
+  {
+   "label": "low, career 1, round on",
+   "tier": "low",
+   "fx": "on",
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "preset": "night",
+   "theme": "docks",
+   "bloom": false,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 4.4,
+    "p99": 20,
+    "worst": 69.1,
+    "mean": 1.82
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.4,
+    "p99": 5.2,
+    "worst": 18,
+    "mean": 0.43
+   },
+   "frame": {
+    "n": 270,
+    "p50": 12,
+    "p95": 333,
+    "p99": 382.2,
+    "worst": 17945.7,
+    "mean": 206.96
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.95
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177217,
+    "p99": 177329,
+    "worst": 177337,
+    "mean": 176059.56
+   },
+   "particlesAtEnd": {
+    "smoke": 110,
+    "dust": 0,
+    "sparks": 21,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "low, career 1, ?fx=0 (main)",
+   "tier": "low",
+   "fx": "0",
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "preset": "night",
+   "theme": "docks",
+   "bloom": false,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 0.9,
+    "p95": 4.5,
+    "p99": 10,
+    "worst": 12.6,
+    "mean": 1.34
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.7,
+    "p99": 5.1,
+    "worst": 10.8,
+    "mean": 0.46
+   },
+   "frame": {
+    "n": 270,
+    "p50": 212.5,
+    "p95": 305.2,
+    "p99": 1392.6,
+    "worst": 14039.4,
+    "mean": 214.42
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 65,
+    "p95": 65,
+    "p99": 65,
+    "worst": 65,
+    "mean": 64.6
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 163609,
+    "p95": 164481,
+    "p99": 164569,
+    "worst": 164585,
+    "mean": 163599.71
+   },
+   "particlesAtEnd": {
+    "smoke": 48,
+    "dust": 0,
+    "sparks": 0,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "low, longest Legend, round on",
+   "tier": "low",
+   "fx": "on",
+   "index": 22,
+   "frames": 300,
+   "driving": 270,
+   "preset": "rain",
+   "theme": "coastal",
+   "bloom": false,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.1,
+    "p95": 4.6,
+    "p99": 15.6,
+    "worst": 56.9,
+    "mean": 1.59
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0,
+    "p95": 1.3,
+    "p99": 7.7,
+    "worst": 55.8,
+    "mean": 0.48
+   },
+   "frame": {
+    "n": 270,
+    "p50": 9.3,
+    "p95": 292.2,
+    "p99": 824.4,
+    "worst": 29557.8,
+    "mean": 223.68
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 72,
+    "p95": 76,
+    "p99": 76,
+    "worst": 76,
+    "mean": 72.1
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 198707,
+    "p95": 199955,
+    "p99": 200039,
+    "worst": 200059,
+    "mean": 199042.41
+   },
+   "particlesAtEnd": {
+    "smoke": 96,
+    "dust": 0,
+    "sparks": 17,
+    "flame": 6,
+    "rain": 140
+   },
+   "errors": []
+  },
+  {
+   "label": "low, longest Legend, ?fx=0 (main)",
+   "tier": "low",
+   "fx": "0",
+   "index": 22,
+   "frames": 300,
+   "driving": 270,
+   "preset": "rain",
+   "theme": "coastal",
+   "bloom": false,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 0.7,
+    "p95": 2.6,
+    "p99": 8.6,
+    "worst": 12.1,
+    "mean": 1.03
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.4,
+    "p99": 4.2,
+    "worst": 8.8,
+    "mean": 0.3
+   },
+   "frame": {
+    "n": 270,
+    "p50": 10.8,
+    "p95": 295.8,
+    "p99": 1512.7,
+    "worst": 28903.9,
+    "mean": 234.68
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 63,
+    "p95": 63,
+    "p99": 63,
+    "worst": 63,
+    "mean": 62.04
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 192919,
+    "p95": 193831,
+    "p99": 193911,
+    "worst": 193935,
+    "mean": 193180.02
+   },
+   "particlesAtEnd": {
+    "smoke": 38,
+    "dust": 0,
+    "sparks": 0,
+    "flame": 0,
+    "rain": 140
+   },
+   "errors": []
+  },
+  {
+   "label": "low, career 1 at night, round on",
+   "tier": "low",
+   "fx": "on",
+   "index": 0,
+   "preset": "night",
+   "frames": 300,
+   "driving": 270,
+   "theme": "docks",
+   "bloom": false,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 0.9,
+    "p95": 5.3,
+    "p99": 8.2,
+    "worst": 97.9,
+    "mean": 1.71
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.5,
+    "p99": 5.1,
+    "worst": 6.1,
+    "mean": 0.36
+   },
+   "frame": {
+    "n": 270,
+    "p50": 10,
+    "p95": 338.2,
+    "p99": 385.4,
+    "worst": 17613.7,
+    "mean": 211.01
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 75.01
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177221,
+    "p99": 177309,
+    "worst": 177325,
+    "mean": 176059.49
+   },
+   "particlesAtEnd": {
+    "smoke": 110,
+    "dust": 0,
+    "sparks": 18,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "low, career 1 at night, ?fx=0 (main)",
+   "tier": "low",
+   "fx": "0",
+   "index": 0,
+   "preset": "night",
+   "frames": 300,
+   "driving": 270,
+   "theme": "docks",
+   "bloom": false,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 0.6,
+    "p95": 3,
+    "p99": 7.9,
+    "worst": 54.4,
+    "mean": 1.23
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.7,
+    "p99": 6.6,
+    "worst": 54.3,
+    "mean": 0.65
+   },
+   "frame": {
+    "n": 270,
+    "p50": 216.1,
+    "p95": 299.1,
+    "p99": 1462.7,
+    "worst": 14568.1,
+    "mean": 219.83
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 65,
+    "p95": 65,
+    "p99": 65,
+    "worst": 65,
+    "mean": 64.6
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 163609,
+    "p95": 164481,
+    "p99": 164569,
+    "worst": 164585,
+    "mean": 163599.3
+   },
+   "particlesAtEnd": {
+    "smoke": 48,
+    "dust": 0,
+    "sparks": 0,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "high, career 1, round on",
+   "tier": "high",
+   "fx": "on",
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "preset": "night",
+   "theme": "docks",
+   "bloom": true,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 6.2,
+    "p99": 9.9,
+    "worst": 13.2,
+    "mean": 1.94
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.5,
+    "p99": 5.5,
+    "worst": 11.7,
+    "mean": 0.5
+   },
+   "frame": {
+    "n": 270,
+    "p50": 15.3,
+    "p95": 635.5,
+    "p99": 749.5,
+    "worst": 33601.3,
+    "mean": 462.94
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 78,
+    "p95": 80,
+    "p99": 80,
+    "worst": 80,
+    "mean": 76.94
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 452163,
+    "p95": 453539,
+    "p99": 453695,
+    "worst": 453711,
+    "mean": 452157.56
+   },
+   "particlesAtEnd": {
+    "smoke": 199,
+    "dust": 0,
+    "sparks": 20,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "high, career 1, ?fx=0 (main)",
+   "tier": "high",
+   "fx": "0",
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "preset": "night",
+   "theme": "docks",
+   "bloom": true,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 4.4,
+    "p99": 8.8,
+    "worst": 28.9,
+    "mean": 1.49
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.8,
+    "p99": 5.6,
+    "worst": 26.5,
+    "mean": 0.64
+   },
+   "frame": {
+    "n": 270,
+    "p50": 428.2,
+    "p95": 1231.3,
+    "p99": 1436.1,
+    "worst": 16452.6,
+    "mean": 424.29
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 67,
+    "p95": 67,
+    "p99": 67,
+    "worst": 67,
+    "mean": 66.6
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 427839,
+    "p95": 428723,
+    "p99": 428835,
+    "worst": 428851,
+    "mean": 427812.05
+   },
+   "particlesAtEnd": {
+    "smoke": 64,
+    "dust": 0,
+    "sparks": 0,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "high, career 1 at night, round on",
+   "tier": "high",
+   "fx": "on",
+   "index": 0,
+   "preset": "night",
+   "frames": 300,
+   "driving": 270,
+   "theme": "docks",
+   "bloom": true,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 6.5,
+    "p99": 15.7,
+    "worst": 81,
+    "mean": 2.42
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.5,
+    "p99": 3.7,
+    "worst": 7.1,
+    "mean": 0.37
+   },
+   "frame": {
+    "n": 270,
+    "p50": 13.7,
+    "p95": 641.7,
+    "p99": 684.5,
+    "worst": 34491.5,
+    "mean": 468.95
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 78,
+    "p95": 80,
+    "p99": 80,
+    "worst": 80,
+    "mean": 76.99
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 452175,
+    "p95": 453555,
+    "p99": 453691,
+    "worst": 453703,
+    "mean": 452156.42
+   },
+   "particlesAtEnd": {
+    "smoke": 201,
+    "dust": 0,
+    "sparks": 16,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "high, career 1 at night, ?fx=0 (main)",
+   "tier": "high",
+   "fx": "0",
+   "index": 0,
+   "preset": "night",
+   "frames": 300,
+   "driving": 270,
+   "theme": "docks",
+   "bloom": true,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.4,
+    "p95": 3.7,
+    "p99": 8.2,
+    "worst": 59.3,
+    "mean": 1.66
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.7,
+    "p99": 5.5,
+    "worst": 59.2,
+    "mean": 0.8
+   },
+   "frame": {
+    "n": 270,
+    "p50": 424.5,
+    "p95": 837.3,
+    "p99": 1401.1,
+    "worst": 24169.6,
+    "mean": 425.1
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 67,
+    "p95": 67,
+    "p99": 67,
+    "worst": 67,
+    "mean": 66.6
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 427839,
+    "p95": 428723,
+    "p99": 428819,
+    "worst": 428843,
+    "mean": 427811.86
+   },
+   "particlesAtEnd": {
+    "smoke": 63,
+    "dust": 0,
+    "sparks": 0,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  },
+  {
+   "label": "known answer: 20 ms of busy work per frame, low, career 1, round on",
+   "tier": "low",
+   "fx": "on",
+   "index": 0,
+   "busy": 20,
+   "frames": 300,
+   "driving": 270,
+   "preset": "night",
+   "theme": "docks",
+   "bloom": false,
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 22.2,
+    "p95": 26.6,
+    "p99": 32.4,
+    "worst": 106.4,
+    "mean": 22.97
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.2,
+    "p99": 3.5,
+    "worst": 5.7,
+    "mean": 0.35
+   },
+   "frame": {
+    "n": 270,
+    "p50": 34.4,
+    "p95": 323.2,
+    "p99": 398.4,
+    "worst": 15629.5,
+    "mean": 202.76
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.92
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176109,
+    "p95": 177217,
+    "p99": 177317,
+    "worst": 177329,
+    "mean": 176058.5
+   },
+   "particlesAtEnd": {
+    "smoke": 110,
+    "dust": 0,
+    "sparks": 19,
+    "flame": 0,
+    "rain": 0
+   },
+   "errors": []
+  }
+ ],
+ "knownAnswer": {
+  "p95": 26.6,
+  "caught": true
+ }
+}

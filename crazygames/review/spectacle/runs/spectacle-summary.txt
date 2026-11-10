@@ -1,0 +1,7 @@
+spectacle-determinism exit 0 in 138 s
+spectacle-night exit 0 in 201 s
+spectacle-smoke exit 0 in 98 s
+spectacle-adapt exit 0 in 15 s
+spectacle-layout exit 0 in 154 s
+spectacle-perf exit 0 in 1000 s
+SPECDONE

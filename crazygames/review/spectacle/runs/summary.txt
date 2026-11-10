@@ -1,0 +1,3 @@
+loop-quota exit 0 in 0 s
+feel-handling exit 0 in 0 s
+feel-corners exit 0 in 3 s

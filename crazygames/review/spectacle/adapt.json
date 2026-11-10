@@ -1,0 +1,148 @@
+{
+ "runs": [
+  {
+   "tier": "low",
+   "start": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "pixelRatio": 1,
+    "bloom": false,
+    "density": 1
+   },
+   "fast": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "pixelRatio": 1,
+    "bloom": false,
+    "density": 1
+   },
+   "slow": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 3619.5999999996275
+     },
+     {
+      "level": 3,
+      "at": 3638.5
+     },
+     {
+      "level": 4,
+      "at": 4350.799999998882
+     }
+    ],
+    "on": true,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   },
+   "after": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 3619.5999999996275
+     },
+     {
+      "level": 3,
+      "at": 3638.5
+     },
+     {
+      "level": 4,
+      "at": 4350.799999998882
+     }
+    ],
+    "on": true,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   }
+  },
+  {
+   "tier": "high",
+   "start": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "pixelRatio": 1,
+    "bloom": true,
+    "density": 1
+   },
+   "fast": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "pixelRatio": 1,
+    "bloom": true,
+    "density": 1
+   },
+   "slow": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 3535.5999999996275
+     },
+     {
+      "level": 2,
+      "at": 3551.5
+     },
+     {
+      "level": 3,
+      "at": 3566.5999999996275
+     },
+     {
+      "level": 4,
+      "at": 3679.5
+     }
+    ],
+    "on": true,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   },
+   "after": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 3535.5999999996275
+     },
+     {
+      "level": 2,
+      "at": 3551.5
+     },
+     {
+      "level": 3,
+      "at": 3566.5999999996275
+     },
+     {
+      "level": 4,
+      "at": 3679.5
+     }
+    ],
+    "on": true,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   }
+  }
+ ],
+ "hitches": {
+  "level": 0,
+  "steps": [],
+  "on": true,
+  "pixelRatio": 1,
+  "bloom": false,
+  "density": 1
+ },
+ "fx0": {
+  "pixelRatio": 1,
+  "before": 1,
+  "adapt": 0,
+  "on": false
+ }
+}
