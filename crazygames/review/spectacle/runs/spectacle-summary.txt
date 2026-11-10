@@ -5,3 +5,10 @@ spectacle-adapt exit 0 in 15 s
 spectacle-layout exit 0 in 154 s
 spectacle-perf exit 0 in 1000 s
 SPECDONE
+spectacle-determinism exit 0 in 140 s (after the last code change)
+spectacle-smoke exit 0 in 100 s (after the last code change)
+spectacle-adapt exit 0 in 16 s (after the last code change)
+spectacle-perf exit 0 in 1013 s (after the last code change)
+retention-perf exit 0 in 218 s (after the last code change)
+feel-probes exit 0 in 299 s (after the last code change)
+AGAINDONE

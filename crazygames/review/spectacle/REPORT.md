@@ -53,9 +53,10 @@ on `main`.
     `?fx=0`.
   - Night passes its bar at every moment measured, on both tiers, and
     night on `main` fails it at every one.
-  - Smoke hides at worst 5.0 per cent of the car's box.
-  - The low tier's JavaScript p95 at 6x throttle is 4.4 to 5.3 ms
-    (`main`: 2.6 to 4.5).
+  - Smoke hides at worst 4.7 to 8.9 per cent of the car's box (the bar
+    is 12).
+  - The low tier's JavaScript p95 at 6x throttle is 2.7 to 5.2 ms
+    (`main`: 2.8 to 3.8).
   - The layout is clean at all four sizes.
 - **Not measurable here:** the GPU. The sandbox draws in software. The
   author has to judge the smoke's overdraw and the high tier's bloom
@@ -179,10 +180,15 @@ frame and 5 per cent as the median, for both shares.
 
 | | box: worst, median | car itself: worst, median |
 |---|---|---|
-| low 1280x720 | 4.6, 2.9 | 3.4, 0.2 |
-| low 390x844 | 2.6, 1.0 | 0.8, 0.0 |
-| high 1280x720 | 5.0, 1.0 | 1.1, 0.0 |
-| high 390x844 | 1.7, 0.7 | 0.1, 0.0 |
+| low 1280x720 | 4.7, 1.5 | 1.1, 0.1 |
+| low 390x844 | 1.2, 0.3 | 0.2, 0.0 |
+| high 1280x720 | 8.9, 2.8 | 6.1, 0.2 |
+| high 390x844 | 3.2, 0.4 | 0.4, 0.0 |
+
+These are the last run, after the last code change. The particles are
+random, so the numbers move between runs: the run before read 4.6, 2.6,
+5.0 and 1.7 for the worst box shares, against 4.7, 1.2, 8.9 and 3.2
+here. Every run since the shipped clearance has passed.
 
 Known answer: without its clearance and at twice the thickness, the
 smoke hides 38 per cent of the box (49 of the car itself). CAUGHT.
@@ -205,19 +211,20 @@ coast.
 
 | | JS p95, ms (main) | draw calls (main) | triangles (main) |
 |---|---|---|---|
-| low, career 1 | 4.4 (4.5) | 76 (65) | 176,117 (163,609) |
-| low, The vice | 4.6 (2.6) | 72 (63) | 198,707 (192,919) |
-| low, career 1 again | 5.3 (3.0) | 76 (65) | 176,117 (163,609) |
-| high, career 1 | 6.2 (4.4) | 78 (67) | 452,163 (427,839) |
-| high, career 1 again | 6.5 (3.7) | 78 (67) | 452,175 (427,839) |
+| low, career 1 | 5.2 (3.8) | 76 (65) | 176,105 (163,609) |
+| low, The vice | 2.7 (2.8) | 72 (63) | 198,687 (192,919) |
+| low, career 1 again | 4.8 (3.4) | 76 (65) | 176,113 (163,609) |
+| high, career 1 | 7.3 (3.2) | 78 (67) | 452,159 (427,839) |
+| high, career 1 again | 5.6 (3.3) | 78 (67) | 452,175 (427,839) |
 
 "Again" is the same configuration measured a second time, to show the
-noise: the same low tier run read 4.4 and 5.3 ms. An earlier run of this
-probe read 5.4 to 6.3 ms for the low tier. The worst frames, up to
-98 ms, are single SwiftShader stalls, as in earlier reports.
+noise. This is the last run, after the last code change. Two earlier
+runs read 4.4 to 6.3 ms for the low tier with the round on. The worst
+frames, up to 54 ms, are single SwiftShader stalls, as in earlier
+reports.
 
 Bar: the low tier's p95 under 16.7 ms with the round on. PASS, worst
-5.3 ms. Known answer: 20 ms of busy work per frame gives a p95 of
+5.2 ms. Known answer: 20 ms of busy work per frame gives a p95 of
 26.6 ms. CAUGHT.
 
 The round adds:
@@ -328,7 +335,48 @@ run's last callouts all at once. A player never sees this.
 
 ### 8. Every probe in `game/test/`
 
-RESULTS_PROBES
+All of them were run in sequence on commit 5f73aa0, the code as it
+was after the last change of look. `runs/` holds each log, and
+`runs/summary.txt` the exit codes. Several probes rewrite other
+sessions' `review/` files. Those files were restored afterwards, so only
+`review/spectacle/` belongs to this branch.
+
+| probe | result |
+|---|---|
+| `loop/quota.js`, `feel/handling.js`, `feel/corners.js` | pass |
+| `feel/probes.js` | all passed, 14 verdicts |
+| `tracks/probes.js` | all measurements pass, every known answer caught |
+| `tracks/tracks2.js` | the busyness known answer MISSED for circuits and sprints, with the same numbers as on `main`. Reported, not fixed, as the brief asks |
+| `visuals/occlusion.js`, `--career` | all passed |
+| `visuals/probes.js` | all passed. With the round on, the edge is still the brightest thing in all 40 shots: worst ratio 1.40, where 1.35 is needed. Night's worst is now 1.41 (it was 5.33 when the road was black). Initial download 2.32 MB |
+| `cars/measure.js`, `retention/codes.js` | pass |
+| `retention/heading.js` | all passed at four sizes (28 verdicts) |
+| `chapters/probes.js` | all passed (98 verdicts) |
+| `retention/probes.js` | 41 passed, **1 failed** (see below) |
+| `loop/probes.js` | all passed (22 verdicts): the ghost frame for frame, the careers and the daily to results, the saves |
+
+**The failure.** `retention/probes.js` checks that the JavaScript p95 at
+6x with a ghost and the missions is within noise (1.5 ms) of a stored
+measurement of `main` (3.6 ms). The round read 5.8 ms. Today's `main`,
+run from a worktree, reads 4.2. So the round's own per-frame work (the
+particles, the glows, the ribbons) was over that probe's margin.
+
+I then cut it down (commit 137a293):
+- an idle particle pool now does no work;
+- the show's per-frame context is kept instead of made each frame;
+- the car's matrix is no longer walked through every part of the model;
+- the trails no longer allocate.
+
+After that change these were rerun and all passed (logs ending "(after
+the last code change)" in `runs/spectacle-summary.txt`):
+- the retention perf section: 3.8 ms against 3.6 (it was 5.3 and 4.9
+  in two runs before the last cut);
+- `feel/probes.js`;
+- this round's determinism, smoke, adaptation and frame time probes.
+
+The full `retention/probes.js` and `loop/probes.js` were not rerun
+after that last change (together about 90 minutes). The change is
+drawing only and touches no gameplay path.
 
 ## What the author should judge on his own devices
 
@@ -346,6 +394,8 @@ RESULTS_PROBES
 - **The slow motion at the line**: about a second (it was 0.35 s). Is
   that a beat or a wait? `DIRECTOR.SLOW`.
 - **Night**: are the lamps and pools too much, or too yellow? `DRESS`.
+  At night the smoke is born red from the tail-lights and can read as a
+  pink haze behind the car; `SHOW.SMOKE.BIRTH.night` sets it.
 - **The score**: do the heat colours of the number (pink at x5) work,
   and can the bank's flight to the total be followed?
 - **Real WebGPU**: none of this has run on it, only on the forced

@@ -16,11 +16,11 @@ PASS camera keeps the car fully on screen in 390x844: lap 2958 frames, drift 276
 PASS known answer: a camera looking at the sky loses the car in 390x844: 900 of 900 frames off screen
 
 == 4. perf
-throttle 1x: frame p95 164.7 worst 444.2 ms; js without submit p95 0.4 worst 3.2; physics p95 0.1 worst 3.1 (2 steps); submit p95 164.4; first frames worst 7.4; webgl2 low
-throttle 4x: frame p95 253.1 worst 806 ms; js without submit p95 3.1 worst 8.1; physics p95 1 worst 7.5 (2 steps); submit p95 252.9; first frames worst 24.5; webgl2 low
-throttle 6x: frame p95 268.7 worst 1126.7 ms; js without submit p95 3.7 worst 19.9; physics p95 1.5 worst 5.9 (2 steps); submit p95 268.4; first frames worst 58.2; webgl2 low
-PASS JavaScript frame p95 at 6x throttle under 16.7 ms: 3.7 ms, worst 19.9
-PASS known answer: 20 ms of busy work per frame raises the p95 by about 20 ms and fails the budget: p95 3.1 -> 24.8 ms at 4x
+throttle 1x: frame p95 164.7 worst 502.7 ms; js without submit p95 0.4 worst 4.9; physics p95 0.2 worst 2.5 (2 steps); submit p95 164.6; first frames worst 18.1; webgl2 low
+throttle 4x: frame p95 260.4 worst 489 ms; js without submit p95 2.6 worst 13.1; physics p95 1 worst 12.6 (2 steps); submit p95 259.7; first frames worst 48.6; webgl2 low
+throttle 6x: frame p95 296.2 worst 2791.5 ms; js without submit p95 4.3 worst 19; physics p95 1.6 worst 10.1 (2 steps); submit p95 293.9; first frames worst 59.3; webgl2 low
+PASS JavaScript frame p95 at 6x throttle under 16.7 ms: 4.3 ms, worst 19
+PASS known answer: 20 ms of busy work per frame raises the p95 by about 20 ms and fails the budget: p95 2.6 -> 24.8 ms at 4x
 
 == shots
 wrote /home/claude/spectacle/crazygames/review/feel/shots/drift-1280x720.png
