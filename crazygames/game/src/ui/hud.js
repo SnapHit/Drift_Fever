@@ -3,7 +3,24 @@
    that rise and fade, a small speed and angle readout, the run's lap or
    distance and time with the best to beat, the 3 2 1 GO countdown, and
    an exit button back to the title. Plain DOM, updated only when a value
-   changes, so it costs nothing at 60fps. */
+   changes, so it costs nothing at 60fps.
+
+   With the spectacle round on (briefs/SPECTACLE.md 4) the score reacts:
+   the number by the car pops with weight at every step of the
+   multiplier and grows and changes colour with it (HUD_SHOW); a banked
+   chain flies from the car to the total, which pops as it lands; a
+   lost chain breaks in two and falls. Plain DOM and CSS animations, a
+   few elements a second at most. */
+import { FX_ON } from '../fx.js';
+
+export const HUD_SHOW = {
+  GROW:        0.12,     // the live number grows this share per multiplier step
+  GROW_MAX:    6,        // up to this multiplier
+  HEAT_CLASSES: 5,       // h1 to h5: the colour by multiplier (index.html)
+  FLY_TIME:    560,      // ms for a banked chain to reach the total
+  BREAK_TIME:  700,      // ms a lost chain takes to fall apart
+};
+
 export function createHud(root) {
   const el = document.createElement('div');
   el.id = 'hud';
@@ -28,6 +45,39 @@ export function createHud(root) {
   let lastTotal = -1, lastLive = -1, lastMult = -1, lastSpeed = -1, lastAngle = -1, lastNear = null, lastVisible = null, lastLap = '', lastClock = '', lastCount = '', lastBeat = '';
   let shown = 0;
   const v = { x: 0, y: 0, z: 0 };
+  let lastText = '', lastHeat = 0;
+  const totalBox = el.querySelector('#total');
+  /* a banked chain flies from where the number was to the total */
+  function fly(text) {
+    const d = document.createElement('div');
+    d.className = 'fly ' + (lastHeat ? 'h' + lastHeat : '');
+    d.textContent = text;
+    el.appendChild(d);
+    const r = total.getBoundingClientRect(), x1 = r.left + r.width / 2, y1 = r.top + r.height / 2;
+    const anim = d.animate([
+      { transform: 'translate(' + v.x + 'px,' + (v.y - 30) + 'px) translate(-50%,-50%) scale(1.25)', opacity: 1 },
+      { transform: 'translate(' + ((v.x + x1) / 2) + 'px,' + (Math.min(v.y, y1) - 40) + 'px) translate(-50%,-50%) scale(1.1)', opacity: 1, offset: 0.45 },
+      { transform: 'translate(' + x1 + 'px,' + y1 + 'px) translate(-50%,-50%) scale(0.55)', opacity: 0.2 },
+    ], { duration: HUD_SHOW.FLY_TIME, easing: 'cubic-bezier(0.5, 0, 0.75, 1)' });
+    const done = () => { d.remove(); total.classList.remove('pop'); void total.offsetWidth; total.classList.add('pop'); };
+    anim.onfinish = done;
+    setTimeout(() => { if (d.isConnected) done(); }, HUD_SHOW.FLY_TIME + 200);   // where animations do not run
+  }
+  /* a lost chain breaks in two and falls */
+  function shatter(text) {
+    for (const side of [-1, 1]) {
+      const d = document.createElement('div');
+      d.className = 'shard ' + (side < 0 ? 'l' : 'r');
+      d.textContent = text;
+      el.appendChild(d);
+      const base = 'translate(' + v.x + 'px,' + (v.y - 30) + 'px) translate(-50%,-50%)';
+      d.animate([
+        { transform: base, opacity: 1 },
+        { transform: base + ' translate(' + side * 46 + 'px, 70px) rotate(' + side * 28 + 'deg)', opacity: 0 },
+      ], { duration: HUD_SHOW.BREAK_TIME, easing: 'cubic-bezier(0.3, 0, 0.9, 0.6)' }).onfinish = () => d.remove();
+      setTimeout(() => d.remove(), HUD_SHOW.BREAK_TIME + 200);
+    }
+  }
   /* SPEED STREAKS: thin lines rushing out from the centre of the screen,
      fading in above STREAK_FROM m/s and strongest while boosting. Drawn
      only; a fixed pool, so nothing allocates per frame. */
@@ -101,8 +151,18 @@ export function createHud(root) {
       if (visible !== lastVisible) { lastVisible = visible; live.classList.toggle('on', visible); }
       if (visible) {
         const n = Math.round(s.chain);
-        if (n !== lastLive) { lastLive = n; liveN.textContent = String(n); }
-        if (s.mult !== lastMult) { lastMult = s.mult; liveM.textContent = s.mult > 1 ? 'x' + s.mult : ''; live.classList.add('bump'); setTimeout(() => live.classList.remove('bump'), 180); }
+        if (n !== lastLive) { lastLive = n; liveN.textContent = String(n); lastText = String(n) + (s.mult > 1 ? ' x' + s.mult : ''); }
+        if (s.mult !== lastMult) {
+          const up = s.mult > lastMult && lastMult > 0;
+          lastMult = s.mult; liveM.textContent = s.mult > 1 ? 'x' + s.mult : ''; live.classList.add('bump'); setTimeout(() => live.classList.remove('bump'), 180);
+          if (FX_ON) {
+            const h = Math.min(HUD_SHOW.HEAT_CLASSES, s.mult);
+            for (let k = 1; k <= HUD_SHOW.HEAT_CLASSES; k++) live.classList.toggle('h' + k, k === h);
+            lastHeat = h;
+            live.style.setProperty('--k', String(1 + HUD_SHOW.GROW * (Math.min(HUD_SHOW.GROW_MAX, s.mult) - 1)));
+            if (up) { live.classList.remove('pop'); void live.offsetWidth; live.classList.add('pop'); }
+          }
+        }
         if (s.near !== lastNear) { lastNear = s.near; live.classList.toggle('near', s.near); }
         // project the car's roof to the screen
         const p = new THREE.Vector3(pose.x, 1.9, pose.z).project(camera);
@@ -118,9 +178,11 @@ export function createHud(root) {
         d.textContent = c.text;
         callouts.appendChild(d);
         setTimeout(() => d.remove(), 1500);
+        if (FX_ON && c.kind === 'bank' && !/^(CLEAN|PACE)/.test(c.text)) fly(c.text.split(' ')[0]);
+        else if (FX_ON && c.kind === 'lost' && lastText) shatter(lastText);
       }
       shown = s.calloutCount;
     },
-    reset() { shown = 0; callouts.innerHTML = ''; lastTotal = -1; lastLive = -1; lastMult = -1; },
+    reset() { shown = 0; callouts.innerHTML = ''; lastTotal = -1; lastLive = -1; lastMult = -1; lastText = ''; for (const d of el.querySelectorAll('.fly, .shard')) d.remove(); },
   };
 }

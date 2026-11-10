@@ -77,11 +77,17 @@ export function concreteTexture(THREE, size) {
   return t;
 }
 
+/* The spectacle round's banners (briefs/SPECTACLE.md 5: invented names
+   only, no real brand, place or game): two of the boards above carried
+   a real place's name and a plain word, and are made up names instead. */
+export const SPONSORS_SHOW = SPONSORS.map(([name, bg, fg]) => [name === 'NULLARBOR' ? 'ZOOMBAT PARTS' : name === 'SOUTHERLY' ? 'SLIDEWAYS SODA' : name, bg, fg]);
+
 /* The sponsor atlas: ROWS panels stacked, each a full width strip. */
-export function sponsorAtlas(THREE) {
-  const W = 512, H = 64, rows = SPONSORS.length, c = canvas(W, H * rows), ctx = c.getContext('2d');
+export function sponsorAtlas(THREE, list) {
+  const L = list || SPONSORS;
+  const W = 512, H = 64, rows = L.length, c = canvas(W, H * rows), ctx = c.getContext('2d');
   const hex = n => '#' + n.toString(16).padStart(6, '0');
-  SPONSORS.forEach(([name, bg, fg], i) => {
+  L.forEach(([name, bg, fg], i) => {
     ctx.fillStyle = hex(bg); ctx.fillRect(0, i * H, W, H);
     ctx.fillStyle = hex(fg);
     ctx.font = '900 44px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
@@ -110,6 +116,32 @@ export function bannerTexture(THREE, text, bg, fg) {
 }
 
 /* A soft disc: alpha falls from the centre, with a little noise, for smoke and dust. */
+/* A billowing puff for the spectacle round's smoke: a cluster of soft
+   lobes, lit a little from above (brighter on top, shaded beneath) so a
+   puff reads as a volume and not a disc, over two octaves of noise. */
+export function puffSprite(THREE, size) {
+  const s = size || 128, c = canvas(s, s), ctx = c.getContext('2d');
+  const img = ctx.createImageData(s, s), d = img.data, rng = makeRng(47);
+  const lobes = [];
+  for (let i = 0; i < 9; i++) { const a = rng.range(0, Math.PI * 2), r = i === 0 ? 0 : rng.range(0.08, 0.24); lobes.push({ x: Math.cos(a) * r, y: Math.sin(a) * r * 0.85, r: i === 0 ? 0.3 : rng.range(0.14, 0.24) }); }
+  const octave = (n, seed) => { const g = makeRng(seed), a = new Float32Array((n + 1) * (n + 1)); for (let i = 0; i < a.length; i++) a[i] = g.next(); return (x, y) => { const fx = x * n, fy = y * n, ix = Math.min(n - 1, Math.floor(fx)), iy = Math.min(n - 1, Math.floor(fy)), tx = fx - ix, ty = fy - iy, sx = tx * tx * (3 - 2 * tx), sy = ty * ty * (3 - 2 * ty); const q = (i, j) => a[j * (n + 1) + i]; return (q(ix, iy) * (1 - sx) + q(ix + 1, iy) * sx) * (1 - sy) + (q(ix, iy + 1) * (1 - sx) + q(ix + 1, iy + 1) * sx) * sy; }; };
+  const n1 = octave(6, 48), n2 = octave(14, 49);
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++) {
+    const u = (x + 0.5) / s - 0.5, v = (y + 0.5) / s - 0.5;
+    let a = 0, top = 0;
+    for (const L of lobes) { const r = Math.hypot(u - L.x, v - L.y) / L.r; if (r < 1) { const k = 1 - r * r; if (k * k > a) { a = k * k; top = (L.y - v) / L.r; } } }
+    const edge = Math.max(0, 1 - Math.hypot(u, v) * 2);
+    a *= Math.min(1, edge * 2.2) * (0.62 + 0.38 * n1((x + 0.5) / s, (y + 0.5) / s)) * (0.82 + 0.18 * n2((x + 0.5) / s, (y + 0.5) / s));
+    const shade = Math.max(0.62, Math.min(1, 0.84 + 0.22 * top));   // canvas y runs down: lobes lit from the top
+    const g = Math.round(255 * shade), k = (y * s + x) * 4;
+    d[k] = g; d[k + 1] = g; d[k + 2] = g; d[k + 3] = Math.round(255 * Math.min(1, a * 1.1));
+  }
+  ctx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.NoColorSpace;
+  return t;
+}
+
 export function softSprite(THREE, size, noisy) {
   const s = size || 128, c = canvas(s, s), ctx = c.getContext('2d');
   const img = ctx.createImageData(s, s), d = img.data, rng = makeRng(31);

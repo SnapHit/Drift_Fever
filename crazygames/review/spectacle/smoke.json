@@ -1,0 +1,197 @@
+{
+ "bar": {
+  "WORST": 0.12,
+  "MEDIAN": 0.05,
+  "HIDE_DELTA": 40,
+  "FRAMES": 8,
+  "EVERY": 5
+ },
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader; the scripted drifter, the chain held at x5",
+ "runs": [
+  {
+   "tier": "low",
+   "viewport": "1280x720",
+   "known": false,
+   "slide": {
+    "angle": 33.356575574756576,
+    "v": 20.559451131071825,
+    "mult": 6,
+    "frame": 954
+   },
+   "shares": [
+    0.0067,
+    0.015,
+    0.0208,
+    0.0153,
+    0.0473,
+    0.0101,
+    0.0202,
+    0.0102
+   ],
+   "worst": 0.0473,
+   "median": 0.0153,
+   "carShares": [
+    0,
+    0.0007,
+    0.0114,
+    0.0003,
+    0.0088,
+    0.001,
+    0.0051,
+    0.0004
+   ],
+   "carWorst": 0.0114,
+   "carMedian": 0.001,
+   "smokeAlive": 110,
+   "pass": true
+  },
+  {
+   "tier": "low",
+   "viewport": "390x844",
+   "known": false,
+   "slide": {
+    "angle": 33.356575574756576,
+    "v": 20.559451131071825,
+    "mult": 6,
+    "frame": 954
+   },
+   "shares": [
+    0.0029,
+    0.0033,
+    0.001,
+    0.012,
+    0.0089,
+    0.0074,
+    0.0033,
+    0.0005
+   ],
+   "worst": 0.012,
+   "median": 0.0033,
+   "carShares": [
+    0,
+    0,
+    0,
+    0.0004,
+    0.0011,
+    0,
+    0.002,
+    0.0004
+   ],
+   "carWorst": 0.002,
+   "carMedian": 0.0004,
+   "smokeAlive": 110,
+   "pass": true
+  },
+  {
+   "tier": "high",
+   "viewport": "1280x720",
+   "known": false,
+   "slide": {
+    "angle": 33.356575574756576,
+    "v": 20.559451131071825,
+    "mult": 6,
+    "frame": 954
+   },
+   "shares": [
+    0.0073,
+    0.0279,
+    0.0069,
+    0.0185,
+    0.0382,
+    0.0442,
+    0.0889,
+    0.0203
+   ],
+   "worst": 0.0889,
+   "median": 0.0279,
+   "carShares": [
+    0.0019,
+    0.0004,
+    0,
+    0.0001,
+    0.0186,
+    0.0169,
+    0.061,
+    0.0004
+   ],
+   "carWorst": 0.061,
+   "carMedian": 0.0019,
+   "smokeAlive": 220,
+   "pass": true
+  },
+  {
+   "tier": "high",
+   "viewport": "390x844",
+   "known": false,
+   "slide": {
+    "angle": 33.356575574756576,
+    "v": 20.559451131071825,
+    "mult": 6,
+    "frame": 954
+   },
+   "shares": [
+    0.0042,
+    0.0195,
+    0,
+    0.032,
+    0.0043,
+    0.0121,
+    0.0004,
+    0
+   ],
+   "worst": 0.032,
+   "median": 0.0043,
+   "carShares": [
+    0.0011,
+    0,
+    0,
+    0.004,
+    0,
+    0,
+    0,
+    0
+   ],
+   "carWorst": 0.004,
+   "carMedian": 0,
+   "smokeAlive": 220,
+   "pass": true
+  },
+  {
+   "tier": "low",
+   "viewport": "1280x720",
+   "known": true,
+   "slide": {
+    "angle": 33.356575574756576,
+    "v": 20.559451131071825,
+    "mult": 6,
+    "frame": 954
+   },
+   "shares": [
+    0.2826,
+    0.273,
+    0.2999,
+    0.3248,
+    0.3528,
+    0.352,
+    0.3929,
+    0.3922
+   ],
+   "worst": 0.3929,
+   "median": 0.352,
+   "carShares": [
+    0.3051,
+    0.2977,
+    0.3888,
+    0.4081,
+    0.4441,
+    0.4344,
+    0.4453,
+    0.4377
+   ],
+   "carWorst": 0.4453,
+   "carMedian": 0.4344,
+   "smokeAlive": 110,
+   "pass": false
+  }
+ ]
+}

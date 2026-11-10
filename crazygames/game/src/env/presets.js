@@ -141,3 +141,23 @@ export function sunDirection(p) {
   const el = p.sunElev * Math.PI / 180, az = p.sunAzim * Math.PI / 180;
   return [Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)];
 }
+
+/* THE SPECTACLE ROUND'S PRESETS (briefs/SPECTACLE.md 2): what each
+   preset becomes with the round on, laid over the values above (with
+   ?fx=0 the presets are exactly as above). Night is no longer nearly
+   black: a brighter moon and sky fill so the world reads as shapes,
+   not a silhouette, a city glow on the horizon, the road's paint
+   glowing harder, the asphalt giving back a little baked moonlight
+   (roadGlow) so it reads between the pools, and the headlights reaching further (LOOK.HEADLIGHT_SHOW
+   in render/scene.js); the lamps and their pools are env/dressing.js.
+   Dusk and dawn get a sun worth looking at: a bigger disc and a wider,
+   stronger glow (sunSize, glowPower and glowGain, read by env/sky.js), and
+   a colour grade on the high tier (grade: lift, gain, saturation and a
+   vignette, through the bloom's post pass). */
+export const PRESET_SHOW = {
+  dusk:  { sunSize: 0.075, glowPower: 3.5, glowGain: 1.35, grade: { lift: [0.02, 0.005, 0.03], gain: [1.06, 1.0, 0.94], saturation: 1.12, vignette: 0.32 } },
+  night: { roadGlow: 0.15, hemi: 1.75, hemiSky: 0x3c4c8a, hemiGround: 0x1a1a26, sun: 1.7, sunColour: 0x9fb2ff, horizon: 0x2a3866, band: 0x152048, glow: 0x5a6aa8, exposure: 1.12, fogFar: 520, edgeGlow: 1.05, sunSize: 0.05, glowPower: 5, grade: { lift: [0.0, 0.01, 0.03], gain: [0.98, 1.0, 1.06], saturation: 1.08, vignette: 0.38 } },
+  dawn:  { sunSize: 0.08, glowPower: 3.2, glowGain: 1.3, grade: { lift: [0.03, 0.015, 0.02], gain: [1.05, 1.0, 0.97], saturation: 1.1, vignette: 0.28 } },
+  rain:  { hemi: 2.8, edgeGlow: 0.75, grade: { lift: [0.0, 0.005, 0.015], gain: [0.97, 1.0, 1.04], saturation: 0.95, vignette: 0.34 } },
+};
+export function presetShow(p) { const o = PRESET_SHOW[p.name]; return o ? { ...p, ...o } : p; }

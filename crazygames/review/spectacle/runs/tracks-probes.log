@@ -1,0 +1,62 @@
+PASS 1 determinism, same seed twice: 0 mismatches over 2000 tracks
+PASS 1 determinism, different seeds differ: 1000 and 1000 distinct of 1000 per kind
+CAUGHT 1a a generator that flips a seed bit at random: 7 of 20 repeats mismatched
+CAUGHT 1b a generator that ignores the seed: 1 distinct of 20
+PASS 1 no engine dependent maths in the generator: 0 calls found
+CAUGHT 1c the same scan on physics/world.js: 25 calls found (Math.hypot, **, Math.cos, Math.sin, Math.tan, Math.atan, Math.atan2)
+PASS 1 Node and Chromium give the same bytes: 0 of 400 differ; the daily track matches
+CAUGHT 1d the browser copy with sine one part in a million high: 400 of 400 tracks differ from Node
+NOTE 1f the browser copy with sine one unit in the last place high: 1 of 400 tracks differ from Node (information: the output is rounded to 0.1 mm and a millionth of a radian, which absorbs most last bit differences)
+NOTE 1e the generator on Math.sin and Math.cos instead of dmath.js: 0 of 400 tracks differ between Node and this Chromium (information only: these two engines happen to agree here, other engines are not guaranteed to)
+NOTE 2 circuits, barriers of parts at least 60 m apart along the track: 517 tracks have such parts within 20 m of each other, closest 0.02 m (p50 22.5); 209 of 1000 tracks have two such barriers closer than the road is wide (not a check: see the report)
+PASS 2 validity, circuits: 0 invalid and 0 fallbacks of 1000; worst clearance margin 0.500 m, closest barrier not beside the same stretch of wall 4.00 m, radii 17.28 to 119.0 m, widths 13.5 to 24.86 m, lengths 604 to 1196 m, lift at top speed 0.98 g
+NOTE 2 sprints, barriers of parts at least 60 m apart along the track: 617 tracks have such parts within 20 m of each other, closest 0.11 m (p50 23.5); 148 of 1000 tracks have two such barriers closer than the road is wide (not a check: see the report)
+PASS 2 validity, sprints: 0 invalid and 0 fallbacks of 1000; worst clearance margin 0.173 m, closest barrier not beside the same stretch of wall 4.00 m, radii 17.31 to 119.8 m, widths 13.5 to 24.87 m, lengths 602 to 1200 m, lift at top speed 0.98 g
+PASS 2 validity, circuits of about 600 m: 0 invalid, 0 fallbacks of 100, lengths 544 to 656 m
+PASS 2 validity, circuits of about 900 m: 0 invalid, 0 fallbacks of 100, lengths 814 to 986 m
+PASS 2 validity, circuits of about 1200 m: 0 invalid, 0 fallbacks of 100, lengths 1084 to 1316 m
+PASS 2 validity, sprints of about 600 m: 0 invalid, 0 fallbacks of 100, lengths 540 to 660 m
+PASS 2 validity, sprints of about 900 m: 0 invalid, 0 fallbacks of 100, lengths 816 to 990 m
+PASS 2 validity, sprints of about 1200 m: 0 invalid, 0 fallbacks of 100, lengths 1082 to 1316 m
+PASS 2 the fallback courses are valid: circuit default: 900 m valid; circuit 600: 600 m valid; circuit 900: 900 m valid; circuit 1200: 1200 m valid; sprint default: 900 m valid; sprint 600: 596 m valid; sprint 900: 900 m valid; sprint 1200: 1182 m valid
+PASS 2 control: the base for the broken tracks is valid: circuit 5
+CAUGHT 2 overlap: a sprint that turns 300 degrees and crosses itself: a 300 degree corner of radius 30 between straights; fails overlap, crossover
+CAUGHT 2 overlap: two parts whose barriers run closer than the gap: two left hairpins that bring the course back alongside its start straight, 2.75 m barrier to barrier, without crossing; fails overlap
+CAUGHT 2 the part gap measurement on the same track: reads 0.76 m, 0.05 of the road width
+CAUGHT 2 clearance: five left wall points moved into the road 300 m further on: samples 40 to 44 placed on the centre line at samples 190 to 194; fails overlap, clearance, contract
+CAUGHT 2 length: the same track against a target it misses: target starts 2 m above its length; fails length
+CAUGHT 2 radius: a corner of radius 11: one 90 degree corner, radius 11 m; fails radius
+CAUGHT 2 radius: a corner of radius 160: one 40 degree corner, radius 160 m; fails radius
+CAUGHT 2 width: 9 m on the start straight: samples 10 to 20; fails width
+CAUGHT 2 elevation: a 1.2 m bump 16 m long: centred on 60 m; fails elevation
+CAUGHT 2 elevation: a 10% ramp: 40 m at 10%, steeper than a bridge ramp; fails elevation
+CAUGHT 2 elevation: 20 degrees of bank: samples 50 to 55, past the banked corners' limit; fails elevation
+PASS 2 control: a generated crossover circuit is valid: circuit 36, bridge at 248.43 m over 633.43 m, 48.4 degrees
+CAUGHT 2 crossover: the same circuit flattened, crossing itself at grade: every height set to zero; fails overlap, clearance, crossover
+CAUGHT 2 crossover: the flattened circuit against the crossover check: the passes 0 m apart in height; fails overlap, clearance, crossover
+CAUGHT 2 crossover: the bridge at half its height: the deck 3.25 m over the road beneath; fails overlap, clearance, crossover
+CAUGHT 2 crossover: the bridge not marked as a layer: layer 0 everywhere; fails crossover
+CAUGHT 2 crossover: the bridge not listed: bridges empty; fails crossover
+PASS 2 findCrossings on a course built to cross once at a right angle: 1 crossing at 70 and 271 m along, sine 1.000 (expected 1 at 70 m, sine 1)
+CAUGHT 2 findCrossings on the same course turning 90 degrees: 0 crossings
+CAUGHT 2 contract: left wall points shifted three samples: the wall no longer beside its samples; fails overlap, contract
+CAUGHT 2 spacing: one sample removed: a 4 m step at 200 m; fails spacing
+PASS 3 drift character, circuits: in corners 69% [56, 75], 35 to 83%, direction changes 6 [2, 10], 0 to 14, longest straight 108 [66, 158], 50 to 172 m (p50 [p5, p95], worst); requested and estimated difficulty rank together at 0.577
+PASS 3 drift character, sprints: in corners 67% [60, 72], 53 to 76%, direction changes 7 [3, 12], 1 to 15, longest straight 106 [90, 134], 84 to 156 m (p50 [p5, p95], worst); requested and estimated difficulty rank together at 0.622
+PASS 3 the analyser on a course built to known numbers: corners 3 (3), direction changes 2 (2), longest straight 100 m (100), in corners 0.343 (0.326 +- one sample a corner end), radii 30, 30, 20
+CAUGHT 3 the analyser with its straight threshold at 25 m: reads 1 corners, 0 changes, longest straight 296 m on the same course
+PASS W the scripted driver in world.js, circuits: 100 of 100 finished, 0 respawns, 0 wall touches (0 hard) on 0 tracks, 46.9 [32.85, 66.85], 30.775 to 72.258 s, clipDistance read on every track
+PASS W the scripted driver in world.js, sprints: 100 of 100 finished, 0 respawns, 0 wall touches (0 hard) on 0 tracks, 50.883 [36.517, 64.6], 32.008 to 74.7 s, clipDistance read on every track
+CAUGHT W a right barrier moved to 2 m left of the centre line for 30 m: touches 0 before, 242 after (242 hard), respawns 241
+PASS W clipDistance at a clip wall: reads 0.532 m, expected 0.58 m (1.5 m less the half width)
+CAUGHT W the same with the barriers misaligned by half a lap: reads 190.028 m
+PASS W a sprint's end caps stop the car: 30 sprints: the car stops -1.45 m along from the last sample, flat out (its nose at the cap face, 0.75 m past), and at 1.45 m reversing from the start
+CAUGHT W the same sprint with its caps removed: gets 30.3 m past the end, -46.8 m behind the start
+PASS D dailySeed: one seed per local date in 6 time zones, 00:05 and 23:55: seed 1976143581 for 31 October 2026 everywhere, 1113709271 the next day; 3653 distinct seeds over 3,653 days
+CAUGHT D the same with the UTC date: gives 3 different seeds for the one local date
+PASS M buildTrackMesh in Node: 0 of 21 generated tracks with a non finite vertex; 6594 to 12556 triangles in 6 to 10 named meshes (road, runoff, kerb, edge, line, wall, clip, bridge, ramp, cut); the hand made test track builds too
+CAUGHT M a track with one NaN coordinate: 18 non finite values found
+PASS M elevation: 0 gives a flat course: largest |y| or |bank| over 40 tracks 0
+CAUGHT M the same measure on the default courses: largest 5.71
+
+all measurements pass and every known answer was caught in 78 s

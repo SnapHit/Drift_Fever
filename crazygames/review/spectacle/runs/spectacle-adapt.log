@@ -1,0 +1,9 @@
+PASS low known answer: 900 frames at 60 fps leave the quality alone: level 0, pixel ratio 1, bloom false
+PASS low: 1,200 frames at 25 fps step it down: level 4 in 3 steps, density 0.55, pixel ratio 1 -> 0.65, bloom false -> false
+PASS low: 900 fast frames after them do not step it back up: level 4
+PASS high known answer: 900 frames at 60 fps leave the quality alone: level 0, pixel ratio 1, bloom true
+PASS high: 1,200 frames at 25 fps step it down: level 4 in 4 steps, density 0.55, pixel ratio 1 -> 0.65, bloom true -> false
+PASS high: 900 fast frames after them do not step it back up: level 4
+PASS one slow frame in six for 1,500 frames is a hitch, not a slow device: level 0
+PASS with ?fx=0 nothing adapts, as on main: on false, level 0, pixel ratio 1 -> 1
+all passed

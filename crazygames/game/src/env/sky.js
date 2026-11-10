@@ -46,7 +46,7 @@ export function makeSky(THREE, preset) {
     mix3(horizon, band, smooth(0.0, 0.12, up), tmp);
     mix3(tmp, zenith, smooth(0.08, 0.55, up), tmp2);
     const d = Math.max(0, x * sunDir[0] + y * sunDir[1] + z * sunDir[2]);
-    const g = Math.pow(d, SKY.GLOW_POWER) * SKY.GLOW * (1 - smooth(0.3, 0.9, up) * 0.7);
+    const g = Math.pow(d, preset.glowPower || SKY.GLOW_POWER) * (preset.glowGain || SKY.GLOW) * (1 - smooth(0.3, 0.9, up) * 0.7);
     // below the horizon the dome is the horizon colour, darkened, so a hill's gap never shows sky
     const below = y < 0 ? smooth(0, -0.25, y) : 0;
     for (let k = 0; k < 3; k++) col[i * 3 + k] = (tmp2[k] + glow[k] * g) * (1 - below * 0.35);
@@ -59,13 +59,27 @@ export function makeSky(THREE, preset) {
   group.add(dome);
   /* the sun's disc */
   if (preset.sunDisc && !preset.rain) {
-    const r = SKY.RADIUS * 0.97 * Math.tan(SKY.SUN_SIZE);
+    const r = SKY.RADIUS * 0.97 * Math.tan(preset.sunSize || SKY.SUN_SIZE);
     const disc = new THREE.Mesh(new THREE.CircleGeometry(r, 24), new THREE.MeshBasicMaterial({ color: preset.sunDisc, fog: false, depthWrite: false, toneMapped: false, transparent: true, opacity: 0.95 }));
     disc.position.set(sunDir[0], sunDir[1], sunDir[2]).multiplyScalar(SKY.RADIUS * 0.97);
     disc.lookAt(0, 0, 0);
     disc.renderOrder = -9;
     disc.name = 'sun';
     group.add(disc);
+    /* the spectacle round's halo: a soft additive bloom round the disc, so the low tier sees a sun worth looking at without the post pass */
+    if (preset.sunSize && typeof document !== 'undefined') {
+      const c = document.createElement('canvas'); c.width = c.height = 128;
+      const g = c.getContext('2d'), grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+      grad.addColorStop(0, 'rgba(255,255,255,0.9)'); grad.addColorStop(0.18, 'rgba(255,255,255,0.45)'); grad.addColorStop(0.5, 'rgba(255,255,255,0.12)'); grad.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
+      const tex = new THREE.CanvasTexture(c);
+      const halo = new THREE.Mesh(new THREE.PlaneGeometry(r * 9, r * 9), new THREE.MeshBasicMaterial({ map: tex, color: preset.glow, fog: false, depthWrite: false, toneMapped: false, transparent: true, blending: THREE.AdditiveBlending, opacity: 0.85 }));
+      halo.position.copy(disc.position).multiplyScalar(0.99);
+      halo.lookAt(0, 0, 0);
+      halo.renderOrder = -8;
+      halo.name = 'halo';
+      group.add(halo);
+    }
   }
   /* stars */
   if (preset.stars) {

@@ -1,0 +1,66 @@
+
+== 1. readability and the shots
+  forest dusk 1280x720: edge 0.863 road 0.055 wall 0.002 outside 0.295 ratio 2.93 (53 samples, edge brightest in 100%)
+  forest night 1280x720: edge 0.899 road 0.087 wall 0 outside 0.143 ratio 6.29 (53 samples, edge brightest in 100%)
+  forest dawn 1280x720: edge 0.869 road 0.061 wall 0.077 outside 0.275 ratio 3.16 (51 samples, edge brightest in 100%)
+  forest rain 1280x720: edge 0.879 road 0.079 wall 0.021 outside 0.277 ratio 3.17 (53 samples, edge brightest in 100%)
+PASS known answer: the edge painted the ground colour fails the margin: ratio 0.69 over 53 samples
+  coastal dusk 1280x720: edge 0.864 road 0.059 wall 0.216 outside 0.333 ratio 2.59 (71 samples, edge brightest in 100%)
+  coastal night 1280x720: edge 0.899 road 0.06 wall 0.087 outside 0.18 ratio 4.99 (69 samples, edge brightest in 97%)
+  coastal dawn 1280x720: edge 0.869 road 0.03 wall 0.315 outside 0.358 ratio 2.43 (70 samples, edge brightest in 100%)
+  coastal rain 1280x720: edge 0.879 road 0.065 wall 0.154 outside 0.321 ratio 2.74 (70 samples, edge brightest in 100%)
+  desert dusk 1280x720: edge 0.864 road 0.053 wall 0.342 outside 0.429 ratio 2.01 (51 samples, edge brightest in 100%)
+  desert night 1280x720: edge 0.9 road 0.07 wall 0.311 outside 0.225 ratio 2.89 (51 samples, edge brightest in 100%)
+  desert dawn 1280x720: edge 0.876 road 0.072 wall 0.088 outside 0.447 ratio 1.96 (51 samples, edge brightest in 100%)
+  desert rain 1280x720: edge 0.879 road 0.067 wall 0.35 outside 0.397 ratio 2.21 (51 samples, edge brightest in 100%)
+  docks dusk 1280x720: edge 0.864 road 0.05 wall 0.394 outside 0.185 ratio 2.19 (63 samples, edge brightest in 94%)
+  docks night 1280x720: edge 0.899 road 0.123 wall 0.512 outside 0.088 ratio 1.76 (61 samples, edge brightest in 90%)
+  docks dawn 1280x720: edge 0.831 road 0.026 wall 0.595 outside 0.192 ratio 1.4 (61 samples, edge brightest in 93%)
+  docks rain 1280x720: edge 0.879 road 0.094 wall 0.442 outside 0.178 ratio 1.99 (62 samples, edge brightest in 98%)
+  mountain dusk 1280x720: edge 0.855 road 0.05 wall 0.001 outside 0.001 ratio 17.1 (37 samples, edge brightest in 100%)
+  mountain night 1280x720: edge 0.899 road 0.069 wall 0 outside 0 ratio 13.03 (36 samples, edge brightest in 100%)
+  mountain dawn 1280x720: edge 0.869 road 0.066 wall 0.06 outside 0.034 ratio 13.17 (36 samples, edge brightest in 100%)
+  mountain rain 1280x720: edge 0.879 road 0.058 wall 0.007 outside 0.005 ratio 15.16 (37 samples, edge brightest in 100%)
+  forest dusk 390x844: edge 0.812 road 0.021 wall 0.001 outside 0.052 ratio 15.62 (11 samples, edge brightest in 100%)
+  forest night 390x844: edge 0.899 road 0.115 wall 0 outside 0.006 ratio 7.82 (9 samples, edge brightest in 100%)
+  forest dawn 390x844: edge 0.869 road 0.065 wall 0.016 outside 0.168 ratio 5.17 (10 samples, edge brightest in 100%)
+  forest rain 390x844: edge 0.878 road 0.115 wall 0.016 outside 0.1 ratio 7.63 (10 samples, edge brightest in 100%)
+  coastal dusk 390x844: edge 0.868 road 0.065 wall 0.574 outside 0.35 ratio 1.51 (20 samples, edge brightest in 100%)
+  coastal night 390x844: edge 0.903 road 0.109 wall 0.639 outside 0.228 ratio 1.41 (20 samples, edge brightest in 100%)
+  coastal dawn 390x844: edge 0.867 road 0.027 wall 0.408 outside 0.307 ratio 2.13 (21 samples, edge brightest in 100%)
+  coastal rain 390x844: edge 0.883 road 0.084 wall 0.612 outside 0.341 ratio 1.44 (23 samples, edge brightest in 100%)
+  desert dusk 390x844: edge 0.812 road 0.032 wall 0.036 outside 0.039 ratio 20.82 (19 samples, edge brightest in 100%)
+  desert night 390x844: edge 0.891 road 0.074 wall 0.241 outside 0.14 ratio 3.7 (20 samples, edge brightest in 100%)
+  desert dawn 390x844: edge 0.831 road 0.027 wall 0.059 outside 0.174 ratio 4.78 (18 samples, edge brightest in 100%)
+  desert rain 390x844: edge 0.871 road 0.094 wall 0.285 outside 0.289 ratio 3.01 (19 samples, edge brightest in 100%)
+  docks dusk 390x844: edge 0.864 road 0.058 wall 0.277 outside 0.201 ratio 3.12 (32 samples, edge brightest in 100%)
+  docks night 390x844: edge 0.907 road 0.117 wall 0.359 outside 0.164 ratio 2.53 (32 samples, edge brightest in 100%)
+  docks dawn 390x844: edge 0.831 road 0.025 wall 0.058 outside 0.18 ratio 4.62 (32 samples, edge brightest in 100%)
+  docks rain 390x844: edge 0.886 road 0.093 wall 0.385 outside 0.225 ratio 2.3 (33 samples, edge brightest in 100%)
+  mountain dusk 390x844: edge 0.859 road 0.054 wall 0.001 outside 0.174 ratio 4.94 (28 samples, edge brightest in 100%)
+  mountain night 390x844: edge 0.899 road 0.079 wall 0 outside 0.286 ratio 3.14 (28 samples, edge brightest in 100%)
+  mountain dawn 390x844: edge 0.869 road 0.064 wall 0.071 outside 0.191 ratio 4.55 (26 samples, edge brightest in 100%)
+  mountain rain 390x844: edge 0.879 road 0.06 wall 0.008 outside 0.26 ratio 3.38 (27 samples, edge brightest in 100%)
+PASS the road edge is the brightest of edge, asphalt, barrier and ground beyond, by 1.35x, in every preset, theme and viewport: 40 shots, worst ratio 1.4 (docks dawn 1280x720), fewest samples 9
+
+== beauty shots
+  wrote /home/claude/spectacle/crazygames/review/visuals/shots/wide-forest-dusk-1280x720.png (73 draw calls, 904769 triangles, bloom true)
+  wrote /home/claude/spectacle/crazygames/review/visuals/shots/wide-coastal-dawn-1280x720.png (70 draw calls, 587713 triangles, bloom true)
+  wrote /home/claude/spectacle/crazygames/review/visuals/shots/wide-docks-night-1280x720.png (82 draw calls, 616179 triangles, bloom true)
+  wrote /home/claude/spectacle/crazygames/review/visuals/shots/wide-mountain-dusk-1280x720.png (71 draw calls, 595649 triangles, bloom true)
+  wrote /home/claude/spectacle/crazygames/review/visuals/shots/wide-desert-rain-1280x720.png (73 draw calls, 548661 triangles, bloom true)
+
+== 3. perf
+  low 1x: js without submit p95 0.7 worst 4 ms; frame p95 200; submit p95 199.7; draw calls 67 (worst 70), triangles 337615; first frames worst 609.2; bloom false
+  low 6x: js without submit p95 3.4 worst 15.1 ms; frame p95 337.5; submit p95 335.9; draw calls 67 (worst 70), triangles 337615; first frames worst 804.5; bloom false
+  high 1x: js without submit p95 0.7 worst 5.1 ms; frame p95 435.8; submit p95 435.3; draw calls 71 (worst 75), triangles 904207; first frames worst 1028.6; bloom true
+  high 6x: js without submit p95 4.9 worst 14 ms; frame p95 721.9; submit p95 719.4; draw calls 71 (worst 75), triangles 904207; first frames worst 1264.7; bloom true
+PASS low tier JavaScript frame p95 at 6x throttle under 16.7 ms, on a generated circuit with the world around it: 3.4 ms, worst 15.1, 67 draw calls
+PASS known answer: 20 ms of busy work per frame raises the p95 by about 20 ms and fails the budget: p95 3.4 -> 27.8 ms
+PASS known answer: one more instanced mesh is one or two more draw calls (its shadow is the second): 67 -> 69
+
+== 4. download
+PASS initial download under 5 MB (limit 20), build and independent count agree: 2.32 MB over 71 files (own count 2.32 MB)
+PASS known answer: a megabyte under game/later/ leaves the initial download unchanged, under game/lab/ it grows by one: 2.32 MB, with later/ 2.32, with lab/ 3.32
+
+all passed; wrote review/visuals/readability.json, beauty.json, perf.json, download.json

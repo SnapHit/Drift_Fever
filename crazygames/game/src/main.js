@@ -45,6 +45,8 @@ import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from '.
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
+import { FX_ON } from './fx.js';
+import { createDirector } from './camera/director.js';
 
 const query = new URLSearchParams(location.search);
 const MAX_STEPS = 8;              // steps per frame before time is dropped
@@ -64,6 +66,7 @@ if (query.get('tune') === '1') { tuned = loadSavedTune(); createTunePanel(root, 
 const debug = query.get('debug') === '1' ? createDebug(root) : null;
 const scene = createScene(canvas, { renderer: query.get('renderer') === 'webgl2' ? 'webgl2' : undefined, tier: query.get('tier') || undefined });
 const THREE = scene.THREE;
+const director = FX_ON ? createDirector(THREE) : null;   // the spectacle round's camera moments, over the chase camera
 const autoDrive = query.get('auto') === '1';
 const devGround = query.get('ground');
 
@@ -144,6 +147,7 @@ function resetRun() {
   tape.length = 0; acc = 0; last = -1; app.runTime = 0;
   prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
   chase.reset({ yaw: world.car.yaw });
+  if (director) director.reset();
   if (autoDrive && app.state !== 'dev' && app.ground.centre.length) app.driver = createDriver(app.ground, { drift: '*' });
 }
 
@@ -175,6 +179,7 @@ let physMs = 0, lastSteps = 0, frameMs = 0;
 function frame(t) {
   const t0 = performance.now();
   if (last < 0) last = t;
+  if (FX_ON) scene.frameTime(t - last);   // the adaptation reads the browser's frame clock
   const dt = Math.min(0.1, Math.max(0, (t - last) / 1000));
   last = t;
   resize();
@@ -194,10 +199,14 @@ function frame(t) {
     if (app.countdown <= 0) { app.state = 'drive'; input.setStarted(true); app.goShown = LOOP.GO_SHOWN; hud.setCount('GO', true); acc = 0; sound.ui('go'); sound.launch(); }
   }
   const stepping = S === 'drive' || S === 'results' || S === 'free' || S === 'dev';
+  /* after the line, time slows (the director's beat): the same physics steps, drawn over more frames */
+  const finishing = !!director && ((S === 'drive' && app.settle > 0) || (S === 'results' && app.results && app.results.finished));
+  if (finishing && director.state.finishT < 0) director.finish(world.lateral > 0 ? -1 : 1);
+  const ts = finishing ? director.timeScale : 1;
   if (stepping) {
     if (S === 'drive' && app.goShown > 0) { app.goShown -= dt; if (app.goShown <= 0) hud.setCount('', false); }
     if (S === 'results') { rec = STOP; app.driver = null; }
-    acc += dt;
+    acc += dt * ts;
     /* How many steps this frame: the count is rounded up when the
        accumulator is within a millionth of a step, so a 60 Hz frame is
        always two steps and a 120 Hz frame always one, instead of the
@@ -208,7 +217,7 @@ function frame(t) {
     for (let i = 0; i < steps; i++) { if (S === 'drive') driveStep(rec); else stepOnce(rec); }
     acc = Math.max(0, acc - steps * STEP);
     physMs = performance.now() - p0; lastSteps = steps;
-    if (S === 'drive' && app.settle > 0) { app.settle -= dt; if (app.settle <= 0) finishRun(); }
+    if (S === 'drive' && app.settle > 0) { app.settle -= dt * ts; if (app.settle <= 0) finishRun(); }
     if (S === 'results') { app.lockout -= dt; if (app.lockout <= 0 && raw.action) onAction('again'); }
   }
   const alpha = stepping ? acc / STEP : 0;
@@ -217,11 +226,14 @@ function frame(t) {
   pose.x = prev.x + (c.x - prev.x) * alpha; pose.y = prev.y + ((c.y || 0) - prev.y) * alpha; pose.z = prev.z + (c.z - prev.z) * alpha; pose.yaw = prev.yaw + dy * alpha;
   pose.slip = c.slip; pose.speed = c.speed; pose.boost = c.boost; pose.layer = c.layer || 0;
   if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
-  else chase.update(pose, dt, scene.camera, view.w / view.h);
+  else {
+    chase.update(pose, dt, scene.camera, view.w / view.h);
+    if (director) director.apply(S === 'countdown' ? 'countdown' : finishing ? 'finish' : 'drive', pose, scene.camera, dt, S === 'countdown' ? 1 - Math.max(0, app.countdown) / LOOP.COUNTDOWN : 0, chase.state);
+  }
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
-  scene.update(pose, world, dt, g);
+  scene.update(pose, world, dt * ts, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1 });
   sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev', world.touching);
-  if (app.frameHit) { sound.hit(app.frameHit.speed, app.frameHit.hard); app.frameHit = null; }
+  if (app.frameHit) { sound.hit(app.frameHit.speed, app.frameHit.hard); if (director && app.frameHit.hard) director.hardHit(); app.frameHit = null; }
   /* the score's sounds, from the callouts it queued this frame */
   const sc = scoring.state;
   if ((app.heardCallouts || 0) > sc.calloutCount) app.heardCallouts = 0;   // the score was reset
@@ -229,7 +241,7 @@ function frame(t) {
     const fresh = Math.min(sc.callouts.length, sc.calloutCount - (app.heardCallouts || 0));
     for (const co of sc.callouts.slice(-fresh)) {
       if (co.kind === 'lost') sound.ui('lost');
-      else if (co.kind === 'bank') sound.ui(/^(CLEAN|PACE)/.test(co.text) ? 'clean' : 'bank', sc.lastBankMult);
+      else if (co.kind === 'bank') { const drift = !/^(CLEAN|PACE)/.test(co.text); sound.ui(drift ? 'bank' : 'clean', sc.lastBankMult); if (director && drift) director.bank(sc.lastBankMult); }
     }
     app.heardCallouts = sc.calloutCount;
   }
@@ -446,14 +458,32 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
+  app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();
+  if (FX_ON && stars > 0) scene.fireworks(stars);
   for (let i = 0; i < stars; i++) sound.ui('star', i + 1, 0.35 + i * 0.28);
   sound.ui('coin', 0, 0.45 + stars * 0.28);
   hud.setCount('', false); hud.setVisible(false); hud.setMissions(null); input.touch.setVisible(false);
   screens.results(app.results);
+  if (FX_ON) countCoins(0.45 + stars * 0.28);
+}
+/* the results' coins count up from nothing, starting with the coin sound */
+let coinTimer = 0;
+function countCoins(delay) {
+  clearInterval(coinTimer);
+  const el = document.querySelector('#screens .coinsN');
+  if (!el) return;
+  const to = +el.dataset.to || 0, t0 = performance.now() + delay * 1000, span = 700;
+  const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  el.textContent = '+0';
+  coinTimer = setInterval(() => {
+    const k = Math.max(0, Math.min(1, (performance.now() - t0) / span));
+    if (!el.isConnected) { clearInterval(coinTimer); return; }
+    el.textContent = '+' + fmt(to * (1 - Math.pow(1 - k, 3)));
+    if (k >= 1) clearInterval(coinTimer);
+  }, 33);
 }
 
 function startFree() {
@@ -538,6 +568,11 @@ let running = false;
 function loop(t) { frame(t); requestAnimationFrame(loop); }
 scene.ready.then(() => {
   resize();
+  if (FX_ON) {
+    document.body.classList.add('fx');
+    /* the low tier has no post pass, so its vignette is a gradient over the canvas (the high tier's is in the grade) */
+    if (scene.info().tier === 'low') { const v = document.createElement('div'); v.id = 'vignette'; document.body.insertBefore(v, root); }
+  }
   if (devGround) {
     /* the feel prototype's endless drive, for the probes and for tuning */
     app.state = 'dev';

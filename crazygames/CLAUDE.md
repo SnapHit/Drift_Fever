@@ -376,3 +376,32 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   coins, cars and missions are never touched, and nothing is dropped
   when the storage is broken, not full. Measured in Node by
   `game/test/loop/quota.js`.
+- 11 November 2026, the spectacle round (`briefs/SPECTACLE.md`,
+  `review/spectacle/REPORT.md`): presentation only, nothing read by the
+  physics or the score. Smoke, tail-light trails, brake lights, exhaust
+  flames, sparks and marks that climb with the multiplier
+  (`SHOW` in `env/show.js`); lamps with pools of light, barrier tape, a
+  start grid, flags, camera flashes and fireworks (`DRESS` in
+  `env/dressing.js`), so night tracks read; a camera director over the
+  chase camera for the countdown sweep, the banked chain's kick, the
+  hard hit and slow motion with a side on view from the line
+  (`DIRECTOR` in `camera/director.js`; `TUNE.CAMERA` untouched); a score
+  that pops, heats and flies to the total (`HUD_SHOW`); a results card
+  in two columns that fits 844x390. One switch in `game/src/fx.js`:
+  `?fx=0` is the game as it was before the round, and `?fx=none` is
+  what `?fx=0` used to mean (no particles). Quality adapts
+  (`LOOK.ADAPT` in `render/scene.js`, `?adapt=0` turns it off): half of
+  the last 90 frames over 22 ms steps down through fewer particles, no
+  bloom, then 80 and 65 per cent pixel ratio; it never steps back up,
+  but if the steps bought no shorter frames (a device capped at 30
+  frames a second) it gives everything back once and stops. Probes in
+  `game/test/spectacle/`. Open for play, since the sandbox draws in
+  software: frame rate on the phone and the Chromebook at night mid
+  slide; whether the smoke is enough by day and too pink at night
+  (`SHOW.SMOKE`); whether a second of slow motion is a beat or a wait
+  (`DIRECTOR.SLOW`); the lamps' strength and colour; nothing has run on
+  real WebGPU. Not done: lit windows in the night skyline, headlights
+  reflected in a wet road, sight lines past the new lamp row
+  (`visuals/occlusion.js` does not place it). When the bloom is dropped
+  on the high tier the colour grade goes with it. Three more rounds are
+  proposed and not started: rivals and tandem, garage, playground.

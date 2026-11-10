@@ -20,12 +20,15 @@ import { TUNE, LOOP } from '../tune.js';
 import { makeCar, makeGhostly } from './car.js';
 import { buildTrackMesh } from '../tracks/mesh.js';
 import { carById, carTune, paintById } from '../garage/roster.js';
-import { PRESETS, presetFor, sunDirection } from '../env/presets.js';
+import { PRESETS, presetFor, sunDirection, presetShow } from '../env/presets.js';
+import { buildDressing } from '../env/dressing.js';
 import { THEMES, themeFor } from '../env/themes.js';
 import { buildEnvironment } from '../env/world.js';
 import { styleTrack, racingLine, TRACK_STYLE } from '../env/trackstyle.js';
 import { createEffects } from '../env/effects.js';
-import { bannerTexture, concreteTexture } from '../env/textures.js';
+import { bannerTexture, concreteTexture, SPONSORS_SHOW } from '../env/textures.js';
+import { createShow, SHOW } from '../env/show.js';
+import { FX_ON, FX_PARTICLES } from '../fx.js';
 
 export const LOOK = {
   EDGE:         0xf6e7a1,     // the brightest, most saturated thing on screen (the mesh builder paints it)
@@ -50,14 +53,38 @@ export const LOOK = {
   SHADOW_NORMAL_BIAS: 0.03,
   SHADOW_AHEAD: 0.35,         // share of the shadow range the box leads the car by
   HEADLIGHT:    { colour: 0xfff2d0, intensity: 900, angle: 0.42, penumbra: 0.6, distance: 70, decay: 1.6, y: 0.75, z: -1.6 },
+  HEADLIGHT_SHOW: { intensity: 1300, angle: 0.48, distance: 110, decay: 1.6, aim: -40 },   // the spectacle round: the headlights reach (aim: m ahead the beam points)
   MARK:         0x000000,     // the marks and the racing line darken the road: black at an opacity
   MARK_WIDTH:   0.22,
   MARK_MIN_SLIDE: 0.9,        // rear slide (as a share of the peak) before a mark is laid
   MARK_SPACING: 0.35,         // m between quads
   MARK_OPACITY: 0.6,
+  /* the spectacle round's marks: wider, darker, and enough of them to
+     stay for the whole run (quads per tier) */
+  MARK_SHOW:    { width: 0.27, opacity: 0.85, low: 6000, high: 12000 },
+  RUBBER_SHOW:  0.46,         // the rubber laid down the racing line, at most this opaque (TRACK_STYLE.RACING_LINE_ALPHA is 0.3)
   TONE_MAPPING: 'aces',
   BLOOM:        { threshold: 0.85, strength: 0.55, radius: 0.012, taps: 12 },
   LOW_TIER_CORES: 4,
+  /* QUALITY THAT ADAPTS (the spectacle round): sustained slow frames
+     step the quality down, one level at a time, and fast frames never
+     step it back up. Measured on the browser's own frame clock, so a
+     probe's fixed 60 Hz clock never trips it. ?adapt=0 turns it off.
+     One exception, once: if frames are still slow after the last step
+     and no shorter than before the first, the quality was never the
+     reason (a phone saving its battery draws 30 frames a second
+     whatever it is given), so everything is given back and the
+     adaptation stops. */
+  ADAPT: {
+    SLOW_MS:    22,       // a frame longer than this is slow (under 45 fps)
+    WINDOW:     90,       // frames looked at
+    SHARE:      0.5,      // share of them slow before a step down
+    COOLDOWN:   150,      // frames after a step (or a new track) before the next can come
+    IGNORE_MS:  250,      // a gap this long is the tab hidden or a load, not a slow frame
+    DENSITY:    0.55,     // level 1: the effects' spawn rates times this
+    PIXEL:      [0.8, 0.65],   // levels 3 and 4: the pixel ratio times these (level 2 is the bloom off)
+    GAIN:       0.1,      // after the last step frames must be this share shorter than before the first, or it is all given back
+  },
   TIERS: {
     low:  { pixelRatio: 1.0, shadow: 1024, shadowRange: 36, terrainCell: 8, sceneryShare: 0.4, shadowMinHeight: 2.5, smoke: 48, dust: 32, sparks: 60, rain: 140, marks: 1400, bloom: false, headlight: true },
     high: { pixelRatio: 2.0, shadow: 2048, shadowRange: 52, terrainCell: 5, sceneryShare: 1.0, shadowMinHeight: 0,   smoke: 120, dust: 80, sparks: 160, rain: 400, marks: 4000, bloom: true,  headlight: true },
@@ -85,7 +112,7 @@ export function createScene(canvas, opts) {
   });
   function T() { return LOOK.TIERS[tier]; }
   function applyTier() {
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio) * pixelScale());
     renderer.setSize(view.w, view.h, false);
     sun.shadow.mapSize.set(T().shadow, T().shadow);
     sun.shadow.camera.left = -T().shadowRange; sun.shadow.camera.right = T().shadowRange; sun.shadow.camera.top = T().shadowRange; sun.shadow.camera.bottom = -T().shadowRange;
@@ -93,7 +120,47 @@ export function createScene(canvas, opts) {
     if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
     headlight.visible = !!(T().headlight && preset.headlights);
     rebuildEffects();
+    setPost(T().bloom && !(adapt.level >= 2));
+  }
+  /* the adaptation's state: level 0 is the tier as chosen */
+  const adapt = { level: 0, ring: new Uint8Array(LOOK.ADAPT.WINDOW), ms: new Float32Array(LOOK.ADAPT.WINDOW), sum: 0, at: 0, filled: 0, slow: 0, wait: LOOK.ADAPT.COOLDOWN, steps: [], base: 0, done: false, gaveBack: false };
+  const adaptOn = FX_ON && query.get('adapt') !== '0';
+  function pixelScale() { const P = LOOK.ADAPT.PIXEL; return adapt.level >= 4 ? P[1] : adapt.level >= 3 ? P[0] : 1; }
+  function density() { return adapt.level >= 1 ? LOOK.ADAPT.DENSITY : 1; }
+  /* one frame's length, from the browser's frame clock */
+  function frameTime(ms) {
+    if (!adaptOn || adapt.done || !(ms > 0) || ms > LOOK.ADAPT.IGNORE_MS) return adapt.level;
+    const A = LOOK.ADAPT, slow = ms > A.SLOW_MS ? 1 : 0, full = adapt.filled >= A.WINDOW;
+    adapt.slow += slow - (full ? adapt.ring[adapt.at] : 0);
+    adapt.sum += ms - (full ? adapt.ms[adapt.at] : 0);
+    adapt.ring[adapt.at] = slow; adapt.ms[adapt.at] = ms; adapt.at = (adapt.at + 1) % A.WINDOW; adapt.filled = Math.min(A.WINDOW, adapt.filled + 1);
+    if (adapt.wait > 0) { adapt.wait--; return adapt.level; }
+    if (adapt.filled >= A.WINDOW && adapt.slow >= A.SHARE * A.WINDOW) {
+      const mean = adapt.sum / A.WINDOW;
+      if (adapt.level < 4) { if (!adapt.base) adapt.base = mean; stepDown(); }
+      else { adapt.done = true; if (mean > adapt.base * (1 - A.GAIN)) giveBack(); }   // still slow at the last level: did any of it help?
+    }
+    return adapt.level;
+  }
+  function clearWindow() { adapt.wait = LOOK.ADAPT.COOLDOWN; adapt.ring.fill(0); adapt.ms.fill(0); adapt.sum = 0; adapt.slow = 0; adapt.filled = 0; }
+  function applyPixels() { renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T().pixelRatio) * pixelScale()); renderer.setSize(view.w, view.h, false); }
+  function stepDown() {
+    adapt.level++;
+    /* the bloom is only there to lose on the high tier: a low tier goes straight on to the pixels */
+    if (adapt.level === 2 && !post) adapt.level = 3;
+    adapt.steps.push({ level: adapt.level, at: performance.now() });
+    clearWindow();
+    if (effects && effects.setDensity) effects.setDensity(density());
+    if (adapt.level === 2) post = null;
+    if (adapt.level >= 3) applyPixels();
+  }
+  /* nothing that was taken away made the frames shorter: put it all back, for good */
+  function giveBack() {
+    adapt.level = 0; adapt.gaveBack = true;
+    adapt.steps.push({ level: 0, at: performance.now() });
+    if (effects && effects.setDensity) effects.setDensity(1);
     setPost(T().bloom);
+    applyPixels();
   }
 
   const scene = new THREE.Scene();
@@ -122,16 +189,20 @@ export function createScene(canvas, opts) {
     renderer.toneMappingExposure = p.exposure;
     headlight.visible = !!(T().headlight && p.headlights);
     if (effects) effects.setPreset(p);
+    if (show) show.setPreset(p);
+    if (FX_ON) setGrade(p);
   }
 
   /* ---- the ground and the world around it ---- */
-  let groundGroup = null, cones = null, env = null, envKey = null, track = null, currentGround = null;
+  let groundGroup = null, cones = null, env = null, envKey = null, track = null, currentGround = null, dressing = null;
   const concrete = concreteTexture(THREE, 128);
   function setGround(ground) {
     currentGround = ground;
     const seed = (ground.seed >>> 0) || (ground.centre.length ? 7 : 3);
     /* a track may name its own preset and theme (the Lab's); the query's override wins over the seed's pick */
-    const p = presetFor(seed, overrides.preset || ground.preset), th = ground.centre.length ? themeFor(seed, overrides.theme || ground.theme) : (overrides.theme && THEMES[overrides.theme] ? THEMES[overrides.theme] : THEMES.docks);
+    let p = presetFor(seed, overrides.preset || ground.preset);
+    if (FX_ON) p = presetShow(p);
+    const th = ground.centre.length ? themeFor(seed, overrides.theme || ground.theme) : (overrides.theme && THEMES[overrides.theme] ? THEMES[overrides.theme] : THEMES.docks);
     applyPreset(p);
     theme = th;
     if (groundGroup) { scene.remove(groundGroup); groundGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
@@ -164,9 +235,11 @@ export function createScene(canvas, opts) {
     const key = [seed, ground.name, p.name, th.name, tier].join('|');
     if (env && envKey !== key) { scene.remove(env.group); scene.remove(env.sky); env.dispose(); env = null; }
     if (!env) {
-      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T() });
+      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), sponsors: FX_ON ? SPONSORS_SHOW : null });
       scene.add(env.group); scene.add(env.sky);
       envKey = key;
+      if (dressing) { scene.remove(dressing.group); dressing.dispose(); dressing = null; }
+      if (FX_ON) { dressing = buildDressing(THREE, ground, { preset: p, theme: th, tierName: tier, env }); scene.add(dressing.group); }
     }
     // cones
     if (cones) { scene.remove(cones); cones.geometry.dispose(); cones = null; }
@@ -177,6 +250,8 @@ export function createScene(canvas, opts) {
     }
     clearMarks();
     if (effects) effects.clear();
+    if (show) show.clear();
+    if (dressing) dressing.clear();
   }
   /* The car park's walls: a track's come with its mesh. */
   function parkWalls(ground) {
@@ -220,6 +295,8 @@ export function createScene(canvas, opts) {
       // only the bright, saturated paint glows: the asphalt (dark) stays dark
       const lum = vc.r.max(vc.g).max(vc.b);
       nm.emissiveNode = vc.mul(TSL.smoothstep(0.45, 0.8, lum)).mul(TSL.float(k));
+      /* the spectacle round's night: the asphalt itself gives back a little light (moonlight on the surface, baked), so the road reads between the lamps' pools */
+      if (FX_ON && preset.roadGlow) nm.emissiveNode = nm.emissiveNode.add(vc.mul(TSL.float(1).sub(TSL.smoothstep(0.45, 0.8, lum))).mul(TSL.float(preset.roadGlow)));
       m.material = nm;
       old.dispose();
     });
@@ -231,7 +308,7 @@ export function createScene(canvas, opts) {
     const TSL = THREE.TSL;
     const m = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
     m.colorNode = TSL.vec3(((LOOK.MARK >> 16) & 255) / 255, ((LOOK.MARK >> 8) & 255) / 255, (LOOK.MARK & 255) / 255);
-    m.opacityNode = TSL.attribute('alpha', 'float').mul(TSL.float(TRACK_STYLE.RACING_LINE_ALPHA));
+    m.opacityNode = TSL.attribute('alpha', 'float').mul(TSL.float(FX_ON ? LOOK.RUBBER_SHOW : TRACK_STYLE.RACING_LINE_ALPHA));
     return m;
   }
 
@@ -263,6 +340,7 @@ export function createScene(canvas, opts) {
   scene.add(car);
   headlight.position.set(0, LOOK.HEADLIGHT.y, LOOK.HEADLIGHT.z);
   headlight.target.position.set(0, 0.2, -30);
+  if (FX_ON) { const H = LOOK.HEADLIGHT_SHOW; headlight.intensity = H.intensity; headlight.angle = H.angle; headlight.distance = H.distance; headlight.decay = H.decay; headlight.target.position.set(0, 0.2, H.aim); }
   car.add(headlight); car.add(headlight.target);
   const ghostRoot = new THREE.Group();
   ghostRoot.visible = false;
@@ -288,6 +366,23 @@ export function createScene(canvas, opts) {
     const r = mount(car, id, paintById(paintId || carById(id).paint).hex, false);
     model = r.model; rig.bRear = r.bRear; rig.half = r.half;
     if (model.lights && model.lights.set) model.lights.set(preset.headlights ? 1 : 0.35, 1);
+    lamps = carLamps(model);
+  }
+  /* Where the tail-lights and the exhaust are on the car, in the frame
+     of the physics origin: the trails and the pops start there. */
+  let lamps = { tails: [], exhaust: null };
+  function carLamps(m) {
+    const out = { tails: [], exhaust: null };
+    const tail = m.lights && m.lights.tail;
+    const oz = m.group.position.z;
+    if (tail && tail.geometry) {
+      tail.geometry.computeBoundingBox();
+      const b = tail.geometry.boundingBox, y = (b.min.y + b.max.y) / 2, z = b.max.z + oz + 0.02, inset = Math.min(0.15, (b.max.x - b.min.x) * 0.12);
+      out.tails.push([b.min.x + inset, y + tail.position.y, z + tail.position.z], [b.max.x - inset, y + tail.position.y, z + tail.position.z]);
+    }
+    const d = m.dims;
+    out.exhaust = [d.halfWidth * 0.45, 0.32, (d.centreZ || 0) + d.halfLength + oz + 0.05];
+    return out;
   }
   function setGhost(id, paintId) {
     if (ghostModel) { ghostRoot.remove(ghostModel.group); ghostModel.dispose(); ghostModel = null; }
@@ -302,16 +397,21 @@ export function createScene(canvas, opts) {
     w.rl.mesh.rotation.x = c.wheelR; w.rr.mesh.rotation.x = c.wheelR;
   }
   setCar('starter');
+  const clearOf = { x: 0, y: 0, z: 0, r: 1.8, keep: 0.1, near: 2.5, far: 7 };
+  const dressArgs = { dt: 0, pose: null, sliding: false };
+  const showCtx = { mult: 1, car: null, tails: null, exhaust: null, lights: null, pools: null, density: 1,
+    extraGlows: g => { if (dressing) dressing.update(dressArgs.dt, camera, dressArgs.pose, show.state.heat, dressArgs.sliding, g); } };
 
   /* ---- tyre marks: a ring of quads under the rear wheels ---- */
-  const markMax = Math.max(LOOK.TIERS.low.marks, LOOK.TIERS.high.marks);
+  const markLimit = () => FX_ON ? LOOK.MARK_SHOW[tier] || LOOK.MARK_SHOW.low : T().marks;
+  const markMax = FX_ON ? Math.max(LOOK.MARK_SHOW.low, LOOK.MARK_SHOW.high) : Math.max(LOOK.TIERS.low.marks, LOOK.TIERS.high.marks);
   const markGeo = new THREE.BufferGeometry();
   const markPos = new Float32Array(markMax * 6 * 3);
   const markAlpha = new Float32Array(markMax * 6);
   markGeo.setAttribute('position', new THREE.BufferAttribute(markPos, 3));
   markGeo.setAttribute('alpha', new THREE.BufferAttribute(markAlpha, 1));
   const markMat = markMaterial();
-  markMat.opacityNode = THREE.TSL.attribute('alpha', 'float').mul(THREE.TSL.float(LOOK.MARK_OPACITY));
+  markMat.opacityNode = THREE.TSL.attribute('alpha', 'float').mul(THREE.TSL.float(FX_ON ? LOOK.MARK_SHOW.opacity : LOOK.MARK_OPACITY));
   const marks = new THREE.Mesh(markGeo, markMat);
   marks.frustumCulled = false;
   marks.position.y = 0.03;
@@ -326,12 +426,14 @@ export function createScene(canvas, opts) {
     lastMark[name] = { x, y, z, hx, hz };
     if (!prev) return;
     if (Math.hypot(x - prev.x, z - prev.z) < LOOK.MARK_SPACING * 0.5) { lastMark[name] = prev; return; }
-    const limit = T().marks;
+    const limit = markLimit();
     const o = markHead * 18;
     const q = [prev.x - prev.hx, prev.z - prev.hz, prev.x + prev.hx, prev.z + prev.hz, x + hx, z + hz, x - hx, z - hz];
     const qy = [prev.y, prev.y, y, y];
     const tri = [0, 1, 2, 0, 2, 3];
     for (let i = 0; i < 6; i++) { markPos[o + i * 3] = q[tri[i] * 2]; markPos[o + i * 3 + 1] = qy[tri[i]]; markPos[o + i * 3 + 2] = q[tri[i] * 2 + 1]; markAlpha[markHead * 6 + i] = strength; }
+    /* with the round on, only the quad just laid goes to the GPU, not the whole ring */
+    if (FX_ON) { markGeo.attributes.position.addUpdateRange(o, 18); markGeo.attributes.alpha.addUpdateRange(markHead * 6, 6); }
     markHead = (markHead + 1) % limit;
     if (markCount < limit) markCount++;
     markGeo.attributes.position.needsUpdate = true; markGeo.attributes.alpha.needsUpdate = true;
@@ -339,14 +441,26 @@ export function createScene(canvas, opts) {
   }
 
   /* ---- effects ---- */
-  let effects = null;
+  let effects = null, show = null;
   function rebuildEffects() {
     if (effects) { scene.remove(effects.group); effects.dispose(); }
-    effects = createEffects(THREE, { tier: T(), preset });
+    effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON });
+    if (FX_ON) effects.setDensity(density());
     scene.add(effects.group);
+    if (FX_ON) {
+      if (show) { scene.remove(show.group); show.dispose(); }
+      show = createShow(THREE, { tier: T(), tierName: tier, preset });
+      scene.add(show.group);
+    }
   }
   rebuildEffects();
 
+  /* the grade's uniforms, set by the preset */
+  const grade = { lift: THREE.TSL.uniform(new THREE.Vector3(0, 0, 0)), gain: THREE.TSL.uniform(new THREE.Vector3(1, 1, 1)), saturation: THREE.TSL.uniform(1), vignette: THREE.TSL.uniform(0) };
+  function setGrade(p) {
+    const g = p.grade || { lift: [0, 0, 0], gain: [1, 1, 1], saturation: 1, vignette: 0 };
+    grade.lift.value.set(...g.lift); grade.gain.value.set(...g.gain); grade.saturation.value = g.saturation; grade.vignette.value = g.vignette;
+  }
   /* ---- bloom on the high tier: the scene pass plus a soft ring of
      samples of its bright parts, through the renderer's post pipeline ---- */
   function setPost(on) {
@@ -365,7 +479,18 @@ export function createScene(canvas, opts) {
         const s = scenePass.getTextureNode('output').sample(uv);
         glow = glow.add(s.rgb.sub(B.threshold).max(0));
       }
-      pipeline.outputNode = colour.add(TSL.vec4(glow.mul(B.strength / B.taps), 0));
+      let out = colour.add(TSL.vec4(glow.mul(B.strength / B.taps), 0));
+      if (FX_ON) {
+        /* the spectacle round's colour grade: lift, gain, saturation and a vignette, per preset */
+        const G = grade;
+        let rgb = out.rgb.mul(G.gain).add(G.lift);
+        const l = rgb.dot(TSL.vec3(0.2126, 0.7152, 0.0722));
+        rgb = TSL.mix(TSL.vec3(l), rgb, G.saturation);
+        const r = TSL.uv().sub(0.5).length().mul(1.414);
+        rgb = rgb.mul(TSL.float(1).sub(G.vignette.mul(TSL.smoothstep(0.35, 1.0, r))));
+        out = TSL.vec4(rgb, out.a);
+      }
+      pipeline.outputNode = out;
       post = pipeline;
     } catch (e) { console.warn('bloom off: ' + (e && e.message)); post = null; }
   }
@@ -382,7 +507,7 @@ export function createScene(canvas, opts) {
     sun.target.position.copy(texel);
     sun.position.copy(texel).addScaledVector(sunDir, LOOK.SUN_DISTANCE);
   }
-  function update(pose, world, dt, ghost) {
+  function update(pose, world, dt, ghost, extra) {
     /* pose: the interpolated car {x, z, yaw}; world.car for the rest;
        ghost: { x, z, yaw, car } interpolated, or null */
     const c = world.car;
@@ -403,10 +528,20 @@ export function createScene(canvas, opts) {
       const wx = pose.x - fx * bRear + lx * half * side, wz = pose.z - fz * bRear + lz * half * side;
       /* the wheel's height on a banked or sloping road: the car's height plus its roll across and pitch along */
       const wy = (pose.y || 0) - Math.sin(c.roll || 0) * half * side + Math.sin(c.pitch || 0) * bRear;
-      if (sliding && c.speed > 1.5) layMark(name, wx, wy, wz, lx * LOOK.MARK_WIDTH * 0.5, lz * LOOK.MARK_WIDTH * 0.5, 0.5 + 0.5 * strength);
+      const mw = FX_ON ? LOOK.MARK_SHOW.width : LOOK.MARK_WIDTH;
+      if (sliding && c.speed > 1.5) layMark(name, wx, wy, wz, lx * mw * 0.5, lz * mw * 0.5, 0.5 + 0.5 * strength);
       else lastMark[name] = null;
     }
-    if (query.get('fx') !== '0') effects.update(dt, camera, pose, world, rig);
+    if (FX_ON) {
+      const C = SHOW.SMOKE.CLEAR;
+      clearOf.x = pose.x; clearOf.y = (pose.y || 0) + 0.7; clearOf.z = pose.z; clearOf.r = C.r; clearOf.keep = C.keep; clearOf.near = C.near; clearOf.far = C.far;
+      effects.update(dt, camera, pose, world, rig, show.state.heat, clearOf);
+      const sliding = c.rearSlide >= 0.9 || c.hb > 0.5 || c.drifting;
+      /* the show's context, one object kept and refreshed, so nothing is made per frame */
+      showCtx.mult = extra ? extra.mult : 1; showCtx.car = car; showCtx.tails = lamps.tails; showCtx.exhaust = lamps.exhaust; showCtx.lights = model && model.lights; showCtx.pools = effects.pools; showCtx.density = density();
+      dressArgs.dt = dt; dressArgs.pose = pose; dressArgs.sliding = sliding;
+      show.update(dt, camera, pose, world, rig, showCtx);
+    } else if (FX_PARTICLES) effects.update(dt, camera, pose, world, rig);
     followSun(pose);
     if (cones) {
       for (let i = 0; i < world.cones.length; i++) {
@@ -447,10 +582,12 @@ export function createScene(canvas, opts) {
     if (currentGround) setGround(currentGround);
   }
   return {
-    THREE, renderer, scene, camera, car, ready, setGround, setCar, setGhost, update, resize, render, clearMarks, setLook,
+    THREE, renderer, scene, camera, car, ready, show: () => show, effects: () => effects, setGround, setCar, setGhost, update, resize, render, clearMarks, setLook,
     carModel: () => model,
-    info: () => ({ backend, tier, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
-    environment: () => env,
+    frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, done: adapt.done, gaveBack: adapt.gaveBack, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
+    info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
+    environment: () => env, dressing: () => dressing,
+    fireworks: stars => { if (dressing) dressing.fireworks(stars); },
     setTier: t => { if (LOOK.TIERS[t]) { tier = t; applyTier(); if (currentGround) setGround(currentGround); } },
   };
 }

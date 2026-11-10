@@ -11,6 +11,7 @@ import { fullscreenSupported, isFullscreen, fullscreenIcon } from './fullscreen.
 import { soundIcon } from '../audio/sound.js';
 import { FIELDS } from '../lab/code.js';
 import { crossoverOffered, format as formatCode } from '../lab/lab.js';
+import { FX_ON } from '../fx.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
@@ -165,14 +166,21 @@ export function createScreens(root, onAction) {
   /* r: { score, best, stars, targets, coins, improved, mode, name, label, seconds, nextIndex, unlock, note, laps, kind, missions, code } */
   function results(r) {
     const targets = r.targets.map((t, i) => `<span class="${r.score >= t ? 'on' : 'off'}">&#9733; ${fmt(t)}</span>`).join('');
+    /* with the spectacle round on, the card is two columns that sit side
+       by side on a short landscape screen (the score on the left, the
+       missions and the buttons on the right) and stack as before
+       anywhere else; the stars land one at a time and the coins count
+       up (main.js starts them, in time with the sounds) */
+    const a = FX_ON ? '<div class="col a">' : '', b = FX_ON ? '</div><div class="col b">' : '', z = FX_ON ? '</div>' : '';
+    const coinsN = FX_ON ? `<b class="coinsN" data-to="${Math.round(r.coins)}">+${fmt(r.coins)}</b>` : `<b>+${fmt(r.coins)}</b>`;
     show('results', `
-      <div class="card">
+      <div class="card${FX_ON ? ' split' : ''}">${a}
         ${r.label ? `<p class="runlabel">${esc(r.label)}</p>` : ''}<h2>${esc(r.name)}</h2>
         <div class="score"><span class="n">${fmt(r.score)}</span><span class="l">points${r.improved ? ' &middot; NEW BEST' : ''}</span></div>
         ${stars(r.stars)}
         <div class="targets">${targets}</div>
         ${r.parts ? `<div class="parts"><span><b>${fmt(r.parts.drift)}</b><small>drift</small></span><span><b>${fmt(r.parts.clean)}</b><small>clean${r.cleanSectors ? ' ' + r.cleanSectors : ''}</small></span><span><b>${fmt(r.parts.pace)}</b><small>pace</small></span></div>` : ''}
-        <div class="facts"><span><b>${fmt(r.best)}</b><small>best chain</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span><b>+${fmt(r.coins)}</b><small>coins${r.newStars ? ' &middot; ' + r.newStars + ' new star' + (r.newStars > 1 ? 's' : '') : ''}</small></span></div>
+        <div class="facts"><span><b>${fmt(r.best)}</b><small>best chain</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span>${coinsN}<small>coins${r.newStars ? ' &middot; ' + r.newStars + ' new star' + (r.newStars > 1 ? 's' : '') : ''}</small></span></div>${b}
         ${r.missions ? `<div class="missions">${r.missions.map(m => `<span class="${m.done ? 'done' : ''}${m.fresh ? ' fresh' : ''}">${m.done ? '&#10003;' : '&#9671;'} ${esc(m.text)}${m.fresh ? ' <b>+' + m.coins + '</b>' : ''}</span>`).join('')}</div>` : ''}
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
@@ -182,7 +190,7 @@ export function createScreens(root, onAction) {
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
           ${r.code ? `<button type="button" class="big" data-action="lab"><b>LAB</b><small>change the track</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>
-        </div>
+        </div>${z}
       </div>`);
   }
 
