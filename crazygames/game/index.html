@@ -37,7 +37,7 @@
   @keyframes totalPop { 0% { transform: scale(1.35); color: var(--edge); } 100% { transform: scale(1); } }
   /* the results: lighter behind, so the finish and the fireworks show; the stars land one by one */
   body.fx #screens.on:has(.screen.results) { background: linear-gradient(180deg, rgba(14,16,30,0.2), rgba(14,16,30,0.7)); }
-  body.fx .results .card { background: rgba(10,14,30,0.74); }
+  body.fx .results .card { background: rgba(10,14,30,0.74); box-sizing: border-box; }   /* its border and padding inside its width: it overflowed a 390 px screen by 2 px a side */
   body.fx .results .card.split .col { display: contents; }
   body.fx .results .stars > span { display: inline-block; }
   body.fx .results .stars > span.on { animation: starLand 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
