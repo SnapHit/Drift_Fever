@@ -119,6 +119,8 @@ export function createShow(THREE, opts) {
   const rand = (a, b) => a + (b - a) * Math.random();   // decoration only
 
   function setPreset(p) { preset = p; }
+  /* one ribbon vertex: where, and its alpha from its age */
+  function put(i, x, y, z, f, gain) { tpos[i * 3] = x; tpos[i * 3 + 1] = y; tpos[i * 3 + 2] = z; tcol[i * 4] = SHOW.TRAIL_COLOUR[0] * gain; tcol[i * 4 + 1] = SHOW.TRAIL_COLOUR[1] * gain; tcol[i * 4 + 2] = SHOW.TRAIL_COLOUR[2] * gain; tcol[i * 4 + 3] = f * f; }
 
   /* ctx: { mult, car (the three.js group at the physics origin), tails
      ([[x, y, z], [x, y, z]] in the car's frame), exhaust ([x, y, z] in
@@ -131,7 +133,7 @@ export function createShow(THREE, opts) {
     state.heat += (target - state.heat) * (1 - Math.exp(-dt * (target > state.heat ? SHOW.HEAT_RISE : SHOW.HEAT_FALL)));
     const heat = state.heat;
     const sliding = (c.rearSlide >= 0.9 || c.hb > 0.5 || c.spinning || c.drifting) && c.speed > SHOW.TRAIL_MIN_SPEED;
-    ctx.car.updateMatrixWorld();
+    ctx.car.updateMatrix();   // the car hangs off the scene, so its own matrix is its world matrix: no need to walk the model's parts
     glows.begin(camera);
 
     /* the tail-lights: brighter under the brake, a halo round each */
@@ -143,7 +145,7 @@ export function createShow(THREE, opts) {
     const haloA = (SHOW.HALO_ALPHA[name] || 0.3) * (1 + (SHOW.HALO_BRAKE - 1) * braking);
     const tails = ctx.tails || [];
     for (let k = 0; k < tails.length; k++) {
-      v.set(tails[k][0], tails[k][1], tails[k][2]).applyMatrix4(ctx.car.matrixWorld);
+      v.set(tails[k][0], tails[k][1], tails[k][2]).applyMatrix4(ctx.car.matrix);
       glows.add(v.x, v.y, v.z, SHOW.HALO_SIZE * (1 + 0.5 * braking), 1, 0.12, 0.08, haloA);
       /* on a wet road the tail-light shows in it, stretched towards the camera */
       if (preset.wet) glows.add(v.x, (pose.y || 0) + 0.04, v.z, 0.2, 1, 0.1, 0.08, 0.45 * (1 + braking), 2.6);
@@ -176,10 +178,9 @@ export function createShow(THREE, opts) {
         const fa = 1 - a.age / life, fb = 1 - b.age / life;
         const wa = width * (0.4 + 0.6 * fa), wb = width * (0.4 + 0.6 * fb);
         const q = quads * 4;
-        const put = (i, x, y, z, f) => { tpos[i * 3] = x; tpos[i * 3 + 1] = y; tpos[i * 3 + 2] = z; const al = f * f; tcol[i * 4] = SHOW.TRAIL_COLOUR[0] * gain; tcol[i * 4 + 1] = SHOW.TRAIL_COLOUR[1] * gain; tcol[i * 4 + 2] = SHOW.TRAIL_COLOUR[2] * gain; tcol[i * 4 + 3] = al; };
-        put(q, a.x + nx * wa, a.y + ny * wa, a.z + nz * wa, fa); put(q + 1, a.x - nx * wa, a.y - ny * wa, a.z - nz * wa, fa);
-        put(q + 2, b.x - nx * wb, b.y - ny * wb, b.z - nz * wb, fb); put(q + 3, b.x + nx * wb, b.y + ny * wb, b.z + nz * wb, fb);
-        tidx.set([q, q + 1, q + 2, q, q + 2, q + 3], quads * 6);
+        put(q, a.x + nx * wa, a.y + ny * wa, a.z + nz * wa, fa, gain); put(q + 1, a.x - nx * wa, a.y - ny * wa, a.z - nz * wa, fa, gain);
+        put(q + 2, b.x - nx * wb, b.y - ny * wb, b.z - nz * wb, fb, gain); put(q + 3, b.x + nx * wb, b.y + ny * wb, b.z + nz * wb, fb, gain);
+        const o6 = quads * 6; tidx[o6] = q; tidx[o6 + 1] = q + 1; tidx[o6 + 2] = q + 2; tidx[o6 + 3] = q; tidx[o6 + 4] = q + 2; tidx[o6 + 5] = q + 3;
         quads++;
       }
     }
@@ -197,7 +198,7 @@ export function createShow(THREE, opts) {
       state.popDue -= dt;
       if (state.popDue <= 0) {
         state.pops--; state.popDue = SHOW.POP_GAP * rand(0.7, 1.4);
-        v.set(ctx.exhaust[0], ctx.exhaust[1], ctx.exhaust[2]).applyMatrix4(ctx.car.matrixWorld);
+        v.set(ctx.exhaust[0], ctx.exhaust[1], ctx.exhaust[2]).applyMatrix4(ctx.car.matrix);
         const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw);
         const puffs = Math.round(pick(SHOW.POP_PUFFS, state.popHeat) * (ctx.density === undefined ? 1 : ctx.density));
         for (let i = 0; i < puffs && ctx.pools; i++) ctx.pools.flame.spawn({ x: v.x + rand(-0.05, 0.05), y: v.y + rand(-0.04, 0.04), z: v.z + rand(-0.05, 0.05), vx: c.wvx * 0.7 - fx * rand(3, 7), vy: rand(0.1, 0.9), vz: c.wvz * 0.7 - fz * rand(3, 7), size: rand(0.16, 0.34) * (1 + state.popHeat * 0.6), life: rand(0.08, 0.2), alpha: 1 });

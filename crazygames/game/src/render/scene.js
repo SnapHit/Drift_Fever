@@ -377,6 +377,9 @@ export function createScene(canvas, opts) {
   }
   setCar('starter');
   const clearOf = { x: 0, y: 0, z: 0, r: 1.8, keep: 0.1, near: 2.5, far: 7 };
+  const dressArgs = { dt: 0, pose: null, sliding: false };
+  const showCtx = { mult: 1, car: null, tails: null, exhaust: null, lights: null, pools: null, density: 1,
+    extraGlows: g => { if (dressing) dressing.update(dressArgs.dt, camera, dressArgs.pose, show.state.heat, dressArgs.sliding, g); } };
 
   /* ---- tyre marks: a ring of quads under the rear wheels ---- */
   const markLimit = () => FX_ON ? LOOK.MARK_SHOW[tier] || LOOK.MARK_SHOW.low : T().marks;
@@ -513,8 +516,10 @@ export function createScene(canvas, opts) {
       clearOf.x = pose.x; clearOf.y = (pose.y || 0) + 0.7; clearOf.z = pose.z; clearOf.r = C.r; clearOf.keep = C.keep; clearOf.near = C.near; clearOf.far = C.far;
       effects.update(dt, camera, pose, world, rig, show.state.heat, clearOf);
       const sliding = c.rearSlide >= 0.9 || c.hb > 0.5 || c.drifting;
-      show.update(dt, camera, pose, world, rig, { mult: extra ? extra.mult : 1, car, tails: lamps.tails, exhaust: lamps.exhaust, lights: model && model.lights, pools: effects.pools, density: density(),
-        extraGlows: g => { if (dressing) dressing.update(dt, camera, pose, show.state.heat, sliding, g); } });
+      /* the show's context, one object kept and refreshed, so nothing is made per frame */
+      showCtx.mult = extra ? extra.mult : 1; showCtx.car = car; showCtx.tails = lamps.tails; showCtx.exhaust = lamps.exhaust; showCtx.lights = model && model.lights; showCtx.pools = effects.pools; showCtx.density = density();
+      dressArgs.dt = dt; dressArgs.pose = pose; dressArgs.sliding = sliding;
+      show.update(dt, camera, pose, world, rig, showCtx);
     } else if (FX_PARTICLES) effects.update(dt, camera, pose, world, rig);
     followSun(pose);
     if (cones) {

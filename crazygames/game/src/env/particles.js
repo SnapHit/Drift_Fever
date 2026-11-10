@@ -42,7 +42,7 @@ export function createParticles(THREE, opts) {
   mesh.renderOrder = o.renderOrder === undefined ? 3 : o.renderOrder;
   mesh.name = o.name || 'particles';
   const P = new Array(max).fill(null).map(() => ({ life: 0, age: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, size: 0, grow: 0, a: 1, g: 0, drag: 0, rot: 0, spin: 0, stretch: 0, gd: 0, c0: [1, 1, 1], c1: [1, 1, 1] }));
-  let head = 0, live = 0;
+  let head = 0, live = 0, awake = false;   // awake: something was spawned since the pool last emptied, so an idle pool costs nothing per frame
   const right = new THREE.Vector3(), up = new THREE.Vector3(), tmp = new THREE.Vector3();
 
   function spawn(s) {
@@ -50,6 +50,7 @@ export function createParticles(THREE, opts) {
     p.life = s.life; p.age = 0; p.x = s.x; p.y = s.y; p.z = s.z; p.vx = s.vx || 0; p.vy = s.vy || 0; p.vz = s.vz || 0;
     p.size = s.size; p.grow = s.grow || 0; p.a = s.alpha === undefined ? 1 : s.alpha; p.g = s.gravity || 0; p.drag = s.drag || 0;
     p.rot = s.rot || 0; p.spin = s.spin || 0; p.stretch = s.stretch || 0; p.gd = s.growDecay || 0;
+    awake = true;
     if (tintA) { const a = s.c0 || WHITE, b = s.c1 || a; p.c0[0] = a[0]; p.c0[1] = a[1]; p.c0[2] = a[2]; p.c1[0] = b[0]; p.c1[1] = b[1]; p.c1[2] = b[2]; }
   }
   /* fade: in quickly, out over the second half */
@@ -59,6 +60,7 @@ export function createParticles(THREE, opts) {
      covers the car on the screen, and the distances from the camera over
      which particles fade in */
   function update(dt, camera, wind, clear) {
+    if (!awake) return;
     camera.matrixWorld.extractBasis(right, up, tmp);
     const wx = wind ? wind.x : 0, wz = wind ? wind.z : 0;
     const cp = camera.position;
@@ -114,6 +116,7 @@ export function createParticles(THREE, opts) {
       n++;
     }
     live = n;
+    if (!n) awake = false;
     geo.setDrawRange(0, n * 6);
     if (n) { geo.attributes.position.needsUpdate = true; geo.attributes.alpha.needsUpdate = true; if (tintA) geo.attributes.tint.needsUpdate = true; }
     mesh.visible = n > 0;

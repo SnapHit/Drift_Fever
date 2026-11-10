@@ -1,0 +1,7 @@
+PASS no prop footprint inside the barriers, over 140 track and theme pairs: 0 inside, least clearance 0.00 m
+PASS the terrain never rises above the road, banked corners and 4 crossings included: worst rise 0.034 m
+PASS sight lines to the road ahead: none blocked within 30 m, at most 2% blocked in all: 31 of 191625 blocked (0.02%), worst track 0.20%, blocked within 30 m: 0
+PASS known answer: a pine on the road is inside the barriers: inside 1, clearance -11.32 m (pine)
+PASS known answer: a pine on the road blocks sight lines: 22 blocked, 7 within 30 m, nearest 4 m
+PASS known answer: the terrain lifted a metre and a half under the road is caught: worst rise 1.079 m
+all passed in 11.5 s; wrote review/visuals/occlusion.json
