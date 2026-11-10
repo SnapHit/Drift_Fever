@@ -1,44 +1,35 @@
 /* CHOOSING EACH RIVAL'S TRACK BY MEASUREMENT (briefs/RIVALS.md: two
    rivals in each chapter, each on a career track of his half of the
-   chapter). For each half chapter after the first rival's, every track
-   in it is driven in Node by the first rival's driving and three
-   variants of it (SETS), in the car the rival will drive, under the
-   search's disturbances (search.js DISTURB), and marked as the search
-   marks a candidate (search.js mark: no respawn, no hard hit, no wall
-   contact, no stall, the corners' sliding, his total and its spread),
-   less a cost for a battle outside 60 to 120 s. The track whose best set
-   marks highest is his. Writes review/rivals/tracks.json.
+   chapter). For a rival, every career track in his half chapter gets a
+   short search (search.js, N tries, in his car and inside his
+   character's ranges) and the best mark found on it, less a cost for a
+   battle outside 60 to 120 s; the track with the highest is his. The
+   long search for his driving then runs on that track.
 
-   node game/test/rivals/tracks.js */
+   node game/test/rivals/tracks.js r2 [--n 24]   appends to review/rivals/tracks.json */
 import path from 'node:path';
 import fs from 'node:fs';
-import { evaluate } from './search.js';
-import { RIVALS } from '../../src/rivals/roster.js';
+import { search, CHARACTERS } from './search.js';
+import { rivalById, RIVALS } from '../../src/rivals/roster.js';
 import { CAREER, CHAPTERS } from '../../src/loop/modes.js';
 
 const here = path.dirname(new URL(import.meta.url).pathname);
-const base = RIVALS[0].drive;
-export const SETS = [base, { ...base, ANGLE_CAP: 32, PROGRESS: 160 }, { ...base, ENTRY: 21, VMAX: 27, EDGE_SAFE: 1.4, EDGE_COST: 1200 }, { ...base, LINK: 30, CHAIN_KEEP: 2500 }];
-export const HALVES = [];
-for (const ch of CHAPTERS) { const mid = ch.from + (ch.to - ch.from) / 2; HALVES.push([ch.from, mid], [mid, ch.to]); }
-const CARS = ['starter', 'hatch', 'fastback', 'tourer', 'driftbuild', 'fastback'];
-
-const out = { sets: SETS, halves: [] };
-for (let h = 1; h < HALVES.length; h++) {
-  const [from, to] = HALVES[h], car = CARS[h], rows = [];
-  for (let i = from; i < to; i++) {
-    let best = null;
-    for (let k = 0; k < SETS.length; k++) {
-      const r = evaluate({ id: 'probe', track: i, car, side: 1, drive: {} }, SETS[k]);
-      const secs = r.detail.seconds, long = secs > 120 ? secs - 120 : secs < 60 ? 60 - secs : 0;
-      const v = r.value - long * 60;
-      if (!best || v > best.value) best = { value: Math.round(v), set: k, ...r.detail };
-    }
-    rows.push({ index: i, name: CAREER[i].name, kind: CAREER[i].kind, ...best });
-    console.log('half ' + h + ' (' + car + ') track ' + (i + 1) + ' ' + CAREER[i].name + ': ' + JSON.stringify(best));
-  }
-  rows.sort((a, b) => b.value - a.value);
-  out.halves.push({ half: h, from, to, car, chosen: rows[0].index, rows });
-  console.log('  chosen: ' + rows[0].name);
+const file = path.resolve(here, '..', '..', '..', 'review', 'rivals', 'tracks.json');
+const args = process.argv.slice(2);
+const id = args.find(a => /^r\d/.test(a)), n = args.includes('--n') ? +args[args.indexOf('--n') + 1] : 24;
+const k = RIVALS.findIndex(r => r.id === id), ch = CHAPTERS[Math.floor(k / 2)], mid = ch.from + (ch.to - ch.from) / 2;
+const [from, to] = k % 2 === 0 ? [ch.from, mid] : [mid, ch.to];
+const C = CHARACTERS[id] || {}, rows = [];
+for (let i = from; i < to; i++) {
+  const def = { ...rivalById(id), track: i };
+  const best = search(def, { n, seed: 11 + i, want: C.want, ranges: C.ranges, quiet: true });
+  const secs = best.detail.seconds, long = secs > 120 ? secs - 120 : secs < 60 ? 60 - secs : 0;
+  const row = { index: i, name: CAREER[i].name, kind: CAREER[i].kind, mark: Math.round(best.value - long * 60), ...best.detail, drive: best.drive };
+  rows.push(row);
+  console.log(id + ' track ' + (i + 1) + ' ' + CAREER[i].name + ': mark ' + row.mark + ' ' + JSON.stringify(best.detail));
 }
-fs.writeFileSync(path.resolve(here, '..', '..', '..', 'review', 'rivals', 'tracks.json'), JSON.stringify(out, null, 1));
+rows.sort((a, b) => b.mark - a.mark);
+console.log(id + ' chosen: track ' + (rows[0].index + 1) + ' ' + rows[0].name);
+let all = {}; try { all = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { all = {}; }
+all[id] = { half: [from, to], tries: n, chosen: rows[0].index, rows };
+fs.writeFileSync(file, JSON.stringify(all, null, 1));

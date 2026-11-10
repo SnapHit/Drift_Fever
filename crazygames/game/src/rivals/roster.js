@@ -9,6 +9,22 @@ export const RIVALS = [
   { id: 'r1', name: 'Kestrow', car: 'starter', paint: 'flame', track: 0, side: 1, prize: 300,
     style: 'Smooth and wide',
     drive: { SLIDE_GAIN: 0.739, PROGRESS: 129, KEEP: 1029, ANGLE_CAP: 48.94, EDGE_SAFE: 0.8, EDGE_COST: 446, ENTRY: 24.74, VMAX: 29.82, CHAIN_KEEP: 2813, CHAIN_MARGIN: 0.4, AY_MAX: 8.84, OUTSIDE: 0.338, SETUP: 23.08, WINDOW_PRE: 3.64, WINDOW_POST: 14.58, LINK: 4.95, HB_TIME: 0.352 } },
+  /* the other five: tracks, and how each drives, chosen by measurement (game/test/rivals/search.js, review/rivals/REPORT.md) */
+  { id: 'r2', name: 'Tolvo', car: 'hatch', paint: 'amber', track: 6, side: -1, prize: 400,
+    style: 'Fast and shallow',
+    drive: {} },
+  { id: 'r3', name: 'Varsk', car: 'fastback', paint: 'lime', track: 11, side: 1, prize: 600,
+    style: 'Late and aggressive',
+    drive: {} },
+  { id: 'r4', name: 'Dovane', car: 'tourer', paint: 'wine', track: 12, side: -1, prize: 800,
+    style: 'Long, linked slides',
+    drive: {} },
+  { id: 'r5', name: 'Halvik', car: 'driftbuild', paint: 'magenta', track: 18, side: 1, prize: 1000,
+    style: 'The biggest angles',
+    drive: {} },
+  { id: 'r6', name: 'Sarrow', car: 'fastback', paint: 'white', track: 22, side: -1, prize: 1500,
+    style: 'Fast, deep and linked',
+    drive: {} },
 ];
 
 export function rivalById(id) { return RIVALS.find(r => r.id === id) || null; }

@@ -1,0 +1,172 @@
+{
+ "margin": 0.3,
+ "runs": [
+  {
+   "id": "r1",
+   "size": "1280x720",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.45,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.42598253478902437,
+    "him": -0.7465545510914846
+   }
+  },
+  {
+   "id": "r1",
+   "size": "390x844",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.46,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.5105203577866388,
+    "him": -0.30588868658391855
+   }
+  },
+  {
+   "id": "r2",
+   "size": "1280x720",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.45,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.4259825347890245,
+    "him": -0.7578248427674862
+   }
+  },
+  {
+   "id": "r2",
+   "size": "390x844",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.46,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.510520357786639,
+    "him": -0.33620697782015885
+   }
+  },
+  {
+   "id": "r3",
+   "size": "1280x720",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.45,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.4259825347890245,
+    "him": -0.7412740999062711
+   }
+  },
+  {
+   "id": "r3",
+   "size": "390x844",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.46,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.510520357786639,
+    "him": -0.29174813327862326
+   }
+  },
+  {
+   "id": "r4",
+   "size": "1280x720",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.45,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.4259825347890229,
+    "him": -0.7410605763775984
+   }
+  },
+  {
+   "id": "r4",
+   "size": "390x844",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.46,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.5105203577866382,
+    "him": -0.29128162611375286
+   }
+  },
+  {
+   "id": "r5",
+   "size": "1280x720",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.45,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.42598253478902404,
+    "him": -0.7405942108828545
+   }
+  },
+  {
+   "id": "r5",
+   "size": "390x844",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.46,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.5105203577866395,
+    "him": -0.2896353730512764
+   }
+  },
+  {
+   "id": "r6",
+   "size": "1280x720",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.45,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.4259825347890248,
+    "him": -0.7412580132612823
+   }
+  },
+  {
+   "id": "r6",
+   "size": "390x844",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.46,
+   "minHim": 7.71,
+   "atGo": {
+    "me": -0.5105203577866387,
+    "him": -0.29169997910916834
+   }
+  }
+ ],
+ "knownAnswer": {
+  "frames": 182,
+  "insideMe": 0,
+  "insideHim": 28,
+  "minMe": 4.2,
+  "minHim": 2,
+  "atGo": {
+   "me": -0.42598253478902437,
+   "him": -0.8589028069875044
+  }
+ }
+}

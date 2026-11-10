@@ -19,6 +19,16 @@ export const RANGES = {
   SLIDE_GAIN: [0.15, 1.5], PROGRESS: [15, 140], KEEP: [0, 1500], ANGLE_CAP: [25, 55], EDGE_SAFE: [0.8, 3], EDGE_COST: [200, 3000],
   ENTRY: [16, 29], VMAX: [24, 34], CHAIN_KEEP: [0, 4000], CHAIN_MARGIN: [0, 0.6], AY_MAX: [5, 9], OUTSIDE: [0, 0.8], SETUP: [15, 80], WINDOW_PRE: [0, 30], WINDOW_POST: [-10, 20], LINK: [0, 60], HB_TIME: [0.1, 0.5],
 };
+/* each rival's character, as narrower ranges and the slide angle he
+   should average, so the character shows in how he drives */
+export const CHARACTERS = {
+  r1: { want: null, ranges: {} },
+  r2: { want: { angle: 24 }, ranges: { ANGLE_CAP: [22, 32], PROGRESS: [110, 200], LINK: [0, 12] } },
+  r3: { want: { angle: 34 }, ranges: { WINDOW_PRE: [0, 3], HB_TIME: [0.3, 0.5], ENTRY: [23, 30], ANGLE_CAP: [36, 50] } },
+  r4: { want: { angle: 30 }, ranges: { LINK: [25, 60], CHAIN_KEEP: [2000, 4000], ANGLE_CAP: [30, 42], KEEP: [600, 1500] } },
+  r5: { want: { angle: 40 }, ranges: { ANGLE_CAP: [48, 60], SLIDE_GAIN: [0.8, 1.5] } },
+  r6: { want: { angle: 35 }, ranges: { LINK: [25, 60], CHAIN_KEEP: [2000, 4000], ANGLE_CAP: [40, 55], SLIDE_GAIN: [0.6, 1.4] } },
+};
 /* the disturbances every candidate is judged on: the start a few cm off and the grip half a per cent off */
 export const DISTURB = [{}, { offset: [0.04, -0.03], grip: 0.005 }, { offset: [-0.05, 0.02], grip: -0.005 }, { offset: [0.01, 0.05], grip: 0.002 }];
 
@@ -33,6 +43,9 @@ export function mark(runs, want) {
     if (m.minKmh < 40) v -= (40 - m.minKmh) * 60;
     const shares = m.corners.map(c => c.share), mean = shares.reduce((a, b) => a + b, 0) / shares.length;
     v += m.worstCorner * 1500 + mean * 800 + m.total * 0.4;
+    /* a rival who does not slide is no rival: every corner should see a slide, and most of each */
+    if (mean < 0.4) v -= (0.4 - mean) * 20000;
+    if (m.worstCorner < 0.2) v -= (0.2 - m.worstCorner) * 10000;
     const ang = m.corners.reduce((a, c) => a + c.angle, 0) / m.corners.length;
     if (want && want.angle) v -= Math.abs(ang - want.angle) * 25;
     if (want && want.seconds && m.seconds > want.seconds) v -= (m.seconds - want.seconds) * 40;
@@ -76,9 +89,11 @@ export function search(def, opts) {
 
 if (process.argv[1] && process.argv[1].endsWith('search.js')) {
   const args = process.argv.slice(2);
-  const def = rivalById(args.find(a => /^r\d/.test(a)) || 'r1');
+  const def = { ...rivalById(args.find(a => /^r\d/.test(a)) || 'r1') };
   const n = args.includes('--n') ? +args[args.indexOf('--n') + 1] : 300, seed = args.includes('--seed') ? +args[args.indexOf('--seed') + 1] : 1;
-  const best = search(def, { n, seed, want: def.want, ranges: def.ranges });
+  const ch = CHARACTERS[def.id] || {};
+  if (args.includes('--track')) def.track = +args[args.indexOf('--track') + 1];
+  const best = search(def, { n, seed, want: ch.want, ranges: ch.ranges });
   console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
   console.log('drive: ' + JSON.stringify(best.drive));
 }

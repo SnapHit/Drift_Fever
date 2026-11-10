@@ -28,6 +28,7 @@ export const DIRECTOR = {
   SWEEP_SIDE:     4.2,     // m out to the side halfway round, staying over the road
   SWEEP_LOOK_UP:  1.6,     // m above the road the sweep looks, over the roof, so the car sits under the countdown's number and not behind it
   /* a battle's sweep (briefs/RIVALS.md 3): from in front of both cars, looking back at the pair, round the side away from the rival */
+  BATTLE:         true,    // a battle has its own sweep (false: the solo sweep, which can start inside a rival right ahead)
   BATTLE_AHEAD:   9.0,     // m in front of the rival's car it starts
   BATTLE_LOW:     1.6,     // m above the road there
   BATTLE_SIDE:    5.5,     // m out on the side away from him, halfway round
@@ -71,7 +72,7 @@ export function createDirector(THREE) {
   function apply(mode, pose, cam, dt, u, chaseState, battle) {
     const D = DIRECTOR;
     const y0 = pose.y || 0;
-    if (mode === 'countdown' && battle) {
+    if (mode === 'countdown' && battle && D.BATTLE) {
       const k = ease(Math.min(1, u / D.SWEEP_END));
       if (k >= 1) return;
       const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
