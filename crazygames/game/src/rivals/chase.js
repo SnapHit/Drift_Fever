@@ -18,6 +18,7 @@ export const CHASE = {
   PACE_MAX:   8,      // m/s, at most
   MATCH:      0,      // on grip, m/s over his speed at the same place per metre too far back (0: off; the planner's own pace does it)
   MATCH_MAX:  9,      // m/s, at most
+  BASE:       null,   // the driving numbers it starts from: null is the rival's own
   DRIVE:      { EDGE_SAFE: 1.6, EDGE_COST: 1500, FOLLOW: 1500 },   // the rival's driving with a wider margin from the edge: a chaser is never quite on his line
   LIFT:       0.12,   // throttle taken off per metre too close
   BRAKE:      0.12,   // and brake on grip
@@ -35,7 +36,8 @@ export function createChaseDriver(track, rival, opts) {
     while (hi - lo > 1) { const m = (lo + hi) >> 1; if (line[m].d <= d) lo = m; else hi = m; }
     return line[lo].lat;
   }
-  const drv = createRivalDriver(track, rival.def.drive, Object.assign({}, K.DRIVE, K.drive || {}), lineAt);
+  /* whose driving: the rival's own (BASE null), or numbers given (the measurements pass the first rival's, tuned for the starter) */
+  const drv = createRivalDriver(track, K.BASE || rival.def.drive, Object.assign({}, K.DRIVE, K.drive || {}), lineAt);
   const base = { VMAX: drv.params.VMAX, ENTRY: drv.params.ENTRY };
   let myDist = track.start.along || 0, myAlong = null;
   const L = track.length, circuit = track.kind === 'circuit';

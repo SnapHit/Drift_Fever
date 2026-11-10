@@ -10,9 +10,9 @@
     "b": 41
    },
    "vs": {
-    "l": 117,
+    "l": 100.9609375,
     "t": 68,
-    "r": 273,
+    "r": 289.0390625,
     "b": 95
    },
    "readout": {
@@ -88,9 +88,9 @@
     "b": 59
    },
    "vs": {
-    "l": 341.4140625,
+    "l": 325.375,
     "t": 68,
-    "r": 502.5859375,
+    "r": 518.625,
     "b": 105
    },
    "readout": {
@@ -142,10 +142,10 @@
     "b": 196
    },
    "count": {
-    "l": 341.7265625,
-    "t": 67.09375,
-    "r": 502.2734375,
-    "b": 358.09375
+    "l": 388.71875,
+    "t": 128.92578125,
+    "r": 455.2578125,
+    "b": 248.92578125
    },
    "meter": null,
    "liveN": null,
@@ -153,9 +153,7 @@
    "tag": null,
    "arrow": null,
    "prompt": null,
-   "clash": [
-    "vs/count"
-   ],
+   "clash": [],
    "outside": []
   },
   "800x450": {
@@ -168,9 +166,9 @@
     "b": 59
    },
    "vs": {
-    "l": 319.4140625,
+    "l": 303.375,
     "t": 68,
-    "r": 480.5859375,
+    "r": 496.625,
     "b": 105
    },
    "readout": {
@@ -207,15 +205,15 @@
    "padR": null,
    "heading": {
     "l": 12,
-    "t": 112,
+    "t": 111.08771514892578,
     "r": 316,
-    "b": 194
+    "b": 193.08770751953125
    },
    "count": {
-    "l": 319.7265625,
-    "t": 87.5,
-    "r": 480.2734375,
-    "b": 378.5
+    "l": 362.3187255859375,
+    "t": 150.15692138671875,
+    "r": 437.68121337890625,
+    "b": 285.60693359375
    },
    "meter": null,
    "liveN": null,
@@ -223,9 +221,7 @@
    "tag": null,
    "arrow": null,
    "prompt": null,
-   "clash": [
-    "vs/count"
-   ],
+   "clash": [],
    "outside": []
   },
   "1280x720": {
@@ -238,9 +234,9 @@
     "b": 59
    },
    "vs": {
-    "l": 559.4140625,
+    "l": 543.375,
     "t": 68,
-    "r": 720.5859375,
+    "r": 736.625,
     "b": 105
    },
    "readout": {
@@ -308,9 +304,9 @@
     "b": 41
    },
    "vs": {
-    "l": 117,
+    "l": 100.9609375,
     "t": 68,
-    "r": 273,
+    "r": 289.0390625,
     "b": 95
    },
    "readout": {
@@ -358,38 +354,31 @@
    "heading": null,
    "count": null,
    "meter": {
-    "l": 156.5,
-    "t": 556,
-    "r": 243.5,
-    "b": 585
+    "l": 155.5,
+    "t": 550,
+    "r": 242.5,
+    "b": 579
    },
    "liveN": {
-    "l": 74.8828125,
-    "t": 454,
-    "r": 89.1171875,
-    "b": 480
+    "l": 73.8828125,
+    "t": 477,
+    "r": 88.1171875,
+    "b": 503
    },
    "liveM": null,
    "tag": {
-    "l": 172.25,
+    "l": 159.7265625,
     "t": 374,
-    "r": 237.75,
+    "r": 256.2734375,
     "b": 393
    },
    "arrow": null,
-   "prompt": {
-    "l": 179.70677185058594,
-    "t": 123.0880355834961,
-    "r": 515.0973968505859,
-    "b": 181.08804321289062
-   },
+   "prompt": null,
    "clash": [],
-   "outside": [
-    "prompt"
-   ],
+   "outside": [],
    "found": {
-    "j": 347,
-    "mult": 2.3935507900624513
+    "j": 427,
+    "mult": 2.355861701582808
    }
   },
   "844x390": {
@@ -402,9 +391,9 @@
     "b": 59
    },
    "vs": {
-    "l": 341.4140625,
+    "l": 325.375,
     "t": 68,
-    "r": 502.5859375,
+    "r": 518.625,
     "b": 105
    },
    "readout": {
@@ -453,39 +442,30 @@
    "count": null,
    "meter": {
     "l": 381.5,
-    "t": 284,
+    "t": 281,
     "r": 468.5,
-    "b": 313
+    "b": 310
    },
    "liveN": {
     "l": 296.0078125,
-    "t": 184,
+    "t": 201,
     "r": 317.9921875,
-    "b": 225
+    "b": 242
    },
    "liveM": null,
    "tag": {
-    "l": 395.25,
+    "l": 381.7265625,
     "t": 150,
-    "r": 460.75,
+    "r": 478.2734375,
     "b": 169
    },
    "arrow": null,
-   "prompt": {
-    "l": 422,
-    "t": 124,
-    "r": 875.796875,
-    "b": 168
-   },
-   "clash": [
-    "tag/prompt"
-   ],
-   "outside": [
-    "prompt"
-   ],
+   "prompt": null,
+   "clash": [],
+   "outside": [],
    "found": {
-    "j": 347,
-    "mult": 2.3935507900624513
+    "j": 427,
+    "mult": 2.355861701582808
    }
   },
   "800x450": {
@@ -498,9 +478,9 @@
     "b": 59
    },
    "vs": {
-    "l": 319.4140625,
+    "l": 303.375,
     "t": 68,
-    "r": 480.5859375,
+    "r": 496.625,
     "b": 105
    },
    "readout": {
@@ -539,35 +519,30 @@
    "count": null,
    "meter": {
     "l": 359.5,
-    "t": 321,
+    "t": 318,
     "r": 446.5,
-    "b": 350
+    "b": 347
    },
    "liveN": {
     "l": 274.0078125,
-    "t": 216,
+    "t": 235,
     "r": 295.9921875,
-    "b": 257
+    "b": 276
    },
    "liveM": null,
    "tag": {
-    "l": 374.25,
-    "t": 175,
-    "r": 439.75,
-    "b": 194
+    "l": 360.7265625,
+    "t": 176,
+    "r": 457.2734375,
+    "b": 195
    },
    "arrow": null,
-   "prompt": {
-    "l": 361.2389831542969,
-    "t": 122.22528076171875,
-    "r": 798.051513671875,
-    "b": 166.22528076171875
-   },
+   "prompt": null,
    "clash": [],
    "outside": [],
    "found": {
-    "j": 347,
-    "mult": 2.3935507900624513
+    "j": 427,
+    "mult": 2.355861701582808
    }
   },
   "1280x720": {
@@ -580,9 +555,9 @@
     "b": 59
    },
    "vs": {
-    "l": 559.4140625,
+    "l": 543.375,
     "t": 68,
-    "r": 720.5859375,
+    "r": 736.625,
     "b": 105
    },
    "readout": {
@@ -621,35 +596,30 @@
    "count": null,
    "meter": {
     "l": 601.5,
-    "t": 486,
+    "t": 481,
     "r": 688.5,
-    "b": 515
+    "b": 510
    },
    "liveN": {
     "l": 516.0078125,
-    "t": 358,
+    "t": 388,
     "r": 537.9921875,
-    "b": 399
+    "b": 429
    },
    "liveM": null,
    "tag": {
-    "l": 618.25,
-    "t": 292,
-    "r": 683.75,
-    "b": 311
+    "l": 606.7265625,
+    "t": 294,
+    "r": 703.2734375,
+    "b": 313
    },
    "arrow": null,
-   "prompt": {
-    "l": 640,
-    "t": 124,
-    "r": 1093.796875,
-    "b": 168
-   },
+   "prompt": null,
    "clash": [],
    "outside": [],
    "found": {
-    "j": 347,
-    "mult": 2.3935507900624513
+    "j": 427,
+    "mult": 2.355861701582808
    }
   }
  },
@@ -657,45 +627,45 @@
   "390x844 won": {
    "W": 390,
    "H": 844,
-   "won": false,
+   "won": true,
    "card": {
     "l": 16,
     "t": 64.625,
     "r": 374,
-    "b": 545.828125
+    "b": 569.828125
    },
    "again": {
     "l": 34,
-    "t": 376.828125,
+    "t": 400.828125,
     "r": 356,
-    "b": 438.828125
+    "b": 462.828125
    },
    "next": {
     "l": 34,
-    "t": 448.828125,
+    "t": 472.828125,
     "r": 191,
-    "b": 525.828125
+    "b": 549.828125
    },
-   "nextWhat": "CAREERwin a star, then come ba",
+   "nextWhat": "CAREERthe next rival opens on ",
    "menu": {
     "l": 199,
-    "t": 448.828125,
+    "t": 472.828125,
     "r": 356,
-    "b": 525.828125
+    "b": 549.828125
    },
    "parts": [
     {
      "what": "runlabel",
-     "l": 107.953125,
+     "l": 92.890625,
      "t": 84.625,
-     "r": 282.03125,
+     "r": 297.09375,
      "b": 98.625
     },
     {
      "what": "who",
-     "l": 96.03125,
+     "l": 119.46875,
      "t": 102.625,
-     "r": 293.953125,
+     "r": 270.53125,
      "b": 133.828125
     },
     {
@@ -714,16 +684,16 @@
     },
     {
      "what": "margin",
-     "l": 161.28125,
+     "l": 164.9375,
      "t": 257.828125,
-     "r": 228.703125,
+     "r": 225.046875,
      "b": 274.828125
     },
     {
      "what": "parts",
-     "l": 77.28125,
+     "l": 68.328125,
      "t": 284.828125,
-     "r": 312.703125,
+     "r": 321.671875,
      "b": 318.828125
     },
     {
@@ -731,26 +701,26 @@
      "l": 34,
      "t": 328.828125,
      "r": 356,
-     "b": 366.828125
+     "b": 390.828125
     },
     {
-     "what": "big primary",
+     "what": "big",
      "l": 34,
-     "t": 376.828125,
+     "t": 400.828125,
      "r": 356,
-     "b": 438.828125
+     "b": 462.828125
     },
     {
      "what": "row2",
      "l": 34,
-     "t": 448.828125,
+     "t": 472.828125,
      "r": 356,
-     "b": 525.828125
+     "b": 549.828125
     }
    ],
    "scrolls": false,
    "clash": [],
-   "ok": false
+   "ok": true
   },
   "390x844 lost": {
    "W": 390,
@@ -784,16 +754,16 @@
    "parts": [
     {
      "what": "runlabel",
-     "l": 107.953125,
+     "l": 92.890625,
      "t": 84.625,
-     "r": 282.03125,
+     "r": 297.09375,
      "b": 98.625
     },
     {
      "what": "who",
-     "l": 96.03125,
+     "l": 59.4375,
      "t": 102.625,
-     "r": 293.953125,
+     "r": 330.546875,
      "b": 133.828125
     },
     {
@@ -812,9 +782,9 @@
     },
     {
      "what": "margin",
-     "l": 156.328125,
+     "l": 156.0625,
      "t": 257.828125,
-     "r": 233.65625,
+     "r": 233.9375,
      "b": 274.828125
     },
     {
@@ -853,7 +823,7 @@
   "844x390 won": {
    "W": 844,
    "H": 390,
-   "won": false,
+   "won": true,
    "card": {
     "l": 32,
     "t": 82,
@@ -872,7 +842,7 @@
     "r": 608.5,
     "b": 288.5
    },
-   "nextWhat": "CAREERwin a star, then come ba",
+   "nextWhat": "CAREERthe next rival opens on ",
    "menu": {
     "l": 616.5,
     "t": 211.5,
@@ -882,16 +852,16 @@
    "parts": [
     {
      "what": "runlabel",
-     "l": 144.453125,
+     "l": 129.390625,
      "t": 96,
-     "r": 318.53125,
+     "r": 333.59375,
      "b": 110
     },
     {
      "what": "who",
-     "l": 136.296875,
+     "l": 158.84375,
      "t": 110,
-     "r": 326.6875,
+     "r": 304.15625,
      "b": 140
     },
     {
@@ -910,16 +880,16 @@
     },
     {
      "what": "margin",
-     "l": 197.78125,
+     "l": 201.4375,
      "t": 235,
-     "r": 265.203125,
+     "r": 261.546875,
      "b": 252
     },
     {
      "what": "parts",
-     "l": 113.78125,
+     "l": 104.828125,
      "t": 258,
-     "r": 349.203125,
+     "r": 358.171875,
      "b": 292
     },
     {
@@ -930,7 +900,7 @@
      "b": 137.5
     },
     {
-     "what": "big primary",
+     "what": "big",
      "l": 431,
      "t": 143.5,
      "r": 794,
@@ -946,7 +916,7 @@
    ],
    "scrolls": false,
    "clash": [],
-   "ok": false
+   "ok": true
   },
   "844x390 lost": {
    "W": 844,
@@ -980,16 +950,16 @@
    "parts": [
     {
      "what": "runlabel",
-     "l": 144.453125,
+     "l": 129.390625,
      "t": 96,
-     "r": 318.53125,
+     "r": 333.59375,
      "b": 110
     },
     {
      "what": "who",
-     "l": 136.296875,
+     "l": 101.109375,
      "t": 110,
-     "r": 326.6875,
+     "r": 361.890625,
      "b": 140
     },
     {
@@ -1008,9 +978,9 @@
     },
     {
      "what": "margin",
-     "l": 192.828125,
+     "l": 192.5625,
      "t": 235,
-     "r": 270.15625,
+     "r": 270.4375,
      "b": 252
     },
     {
@@ -1049,7 +1019,7 @@
   "800x450 won": {
    "W": 800,
    "H": 450,
-   "won": false,
+   "won": true,
    "card": {
     "l": 16,
     "t": 112,
@@ -1068,7 +1038,7 @@
     "r": 583.5,
     "b": 318.5
    },
-   "nextWhat": "CAREERwin a star, then come ba",
+   "nextWhat": "CAREERthe next rival opens on ",
    "menu": {
     "l": 591.5,
     "t": 241.5,
@@ -1078,16 +1048,16 @@
    "parts": [
     {
      "what": "runlabel",
-     "l": 125.453125,
+     "l": 110.390625,
      "t": 126,
-     "r": 299.53125,
+     "r": 314.59375,
      "b": 140
     },
     {
      "what": "who",
-     "l": 117.296875,
+     "l": 139.84375,
      "t": 140,
-     "r": 307.6875,
+     "r": 285.15625,
      "b": 170
     },
     {
@@ -1106,16 +1076,16 @@
     },
     {
      "what": "margin",
-     "l": 178.78125,
+     "l": 182.4375,
      "t": 265,
-     "r": 246.203125,
+     "r": 242.546875,
      "b": 282
     },
     {
      "what": "parts",
-     "l": 94.78125,
+     "l": 85.828125,
      "t": 288,
-     "r": 330.203125,
+     "r": 339.171875,
      "b": 322
     },
     {
@@ -1126,7 +1096,7 @@
      "b": 167.5
     },
     {
-     "what": "big primary",
+     "what": "big",
      "l": 409,
      "t": 173.5,
      "r": 766,
@@ -1142,7 +1112,7 @@
    ],
    "scrolls": false,
    "clash": [],
-   "ok": false
+   "ok": true
   },
   "800x450 lost": {
    "W": 800,
@@ -1176,16 +1146,16 @@
    "parts": [
     {
      "what": "runlabel",
-     "l": 125.453125,
+     "l": 110.390625,
      "t": 126,
-     "r": 299.53125,
+     "r": 314.59375,
      "b": 140
     },
     {
      "what": "who",
-     "l": 117.296875,
+     "l": 82.109375,
      "t": 140,
-     "r": 307.6875,
+     "r": 342.890625,
      "b": 170
     },
     {
@@ -1204,9 +1174,9 @@
     },
     {
      "what": "margin",
-     "l": 173.828125,
+     "l": 173.5625,
      "t": 265,
-     "r": 251.15625,
+     "r": 251.4375,
      "b": 282
     },
     {
@@ -1245,7 +1215,7 @@
   "1280x720 won": {
    "W": 1280,
    "H": 720,
-   "won": false,
+   "won": true,
    "card": {
     "l": 430,
     "t": 57.1875,
@@ -1264,7 +1234,7 @@
     "r": 636,
     "b": 531.1875
    },
-   "nextWhat": "CAREERwin a star, then come ba",
+   "nextWhat": "CAREERthe next rival opens on ",
    "menu": {
     "l": 644,
     "t": 454.1875,
@@ -1274,16 +1244,16 @@
    "parts": [
     {
      "what": "runlabel",
-     "l": 552.953125,
+     "l": 537.890625,
      "t": 77.1875,
-     "r": 727.03125,
+     "r": 742.09375,
      "b": 91.1875
     },
     {
      "what": "who",
-     "l": 500.390625,
+     "l": 533.4375,
      "t": 95.1875,
-     "r": 779.609375,
+     "r": 746.5625,
      "b": 139.1875
     },
     {
@@ -1302,16 +1272,16 @@
     },
     {
      "what": "margin",
-     "l": 606.28125,
+     "l": 609.9375,
      "t": 263.1875,
-     "r": 673.703125,
+     "r": 670.046875,
      "b": 280.1875
     },
     {
      "what": "parts",
-     "l": 522.28125,
+     "l": 513.328125,
      "t": 290.1875,
-     "r": 757.703125,
+     "r": 766.671875,
      "b": 324.1875
     },
     {
@@ -1322,7 +1292,7 @@
      "b": 372.1875
     },
     {
-     "what": "big primary",
+     "what": "big",
      "l": 448,
      "t": 382.1875,
      "r": 832,
@@ -1338,7 +1308,7 @@
    ],
    "scrolls": false,
    "clash": [],
-   "ok": false
+   "ok": true
   },
   "1280x720 lost": {
    "W": 1280,
@@ -1372,16 +1342,16 @@
    "parts": [
     {
      "what": "runlabel",
-     "l": 552.953125,
+     "l": 537.890625,
      "t": 77.1875,
-     "r": 727.03125,
+     "r": 742.09375,
      "b": 91.1875
     },
     {
      "what": "who",
-     "l": 500.390625,
+     "l": 448.765625,
      "t": 95.1875,
-     "r": 779.609375,
+     "r": 831.234375,
      "b": 139.1875
     },
     {
@@ -1400,9 +1370,9 @@
     },
     {
      "what": "margin",
-     "l": 601.328125,
+     "l": 601.0625,
      "t": 263.1875,
-     "r": 678.65625,
+     "r": 678.9375,
      "b": 280.1875
     },
     {
@@ -1441,45 +1411,75 @@
  },
  "career": {
   "390x844": {
-   "cards": 1,
+   "cards": 6,
    "meetings": [],
    "outside": [],
    "states": [
-    "beaten:VS ROOKSmooth and wide · tandem battle BEATENbest +412"
+    "beaten:VS KESTROWSmooth and wide · tandem battle BEATENbest +412",
+    "open:VS TOLVOFast and shallow · tandem battle BATTLEprize 400",
+    "locked:VS VARSKLate and aggressive · tandem battle 🔒a win over Tol",
+    "locked:VS DOVANELong, linked slides · tandem battle 🔒a star on Ove",
+    "locked:VS HALVIKThe biggest angles · tandem battle 🔒a star on Knot",
+    "locked:VS SARROWFast, deep and linked · tandem battle 🔒a star on E"
    ]
   },
   "390x844 known answer": {
-   "cards": 1,
+   "cards": 6,
    "meetings": [
-    "r1 meets 1 First slide3 laps "
+    "r1 meets 1 First slide3 laps ",
+    "r2 meets 7 Hairpin heaven3 la",
+    "r3 meets 1 Upper deck3 laps ·",
+    "r4 meets 5 Over and under3 la",
+    "r5 meets 1 Knot yard3 laps 🔒",
+    "r6 meets 5 Endless eight3 lap"
    ],
    "outside": [],
    "states": [
-    "beaten:VS ROOKSmooth and wide · tandem battle BEATENbest +412"
+    "beaten:VS KESTROWSmooth and wide · tandem battle BEATENbest +412",
+    "open:VS TOLVOFast and shallow · tandem battle BATTLEprize 400",
+    "locked:VS VARSKLate and aggressive · tandem battle 🔒a win over Tol",
+    "locked:VS DOVANELong, linked slides · tandem battle 🔒a star on Ove",
+    "locked:VS HALVIKThe biggest angles · tandem battle 🔒a star on Knot",
+    "locked:VS SARROWFast, deep and linked · tandem battle 🔒a star on E"
    ]
   },
   "844x390": {
-   "cards": 1,
+   "cards": 6,
    "meetings": [],
    "outside": [],
    "states": [
-    "beaten:VS ROOKSmooth and wide · tandem battle BEATENbest +412"
+    "beaten:VS KESTROWSmooth and wide · tandem battle BEATENbest +412",
+    "open:VS TOLVOFast and shallow · tandem battle BATTLEprize 400",
+    "locked:VS VARSKLate and aggressive · tandem battle 🔒a win over Tol",
+    "locked:VS DOVANELong, linked slides · tandem battle 🔒a star on Ove",
+    "locked:VS HALVIKThe biggest angles · tandem battle 🔒a star on Knot",
+    "locked:VS SARROWFast, deep and linked · tandem battle 🔒a star on E"
    ]
   },
   "800x450": {
-   "cards": 1,
+   "cards": 6,
    "meetings": [],
    "outside": [],
    "states": [
-    "beaten:VS ROOKSmooth and wide · tandem battle BEATENbest +412"
+    "beaten:VS KESTROWSmooth and wide · tandem battle BEATENbest +412",
+    "open:VS TOLVOFast and shallow · tandem battle BATTLEprize 400",
+    "locked:VS VARSKLate and aggressive · tandem battle 🔒a win over Tol",
+    "locked:VS DOVANELong, linked slides · tandem battle 🔒a star on Ove",
+    "locked:VS HALVIKThe biggest angles · tandem battle 🔒a star on Knot",
+    "locked:VS SARROWFast, deep and linked · tandem battle 🔒a star on E"
    ]
   },
   "1280x720": {
-   "cards": 1,
+   "cards": 6,
    "meetings": [],
    "outside": [],
    "states": [
-    "beaten:VS ROOKSmooth and wide · tandem battle BEATENbest +412"
+    "beaten:VS KESTROWSmooth and wide · tandem battle BEATENbest +412",
+    "open:VS TOLVOFast and shallow · tandem battle BATTLEprize 400",
+    "locked:VS VARSKLate and aggressive · tandem battle 🔒a win over Tol",
+    "locked:VS DOVANELong, linked slides · tandem battle 🔒a star on Ove",
+    "locked:VS HALVIKThe biggest angles · tandem battle 🔒a star on Knot",
+    "locked:VS SARROWFast, deep and linked · tandem battle 🔒a star on E"
    ]
   }
  }

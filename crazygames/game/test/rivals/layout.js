@@ -57,7 +57,7 @@ for (const vp of SIZES) {
   {
     const pg = await R.page(env, vp, '', { touch });
     const p = pg.page;
-    await p.evaluate(() => { const S = window.__loop.save; S.reset(); S.setOnboarded(); S.careerResult(0, 1, 500); });
+    await p.evaluate(() => { const S = window.__loop.save; S.reset(); S.setOnboarded(); S.careerResult(0, 1, 500); S.state.rivals.r1 = { won: false, best: -100, when: 1 }; });   // a battle played before: no first battle prompt, so the tag is in the check (the prompt is checked in shots.js's frames and its own run below)
     await R.battleRun(p, 'r1', { chase: true });
     await R.runFrames(p, 30);
     const cd = await p.evaluate(new Function(BOXES));
@@ -72,7 +72,7 @@ for (const vp of SIZES) {
     const c2 = check(hb, ['meter', 'liveN', 'liveM', 'tag', 'arrow', 'prompt']);
     out.hud[tag] = { ...hb, ...c2, found: f };
     await R.shot(p, path.join(R.rivalShots, 'layout-hud-' + tag + '.png'));
-    R.verdict(!!f && !c2.clash.length && !c2.outside.length && !!hb.meter && !!hb.liveN, tag + ' HUD mid chase, the tandem at x' + (f ? f.mult.toFixed(1) : '-') + ': ' + (c2.clash.length ? 'overlaps ' + c2.clash.join(', ') : 'no overlaps') + (c2.outside.length ? ', outside ' + c2.outside.join(', ') : '') + '; meter ' + (hb.meter ? 'shown' : 'NOT shown') + ', live score ' + (hb.liveN ? 'shown' : 'NOT shown') + ', tag ' + (hb.tag ? 'shown' : 'hidden'));
+    R.verdict(!!f && !c2.clash.length && !c2.outside.length && !!hb.meter && !!hb.liveN && !!hb.tag, tag + ' HUD mid chase, the tandem at x' + (f ? f.mult.toFixed(1) : '-') + ': ' + (c2.clash.length ? 'overlaps ' + c2.clash.join(', ') : 'no overlaps') + (c2.outside.length ? ', outside ' + c2.outside.join(', ') : '') + '; meter ' + (hb.meter ? 'shown' : 'NOT shown') + ', live score ' + (hb.liveN ? 'shown' : 'NOT shown') + ', tag ' + (hb.tag ? 'shown' : 'hidden'));
     await pg.close();
   }
   for (const [name, t, bonus] of [['won', won, 40], ['lost', lost, 0]]) {

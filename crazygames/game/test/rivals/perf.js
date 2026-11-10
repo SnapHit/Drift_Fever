@@ -28,7 +28,7 @@ async function measure(o) {
   const pg = await R.page(env, R.PORTRAIT, 'tier=' + o.tier, { touch: true });
   const p = pg.page;
   const index = await p.evaluate(id => window.__loop.RIVALS.find(r => r.id === id).track, o.rival);
-  if (o.battle) await R.battleRun(p, o.rival, { chase: true }); else await R.careerRun(p, index);
+  if (o.battle) await R.battleRun(p, o.rival, o.driver || { chase: true }); else await R.careerRun(p, index);
   await R.until(p, "f.state==='drive'", 400);
   await R.runFrames(p, 60 * (o.into || 8));
   const cdp = await pg.context.newCDPSession(p);
@@ -56,8 +56,10 @@ async function measure(o) {
 const show = r => console.log('  ' + r.label + ': JS p95 ' + r.jsWithoutSubmit.p95 + ' ms (worst ' + r.jsWithoutSubmit.worst + '), physics p95 ' + r.physics.p95 + ' ms, draw calls ' + r.drawCalls.p50 + ', triangles ' + r.triangles.p50 + ' (' + r.preset + '; ' + r.driving + ' frames driving, ' + (r.battle ? r.near + ' with him within 40 m' : 'solo') + ')');
 const plan = [];
 for (const rv of [first, last]) for (const tier of ['low', 'high']) for (const battle of [true, false]) plan.push({ label: tier + ', ' + (battle ? 'battle against ' + rv : 'the same track solo (' + rv + '\'s)'), tier, rival: rv, battle });
+/* the chase driver runs the same look ahead as the rival: a battle with a cheap player (the scripted drifter), measured early while he is near, shows what a human player's battle costs */
+plan.push({ label: 'low, battle against ' + first + ', the scripted drifter playing (no second look ahead)', tier: 'low', rival: first, battle: true, driver: { drift: '*' }, into: 2 });
 for (const o of plan) { const r = await measure(o); out.runs.push(r); show(r); }
-const lowB = out.runs.filter(r => r.tier === 'low' && r.battle);
+const lowB = out.runs.filter(r => r.tier === 'low' && r.battle && !r.driver);
 const worst = lowB.reduce((a, b) => (b.jsWithoutSubmit.p95 > a.jsWithoutSubmit.p95 ? b : a));
 R.verdict(lowB.every(r => r.jsWithoutSubmit.p95 < BUDGET && r.driving > 0 && r.near > 0 && !r.errors.length), 'low tier, a battle, JavaScript p95 at 6x under ' + BUDGET + ' ms: worst ' + worst.jsWithoutSubmit.p95 + ' ms (' + worst.label + ')');
 for (const r of out.runs.filter(r => r.battle)) { const s = out.runs.find(q => !q.battle && q.tier === r.tier && q.rival === r.rival); console.log('  ' + r.label + ' against solo: JS p95 ' + s.jsWithoutSubmit.p95 + ' -> ' + r.jsWithoutSubmit.p95 + ' ms, physics p95 ' + s.physics.p95 + ' -> ' + r.physics.p95 + ', draw calls ' + s.drawCalls.p50 + ' -> ' + r.drawCalls.p50 + ', triangles ' + s.triangles.p50 + ' -> ' + r.triangles.p50); }
