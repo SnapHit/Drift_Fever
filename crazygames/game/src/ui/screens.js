@@ -236,10 +236,10 @@ export function createScreens(root, onAction) {
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
         ${r.note ? `<p class="chapnote">${esc(r.note.text)}</p>` : ''}
-        ${r.offer ? `<button type="button" class="big primary rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RIVAL: ${esc(r.offer.name.toUpperCase())}</b><small>a tandem battle is open</small></button>` : ''}
-        <button type="button" class="big${r.unlock && r.unlock.done || r.offer ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
+        ${r.offer ? `<button type="button" class="big rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RIVAL: ${esc(r.offer.name.toUpperCase())}</b><small>a tandem battle is open</small></button>` : ''}
+        <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
-          ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done && !r.offer ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
+          ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
           ${r.code ? `<button type="button" class="big" data-action="lab"><b>LAB</b><small>change the track</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>
         </div>${z}

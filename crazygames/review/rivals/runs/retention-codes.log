@@ -1,0 +1,15 @@
+
+== 1. round trips
+PASS 1000 random settings and seeds encode and decode to the same track: 1000 same settings, 1000 same centre line, 0 fallback layouts, worst generate 214 ms
+PASS known answer: one character changed never gives the same track: 50 of 50 rejected, the rest another track
+  by style: flowing 9 corners, hairpins 0, sweepers 0.68, fallbacks 0; hairpins 7.1 corners, hairpins 0.46, sweepers 0.26, fallbacks 0; mixed 9.3 corners, hairpins 0.12, sweepers 0.46, fallbacks 0; technical 10.2 corners, hairpins 0.07, sweepers 0.25, fallbacks 0
+  by length: circuit long 1001 m, bridges 0/78, fallbacks 0; circuit long crossover 1021 m, bridges 89/89, fallbacks 0; circuit medium 764 m, bridges 0/158, fallbacks 0; circuit short 569 m, bridges 0/175, fallbacks 0; sprint long 1310 m, bridges 0/153, fallbacks 0; sprint medium 1012 m, bridges 0/174, fallbacks 0; sprint short 704 m, bridges 0/173, fallbacks 0
+
+== 2. malformed codes
+PASS every malformed code of the fuzzed set (2389) is rejected with a reason and nothing throws: 8 no code; 6 a code has twelve characters; 1911 a code from another version of the game; 463 that is not a track code (a character may be wrong); 1 the character U is not in a code
+
+== 3. the default generator against main
+PASS the generator without the new options is byte identical to main (450312f) on 400 seeds: 400 identical, 0 differ
+PASS known answer: the hairpins style's weights change the track: 60 of 60 differ
+
+all passed; wrote review/retention/codes.json
