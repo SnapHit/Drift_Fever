@@ -282,7 +282,7 @@ function frame(t) {
   if (app.missionsShown > 0 && S === 'drive') { app.missionsShown -= dt; if (app.missionsShown <= 0) hud.setMissions(null); }
   hud.update(scoring, pose, scene.camera, THREE, view, dt);
   if (app.rival && (S === 'drive' || S === 'countdown')) {
-    hud.battle(app.tandem.state, app.rival, scoring.state, rv, scene.camera, THREE, view, dt);
+    hud.battle(app.tandem.state, app.rival, scoring.state, rv, scene.camera, THREE, view, dt, S === 'countdown');
     /* the first battle ever: one prompt, as he starts his first slide */
     if (app.battleIntro && app.rival.state.sliding && S === 'drive') { app.battleIntro = false; hud.prompt('Stay close behind him while you both slide', 3.2); }
     const tc = app.tandem.state;
@@ -400,7 +400,7 @@ function runHead(spec) {
   if (spec.mode === 'career') { const ch = CHAPTERS[chapterOf(spec.index)]; return { label: 'CAREER \u00b7 ' + ch.name.toUpperCase() + ' \u00b7 TRACK ' + (spec.index - ch.from + 1) + ' OF ' + (ch.to - ch.from), name: spec.name }; }
   if (spec.mode === 'daily') return { label: 'DAILY DRIFT', name: 'A new track every day' };
   if (spec.mode === 'lab') return { label: 'TRACK LAB', name: formatCode(spec.code) };
-  if (spec.mode === 'battle') { const d = rivalById(spec.rival); return { label: 'TANDEM BATTLE \u00b7 ' + d.name.toUpperCase(), name: 'Stay close while you both slide. Outscore him.' }; }
+  if (spec.mode === 'battle') { const d = rivalById(spec.rival); return { label: 'TANDEM BATTLE \u00b7 ' + d.name.toUpperCase(), name: 'Stay close while you both slide. Outscore him.', battle: true }; }
   return null;
 }
 

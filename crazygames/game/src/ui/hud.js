@@ -31,6 +31,8 @@ export const HUD_BATTLE = {
   METER_SEGS:    5,        // segments of the meter
   TAG_UP:        2.3,      // m over the rival's car his tag sits
   EDGE:          34,       // px from the screen's edge the arrow sits
+  ARROW_TOP:     84,       // px more below the top edge, clear of the totals
+  ARROW_LOW:     0.6,      // and no lower than this share of the height, clear of the pads
   LIVE_SIDE:     118,      // px the live score moves beside the player's car, away from the rival, so it never sits on him
   LIVE_DOWN:     34,       // px down from over the roof
   SMOOTH:        0.12,     // s, the meter's easing
@@ -151,6 +153,7 @@ export function createHud(root) {
       missionsEl.innerHTML = (head ? '<i>' + esc(head.label) + '</i><strong>' + esc(head.name) + '</strong>' : '')
         + (list && list.length ? '<b>MISSIONS</b>' + list.map(m => '<span class="' + (m.done ? 'done' : '') + '">' + (m.done ? '&#10003;' : '&#9671;') + ' ' + esc(m.text) + '</span>').join('') : '');
       missionsEl.classList.toggle('headed', !!head);
+      missionsEl.classList.toggle('battle', !!(head && head.battle));
       missionsEl.hidden = false;
     },
     /* a one line notice that rises and fades like the score's callouts */
@@ -224,7 +227,7 @@ export function createHud(root) {
     prompt(text, seconds) { prompt1.textContent = text; prompt1.hidden = false; prompt1.classList.remove('in'); void prompt1.offsetWidth; prompt1.classList.add('in'); bat.promptT = seconds || 3; },
     /* every frame of a battle: t the tandem's state, rival, the player's
        score state, rv the rival's drawn pose (or null) */
-    battle(t, rival, mine, rv, camera, THREE, view, dt) {
+    battle(t, rival, mine, rv, camera, THREE, view, dt, counting) {
       if (!bat.on) return;
       const theirs = rival.scoring.state.total;
       if (theirs !== bat.lastN) { bat.lastN = theirs; vsN.textContent = String(theirs); }
@@ -250,18 +253,22 @@ export function createHud(root) {
       const p = tmpV.set(rv.pose.x, (rv.pose.y || 0) + HUD_BATTLE.TAG_UP, rv.pose.z).project(camera);
       const inView = p.z < 1 && Math.abs(p.x) < 1 && Math.abs(p.y) < 1;
       bat.rivalX = p.z < 1 ? (p.x * 0.5 + 0.5) * view.w : null;
-      if (inView) {
+      if (inView && bat.promptT > 0) { if (!tag.hidden) tag.hidden = true; if (!arrow.hidden) arrow.hidden = true; }   // the prompt says who he is
+      else if (inView) {
         if (tag.hidden) tag.hidden = false; if (!arrow.hidden) arrow.hidden = true;
         tag.style.transform = 'translate(' + Math.round((p.x * 0.5 + 0.5) * view.w) + 'px,' + Math.round((-p.y * 0.5 + 0.5) * view.h) + 'px) translate(-50%, -100%)';
         const m = rival.scoring.state.chain > 0 && rival.scoring.state.mult > 1 ? 'x' + rival.scoring.state.mult : '';
         if (m !== bat.lastMult) { bat.lastMult = m; tagMult.textContent = m; }
       } else {
-        if (!tag.hidden) tag.hidden = true; if (arrow.hidden) arrow.hidden = false;
+        if (!tag.hidden) tag.hidden = true;
+        if (counting) { if (!arrow.hidden) arrow.hidden = true; return; }   // the countdown's sweep has both cars in its frame by design
+        if (arrow.hidden) arrow.hidden = false;
         /* the direction on the screen: behind the camera the projection flips */
         let ax = p.x, ay = p.y; if (p.z > 1) { ax = -ax; ay = -ay; }
         const len = Math.hypot(ax, ay) || 1; ax /= len; ay /= len;
         const E = HUD_BATTLE.EDGE, hw = view.w / 2 - E, hh = view.h / 2 - E, sc = Math.min(hw / Math.max(1e-6, Math.abs(ax)), hh / Math.max(1e-6, Math.abs(ay)));
-        const x = view.w / 2 + ax * sc, y = view.h / 2 - ay * sc, ang = Math.atan2(ax, ay) * 180 / Math.PI;
+        /* kept clear of the top row of the HUD and of the pads at the bottom */
+        const x = view.w / 2 + ax * sc, y = Math.max(E + HUD_BATTLE.ARROW_TOP, Math.min(view.h * HUD_BATTLE.ARROW_LOW, view.h / 2 - ay * sc)), ang = Math.atan2(ax, ay) * 180 / Math.PI;
         arrow.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px) translate(-50%, -50%)';
         arrow.firstElementChild.style.transform = 'rotate(' + Math.round(ang) + 'deg)';
         const d = Math.round(Math.hypot(rv.pose.x - camera.position.x, rv.pose.z - camera.position.z)) + ' m';
