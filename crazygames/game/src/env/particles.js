@@ -55,9 +55,9 @@ export function createParticles(THREE, opts) {
   /* fade: in quickly, out over the second half */
   const fade = t => t < 0.12 ? t / 0.12 : t > 0.5 ? 1 - (t - 0.5) / 0.5 : 1;
   /* clear: null, or { x, y, z, r, keep, near, far }: the car's centre
-     and radius in metres, the share of a particle's alpha kept when it
-     stands right on the line from the camera to the car, and the
-     distances from the camera over which particles fade in */
+     and radius in metres, the share of a particle's alpha kept where it
+     covers the car on the screen, and the distances from the camera over
+     which particles fade in */
   function update(dt, camera, wind, clear) {
     camera.matrixWorld.extractBasis(right, up, tmp);
     const wx = wind ? wind.x : 0, wz = wind ? wind.z : 0;
@@ -83,11 +83,12 @@ export function createParticles(THREE, opts) {
         const along = qx * cdx + qy * cdy + qz * cdz;
         const near = Math.max(0, Math.min(1, (along - clear.near) / Math.max(0.01, clear.far - clear.near)));
         a *= near * near * (3 - 2 * near);
-        if (along > 0 && along < cdl + clear.r) {
+        if (along > 0.1 && along < cdl + clear.r) {
+          /* on the screen: how far the particle's nearest edge stands from the car's middle, against the car's own size there (angles, so a puff near the camera is judged by what it covers) */
           const ox = qx - cdx * along, oy = qy - cdy * along, oz = qz - cdz * along;
-          const off = Math.hypot(ox, oy, oz) - p.size;   // the particle's nearest edge from the line
-          const k = Math.max(0, Math.min(1, off / clear.r));   // 0 on the line, 1 a car's radius off it
-          a *= clear.keep + (1 - clear.keep) * k * k;
+          const q = ((Math.hypot(ox, oy, oz) - p.size * 0.5) / along) / (clear.r / cdl);   // a puff is dense in its middle half
+          const k = Math.max(0, Math.min(1, (q - 0.8) / 0.9));   // over the car: 0; clear of it by half its size: 1
+          a *= clear.keep + (1 - clear.keep) * k * k * (3 - 2 * k);
         }
       }
       const s = p.size, cr = Math.cos(p.rot), sr = Math.sin(p.rot);

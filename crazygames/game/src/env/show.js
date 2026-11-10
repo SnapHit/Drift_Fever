@@ -64,17 +64,18 @@ export const SHOW = {
     GROW_DECAY:     0.8,         // per second
     RISE:           1.7,         // m per second
     ALPHA:          [0.42, 0.58],
-    KEEP:           0.2,         // share of the wheel's velocity a puff is born with
-    THROW:          [3.0, 4.5],  // m/s a puff is thrown the way the tyres slide (out of the corner), so the cloud billows beside the car's path where the camera can see it
+    KEEP:           0.12,        // share of the wheel's velocity a puff is born with
+    THROW:          [4.5, 6.5],  // m/s a puff is thrown the way the tyres slide (out of the corner), so the cloud billows beside the car's path where the camera can see it
     DRAG:           1.3,
     COLOUR:         { dusk: 0xe8d4c8, night: 0xa4abc8, dawn: 0xfff0e2, rain: 0xb8bec8 },   // the smoke as it drifts away, lit by the preset
     BIRTH:          { dusk: 0xffc89a, night: 0xff5a4a, dawn: 0xffe2c0, rain: 0xe0c4c4 },   // as it leaves the tyre: warm in the low sun, red from the tail-lights in the dark
     HEAT_TINT:      0xffb48a,    // the smoke warms towards this with the heat
     HEAT_TINT_MAX:  0.3,
-    /* the car stays readable: smoke on the camera's line to the car keeps
-       only KEEP of its alpha, a car's radius off the line all of it, and
-       nothing within NEAR of the camera shows, fading in by FAR */
-    CLEAR:          { r: 1.8, keep: 0.1, near: 1.2, far: 4 },
+    /* the car stays readable: smoke that covers the car on the screen
+       keeps only KEEP of its alpha, and all of it once clear of the car by
+       half the car's size (R is the car's radius, m); nothing within NEAR
+       of the camera shows, fading in by FAR */
+    CLEAR:          { r: 2.4, keep: 0.03, near: 1.2, far: 4 },
   },
   /* rain: spray off the tyres whenever the car is quick */
   SPRAY: { FROM: 8, RATE: 34, LIFE: 0.55, SIZE: 0.35, GROW: 1.8, ALPHA: 0.3, COLOUR: 0xd8dee8 },
