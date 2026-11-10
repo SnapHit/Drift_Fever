@@ -219,7 +219,7 @@ function frame(t) {
   if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
   else chase.update(pose, dt, scene.camera, view.w / view.h);
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
-  scene.update(pose, world, dt, g);
+  scene.update(pose, world, dt, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1 });
   sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev', world.touching);
   if (app.frameHit) { sound.hit(app.frameHit.speed, app.frameHit.hard); app.frameHit = null; }
   /* the score's sounds, from the callouts it queued this frame */
