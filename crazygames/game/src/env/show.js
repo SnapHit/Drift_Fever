@@ -17,6 +17,7 @@ import { createGlows } from './particles.js';
 import { softSprite } from './textures.js';
 
 export const SHOW = {
+  GLOWS:            { low: 160, high: 240 },   // flares, halos and flashes drawn at once
   HEAT_FULL:        4,       // the multiplier at which the heat is full
   HEAT_RISE:        2.5,     // per second the heat eases towards its target
   HEAT_FALL:        1.2,     // and back down after a bank or a loss
@@ -91,7 +92,7 @@ export function createShow(THREE, opts) {
   const group = new THREE.Group();
   group.name = 'show';
   const soft = softSprite(THREE, 64, true);
-  const glows = createGlows(THREE, { max: tier.glows || 96, texture: soft, name: 'glows', renderOrder: 6 });
+  const glows = createGlows(THREE, { max: SHOW.GLOWS[o.tierName] || SHOW.GLOWS.low, texture: soft, name: 'glows', renderOrder: 6 });
   group.add(glows.mesh);
 
   /* ---- the trails: two ribbons, one per tail-light ---- */
@@ -143,6 +144,8 @@ export function createShow(THREE, opts) {
     for (let k = 0; k < tails.length; k++) {
       v.set(tails[k][0], tails[k][1], tails[k][2]).applyMatrix4(ctx.car.matrixWorld);
       glows.add(v.x, v.y, v.z, SHOW.HALO_SIZE * (1 + 0.5 * braking), 1, 0.12, 0.08, haloA);
+      /* on a wet road the tail-light shows in it, stretched towards the camera */
+      if (preset.wet) glows.add(v.x, (pose.y || 0) + 0.04, v.z, 0.2, 1, 0.1, 0.08, 0.45 * (1 + braking), 2.6);
       /* the trail: a point every few centimetres while sliding */
       const tr = trail[k], strength = SHOW.TRAIL_PRESETS[name] || 0;
       const on = sliding && strength > 0;

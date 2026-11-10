@@ -45,6 +45,7 @@ import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from '.
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
 import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
+import { FX_ON } from './fx.js';
 
 const query = new URLSearchParams(location.search);
 const MAX_STEPS = 8;              // steps per frame before time is dropped
@@ -538,6 +539,11 @@ let running = false;
 function loop(t) { frame(t); requestAnimationFrame(loop); }
 scene.ready.then(() => {
   resize();
+  if (FX_ON) {
+    document.body.classList.add('fx');
+    /* the low tier has no post pass, so its vignette is a gradient over the canvas (the high tier's is in the grade) */
+    if (scene.info().tier === 'low') { const v = document.createElement('div'); v.id = 'vignette'; document.body.insertBefore(v, root); }
+  }
   if (devGround) {
     /* the feel prototype's endless drive, for the probes and for tuning */
     app.state = 'dev';
