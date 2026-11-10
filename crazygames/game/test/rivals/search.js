@@ -17,13 +17,15 @@ import { RIVAL_DRIVE } from '../../src/rivals/driver.js';
 
 export const RANGES = {
   SLIDE_GAIN: [0.15, 1.5], PROGRESS: [15, 140], KEEP: [0, 1500], ANGLE_CAP: [25, 55], EDGE_SAFE: [0.8, 3], EDGE_COST: [200, 3000],
-  ENTRY: [16, 29], VMAX: [24, 34], AY_MAX: [5, 9], OUTSIDE: [0, 0.8], SETUP: [15, 80], WINDOW_PRE: [0, 30], WINDOW_POST: [-10, 20], LINK: [0, 60], HB_TIME: [0.1, 0.5],
+  ENTRY: [16, 29], VMAX: [24, 34], CHAIN_KEEP: [0, 4000], CHAIN_MARGIN: [0, 0.6], AY_MAX: [5, 9], OUTSIDE: [0, 0.8], SETUP: [15, 80], WINDOW_PRE: [0, 30], WINDOW_POST: [-10, 20], LINK: [0, 60], HB_TIME: [0.1, 0.5],
 };
 /* the disturbances every candidate is judged on: the start a few cm off and the grip half a per cent off */
-export const DISTURB = [{}, { offset: [0.04, -0.03], grip: 0.005 }, { offset: [-0.05, 0.02], grip: -0.005 }];
+export const DISTURB = [{}, { offset: [0.04, -0.03], grip: 0.005 }, { offset: [-0.05, 0.02], grip: -0.005 }, { offset: [0.01, 0.05], grip: 0.002 }];
 
 export function mark(runs, want) {
   let worst = Infinity, detail = null;
+  /* his total should not swing with a disturbance: the spread across the runs, as a share of their mean, costs */
+  const totals = runs.map(m => m.total), mean = totals.reduce((a, b) => a + b, 0) / totals.length, spread = mean > 0 ? (Math.max(...totals) - Math.min(...totals)) / mean : 1;
   for (const m of runs) {
     let v = 0;
     if (!m.finished) v -= 20000;
@@ -34,7 +36,8 @@ export function mark(runs, want) {
     const ang = m.corners.reduce((a, c) => a + c.angle, 0) / m.corners.length;
     if (want && want.angle) v -= Math.abs(ang - want.angle) * 25;
     if (want && want.seconds && m.seconds > want.seconds) v -= (m.seconds - want.seconds) * 40;
-    if (v < worst) { worst = v; detail = { total: m.total, seconds: m.seconds, worstCorner: +m.worstCorner.toFixed(2), mean: +mean.toFixed(2), angle: +ang.toFixed(1), hits: m.contacts, hard: m.hard, resp: m.respawns, minKmh: m.minKmh }; }
+    v -= spread * 2500;
+    if (v < worst) { worst = v; detail = { spread: +spread.toFixed(2), total: m.total, seconds: m.seconds, worstCorner: +m.worstCorner.toFixed(2), mean: +mean.toFixed(2), angle: +ang.toFixed(1), hits: m.contacts, hard: m.hard, resp: m.respawns, minKmh: m.minKmh }; }
   }
   return { value: worst, detail };
 }

@@ -10,7 +10,7 @@
 import { createRivalDriver } from './driver.js';
 
 export const CHASE = {
-  GAP:        5.0,    // m behind him (along the run) it aims for
+  GAP:        6.5,    // m behind him (along the run) it aims for
   PACE:       0.6,    // m/s more speed wanted on grip per metre too far back
   PACE_MAX:   8,      // m/s, at most
   LIFT:       0.12,   // throttle taken off per metre too close

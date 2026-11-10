@@ -62,7 +62,8 @@ export const LOOK = {
   /* the spectacle round's marks: wider, darker, and enough of them to
      stay for the whole run (quads per tier) */
   MARK_SHOW:    { width: 0.27, opacity: 0.85, low: 6000, high: 12000 },
-  RUBBER_SHOW:  0.46,         // the rubber laid down the racing line, at most this opaque (TRACK_STYLE.RACING_LINE_ALPHA is 0.3)
+  RUBBER_SHOW:  0.46,
+        // the rubber laid down the racing line, at most this opaque (TRACK_STYLE.RACING_LINE_ALPHA is 0.3)
   TONE_MAPPING: 'aces',
   BLOOM:        { threshold: 0.85, strength: 0.55, radius: 0.012, taps: 12 },
   LOW_TIER_CORES: 4,
@@ -409,6 +410,11 @@ export function createScene(canvas, opts) {
     if (!id) { rivalRoot.visible = false; return; }
     const r = mount(rivalRoot, id, paintById(paintId || carById(id).paint).hex, false);
     rivalModel = r.model; rivalRig.bRear = r.bRear; rivalRig.half = r.half; rivalRoot.visible = true;
+    /* the player's headlights never light him: a few metres behind him
+       in a tandem they washed his paint to white. The sky and the sun
+       still do, so he reads as his colour, lit as the scene is */
+    const lit = THREE.TSL.lights([hemi, sun]);
+    rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
     if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
     rivalLamps = carLamps(rivalModel);
     rebuildRivalFx();

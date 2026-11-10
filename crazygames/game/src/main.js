@@ -250,7 +250,7 @@ function frame(t) {
   if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
   else {
     chase.update(pose, dt, scene.camera, view.w / view.h);
-    if (director) director.apply(S === 'countdown' ? 'countdown' : finishing ? 'finish' : 'drive', pose, scene.camera, dt, S === 'countdown' ? 1 - Math.max(0, app.countdown) / LOOP.COUNTDOWN : 0, chase.state);
+    if (director) director.apply(S === 'countdown' ? 'countdown' : finishing ? 'finish' : 'drive', pose, scene.camera, dt, S === 'countdown' ? 1 - Math.max(0, app.countdown) / LOOP.COUNTDOWN : 0, chase.state, app.rival && S === 'countdown' ? app.rival.world.car : null);
   }
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
   let rv = null;
@@ -454,7 +454,7 @@ function startRun(spec, opts) {
   /* a battle: the rival on the grid ahead, solid */
   if (spec.mode === 'battle') {
     const def = rivalById(spec.rival);
-    app.rival = createRival(app.track, def, app.laps);
+    app.rival = createRival(app.track, def, app.laps, app.rivalProbe || undefined);   // rivalProbe: the measurements' disturbances and known answers only
     app.world.obstacle = () => app.rival.body();
     scene.setRival(def.car, rivalPaint(def, paint));
     app.battleIntro = Object.keys(save.state.rivals).length === 0;
@@ -717,6 +717,8 @@ window.__loop = {
   lab: { setLab, labSpec, specFromCode, state: () => app.lab && { settings: app.lab.settings, seed: app.lab.seed, code: app.lab.code, message: app.lab.message, error: app.lab.error, track: app.lab.track && { name: app.lab.track.name, length: app.lab.track.length, kind: app.lab.track.kind, corners: app.lab.track.corners.length, bridges: (app.lab.track.bridges || []).length, fallback: !!app.lab.track.fallback, theme: app.lab.track.theme, preset: app.lab.track.preset } } },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor, battleSpec: id => battleSpec(rivalById(id)), RIVALS, TANDEM,
   rival: () => app.rival, tandem: () => app.tandem.state,
+  /* the probes: the next battle's rival with a start offset, a grip share or a driving number changed (rivals/rival.js opts); null for none */
+  setRivalProbe(o) { app.rivalProbe = o || null; },
   progress: () => app.progress && app.progress.state,
   results: () => app.results,
   ghostHash: () => app.ghost ? app.ghost.hash() : null,

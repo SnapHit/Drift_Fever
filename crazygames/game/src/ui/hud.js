@@ -31,6 +31,8 @@ export const HUD_BATTLE = {
   METER_SEGS:    5,        // segments of the meter
   TAG_UP:        2.3,      // m over the rival's car his tag sits
   EDGE:          34,       // px from the screen's edge the arrow sits
+  LIVE_SIDE:     118,      // px the live score moves beside the player's car, away from the rival, so it never sits on him
+  LIVE_DOWN:     34,       // px down from over the roof
   SMOOTH:        0.12,     // s, the meter's easing
 };
 
@@ -69,7 +71,7 @@ export function createHud(root) {
   const meter = el.querySelector('#meter'), segs = [...meter.querySelectorAll('i')], meterT = el.querySelector('#meterT');
   const tag = el.querySelector('#tag'), tagName = el.querySelector('#tagName'), tagMult = el.querySelector('#tagMult');
   const arrow = el.querySelector('#arrow'), arrowD = el.querySelector('#arrowD'), prompt1 = el.querySelector('#prompt1');
-  const bat = { on: false, k: 0, lastN: -1, lastLead: '', lastSeg: -1, lastMode: '', lastT: '', lastTag: null, lastArrow: null, lastMult: '', promptT: 0 };
+  const bat = { rivalX: null, on: false, k: 0, lastN: -1, lastLead: '', lastSeg: -1, lastMode: '', lastT: '', lastTag: null, lastArrow: null, lastMult: '', promptT: 0 };
   const carPx = { x: 0, y: 0 };
   let tmpV = null;
   /* a banked chain flies from where the number was to the total */
@@ -194,6 +196,8 @@ export function createHud(root) {
         // project the car's roof to the screen
         const p = new THREE.Vector3(pose.x, 1.9, pose.z).project(camera);
         v.x = (p.x * 0.5 + 0.5) * view.w; v.y = (-p.y * 0.5 + 0.5) * view.h;
+        /* in a battle, beside the car on the side away from the rival, as far as the screen allows */
+        if (bat.on && bat.rivalX !== null) { const side = bat.rivalX > v.x ? -1 : 1; v.x = Math.max(70, Math.min(view.w - 70, v.x + side * HUD_BATTLE.LIVE_SIDE)); v.y += HUD_BATTLE.LIVE_DOWN; }
         live.style.transform = 'translate(' + Math.round(v.x) + 'px,' + Math.round(v.y) + 'px)';
       }
       if (s.calloutCount < shown) shown = 0;
@@ -212,7 +216,7 @@ export function createHud(root) {
     },
     /* the battle: { name } or null */
     setBattle(b) {
-      bat.on = !!b; vs.hidden = !b; meter.hidden = true; tag.hidden = true; arrow.hidden = true; prompt1.hidden = true; bat.lastN = -1; bat.lastLead = ''; bat.lastSeg = -1; bat.lastMode = ''; bat.lastT = ''; bat.lastTag = null; bat.lastArrow = null; bat.k = 0;
+      bat.on = !!b; bat.rivalX = null; vs.hidden = !b; meter.hidden = true; tag.hidden = true; arrow.hidden = true; prompt1.hidden = true; bat.lastN = -1; bat.lastLead = ''; bat.lastSeg = -1; bat.lastMode = ''; bat.lastT = ''; bat.lastTag = null; bat.lastArrow = null; bat.k = 0;
       el.classList.toggle('battle', !!b);
       if (b) { vsName.textContent = b.name.toUpperCase(); tagName.textContent = b.name.toUpperCase(); }
     },
@@ -242,9 +246,10 @@ export function createHud(root) {
         meter.style.transform = 'translate(' + Math.round(carPx.x) + 'px,' + Math.round(carPx.y + HUD_BATTLE.METER_BELOW) + 'px) translate(-50%, 0)';
       }
       /* the tag over his car, or the arrow at the edge when he is out of view */
-      if (!rv || rival.state.fade >= 0.95 || !rival.solid() && rival.state.fade > 0.5) { if (!tag.hidden) tag.hidden = true; if (!arrow.hidden) arrow.hidden = true; return; }
+      if (!rv || rival.state.fade >= 0.95 || !rival.solid() && rival.state.fade > 0.5) { bat.rivalX = null; if (!tag.hidden) tag.hidden = true; if (!arrow.hidden) arrow.hidden = true; return; }
       const p = tmpV.set(rv.pose.x, (rv.pose.y || 0) + HUD_BATTLE.TAG_UP, rv.pose.z).project(camera);
       const inView = p.z < 1 && Math.abs(p.x) < 1 && Math.abs(p.y) < 1;
+      bat.rivalX = p.z < 1 ? (p.x * 0.5 + 0.5) * view.w : null;
       if (inView) {
         if (tag.hidden) tag.hidden = false; if (!arrow.hidden) arrow.hidden = true;
         tag.style.transform = 'translate(' + Math.round((p.x * 0.5 + 0.5) * view.w) + 'px,' + Math.round((-p.y * 0.5 + 0.5) * view.h) + 'px) translate(-50%, -100%)';

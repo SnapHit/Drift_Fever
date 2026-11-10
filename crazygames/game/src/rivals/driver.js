@@ -25,6 +25,7 @@
 
    A character (rivals/roster.js) is a few overrides of RIVAL_DRIVE. */
 import { stepVehicle, STEP } from '../physics/vehicle.js';
+import { TUNE } from '../tune.js';
 
 export const RIVAL_DRIVE = {
   /* looking ahead */
@@ -59,6 +60,12 @@ export const RIVAL_DRIVE = {
   WINDOW_POST:  4,       // m before its end the last slide may be started
   LINK:         30,      // m: within this of the next corner, a slide may be held across the gap
   HB_TIME:      0.25,    // s of DRIFT / BRAKE in a flick
+  /* his chain: the score banks an open chain after SCORING.BANK_GAP seconds
+     without a scoring slide; a try that lets it lapse while the next
+     corner is within LINK costs this, so he links corners decisively
+     instead of by a coin toss at the gap */
+  CHAIN_KEEP:   2500,
+  CHAIN_MARGIN: 0.25,    // s short of the bank gap the cost is judged at
   /* a character's own line (0: none): a reward per metre the car is to the outside (positive) of a corner */
   WIDE:         0,
 };
@@ -124,9 +131,14 @@ export function createRivalDriver(ground, character, override) {
     return best;
   }
   /* kind: -1 grip, else an index into INTO; dir the slide's sign */
+  const SC = TUNE.SCORING;
+  const scores = c => Math.abs(c.slip) * DEG >= SC.MIN_ANGLE && c.speed >= SC.MIN_SPEED && c.vx > 0;
+  /* is the next corner near enough that an open chain should live to it */
+  function linkAhead(s) { const { c, ahead } = cornerAt(s); return !!c && ahead <= D.LINK; }
   function rollout(car, ci0, s0, kind, dir, hl, hw0) {
     Object.assign(sim, car);
     let ci = ci0, value = 0, flick = kind >= 0 && !car.drifting ? HB : 0;
+    let gapT = sinceSlide, chain = sinceSlide < SC.BANK_GAP;
     const into = kind >= 0 ? D.INTO[kind] : 0;
     for (let k = 0; k < H; k++) {
       const c = C[ci];
@@ -152,6 +164,8 @@ export function createRivalDriver(ground, character, override) {
       const angle = Math.abs(sim.slip) * DEG;
       if (angle >= 12 && sim.speed >= 6 && sim.vx > 0 && along > 0) value += D.SLIDE_GAIN * Math.min(angle, D.ANGLE_CAP) * sim.speed * 3.6 * STEP * along;
       if (D.WIDE && dir) value += D.WIDE * (-l2 * -dir) * STEP;   // outside of the slide's corner
+      if (scores(sim)) gapT = 0; else gapT += STEP;
+      if (chain && gapT >= SC.BANK_GAP - D.CHAIN_MARGIN) { chain = false; if (linkAhead(ci * 2)) value -= D.CHAIN_KEEP; }
       void lat; void s;
     }
     const cEnd = C[ci];
@@ -162,14 +176,15 @@ export function createRivalDriver(ground, character, override) {
     return value;
   }
 
-  let choice = -1, dirNow = 0, flickLeft = 0, untilReplan = 0;
+  let choice = -1, dirNow = 0, flickLeft = 0, untilReplan = 0, sinceSlide = 1e9;
   const out = { steer: 0, throttle: 0, brake: 0, handbrake: 0 };
   const last = { tries: 0 };
-  function reset() { choice = -1; dirNow = 0; flickLeft = 0; untilReplan = 0; }
+  function reset() { choice = -1; dirNow = 0; flickLeft = 0; untilReplan = 0; sinceSlide = 1e9; }
   function input(world) {
     const car = world.car, s = world.along, ci = world.centreIndex;
     const V = car.tune ? car.tune.VEHICLE : null;
     const hl = V ? V.HALF_LENGTH : 2.2, hw0 = V ? V.HALF_WIDTH : 0.92;
+    sinceSlide = scores(car) ? 0 : sinceSlide + STEP;
     if (--untilReplan <= 0) {
       untilReplan = D.REPLAN;
       const { c, ahead } = cornerAt(s);
@@ -177,7 +192,7 @@ export function createRivalDriver(ground, character, override) {
       let dir = 0;
       if (c) {
         const inWindow = ahead > 0 ? ahead <= D.WINDOW_PRE : s <= c.to - D.WINDOW_POST || car.drifting;
-        if (inWindow || (car.drifting && ahead <= D.LINK)) dir = -c.sign;
+        if (inWindow || ((car.drifting || sinceSlide < SC.BANK_GAP) && ahead <= D.LINK)) dir = -c.sign;
       }
       let best = -1, bestV = 0;
       last.tries = 0;

@@ -277,6 +277,16 @@
   .results .duel .him i { background: var(--rival); } .results .duel .him .nm { color: var(--rival); }
   .results .margin { margin: -2px 0 0; font-size: 14px; font-weight: 800; opacity: 0.85; }
   @media (orientation: landscape) and (max-height: 500px) { .results .card.battle .who { font-size: 30px; } .results .duel .n { font-size: 20px; } .results .duel { gap: 3px; } }
+  /* the career's rival cards */
+  .career .rivalcard { flex: none; display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; min-height: 52px; padding: 6px 12px; border-radius: 12px; border: 2px solid var(--rival); background: linear-gradient(90deg, rgba(255,106,60,0.22), rgba(10,14,30,0.6)); color: #fff; font: inherit; text-align: left; }
+  .career .rivalcard.locked { border-color: rgba(255,255,255,0.14); background: rgba(10,14,30,0.45); opacity: 0.7; }
+  .career .rivalcard.beaten { border-color: rgba(25,216,255,0.6); background: linear-gradient(90deg, rgba(25,216,255,0.16), rgba(10,14,30,0.6)); }
+  .career .rivalcard .vs { flex: 0 0 auto; width: 30px; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; color: var(--rival); text-align: center; }
+  .career .rivalcard.beaten .vs { color: var(--cyan); }
+  .career .rivalcard .name { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; } .career .rivalcard .name b { font-size: 15px; font-weight: 900; letter-spacing: 0.08em; } .career .rivalcard .name small { font-size: 11px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .career .rivalcard .state { flex: 0 1 auto; display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-align: right; max-width: 48%; }
+  .career .rivalcard .state small { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; opacity: 0.8; white-space: normal; }
+  .career .rivalcard .state.go { color: var(--brand-fill); } .career .rivalcard .state.won { color: var(--cyan); }
   .results .missions .done { color: #ffd34d; } .results .missions .fresh b { color: #ffd34d; margin-left: 4px; }
   .pips.m i { width: 10px; height: 10px; border-radius: 5px; } .pips.m i.on { background: #ffd34d; }
   .row .col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }

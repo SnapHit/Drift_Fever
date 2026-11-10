@@ -12,6 +12,7 @@ import { soundIcon } from '../audio/sound.js';
 import { FIELDS } from '../lab/code.js';
 import { crossoverOffered, format as formatCode } from '../lab/lab.js';
 import { FX_ON } from '../fx.js';
+import { RIVALS, rivalOpen } from '../rivals/roster.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
@@ -67,6 +68,28 @@ export function createScreens(root, onAction) {
       <p class="hint">Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.</p>`);
   }
 
+  /* A rival's card on the career screen, after his track (briefs/RIVALS.md
+     3): locked (and what opens him), open, or beaten with the best margin. */
+  function rivalCard(save, index) {
+    const k = RIVALS.findIndex(r => r.track === index);
+    if (k < 0) return '';
+    const d = RIVALS[k], open = rivalOpen(save, d.id), e = save.rivals && save.rivals[d.id];
+    const beaten = !!(e && e.won);
+    let what;
+    if (beaten) what = `<span class="state won">BEATEN<small>best +${fmt(Math.max(0, e.best))}</small></span>`;
+    else if (open) what = `<span class="state go">BATTLE<small>${e ? 'best ' + (e.best >= 0 ? '+' : '') + fmt(e.best) : 'prize ' + fmt(d.prize)}</small></span>`;
+    else {
+      const needStar = !((save.career[String(d.track)] || {}).stars >= 1), prev = RIVALS[k - 1], needWin = k > 0 && !(save.rivals && save.rivals[prev.id] && save.rivals[prev.id].won);
+      const why = [needStar ? 'a star on ' + esc(CAREER[d.track].name) : '', needWin ? 'a win over ' + esc(prev.name) : ''].filter(Boolean).join(' and ');
+      what = `<span class="state lockd">&#128274;<small>${why}</small></span>`;
+    }
+    return `<button type="button" class="rivalcard${open ? '' : ' locked'}${beaten ? ' beaten' : ''}" data-action="battle" data-arg="${esc(d.id)}" ${open ? '' : 'disabled'}>
+        <span class="vs">VS</span>
+        <span class="name"><b>${esc(d.name.toUpperCase())}</b><small>${esc(d.style)} &middot; tandem battle</small></span>
+        ${what}
+      </button>`;
+  }
+
   /* THE CAREER: three chapters of eight, each a header (its stars and
      missions, or how many more stars open it) over its tracks. The list
      scrolls in its own box under the screen's header, and opens scrolled
@@ -82,7 +105,7 @@ export function createScreens(root, onAction) {
         <span class="n">${k + 1}</span>
         <span class="name"><b>${esc(t.name)}</b><small>${t.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint'}${e && e.best ? ' &middot; best ' + fmt(e.best) : ''}</small></span>
         ${playable ? '<span class="col">' + stars(e ? e.stars : 0) + pips(save.missions && save.missions['career:' + i]) + '</span>' : '<span class="lock">&#128274;</span>'}
-      </button>`;
+      </button>` + rivalCard(save, i);
       }).join('');
       const k = starsToOpen(save, c);
       const sub = open ? `${chapterStars(save, c)}/${size * 3} &#9733; &middot; ${done}/${size * 3} missions` : `${k} more ${esc(CHAPTERS[c - 1].name)} star${k === 1 ? '' : 's'} to open ${esc(ch.name)}`;
