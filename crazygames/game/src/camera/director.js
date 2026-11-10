@@ -5,7 +5,7 @@
    camera on from where the chase camera put it, and only:
 
    - over the countdown, a sweep that starts in front of the car, low,
-     and arcs up over it to end exactly on the chase camera
+     and swings round beside it to end exactly on the chase camera
      well before GO (the countdown's length is unchanged, and nothing
      about the controls is);
    - when a big chain is banked, a kick: the view pulls back and widens
@@ -22,10 +22,10 @@
 export const DIRECTOR = {
   /* the countdown's sweep, over u from 0 (the countdown starts) to 1 (GO) */
   SWEEP_END:      0.8,     // share of the countdown by which the camera is on the chase camera
-  SWEEP_AHEAD:    8.5,     // m in front of the car the sweep starts, low, looking back at its face
-  SWEEP_LOW:      1.3,     // m above the road there
-  SWEEP_OVER:     5.5,     // m the arc rises over the car as it swings from the front to the back, staying over the road
-  SWEEP_SIDE:     2.2,     // m to one side, so it is a three quarter view and not a straight crane
+  SWEEP_AHEAD:    6.0,     // m in front of the car the sweep starts, low, looking back at its face
+  SWEEP_LOW:      1.2,     // m above the road there
+  SWEEP_RISE:     1.5,     // m it rises as it swings round beside the car (kept under a start gantry's banner, 2.9 m up)
+  SWEEP_SIDE:     4.2,     // m out to the side halfway round, staying over the road
   SWEEP_LOOK_UP:  0.8,     // m above the road the sweep looks at the car
   /* the kick when a chain is banked */
   KICK_FROM:      3,       // the multiplier a banked chain needs
@@ -69,10 +69,10 @@ export function createDirector(THREE) {
     if (mode === 'countdown') {
       const k = ease(Math.min(1, u / D.SWEEP_END));
       if (k >= 1) return;
-      /* an arc in the car's own vertical plane, from in front of it (phi = pi), up over the roof, to behind (phi = 0), staying over the road */
+      /* round the car at the height of its roof, from in front of it (phi = pi) by its side to behind it (phi = 0), staying over the road */
       const phi = (1 - k) * Math.PI;
       const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
-      const along = -Math.cos(phi) * D.SWEEP_AHEAD, up = D.SWEEP_LOW + Math.sin(phi) * D.SWEEP_OVER, side = Math.sin(phi) * D.SWEEP_SIDE + (1 - k) * D.SWEEP_SIDE * 0.5;
+      const along = -Math.cos(phi) * D.SWEEP_AHEAD, up = D.SWEEP_LOW + Math.sin(phi) * D.SWEEP_RISE, side = Math.sin(phi) * D.SWEEP_SIDE;
       const px = pose.x + fx * along + lx * side, pz = pose.z + fz * along + lz * side, py = y0 + up;
       /* blended into the chase camera's own position and look, so it lands on it exactly */
       const w = ease(Math.max(0, (k - 0.55) / 0.45));

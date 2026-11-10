@@ -87,7 +87,7 @@ export function createParticles(THREE, opts) {
           /* on the screen: how far the particle's nearest edge stands from the car's middle, against the car's own size there (angles, so a puff near the camera is judged by what it covers) */
           const ox = qx - cdx * along, oy = qy - cdy * along, oz = qz - cdz * along;
           const q = ((Math.hypot(ox, oy, oz) - p.size * 0.5) / along) / (clear.r / cdl);   // a puff is dense in its middle half
-          const k = Math.max(0, Math.min(1, (q - 0.8) / 0.9));   // over the car: 0; clear of it by half its size: 1
+          const k = Math.max(0, Math.min(1, (q - 0.85) / 0.45));   // over the car: 0; just clear of it: 1
           a *= clear.keep + (1 - clear.keep) * k * k * (3 - 2 * k);
         }
       }

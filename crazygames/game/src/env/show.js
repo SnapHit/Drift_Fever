@@ -63,7 +63,7 @@ export const SHOW = {
     GROW:           [2.6, 3.4],  // m per second at birth, slowing as the puff ages
     GROW_DECAY:     0.8,         // per second
     RISE:           1.7,         // m per second
-    ALPHA:          [0.42, 0.58],
+    ALPHA:          [0.5, 0.66],
     KEEP:           0.12,        // share of the wheel's velocity a puff is born with
     THROW:          [4.5, 6.5],  // m/s a puff is thrown the way the tyres slide (out of the corner), so the cloud billows beside the car's path where the camera can see it
     DRAG:           1.3,

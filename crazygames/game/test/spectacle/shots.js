@@ -61,11 +61,13 @@ async function moment(p, name) {
     return !!f;
   }
   if (name === 'finish' || name === 'results') {
-    await p.evaluate(t => { const Lp = window.__loop; Lp.replayRun(Lp.careerSpec(0), t); Lp.app.state = 'drive'; window.__feel.setDriver({ drift: '*' }); }, lead.tape);
+    /* the tape to just before the line, then the drifter on from there; the replay draws no frames, so the HUD is set as the frames would have left it */
+    await p.evaluate(t => { const Lp = window.__loop, F = window.__feel; Lp.replayRun(Lp.careerSpec(0), t); Lp.app.state = 'drive'; Lp.app.missionsShown = 0; F.hud.setCount('', false); F.hud.setMissions(null); F.hud.reset(); F.setDriver({ drift: '*' }); }, lead.tape);
     const f = await S.untilExact(p, 'f.finished', 240);
     if (name === 'finish') { await S.runFrames(p, 14); return !!f; }
     await S.until(p, "f.state==='results'", 600, 10);
     await S.runFrames(p, 100);
+    await new Promise(r => setTimeout(r, 2500));   // the stars land and the coins count on the page's own clock
     return true;
   }
 }
