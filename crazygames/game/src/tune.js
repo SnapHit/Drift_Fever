@@ -332,3 +332,34 @@ export const LOOP = {
     INFO_CHAIN_MIN:   15,      // points a banked chain must be worth before it is the one explained (a one point bank teaches nothing)
   },
 };
+
+/* THE TANDEM BLOCK (briefs/RIVALS.md): a battle is one run against a
+   rival who leads it. Every number about the run itself lives here; the
+   rivals themselves (names, cars, tracks, how each drives) are in
+   rivals/roster.js. First guesses for the author to set by play. With
+   no rival, nothing here is read. */
+export const TANDEM = {
+  LAPS:             2,       // laps of a circuit in a battle (a solo run is LOOP.LAPS), so a battle stays near 60 to 120 s
+  STAGGER_AHEAD:    8,       // m the rival starts ahead of the player on the grid
+  STAGGER_SIDE:     3,       // m to the side; the sign is the rival's (left is positive)
+  /* the zone: how close counts. Distances are between the two cars' centres */
+  NEAR:             4.5,     // m: this close or closer is the full bonus
+  FAR:              14,      // m: past this there is no bonus ("too far")
+  BONUS:            1.5,     // at full closeness the player's drift points count 1 + this times over
+  AHEAD:            1.0,     // m: the player's centre this far ahead of the rival's, along the rival's travel, is ahead: no bonus
+  LAYER:            2.5,     // m of height apart (a bridge over the other road) that is never together
+  RUN_GAP:          40,      // m apart in run distance that is never together (a car a lap down passing the other)
+  /* contact: the rival is solid and never moved by the player */
+  HARD_HIT:         5.0,     // m/s into the rival that is a hard contact: the chain is lost, as a wall hit
+  HIT_SPEED_KEEP:   0.85,    // share of the player's speed, relative to the rival, kept through a hard contact
+  RESTITUTION:      0.1,
+  FRICTION:         0.3,
+  COOL:             1.5,     // s the tandem bonus is off after a hard contact
+  PIN_SLACK:        0.4,     // m: if the walls hold the player this deep inside the rival, the rival lets him through until they part
+  FADE:             1.2,     // s the rival takes to fade away after his finish, no longer solid
+  /* the HUD and callouts */
+  CALL_HOLD:        1.2,     // s in the zone, both sliding, before TANDEM is called
+  CALL_CLOSE:       2.6,     // m of gap between the cars' sides for DOOR TO DOOR
+  CALL_FAR_AFTER:   2.0,     // s too far while he slides before TOO FAR is called (once per slide)
+  METER_SMOOTH:     0.12,    // s, the closeness meter's easing
+};
