@@ -97,9 +97,10 @@ prices, chapters), career seeds.
   grip player braked with DRIFT and slid the tight corners anyway (67
   and 54 per cent sliding with no slide asked for). The final one has no
   drift points at all. The mixed player's drift points were weighed 1.5
-  against its time. Alone on First slide (four laps): grip 74 s, 0
-  drift; mixed about 75 s, slides the two drift corners (66, 64 per
-  cent) and never the sweeper; slide about 88 s, slides all three.
+  against its time. Alone on First slide (four laps, no rival): grip
+  75.0 s and 754 points, none of them drift; mixed 76.1 s and 3,141,
+  sliding the two drift corners (about 62 per cent of each) and never
+  the sweeper; slide 88.4 s and 5,616, sliding all three.
 - **Kestrow** (`test/driftrace/search.js --character`): the rivals
   round's search, his driver planning with a player's hands, plus a
   pace term (his time at the players' pace), a ceiling on his total, and
@@ -241,7 +242,7 @@ Why the mixed player loses, as far as I can see:
   cap 15 to 17 degrees) broke the robustness bar (3 to 20 of 20 runs
   miss);
 - **level starts at equal pace mean contact.** Alone the mixed player
-  scores about 2,450; in the race 1,774 to 2,899, because the two cars
+  scores 3,141; in the race 1,774 to 2,899, because the two cars
   run together and touch up to 34 times, and a hard touch loses the
   chain. He does not see the player, the player's scripted driver does
   and still touches him. A human will avoid him better; that is the
