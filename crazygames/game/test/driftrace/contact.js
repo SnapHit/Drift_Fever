@@ -182,7 +182,8 @@ const np = run('FOLLOW', { up: FOLLOW_UP });
 const npPark = run('PARK', {});
 [TANDEM.PIN_SLACK] = pin;
 out.knownAnswerPinPark = npPark;
-verdict(npPark.maxHeld > HELD || npPark.respawns > 0, 'known answer: with the pin release off the parked player is ' + (npPark.maxHeld > HELD ? 'held ' + npPark.maxHeld + ' s' : 'not held') + ', respawned ' + npPark.respawns + ' times after the contact: ' + (npPark.maxHeld > HELD || npPark.respawns > 0 ? 'CAUGHT' : 'MISSED'));
+const P = out.scenarios.PARK, parkOk = P.maxHeld <= HELD && P.respawns === 0, parkKa = parkOk && (npPark.maxHeld > HELD || npPark.respawns > 0);
+verdict(parkKa, 'known answer: with the pin release off the parked player is ' + (npPark.maxHeld > HELD ? 'held ' + npPark.maxHeld + ' s' : 'not held') + ', respawned ' + npPark.respawns + ' times after the contact: ' + (!parkOk ? 'CANNOT BE JUDGED (the case itself fails)' : parkKa ? 'CAUGHT' : 'MISSED (the pin release was ' + (P.passThroughSteps ? 'used ' + P.passThroughSteps + ' steps' : 'never used') + ')'));
 out.knownAnswerPin = np;
 /* the known answer can only be caught if the case itself passes, and only for the right reason if the pin release did something in it */
 const kaCaught = F.past !== null && (np.past === null || np.maxHeld > HELD);

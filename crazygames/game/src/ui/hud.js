@@ -243,7 +243,9 @@ export function createHud(root) {
       if (ahead !== bat.lastLead) { bat.lastLead = ahead; vs.className = ahead; vsLead.textContent = ahead === 'ahead' ? 'YOU LEAD' : ahead === 'behind' ? 'HE LEADS' : 'LEVEL'; }
       if (bat.promptT > 0) { bat.promptT -= dt; if (bat.promptT <= 0) prompt1.hidden = true; }
       /* under the player's car: his place and the gap, and the close bonus while it counts */
-      if (meter.hidden) meter.hidden = false;
+      /* over the countdown the sweep swings round the cars, so the place waits for GO */
+      if (counting) { if (!meter.hidden) meter.hidden = true; }
+      else if (meter.hidden) meter.hidden = false;
       const place = counting ? 'GRID' : L.place === 1 ? '1ST' : '2ND';
       if (place !== bat.lastPlace) { bat.lastPlace = place; placeN.textContent = place; placeBox.className = counting ? 'grid' : L.place === 1 ? 'first' : 'second'; }
       const gap = counting || !rival.solid() || L.gap < 0.05 ? '' : (L.place === 1 ? '+' : '-') + L.gap.toFixed(1) + ' s';

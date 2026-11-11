@@ -3,7 +3,7 @@
    1280x720, by bounding boxes, every element inside the view and none
    of these overlapping:
    1. The race's countdown: its heading and line, the count, the two
-      totals, the place under the car (GRID), the readout, the lap and
+      totals, the readout, the lap and
       clock, the buttons, the pads.
    2. The HUD mid race, the close bonus counting: the same fixed
       elements, the place, gap and close bonus under the player's car,
