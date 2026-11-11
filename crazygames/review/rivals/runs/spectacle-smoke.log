@@ -1,0 +1,6 @@
+PASS low 1280x720: the smoke hides at worst 3.2% of the car box, median 1.6% over 8 frames of a slide at x5 (110 puffs alive); of the car itself at worst 1.6%, median 0.0%
+PASS low 390x844: the smoke hides at worst 2.4% of the car box, median 1.6% over 8 frames of a slide at x5 (110 puffs alive); of the car itself at worst 0.6%, median 0.1%
+PASS high 1280x720: the smoke hides at worst 3.2% of the car box, median 1.7% over 8 frames of a slide at x5 (221 puffs alive); of the car itself at worst 0.7%, median 0.0%
+PASS high 390x844: the smoke hides at worst 1.6% of the car box, median 0.7% over 8 frames of a slide at x5 (222 puffs alive); of the car itself at worst 0.1%, median 0.0%
+PASS known answer: the smoke without its clearance and twice as thick hides at worst 37.3%, median 33.1% (of the car itself 44.8% and 38.6%): CAUGHT
+all passed

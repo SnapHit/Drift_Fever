@@ -481,7 +481,29 @@ All were looked at. What I see:
 
 ### Every probe in `game/test/`
 
-SUITES_TABLE
+Run in sequence on this branch after the last code change. Each log is in
+`runs/`, and `runs/summary.txt` holds the exit codes. The probes rewrite
+other rounds' `review/` files; those were restored, so only
+`review/rivals/` belongs to this branch.
+
+| probe | result |
+|---|---|
+| `rivals/determinism.js`, `drive.js`, `fair.js`, `contact.js`, `camera.js`, `layout.js`, `save.js`, `perf.js` | as above: `drive.js` fails my disturbance bar for rivals 2 to 6, and `fair.js` fails for Tolvo and Varsk; the rest pass |
+| `loop/quota.js`, `feel/handling.js`, `feel/corners.js` | pass |
+| `feel/probes.js` | all passed, 14 verdicts |
+| `tracks/probes.js` | all measurements pass, every known answer caught |
+| `tracks/tracks2.js` | the busyness known answer MISSED for circuits and sprints, as on `main`. Reported, not fixed |
+| `visuals/occlusion.js`, `--career` | all passed |
+| `visuals/probes.js` | all passed, 7 verdicts |
+| `cars/measure.js`, `retention/codes.js` | pass |
+| `cars/render.js` | **FAILS, also on `main`**: `lab/cars.html` reads `LOOK.SUN_DIR`, which `render/scene.js` has not had since an earlier round (absent at 450312f too), so the turntable never starts. Not touched; reported |
+| `retention/heading.js` | all passed, 28 verdicts (after the offer fix in deviation 8) |
+| `chapters/probes.js` | all passed, 98 verdicts |
+| `spectacle/determinism.js`, `night.js`, `smoke.js`, `adapt.js`, `layout.js`, `perf.js` | all passed (10, 4, 5, 14, 9, 2 verdicts) |
+| `retention/probes.js` | all passed, 42 verdicts; its perf check read 4.3 ms against the stored 3.6 (noise 1.5) |
+| `loop/probes.js` | all passed, 22 verdicts |
+
+`npm run build` passes: initial download 2.40 MB over 76 files (2.32 MB over 71 after the spectacle round).
 
 ## What the author should judge on his own devices
 

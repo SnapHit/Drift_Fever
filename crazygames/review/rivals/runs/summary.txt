@@ -1,0 +1,14 @@
+feel/probes exit 0
+visuals/probes exit 0
+cars/render exit 1
+cars/render exit 1 (LOOK.SUN_DIR missing in lab/cars.html, also on main 450312f)
+chapters/probes exit 0
+spectacle/determinism exit 0
+spectacle/night exit 0
+spectacle/smoke exit 0
+spectacle/adapt exit 0
+spectacle/layout exit 0
+spectacle/perf exit 0
+retention/probes exit 0
+loop/probes exit 0
+ALL DONE

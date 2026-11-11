@@ -18,3 +18,14 @@ PASS known answer: a camera looking at the sky loses the car in 390x844: 900 of 
 == 4. perf
 throttle 1x: frame p95 215 worst 2116.2 ms; js without submit p95 0.5 worst 6.6; physics p95 0.2 worst 1.9 (2 steps); submit p95 214.3; first frames worst 10; webgl2 low
 throttle 4x: frame p95 387.1 worst 1015.1 ms; js without submit p95 2.4 worst 17.3; physics p95 0.9 worst 7.1 (2 steps); submit p95 386.1; first frames worst 44.4; webgl2 low
+throttle 6x: frame p95 434.2 worst 2844.2 ms; js without submit p95 3.8 worst 10.6; physics p95 1.6 worst 9.2 (2 steps); submit p95 428.1; first frames worst 65; webgl2 low
+PASS JavaScript frame p95 at 6x throttle under 16.7 ms: 3.8 ms, worst 10.6
+PASS known answer: 20 ms of busy work per frame raises the p95 by about 20 ms and fails the budget: p95 2.4 -> 25 ms at 4x
+
+== shots
+wrote /home/claude/rivals/crazygames/review/feel/shots/drift-1280x720.png
+wrote /home/claude/rivals/crazygames/review/feel/shots/park-1280x720.png
+wrote /home/claude/rivals/crazygames/review/feel/shots/drift-390x844.png
+wrote /home/claude/rivals/crazygames/review/feel/shots/park-390x844.png
+
+all passed; wrote review/feel/determinism.json, drive.json, camera.json, perf.json, shots.json
