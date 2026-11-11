@@ -459,6 +459,592 @@
     }
    },
    "measured": "2026-11-11"
+  },
+  "r2": {
+   "id": "r2",
+   "name": "Tolvo",
+   "style": "Fast and shallow",
+   "track": 4,
+   "trackName": "Tight city",
+   "kind": "circuit",
+   "laps": 3,
+   "car": "hatch",
+   "paint": "amber",
+   "chapter": "Rookie",
+   "playerCar": "starter, no upgrades",
+   "seconds": 83.48,
+   "total": 4849,
+   "target3": 1780,
+   "multiple": 2.724,
+   "target3career": 1780,
+   "multipleCareer": 2.724,
+   "wins": {
+    "grip": 0,
+    "slide": 3,
+    "mixed": 8,
+    "all": 11
+   },
+   "m2": {
+    "pass": true,
+    "page": {
+     "rival": "r2",
+     "track": 4,
+     "finished": true,
+     "seconds": 83.48,
+     "total": 4849,
+     "drift": 4237,
+     "clean": 336,
+     "pace": 276,
+     "best": 1160,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.3,
+     "minAt": 25,
+     "corners": [
+      {
+       "name": "tightening 1 L1",
+       "share": 0.914,
+       "angle": 18.4,
+       "max": 26.9,
+       "s": 2.7
+      },
+      {
+       "name": "esses 1 L1",
+       "share": 0.367,
+       "angle": 18.8,
+       "max": 22.2,
+       "s": 2.07
+      },
+      {
+       "name": "esses 2 L1",
+       "share": 0.551,
+       "angle": 18.8,
+       "max": 22.4,
+       "s": 1.39
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.855,
+       "angle": 18.5,
+       "max": 26.9,
+       "s": 2.47
+      },
+      {
+       "name": "double 1 L1",
+       "share": 0.812,
+       "angle": 26.9,
+       "max": 42.6,
+       "s": 4.03
+      },
+      {
+       "name": "double 2 L1",
+       "share": 0.846,
+       "angle": 32.1,
+       "max": 41,
+       "s": 3.51
+      },
+      {
+       "name": "tight 1 L1",
+       "share": 0.455,
+       "angle": 24,
+       "max": 28.2,
+       "s": 3.24
+      },
+      {
+       "name": "tightening 1 L2",
+       "share": 0.91,
+       "angle": 18.2,
+       "max": 26,
+       "s": 2.69
+      },
+      {
+       "name": "esses 1 L2",
+       "share": 0.34,
+       "angle": 18.8,
+       "max": 22.1,
+       "s": 2.06
+      },
+      {
+       "name": "esses 2 L2",
+       "share": 0.565,
+       "angle": 22.5,
+       "max": 28.5,
+       "s": 1.4
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.845,
+       "angle": 18.5,
+       "max": 26.8,
+       "s": 2.47
+      },
+      {
+       "name": "double 1 L2",
+       "share": 0.808,
+       "angle": 27.4,
+       "max": 43,
+       "s": 4.04
+      },
+      {
+       "name": "double 2 L2",
+       "share": 0.921,
+       "angle": 25.3,
+       "max": 28.4,
+       "s": 3.27
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.478,
+       "angle": 24.1,
+       "max": 28.2,
+       "s": 3.38
+      },
+      {
+       "name": "tightening 1 L3",
+       "share": 0.723,
+       "angle": 22.6,
+       "max": 28.3,
+       "s": 2.73
+      },
+      {
+       "name": "esses 1 L3",
+       "share": 0.354,
+       "angle": 21.8,
+       "max": 27.9,
+       "s": 2.05
+      },
+      {
+       "name": "esses 2 L3",
+       "share": 0.497,
+       "angle": 18.8,
+       "max": 22.2,
+       "s": 1.41
+      },
+      {
+       "name": "opening 1 L3",
+       "share": 0.867,
+       "angle": 18.4,
+       "max": 26.8,
+       "s": 2.45
+      },
+      {
+       "name": "double 1 L3",
+       "share": 0.758,
+       "angle": 29,
+       "max": 42.3,
+       "s": 3.75
+      },
+      {
+       "name": "double 2 L3",
+       "share": 0.861,
+       "angle": 24.7,
+       "max": 28.3,
+       "s": 3.36
+      },
+      {
+       "name": "tight 1 L3",
+       "share": 0.526,
+       "angle": 23.6,
+       "max": 28.2,
+       "s": 2.93
+      }
+     ],
+     "worstCorner": 0.3400809716599198,
+     "meanCorner": 0.6786242133815166,
+     "hash": "1.6849709030141455,-8.086893196536074,0.04547878932868857,-0.9572019981207611,-28.655338367137784,0.15210083475617592,0.022796444626791038,6.083231355444087,0,0,0,-7.40948242048053,-6.023393097833277|10018,0,0|4849,10018",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "node": {
+     "rival": "r2",
+     "track": 4,
+     "finished": true,
+     "seconds": 83.48,
+     "total": 4849,
+     "drift": 4237,
+     "clean": 336,
+     "pace": 276,
+     "best": 1160,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.3,
+     "minAt": 25,
+     "corners": [
+      {
+       "name": "tightening 1 L1",
+       "share": 0.914,
+       "angle": 18.4,
+       "max": 26.9,
+       "s": 2.7
+      },
+      {
+       "name": "esses 1 L1",
+       "share": 0.367,
+       "angle": 18.8,
+       "max": 22.2,
+       "s": 2.07
+      },
+      {
+       "name": "esses 2 L1",
+       "share": 0.551,
+       "angle": 18.8,
+       "max": 22.4,
+       "s": 1.39
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.855,
+       "angle": 18.5,
+       "max": 26.9,
+       "s": 2.47
+      },
+      {
+       "name": "double 1 L1",
+       "share": 0.812,
+       "angle": 26.9,
+       "max": 42.6,
+       "s": 4.03
+      },
+      {
+       "name": "double 2 L1",
+       "share": 0.846,
+       "angle": 32.1,
+       "max": 41,
+       "s": 3.51
+      },
+      {
+       "name": "tight 1 L1",
+       "share": 0.455,
+       "angle": 24,
+       "max": 28.2,
+       "s": 3.24
+      },
+      {
+       "name": "tightening 1 L2",
+       "share": 0.91,
+       "angle": 18.2,
+       "max": 26,
+       "s": 2.69
+      },
+      {
+       "name": "esses 1 L2",
+       "share": 0.34,
+       "angle": 18.8,
+       "max": 22.1,
+       "s": 2.06
+      },
+      {
+       "name": "esses 2 L2",
+       "share": 0.565,
+       "angle": 22.5,
+       "max": 28.5,
+       "s": 1.4
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.845,
+       "angle": 18.5,
+       "max": 26.8,
+       "s": 2.47
+      },
+      {
+       "name": "double 1 L2",
+       "share": 0.808,
+       "angle": 27.4,
+       "max": 43,
+       "s": 4.04
+      },
+      {
+       "name": "double 2 L2",
+       "share": 0.921,
+       "angle": 25.3,
+       "max": 28.4,
+       "s": 3.27
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.478,
+       "angle": 24.1,
+       "max": 28.2,
+       "s": 3.38
+      },
+      {
+       "name": "tightening 1 L3",
+       "share": 0.723,
+       "angle": 22.6,
+       "max": 28.3,
+       "s": 2.73
+      },
+      {
+       "name": "esses 1 L3",
+       "share": 0.354,
+       "angle": 21.8,
+       "max": 27.9,
+       "s": 2.05
+      },
+      {
+       "name": "esses 2 L3",
+       "share": 0.497,
+       "angle": 18.8,
+       "max": 22.2,
+       "s": 1.41
+      },
+      {
+       "name": "opening 1 L3",
+       "share": 0.867,
+       "angle": 18.4,
+       "max": 26.8,
+       "s": 2.45
+      },
+      {
+       "name": "double 1 L3",
+       "share": 0.758,
+       "angle": 29,
+       "max": 42.3,
+       "s": 3.75
+      },
+      {
+       "name": "double 2 L3",
+       "share": 0.861,
+       "angle": 24.7,
+       "max": 28.3,
+       "s": 3.36
+      },
+      {
+       "name": "tight 1 L3",
+       "share": 0.526,
+       "angle": 23.6,
+       "max": 28.2,
+       "s": 2.93
+      }
+     ],
+     "worstCorner": 0.3400809716599198,
+     "meanCorner": 0.6786242133815166,
+     "hash": "1.6849709030136026,-8.086893196536536,0.04547878932868002,-0.957201998120518,-28.655338367137865,0.152100834756175,0.022796444626790938,6.08323135544407,0,0,0,-7.409482420480474,-6.0233930978333206|10018,0,0|4849,10018",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.5,
+     "worstCorner": 0.31,
+     "total": [
+      4177,
+      5005
+     ],
+     "seconds": [
+      81.08,
+      83.23
+     ],
+     "guard": 0,
+     "brake": 0,
+     "lift": 0
+    },
+    "missing": 0,
+    "own": []
+   },
+   "m3": {
+    "pass": true,
+    "players": {
+     "grip": {
+      "wins": 0,
+      "allAhead": 0,
+      "allBehind": 12,
+      "seconds": [
+       83.24,
+       86.01
+      ],
+      "rivalSeconds": [
+       81.08,
+       83.48
+      ],
+      "total": [
+       598,
+       3076
+      ],
+      "rival": [
+       5809,
+       6637
+      ],
+      "margin": [
+       -5730,
+       -3169
+      ],
+      "aheadShare": [
+       0,
+       0.293
+      ],
+      "changes": [
+       0,
+       34
+      ],
+      "leadGates": [
+       0,
+       3
+      ],
+      "lineWon": 0,
+      "wallHits": 16,
+      "hard": 7,
+      "bodyHits": 33,
+      "respawns": 0,
+      "handsBroken": 0,
+      "parts": {
+       "drift": 477,
+       "clean": 168,
+       "pace": 268,
+       "leads": 0,
+       "line": 0,
+       "close": 0
+      },
+      "rivalParts": {
+       "drift": 4237,
+       "clean": 336,
+       "pace": 276,
+       "leads": 1122,
+       "line": 510,
+       "close": 0
+      }
+     },
+     "slide": {
+      "wins": 3,
+      "allAhead": 0,
+      "allBehind": 12,
+      "seconds": [
+       87.37,
+       95.32
+      ],
+      "rivalSeconds": [
+       81.08,
+       83.48
+      ],
+      "total": [
+       1727,
+       8117
+      ],
+      "rival": [
+       5707,
+       6637
+      ],
+      "margin": [
+       -4556,
+       1687
+      ],
+      "aheadShare": [
+       0,
+       0.274
+      ],
+      "changes": [
+       0,
+       8
+      ],
+      "leadGates": [
+       0,
+       3
+      ],
+      "lineWon": 0,
+      "wallHits": 15,
+      "hard": 6,
+      "bodyHits": 18,
+      "respawns": 0,
+      "handsBroken": 0,
+      "parts": {
+       "drift": 4495,
+       "clean": 224,
+       "pace": 253,
+       "leads": 102,
+       "line": 0,
+       "close": 0
+      },
+      "rivalParts": {
+       "drift": 4237,
+       "clean": 336,
+       "pace": 276,
+       "leads": 1020,
+       "line": 510,
+       "close": 0
+      }
+     },
+     "mixed": {
+      "wins": 8,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       78.96,
+       89.15
+      ],
+      "rivalSeconds": [
+       81.08,
+       83.48
+      ],
+      "total": [
+       1899,
+       9948
+      ],
+      "rival": [
+       4177,
+       6433
+      ],
+      "margin": [
+       -4457,
+       5771
+      ],
+      "aheadShare": [
+       0.06,
+       0.986
+      ],
+      "changes": [
+       1,
+       19
+      ],
+      "leadGates": [
+       1,
+       11
+      ],
+      "lineWon": 7,
+      "wallHits": 22,
+      "hard": 7,
+      "bodyHits": 25,
+      "respawns": 0,
+      "handsBroken": 0,
+      "parts": {
+       "drift": 3743,
+       "clean": 196,
+       "pace": 272,
+       "leads": 102,
+       "line": 0,
+       "close": 0
+      },
+      "rivalParts": {
+       "drift": 4237,
+       "clean": 336,
+       "pace": 276,
+       "leads": 1020,
+       "line": 510,
+       "close": 0
+      }
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 6481,
+     "won": false
+    }
+   },
+   "measured": "2026-11-11"
   }
  },
  "bar": {
@@ -493,6 +1079,21 @@
     "steer": 2
    },
    "label": "starter, two steps of each"
+  }
+ ],
+ "climbs": [
+  {
+   "from": "Kestrow",
+   "to": "Tolvo",
+   "winsFall": true,
+   "multipleRises": true,
+   "ok": true
+  }
+ ],
+ "knownAnswer": [
+  {
+   "swapped": "Kestrow and Tolvo",
+   "caught": true
   }
  ]
 }

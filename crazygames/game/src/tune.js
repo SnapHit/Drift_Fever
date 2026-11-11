@@ -341,7 +341,7 @@ export const LOOP = {
    laps, how each drives) are in rivals/roster.js. First guesses for the
    author to set by play. With no rival, nothing here is read. */
 export const TANDEM = {
-  LIVE:             1,       // how many of the six rivals are in the game; the rest wait behind ?rivals=all until each passes under the race's rules
+  LIVE:             2,       // how many of the six rivals are in the game, in ladder order; the rest wait behind ?rivals=all until each passes measures 2 and 3 of briefs/RIVALS-LADDER.md (game/test/ladder/rivals.js)
   LAPS:             2,       // laps of a circuit in a race, for a rival with no laps of his own (rivals/roster.js), so a race stays near 60 to 120 s
   /* the grid: level, side by side, either side of the centre line */
   GRID_SIDE:        2.2,     // m each car starts from the centre line, the rival on his side (roster) and the player on the other
