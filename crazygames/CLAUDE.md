@@ -403,5 +403,29 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   real WebGPU. Not done: lit windows in the night skyline, headlights
   reflected in a wet road, sight lines past the new lamp row
   (`visuals/occlusion.js` does not place it). When the bloom is dropped
-  on the high tier the colour grade goes with it. Three more rounds are
-  proposed and not started: rivals and tandem, garage, playground.
+  on the high tier the colour grade goes with it.
+- 11 November 2026, the rivals round (`briefs/RIVALS.md`,
+  `review/rivals/REPORT.md`): a tandem battle. A named rival leads a
+  run of his career track in his own physics world, stepped in lockstep
+  with the player's and driven live by a look-ahead driver
+  (`game/src/rivals/`); he reads only his own world, so he is the same
+  every time and the player never moves him. The player's drift points
+  count up to 2.5 times while both slide and the player is close behind
+  or beside him (`TANDEM` in `tune.js`, `scoring/tandem.js`); he is
+  solid, and a hard touch loses the chain. The player wins with a total
+  at least his. Battles gate nothing, pay coins and a first-win prize,
+  earn no stars or missions, keep no ghost, and add `rivals` to the
+  save. With no rival every run is the same to the bit (main's tapes
+  replay). **Only the first rival, Kestrow on career 1, is in the
+  game** (`TANDEM.LIVE` 1): he passed every measure and the scripted
+  chaser beats him 9 times in 12 in the starter, 0 in 12 with the bonus
+  at nothing. The other five (Tolvo, Varsk, Dovane, Halvik, Sarrow) are
+  built and wait behind `?rivals=all`: under small disturbances 2 to 6
+  runs in 20 miss the driving bar each, the chaser never beats Tolvo or
+  Varsk, and it beats Dovane without the tandem. Open for play: whether
+  chasing Kestrow is a thrill (the chase camera sits high, so he looks
+  small), the zone and bonus numbers, frame rate in a battle on real
+  devices, a First slide battle is about 45 s. Not done: the lead run
+  (the rival chasing), a rival's sound. `lab/cars.html` is broken on
+  main too (it reads `LOOK.SUN_DIR`, which is gone). Two rounds are
+  proposed and not started: garage, playground.

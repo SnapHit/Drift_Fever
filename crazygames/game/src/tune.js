@@ -339,6 +339,7 @@ export const LOOP = {
    rivals/roster.js. First guesses for the author to set by play. With
    no rival, nothing here is read. */
 export const TANDEM = {
+  LIVE:             1,       // how many of the six rivals are in the game; the rest wait behind ?rivals=all until they are fair and robust
   LAPS:             2,       // laps of a circuit in a battle (a solo run is LOOP.LAPS), so a battle stays near 60 to 120 s
   STAGGER_AHEAD:    8,       // m the rival starts ahead of the player on the grid
   STAGGER_SIDE:     3,       // m to the side; the sign is the rival's (left is positive)

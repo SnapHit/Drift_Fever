@@ -12,7 +12,7 @@ import { soundIcon } from '../audio/sound.js';
 import { FIELDS } from '../lab/code.js';
 import { crossoverOffered, format as formatCode } from '../lab/lab.js';
 import { FX_ON } from '../fx.js';
-import { RIVALS, rivalOpen } from '../rivals/roster.js';
+import { RIVALS, rivalOpen, rivalsLive } from '../rivals/roster.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
@@ -72,7 +72,7 @@ export function createScreens(root, onAction) {
      3): locked (and what opens him), open, or beaten with the best margin. */
   function rivalCard(save, index) {
     const k = RIVALS.findIndex(r => r.track === index);
-    if (k < 0) return '';
+    if (k < 0 || k >= rivalsLive()) return '';
     const d = RIVALS[k], open = rivalOpen(save, d.id), e = save.rivals && save.rivals[d.id];
     const beaten = !!(e && e.won);
     let what;
@@ -196,7 +196,7 @@ export function createScreens(root, onAction) {
     const top = Math.max(1, r.score, r.rival.total), bar = n => Math.max(2, Math.round(n / top * 100));
     const coinsN = FX_ON ? `<b class="coinsN" data-to="${Math.round(r.coins)}">+${fmt(r.coins)}</b>` : `<b>+${fmt(r.coins)}</b>`;
     const next = r.offer ? `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="battle" data-arg="${esc(r.offer.id)}"><b>NEXT RIVAL</b><small>${esc(r.offer.name)}</small></button>`
-      : `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="career"><b>CAREER</b><small>${r.won ? 'the next rival opens on the career' : 'win a star, then come back'}</small></button>`;
+      : `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="career"><b>CAREER</b><small>${r.won ? 'back to the tracks' : 'win a star, then come back'}</small></button>`;
     show('results', `
       <div class="card split battle${r.won ? ' won' : ' lost'}">${a}
         <p class="runlabel">${esc(r.label)}</p><h2 class="who">${who}</h2><p class="trackname">${esc(r.name)}</p>

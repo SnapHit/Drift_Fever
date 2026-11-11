@@ -5,6 +5,8 @@
    character: a few overrides of the rival driver's numbers
    (rivals/driver.js RIVAL_DRIVE). First guesses for the author to set
    by play; the measurements in game/test/rivals/ say how each drives. */
+import { TANDEM } from '../tune.js';
+
 export const RIVALS = [
   { id: 'r1', name: 'Kestrow', car: 'starter', paint: 'flame', track: 0, side: 1, prize: 300,
     style: 'Smooth and wide',
@@ -33,9 +35,14 @@ export function rivalOnTrack(index) { return RIVALS.find(r => r.track === index)
 /* A rival opens with a star on his track and a win over the rival
    before him (briefs/RIVALS.md). Battles gate nothing that exists. */
 export function rivalIndex(id) { return RIVALS.findIndex(r => r.id === id); }
+/* How many rivals are in the game: the first TANDEM.LIVE, or all six
+   with ?rivals=all in the address (the rest are built but not yet fair
+   or robust: review/rivals/REPORT.md). */
+const ALL = typeof location !== 'undefined' && /[?&]rivals=all(&|$)/.test(location.search || '');
+export function rivalsLive() { return ALL ? RIVALS.length : Math.min(RIVALS.length, TANDEM.LIVE); }
 export function rivalOpen(save, id) {
   const k = rivalIndex(id);
-  if (k < 0) return false;
+  if (k < 0 || k >= rivalsLive()) return false;
   const e = save.career[String(RIVALS[k].track)];
   if (!e || e.stars < 1) return false;
   if (k === 0) return true;
