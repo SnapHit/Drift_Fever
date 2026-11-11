@@ -1,0 +1,498 @@
+{
+ "rows": {
+  "r1": {
+   "id": "r1",
+   "name": "Kestrow",
+   "style": "Smooth and wide",
+   "track": 0,
+   "trackName": "First slide",
+   "kind": "circuit",
+   "laps": 4,
+   "car": "starter",
+   "paint": "flame",
+   "chapter": "Rookie",
+   "playerCar": "starter, no upgrades",
+   "seconds": 75.2,
+   "total": 2662,
+   "target3": 2110,
+   "multiple": 1.262,
+   "target3career": 1580,
+   "multipleCareer": 1.685,
+   "wins": {
+    "grip": 9,
+    "slide": 12,
+    "mixed": 6,
+    "all": 27
+   },
+   "m2": {
+    "pass": true,
+    "page": {
+     "rival": "r1",
+     "track": 0,
+     "finished": true,
+     "seconds": 75.2,
+     "total": 2662,
+     "drift": 1909,
+     "clean": 384,
+     "pace": 369,
+     "best": 216,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83,
+     "minAt": 72.9,
+     "corners": [
+      {
+       "name": "tight 1 L1",
+       "share": 0.598,
+       "angle": 23.6,
+       "max": 33.2,
+       "s": 3.36
+      },
+      {
+       "name": "sweeper 1 L1",
+       "share": 0.485,
+       "angle": 21.7,
+       "max": 27.5,
+       "s": 5.19
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.628,
+       "angle": 22.9,
+       "max": 27.3,
+       "s": 4.42
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.787,
+       "angle": 17.2,
+       "max": 24.1,
+       "s": 3.52
+      },
+      {
+       "name": "sweeper 1 L2",
+       "share": 0.418,
+       "angle": 21.2,
+       "max": 27.4,
+       "s": 5.31
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.654,
+       "angle": 23.2,
+       "max": 27.3,
+       "s": 4.36
+      },
+      {
+       "name": "tight 1 L3",
+       "share": 0.774,
+       "angle": 16.9,
+       "max": 22.6,
+       "s": 3.54
+      },
+      {
+       "name": "sweeper 1 L3",
+       "share": 0.424,
+       "angle": 21.2,
+       "max": 27.3,
+       "s": 5.31
+      },
+      {
+       "name": "opening 1 L3",
+       "share": 0.66,
+       "angle": 23.2,
+       "max": 27.3,
+       "s": 4.36
+      },
+      {
+       "name": "tight 1 L4",
+       "share": 0.646,
+       "angle": 23.2,
+       "max": 30.3,
+       "s": 3.34
+      },
+      {
+       "name": "sweeper 1 L4",
+       "share": 0.496,
+       "angle": 21.8,
+       "max": 27.4,
+       "s": 5.24
+      },
+      {
+       "name": "opening 1 L4",
+       "share": 0.623,
+       "angle": 26.6,
+       "max": 44.8,
+       "s": 4.48
+      }
+     ],
+     "worstCorner": 0.4175824175824124,
+     "meanCorner": 0.5993355640277626,
+     "hash": "-1.3369512014889298,-8.12145995196981,0.10127703632114296,-3.9038700374478355,-29.009678204836902,-0.558557563211065,-0.09317010858562311,2.899659126496913,0,0,0,11.450253049335458,-4.717873106137545|9024,0,0|2662,9024",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "node": {
+     "rival": "r1",
+     "track": 0,
+     "finished": true,
+     "seconds": 75.2,
+     "total": 2662,
+     "drift": 1909,
+     "clean": 384,
+     "pace": 369,
+     "best": 216,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83,
+     "minAt": 72.9,
+     "corners": [
+      {
+       "name": "tight 1 L1",
+       "share": 0.598,
+       "angle": 23.6,
+       "max": 33.2,
+       "s": 3.36
+      },
+      {
+       "name": "sweeper 1 L1",
+       "share": 0.485,
+       "angle": 21.7,
+       "max": 27.5,
+       "s": 5.19
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.628,
+       "angle": 22.9,
+       "max": 27.3,
+       "s": 4.42
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.787,
+       "angle": 17.2,
+       "max": 24.1,
+       "s": 3.52
+      },
+      {
+       "name": "sweeper 1 L2",
+       "share": 0.418,
+       "angle": 21.2,
+       "max": 27.4,
+       "s": 5.31
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.654,
+       "angle": 23.2,
+       "max": 27.3,
+       "s": 4.36
+      },
+      {
+       "name": "tight 1 L3",
+       "share": 0.774,
+       "angle": 16.9,
+       "max": 22.6,
+       "s": 3.54
+      },
+      {
+       "name": "sweeper 1 L3",
+       "share": 0.424,
+       "angle": 21.2,
+       "max": 27.3,
+       "s": 5.31
+      },
+      {
+       "name": "opening 1 L3",
+       "share": 0.66,
+       "angle": 23.2,
+       "max": 27.3,
+       "s": 4.36
+      },
+      {
+       "name": "tight 1 L4",
+       "share": 0.646,
+       "angle": 23.2,
+       "max": 30.3,
+       "s": 3.34
+      },
+      {
+       "name": "sweeper 1 L4",
+       "share": 0.496,
+       "angle": 21.8,
+       "max": 27.4,
+       "s": 5.24
+      },
+      {
+       "name": "opening 1 L4",
+       "share": 0.623,
+       "angle": 26.6,
+       "max": 44.8,
+       "s": 4.48
+      }
+     ],
+     "worstCorner": 0.4175824175824124,
+     "meanCorner": 0.5993355640277626,
+     "hash": "-1.336951201488799,-8.121459951968617,0.10127703632114515,-3.9038700374479047,-29.00967820483693,-0.5585575632110638,-0.09317010858562293,2.8996591264969087,0,0,0,11.450253049335446,-4.717873106137565|9024,0,0|2662,9024",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 74.7,
+     "worstCorner": 0.36,
+     "total": [
+      2526,
+      2901
+     ],
+     "seconds": [
+      74.15,
+      76.21
+     ],
+     "guard": 0,
+     "brake": 0,
+     "lift": 0
+    },
+    "missing": 0,
+    "own": []
+   },
+   "m3": {
+    "pass": true,
+    "players": {
+     "grip": {
+      "wins": 9,
+      "allAhead": 2,
+      "allBehind": 0,
+      "seconds": [
+       73.48,
+       75.97
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       1174,
+       2670
+      ],
+      "rival": [
+       2526,
+       4263
+      ],
+      "margin": [
+       -2983,
+       114
+      ],
+      "aheadShare": [
+       0.254,
+       1
+      ],
+      "changes": [
+       0,
+       14
+      ],
+      "leadGates": [
+       4,
+       15
+      ],
+      "lineWon": 16,
+      "wallHits": 2,
+      "hard": 1,
+      "bodyHits": 17,
+      "respawns": 0,
+      "handsBroken": 0,
+      "parts": {
+       "drift": 119,
+       "clean": 216,
+       "pace": 373,
+       "leads": 1232,
+       "line": 603,
+       "close": 41
+      },
+      "rivalParts": {
+       "drift": 1909,
+       "clean": 384,
+       "pace": 369,
+       "leads": 88,
+       "line": 0,
+       "close": 0
+      }
+     },
+     "slide": {
+      "wins": 12,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       85.99,
+       89.85
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       2068,
+       5964
+      ],
+      "rival": [
+       4405,
+       4824
+      ],
+      "margin": [
+       -2453,
+       1549
+      ],
+      "aheadShare": [
+       0.003,
+       0.107
+      ],
+      "changes": [
+       1,
+       3
+      ],
+      "leadGates": [
+       0,
+       2
+      ],
+      "lineWon": 0,
+      "wallHits": 5,
+      "hard": 3,
+      "bodyHits": 11,
+      "respawns": 0,
+      "handsBroken": 0,
+      "parts": {
+       "drift": 3549,
+       "clean": 336,
+       "pace": 311,
+       "leads": 0,
+       "line": 0,
+       "close": 0
+      },
+      "rivalParts": {
+       "drift": 1909,
+       "clean": 384,
+       "pace": 369,
+       "leads": 1320,
+       "line": 603,
+       "close": 0
+      }
+     },
+     "mixed": {
+      "wins": 6,
+      "allAhead": 3,
+      "allBehind": 0,
+      "seconds": [
+       73.31,
+       82.68
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       2068,
+       4188
+      ],
+      "rival": [
+       2580,
+       4573
+      ],
+      "margin": [
+       -2459,
+       1496
+      ],
+      "aheadShare": [
+       0.056,
+       1
+      ],
+      "changes": [
+       0,
+       12
+      ],
+      "leadGates": [
+       1,
+       15
+      ],
+      "lineWon": 6,
+      "wallHits": 6,
+      "hard": 4,
+      "bodyHits": 34,
+      "respawns": 0,
+      "handsBroken": 0,
+      "parts": {
+       "drift": 1363,
+       "clean": 288,
+       "pace": 357,
+       "leads": 528,
+       "line": 0,
+       "close": 80
+      },
+      "rivalParts": {
+       "drift": 1909,
+       "clean": 384,
+       "pace": 369,
+       "leads": 792,
+       "line": 603,
+       "close": 0
+      }
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 4585,
+     "won": false
+    }
+   },
+   "measured": "2026-11-11"
+  }
+ },
+ "bar": {
+  "respawns": 0,
+  "hard": 0,
+  "contacts": 2,
+  "minKmh": 40,
+  "corner": 0.3,
+  "total": 0.25
+ },
+ "runs": 20,
+ "playerCar": [
+  {
+   "car": "starter",
+   "up": null,
+   "label": "starter, no upgrades"
+  },
+  {
+   "car": "starter",
+   "up": {
+    "power": 1,
+    "grip": 1,
+    "steer": 1
+   },
+   "label": "starter, one step of each"
+  },
+  {
+   "car": "starter",
+   "up": {
+    "power": 2,
+    "grip": 2,
+    "steer": 2
+   },
+   "label": "starter, two steps of each"
+  }
+ ]
+}
