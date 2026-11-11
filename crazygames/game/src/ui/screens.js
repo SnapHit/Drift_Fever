@@ -244,7 +244,7 @@ export function createScreens(root, onAction) {
     const coinsN = FX_ON ? `<b class="coinsN" data-to="${Math.round(r.coins)}">+${fmt(r.coins)}</b>` : `<b>+${fmt(r.coins)}</b>`;
     /* the next rival (briefs/RIVALS-LADDER.md): offered when he is earned, else what still earns him; the rivals screen always */
     const N = r.next, goNext = !!(N && N.id && N.open);
-    const next = goNext ? `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="battle" data-arg="${esc(N.id)}"><b>NEXT: ${esc(N.name.toUpperCase())}</b><small>${N.beaten ? 'beaten, race again' : 'drift race'}</small></button>` : '';
+    const next = goNext ? `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="battle" data-arg="${esc(N.id)}"><b>${esc(N.name.toUpperCase())}</b><small>${N.beaten ? 'next, beaten' : 'next rival'}</small></button>` : '';
     const nextLine = !N ? '' : N.last ? `<p class="unlock done">${r.won ? 'The whole ladder is yours' : 'The last rival on the ladder'}</p>`
       : N.open ? (r.offer ? `<p class="unlock done">&#128275; Next rival earned: ${esc(N.name)}</p>` : '')
       : `<p class="unlock nextr">Next, ${esc(N.name)}: ${N.needs.map(n => `<span class="${n.done ? 'done' : ''}">${n.done ? '&#10003;' : '&#9675;'} ${esc(n.text)}</span>`).join(' ')}</p>`;
@@ -298,7 +298,7 @@ export function createScreens(root, onAction) {
         <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
-          ${r.offer ? `<button type="button" class="big rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RACE ${esc(r.offer.name.toUpperCase())}</b><small>${r.offer.fresh ? 'just earned' : 'drift race'}</small></button>` : ''}
+          ${r.offer ? `<button type="button" class="big rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>${esc(r.offer.name.toUpperCase())}</b><small>${r.offer.fresh ? 'race him, just earned' : 'race him'}</small></button>` : ''}
           ${r.code ? `<button type="button" class="big" data-action="lab"><b>LAB</b><small>change the track</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>
         </div>${z}
