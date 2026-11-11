@@ -8,7 +8,7 @@
    ranges (rivals/search.js CHARACTERS) keep his driving his own. The
    probes are the record; this is the search.
 
-   node game/test/ladder/search.js r2 --track 4 --laps 3 [--car hatch] [--n 200] [--seed 1] [--seconds 81] [--cap 2600] [--from r1|grip|slide|mixed|JSON] [--cap-weight 1] [--range KEY=a,b] [--all20: judge on measure 2's twenty disturbances and the undisturbed run] */
+   node game/test/ladder/search.js r2 --track 4 --laps 3 [--car hatch] [--up '{"power":1,...}'] [--n 200] [--seed 1] [--seconds 81] [--cap 2600] [--from r1|grip|slide|mixed|JSON] [--cap-weight 1] [--range KEY=a,b] [--all20: judge on measure 2's twenty disturbances and the undisturbed run] */
 import { search } from '../driftrace/search.js';
 import { CHARACTERS } from '../rivals/search.js';
 import { rivalById } from '../../src/rivals/roster.js';
@@ -17,7 +17,7 @@ import { DISTURB as DISTURB20 } from '../driftrace/hands.js';
 
 const args = process.argv.slice(2), arg = (k, d) => args.includes(k) ? args[args.indexOf(k) + 1] : d;
 const base = rivalById(args.find(a => /^r\d/.test(a)) || 'r2');
-const def = { ...base, track: +arg('--track', base.track), laps: +arg('--laps', base.laps || 2), car: arg('--car', base.car) };
+const def = { ...base, track: +arg('--track', base.track), laps: +arg('--laps', base.laps || 2), car: arg('--car', base.car), up: args.includes('--up') ? JSON.parse(arg('--up')) : base.up };
 const from = arg('--from', null);
 if (from) def.drive = { ...(PLAYERS[from] ? PLAYERS[from].drive : from.startsWith('{') ? JSON.parse(from) : rivalById(from).drive) };
 /* --range KEY=a,b narrows or widens one number's range */
