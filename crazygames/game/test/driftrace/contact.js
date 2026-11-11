@@ -34,7 +34,7 @@ import { STEP } from '../../src/physics/world.js';
 const here = path.dirname(new URL(import.meta.url).pathname);
 const outDir = path.resolve(here, '..', '..', '..', 'review', 'rivals');
 export const OVERLAP = 0.3, HELD = 1.0, PARK_AT = 120;
-const def = rivalById('r1'), track = trackFor(careerSpec(def.track)), laps = battleLaps(track);
+const def = rivalById('r1'), track = trackFor(careerSpec(def.track)), laps = battleLaps(track, def);
 let failed = 0;
 const verdict = (ok, text) => { if (!ok) failed++; console.log((ok ? 'PASS ' : 'FAIL ') + text); return ok; };
 

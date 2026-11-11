@@ -8,7 +8,7 @@
 import { TANDEM } from '../tune.js';
 
 export const RIVALS = [
-  { id: 'r1', name: 'Kestrow', car: 'starter', paint: 'flame', track: 0, side: 1, prize: 300,
+  { id: 'r1', name: 'Kestrow', car: 'starter', paint: 'flame', track: 0, side: 1, prize: 300, laps: 3,
     style: 'Smooth and wide',
     drive: { SLIDE_GAIN: 0.739, PROGRESS: 129, KEEP: 1029, ANGLE_CAP: 48.94, EDGE_SAFE: 0.8, EDGE_COST: 446, ENTRY: 24.74, VMAX: 29.82, CHAIN_KEEP: 2813, CHAIN_MARGIN: 0.4, AY_MAX: 8.84, OUTSIDE: 0.338, SETUP: 23.08, WINDOW_PRE: 3.64, WINDOW_POST: 14.58, LINK: 4.95, HB_TIME: 0.352 } },
   /* the other five: tracks, and how each drives, chosen by measurement (game/test/rivals/search.js, review/rivals/REPORT.md) */

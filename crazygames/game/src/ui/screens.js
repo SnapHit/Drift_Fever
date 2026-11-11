@@ -77,7 +77,7 @@ export function createScreens(root, onAction) {
     const beaten = !!(e && e.won);
     let what;
     if (beaten) what = `<span class="state won">BEATEN<small>best +${fmt(Math.max(0, e.best))}</small></span>`;
-    else if (open) what = `<span class="state go">BATTLE<small>${e ? 'best ' + (e.best >= 0 ? '+' : '') + fmt(e.best) : 'prize ' + fmt(d.prize)}</small></span>`;
+    else if (open) what = `<span class="state go">RACE<small>${e ? 'best ' + (e.best >= 0 ? '+' : '') + fmt(e.best) : 'prize ' + fmt(d.prize)}</small></span>`;
     else {
       const needStar = !((save.career[String(d.track)] || {}).stars >= 1), prev = RIVALS[k - 1], needWin = k > 0 && !(save.rivals && save.rivals[prev.id] && save.rivals[prev.id].won);
       const why = [needStar ? 'a star on ' + esc(CAREER[d.track].name) : '', needWin ? 'a win over ' + esc(prev.name) : ''].filter(Boolean).join(' and ');
@@ -85,7 +85,7 @@ export function createScreens(root, onAction) {
     }
     return `<button type="button" class="rivalcard${open ? '' : ' locked'}${beaten ? ' beaten' : ''}" data-action="battle" data-arg="${esc(d.id)}" ${open ? '' : 'disabled'}>
         <span class="vs">VS</span>
-        <span class="name"><b>${esc(d.name.toUpperCase())}</b><small>${esc(d.style)} &middot; tandem battle</small></span>
+        <span class="name"><b>${esc(d.name.toUpperCase())}</b><small>${esc(d.style)} &middot; drift race</small></span>
         ${what}
       </button>`;
   }
@@ -186,9 +186,11 @@ export function createScreens(root, onAction) {
       </div>`);
   }
 
-  /* A battle's results (briefs/RIVALS.md 3): who won, both totals, what
-     the tandem was worth, the coins, and REMATCH and the next thing to
-     do. r: { won, score, rival: { name, total }, margin, tandem, parts,
+  /* A drift race's results (briefs/DRIFT-RACE.md 3; the code says
+     battle): who won, both totals, what each part was worth for each car
+     (drift, clean, pace, leads, the line, close), the coins, and REMATCH
+     and the next thing to do. r: { won, score, rival: { name, total },
+     margin, parts, rivalParts, gates, leadGates, rivalGates, lineTo,
      coins, prize, offer, label, name, seconds, best2 } */
   function battleResults(r) {
     const a = '<div class="col a">', b = '</div><div class="col b">', z = '</div>';
@@ -197,6 +199,14 @@ export function createScreens(root, onAction) {
     const coinsN = FX_ON ? `<b class="coinsN" data-to="${Math.round(r.coins)}">+${fmt(r.coins)}</b>` : `<b>+${fmt(r.coins)}</b>`;
     const next = r.offer ? `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="battle" data-arg="${esc(r.offer.id)}"><b>NEXT RIVAL</b><small>${esc(r.offer.name)}</small></button>`
       : `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="career"><b>CAREER</b><small>${r.won ? 'back to the tracks' : 'win a star, then come back'}</small></button>`;
+    const P = r.parts || {}, Q = r.rivalParts || {}, gates = Math.max(0, (r.gates || 1) - 1);
+    const row = (label, x, y, hint) => `<tr><th>${label}${hint ? ` <small>${hint}</small>` : ''}</th><td>${x}</td><td>${y}</td></tr>`;
+    const n = v => fmt(v || 0);
+    const table = `<table class="race"><thead><tr><th></th><th class="you">YOU</th><th class="him">${esc(r.rival.name.toUpperCase())}</th></tr></thead><tbody>
+      ${row('Drift', n(P.drift), n(Q.drift))}${row('Clean', n(P.clean), n(Q.clean))}${row('Pace', n(P.pace), n(Q.pace))}
+      ${row('Leads', n(P.leads) + ` <small>${r.leadGates || 0}/${gates}</small>`, n(Q.leads) + ` <small>${r.rivalGates || 0}/${gates}</small>`)}
+      ${row('First home', r.lineTo === 'player' ? '+' + n(P.line) : '', r.lineTo === 'rival' ? '+' + n(Q.line) : '')}
+      ${row('Close', n(P.close), '')}</tbody></table>`;
     show('results', `
       <div class="card split battle${r.won ? ' won' : ' lost'}">${a}
         <p class="runlabel">${esc(r.label)}</p><h2 class="who">${who}</h2><p class="trackname">${esc(r.name)}</p>
@@ -204,9 +214,9 @@ export function createScreens(root, onAction) {
           <div class="side you"><span class="nm">YOU</span><span class="n">${fmt(r.score)}</span><i style="width:${bar(r.score)}%"></i></div>
           <div class="side him"><span class="nm">${esc(r.rival.name.toUpperCase())}</span><span class="n">${fmt(r.rival.total)}</span><i style="width:${bar(r.rival.total)}%"></i></div>
         </div>
-        <p class="margin">${r.won ? 'by ' + fmt(r.margin) : fmt(-r.margin) + ' short'}</p>
-        <div class="parts"><span><b>+${fmt(r.tandem)}</b><small>tandem</small></span><span><b>${Math.round(r.zoneShare * 100)}%</b><small>of his slides close</small></span><span><b>${fmt(r.parts.drift)}</b><small>drift</small></span></div>${b}
-        <div class="facts"><span>${coinsN}<small>coins${r.prize ? ' &middot; first win +' + fmt(r.prize) : ''}</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>run</small></span><span><b>${r.best2 !== undefined && r.best2 > -1e9 ? (r.best2 >= 0 ? '+' : '') + fmt(r.best2) : ''}</b><small>best margin</small></span></div>
+        <p class="margin">${r.won ? (r.margin ? 'by ' + fmt(r.margin) : 'a tie is yours') : fmt(-r.margin) + ' short'}</p>${b}
+        ${table}
+        <div class="facts"><span>${coinsN}<small>coins${r.prize ? ' &middot; first win +' + fmt(r.prize) : ''}</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>race</small></span><span><b>${r.best2 !== undefined && r.best2 > -1e9 ? (r.best2 >= 0 ? '+' : '') + fmt(r.best2) : ''}</b><small>best margin</small></span></div>
         ${r.offer ? `<p class="unlock done">&#128275; Next rival open: ${esc(r.offer.name)}</p>` : ''}
         <button type="button" class="big${r.won ? '' : ' primary'}" data-action="again"><b>REMATCH</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">${next}<button type="button" class="big" data-action="title"><b>MENU</b></button></div>${z}
@@ -236,7 +246,7 @@ export function createScreens(root, onAction) {
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
         ${r.note ? `<p class="chapnote">${esc(r.note.text)}</p>` : ''}
-        ${r.offer ? `<button type="button" class="big rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RIVAL: ${esc(r.offer.name.toUpperCase())}</b><small>a tandem battle is open</small></button>` : ''}
+        ${r.offer ? `<button type="button" class="big rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RIVAL: ${esc(r.offer.name.toUpperCase())}</b><small>a drift race is open</small></button>` : ''}
         <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}

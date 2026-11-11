@@ -53,7 +53,14 @@ export const RIVAL_DRIVE = {
   AY_MAX:       7.0,     // m/s^2 of cornering planned for on grip
   VMAX:         32,      // m/s on a straight
   ENTRY:        25,      // m/s wanted at the start of a corner
-  BRAKE_GAIN:   0.25,    // brake per m/s over the speed wanted
+  BRAKE_GAIN:   0.25,    // brake per m/s over the speed wanted (HANDS 0 only)
+  /* a player's hands (briefs/DRIFT-RACE.md): the throttle always on, no
+     brake pedal, and DRIFT with no steering is the only brake. 1 plans
+     with exactly those; 0 is the rivals round's driver, which lifted and
+     braked (kept for the known answer of game/test/driftrace/hands.js) */
+  HANDS:        1,
+  HB_OVER:      1.5,     // m/s over the speed wanted on grip before DRIFT with no steering is pressed, to slow
+  HB_STEER:     0.2,     // and only while the line asks for less steering than this (the brake needs the wheel straight)
   OUTSIDE:      0.45,    // share of the half width to the outside of the next corner the grip line moves to
   SETUP:        50,      // m before a corner the grip line moves out
   EDGE:         2.6,     // m of the half width kept clear by the grip line
@@ -79,7 +86,9 @@ export const RIVAL_DRIVE = {
 const wrap = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
 const DEG = 180 / Math.PI;
 
-export function createRivalDriver(ground, character, override, follow) {
+/* pick (optional, the scripted players of the measurements): pick(corner)
+   says whether a slide may be tried in that corner; none is every corner */
+export function createRivalDriver(ground, character, override, follow, pick) {
   const D = Object.assign({}, RIVAL_DRIVE, character || {}, override || {});
   const C = ground.centre, n = C.length, closed = ground.kind === 'circuit', L = ground.length;
   const at = i => closed ? ((i % n) + n) % n : Math.max(0, Math.min(n - 1, i));
@@ -88,7 +97,7 @@ export function createRivalDriver(ground, character, override, follow) {
   const LX = new Float64Array(n), LZ = new Float64Array(n), FX = new Float64Array(n), FZ = new Float64Array(n);
   for (let i = 0; i < n; i++) { LX[i] = -Math.cos(C[i].heading); LZ[i] = Math.sin(C[i].heading); FX[i] = -Math.sin(C[i].heading); FZ[i] = -Math.cos(C[i].heading); }
   for (let i = 0; i < n; i++) kap[i] = Math.abs(wrap(C[at(i + 1)].heading - C[at(i - 1)].heading)) / 4;
-  const corners = (ground.corners || []).map(c => ({ from: c.from, to: c.to, sign: c.dir === 'left' ? 1 : -1, name: c.name })).sort((a, b) => a.from - b.from);
+  const corners = (ground.corners || []).map(c => ({ from: c.from, to: c.to, sign: c.dir === 'left' ? 1 : -1, name: c.name, src: c })).sort((a, b) => a.from - b.from);
   const DT = STEP * D.SUB, H = Math.round(D.HORIZON / DT), HB = Math.round(D.HB_TIME / DT), HBS = Math.round(D.HB_TIME / STEP);
 
   /* the corner the car is in, or the next one, and how far to it, from s */
@@ -136,6 +145,12 @@ export function createRivalDriver(ground, character, override, follow) {
     for (let k = 0; k <= plan; k++) { if (c && ahead > 0 && k * 2 >= ahead) break; if (c && ahead === 0) break; const kk = kap[at(ci + k)]; if (kk > kmax) kmax = kk; }
     let vWant = kmax > 1e-4 ? Math.min(D.VMAX, Math.sqrt(D.AY_MAX / kmax)) : D.VMAX;
     if (c && ahead > 0) vWant = Math.min(vWant, Math.sqrt(D.ENTRY * D.ENTRY + 2 * 8 * ahead));
+    if (D.HANDS) {
+      /* the throttle stays on; to slow, DRIFT with the wheel straight, as a player brakes */
+      out.throttle = 1; out.brake = 0; out.handbrake = 0;
+      if (v > vWant + D.HB_OVER && Math.abs(out.steer) < D.HB_STEER) { out.steer = 0; out.handbrake = 1; }
+      return out;
+    }
     out.throttle = v < vWant ? 1 : 0;
     out.brake = v > vWant + 0.5 ? Math.min(1, (v - vWant) * D.BRAKE_GAIN) : 0;
     out.handbrake = 0;
@@ -230,6 +245,7 @@ export function createRivalDriver(ground, character, override, follow) {
       if (c) {
         const inWindow = ahead > 0 ? ahead <= D.WINDOW_PRE : s <= c.to - D.WINDOW_POST || car.drifting;
         if (inWindow || ((car.drifting || sinceSlide < SC.BANK_GAP) && ahead <= D.LINK)) dir = -c.sign;
+        if (pick && !pick(c)) dir = 0;
       }
       last.tries = 0;
       if (dir && car.speed > 8) {

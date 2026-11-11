@@ -1,27 +1,29 @@
-/* RIVALS MEASURE 1: NOTHING THAT EXISTS HAS CHANGED, AND A BATTLE
-   REPLAYS. In headless Chromium through the game's own run structure.
+/* DRIFT RACE MEASURE 1 (briefs/DRIFT-RACE.md; the rivals round's
+   measure 1, reworked for the race): NOTHING THAT EXISTS HAS CHANGED,
+   AND A RACE REPLAYS. In headless Chromium through the game's own run structure.
 
-   a. The tapes recorded on main's code (review/rivals/main-tapes.json,
-      written by main-tapes.js before any rival code: career 1 and The
+   a. The tapes recorded on main's code (review/driftrace/main.json,
+      written by main-record.js on this branch's base: career 1 and The
       vice, the scripted drifter) replay on this branch to the same world
       hash and the same score, through the run structure
       (__loop.replayRun) and through the bare world (__feel.replay).
-   b. A battle against the first rival, the chase driver playing the
-      player, live through the frame function with drawing; its tape
-      replays through the run structure to the same player hash, the
-      same rival hash and the same two totals.
+   b. A race against the first rival, the mixed scripted player (a
+      player's hands only, rivals/players.js) playing the player, live
+      through the frame function with drawing; its tape replays through
+      the run structure to the same player hash, the same rival hash and
+      the same two totals (each with its lead and line bonuses).
    c. Known answers: the main tape with one steering entry turned the
-      other way does not replay to main's hash; the battle with one of
+      other way does not replay to main's hash; the race with one of
       the rival's driving numbers changed gives a different rival hash.
 
-   node game/test/rivals/determinism.js   writes review/rivals/determinism.json */
+   node game/test/driftrace/determinism.js   writes review/driftrace/determinism.json */
 import path from 'node:path';
 import fs from 'node:fs';
-import * as R from './lib.js';
+import * as R from '../rivals/lib.js';
 
 const env = await R.start();
 const VP = { width: 640, height: 360 };
-const main = JSON.parse(fs.readFileSync(path.join(R.rivalsDir, 'main-tapes.json'), 'utf8'));
+const main = JSON.parse(fs.readFileSync(path.join(R.raceDir, 'main.json'), 'utf8'));
 const toTape = t => t.map(e => ({ n: e[0], s: e[1], t: e[2], b: e[3], h: e[4] }));
 const out = { note: 'headless Chromium, forced WebGL 2 on SwiftShader, 60 Hz synthetic clock', mainCommit: main.commit, main: [], battle: null };
 
@@ -58,7 +60,7 @@ for (const t of main.tapes) {
 
 /* the battle, live, drawn every 30th frame */
 const pg = await R.page(env, VP, '');
-await R.battleRun(pg.page, 'r1', { chase: true });
+await R.battleRun(pg.page, 'r1', { player: 'mixed' });
 const live = await pg.page.evaluate(() => {
   const F = window.__feel, A = window.__loop.app; let k = 0;
   while (A.state !== 'results' && k < 60 * 300) { window.__clock += 1000 / 60; F.draw = k % 30 === 0; F.frame(window.__clock); k++; }
@@ -70,7 +72,7 @@ const live = await pg.page.evaluate(() => {
 });
 live.errors = pg.errors.slice(0, 3);
 await pg.close();
-R.verdict(live.errors.length === 0 && live.steps > 0, 'the battle live: ' + live.frames + ' frames, the player ' + live.score + ' against the rival ' + live.rival + (live.won ? ' (won)' : ' (lost)') + ', ' + live.steps + ' steps');
+R.verdict(live.errors.length === 0 && live.steps > 0, 'the race live: ' + live.frames + ' frames, the player ' + live.score + ' against the rival ' + live.rival + (live.won ? ' (won)' : ' (lost)') + ', ' + live.steps + ' steps');
 const rb = await replay({ battle: 'r1' }, live.tape);
 R.verdict(rb.run && rb.bare === live.hash && rb.run.rivalHash === live.rivalHash && rb.bareRival === live.rivalHash && rb.run.score === live.score && rb.run.rival === live.rival, 'its tape replays: player hash through the world ' + (rb.bare === live.hash ? 'same' : 'DIFFERENT') + ', rival hash ' + (rb.run.rivalHash === live.rivalHash && rb.bareRival === live.rivalHash ? 'same' : 'DIFFERENT') + ', the two totals through the run structure ' + rb.run.score + ' and ' + rb.run.rival + ' against ' + live.score + ' and ' + live.rival);
 const entry = (await import('../../src/rivals/roster.js')).RIVALS[0].drive.ENTRY;
@@ -79,9 +81,9 @@ const chHash = changed.run ? changed.run.rivalHash : changed.bareRival;
 R.verdict(chHash !== live.rivalHash, 'known answer: the rival with one driving number changed (his corner entry speed ' + entry + ' to ' + (entry - 0.5).toFixed(2) + ' m/s) gives a different rival hash: ' + (chHash !== live.rivalHash ? 'CAUGHT' : 'MISSED') + (changed.run ? ' (his total ' + changed.run.rival + ')' : ''));
 const bad = live.tape.map(e => ({ ...e })); let kk = Math.floor(bad.length * 0.5); while (kk < bad.length && Math.abs(bad[kk].s) < 0.2) kk++; bad[kk].s = -bad[kk].s;
 const rbad = await replay({ battle: 'r1' }, bad);
-R.verdict(rbad.bare !== live.hash && rbad.bareRival === live.rivalHash, 'known answer: the battle tape with one input changed replays to a different player hash (' + (rbad.bare !== live.hash ? 'CAUGHT' : 'MISSED') + '), and the rival\'s hash is unchanged by it (' + (rbad.bareRival === live.rivalHash ? 'yes' : 'NO') + ')');
+R.verdict(rbad.bare !== live.hash && rbad.bareRival === live.rivalHash, 'known answer: the race tape with one input changed replays to a different player hash (' + (rbad.bare !== live.hash ? 'CAUGHT' : 'MISSED') + '), and the rival\'s hash is unchanged by it (' + (rbad.bareRival === live.rivalHash ? 'yes' : 'NO') + ')');
 out.battle = { live: { ...live, tape: undefined }, replay: rb.run, bareSame: rb.bare === live.hash, knownAnswerRival: { rivalTotal: changed.run && changed.run.rival, caught: chHash !== live.rivalHash }, knownAnswerTape: { entry: kk, caught: rbad.bare !== live.hash, rivalUnchanged: rbad.bareRival === live.rivalHash } };
-R.writeJson(path.join(R.rivalsDir, 'determinism.json'), out);
+R.writeJson(path.join(R.raceDir, 'determinism.json'), out);
 await env.close();
 console.log(R.failures() ? R.failures() + ' failed' : 'all passed');
 process.exit(R.failures() ? 1 : 0);

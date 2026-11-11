@@ -147,12 +147,13 @@ export function coinsFor(score, stars, mode) {
 
 export function lapsFor(track) { return track.kind === 'circuit' ? LOOP.LAPS : 1; }
 
-/* A battle (briefs/RIVALS.md): the career track of a rival, run with
-   TANDEM.LAPS laps against him. The track is the career's, generated
-   from the same spec. */
+/* A drift race (briefs/DRIFT-RACE.md; the code still says battle): the
+   career track of a rival, run over his laps (his `laps` in
+   rivals/roster.js, else TANDEM.LAPS) against him. The track is the
+   career's, generated from the same spec. */
 export function battleSpec(def) {
   const c = careerSpec(def.track);
   if (!c) return null;
   return Object.assign({}, c, { mode: 'battle', key: 'battle:' + def.id, rival: def.id });
 }
-export function battleLaps(track) { return track.kind === 'circuit' ? TANDEM.LAPS : 1; }
+export function battleLaps(track, def) { return track.kind === 'circuit' ? (def && def.laps) || TANDEM.LAPS : 1; }

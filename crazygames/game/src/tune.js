@@ -333,34 +333,37 @@ export const LOOP = {
   },
 };
 
-/* THE TANDEM BLOCK (briefs/RIVALS.md): a battle is one run against a
-   rival who leads it. Every number about the run itself lives here; the
-   rivals themselves (names, cars, tracks, how each drives) are in
-   rivals/roster.js. First guesses for the author to set by play. With
-   no rival, nothing here is read. */
+/* THE DRIFT RACE BLOCK (briefs/DRIFT-RACE.md). It keeps the name
+   TANDEM from the rivals round, which nothing stored depends on, and now
+   holds the drift race's numbers: a race is one run against a rival,
+   started level, side by side, won on points. Every number about the
+   race itself lives here; the rivals themselves (names, cars, tracks,
+   laps, how each drives) are in rivals/roster.js. First guesses for the
+   author to set by play. With no rival, nothing here is read. */
 export const TANDEM = {
-  LIVE:             1,       // how many of the six rivals are in the game; the rest wait behind ?rivals=all until they are fair and robust
-  LAPS:             2,       // laps of a circuit in a battle (a solo run is LOOP.LAPS), so a battle stays near 60 to 120 s
-  STAGGER_AHEAD:    8,       // m the rival starts ahead of the player on the grid
-  STAGGER_SIDE:     3,       // m to the side; the sign is the rival's (left is positive)
-  /* the zone: how close counts. Distances are between the two cars' centres */
+  LIVE:             1,       // how many of the six rivals are in the game; the rest wait behind ?rivals=all until each passes under the race's rules
+  LAPS:             2,       // laps of a circuit in a race, for a rival with no laps of his own (rivals/roster.js), so a race stays near 60 to 120 s
+  /* the grid: level, side by side, either side of the centre line */
+  GRID_SIDE:        2.2,     // m each car starts from the centre line, the rival on his side (roster) and the player on the other
+  /* being ahead pays: at each checkpoint and each lap's line the first car there banks a lead bonus, and the first across the finish a larger one */
+  LEAD_SHARE:       0.45,    // of the track's first star, shared over the race's lead gates (every checkpoint and lap line before the finish)
+  LINE_SHARE:       0.3,     // of the first star, to the first car across the finish
+  /* close pays, in any position: while both cars slide and are close, the player's drift points count more. Distances are between the two cars' centres */
   NEAR:             4.5,     // m: this close or closer is the full bonus
-  FAR:              14,      // m: past this there is no bonus ("too far")
-  BONUS:            1.5,     // at full closeness the player's drift points count 1 + this times over
-  AHEAD:            1.0,     // m: the player's centre this far ahead of the rival's, along the rival's travel, is ahead: no bonus
-  LAYER:            2.5,     // m of height apart (a bridge over the other road) that is never together
-  RUN_GAP:          40,      // m apart in run distance that is never together (a car a lap down passing the other)
+  FAR:              12,      // m: past this there is no bonus
+  BONUS:            0.6,     // at full closeness the player's drift points count 1 + this times over (a garnish, not the decider)
+  LAYER:            2.5,     // m of height apart (a bridge over the other road) that is never close
+  RUN_GAP:          40,      // m apart in run distance that is never close (a car a lap down passing the other)
   /* contact: the rival is solid and never moved by the player */
   HARD_HIT:         5.0,     // m/s into the rival that is a hard contact: the chain is lost, as a wall hit
   HIT_SPEED_KEEP:   0.85,    // share of the player's speed, relative to the rival, kept through a hard contact
   RESTITUTION:      0.1,
   FRICTION:         0.3,
-  COOL:             1.5,     // s the tandem bonus is off after a hard contact
+  COOL:             1.5,     // s the close bonus is off after a hard contact
   PIN_SLACK:        0.4,     // m: if the walls hold the player this deep inside the rival, the rival lets him through until they part
   FADE:             1.2,     // s the rival takes to fade away after his finish, no longer solid
   /* the HUD and callouts */
-  CALL_HOLD:        1.2,     // s in the zone, both sliding, before TANDEM is called
+  CALL_HOLD:        1.2,     // s close, both sliding, before CLOSE is called
   CALL_CLOSE:       2.6,     // m of gap between the cars' sides for DOOR TO DOOR
-  CALL_FAR_AFTER:   2.0,     // s too far while he slides before TOO FAR is called (once per slide)
-  METER_SMOOTH:     0.12,    // s, the closeness meter's easing
+  METER_SMOOTH:     0.12,    // s, the close meter's easing
 };
