@@ -48,8 +48,9 @@ export function rivalOpen(save, id) {
   const e = save.career[String(RIVALS[k].track)];
   if (!e || e.stars < 1) return false;
   if (k === 0) return true;
+  /* the ladder is a chain (briefs/RIVALS-LADDER.md measure 4): the win over the rival before him counts only if he was earned too, so a save holding a win over the third and none over the second does not open the fourth */
   const prev = save.rivals && save.rivals[RIVALS[k - 1].id];
-  return !!(prev && prev.won);
+  return !!(prev && prev.won) && rivalOpen(save, RIVALS[k - 1].id);
 }
 export function openRivals(save) { return RIVALS.filter(r => rivalOpen(save, r.id)).map(r => r.id); }
 
@@ -61,7 +62,7 @@ export function rivalNeeds(save, k) {
   if (!d) return [];
   const e = save.career[String(d.track)], prev = k > 0 ? RIVALS[k - 1] : null, pe = prev && save.rivals && save.rivals[prev.id];
   const out = [{ kind: 'star', text: 'Win a star on ' + CAREER[d.track].name, done: !!(e && e.stars >= 1), track: d.track }];
-  if (prev) out.push({ kind: 'win', text: 'Beat ' + prev.name, done: !!(pe && pe.won), rival: prev.id });
+  if (prev) out.push({ kind: 'win', text: 'Beat ' + prev.name, done: !!(pe && pe.won) && rivalOpen(save, prev.id), rival: prev.id });
   return out;
 }
 /* A rival's state: 'off' (not in the game yet), 'locked', 'open' (earned

@@ -766,6 +766,8 @@ window.__loop = {
   ghostHash: () => app.ghost ? app.ghost.hash() : null,
   ghostState: () => app.ghost ? { steps: app.ghost.state.steps, done: app.ghost.state.done, x: app.ghost.world.car.x, z: app.ghost.world.car.z, yaw: app.ghost.world.car.yaw } : null,
   skipCountdown() { if (app.state === 'countdown') { app.countdown = 0; } },
+  /* the probes: end the run now, as its line would (briefs/RIVALS-LADDER.md measure 4 reads the offers this way) */
+  finishNow() { if (app.state === 'drive' || app.state === 'countdown') finishRun(); return app.results; },
   missions: () => app.missions && { list: app.missions.missions, ...JSON.parse(JSON.stringify(app.missions.state)) },
   /* the probes: judge every mission the current track could carry, not only its three */
   judgeAll() { app.missions = createMissionJudge(allMissionsFor(app.track, app.laps), app.track, app.laps); app.missions.probe = true; app.heardMissions = 0; return app.missions.missions; },
