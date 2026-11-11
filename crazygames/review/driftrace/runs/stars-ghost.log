@@ -1,0 +1,5 @@
+PASS known answer: a ghost with no seed replays on First slide, whose seed never changed: true
+PASS a ghost with no seed is ignored on Harbour run and Crossover (seeds were 1202 and 1327): false, false
+PASS a ghost recorded on the new seed replays: true
+PASS a ghost that names the old seed is ignored: false
+all passed

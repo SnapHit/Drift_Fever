@@ -1,0 +1,9 @@
+PASS career 1, First slide: main's tape replays on this branch to main's score through the run structure (895 against 895) and to main's hash through the world (same)
+PASS career 1, First slide known answer: entry 1807 steered the other way replays to a different hash: CAUGHT (score 934)
+PASS career 23, The vice: main's tape replays on this branch to main's score through the run structure (1678 against 1678) and to main's hash through the world (same)
+PASS career 23, The vice known answer: entry 4043 steered the other way replays to a different hash: CAUGHT (score no finish)
+PASS the race live: 4931 frames, the player 2044 against the rival 3095 (lost), 9424 steps
+PASS its tape replays: player hash through the world same, rival hash same, the two totals through the run structure 2044 and 3095 against 2044 and 3095
+PASS known answer: the rival with one driving number changed (his corner entry speed 26.25 to 25.75 m/s) gives a different rival hash: CAUGHT
+PASS known answer: the race tape with one input changed replays to a different player hash (CAUGHT), and the rival's hash is unchanged by it (yes)
+all passed

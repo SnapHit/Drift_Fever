@@ -1,0 +1,15 @@
+PASS low known answer: 900 frames at 60 fps leave the quality alone: level 0, pixel ratio 1, bloom false
+PASS low: 1,500 frames of a slow device (40 ms a frame, 24 at the last level) step it down and leave it there, nothing given back (the known answer for the capped device): level 4 in 3 steps, density 0.55, pixel ratio 1 -> 0.65, bloom false -> false
+PASS low: 900 fast frames after them do not step it back up: level 4
+PASS low capped at 30 fps: it is stepped down first like any slow device: level 4 after 500 frames, pixel ratio 1 -> 0.65
+PASS low capped at 30 fps: the last step bought nothing, so everything is given back: level 0, pixel ratio 1, bloom false, density 1, steps 1 3 4 0
+PASS low capped at 30 fps: and the adaptation has stopped: 1,200 slow frames later still level 0
+PASS high known answer: 900 frames at 60 fps leave the quality alone: level 0, pixel ratio 1, bloom true
+PASS high: 1,500 frames of a slow device (40 ms a frame, 24 at the last level) step it down and leave it there, nothing given back (the known answer for the capped device): level 4 in 4 steps, density 0.55, pixel ratio 1 -> 0.65, bloom true -> false
+PASS high: 900 fast frames after them do not step it back up: level 4
+PASS high capped at 30 fps: it is stepped down first like any slow device: level 3 after 500 frames, pixel ratio 1 -> 0.8
+PASS high capped at 30 fps: the last step bought nothing, so everything is given back: level 0, pixel ratio 1, bloom true, density 1, steps 1 2 3 4 0
+PASS high capped at 30 fps: and the adaptation has stopped: 1,200 slow frames later still level 0
+PASS one slow frame in six for 1,500 frames is a hitch, not a slow device: level 0
+PASS with ?fx=0 nothing adapts, as on main: on false, level 0, pixel ratio 1 -> 1
+all passed

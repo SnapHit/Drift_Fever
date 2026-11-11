@@ -1,0 +1,24 @@
+grip  wins 0 of 20; finish 73.48 to 75.97 s against his 74.15 to 76.21 s; ahead 25% to 100% of the race; lead gates 4 to 15 of the gates; first home 16; place changes 0 to 14; totals 767 to 1198 against 2526 to 3071; walls 2 (hard 1), contacts with him 17, respawns 0
+PASS grip: only the player's hands on every step of every race
+PASS grip: not ahead all the way in every race (2 of 20 ahead all the way) and not behind all the way in every race (0 of 20)
+slide wins 17 of 20; finish 85.99 to 89.85 s against his 74.15 to 76.21 s; ahead 0% to 11% of the race; lead gates 0 to 2 of the gates; first home 0; place changes 1 to 3; totals 2068 to 5894 against 2977 to 3352; walls 5 (hard 3), contacts with him 11, respawns 0
+PASS slide: only the player's hands on every step of every race
+PASS slide: not ahead all the way in every race (0 of 20 ahead all the way) and not behind all the way in every race (0 of 20)
+mixed wins 2 of 20; finish 73.31 to 82.68 s against his 74.15 to 76.21 s; ahead 6% to 100% of the race; lead gates 1 to 15 of the gates; first home 6; place changes 0 to 12; totals 1774 to 2899 against 2580 to 3280; walls 6 (hard 4), contacts with him 34, respawns 0
+PASS mixed: only the player's hands on every step of every race
+PASS mixed: not ahead all the way in every race (3 of 20 ahead all the way) and not behind all the way in every race (0 of 20)
+FAIL the place changes hands at least once in every mixed race: 17 of 20 (fewest changes 0)
+FAIL the mixed player wins every race: 2 of 20, the narrowest margin -1150
+PASS a player who never moves loses: 0 against 3113
+no lead or line bonus: grip wins 0 of 20 (margin -2158 to -1666)
+no lead or line bonus: slide wins 18 of 20 (margin -530 to 3296)
+no lead or line bonus: mixed wins 1 of 20 (margin -1167 to 311)
+no close bonus: grip wins 0 of 20 (margin -2215 to -1358)
+no close bonus: slide wins 17 of 20 (margin -981 to 2720)
+no close bonus: mixed wins 1 of 20 (margin -1170 to 13)
+FAIL with the close bonus at nothing the mixed player still wins every race: 1 of 20, the narrowest margin -1170
+EDGE a player who leads all the way but never slides (the grip player): in its races ahead 93% of the undisturbed race, 1182 against 2680 (loses); had he led every gate and the line: 1200 (749 of his own, of it 119 drift from the slip of a grip car and his braking, + 15 gates at 18 + the line 181) against 2662 for the rival
+EDGE a player who slides well but trails all the way (the slide player): undisturbed ahead 0%, 4196 against 3113 (wins); had he trailed at every gate and the line: 4196 against 3113 for the rival (2662 of his own + all 15 gates and the line)
+PASS known answer: the rival made far too slow ({"VMAX":16,"ENTRY":12}) is behind all the way in every race of 3 of the 3 players, and the pace check fails for him: CAUGHT (his time 98.98 to 108.7 s)
+PASS known answer: against a rival who drives as the slide player does (KNOWN_STRONG), the mixed player's win check fails: he wins 0 of 4 (2711 to 3065 against 4014 to 5864): CAUGHT
+3 failed

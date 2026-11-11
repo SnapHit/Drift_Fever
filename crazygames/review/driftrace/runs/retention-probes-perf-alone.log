@@ -1,0 +1,7 @@
+
+== 6. perf
+6x: js without submit p95 5.3 worst 21.9 ms; physics p95 1.6; main here: 3.6
+FAIL JavaScript p95 at 6x with the ghost and the missions judged is within noise of main's in this sandbox and under the budget: 5.3 ms against 3.6 (noise 1.5)
+PASS known answer: 20 ms of busy work per frame flips the verdict: 5.3 -> 29 ms
+
+1 FAILED; wrote review/retention/perf.json
