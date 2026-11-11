@@ -11,10 +11,11 @@
      lap's line he takes, stops there with DRIFT and no steering, holds
      it until he has come by, then drives on.
    - FOLLOW: follows directly behind him for a lap at a higher speed.
-     Pure pursuit on a point FOLLOW_GAP m behind his car, flat out (the
-     player's car on grip is quicker than his sliding one), for a lap
-     from the first time it is behind him; then pulls out to the side of
-     the road with more room and goes by.
+     The grip player (quicker on the line than his sliding car) catches
+     him; from the first time it is within FOLLOW_NEAR m behind him it is
+     aimed for a lap at a point FOLLOW_GAP m behind his car, flat out;
+     then it drives its own line again, and when he is within PASS_NEAR m
+     ahead it goes for the side of the road with more room.
    Every step, measured here: the depth the two boxes overlap (separating
    axes), whether a hard contact lost an open chain, a respawn in the 2 s
    after a contact (the game's own "off the track"), how long the player
@@ -43,7 +44,7 @@ import { STEP } from '../../src/physics/world.js';
 
 const here = path.dirname(new URL(import.meta.url).pathname);
 const outDir = path.resolve(here, '..', '..', '..', 'review', 'driftrace');
-export const OVERLAP = 0.3, HELD = 1.0, PARK_AT = 120, SWIPE_NEAR = 8, FOLLOW_GAP = 3, PAST = 6;
+export const OVERLAP = 0.3, HELD = 1.0, PARK_AT = 120, SWIPE_NEAR = 8, FOLLOW_GAP = 3, FOLLOW_NEAR = 12, PASS_NEAR = 10, PAST = 6;
 const def = rivalById(process.argv.slice(2).find(a => /^r\d/.test(a)) || 'r1'), track = trackFor(careerSpec(def.track)), laps = battleLaps(track, def), L = track.length;
 let failed = 0;
 const verdict = (ok, text) => { if (!ok) failed++; console.log((ok ? 'PASS ' : 'FAIL ') + text); return ok; };
@@ -101,19 +102,25 @@ const players = {
     if (rival.runDistance() < track.start.along + L + PARK_AT + 25) return HOLD;
     return drive(pursuit(world, ...roadPoint(world, 12, 0)));
   }; },
-  FOLLOW: () => { let from = null, phase = 'catch'; return (world, rival, ctx) => {
-    const r = rival.world.car, rd = rival.runDistance(), d = ctx.dist || 0;
-    if (!rival.solid()) return drive(pursuit(world, ...roadPoint(world, 12, 0)));
-    if (phase === 'catch' && rd > d && from === null) from = d;
-    if (from !== null && phase === 'catch' && d - from >= L) phase = 'pass';
-    if (phase === 'pass') {
-      /* to the side of him with more road, then on */
-      const lat = rival.world.lateral, half = rival.world.halfWidth, side = lat > 0 ? -1 : 1, aim = side * Math.min(half - 1.6, Math.abs(lat) + 3.2) * (lat > 0 ? 1 : 1);
-      return drive(pursuit(world, ...roadPoint(world, 10, side < 0 ? -Math.abs(aim) : Math.abs(aim))));
+  FOLLOW: () => { let p = null, from = null, phase = 'catch'; return (world, rival, ctx) => {
+    if (!p) p = createPlayer(track, 'grip');
+    const own = { ...p.input(world) };
+    const r = rival.world.car, rd = rival.runDistance(), d = ctx.dist || 0, gap = rd - d;
+    if (!rival.solid()) return own;
+    /* catch him on the grip player's line (quicker than his sliding one), then a lap directly behind: aimed at a point FOLLOW_GAP m behind his car, flat out */
+    if (phase === 'catch' && gap > 0 && gap < FOLLOW_NEAR) { phase = 'follow'; from = d; }
+    if (phase === 'follow' && d - from >= L) phase = 'pass';
+    ctx.phase = phase; ctx.followFrom = from;
+    if (phase === 'follow') {
+      const fx = -Math.sin(r.yaw), fz = -Math.cos(r.yaw);
+      return drive(pursuit(world, r.x - fx * FOLLOW_GAP, r.z - fz * FOLLOW_GAP));
     }
-    /* directly behind him: a point FOLLOW_GAP m behind his car, along his heading */
-    const fx = -Math.sin(r.yaw), fz = -Math.cos(r.yaw);
-    return drive(pursuit(world, r.x - fx * FOLLOW_GAP, r.z - fz * FOLLOW_GAP));
+    /* then its own line again; when he is just ahead, to the side of the road with more room */
+    if (phase === 'pass' && gap > 0 && gap < PASS_NEAR) {
+      const lat = rival.world.lateral, half = rival.world.halfWidth, side = lat > 0 ? -1 : 1, aim = side * Math.max(0, Math.min(half - 1.6, half * 0.6));
+      return { ...own, steer: pursuit(world, ...roadPoint(world, 10, aim)), handbrake: 0 };
+    }
+    return own;
   }; },
 };
 
@@ -121,7 +128,8 @@ function run(name, opts) {
   const st = { maxOverlap: 0, hardContacts: 0, hardWithChain: 0, hardKeptChain: 0, contacts: 0, maxOff: 0, respawns: 0, maxHeld: 0, nan: false, chainBefore: 0, minGap: Infinity, passThroughSteps: 0, followFrom: null, past: null, behindT: 0 };
   let held = 0, lastInp = null, sinceHit = Infinity;
   const who = players[name]();
-  const res = runRace(def, (w, r, ctx) => { const i = who(w, r, ctx); lastInp = i; return i; }, { ...opts, maxSeconds: 150, onStep: ({ world, rival, scoring, dist }) => {
+  let ctxRef = {};
+  const res = runRace(def, (w, r, ctx) => { ctxRef = ctx; const i = who(w, r, ctx); lastInp = i; return i; }, { ...opts, maxSeconds: 150, onStep: ({ world, rival, scoring, dist, t }) => {
     const c = world.car, r = rival.world.car;
     const ov = rival.solid() ? overlap({ x: c.x, z: c.z, yaw: c.yaw, hl: V.HALF_LENGTH, hw: V.HALF_WIDTH }, { x: r.x, z: r.z, yaw: r.yaw, hl: rival.box.halfLength, hw: rival.box.halfWidth }) : 0;
     if (ov > st.maxOverlap && !world.passThrough) st.maxOverlap = ov;
@@ -136,7 +144,8 @@ function run(name, opts) {
     if (!isFinite(c.x + c.z + c.wvx + c.wvz + c.r + c.yaw + scoring.chain + scoring.total)) st.nan = true;
     /* the following case: when it is first behind him, and when it is first PAST m ahead of him after a lap behind */
     const rd = rival.runDistance();
-    if (st.followFrom === null && rd > dist + 1) st.followFrom = dist;
+    if (process.env.TRACE === name && Math.round(t * 120) % 60 === 0) console.log('  ' + t.toFixed(1) + ' s d ' + dist.toFixed(0) + ' his ' + rd.toFixed(0) + ' lat ' + world.lateral.toFixed(1) + '/' + rival.world.lateral.toFixed(1) + ' v ' + c.speed.toFixed(1) + '/' + r.speed.toFixed(1) + ' gap ' + Math.hypot(c.x - r.x, c.z - r.z).toFixed(1) + ' ' + (ctxRef.phase || ''));
+    if (name === 'FOLLOW' ? (st.followFrom === null && ctxRef.followFrom !== null && ctxRef.followFrom !== undefined) : (st.followFrom === null && rd > dist + 1)) st.followFrom = name === 'FOLLOW' ? ctxRef.followFrom : dist;
     if (st.followFrom !== null && rd > dist) st.behindT += STEP;
     if (st.followFrom !== null && st.past === null && dist - st.followFrom >= L && dist > rd + PAST) st.past = +(dist - st.followFrom - L).toFixed(1);
   } });

@@ -15,6 +15,8 @@ import { rivalById } from '../../src/rivals/roster.js';
 import { RIVAL_DRIVE } from '../../src/rivals/driver.js';
 
 export const HAND_RANGES = Object.assign({}, RANGES, { HB_OVER: [0.5, 6], HB_STEER: [0.05, 0.5], VMAX: [22, 34] });
+/* the race's characters: the first rival smooth and wide, a modest drifter who banks each corner (shallow angles, no long links), so a player who slides the drift corners well can outscore him */
+export const RACE_CHARACTERS = { r1: { ANGLE_CAP: [16, 30], LINK: [0, 6], CHAIN_KEEP: [0, 400], SLIDE_GAIN: [0.15, 0.8] } };
 /* the disturbances: the start a few cm off and the grip half a per cent off */
 export const DISTURB = [{}, { offset: [0.04, -0.03], grip: 0.005 }, { offset: [-0.05, 0.02], grip: -0.005 }, { offset: [0.01, 0.05], grip: 0.002 }, { offset: [-0.02, -0.04], grip: -0.003 }, { offset: [0.03, 0.03], grip: 0.004 }];
 
@@ -63,7 +65,7 @@ if (process.argv[1] && process.argv[1].endsWith('driftrace/search.js')) {
   /* --from grip|slide|mixed: start from a scripted player's numbers, and search near them from the first try */
   if (args.includes('--from')) { const { PLAYERS } = await import('../../src/rivals/players.js'); def.drive = { ...PLAYERS[args[args.indexOf('--from') + 1]].drive }; }
   const ch = CHARACTERS[def.id] || {};
-  const best = search(def, { n: arg('--n', 300), seed: arg('--seed', 1), seconds: arg('--seconds', 60), slack: arg('--slack', 1.5), cap: arg('--cap', 1700), want: ch.want, ranges: ch.ranges, disturb: DISTURB.slice(0, arg('--disturb', 6)), localFrom: args.includes('--from') ? 0 : undefined });
+  const best = search(def, { n: arg('--n', 300), seed: arg('--seed', 1), seconds: arg('--seconds', 60), slack: arg('--slack', 1.5), cap: arg('--cap', 1700), want: ch.want, ranges: Object.assign({}, ch.ranges, args.includes('--character') ? RACE_CHARACTERS[def.id] : {}), disturb: DISTURB.slice(0, arg('--disturb', 6)), localFrom: args.includes('--from') ? 0 : undefined });
   console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
   console.log('drive: ' + JSON.stringify(best.drive));
 }

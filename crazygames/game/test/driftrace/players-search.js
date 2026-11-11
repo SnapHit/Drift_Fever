@@ -20,7 +20,9 @@ export function markPlayer(def, kind, drive) {
     const r = runRace(def, kind, { noRival: true, offset: off, playerOpts: drive });
     const solo = r.total - r.parts.leads - r.parts.line;
     let v = -r.hard * 3000 - r.wallHits * 500 - r.respawns * 8000 - (r.finished ? 0 : 20000) - r.seconds * 60;
-    if (kind !== 'grip') v += r.parts.drift * 0.6;
+    if (kind !== 'grip') v += r.parts.drift * (+process.env.DRIFT_WEIGHT || 0.6);
+    /* the grip player never slides: drift points it earns anyway (the slip of a car at the limit, a brake with DRIFT) cost */
+    else v -= r.parts.drift * (+process.env.GRIP_DRIFT_COST || 0);
     if (v < worst) { worst = v; detail = { seconds: r.seconds, solo, walls: r.wallHits, hard: r.hard, respawns: r.respawns, minKmh: r.minKmh }; }
   }
   return { value: worst, detail };

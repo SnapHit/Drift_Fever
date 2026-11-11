@@ -29,6 +29,7 @@ import { TUNE } from '../../src/tune.js';
 const q = r => ({ steer: Math.round(r.steer * 1000) / 1000, throttle: Math.round(r.throttle * 100) / 100, brake: Math.round(r.brake * 100) / 100, handbrake: r.handbrake ? 1 : 0 });
 /* a player's hands: the throttle full, no brake (DRIFT with no steering is a handbrake with the wheel straight) */
 export const handsOk = inp => inp.throttle === 1 && inp.brake === 0;
+export const LAUNCH = 3;   // s after GO before the place counts
 
 /* opts: { car, up, rivalOpts, playerOpts (driving numbers for a scripted player), offset [dx, dz] on the player's start,
    solid (false: the rival not solid), noRival (the rival drives but is not in the player's world),
@@ -50,6 +51,8 @@ export function runRace(def, who, opts) {
   let dist = track.start.along || 0, along = world.along, t = 0, handsBroken = 0;
   const L = track.length, limit = Math.round((o.maxSeconds || 300) / STEP);
   let finished = false, i = 0, respawns = 0, minV = Infinity;
+  /* the place after the launch (LAUNCH s): on a level grid both cars are level at the start, which is not a lead */
+  let lastPlace = 0, changes = 0, aheadT = 0, raceT = 0;
   const trace = [];
   for (; i < limit; i++) {
     const inp = q(drive(world));
@@ -68,6 +71,7 @@ export function runRace(def, who, opts) {
     lead.step(progress.state, rival.progress.state, dist, rival.runDistance());
     t += STEP;
     if (t > 3 && c.speed < minV) minV = c.speed;
+    if (t > LAUNCH && !rival.state.finished) { const pl = lead.state.place; if (lastPlace && pl !== lastPlace) changes++; lastPlace = pl; raceT += STEP; if (pl === 1) aheadT += STEP; }
     if (o.onStep) o.onStep({ world, rival, tandem: tandem.state, lead: lead.state, scoring: scoring.state, i, t, dist });
     if (o.trace && i % 60 === 0) trace.push({ t: +t.toFixed(1), d: +dist.toFixed(0), rd: +rival.runDistance().toFixed(0), place: lead.state.place, gap: +lead.state.gap.toFixed(2), v: +c.speed.toFixed(1), rv: +rival.world.car.speed.toFixed(1) });
     if (progress.state.finished) { scoring.bank(); race.finish(t); finished = true; break; }
@@ -83,7 +87,7 @@ export function runRace(def, who, opts) {
     parts: { drift: s.drift - s.tandem, clean: s.clean, pace: s.pace, leads: LS.player.lead, line: LS.player.line, close: s.tandem },
     rivalParts: { drift: rs.drift, clean: rs.clean, pace: rs.pace, leads: LS.rival.lead, line: LS.rival.line, close: 0 },
     gates: LS.gates, leadGates: LS.player.gates, rivalGates: LS.rival.gates, lineTo: LS.owner[LS.gates - 1] || null,
-    aheadShare: t > 0 ? +(LS.aheadT / t).toFixed(3) : 0, changes: LS.changes,
+    aheadShare: raceT > 0 ? +(aheadT / raceT).toFixed(3) : 0, changes, changesAll: LS.changes,
     closeShare: tandem.state.rivalSlideT ? +(tandem.state.bothT / tandem.state.rivalSlideT).toFixed(3) : 0,
     wallHits: world.hits - world.bodyHits, hard: world.hardHits - world.bodyHardHits, bodyHits: world.bodyHits, bodyHard: world.bodyHardHits, respawns, minKmh: +(minV * 3.6).toFixed(1),
     handsBroken, rivalOverruled: rival.state.overruled,

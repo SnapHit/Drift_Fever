@@ -15,8 +15,8 @@ import { createRivalDriver } from './driver.js';
 
 export const PLAYERS = {
   MIX_RADIUS: 42,          // m: the mixed player slides corners this tight or tighter (game/test/stars/slot.js calls these drift corners)
-  /* each player's numbers, chosen by game/test/driftrace/players-search.js on career 1 in the starter: no wall contact in its worst run */
-  grip:  { drive: { EDGE_SAFE: 1.56, ENTRY: 24.75, VMAX: 34, AY_MAX: 5.76, OUTSIDE: 0.506, SETUP: 49.57, HB_OVER: 3.92, HB_STEER: 0.26 } },
+  /* each player's numbers, chosen by game/test/driftrace/players-search.js on career 1 in the starter: no wall contact in its worst run; the grip player's search also charged for any drift points (GRIP_DRIFT_COST 8), so it truly takes the line on grip */
+  grip:  { drive: { EDGE_SAFE: 1.6, ENTRY: 17.39, VMAX: 31.9, AY_MAX: 8.26, OUTSIDE: 0.397, SETUP: 64.3, HB_OVER: 5.82, HB_STEER: 0.38 } },
   slide: { drive: { SLIDE_GAIN: 0.306, PROGRESS: 62, KEEP: 607, ANGLE_CAP: 44.25, EDGE_SAFE: 2.43, EDGE_COST: 2254, ENTRY: 23.3, VMAX: 22, CHAIN_KEEP: 0, CHAIN_MARGIN: 0.58, AY_MAX: 5.75, OUTSIDE: 0.284, SETUP: 54.92, WINDOW_PRE: 17.12, WINDOW_POST: -6.22, LINK: 33.17, HB_TIME: 0.443, HB_OVER: 2.46, HB_STEER: 0.47 } },
   mixed: { drive: { SLIDE_GAIN: 0.416, PROGRESS: 92, KEEP: 585, ANGLE_CAP: 35.38, EDGE_SAFE: 2.34, EDGE_COST: 2525, ENTRY: 29, VMAX: 25.65, CHAIN_KEEP: 418, CHAIN_MARGIN: 0.15, AY_MAX: 5.32, OUTSIDE: 0.648, SETUP: 34.27, WINDOW_PRE: 6.51, WINDOW_POST: 20, LINK: 46.97, HB_TIME: 0.1, HB_OVER: 1.51, HB_STEER: 0.05 } },
 };

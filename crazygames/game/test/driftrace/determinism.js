@@ -39,6 +39,8 @@ async function replay(spec, tape, probe) {
     /* the bare replay: every step of the tape through the world (and, in a battle, the rival and the tandem), as the live run took them */
     Lp.startRun(sp); Lp.app.driver = null;
     const bare = F.replay(tape);
+    /* his hash is taken at his line: run him on to it if the player was home first */
+    if (Lp.rival() && !Lp.rival().state.finished) Lp.rival().finishRun();
     const rb = Lp.rival() ? Lp.rival().hash() : null;
     void R2;
     return { run, bare, bareRival: rb };
