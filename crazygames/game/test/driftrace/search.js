@@ -28,6 +28,8 @@ export function judge(def, drive, o) {
     v -= Math.max(0, Math.abs(r.seconds - o.seconds) - o.slack) * 300;
     v -= Math.max(0, r.total - o.cap) * (o.capWeight || 1);   // capWeight: the ladder round's searches pull harder on a ceiling (1 as before)
     v -= r.contacts * 600 + r.hard * 3000;
+    /* totalBar (the ladder round): measure 2's bar, his total within this share of his undisturbed run's, as a demand */
+    if (o.totalBar) v -= Math.max(0, Math.abs(r.total - runs[0].total) - o.totalBar * runs[0].total) * 30;
     /* sliding every corner is the rule (the bar is 30 per cent of each): a demand, not a preference */
     v -= Math.max(0, 0.33 - r.worstCorner) * 60000;
   }

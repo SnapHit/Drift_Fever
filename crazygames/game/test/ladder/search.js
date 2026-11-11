@@ -8,11 +8,12 @@
    ranges (rivals/search.js CHARACTERS) keep his driving his own. The
    probes are the record; this is the search.
 
-   node game/test/ladder/search.js r2 --track 4 --laps 3 [--car hatch] [--n 200] [--seed 1] [--seconds 81] [--cap 2600] [--from r1|grip|slide|mixed|JSON] [--cap-weight 1] [--range KEY=a,b] */
+   node game/test/ladder/search.js r2 --track 4 --laps 3 [--car hatch] [--n 200] [--seed 1] [--seconds 81] [--cap 2600] [--from r1|grip|slide|mixed|JSON] [--cap-weight 1] [--range KEY=a,b] [--all20: judge on measure 2's twenty disturbances and the undisturbed run] */
 import { search } from '../driftrace/search.js';
 import { CHARACTERS } from '../rivals/search.js';
 import { rivalById } from '../../src/rivals/roster.js';
 import { PLAYERS } from '../../src/rivals/players.js';
+import { DISTURB as DISTURB20 } from '../driftrace/hands.js';
 
 const args = process.argv.slice(2), arg = (k, d) => args.includes(k) ? args[args.indexOf(k) + 1] : d;
 const base = rivalById(args.find(a => /^r\d/.test(a)) || 'r2');
@@ -24,6 +25,6 @@ const ranges = Object.assign({}, (CHARACTERS[def.id] || {}).ranges);
 for (let i = 0; i < args.length; i++) if (args[i] === '--range') { const [k, v] = args[i + 1].split('='); ranges[k] = v.split(',').map(Number); }
 const ch = CHARACTERS[def.id] || {};
 console.log('searching ' + def.name + ' on career ' + (def.track + 1) + ', ' + def.laps + ' laps, ' + def.car + ', ranges ' + JSON.stringify(ranges));
-const best = search(def, { n: +arg('--n', 200), seed: +arg('--seed', 1), seconds: +arg('--seconds', 80), slack: +arg('--slack', 2), cap: +arg('--cap', 2600), capWeight: +arg('--cap-weight', 1), want: ch.want, ranges, localFrom: args.includes('--local') ? 0 : undefined });
+const best = search(def, { n: +arg('--n', 200), seed: +arg('--seed', 1), seconds: +arg('--seconds', 80), slack: +arg('--slack', 2), cap: +arg('--cap', 2600), capWeight: +arg('--cap-weight', 1), want: ch.want, ranges, totalBar: args.includes('--all20') ? 0.22 : 0, disturb: args.includes('--all20') ? [{}, ...DISTURB20] : undefined, localFrom: args.includes('--local') ? 0 : undefined });
 console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
 console.log('drive: ' + JSON.stringify(best.drive));
