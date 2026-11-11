@@ -360,7 +360,7 @@ export const TANDEM = {
   RESTITUTION:      0.1,
   FRICTION:         0.3,
   COOL:             1.5,     // s the close bonus is off after a hard contact
-  PIN_SLACK:        0.4,     // m: if the walls hold the player this deep inside the rival, the rival lets him through until they part
+  PIN_SLACK:        0.25,    // m: if the walls hold the player this deep inside the rival, the rival lets him through until they part (under the contact measure's 0.3 m tolerance; was 0.4)
   FADE:             1.2,     // s the rival takes to fade away after his finish, no longer solid
   /* the HUD and callouts */
   CALL_HOLD:        1.2,     // s close, both sliding, before CLOSE is called

@@ -1,22 +1,25 @@
-/* RIVALS MEASURE 5: FRAME TIME. JavaScript time per frame at 6x CPU
-   throttle on the low tier, measured as the spectacle and visuals probes
-   do it (forced WebGL 2, 390x844, 300 frames with the first 30 apart,
-   "JS without submit": the frame less renderer.render, which on
-   SwiftShader is the whole software rasterisation and says nothing
-   about a GPU): a battle against the first and the last rival, the chase
-   driver following him so he is in view, against the same track solo
-   with the scripted drifter. The player's chain is held at x5 as the
-   spectacle probe holds it (the show at its heaviest); his own heat is
-   his own. Draw calls and triangles per tier, with and without him.
-   Physics p95 is reported apart: it now includes his world and his
-   driver's look ahead.
+/* DRIFT RACE MEASURE 5 (briefs/DRIFT-RACE.md: as the rivals round's
+   measure 5): FRAME TIME. JavaScript time per frame at 6x CPU throttle on
+   the low tier, measured as the spectacle and visuals probes do it
+   (forced WebGL 2, 390x844, 300 frames with the first 30 apart, "JS
+   without submit": the frame less renderer.render, which on SwiftShader
+   is the whole software rasterisation and says nothing about a GPU): a
+   race against the first rival and against the last, the player driven
+   by the scripted drifter of the solo probes (no look ahead of its own,
+   so the frame carries one look ahead, his, as a human's race does) and
+   by the mixed scripted player (two look aheads, the worst case), against
+   the same track solo with the scripted drifter. The player's chain is
+   held at x5 as the spectacle probe holds it. Draw calls and triangles
+   per tier, with and without him. Physics p95 is reported apart: it
+   includes his world, his driver's look ahead, the close bonus and the
+   lead gates.
 
-   THE BAR: the low tier's p95 at 6x under 16.7 ms in a battle. Known
+   THE BAR: the low tier's p95 at 6x under 16.7 ms in a race. Known
    answer: 20 ms of busy work per frame fails it.
 
-   node game/test/rivals/perf.js [first last]   writes review/rivals/perf.json */
+   node game/test/driftrace/perf.js [first last]   writes review/driftrace/perf.json */
 import path from 'node:path';
-import * as R from './lib.js';
+import * as R from '../rivals/lib.js';
 
 const FRAMES = 300, WARM = 30, BUDGET = 16.7;
 const env = await R.start();
@@ -28,7 +31,7 @@ async function measure(o) {
   const pg = await R.page(env, R.PORTRAIT, 'tier=' + o.tier, { touch: true });
   const p = pg.page;
   const index = await p.evaluate(id => window.__loop.RIVALS.find(r => r.id === id).track, o.rival);
-  if (o.battle) await R.battleRun(p, o.rival, o.driver || { chase: true }); else await R.careerRun(p, index);
+  if (o.battle) await R.battleRun(p, o.rival, o.driver || { drift: '*' }); else await R.careerRun(p, index);
   await R.until(p, "f.state==='drive'", 400);
   await R.runFrames(p, 60 * (o.into || 8));
   const cdp = await pg.context.newCDPSession(p);
@@ -55,19 +58,19 @@ async function measure(o) {
 }
 const show = r => console.log('  ' + r.label + ': JS p95 ' + r.jsWithoutSubmit.p95 + ' ms (worst ' + r.jsWithoutSubmit.worst + '), physics p95 ' + r.physics.p95 + ' ms, draw calls ' + r.drawCalls.p50 + ', triangles ' + r.triangles.p50 + ' (' + r.preset + '; ' + r.driving + ' frames driving, ' + (r.battle ? r.near + ' with him within 40 m' : 'solo') + ')');
 const plan = [];
-for (const rv of [first, last]) for (const tier of ['low', 'high']) for (const battle of [true, false]) plan.push({ label: tier + ', ' + (battle ? 'battle against ' + rv : 'the same track solo (' + rv + '\'s)'), tier, rival: rv, battle });
-/* the chase driver runs the same look ahead as the rival: a battle with a cheap player (the scripted drifter), measured early while he is near, shows what a human player's battle costs */
-plan.push({ label: 'low, battle against ' + first + ', the scripted drifter playing (no second look ahead)', tier: 'low', rival: first, battle: true, driver: { drift: '*' }, into: 2 });
+for (const rv of [first, last]) for (const tier of ['low', 'high']) for (const battle of [true, false]) plan.push({ label: tier + ', ' + (battle ? 'race against ' + rv : 'the same track solo (' + rv + '\'s)'), tier, rival: rv, battle, into: battle ? 2 : 8 });
+/* the mixed scripted player runs the same look ahead as the rival: two in one frame, the worst case */
+plan.push({ label: 'low, race against ' + first + ', the mixed scripted player playing (a second look ahead)', tier: 'low', rival: first, battle: true, driver: { player: 'mixed' }, into: 2 });
 for (const o of plan) { const r = await measure(o); out.runs.push(r); show(r); }
-const lowB = out.runs.filter(r => r.tier === 'low' && r.battle && !r.driver);
+const lowB = out.runs.filter(r => r.tier === 'low' && r.battle);
 const worst = lowB.reduce((a, b) => (b.jsWithoutSubmit.p95 > a.jsWithoutSubmit.p95 ? b : a));
-R.verdict(lowB.every(r => r.jsWithoutSubmit.p95 < BUDGET && r.driving > 0 && r.near > 0 && !r.errors.length), 'low tier, a battle, JavaScript p95 at 6x under ' + BUDGET + ' ms: worst ' + worst.jsWithoutSubmit.p95 + ' ms (' + worst.label + ')');
-for (const r of out.runs.filter(r => r.battle)) { const s = out.runs.find(q => !q.battle && q.tier === r.tier && q.rival === r.rival); console.log('  ' + r.label + ' against solo: JS p95 ' + s.jsWithoutSubmit.p95 + ' -> ' + r.jsWithoutSubmit.p95 + ' ms, physics p95 ' + s.physics.p95 + ' -> ' + r.physics.p95 + ', draw calls ' + s.drawCalls.p50 + ' -> ' + r.drawCalls.p50 + ', triangles ' + s.triangles.p50 + ' -> ' + r.triangles.p50); }
-const loaded = await measure({ label: 'known answer: 20 ms of busy work per frame, low, battle against ' + first, tier: 'low', rival: first, battle: true, busy: 20 });
+R.verdict(lowB.every(r => r.jsWithoutSubmit.p95 < BUDGET && r.driving > 0 && r.near > 0 && !r.errors.length), 'low tier, a race, JavaScript p95 at 6x under ' + BUDGET + ' ms: worst ' + worst.jsWithoutSubmit.p95 + ' ms (' + worst.label + ')');
+for (const r of out.runs.filter(r => r.battle && !r.driver)) { const s = out.runs.find(q => !q.battle && q.tier === r.tier && q.rival === r.rival); console.log('  ' + r.label + ' against solo: JS p95 ' + s.jsWithoutSubmit.p95 + ' -> ' + r.jsWithoutSubmit.p95 + ' ms, physics p95 ' + s.physics.p95 + ' -> ' + r.physics.p95 + ', draw calls ' + s.drawCalls.p50 + ' -> ' + r.drawCalls.p50 + ', triangles ' + s.triangles.p50 + ' -> ' + r.triangles.p50); }
+const loaded = await measure({ label: 'known answer: 20 ms of busy work per frame, low, race against ' + first, tier: 'low', rival: first, battle: true, busy: 20 });
 show(loaded);
 out.knownAnswer = { p95: loaded.jsWithoutSubmit.p95, caught: loaded.jsWithoutSubmit.p95 >= BUDGET };
 R.verdict(out.knownAnswer.caught, 'known answer: 20 ms of busy work per frame fails the budget: p95 ' + loaded.jsWithoutSubmit.p95 + ' ms: ' + (out.knownAnswer.caught ? 'CAUGHT' : 'MISSED'));
-R.writeJson(path.join(R.rivalsDir, 'perf.json'), out);
+R.writeJson(path.join(R.raceDir, 'perf.json'), out);
 await env.close();
 console.log(R.failures() ? R.failures() + ' failed' : 'all passed');
 process.exit(R.failures() ? 1 : 0);

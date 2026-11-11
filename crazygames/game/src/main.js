@@ -255,7 +255,7 @@ function frame(t) {
   if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
   else {
     chase.update(pose, dt, scene.camera, view.w / view.h);
-    if (director) director.apply(S === 'countdown' ? 'countdown' : finishing ? 'finish' : 'drive', pose, scene.camera, dt, S === 'countdown' ? 1 - Math.max(0, app.countdown) / LOOP.COUNTDOWN : 0, chase.state, app.rival && S === 'countdown' ? app.rival.world.car : null);
+    if (director) director.apply(S === 'countdown' ? 'countdown' : finishing ? 'finish' : 'drive', pose, scene.camera, dt, S === 'countdown' ? 1 - Math.max(0, app.countdown) / LOOP.COUNTDOWN : 0, chase.state, app.rival && (S === 'countdown' || S === 'drive') ? app.rival.world.car : null);
   }
   const g = app.ghost && (S === 'drive' || S === 'results') ? app.ghost.pose(alpha, ghostPose) : null;
   let rv = null;

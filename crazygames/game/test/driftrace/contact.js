@@ -1,40 +1,50 @@
-/* RIVALS MEASURE 4: CONTACT. In Node, through the host's battle step
-   (battle.js), against the first rival on career 1. Three scripted
-   players:
-   - TAIL: ram his tail. Pure pursuit on his car at up to his speed and
-     5 m/s more, from the grid.
-   - SWIPE: swipe his side. The chase driver until both are sliding with
-     a chain open, then steered into his side.
-   - PARK: park on his line. Drive to PARK_AT metres along, stop there
-     on the line he takes on his second lap, wait for him, then drive on.
-   Every step, measured here, not by the world's own numbers: the depth
-   the two boxes overlap (separating axes on the road's plane), whether
-   a hard contact lost an open chain, how far the player is outside the
-   road, how long he is held under 1 m/s while asking to drive, and
-   whether any number is NaN. And the rival's hash at his finish is
-   compared with his run with no player at all.
-   The bar: overlap never over OVERLAP m (a step at 20 m/s closing is
-   0.17 m), every hard contact with a chain open loses it, no respawn
-   in the 2 s after a contact (the game's own "off the track"; how far
-   into the run-off he goes is reported, against the same script with
-   no contact), never held more than 1 s, no NaN. Known answer: with him not solid, the overlap check fails.
+/* DRIFT RACE MEASURE 4 (briefs/DRIFT-RACE.md): CONTACT AND PASSING. In
+   Node, through the host's race step (race.js), against the rival on his
+   track, from the level grid. Four scripted players, each with only the
+   player's hands (the throttle always on, no brake; DRIFT with no
+   steering is the only way to slow or stop):
+   - TAIL: runs into his tail. Pure pursuit on his car, flat out.
+   - SWIPE: swipes his side. The mixed player until both are sliding
+     with a chain open and within SWIPE_NEAR m, then steered into his
+     side for 1.5 s.
+   - PARK: parks on his line. Drives to PARK_AT metres along the second
+     lap's line he takes, stops there with DRIFT and no steering, holds
+     it until he has come by, then drives on.
+   - FOLLOW: follows directly behind him for a lap at a higher speed.
+     Pure pursuit on a point FOLLOW_GAP m behind his car, flat out (the
+     player's car on grip is quicker than his sliding one), for a lap
+     from the first time it is behind him; then pulls out to the side of
+     the road with more room and goes by.
+   Every step, measured here: the depth the two boxes overlap (separating
+   axes), whether a hard contact lost an open chain, a respawn in the 2 s
+   after a contact (the game's own "off the track"), how long the player
+   is held under 1 m/s while asking to drive (anything but DRIFT with no
+   steering), whether any number is NaN; and his hash compared with his
+   run with no player at all.
+   The bar: overlap never over OVERLAP m, every hard contact with a chain
+   open loses it, no respawn in the 2 s after a contact, never held more
+   than HELD s, no NaN, his hash unchanged, and in FOLLOW the player gets
+   past him (ahead of him by PAST m) within the lap after the following
+   lap. Known answers: with the pin release off (TANDEM.PIN_SLACK
+   Infinity) the following case fails; with him not solid the overlap
+   check fails.
 
-   node game/test/rivals/contact.js   writes review/rivals/contact.json */
+   node game/test/driftrace/contact.js [r1]   writes review/driftrace/contact.json */
 import path from 'node:path';
 import fs from 'node:fs';
-import { runBattle } from './battle.js';
+import { runRace, handsOk } from './race.js';
 import { createRival } from '../../src/rivals/rival.js';
-import { createChaseDriver } from '../../src/rivals/chase.js';
+import { createPlayer } from '../../src/rivals/players.js';
 import { rivalById } from '../../src/rivals/roster.js';
 import { trackFor } from '../../src/ground/source.js';
 import { careerSpec, battleLaps } from '../../src/loop/modes.js';
-import { TUNE } from '../../src/tune.js';
+import { TUNE, TANDEM } from '../../src/tune.js';
 import { STEP } from '../../src/physics/world.js';
 
 const here = path.dirname(new URL(import.meta.url).pathname);
-const outDir = path.resolve(here, '..', '..', '..', 'review', 'rivals');
-export const OVERLAP = 0.3, HELD = 1.0, PARK_AT = 120;
-const def = rivalById('r1'), track = trackFor(careerSpec(def.track)), laps = battleLaps(track, def);
+const outDir = path.resolve(here, '..', '..', '..', 'review', 'driftrace');
+export const OVERLAP = 0.3, HELD = 1.0, PARK_AT = 120, SWIPE_NEAR = 8, FOLLOW_GAP = 3, PAST = 6;
+const def = rivalById(process.argv.slice(2).find(a => /^r\d/.test(a)) || 'r1'), track = trackFor(careerSpec(def.track)), laps = battleLaps(track, def), L = track.length;
 let failed = 0;
 const verdict = (ok, text) => { if (!ok) failed++; console.log((ok ? 'PASS ' : 'FAIL ') + text); return ok; };
 
@@ -52,87 +62,111 @@ function overlap(a, b) {
   return depth;
 }
 const V = TUNE.VEHICLE;
-
-/* his run alone: no player anywhere */
 const alone = createRival(track, def, laps); alone.finishRun();
 const aloneHash = alone.hash();
-
 /* where his second lap passes PARK_AT, from that run */
 const solo = createRival(track, def, laps); let parkLat = 0;
-for (let i = 0; i < 120 * 200 && !solo.state.finished; i++) { solo.step(); if (solo.runDistance() >= track.length + PARK_AT) { parkLat = solo.world.lateral; break; } }
+for (let i = 0; i < 120 * 200 && !solo.state.finished; i++) { solo.step(); if (solo.runDistance() >= track.start.along + L + PARK_AT) { parkLat = solo.world.lateral; break; } }
 
 function pursuit(world, tx, tz, gain) {
   const c = world.car, fx = -Math.sin(c.yaw), fz = -Math.cos(c.yaw), lx = -Math.cos(c.yaw), lz = Math.sin(c.yaw);
   const dx = tx - c.x, dz = tz - c.z;
   return Math.max(-1, Math.min(1, -Math.atan2(dx * lx + dz * lz, dx * fx + dz * fz) * (gain || 2.4)));
 }
+const drive = steer => ({ steer, throttle: 1, brake: 0, handbrake: 0 });
+const HOLD = { steer: 0, throttle: 1, brake: 0, handbrake: 1 };   // DRIFT with no steering: the player's brake
+/* a point on the road ahead of the player, `ahead` m on, `lat` m left of the centre */
+function roadPoint(world, ahead, lat) { const C = track.centre, t = C[(world.centreIndex + Math.round(ahead / 2)) % C.length]; return [t.x - Math.cos(t.heading) * lat, t.z + Math.sin(t.heading) * lat]; }
 const players = {
-  TAIL: () => (world, rival) => {
-    const r = rival.world.car, v = world.car.speed, want = r.speed + 5;
-    return { steer: pursuit(world, r.x, r.z), throttle: v < want ? 1 : 0, brake: v > want + 2 ? 0.5 : 0, handbrake: 0 };
-  },
-  SWIPE: () => { let chase = null, swiping = 0; return (world, rival) => {
-    if (!chase) chase = createChaseDriver(track, rival, { GAP: 3.5 });
-    const inp = chase.input(world);
-    if (!swiping && rival.state.sliding && Math.abs(world.car.slip) * 57.3 > 15 && rival.runDistance() > 60) swiping = 1;
-    if (swiping && swiping < 120 * 1.5) { swiping++; const r = rival.world.car; inp.steer = pursuit(world, r.x, r.z, 4); inp.throttle = 1; inp.handbrake = 0; }
+  TAIL: () => (world, rival) => { const r = rival.world.car; return rival.solid() ? drive(pursuit(world, r.x, r.z)) : drive(pursuit(world, ...roadPoint(world, 12, 0))); },
+  SWIPE: () => { let p = null, swiping = 0; return (world, rival) => {
+    if (!p) p = createPlayer(track, 'mixed');
+    const inp = { ...p.input(world) };
+    const r = rival.world.car, near = Math.hypot(r.x - world.car.x, r.z - world.car.z);
+    if (!swiping && rival.solid() && rival.state.sliding && Math.abs(world.car.slip) * 57.3 > 15 && near < SWIPE_NEAR) swiping = 1;
+    if (swiping && swiping < 120 * 1.5) { swiping++; inp.steer = pursuit(world, r.x, r.z, 4); inp.handbrake = 0; }
     return inp;
   }; },
-  PARK: () => { let parked = false, waited = 0; return (world, rival) => {
+  PARK: () => { let parked = false; return (world, rival, ctx) => {
     const c = world.car, C = track.centre, i = Math.round(PARK_AT / 2);
     if (!parked) {
-      const t = C[i], lx = -Math.cos(t.heading), lz = Math.sin(t.heading), tx = t.x + lx * parkLat, tz = t.z + lz * parkLat;
+      const t = C[i], tx = t.x - Math.cos(t.heading) * parkLat, tz = t.z + Math.sin(t.heading) * parkLat;
       const near = Math.hypot(tx - c.x, tz - c.z);
-      if (world.along > PARK_AT - 1 && world.along < PARK_AT + 30 && c.speed < 0.3) parked = true;
-      const v = near > 30 ? 12 : Math.max(0, near * 0.4);
-      return { steer: pursuit(world, tx, tz), throttle: c.speed < v ? 1 : 0, brake: c.speed > v + 0.5 ? 1 : 0, handbrake: 0 };
+      if (ctx.dist > track.start.along + PARK_AT - 30 && c.speed < 0.5) parked = true;
+      /* aim at the spot; within reach of it, DRIFT with the wheel straight to stop on it */
+      if (ctx.dist > track.start.along + 20 && near < Math.max(6, c.speed * c.speed / 14)) return HOLD;
+      return drive(pursuit(world, tx, tz));
     }
     /* wait until he has come by on his second lap, then drive on */
-    if (rival.runDistance() < track.length + PARK_AT + 25) { waited++; return { steer: 0, throttle: 0, brake: 0, handbrake: 1 }; }
-    const t = C[(world.centreIndex + 6) % C.length];
-    return { steer: pursuit(world, t.x, t.z), throttle: c.speed < 15 ? 1 : 0, brake: 0, handbrake: 0 };
+    if (rival.runDistance() < track.start.along + L + PARK_AT + 25) return HOLD;
+    return drive(pursuit(world, ...roadPoint(world, 12, 0)));
+  }; },
+  FOLLOW: () => { let from = null, phase = 'catch'; return (world, rival, ctx) => {
+    const r = rival.world.car, rd = rival.runDistance(), d = ctx.dist || 0;
+    if (!rival.solid()) return drive(pursuit(world, ...roadPoint(world, 12, 0)));
+    if (phase === 'catch' && rd > d && from === null) from = d;
+    if (from !== null && phase === 'catch' && d - from >= L) phase = 'pass';
+    if (phase === 'pass') {
+      /* to the side of him with more road, then on */
+      const lat = rival.world.lateral, half = rival.world.halfWidth, side = lat > 0 ? -1 : 1, aim = side * Math.min(half - 1.6, Math.abs(lat) + 3.2) * (lat > 0 ? 1 : 1);
+      return drive(pursuit(world, ...roadPoint(world, 10, side < 0 ? -Math.abs(aim) : Math.abs(aim))));
+    }
+    /* directly behind him: a point FOLLOW_GAP m behind his car, along his heading */
+    const fx = -Math.sin(r.yaw), fz = -Math.cos(r.yaw);
+    return drive(pursuit(world, r.x - fx * FOLLOW_GAP, r.z - fz * FOLLOW_GAP));
   }; },
 };
 
-function run(name, solid) {
-  const st = { maxOverlap: 0, hardContacts: 0, hardWithChain: 0, hardKeptChain: 0, contacts: 0, maxOff: 0, respawns: 0, held: 0, maxHeld: 0, nan: false, chainBefore: 0, rivalHits: 0, minGap: Infinity };
-  let wasHeld = 0, lastThrottle = 0, sinceHit = Infinity;
+function run(name, opts) {
+  const st = { maxOverlap: 0, hardContacts: 0, hardWithChain: 0, hardKeptChain: 0, contacts: 0, maxOff: 0, respawns: 0, maxHeld: 0, nan: false, chainBefore: 0, minGap: Infinity, passThroughSteps: 0, followFrom: null, past: null, behindT: 0 };
+  let held = 0, lastInp = null, sinceHit = Infinity;
   const who = players[name]();
-  const res = runBattle(def, (w, r) => { const i = who(w, r); lastThrottle = i.throttle; return i; }, { solid, maxSeconds: 120, onStep: ({ world, rival, scoring }) => {
+  const res = runRace(def, (w, r, ctx) => { const i = who(w, r, ctx); lastInp = i; return i; }, { ...opts, maxSeconds: 150, onStep: ({ world, rival, scoring, dist }) => {
     const c = world.car, r = rival.world.car;
     const ov = rival.solid() ? overlap({ x: c.x, z: c.z, yaw: c.yaw, hl: V.HALF_LENGTH, hw: V.HALF_WIDTH }, { x: r.x, z: r.z, yaw: r.yaw, hl: rival.box.halfLength, hw: rival.box.halfWidth }) : 0;
-    if (ov > st.maxOverlap) st.maxOverlap = ov;
-    st.minGap = Math.min(st.minGap, Math.hypot(c.x - r.x, c.z - r.z));
+    if (ov > st.maxOverlap && !world.passThrough) st.maxOverlap = ov;
+    if (world.passThrough) st.passThroughSteps++;
+    if (rival.solid()) st.minGap = Math.min(st.minGap, Math.hypot(c.x - r.x, c.z - r.z));
     sinceHit += STEP;
     if (world.hit && world.hit.kind === 'rival') { sinceHit = 0; st.contacts++; if (world.hit.hard) { st.hardContacts++; if (st.chainBefore > 0) { st.hardWithChain++; if (scoring.chain > 0) st.hardKeptChain++; } } }
     st.chainBefore = scoring.chain;
-    /* thrown off: in the 2 s after a contact, past the edge or put back on the road */
     if (sinceHit <= 2) { if (world.respawned) st.respawns++; st.maxOff = Math.max(st.maxOff, Math.abs(world.lateral) - world.halfWidth); }
-    if (world.respawned) st.allRespawns = (st.allRespawns || 0) + 1;
-    st.runOff = Math.max(st.runOff || -Infinity, Math.abs(world.lateral) - world.halfWidth);
-    if (lastThrottle > 0 && c.speed < 1) { wasHeld += STEP; st.maxHeld = Math.max(st.maxHeld, wasHeld); } else wasHeld = 0;
+    const asking = lastInp && !(lastInp.handbrake && lastInp.steer === 0);
+    if (asking && c.speed < 1) { held += STEP; st.maxHeld = Math.max(st.maxHeld, held); } else held = 0;
     if (!isFinite(c.x + c.z + c.wvx + c.wvz + c.r + c.yaw + scoring.chain + scoring.total)) st.nan = true;
+    /* the following case: when it is first behind him, and when it is first PAST m ahead of him after a lap behind */
+    const rd = rival.runDistance();
+    if (st.followFrom === null && rd > dist + 1) st.followFrom = dist;
+    if (st.followFrom !== null && rd > dist) st.behindT += STEP;
+    if (st.followFrom !== null && st.past === null && dist - st.followFrom >= L && dist > rd + PAST) st.past = +(dist - st.followFrom - L).toFixed(1);
   } });
-  st.maxOverlap = +st.maxOverlap.toFixed(3); st.maxOff = +st.maxOff.toFixed(2); st.maxHeld = +st.maxHeld.toFixed(2); st.minGap = +st.minGap.toFixed(2);
-  return { ...st, rivalHash: res.rivalHash, finished: res.finished, score: res.score, rival: res.rival, wallHits: res.wallHits, nanInHash: /NaN/.test(res.hash + res.rivalHash) };
+  for (const k of ['maxOverlap', 'maxOff', 'maxHeld', 'minGap']) st[k] = +st[k].toFixed(3);
+  return { ...st, rivalHash: res.rivalHash, finished: res.finished, total: res.total, rival: res.rival, wallHits: res.wallHits, handsBroken: res.handsBroken, nanInHash: /NaN/.test(res.hash + res.rivalHash) };
 }
 
-const out = { overlapTolerance: OVERLAP, held: HELD, parkAt: PARK_AT, parkLateral: +parkLat.toFixed(2), aloneHash, scenarios: {} };
+const out = { rival: def.id, overlapTolerance: OVERLAP, held: HELD, parkAt: PARK_AT, parkLateral: +parkLat.toFixed(2), aloneHash, scenarios: {} };
 for (const name of Object.keys(players)) {
-  const m = run(name, true);
+  const m = run(name, {});
   out.scenarios[name] = m;
-  verdict(m.maxOverlap <= OVERLAP, name + ': the boxes overlap at most ' + m.maxOverlap + ' m (bar ' + OVERLAP + '); ' + m.contacts + ' contacts, ' + m.hardContacts + ' hard, closest centres ' + m.minGap + ' m');
+  verdict(m.handsBroken === 0, name + ': only the player\'s hands');
+  verdict(m.maxOverlap <= OVERLAP, name + ': the boxes overlap at most ' + m.maxOverlap + ' m outside a pin release (bar ' + OVERLAP + '); ' + m.contacts + ' contacts, ' + m.hardContacts + ' hard, closest centres ' + m.minGap + ' m, ' + m.passThroughSteps + ' steps let through by the pin release');
   verdict(m.hardKeptChain === 0 && (name !== 'SWIPE' || m.hardWithChain > 0), name + ': ' + m.hardWithChain + ' hard contacts with a chain open, ' + m.hardKeptChain + ' kept it' + (name === 'SWIPE' && !m.hardWithChain ? ' (the swipe never hit hard with a chain open: the case is not tested)' : ''));
-  verdict(m.respawns === 0, name + ': not thrown off the track (the game puts a car back on the road 6 m past the edge): ' + m.respawns + ' respawns in the 2 s after a contact; at most ' + Math.max(0, m.maxOff).toFixed(2) + ' m past the edge line into the run-off then (respawns in the whole run: ' + (m.allRespawns || 0) + ')');
+  verdict(m.respawns === 0, name + ': not thrown off the track: ' + m.respawns + ' respawns in the 2 s after a contact; at most ' + Math.max(0, m.maxOff).toFixed(2) + ' m past the edge line then');
   verdict(m.maxHeld <= HELD, name + ': held under 1 m/s while asking to drive for at most ' + m.maxHeld + ' s');
   verdict(!m.nan && !m.nanInHash, name + ': no number NaN');
   verdict(m.rivalHash === aloneHash, name + ': his hash with the player there is his hash with no player: ' + (m.rivalHash === aloneHash ? 'same' : 'DIFFERENT'));
 }
-const ghost = run('TAIL', false);
-console.log('for comparison: the tail ram with him not solid runs ' + ghost.runOff.toFixed(2) + ' m past the edge line on its own; with him solid, ' + out.scenarios.TAIL.runOff.toFixed(2));
-out.runOffWithoutContact = ghost.runOff;
-out.knownAnswer = ghost;
-verdict(ghost.maxOverlap > OVERLAP, 'known answer: with him not solid the tail ram overlaps ' + ghost.maxOverlap + ' m: ' + (ghost.maxOverlap > OVERLAP ? 'CAUGHT' : 'MISSED'));
+const F = out.scenarios.FOLLOW;
+verdict(F.past !== null, 'FOLLOW: behind him from ' + (F.followFrom === null ? 'never' : Math.round(F.followFrom) + ' m') + ', ' + F.behindT.toFixed(1) + ' s behind in all; after a lap behind it gets past him: ' + (F.past !== null ? 'yes, ' + F.past + ' m into the next lap' : 'NO'));
+/* known answers */
+const pin = TANDEM.PIN_SLACK; TANDEM.PIN_SLACK = Infinity;
+const np = run('FOLLOW', {});
+TANDEM.PIN_SLACK = pin;
+out.knownAnswerPin = np;
+verdict(np.past === null || np.maxHeld > HELD, 'known answer: with the pin release off the following case fails (does not get past, or is held): ' + (np.past === null || np.maxHeld > HELD ? 'CAUGHT' : 'MISSED (it got past ' + np.past + ' m into the next lap, held at most ' + np.maxHeld + ' s, ' + np.passThroughSteps + ' pin steps)'));
+const ghost = run('TAIL', { solid: false });
+out.knownAnswerSolid = ghost;
+verdict(ghost.maxOverlap > OVERLAP, 'known answer: with him not solid the tail run overlaps ' + ghost.maxOverlap + ' m: ' + (ghost.maxOverlap > OVERLAP ? 'CAUGHT' : 'MISSED'));
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, 'contact.json'), JSON.stringify(out, null, 1));
 console.log(failed ? failed + ' failed' : 'all passed');

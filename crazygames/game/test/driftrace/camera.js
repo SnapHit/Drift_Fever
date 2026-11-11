@@ -1,26 +1,31 @@
-/* RIVALS MEASURE 7: THE CAMERA. Through the battle's countdown sweep,
-   every frame at 60 Hz: the camera is never inside either car (each
-   car's box from the road to its roof, grown by MARGIN), and at GO both
-   cars are wholly in view (the eight corners of each box inside the
-   view). For every rival on his track, at 1280x720 and 390x844.
-   Known answer: the solo sweep (DIRECTOR.BATTLE off), with the rival
-   on the grid straight ahead (TANDEM.STAGGER_SIDE 0), starts inside him.
+/* DRIFT RACE MEASURE 7 (briefs/DRIFT-RACE.md; the rivals round's measure
+   7 reworked for the level grid): THE CAMERA. Through the race's
+   countdown sweep, every frame at 60 Hz: the camera is never inside
+   either car (each car's box from the road to its roof, grown by
+   MARGIN), and at GO both cars are wholly in view (the eight corners of
+   each box inside the view) and side by side (level along the road
+   within LEVEL m, apart across it). For the first rival (and every
+   rival with all) at 1280x720 and 390x844.
+   Known answer: with the cars on the grid one behind the other (the
+   rival GRID_BACK m behind the player's line, so he is not level), the
+   side by side check fails.
 
-   node game/test/rivals/camera.js   writes review/rivals/camera.json */
+   node game/test/driftrace/camera.js [all]   writes review/driftrace/camera.json */
 import path from 'node:path';
-import * as R from './lib.js';
+import * as R from '../rivals/lib.js';
 
-const MARGIN = 0.3;
+const MARGIN = 0.3, LEVEL = 0.5, GRID_BACK = 8;
 const env = await R.start();
 const out = { margin: MARGIN, runs: [] };
-const ids = await (async () => { const pg = await R.page(env, { width: 200, height: 200 }, ''); const v = await pg.page.evaluate(() => window.__loop.RIVALS.map(r => r.id)); await pg.close(); return v; })();
+const ids = process.argv.includes('all') ? await (async () => { const pg = await R.page(env, { width: 200, height: 200 }, ''); const v = await pg.page.evaluate(() => window.__loop.RIVALS.map(r => r.id)); await pg.close(); return v; })() : ['r1'];
 
 async function sweep(id, vp, flip) {
   const pg = await R.page(env, vp, '');
   const r = await pg.page.evaluate(async ({ id, MARGIN, flip }) => {
-    if (flip) { const d = await import('/src/camera/director.js'); d.DIRECTOR.BATTLE = false; window.__loop.TANDEM.STAGGER_SIDE = 0; }
     const Lp = window.__loop, F = window.__feel, A = Lp.app, THREE = F.scene.THREE;
     window.__clock = 1000; Lp.startRun(Lp.battleSpec(id)); F.draw = false;
+    /* the known answer: the rival moved back down the road, not level */
+    if (flip) { const rc = Lp.rival().world.car, fx = -Math.sin(rc.yaw), fz = -Math.cos(rc.yaw); rc.x -= fx * flip; rc.z -= fz * flip; }
     const cam = F.scene.camera, v = new THREE.Vector3();
     const boxOf = (c, hl, hw) => ({ c, hl: hl + MARGIN, hw: hw + MARGIN, h: 1.45 + MARGIN });
     const inside = (b, p) => { const c = b.c, fx = -Math.sin(c.yaw), fz = -Math.cos(c.yaw), lx = -Math.cos(c.yaw), lz = Math.sin(c.yaw), dx = p.x - c.x, dz = p.z - c.z, f = dx * fx + dz * fz, l = dx * lx + dz * lz, y = p.y - (c.y || 0); return Math.abs(f) <= b.hl && Math.abs(l) <= b.hw && y >= -MARGIN && y <= b.h; };
@@ -37,20 +42,25 @@ async function sweep(id, vp, flip) {
       if (A.state !== 'countdown') atGo = { me: view(me), him: view(him) };
     }
     if (!atGo) { cam.updateMatrixWorld(); atGo = { me: view(boxOf(pv, hlP, hwP)), him: view(boxOf(rv, Lp.rival().box.halfLength, Lp.rival().box.halfWidth)) }; }
+    /* side by side at GO: along the player's heading and across it */
+    const fx = -Math.sin(pv.yaw), fz = -Math.cos(pv.yaw), lx = -Math.cos(pv.yaw), lz = Math.sin(pv.yaw), dx = rv.x - pv.x, dz = rv.z - pv.z;
+    atGo.along = +(dx * fx + dz * fz).toFixed(3); atGo.across = +(dx * lx + dz * lz).toFixed(3);
     return { frames, insideMe, insideHim, minMe: +minMe.toFixed(2), minHim: +minHim.toFixed(2), atGo };
-  }, { id, MARGIN, flip });
+  }, { id, MARGIN, flip: flip ? GRID_BACK : 0 });
   await pg.close();
   return r;
 }
 for (const id of ids) for (const vp of [R.LANDSCAPE, R.PORTRAIT]) {
   const r = await sweep(id, vp, false);
   out.runs.push({ id, size: R.tagOf(vp), ...r });
-  R.verdict(r.insideMe === 0 && r.insideHim === 0 && r.atGo.me <= 0 && r.atGo.him <= 0, id + ' ' + R.tagOf(vp) + ': ' + r.frames + ' frames of the sweep, inside the player ' + r.insideMe + ', inside him ' + r.insideHim + ' (closest ' + r.minMe + ' and ' + r.minHim + ' m); at GO both in view: player ' + (r.atGo.me <= 0) + ', rival ' + (r.atGo.him <= 0));
+  const level = Math.abs(r.atGo.along) <= LEVEL && Math.abs(r.atGo.across) > 2;
+  R.verdict(r.insideMe === 0 && r.insideHim === 0 && r.atGo.me <= 0 && r.atGo.him <= 0 && level, id + ' ' + R.tagOf(vp) + ': ' + r.frames + ' frames of the sweep, inside the player ' + r.insideMe + ', inside him ' + r.insideHim + ' (closest ' + r.minMe + ' and ' + r.minHim + ' m); at GO both in view: player ' + (r.atGo.me <= 0) + ', rival ' + (r.atGo.him <= 0) + '; side by side: ' + r.atGo.along + ' m along, ' + r.atGo.across + ' m across (' + (level ? 'level' : 'NOT level') + ')');
 }
 const ka = await sweep(ids[0], R.LANDSCAPE, true);
 out.knownAnswer = ka;
-R.verdict(ka.insideHim > 0 || ka.atGo.him > 0, 'known answer: the solo sweep with him straight ahead passes inside him in ' + ka.insideHim + ' frames (closest ' + ka.minHim + ' m) or leaves him out at GO (' + (ka.atGo.him > 0) + '): ' + (ka.insideHim > 0 || ka.atGo.him > 0 ? 'CAUGHT' : 'MISSED'));
-R.writeJson(path.join(R.rivalsDir, 'camera.json'), out);
+const kaLevel = Math.abs(ka.atGo.along) <= LEVEL;
+R.verdict(!kaLevel, 'known answer: with him ' + GRID_BACK + ' m back on the grid the side by side check fails (' + ka.atGo.along + ' m along): ' + (!kaLevel ? 'CAUGHT' : 'MISSED'));
+R.writeJson(path.join(R.raceDir, 'camera.json'), out);
 await env.close();
 console.log(R.failures() ? R.failures() + ' failed' : 'all passed');
 process.exit(R.failures() ? 1 : 0);

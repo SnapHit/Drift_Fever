@@ -33,6 +33,10 @@ export const DIRECTOR = {
   BATTLE_LOW:     1.6,     // m above the road there
   BATTLE_SIDE:    5.5,     // m out on the side away from him, halfway round
   BATTLE_PAIR:    0.6,     // share of the way from the player to the rival the look starts at (the pair in frame), easing to the player
+  /* a drift race starts level (briefs/DRIFT-RACE.md): the sweep ends on the chase camera pulled back and turned to the pair, so both cars are in view at GO, side by side; after GO it eases into the chase camera */
+  RACE_PAIR_BACK: 3.5,     // m the end of the sweep sits back from the chase camera, along its view
+  RACE_PAIR_LOOK: 0.5,     // share of the way from the player to the rival the camera and its look are moved across
+  RACE_PAIR_OUT:  0.9,     // s after GO for the view to ease into the chase camera
   /* the kick when a chain is banked */
   KICK_FROM:      3,       // the multiplier a banked chain needs
   KICK_BACK:      [0.9, 2.2],   // m the view pulls back, at KICK_FROM and at x8
@@ -56,10 +60,19 @@ const ease = t => t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
 const lerp = (a, b, t) => a + (b - a) * t;
 
 export function createDirector(THREE) {
-  const s = { kick: 0, kickK: 0, shake: 0, shakeT: 0, finishT: -1, side: 1, timeScale: 1, fx: 0, fz: 0 };
+  const s = { kick: 0, kickK: 0, shake: 0, shakeT: 0, finishT: -1, side: 1, timeScale: 1, fx: 0, fz: 0, pair: 1 };
   const look = new THREE.Vector3(), dir = new THREE.Vector3(), from = new THREE.Vector3();
+  const pv = { px: 0, py: 0, pz: 0, tx: 0, ty: 0, tz: 0 };
+  /* the race's pair view: the chase camera moved back along its view and across towards the rival */
+  function pairView(pose, chaseState, other) {
+    const D = DIRECTOR, mx = (other.x - pose.x) * D.RACE_PAIR_LOOK, mz = (other.z - pose.z) * D.RACE_PAIR_LOOK;
+    const bx = chaseState.px - chaseState.tx, by = chaseState.py - chaseState.ty, bz = chaseState.pz - chaseState.tz, bl = Math.hypot(bx, by, bz) || 1;
+    pv.px = chaseState.px + bx / bl * D.RACE_PAIR_BACK + mx; pv.py = chaseState.py + by / bl * D.RACE_PAIR_BACK; pv.pz = chaseState.pz + bz / bl * D.RACE_PAIR_BACK + mz;
+    pv.tx = chaseState.tx + mx; pv.ty = chaseState.ty; pv.tz = chaseState.tz + mz;
+    return pv;
+  }
 
-  function reset() { s.kick = 0; s.shake = 0; s.finishT = -1; s.timeScale = 1; }
+  function reset() { s.kick = 0; s.shake = 0; s.finishT = -1; s.timeScale = 1; s.pair = 1; }
   /* a banked chain: the value and its multiplier */
   function bank(mult) { if (mult >= DIRECTOR.KICK_FROM) { s.kick = 1; s.kickK = Math.min(1, (mult - DIRECTOR.KICK_FROM) / Math.max(1, 8 - DIRECTOR.KICK_FROM)); } }
   function hardHit() { s.shake = 1; }
@@ -74,7 +87,9 @@ export function createDirector(THREE) {
     const y0 = pose.y || 0;
     if (mode === 'countdown' && battle && D.BATTLE) {
       const k = ease(Math.min(1, u / D.SWEEP_END));
-      if (k >= 1) return;
+      chaseState = pairView(pose, chaseState, battle);
+      s.pair = 1;
+      if (k >= 1) { cam.position.set(chaseState.px, chaseState.py, chaseState.pz); look.set(chaseState.tx, chaseState.ty, chaseState.tz); cam.lookAt(look); return; }
       const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
       /* the rival ahead of the player, and the side away from him */
       const rx = battle.x - pose.x, rz = battle.z - pose.z, ahead = rx * fx + rz * fz, away = (rx * lx + rz * lz) > 0 ? -1 : 1;
@@ -118,6 +133,14 @@ export function createDirector(THREE) {
       return;
     }
     s.timeScale = 1;
+    /* a race, just after GO: from the pair view into the chase camera */
+    if (mode === 'drive' && battle && D.BATTLE && s.pair > 0) {
+      const w = ease(s.pair), q = pairView(pose, chaseState, battle);
+      cam.position.set(lerp(chaseState.px, q.px, w), lerp(chaseState.py, q.py, w), lerp(chaseState.pz, q.pz, w));
+      look.set(lerp(chaseState.tx, q.tx, w), lerp(chaseState.ty, q.ty, w), lerp(chaseState.tz, q.tz, w));
+      cam.lookAt(look);
+      s.pair = Math.max(0, s.pair - dt / D.RACE_PAIR_OUT);
+    }
     /* the kick: back along the view and wider, easing out */
     if (s.kick > 0) {
       const e = s.kick * s.kick;

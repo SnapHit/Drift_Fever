@@ -1,0 +1,48 @@
+{
+ "margin": 0.3,
+ "runs": [
+  {
+   "id": "r1",
+   "size": "1280x720",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.43,
+   "minHim": 9.12,
+   "atGo": {
+    "me": -0.6181408963928197,
+    "him": -0.6181513175659421,
+    "along": 0,
+    "across": 4.4
+   }
+  },
+  {
+   "id": "r1",
+   "size": "390x844",
+   "frames": 182,
+   "insideMe": 0,
+   "insideHim": 0,
+   "minMe": 5.44,
+   "minHim": 9.18,
+   "atGo": {
+    "me": -0.2288713274589902,
+    "him": -0.22887014583581988,
+    "along": 0,
+    "across": 4.4
+   }
+  }
+ ],
+ "knownAnswer": {
+  "frames": 182,
+  "insideMe": 19,
+  "insideHim": 0,
+  "minMe": 1,
+  "minHim": 5.52,
+  "atGo": {
+   "me": -0.7923155138613467,
+   "him": -0.17719732319232828,
+   "along": -8,
+   "across": 4.4
+  }
+ }
+}

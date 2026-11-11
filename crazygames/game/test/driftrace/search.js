@@ -23,9 +23,11 @@ export function judge(def, drive, o) {
   const m = mark(runs, o.want);
   let v = m.value;
   for (const r of runs) {
-    v -= Math.max(0, Math.abs(r.seconds - o.seconds) - o.slack) * 400;
-    v -= Math.max(0, r.total - o.cap) * 2;
+    v -= Math.max(0, Math.abs(r.seconds - o.seconds) - o.slack) * 300;
+    v -= Math.max(0, r.total - o.cap) * 1;
     v -= r.contacts * 600 + r.hard * 3000;
+    /* sliding every corner is the rule (the bar is 30 per cent of each): a demand, not a preference */
+    v -= Math.max(0, 0.33 - r.worstCorner) * 60000;
   }
   const secs = runs.map(r => r.seconds), tots = runs.map(r => r.total);
   return { value: v, detail: Object.assign({}, m.detail, { seconds: [Math.min(...secs), Math.max(...secs)], totals: [Math.min(...tots), Math.max(...tots)], contacts: Math.max(...runs.map(r => r.contacts)), worstCorner: +Math.min(...runs.map(r => r.worstCorner)).toFixed(2) }) };
@@ -41,7 +43,7 @@ export function search(def, o) {
   let best = { drive: Object.assign({}, def.drive), ...judge(def, def.drive, o) };
   console.log('start ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
   for (let k = 0; k < o.n; k++) {
-    const local = k > o.n * 0.35;
+    const local = k > o.n * (o.localFrom === undefined ? 0.35 : o.localFrom);
     const drive = Object.assign({}, local ? best.drive : {});
     for (const key of Object.keys(ranges)) {
       const [a, b] = ranges[key];
@@ -58,8 +60,10 @@ if (process.argv[1] && process.argv[1].endsWith('driftrace/search.js')) {
   const args = process.argv.slice(2), arg = (k, d) => args.includes(k) ? +args[args.indexOf(k) + 1] : d;
   const def = { ...rivalById(args.find(a => /^r\d/.test(a)) || 'r1') };
   if (args.includes('--fresh')) def.drive = {};
+  /* --from grip|slide|mixed: start from a scripted player's numbers, and search near them from the first try */
+  if (args.includes('--from')) { const { PLAYERS } = await import('../../src/rivals/players.js'); def.drive = { ...PLAYERS[args[args.indexOf('--from') + 1]].drive }; }
   const ch = CHARACTERS[def.id] || {};
-  const best = search(def, { n: arg('--n', 300), seed: arg('--seed', 1), seconds: arg('--seconds', 60), slack: arg('--slack', 1.5), cap: arg('--cap', 1700), want: ch.want, ranges: ch.ranges, disturb: DISTURB.slice(0, arg('--disturb', 6)) });
+  const best = search(def, { n: arg('--n', 300), seed: arg('--seed', 1), seconds: arg('--seconds', 60), slack: arg('--slack', 1.5), cap: arg('--cap', 1700), want: ch.want, ranges: ch.ranges, disturb: DISTURB.slice(0, arg('--disturb', 6)), localFrom: args.includes('--from') ? 0 : undefined });
   console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
   console.log('drive: ' + JSON.stringify(best.drive));
 }
