@@ -18,6 +18,8 @@ import { softSprite } from './textures.js';
 
 export const SHOW = {
   GLOWS:            { low: 160, high: 240 },   // flares, halos and flashes drawn at once
+  /* the rival's show (briefs/RIVALS.md): the same show on a second car, at its own density */
+  RIVAL:            { SHARE: { low: 0.5, high: 0.7 }, GLOWS: { low: 40, high: 60 } },   // his particle pools as a share of the player's, and his glows
   HEAT_FULL:        4,       // the multiplier at which the heat is full
   HEAT_RISE:        2.5,     // per second the heat eases towards its target
   HEAT_FALL:        1.2,     // and back down after a bank or a loss
@@ -93,7 +95,7 @@ export function createShow(THREE, opts) {
   const group = new THREE.Group();
   group.name = 'show';
   const soft = softSprite(THREE, 64, true);
-  const glows = createGlows(THREE, { max: SHOW.GLOWS[o.tierName] || SHOW.GLOWS.low, texture: soft, name: 'glows', renderOrder: 6 });
+  const glows = createGlows(THREE, { max: o.glows || SHOW.GLOWS[o.tierName] || SHOW.GLOWS.low, texture: soft, name: 'glows', renderOrder: 6 });
   group.add(glows.mesh);
 
   /* ---- the trails: two ribbons, one per tail-light ---- */

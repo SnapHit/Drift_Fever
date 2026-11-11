@@ -1,0 +1,310 @@
+{
+ "shots": [
+  {
+   "file": "1280x720-dusk-countdown.png",
+   "k": 61,
+   "state": "countdown",
+   "gap": null,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "1280x720-dusk-close.png",
+   "k": 418,
+   "state": "drive",
+   "gap": 4.592492741591336,
+   "mult": 2.485395882906631,
+   "zone": "near"
+  },
+  {
+   "file": "1280x720-dusk-finish.png",
+   "k": 2172,
+   "state": "drive",
+   "gap": 77.49375167422093,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "1280x720-dusk-far.png",
+   "k": 481,
+   "state": "drive",
+   "gap": 26.27724295371779,
+   "mult": 1,
+   "zone": "far"
+  },
+  {
+   "file": "1280x720-dusk-contact.png",
+   "k": 487,
+   "state": "drive",
+   "gap": 4.34452180854291,
+   "mult": 2.5,
+   "zone": "close"
+  },
+  {
+   "file": "1280x720-dusk-won.png",
+   "won": true
+  },
+  {
+   "file": "1280x720-dusk-lost.png",
+   "won": false
+  },
+  {
+   "file": "1280x720-dusk-career.png"
+  },
+  {
+   "file": "390x844-dusk-countdown.png",
+   "k": 61,
+   "state": "countdown",
+   "gap": null,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "390x844-dusk-close.png",
+   "k": 418,
+   "state": "drive",
+   "gap": 4.592492741591336,
+   "mult": 2.485395882906631,
+   "zone": "near"
+  },
+  {
+   "file": "390x844-dusk-finish.png",
+   "k": 2172,
+   "state": "drive",
+   "gap": 77.49375167422093,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "390x844-dusk-far.png",
+   "k": 481,
+   "state": "drive",
+   "gap": 26.27724295371779,
+   "mult": 1,
+   "zone": "far"
+  },
+  {
+   "file": "390x844-dusk-contact.png",
+   "k": 487,
+   "state": "drive",
+   "gap": 4.34452180854291,
+   "mult": 2.5,
+   "zone": "close"
+  },
+  {
+   "file": "390x844-dusk-won.png",
+   "won": true
+  },
+  {
+   "file": "390x844-dusk-lost.png",
+   "won": false
+  },
+  {
+   "file": "390x844-dusk-career.png"
+  },
+  {
+   "file": "844x390-dusk-countdown.png",
+   "k": 61,
+   "state": "countdown",
+   "gap": null,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "844x390-dusk-close.png",
+   "k": 418,
+   "state": "drive",
+   "gap": 4.592492741591336,
+   "mult": 2.485395882906631,
+   "zone": "near"
+  },
+  {
+   "file": "844x390-dusk-finish.png",
+   "k": 2172,
+   "state": "drive",
+   "gap": 77.49375167422093,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "844x390-dusk-far.png",
+   "k": 481,
+   "state": "drive",
+   "gap": 26.27724295371779,
+   "mult": 1,
+   "zone": "far"
+  },
+  {
+   "file": "844x390-dusk-contact.png",
+   "k": 487,
+   "state": "drive",
+   "gap": 4.34452180854291,
+   "mult": 2.5,
+   "zone": "close"
+  },
+  {
+   "file": "844x390-dusk-won.png",
+   "won": true
+  },
+  {
+   "file": "844x390-dusk-lost.png",
+   "won": false
+  },
+  {
+   "file": "844x390-dusk-career.png"
+  },
+  {
+   "file": "1280x720-night-countdown.png",
+   "k": 61,
+   "state": "countdown",
+   "gap": null,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "1280x720-night-close.png",
+   "k": 418,
+   "state": "drive",
+   "gap": 4.592492741591336,
+   "mult": 2.485395882906631,
+   "zone": "near"
+  },
+  {
+   "file": "1280x720-night-finish.png",
+   "k": 2172,
+   "state": "drive",
+   "gap": 77.49375167422093,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "1280x720-night-far.png",
+   "k": 481,
+   "state": "drive",
+   "gap": 26.27724295371779,
+   "mult": 1,
+   "zone": "far"
+  },
+  {
+   "file": "1280x720-night-contact.png",
+   "k": 487,
+   "state": "drive",
+   "gap": 4.34452180854291,
+   "mult": 2.5,
+   "zone": "close"
+  },
+  {
+   "file": "1280x720-night-won.png",
+   "won": true
+  },
+  {
+   "file": "1280x720-night-lost.png",
+   "won": false
+  },
+  {
+   "file": "1280x720-night-career.png"
+  },
+  {
+   "file": "390x844-night-countdown.png",
+   "k": 61,
+   "state": "countdown",
+   "gap": null,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "390x844-night-close.png",
+   "k": 418,
+   "state": "drive",
+   "gap": 4.592492741591336,
+   "mult": 2.485395882906631,
+   "zone": "near"
+  },
+  {
+   "file": "390x844-night-finish.png",
+   "k": 2172,
+   "state": "drive",
+   "gap": 77.49375167422093,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "390x844-night-far.png",
+   "k": 481,
+   "state": "drive",
+   "gap": 26.27724295371779,
+   "mult": 1,
+   "zone": "far"
+  },
+  {
+   "file": "390x844-night-contact.png",
+   "k": 487,
+   "state": "drive",
+   "gap": 4.34452180854291,
+   "mult": 2.5,
+   "zone": "close"
+  },
+  {
+   "file": "390x844-night-won.png",
+   "won": true
+  },
+  {
+   "file": "390x844-night-lost.png",
+   "won": false
+  },
+  {
+   "file": "390x844-night-career.png"
+  },
+  {
+   "file": "844x390-night-countdown.png",
+   "k": 61,
+   "state": "countdown",
+   "gap": null,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "844x390-night-close.png",
+   "k": 418,
+   "state": "drive",
+   "gap": 4.592492741591336,
+   "mult": 2.485395882906631,
+   "zone": "near"
+  },
+  {
+   "file": "844x390-night-finish.png",
+   "k": 2172,
+   "state": "drive",
+   "gap": 77.49375167422093,
+   "mult": 1,
+   "zone": "off"
+  },
+  {
+   "file": "844x390-night-far.png",
+   "k": 481,
+   "state": "drive",
+   "gap": 26.27724295371779,
+   "mult": 1,
+   "zone": "far"
+  },
+  {
+   "file": "844x390-night-contact.png",
+   "k": 487,
+   "state": "drive",
+   "gap": 4.34452180854291,
+   "mult": 2.5,
+   "zone": "close"
+  },
+  {
+   "file": "844x390-night-won.png",
+   "won": true
+  },
+  {
+   "file": "844x390-night-lost.png",
+   "won": false
+  },
+  {
+   "file": "844x390-night-career.png"
+  }
+ ]
+}

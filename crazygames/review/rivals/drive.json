@@ -1,0 +1,2768 @@
+{
+ "bar": {
+  "respawns": 0,
+  "hard": 0,
+  "contacts": 2,
+  "minKmh": 40,
+  "corner": 0.3,
+  "total": 0.25
+ },
+ "disturbances": [
+  {
+   "offset": [
+    -0.05,
+    -0.01
+   ],
+   "grip": -0.003
+  },
+  {
+   "offset": [
+    0.02,
+    0.02
+   ],
+   "grip": 0.002
+  },
+  {
+   "offset": [
+    -0.02,
+    0.05
+   ],
+   "grip": -0.004
+  },
+  {
+   "offset": [
+    0.05,
+    -0.03
+   ],
+   "grip": 0.001
+  },
+  {
+   "offset": [
+    0.01,
+    0
+   ],
+   "grip": -0.005
+  },
+  {
+   "offset": [
+    -0.03,
+    0.03
+   ],
+   "grip": 0
+  },
+  {
+   "offset": [
+    0.04,
+    -0.05
+   ],
+   "grip": 0.005
+  },
+  {
+   "offset": [
+    0,
+    -0.02
+   ],
+   "grip": -0.001
+  },
+  {
+   "offset": [
+    -0.04,
+    0.01
+   ],
+   "grip": 0.004
+  },
+  {
+   "offset": [
+    0.03,
+    0.04
+   ],
+   "grip": -0.002
+  },
+  {
+   "offset": [
+    -0.01,
+    -0.04
+   ],
+   "grip": 0.003
+  },
+  {
+   "offset": [
+    -0.05,
+    -0.01
+   ],
+   "grip": -0.003
+  },
+  {
+   "offset": [
+    0.02,
+    0.02
+   ],
+   "grip": 0.002
+  },
+  {
+   "offset": [
+    -0.02,
+    0.05
+   ],
+   "grip": -0.004
+  },
+  {
+   "offset": [
+    0.05,
+    -0.03
+   ],
+   "grip": 0.001
+  },
+  {
+   "offset": [
+    0.01,
+    0
+   ],
+   "grip": -0.005
+  },
+  {
+   "offset": [
+    -0.03,
+    0.03
+   ],
+   "grip": 0
+  },
+  {
+   "offset": [
+    0.04,
+    -0.05
+   ],
+   "grip": 0.005
+  },
+  {
+   "offset": [
+    0,
+    -0.02
+   ],
+   "grip": -0.001
+  },
+  {
+   "offset": [
+    -0.04,
+    0.01
+   ],
+   "grip": 0.004
+  }
+ ],
+ "rivals": [
+  {
+   "id": "r1",
+   "name": "Kestrow",
+   "track": 0,
+   "page": {
+    "rival": "r1",
+    "track": 0,
+    "finished": true,
+    "seconds": 41.04,
+    "total": 1573,
+    "drift": 1212,
+    "clean": 192,
+    "pace": 169,
+    "best": 273,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 83,
+    "minAt": 12,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.439,
+      "angle": 34.5,
+      "max": 47.7,
+      "s": 3.55
+     },
+     {
+      "name": "sweeper 1 L1",
+      "share": 0.448,
+      "angle": 26,
+      "max": 47.5,
+      "s": 6.12
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.567,
+      "angle": 30.8,
+      "max": 47.8,
+      "s": 4.5
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.497,
+      "angle": 31.9,
+      "max": 47.7,
+      "s": 3.57
+     },
+     {
+      "name": "sweeper 1 L2",
+      "share": 0.453,
+      "angle": 26,
+      "max": 47.5,
+      "s": 6.13
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.57,
+      "angle": 30.6,
+      "max": 47.8,
+      "s": 4.5
+     }
+    ],
+    "worstCorner": 0.4389671361502351,
+    "meanCorner": 0.49563296283572167,
+    "hash": "1.6504613370185621,-8.08453759559509,0.13061547357614478,-4.067308592612396,-26.123707265620858,-0.41851761845303725,-0.018110329356583584,6.389318320303146,0,0,0,-0.5095676044746184,-6.067590496060716|4925,0,0|1573,4925"
+   },
+   "node": {
+    "rival": "r1",
+    "track": 0,
+    "finished": true,
+    "seconds": 41.04,
+    "total": 1573,
+    "drift": 1212,
+    "clean": 192,
+    "pace": 169,
+    "best": 273,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 83,
+    "minAt": 12,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.439,
+      "angle": 34.5,
+      "max": 47.7,
+      "s": 3.55
+     },
+     {
+      "name": "sweeper 1 L1",
+      "share": 0.448,
+      "angle": 26,
+      "max": 47.5,
+      "s": 6.12
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.567,
+      "angle": 30.8,
+      "max": 47.8,
+      "s": 4.5
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.497,
+      "angle": 31.9,
+      "max": 47.7,
+      "s": 3.57
+     },
+     {
+      "name": "sweeper 1 L2",
+      "share": 0.453,
+      "angle": 26,
+      "max": 47.5,
+      "s": 6.13
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.57,
+      "angle": 30.6,
+      "max": 47.8,
+      "s": 4.5
+     }
+    ],
+    "worstCorner": 0.4389671361502351,
+    "meanCorner": 0.49563296283572167,
+    "hash": "1.650461337018871,-8.084537595594671,0.13061547357614317,-4.067308592612358,-26.123707265620894,-0.4185176184530421,-0.018110329356583563,6.389318320303143,0,0,0,-0.5095676044747195,-6.06759049606069|4925,0,0|1573,4925"
+   },
+   "worst": {
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 81.7,
+    "worstCorner": 0.42,
+    "totalLow": 1517,
+    "totalHigh": 1596,
+    "seconds": 41.18
+   },
+   "missing": 0,
+   "disturbed": [
+    {
+     "total": 1596,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 81.7,
+     "worstCorner": 0.436,
+     "seconds": 41.18
+    },
+    {
+     "total": 1542,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.426,
+     "seconds": 40.97
+    },
+    {
+     "total": 1579,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.448,
+     "seconds": 41.17
+    },
+    {
+     "total": 1569,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.439,
+     "seconds": 41.04
+    },
+    {
+     "total": 1591,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.1,
+     "worstCorner": 0.439,
+     "seconds": 41.07
+    },
+    {
+     "total": 1579,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.448,
+     "seconds": 41.17
+    },
+    {
+     "total": 1580,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82,
+     "worstCorner": 0.451,
+     "seconds": 41.12
+    },
+    {
+     "total": 1576,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83,
+     "worstCorner": 0.439,
+     "seconds": 41.04
+    },
+    {
+     "total": 1569,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.44,
+     "seconds": 41.04
+    },
+    {
+     "total": 1576,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83.1,
+     "worstCorner": 0.439,
+     "seconds": 41.04
+    },
+    {
+     "total": 1517,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.7,
+     "worstCorner": 0.424,
+     "seconds": 40.82
+    },
+    {
+     "total": 1596,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 81.7,
+     "worstCorner": 0.436,
+     "seconds": 41.18
+    },
+    {
+     "total": 1542,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.426,
+     "seconds": 40.97
+    },
+    {
+     "total": 1579,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.448,
+     "seconds": 41.17
+    },
+    {
+     "total": 1569,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.439,
+     "seconds": 41.04
+    },
+    {
+     "total": 1591,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.1,
+     "worstCorner": 0.439,
+     "seconds": 41.07
+    },
+    {
+     "total": 1579,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.448,
+     "seconds": 41.17
+    },
+    {
+     "total": 1580,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82,
+     "worstCorner": 0.451,
+     "seconds": 41.12
+    },
+    {
+     "total": 1576,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83,
+     "worstCorner": 0.439,
+     "seconds": 41.04
+    },
+    {
+     "total": 1569,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.44,
+     "seconds": 41.04
+    }
+   ]
+  },
+  {
+   "id": "r2",
+   "name": "Tolvo",
+   "track": 6,
+   "page": {
+    "rival": "r2",
+    "track": 6,
+    "finished": true,
+    "seconds": 61.71,
+    "total": 2168,
+    "drift": 1813,
+    "clean": 200,
+    "pace": 155,
+    "best": 499,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 64.6,
+    "minAt": 43.9,
+    "corners": [
+     {
+      "name": "opening 1 L1",
+      "share": 0.596,
+      "angle": 22.3,
+      "max": 28.5,
+      "s": 3.67
+     },
+     {
+      "name": "esses 1 L1",
+      "share": 0.712,
+      "angle": 23.6,
+      "max": 28.4,
+      "s": 2.98
+     },
+     {
+      "name": "esses 2 L1",
+      "share": 0.494,
+      "angle": 21.7,
+      "max": 29.1,
+      "s": 2.68
+     },
+     {
+      "name": "esses 3 L1",
+      "share": 0.528,
+      "angle": 22.3,
+      "max": 29.2,
+      "s": 2.84
+     },
+     {
+      "name": "tight 1 L1",
+      "share": 0.642,
+      "angle": 24.5,
+      "max": 28.4,
+      "s": 2.87
+     },
+     {
+      "name": "chicane 1 L1",
+      "share": 0.584,
+      "angle": 22,
+      "max": 27.8,
+      "s": 1.24
+     },
+     {
+      "name": "chicane 2 L1",
+      "share": 0.651,
+      "angle": 22.9,
+      "max": 28.4,
+      "s": 1.41
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.465,
+      "angle": 16.5,
+      "max": 21,
+      "s": 3.26
+     },
+     {
+      "name": "esses 1 L2",
+      "share": 0.738,
+      "angle": 23.6,
+      "max": 28.4,
+      "s": 2.99
+     },
+     {
+      "name": "esses 2 L2",
+      "share": 0.531,
+      "angle": 22,
+      "max": 28.9,
+      "s": 2.72
+     },
+     {
+      "name": "esses 3 L2",
+      "share": 0.553,
+      "angle": 22.6,
+      "max": 29.5,
+      "s": 2.91
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.801,
+      "angle": 17.8,
+      "max": 23.2,
+      "s": 2.97
+     },
+     {
+      "name": "chicane 1 L2",
+      "share": 0.544,
+      "angle": 21.6,
+      "max": 27.3,
+      "s": 1.22
+     },
+     {
+      "name": "chicane 2 L2",
+      "share": 0.581,
+      "angle": 22.2,
+      "max": 28.9,
+      "s": 1.33
+     }
+    ],
+    "worstCorner": 0.4654731457800515,
+    "meanCorner": 0.6015313412648727,
+    "hash": "1.0090337143545216,-8.023349874154288,0.04427394022761771,-0.6661227916372903,-25.4735807884432,0.13169351384258374,0.012728161666404277,0.41804595785727294,0,0,0,-5.9020121917826955,-0.3272928943354798|7405,0,0|2168,7405"
+   },
+   "node": {
+    "rival": "r2",
+    "track": 6,
+    "finished": true,
+    "seconds": 61.71,
+    "total": 2168,
+    "drift": 1813,
+    "clean": 200,
+    "pace": 155,
+    "best": 499,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 64.6,
+    "minAt": 43.9,
+    "corners": [
+     {
+      "name": "opening 1 L1",
+      "share": 0.596,
+      "angle": 22.3,
+      "max": 28.5,
+      "s": 3.67
+     },
+     {
+      "name": "esses 1 L1",
+      "share": 0.712,
+      "angle": 23.6,
+      "max": 28.4,
+      "s": 2.98
+     },
+     {
+      "name": "esses 2 L1",
+      "share": 0.494,
+      "angle": 21.7,
+      "max": 29.1,
+      "s": 2.68
+     },
+     {
+      "name": "esses 3 L1",
+      "share": 0.528,
+      "angle": 22.3,
+      "max": 29.2,
+      "s": 2.84
+     },
+     {
+      "name": "tight 1 L1",
+      "share": 0.642,
+      "angle": 24.5,
+      "max": 28.4,
+      "s": 2.87
+     },
+     {
+      "name": "chicane 1 L1",
+      "share": 0.584,
+      "angle": 22,
+      "max": 27.8,
+      "s": 1.24
+     },
+     {
+      "name": "chicane 2 L1",
+      "share": 0.651,
+      "angle": 22.9,
+      "max": 28.4,
+      "s": 1.41
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.465,
+      "angle": 16.5,
+      "max": 21,
+      "s": 3.26
+     },
+     {
+      "name": "esses 1 L2",
+      "share": 0.738,
+      "angle": 23.6,
+      "max": 28.4,
+      "s": 2.99
+     },
+     {
+      "name": "esses 2 L2",
+      "share": 0.531,
+      "angle": 22,
+      "max": 28.9,
+      "s": 2.72
+     },
+     {
+      "name": "esses 3 L2",
+      "share": 0.553,
+      "angle": 22.6,
+      "max": 29.5,
+      "s": 2.91
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.801,
+      "angle": 17.8,
+      "max": 23.2,
+      "s": 2.97
+     },
+     {
+      "name": "chicane 1 L2",
+      "share": 0.544,
+      "angle": 21.6,
+      "max": 27.3,
+      "s": 1.22
+     },
+     {
+      "name": "chicane 2 L2",
+      "share": 0.581,
+      "angle": 22.2,
+      "max": 28.9,
+      "s": 1.33
+     }
+    ],
+    "worstCorner": 0.4654731457800515,
+    "meanCorner": 0.6015313412648727,
+    "hash": "1.0090337143537056,-8.02334987415492,0.044273940227625506,-0.6661227916374887,-25.47358078844318,0.13169351384258388,0.012728161666404288,0.41804595785727405,0,0,0,-5.902012191782696,-0.32729289433543485|7405,0,0|2168,7405"
+   },
+   "worst": {
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 1,
+    "minKmh": 64.5,
+    "worstCorner": 0.08,
+    "totalLow": 2011,
+    "totalHigh": 2298,
+    "seconds": 62.04
+   },
+   "missing": 5,
+   "disturbed": [
+    {
+     "total": 2044,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 65.2,
+     "worstCorner": 0.352,
+     "seconds": 61.31
+    },
+    {
+     "total": 2247,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.7,
+     "worstCorner": 0.422,
+     "seconds": 61.54
+    },
+    {
+     "total": 2031,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 65.1,
+     "worstCorner": 0.342,
+     "seconds": 59.72
+    },
+    {
+     "total": 2178,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.7,
+     "worstCorner": 0.09,
+     "seconds": 61.71
+    },
+    {
+     "total": 2298,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.9,
+     "worstCorner": 0.543,
+     "seconds": 61.69
+    },
+    {
+     "total": 2289,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.8,
+     "worstCorner": 0.494,
+     "seconds": 62.04
+    },
+    {
+     "total": 2120,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.8,
+     "worstCorner": 0.145,
+     "seconds": 61.51
+    },
+    {
+     "total": 2011,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.5,
+     "worstCorner": 0.475,
+     "seconds": 60.95
+    },
+    {
+     "total": 2068,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.9,
+     "worstCorner": 0.498,
+     "seconds": 60.92
+    },
+    {
+     "total": 2121,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 64.8,
+     "worstCorner": 0.084,
+     "seconds": 60.72
+    },
+    {
+     "total": 2167,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.7,
+     "worstCorner": 0.44,
+     "seconds": 61.29
+    },
+    {
+     "total": 2044,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 65.2,
+     "worstCorner": 0.352,
+     "seconds": 61.31
+    },
+    {
+     "total": 2247,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.7,
+     "worstCorner": 0.422,
+     "seconds": 61.54
+    },
+    {
+     "total": 2031,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 65.1,
+     "worstCorner": 0.342,
+     "seconds": 59.72
+    },
+    {
+     "total": 2178,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.7,
+     "worstCorner": 0.09,
+     "seconds": 61.71
+    },
+    {
+     "total": 2298,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.9,
+     "worstCorner": 0.543,
+     "seconds": 61.69
+    },
+    {
+     "total": 2289,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.8,
+     "worstCorner": 0.494,
+     "seconds": 62.04
+    },
+    {
+     "total": 2120,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.8,
+     "worstCorner": 0.145,
+     "seconds": 61.51
+    },
+    {
+     "total": 2011,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.5,
+     "worstCorner": 0.475,
+     "seconds": 60.95
+    },
+    {
+     "total": 2068,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.9,
+     "worstCorner": 0.498,
+     "seconds": 60.92
+    }
+   ]
+  },
+  {
+   "id": "r3",
+   "name": "Varsk",
+   "track": 8,
+   "page": {
+    "rival": "r3",
+    "track": 8,
+    "finished": true,
+    "seconds": 66.96,
+    "total": 4206,
+    "drift": 3700,
+    "clean": 272,
+    "pace": 234,
+    "best": 1670,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 83.3,
+    "minAt": 24.3,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.674,
+      "angle": 35.1,
+      "max": 47.9,
+      "s": 2.35
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.493,
+      "angle": 36.1,
+      "max": 48,
+      "s": 3.55
+     },
+     {
+      "name": "multi 1 L1",
+      "share": 0.348,
+      "angle": 21.6,
+      "max": 29.3,
+      "s": 2.32
+     },
+     {
+      "name": "multi 2 L1",
+      "share": 0.787,
+      "angle": 33.9,
+      "max": 48,
+      "s": 2.22
+     },
+     {
+      "name": "multi 3 L1",
+      "share": 0.5,
+      "angle": 27.8,
+      "max": 42.4,
+      "s": 2.52
+     },
+     {
+      "name": "tight 2 L1",
+      "share": 0.652,
+      "angle": 34.5,
+      "max": 47.9,
+      "s": 2.32
+     },
+     {
+      "name": "opening 2 L1",
+      "share": 0.474,
+      "angle": 35.6,
+      "max": 48,
+      "s": 3.64
+     },
+     {
+      "name": "multi 4 L1",
+      "share": 0.424,
+      "angle": 20.1,
+      "max": 27.9,
+      "s": 2.24
+     },
+     {
+      "name": "multi 5 L1",
+      "share": 0.623,
+      "angle": 31.2,
+      "max": 46.7,
+      "s": 2.1
+     },
+     {
+      "name": "multi 6 L1",
+      "share": 0.474,
+      "angle": 30.2,
+      "max": 44.2,
+      "s": 2.41
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.674,
+      "angle": 35.1,
+      "max": 47.9,
+      "s": 2.35
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.493,
+      "angle": 36.1,
+      "max": 48,
+      "s": 3.55
+     },
+     {
+      "name": "multi 1 L2",
+      "share": 0.487,
+      "angle": 19.8,
+      "max": 27.6,
+      "s": 2.21
+     },
+     {
+      "name": "multi 2 L2",
+      "share": 0.724,
+      "angle": 35.1,
+      "max": 48,
+      "s": 2.29
+     },
+     {
+      "name": "multi 3 L2",
+      "share": 0.485,
+      "angle": 31.1,
+      "max": 46,
+      "s": 2.49
+     },
+     {
+      "name": "tight 2 L2",
+      "share": 0.652,
+      "angle": 34.5,
+      "max": 47.9,
+      "s": 2.32
+     },
+     {
+      "name": "opening 2 L2",
+      "share": 0.469,
+      "angle": 35.5,
+      "max": 48,
+      "s": 3.67
+     },
+     {
+      "name": "multi 4 L2",
+      "share": 0.411,
+      "angle": 20.4,
+      "max": 28.1,
+      "s": 2.25
+     },
+     {
+      "name": "multi 5 L2",
+      "share": 0.669,
+      "angle": 33.6,
+      "max": 47.8,
+      "s": 2.22
+     },
+     {
+      "name": "multi 6 L2",
+      "share": 0.493,
+      "angle": 31,
+      "max": 45.8,
+      "s": 2.45
+     }
+    ],
+    "worstCorner": 0.347670250896058,
+    "meanCorner": 0.5502533950599425,
+    "hash": "81.04872361259822,1.6953518968467074,2.632964999514173,-3.0437357380797008,26.647977988164275,-1.0937768502548364,0.1741435636493121,3.596282360899945,0,0,0.5750000000000004,-6.091886804718441,2.0675702938437226|8035,0,0|4206,8035"
+   },
+   "node": {
+    "rival": "r3",
+    "track": 8,
+    "finished": true,
+    "seconds": 66.96,
+    "total": 4206,
+    "drift": 3700,
+    "clean": 272,
+    "pace": 234,
+    "best": 1670,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 83.3,
+    "minAt": 24.3,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.674,
+      "angle": 35.1,
+      "max": 47.9,
+      "s": 2.35
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.493,
+      "angle": 36.1,
+      "max": 48,
+      "s": 3.55
+     },
+     {
+      "name": "multi 1 L1",
+      "share": 0.348,
+      "angle": 21.6,
+      "max": 29.3,
+      "s": 2.32
+     },
+     {
+      "name": "multi 2 L1",
+      "share": 0.787,
+      "angle": 33.9,
+      "max": 48,
+      "s": 2.22
+     },
+     {
+      "name": "multi 3 L1",
+      "share": 0.5,
+      "angle": 27.8,
+      "max": 42.4,
+      "s": 2.52
+     },
+     {
+      "name": "tight 2 L1",
+      "share": 0.652,
+      "angle": 34.5,
+      "max": 47.9,
+      "s": 2.32
+     },
+     {
+      "name": "opening 2 L1",
+      "share": 0.474,
+      "angle": 35.6,
+      "max": 48,
+      "s": 3.64
+     },
+     {
+      "name": "multi 4 L1",
+      "share": 0.424,
+      "angle": 20.1,
+      "max": 27.9,
+      "s": 2.24
+     },
+     {
+      "name": "multi 5 L1",
+      "share": 0.623,
+      "angle": 31.2,
+      "max": 46.7,
+      "s": 2.1
+     },
+     {
+      "name": "multi 6 L1",
+      "share": 0.474,
+      "angle": 30.2,
+      "max": 44.2,
+      "s": 2.41
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.674,
+      "angle": 35.1,
+      "max": 47.9,
+      "s": 2.35
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.493,
+      "angle": 36.1,
+      "max": 48,
+      "s": 3.55
+     },
+     {
+      "name": "multi 1 L2",
+      "share": 0.487,
+      "angle": 19.8,
+      "max": 27.6,
+      "s": 2.21
+     },
+     {
+      "name": "multi 2 L2",
+      "share": 0.724,
+      "angle": 35.1,
+      "max": 48,
+      "s": 2.29
+     },
+     {
+      "name": "multi 3 L2",
+      "share": 0.485,
+      "angle": 31.1,
+      "max": 46,
+      "s": 2.49
+     },
+     {
+      "name": "tight 2 L2",
+      "share": 0.652,
+      "angle": 34.5,
+      "max": 47.9,
+      "s": 2.32
+     },
+     {
+      "name": "opening 2 L2",
+      "share": 0.469,
+      "angle": 35.5,
+      "max": 48,
+      "s": 3.67
+     },
+     {
+      "name": "multi 4 L2",
+      "share": 0.411,
+      "angle": 20.4,
+      "max": 28.1,
+      "s": 2.25
+     },
+     {
+      "name": "multi 5 L2",
+      "share": 0.669,
+      "angle": 33.6,
+      "max": 47.8,
+      "s": 2.22
+     },
+     {
+      "name": "multi 6 L2",
+      "share": 0.493,
+      "angle": 31,
+      "max": 45.8,
+      "s": 2.45
+     }
+    ],
+    "worstCorner": 0.347670250896058,
+    "meanCorner": 0.5502533950599425,
+    "hash": "81.04872361259903,1.6953518968471506,2.632964999514169,-3.043735738079813,26.647977988164207,-1.093776850254836,0.17414356364931255,3.596282360899945,0,0,0.5750000000000004,-6.091886804718409,2.0675702938437173|8035,0,0|4206,8035"
+   },
+   "worst": {
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 82.1,
+    "worstCorner": 0.35,
+    "totalLow": 3058,
+    "totalHigh": 5363,
+    "seconds": 67.28
+   },
+   "missing": 6,
+   "disturbed": [
+    {
+     "total": 5288,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.7,
+     "worstCorner": 0.348,
+     "seconds": 66.96
+    },
+    {
+     "total": 4311,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.2,
+     "worstCorner": 0.348,
+     "seconds": 67.26
+    },
+    {
+     "total": 4005,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.348,
+     "seconds": 67.28
+    },
+    {
+     "total": 4086,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.6,
+     "worstCorner": 0.349,
+     "seconds": 66.42
+    },
+    {
+     "total": 4095,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.348,
+     "seconds": 66.81
+    },
+    {
+     "total": 3998,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.7,
+     "worstCorner": 0.348,
+     "seconds": 67.28
+    },
+    {
+     "total": 4867,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83,
+     "worstCorner": 0.373,
+     "seconds": 66.67
+    },
+    {
+     "total": 5257,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.2,
+     "worstCorner": 0.386,
+     "seconds": 67.05
+    },
+    {
+     "total": 3058,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.5,
+     "worstCorner": 0.37,
+     "seconds": 67.12
+    },
+    {
+     "total": 5307,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.2,
+     "worstCorner": 0.348,
+     "seconds": 67.12
+    },
+    {
+     "total": 5363,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.1,
+     "worstCorner": 0.386,
+     "seconds": 67.14
+    },
+    {
+     "total": 5288,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.7,
+     "worstCorner": 0.348,
+     "seconds": 66.96
+    },
+    {
+     "total": 4311,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.2,
+     "worstCorner": 0.348,
+     "seconds": 67.26
+    },
+    {
+     "total": 4005,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.348,
+     "seconds": 67.28
+    },
+    {
+     "total": 4086,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.6,
+     "worstCorner": 0.349,
+     "seconds": 66.42
+    },
+    {
+     "total": 4095,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.348,
+     "seconds": 66.81
+    },
+    {
+     "total": 3998,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.7,
+     "worstCorner": 0.348,
+     "seconds": 67.28
+    },
+    {
+     "total": 4867,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83,
+     "worstCorner": 0.373,
+     "seconds": 66.67
+    },
+    {
+     "total": 5257,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.2,
+     "worstCorner": 0.386,
+     "seconds": 67.05
+    },
+    {
+     "total": 3058,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.5,
+     "worstCorner": 0.37,
+     "seconds": 67.12
+    }
+   ]
+  },
+  {
+   "id": "r4",
+   "name": "Dovane",
+   "track": 12,
+   "page": {
+    "rival": "r4",
+    "track": 12,
+    "finished": true,
+    "seconds": 55.62,
+    "total": 2475,
+    "drift": 1954,
+    "clean": 264,
+    "pace": 257,
+    "best": 532,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 84.1,
+    "minAt": 28.4,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.787,
+      "angle": 23.6,
+      "max": 27.8,
+      "s": 2.54
+     },
+     {
+      "name": "tightening 1 L1",
+      "share": 0.688,
+      "angle": 23,
+      "max": 40.2,
+      "s": 2.11
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.802,
+      "angle": 17,
+      "max": 22.9,
+      "s": 2.78
+     },
+     {
+      "name": "tight 2 L1",
+      "share": 0.853,
+      "angle": 19.7,
+      "max": 29.2,
+      "s": 2.6
+     },
+     {
+      "name": "tightening 2 L1",
+      "share": 1,
+      "angle": 21.7,
+      "max": 32.9,
+      "s": 2.13
+     },
+     {
+      "name": "opening 2 L1",
+      "share": 0.773,
+      "angle": 25.2,
+      "max": 32.7,
+      "s": 2.53
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.817,
+      "angle": 22.5,
+      "max": 27.5,
+      "s": 2.5
+     },
+     {
+      "name": "tightening 1 L2",
+      "share": 1,
+      "angle": 19.6,
+      "max": 35.9,
+      "s": 2.12
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.783,
+      "angle": 21.6,
+      "max": 31.3,
+      "s": 2.61
+     },
+     {
+      "name": "tight 2 L2",
+      "share": 0.722,
+      "angle": 21.7,
+      "max": 35.2,
+      "s": 2.7
+     },
+     {
+      "name": "tightening 2 L2",
+      "share": 1,
+      "angle": 20.8,
+      "max": 31.3,
+      "s": 2.12
+     },
+     {
+      "name": "opening 2 L2",
+      "share": 0.773,
+      "angle": 25.4,
+      "max": 32.7,
+      "s": 2.53
+     }
+    ],
+    "worstCorner": 0.6877470355731228,
+    "meanCorner": 0.8331067264934506,
+    "hash": "117.42041580154864,18.897640924886733,1.9322974733569214,-20.881687587374497,13.208916269217458,0.32713363760168623,0.21255718206793991,5.68185002478178,0,0,3.108333333333325,-8.008417798489297,-5.985009278472502|6675,0,0|2475,6675"
+   },
+   "node": {
+    "rival": "r4",
+    "track": 12,
+    "finished": true,
+    "seconds": 55.65,
+    "total": 2445,
+    "drift": 1957,
+    "clean": 231,
+    "pace": 257,
+    "best": 532,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 1,
+    "minKmh": 84.1,
+    "minAt": 28.4,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.787,
+      "angle": 23.6,
+      "max": 27.8,
+      "s": 2.54
+     },
+     {
+      "name": "tightening 1 L1",
+      "share": 0.688,
+      "angle": 23,
+      "max": 40.2,
+      "s": 2.11
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.802,
+      "angle": 17,
+      "max": 22.9,
+      "s": 2.78
+     },
+     {
+      "name": "tight 2 L1",
+      "share": 0.853,
+      "angle": 19.7,
+      "max": 29.2,
+      "s": 2.6
+     },
+     {
+      "name": "tightening 2 L1",
+      "share": 1,
+      "angle": 21.7,
+      "max": 32.9,
+      "s": 2.13
+     },
+     {
+      "name": "opening 2 L1",
+      "share": 0.773,
+      "angle": 25.2,
+      "max": 32.7,
+      "s": 2.53
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.817,
+      "angle": 22.5,
+      "max": 27.5,
+      "s": 2.5
+     },
+     {
+      "name": "tightening 1 L2",
+      "share": 1,
+      "angle": 19.8,
+      "max": 36.8,
+      "s": 2.13
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.783,
+      "angle": 21.6,
+      "max": 31.3,
+      "s": 2.61
+     },
+     {
+      "name": "tight 2 L2",
+      "share": 0.722,
+      "angle": 21.7,
+      "max": 35.2,
+      "s": 2.7
+     },
+     {
+      "name": "tightening 2 L2",
+      "share": 1,
+      "angle": 20.8,
+      "max": 31.3,
+      "s": 2.12
+     },
+     {
+      "name": "opening 2 L2",
+      "share": 0.773,
+      "angle": 25.4,
+      "max": 32.7,
+      "s": 2.53
+     }
+    ],
+    "worstCorner": 0.6877470355731228,
+    "meanCorner": 0.8331067264934506,
+    "hash": "117.52219768887561,19.124391158210273,1.8852337188004302,-20.71499307538321,12.381045751082784,0.3529655814591798,0.2379755071492898,5.80299009753936,0,0,3.133333333333325,-7.8852054427781235,-6.546750766724438|6678,1,0|2445,6678"
+   },
+   "worst": {
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 5,
+    "minKmh": 82.4,
+    "worstCorner": 0.62,
+    "totalLow": 2245,
+    "totalHigh": 3105,
+    "seconds": 56.12
+   },
+   "missing": 6,
+   "disturbed": [
+    {
+     "total": 2463,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 88.4,
+     "worstCorner": 0.77,
+     "seconds": 55.39
+    },
+    {
+     "total": 2245,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 85.4,
+     "worstCorner": 0.747,
+     "seconds": 55.84
+    },
+    {
+     "total": 2387,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 88.1,
+     "worstCorner": 0.779,
+     "seconds": 55.71
+    },
+    {
+     "total": 2480,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 5,
+     "minKmh": 83.7,
+     "worstCorner": 0.662,
+     "seconds": 56.07
+    },
+    {
+     "total": 3105,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 85.1,
+     "worstCorner": 0.632,
+     "seconds": 56.12
+    },
+    {
+     "total": 2533,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 86.5,
+     "worstCorner": 0.751,
+     "seconds": 55.58
+    },
+    {
+     "total": 2624,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 3,
+     "minKmh": 86.2,
+     "worstCorner": 0.752,
+     "seconds": 55.44
+    },
+    {
+     "total": 2284,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.4,
+     "worstCorner": 0.675,
+     "seconds": 56.08
+    },
+    {
+     "total": 2301,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 87.5,
+     "worstCorner": 0.772,
+     "seconds": 55.44
+    },
+    {
+     "total": 2581,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 85.2,
+     "worstCorner": 0.619,
+     "seconds": 55.83
+    },
+    {
+     "total": 2285,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 87.4,
+     "worstCorner": 0.75,
+     "seconds": 55.38
+    },
+    {
+     "total": 2463,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 88.4,
+     "worstCorner": 0.77,
+     "seconds": 55.39
+    },
+    {
+     "total": 2245,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 85.4,
+     "worstCorner": 0.747,
+     "seconds": 55.84
+    },
+    {
+     "total": 2387,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 88.1,
+     "worstCorner": 0.779,
+     "seconds": 55.71
+    },
+    {
+     "total": 2480,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 5,
+     "minKmh": 83.7,
+     "worstCorner": 0.662,
+     "seconds": 56.07
+    },
+    {
+     "total": 3105,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 85.1,
+     "worstCorner": 0.632,
+     "seconds": 56.12
+    },
+    {
+     "total": 2533,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 86.5,
+     "worstCorner": 0.751,
+     "seconds": 55.58
+    },
+    {
+     "total": 2624,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 3,
+     "minKmh": 86.2,
+     "worstCorner": 0.752,
+     "seconds": 55.44
+    },
+    {
+     "total": 2284,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.4,
+     "worstCorner": 0.675,
+     "seconds": 56.08
+    },
+    {
+     "total": 2301,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 87.5,
+     "worstCorner": 0.772,
+     "seconds": 55.44
+    }
+   ]
+  },
+  {
+   "id": "r5",
+   "name": "Halvik",
+   "track": 16,
+   "page": {
+    "rival": "r5",
+    "track": 16,
+    "finished": true,
+    "seconds": 67.64,
+    "total": 2022,
+    "drift": 1550,
+    "clean": 256,
+    "pace": 216,
+    "best": 149,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 77.6,
+    "minAt": 8.2,
+    "corners": [
+     {
+      "name": "tightening 1 L1",
+      "share": 0.45,
+      "angle": 35.9,
+      "max": 49.6,
+      "s": 3.68
+     },
+     {
+      "name": "tightening 2 L1",
+      "share": 0.566,
+      "angle": 37.3,
+      "max": 49.6,
+      "s": 3.24
+     },
+     {
+      "name": "tightening 3 L1",
+      "share": 0.622,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.13
+     },
+     {
+      "name": "tightening 4 L1",
+      "share": 0.421,
+      "angle": 35.4,
+      "max": 49.4,
+      "s": 3.72
+     },
+     {
+      "name": "tightening 5 L1",
+      "share": 0.567,
+      "angle": 37.2,
+      "max": 49.6,
+      "s": 3.25
+     },
+     {
+      "name": "tightening 6 L1",
+      "share": 0.626,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.1
+     },
+     {
+      "name": "tightening 1 L2",
+      "share": 0.449,
+      "angle": 35.9,
+      "max": 49.6,
+      "s": 3.69
+     },
+     {
+      "name": "tightening 2 L2",
+      "share": 0.566,
+      "angle": 37.3,
+      "max": 49.6,
+      "s": 3.24
+     },
+     {
+      "name": "tightening 3 L2",
+      "share": 0.626,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.1
+     },
+     {
+      "name": "tightening 4 L2",
+      "share": 0.422,
+      "angle": 35.4,
+      "max": 49.4,
+      "s": 3.72
+     },
+     {
+      "name": "tightening 5 L2",
+      "share": 0.564,
+      "angle": 37.3,
+      "max": 49.6,
+      "s": 3.27
+     },
+     {
+      "name": "tightening 6 L2",
+      "share": 0.625,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.11
+     }
+    ],
+    "worstCorner": 0.4205816554809847,
+    "meanCorner": 0.5418986290034787,
+    "hash": "-114.08344711461285,3.6731899761216336,-2.255152123972527,20.163074081092105,11.974416375649488,-1.1364317311328844,-0.1664754812266877,1.5883614525801713,0,0,0,-7.718868366606549,15.121308603845659|8117,0,0|2022,8117"
+   },
+   "node": {
+    "rival": "r5",
+    "track": 16,
+    "finished": true,
+    "seconds": 67.64,
+    "total": 2022,
+    "drift": 1550,
+    "clean": 256,
+    "pace": 216,
+    "best": 149,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 77.6,
+    "minAt": 8.2,
+    "corners": [
+     {
+      "name": "tightening 1 L1",
+      "share": 0.45,
+      "angle": 35.9,
+      "max": 49.6,
+      "s": 3.68
+     },
+     {
+      "name": "tightening 2 L1",
+      "share": 0.566,
+      "angle": 37.3,
+      "max": 49.6,
+      "s": 3.24
+     },
+     {
+      "name": "tightening 3 L1",
+      "share": 0.622,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.13
+     },
+     {
+      "name": "tightening 4 L1",
+      "share": 0.421,
+      "angle": 35.4,
+      "max": 49.4,
+      "s": 3.72
+     },
+     {
+      "name": "tightening 5 L1",
+      "share": 0.567,
+      "angle": 37.2,
+      "max": 49.6,
+      "s": 3.25
+     },
+     {
+      "name": "tightening 6 L1",
+      "share": 0.626,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.1
+     },
+     {
+      "name": "tightening 1 L2",
+      "share": 0.449,
+      "angle": 35.9,
+      "max": 49.6,
+      "s": 3.69
+     },
+     {
+      "name": "tightening 2 L2",
+      "share": 0.566,
+      "angle": 37.3,
+      "max": 49.6,
+      "s": 3.24
+     },
+     {
+      "name": "tightening 3 L2",
+      "share": 0.626,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.1
+     },
+     {
+      "name": "tightening 4 L2",
+      "share": 0.422,
+      "angle": 35.4,
+      "max": 49.4,
+      "s": 3.72
+     },
+     {
+      "name": "tightening 5 L2",
+      "share": 0.564,
+      "angle": 37.3,
+      "max": 49.6,
+      "s": 3.27
+     },
+     {
+      "name": "tightening 6 L2",
+      "share": 0.625,
+      "angle": 37.8,
+      "max": 49.3,
+      "s": 3.11
+     }
+    ],
+    "worstCorner": 0.4205816554809847,
+    "meanCorner": 0.5418986290034787,
+    "hash": "-114.08344711461334,3.6731899761220315,-2.2551521239725254,20.16307408109214,11.974416375649454,-1.1364317311328855,-0.16647548122668757,1.5883614525801717,0,0,0,-7.718868366606519,15.121308603845668|8117,0,0|2022,8117"
+   },
+   "worst": {
+    "respawns": 0,
+    "hard": 1,
+    "contacts": 1,
+    "minKmh": 49.2,
+    "worstCorner": 0.4,
+    "totalLow": 1867,
+    "totalHigh": 2043,
+    "seconds": 68.19
+   },
+   "missing": 2,
+   "disturbed": [
+    {
+     "total": 2032,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.7,
+     "worstCorner": 0.422,
+     "seconds": 67.59
+    },
+    {
+     "total": 2024,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.7,
+     "worstCorner": 0.422,
+     "seconds": 67.64
+    },
+    {
+     "total": 1867,
+     "respawns": 0,
+     "hard": 1,
+     "contacts": 1,
+     "minKmh": 49.2,
+     "worstCorner": 0.421,
+     "seconds": 68.19
+    },
+    {
+     "total": 2014,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.409,
+     "seconds": 67.57
+    },
+    {
+     "total": 2043,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.421,
+     "seconds": 67.66
+    },
+    {
+     "total": 2022,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.421,
+     "seconds": 67.64
+    },
+    {
+     "total": 2019,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.421,
+     "seconds": 67.74
+    },
+    {
+     "total": 2021,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.5,
+     "worstCorner": 0.421,
+     "seconds": 67.64
+    },
+    {
+     "total": 2007,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.404,
+     "seconds": 67.95
+    },
+    {
+     "total": 2020,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.7,
+     "worstCorner": 0.421,
+     "seconds": 67.62
+    },
+    {
+     "total": 2013,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.5,
+     "worstCorner": 0.421,
+     "seconds": 67.61
+    },
+    {
+     "total": 2032,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.7,
+     "worstCorner": 0.422,
+     "seconds": 67.59
+    },
+    {
+     "total": 2024,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.7,
+     "worstCorner": 0.422,
+     "seconds": 67.64
+    },
+    {
+     "total": 1867,
+     "respawns": 0,
+     "hard": 1,
+     "contacts": 1,
+     "minKmh": 49.2,
+     "worstCorner": 0.421,
+     "seconds": 68.19
+    },
+    {
+     "total": 2014,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.409,
+     "seconds": 67.57
+    },
+    {
+     "total": 2043,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.421,
+     "seconds": 67.66
+    },
+    {
+     "total": 2022,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.421,
+     "seconds": 67.64
+    },
+    {
+     "total": 2019,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.421,
+     "seconds": 67.74
+    },
+    {
+     "total": 2021,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.5,
+     "worstCorner": 0.421,
+     "seconds": 67.64
+    },
+    {
+     "total": 2007,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.6,
+     "worstCorner": 0.404,
+     "seconds": 67.95
+    }
+   ]
+  },
+  {
+   "id": "r6",
+   "name": "Sarrow",
+   "track": 20,
+   "page": {
+    "rival": "r6",
+    "track": 20,
+    "finished": true,
+    "seconds": 68.68,
+    "total": 3550,
+    "drift": 3114,
+    "clean": 240,
+    "pace": 196,
+    "best": 487,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 76.9,
+    "minAt": 10,
+    "corners": [
+     {
+      "name": "multi 1 L1",
+      "share": 0.57,
+      "angle": 21.4,
+      "max": 39.2,
+      "s": 2.56
+     },
+     {
+      "name": "multi 2 L1",
+      "share": 0.692,
+      "angle": 35.6,
+      "max": 47.9,
+      "s": 1.89
+     },
+     {
+      "name": "multi 3 L1",
+      "share": 0.729,
+      "angle": 34.9,
+      "max": 47.5,
+      "s": 2
+     },
+     {
+      "name": "hairpin 1 L1",
+      "share": 0.984,
+      "angle": 40.7,
+      "max": 47.8,
+      "s": 2.67
+     },
+     {
+      "name": "multi 4 L1",
+      "share": 0.572,
+      "angle": 21.1,
+      "max": 35.5,
+      "s": 2.53
+     },
+     {
+      "name": "multi 5 L1",
+      "share": 0.687,
+      "angle": 35.4,
+      "max": 47.8,
+      "s": 1.92
+     },
+     {
+      "name": "multi 6 L1",
+      "share": 0.693,
+      "angle": 32.7,
+      "max": 47.2,
+      "s": 2.12
+     },
+     {
+      "name": "hairpin 2 L1",
+      "share": 0.991,
+      "angle": 40.7,
+      "max": 47.8,
+      "s": 2.66
+     },
+     {
+      "name": "multi 1 L2",
+      "share": 0.577,
+      "angle": 21.5,
+      "max": 39.7,
+      "s": 2.56
+     },
+     {
+      "name": "multi 2 L2",
+      "share": 0.69,
+      "angle": 35.6,
+      "max": 47.9,
+      "s": 1.88
+     },
+     {
+      "name": "multi 3 L2",
+      "share": 0.729,
+      "angle": 34.8,
+      "max": 47.5,
+      "s": 2
+     },
+     {
+      "name": "hairpin 1 L2",
+      "share": 0.984,
+      "angle": 40.6,
+      "max": 47.8,
+      "s": 2.68
+     },
+     {
+      "name": "multi 4 L2",
+      "share": 0.556,
+      "angle": 21,
+      "max": 34.2,
+      "s": 2.53
+     },
+     {
+      "name": "multi 5 L2",
+      "share": 0.7,
+      "angle": 35.4,
+      "max": 47.8,
+      "s": 1.92
+     },
+     {
+      "name": "multi 6 L2",
+      "share": 0.681,
+      "angle": 32.5,
+      "max": 47.2,
+      "s": 2.12
+     },
+     {
+      "name": "hairpin 2 L2",
+      "share": 0.975,
+      "angle": 40.8,
+      "max": 47.8,
+      "s": 2.7
+     }
+    ],
+    "worstCorner": 0.5559210526315793,
+    "meanCorner": 0.738179393936482,
+    "hash": "-50.243734143801376,13.811880293262949,-0.03682199236707354,0.7142388264695823,-24.761526744699637,-0.7613762596975653,-0.05241069127142252,1.0669927054297788,0,0,0,1.3822145241341133,-0.6954730378816676|8241,0,0|3550,8241"
+   },
+   "node": {
+    "rival": "r6",
+    "track": 20,
+    "finished": true,
+    "seconds": 68.68,
+    "total": 3550,
+    "drift": 3114,
+    "clean": 240,
+    "pace": 196,
+    "best": 487,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 76.9,
+    "minAt": 10,
+    "corners": [
+     {
+      "name": "multi 1 L1",
+      "share": 0.57,
+      "angle": 21.4,
+      "max": 39.2,
+      "s": 2.56
+     },
+     {
+      "name": "multi 2 L1",
+      "share": 0.692,
+      "angle": 35.6,
+      "max": 47.9,
+      "s": 1.89
+     },
+     {
+      "name": "multi 3 L1",
+      "share": 0.729,
+      "angle": 34.9,
+      "max": 47.5,
+      "s": 2
+     },
+     {
+      "name": "hairpin 1 L1",
+      "share": 0.984,
+      "angle": 40.7,
+      "max": 47.8,
+      "s": 2.67
+     },
+     {
+      "name": "multi 4 L1",
+      "share": 0.572,
+      "angle": 21.1,
+      "max": 35.5,
+      "s": 2.53
+     },
+     {
+      "name": "multi 5 L1",
+      "share": 0.687,
+      "angle": 35.4,
+      "max": 47.8,
+      "s": 1.92
+     },
+     {
+      "name": "multi 6 L1",
+      "share": 0.693,
+      "angle": 32.7,
+      "max": 47.2,
+      "s": 2.12
+     },
+     {
+      "name": "hairpin 2 L1",
+      "share": 0.991,
+      "angle": 40.7,
+      "max": 47.8,
+      "s": 2.66
+     },
+     {
+      "name": "multi 1 L2",
+      "share": 0.577,
+      "angle": 21.5,
+      "max": 39.7,
+      "s": 2.56
+     },
+     {
+      "name": "multi 2 L2",
+      "share": 0.69,
+      "angle": 35.6,
+      "max": 47.9,
+      "s": 1.88
+     },
+     {
+      "name": "multi 3 L2",
+      "share": 0.729,
+      "angle": 34.8,
+      "max": 47.5,
+      "s": 2
+     },
+     {
+      "name": "hairpin 1 L2",
+      "share": 0.984,
+      "angle": 40.6,
+      "max": 47.8,
+      "s": 2.68
+     },
+     {
+      "name": "multi 4 L2",
+      "share": 0.556,
+      "angle": 21,
+      "max": 34.2,
+      "s": 2.53
+     },
+     {
+      "name": "multi 5 L2",
+      "share": 0.7,
+      "angle": 35.4,
+      "max": 47.8,
+      "s": 1.92
+     },
+     {
+      "name": "multi 6 L2",
+      "share": 0.681,
+      "angle": 32.5,
+      "max": 47.2,
+      "s": 2.12
+     },
+     {
+      "name": "hairpin 2 L2",
+      "share": 0.975,
+      "angle": 40.8,
+      "max": 47.8,
+      "s": 2.7
+     }
+    ],
+    "worstCorner": 0.5559210526315793,
+    "meanCorner": 0.738179393936482,
+    "hash": "-50.243734143801234,13.811880293263123,-0.03682199236707481,0.7142388264696132,-24.76152674469964,-0.7613762596975652,-0.05241069127142251,1.0669927054297785,0,0,0,1.3822145241341137,-0.695473037881665|8241,0,0|3550,8241"
+   },
+   "worst": {
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 3,
+    "minKmh": 75.7,
+    "worstCorner": 0.31,
+    "totalLow": 3240,
+    "totalHigh": 3550,
+    "seconds": 68.88
+   },
+   "missing": 4,
+   "disturbed": [
+    {
+     "total": 3539,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 75.7,
+     "worstCorner": 0.561,
+     "seconds": 68.61
+    },
+    {
+     "total": 3240,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 3,
+     "minKmh": 77.1,
+     "worstCorner": 0.314,
+     "seconds": 68.87
+    },
+    {
+     "total": 3544,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.7,
+     "worstCorner": 0.556,
+     "seconds": 68.61
+    },
+    {
+     "total": 3549,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.9,
+     "worstCorner": 0.568,
+     "seconds": 68.67
+    },
+    {
+     "total": 3314,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 3,
+     "minKmh": 76.6,
+     "worstCorner": 0.41,
+     "seconds": 68.88
+    },
+    {
+     "total": 3546,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.8,
+     "worstCorner": 0.566,
+     "seconds": 68.67
+    },
+    {
+     "total": 3543,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.8,
+     "worstCorner": 0.542,
+     "seconds": 68.73
+    },
+    {
+     "total": 3547,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.9,
+     "worstCorner": 0.564,
+     "seconds": 68.68
+    },
+    {
+     "total": 3544,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.8,
+     "worstCorner": 0.563,
+     "seconds": 68.66
+    },
+    {
+     "total": 3545,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.7,
+     "worstCorner": 0.563,
+     "seconds": 68.6
+    },
+    {
+     "total": 3550,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.9,
+     "worstCorner": 0.563,
+     "seconds": 68.67
+    },
+    {
+     "total": 3539,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 75.7,
+     "worstCorner": 0.561,
+     "seconds": 68.61
+    },
+    {
+     "total": 3240,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 3,
+     "minKmh": 77.1,
+     "worstCorner": 0.314,
+     "seconds": 68.87
+    },
+    {
+     "total": 3544,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.7,
+     "worstCorner": 0.556,
+     "seconds": 68.61
+    },
+    {
+     "total": 3549,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.9,
+     "worstCorner": 0.568,
+     "seconds": 68.67
+    },
+    {
+     "total": 3314,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 3,
+     "minKmh": 76.6,
+     "worstCorner": 0.41,
+     "seconds": 68.88
+    },
+    {
+     "total": 3546,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.8,
+     "worstCorner": 0.566,
+     "seconds": 68.67
+    },
+    {
+     "total": 3543,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.8,
+     "worstCorner": 0.542,
+     "seconds": 68.73
+    },
+    {
+     "total": 3547,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.9,
+     "worstCorner": 0.564,
+     "seconds": 68.68
+    },
+    {
+     "total": 3544,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 76.8,
+     "worstCorner": 0.563,
+     "seconds": 68.66
+    }
+   ]
+  }
+ ],
+ "knownAnswer": {
+  "drive": {
+   "ENTRY": 32,
+   "VMAX": 40,
+   "PROGRESS": 260,
+   "EDGE_COST": 200,
+   "CRASH": 3000
+  },
+  "runs": [
+   {
+    "total": 502,
+    "hard": 5,
+    "contacts": 8,
+    "minKmh": 28.8,
+    "worstCorner": 0
+   },
+   {
+    "total": 844,
+    "hard": 2,
+    "contacts": 8,
+    "minKmh": 0,
+    "worstCorner": 0.26783754116355
+   },
+   {
+    "total": 523,
+    "hard": 3,
+    "contacts": 4,
+    "minKmh": 0,
+    "worstCorner": 0
+   },
+   {
+    "total": 1076,
+    "hard": 2,
+    "contacts": 11,
+    "minKmh": 20.5,
+    "worstCorner": 0.3567335243552952
+   },
+   {
+    "total": 752,
+    "hard": 3,
+    "contacts": 11,
+    "minKmh": 0,
+    "worstCorner": 0.4017857142857115
+   },
+   {
+    "total": 525,
+    "hard": 3,
+    "contacts": 7,
+    "minKmh": 41.9,
+    "worstCorner": 0
+   }
+  ],
+  "missing": 6
+ }
+}

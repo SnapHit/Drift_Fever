@@ -1,0 +1,10 @@
+PASS 390x844 HUD mid slide at x5 and as a bank flies to the total: no overlaps; live number 81x74 px
+PASS 390x844 results: card 65 to 622 of 844 px, GO AGAIN bottom 530, NEXT bottom 602, scrolls false, no overlaps
+PASS 844x390 HUD mid slide at x5 and as a bank flies to the total: no overlaps; live number 125x116 px
+PASS 844x390 results: card 55 to 334 of 390 px, GO AGAIN bottom 227, NEXT bottom 295, scrolls false, no overlaps
+PASS 844x390 known answer, ?fx=0 (main): card bottom 501 of 390 px, NEXT bottom 489, scrolls true: CAUGHT
+PASS 800x450 HUD mid slide at x5 and as a bank flies to the total: no overlaps; live number 125x116 px
+PASS 800x450 results: card 85 to 364 of 450 px, GO AGAIN bottom 257, NEXT bottom 325, scrolls false, no overlaps
+PASS 1280x720 HUD mid slide at x5 and as a bank flies to the total: no overlaps; live number 125x116 px
+PASS 1280x720 results: card 57 to 640 of 720 px, GO AGAIN bottom 548, NEXT bottom 620, scrolls false, no overlaps
+all passed

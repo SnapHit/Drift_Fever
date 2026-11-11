@@ -1,0 +1,1196 @@
+{
+ "runs": 12,
+ "ladder": [
+  {
+   "car": "starter",
+   "up": null
+  },
+  {
+   "car": "starter",
+   "up": {
+    "power": 3,
+    "grip": 3,
+    "steer": 3
+   }
+  },
+  {
+   "car": "hatch",
+   "up": {
+    "power": 3,
+    "grip": 3,
+    "steer": 3
+   }
+  },
+  {
+   "car": "tourer",
+   "up": {
+    "power": 3,
+    "grip": 3,
+    "steer": 3
+   }
+  },
+  {
+   "car": "fastback",
+   "up": {
+    "power": 3,
+    "grip": 3,
+    "steer": 3
+   }
+  },
+  {
+   "car": "driftbuild",
+   "up": {
+    "power": 3,
+    "grip": 3,
+    "steer": 3
+   }
+  }
+ ],
+ "rivals": {
+  "r1": {
+   "name": "Kestrow",
+   "track": 0,
+   "car": {
+    "car": "starter",
+    "up": null
+   },
+   "chase": {
+    "wins": 9,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 43.62,
+     "score": 1393,
+     "rival": 1573,
+     "rivalSeconds": 41.04,
+     "won": false,
+     "margin": -180,
+     "tandem": 389,
+     "drift": 1114,
+     "clean": 120,
+     "pace": 159,
+     "zoneShare": 0.484,
+     "closeShare": 0,
+     "bothShare": 0.329,
+     "wallHits": 7,
+     "hard": 3,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "1.650461337018871,-8.084537595594671,0.13061547357614317,-4.067308592612358,-26.123707265620894,-0.4185176184530421,-0.018110329356583563,6.389318320303143,0,0,0,-0.5095676044747195,-6.06759049606069|4925,0,0|1573,4925",
+     "hash": "0.26161940673587086,-8.004609729562864,0.06825549216874832,-2.2935169787576184,-28.046573368988092,-0.14857568132032134,-0.02895702225756275,6.071203050951575,0,0,0,4.05381671078474,-6.391563613627357|5235,7,3"
+    },
+    "worstMargin": -227,
+    "bestMargin": 895,
+    "zoneMin": 0.483,
+    "zoneMean": 0.64,
+    "rows": [
+     {
+      "score": 1393,
+      "rival": 1573,
+      "won": false,
+      "zone": 0.484,
+      "tandem": 389,
+      "wallHits": 7,
+      "bodyHits": 0
+     },
+     {
+      "score": 2471,
+      "rival": 1576,
+      "won": true,
+      "zone": 0.964,
+      "tandem": 939,
+      "wallHits": 0,
+      "bodyHits": 0
+     },
+     {
+      "score": 1892,
+      "rival": 1581,
+      "won": true,
+      "zone": 0.618,
+      "tandem": 559,
+      "wallHits": 1,
+      "bodyHits": 0
+     },
+     {
+      "score": 1829,
+      "rival": 1570,
+      "won": true,
+      "zone": 0.676,
+      "tandem": 603,
+      "wallHits": 2,
+      "bodyHits": 1
+     },
+     {
+      "score": 1364,
+      "rival": 1591,
+      "won": false,
+      "zone": 0.489,
+      "tandem": 361,
+      "wallHits": 5,
+      "bodyHits": 0
+     },
+     {
+      "score": 1797,
+      "rival": 1577,
+      "won": true,
+      "zone": 0.525,
+      "tandem": 653,
+      "wallHits": 3,
+      "bodyHits": 1
+     },
+     {
+      "score": 1807,
+      "rival": 1543,
+      "won": true,
+      "zone": 0.626,
+      "tandem": 599,
+      "wallHits": 3,
+      "bodyHits": 0
+     },
+     {
+      "score": 1925,
+      "rival": 1561,
+      "won": true,
+      "zone": 0.603,
+      "tandem": 559,
+      "wallHits": 2,
+      "bodyHits": 0
+     },
+     {
+      "score": 1895,
+      "rival": 1567,
+      "won": true,
+      "zone": 0.528,
+      "tandem": 547,
+      "wallHits": 4,
+      "bodyHits": 1
+     },
+     {
+      "score": 1722,
+      "rival": 1573,
+      "won": true,
+      "zone": 0.695,
+      "tandem": 586,
+      "wallHits": 2,
+      "bodyHits": 0
+     },
+     {
+      "score": 2478,
+      "rival": 1585,
+      "won": true,
+      "zone": 0.989,
+      "tandem": 921,
+      "wallHits": 1,
+      "bodyHits": 1
+     },
+     {
+      "score": 1380,
+      "rival": 1602,
+      "won": false,
+      "zone": 0.483,
+      "tandem": 373,
+      "wallHits": 4,
+      "bodyHits": 0
+     }
+    ]
+   },
+   "careful": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 51.77,
+     "score": 326,
+     "rival": 1573,
+     "rivalSeconds": 41.04,
+     "won": false,
+     "margin": -1247,
+     "tandem": 0,
+     "drift": 0,
+     "clean": 192,
+     "pace": 134,
+     "zoneShare": 0,
+     "closeShare": 0,
+     "bothShare": 0,
+     "wallHits": 0,
+     "hard": 0,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "1.650461337018871,-8.084537595594671,0.13061547357614317,-4.067308592612358,-26.123707265620894,-0.4185176184530421,-0.018110329356583563,6.389318320303143,0,0,0,-0.5095676044747195,-6.06759049606069|4925,0,0|1573,4925",
+     "hash": "-0.1626011827683005,-8.091699927922473,-0.00752049477761153,0.22069386033251354,-31.69592526935832,-0.004620938693343351,-0.0008377580409572782,6.089453711914247,0,0,0,0.43747786895227536,-6.08743605445211|6212,0,0"
+    },
+    "worstMargin": -1276,
+    "bestMargin": -1217,
+    "zoneMin": 0,
+    "zoneMean": 0
+   },
+   "still": {
+    "score": 0,
+    "rival": 1573,
+    "won": false
+   }
+  },
+  "r2": {
+   "name": "Tolvo",
+   "track": 6,
+   "car": {
+    "car": "starter",
+    "up": null
+   },
+   "chase": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 62.75,
+     "score": 348,
+     "rival": 2168,
+     "rivalSeconds": 61.71,
+     "won": false,
+     "margin": -1820,
+     "tandem": 43,
+     "drift": 170,
+     "clean": 25,
+     "pace": 153,
+     "zoneShare": 0.751,
+     "closeShare": 0.143,
+     "bothShare": 0.305,
+     "wallHits": 2,
+     "hard": 2,
+     "bodyHits": 14,
+     "bodyHard": 12,
+     "respawns": 0,
+     "rivalHash": "1.0090337143537056,-8.02334987415492,0.044273940227625506,-0.6661227916374887,-25.47358078844318,0.13169351384258388,0.012728161666404288,0.41804595785727405,0,0,0,-5.902012191782696,-0.32729289433543485|7405,0,0|2168,7405",
+     "hash": "1.474595806987492,-8.153291917052405,0.025725667423977396,-0.18455210170007708,-25.43299344487939,0.36644772073028276,0.043569852376229325,0.9568413945269589,0,0,0,-8.720535216983068,-1.1341268093025454|7530,16,14"
+    },
+    "worstMargin": -1968,
+    "bestMargin": -529,
+    "zoneMin": 0.48,
+    "zoneMean": 0.751,
+    "rows": [
+     {
+      "score": 348,
+      "rival": 2168,
+      "won": false,
+      "zone": 0.751,
+      "tandem": 43,
+      "wallHits": 2,
+      "bodyHits": 14
+     },
+     {
+      "score": 915,
+      "rival": 2256,
+      "won": false,
+      "zone": 0.876,
+      "tandem": 263,
+      "wallHits": 3,
+      "bodyHits": 23
+     },
+     {
+      "score": 628,
+      "rival": 2067,
+      "won": false,
+      "zone": 0.48,
+      "tandem": 42,
+      "wallHits": 8,
+      "bodyHits": 6
+     },
+     {
+      "score": 859,
+      "rival": 2185,
+      "won": false,
+      "zone": 0.757,
+      "tandem": 195,
+      "wallHits": 0,
+      "bodyHits": 21
+     },
+     {
+      "score": 534,
+      "rival": 2219,
+      "won": false,
+      "zone": 0.766,
+      "tandem": 64,
+      "wallHits": 0,
+      "bodyHits": 16
+     },
+     {
+      "score": 479,
+      "rival": 2231,
+      "won": false,
+      "zone": 0.774,
+      "tandem": 71,
+      "wallHits": 0,
+      "bodyHits": 26
+     },
+     {
+      "score": 1189,
+      "rival": 2242,
+      "won": false,
+      "zone": 0.849,
+      "tandem": 342,
+      "wallHits": 0,
+      "bodyHits": 21
+     },
+     {
+      "score": 592,
+      "rival": 1895,
+      "won": false,
+      "zone": 0.842,
+      "tandem": 12,
+      "wallHits": 4,
+      "bodyHits": 23
+     },
+     {
+      "score": 348,
+      "rival": 2316,
+      "won": false,
+      "zone": 0.901,
+      "tandem": 57,
+      "wallHits": 0,
+      "bodyHits": 34
+     },
+     {
+      "score": 1639,
+      "rival": 2168,
+      "won": false,
+      "zone": 0.668,
+      "tandem": 89,
+      "wallHits": 4,
+      "bodyHits": 4
+     },
+     {
+      "score": 335,
+      "rival": 2028,
+      "won": false,
+      "zone": 0.547,
+      "tandem": 8,
+      "wallHits": 0,
+      "bodyHits": 22
+     },
+     {
+      "score": 431,
+      "rival": 2298,
+      "won": false,
+      "zone": 0.806,
+      "tandem": 53,
+      "wallHits": 4,
+      "bodyHits": 17
+     }
+    ]
+   },
+   "careful": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 77.19,
+     "score": 324,
+     "rival": 2168,
+     "rivalSeconds": 61.71,
+     "won": false,
+     "margin": -1844,
+     "tandem": 0,
+     "drift": 0,
+     "clean": 200,
+     "pace": 124,
+     "zoneShare": 0.012,
+     "closeShare": 0,
+     "bothShare": 0,
+     "wallHits": 0,
+     "hard": 0,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "1.0090337143537056,-8.02334987415492,0.044273940227625506,-0.6661227916374887,-25.47358078844318,0.13169351384258388,0.012728161666404288,0.41804595785727405,0,0,0,-5.902012191782696,-0.32729289433543485|7405,0,0|2168,7405",
+     "hash": "-0.040622582125898234,-8.035956790533715,-0.0017781403751057977,0.05087341475428828,-31.03878904555697,-0.0014002663576601353,-0.00020943951023931956,6.637806387361739,0,0,0,0.12351304850665737,-6.637694448678752|9263,0,0"
+    },
+    "worstMargin": -1992,
+    "bestMargin": -1571,
+    "zoneMin": 0.012,
+    "zoneMean": 0.013
+   },
+   "still": {
+    "score": 0,
+    "rival": 2168,
+    "won": false
+   }
+  },
+  "r3": {
+   "name": "Varsk",
+   "track": 8,
+   "car": {
+    "car": "driftbuild",
+    "up": {
+     "power": 3,
+     "grip": 3,
+     "steer": 3
+    }
+   },
+   "chase": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 67.23,
+     "score": 1651,
+     "rival": 4206,
+     "rivalSeconds": 66.96,
+     "won": false,
+     "margin": -2555,
+     "tandem": 502,
+     "drift": 1350,
+     "clean": 68,
+     "pace": 233,
+     "zoneShare": 0.812,
+     "closeShare": 0.057,
+     "bothShare": 0.54,
+     "wallHits": 5,
+     "hard": 1,
+     "bodyHits": 16,
+     "bodyHard": 13,
+     "respawns": 0,
+     "rivalHash": "81.04872361259903,1.6953518968471506,2.632964999514169,-3.043735738079813,26.647977988164207,-1.093776850254836,0.17414356364931255,3.596282360899945,0,0,0.5750000000000004,-6.091886804718409,2.0675702938437173|8035,0,0|4206,8035",
+     "hash": "79.55161408304693,1.3585858426620048,2.4520645309682023,-10.565206305733158,24.5875074835173,0.49111179751353107,0.30833174186819184,6.528129310137768,0,0,0.9833333333333323,-9.89940414811619,0.20815790543918716|8068,21,14"
+    },
+    "worstMargin": -3782,
+    "bestMargin": -669,
+    "zoneMin": 0.538,
+    "zoneMean": 0.808,
+    "rows": [
+     {
+      "score": 1651,
+      "rival": 4206,
+      "won": false,
+      "zone": 0.812,
+      "tandem": 502,
+      "wallHits": 5,
+      "bodyHits": 16
+     },
+     {
+      "score": 747,
+      "rival": 3820,
+      "won": false,
+      "zone": 0.932,
+      "tandem": 171,
+      "wallHits": 6,
+      "bodyHits": 27
+     },
+     {
+      "score": 2951,
+      "rival": 4245,
+      "won": false,
+      "zone": 0.894,
+      "tandem": 824,
+      "wallHits": 2,
+      "bodyHits": 12
+     },
+     {
+      "score": 2099,
+      "rival": 3288,
+      "won": false,
+      "zone": 0.905,
+      "tandem": 674,
+      "wallHits": 4,
+      "bodyHits": 15
+     },
+     {
+      "score": 1236,
+      "rival": 5018,
+      "won": false,
+      "zone": 0.897,
+      "tandem": 329,
+      "wallHits": 6,
+      "bodyHits": 17
+     },
+     {
+      "score": 2619,
+      "rival": 3288,
+      "won": false,
+      "zone": 0.902,
+      "tandem": 745,
+      "wallHits": 3,
+      "bodyHits": 22
+     },
+     {
+      "score": 1975,
+      "rival": 5252,
+      "won": false,
+      "zone": 0.633,
+      "tandem": 331,
+      "wallHits": 4,
+      "bodyHits": 5
+     },
+     {
+      "score": 2255,
+      "rival": 4089,
+      "won": false,
+      "zone": 0.885,
+      "tandem": 643,
+      "wallHits": 1,
+      "bodyHits": 11
+     },
+     {
+      "score": 1611,
+      "rival": 4717,
+      "won": false,
+      "zone": 0.538,
+      "tandem": 425,
+      "wallHits": 6,
+      "bodyHits": 9
+     },
+     {
+      "score": 3018,
+      "rival": 4206,
+      "won": false,
+      "zone": 0.87,
+      "tandem": 814,
+      "wallHits": 3,
+      "bodyHits": 11
+     },
+     {
+      "score": 1277,
+      "rival": 3841,
+      "won": false,
+      "zone": 0.807,
+      "tandem": 285,
+      "wallHits": 6,
+      "bodyHits": 20
+     },
+     {
+      "score": 3697,
+      "rival": 4986,
+      "won": false,
+      "zone": 0.624,
+      "tandem": 997,
+      "wallHits": 4,
+      "bodyHits": 13
+     }
+    ]
+   },
+   "careful": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 90.83,
+     "score": 445,
+     "rival": 4206,
+     "rivalSeconds": 66.96,
+     "won": false,
+     "margin": -3761,
+     "tandem": 0,
+     "drift": 0,
+     "clean": 272,
+     "pace": 173,
+     "zoneShare": 0.008,
+     "closeShare": 0,
+     "bothShare": 0,
+     "wallHits": 0,
+     "hard": 0,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "81.04872361259903,1.6953518968471506,2.632964999514169,-3.043735738079813,26.647977988164207,-1.093776850254836,0.17414356364931255,3.596282360899945,0,0,0.5750000000000004,-6.091886804718409,2.0675702938437173|8035,0,0|4206,8035",
+     "hash": "79.95193464903902,1.4004481458085962,2.8796497784196715,-5.903611963083092,22.52620879906059,-0.07188085262080403,-0.006596026052210122,-6.695344281522367,0,0,0,-0.14666109479896447,-6.945562587490768|10899,0,0"
+    },
+    "worstMargin": -4807,
+    "bestMargin": -2843,
+    "zoneMin": 0.008,
+    "zoneMean": 0.008
+   },
+   "still": {
+    "score": 0,
+    "rival": 4206,
+    "won": false
+   }
+  },
+  "r4": {
+   "name": "Dovane",
+   "track": 12,
+   "car": {
+    "car": "starter",
+    "up": null
+   },
+   "chase": {
+    "wins": 10,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 58.37,
+     "score": 2687,
+     "rival": 2445,
+     "rivalSeconds": 55.65,
+     "won": true,
+     "margin": 242,
+     "tandem": 33,
+     "drift": 2298,
+     "clean": 132,
+     "pace": 257,
+     "zoneShare": 0.063,
+     "closeShare": 0,
+     "bothShare": 0.025,
+     "wallHits": 4,
+     "hard": 1,
+     "bodyHits": 1,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "117.52219768887561,19.124391158210273,1.8852337188004302,-20.71499307538321,12.381045751082784,0.3529655814591798,0.2379755071492898,5.80299009753936,0,0,3.133333333333325,-7.8852054427781235,-6.546750766724438|6678,1,0|2445,6678",
+     "hash": "119.09145260048766,21.643311660102793,1.548056899211711,-21.24675191159829,11.344502350052887,0.8080537494557887,0.27811021352459486,7.256468891294202,0,0,3.1833333333333247,-6.851863866824293,-8.78158590118484|7004,5,1"
+    },
+    "worstMargin": -174,
+    "bestMargin": 2631,
+    "zoneMin": 0.061,
+    "zoneMean": 0.139,
+    "rows": [
+     {
+      "score": 2687,
+      "rival": 2445,
+      "won": true,
+      "zone": 0.063,
+      "tandem": 33,
+      "wallHits": 4,
+      "bodyHits": 1
+     },
+     {
+      "score": 3466,
+      "rival": 2660,
+      "won": true,
+      "zone": 0.062,
+      "tandem": 0,
+      "wallHits": 8,
+      "bodyHits": 1
+     },
+     {
+      "score": 3009,
+      "rival": 2603,
+      "won": true,
+      "zone": 0.063,
+      "tandem": 0,
+      "wallHits": 11,
+      "bodyHits": 2
+     },
+     {
+      "score": 3001,
+      "rival": 2601,
+      "won": true,
+      "zone": 0.077,
+      "tandem": 16,
+      "wallHits": 3,
+      "bodyHits": 1
+     },
+     {
+      "score": 3184,
+      "rival": 2243,
+      "won": true,
+      "zone": 0.306,
+      "tandem": 351,
+      "wallHits": 4,
+      "bodyHits": 2
+     },
+     {
+      "score": 2801,
+      "rival": 2344,
+      "won": true,
+      "zone": 0.066,
+      "tandem": 15,
+      "wallHits": 2,
+      "bodyHits": 1
+     },
+     {
+      "score": 3142,
+      "rival": 2262,
+      "won": true,
+      "zone": 0.069,
+      "tandem": 16,
+      "wallHits": 1,
+      "bodyHits": 1
+     },
+     {
+      "score": 5041,
+      "rival": 2410,
+      "won": true,
+      "zone": 0.444,
+      "tandem": 401,
+      "wallHits": 5,
+      "bodyHits": 1
+     },
+     {
+      "score": 2482,
+      "rival": 2583,
+      "won": false,
+      "zone": 0.061,
+      "tandem": 0,
+      "wallHits": 12,
+      "bodyHits": 1
+     },
+     {
+      "score": 3243,
+      "rival": 2445,
+      "won": true,
+      "zone": 0.085,
+      "tandem": 169,
+      "wallHits": 5,
+      "bodyHits": 2
+     },
+     {
+      "score": 2005,
+      "rival": 2179,
+      "won": false,
+      "zone": 0.311,
+      "tandem": 17,
+      "wallHits": 5,
+      "bodyHits": 1
+     },
+     {
+      "score": 3726,
+      "rival": 2502,
+      "won": true,
+      "zone": 0.063,
+      "tandem": 30,
+      "wallHits": 11,
+      "bodyHits": 1
+     }
+    ]
+   },
+   "careful": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 95.37,
+     "score": 422,
+     "rival": 2445,
+     "rivalSeconds": 55.65,
+     "won": false,
+     "margin": -2023,
+     "tandem": 0,
+     "drift": 0,
+     "clean": 264,
+     "pace": 158,
+     "zoneShare": 0.019,
+     "closeShare": 0,
+     "bothShare": 0,
+     "wallHits": 0,
+     "hard": 0,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "117.52219768887561,19.124391158210273,1.8852337188004302,-20.71499307538321,12.381045751082784,0.3529655814591798,0.2379755071492898,5.80299009753936,0,0,3.133333333333325,-7.8852054427781235,-6.546750766724438|6678,1,0|2445,6678",
+     "hash": "117.88515993410864,19.715173403257396,2.198022700731246,-18.18281416799199,13.196592305479589,-0.06666111525519856,-0.011915060571222817,8.275136837940241,0,0,0,-7.664012885080998,3.5625118558576983|11444,0,0"
+    },
+    "worstMargin": -2238,
+    "bestMargin": -1757,
+    "zoneMin": 0.018,
+    "zoneMean": 0.019
+   },
+   "still": {
+    "score": 0,
+    "rival": 2445,
+    "won": false
+   }
+  },
+  "r5": {
+   "name": "Halvik",
+   "track": 16,
+   "car": {
+    "car": "starter",
+    "up": null
+   },
+   "chase": {
+    "wins": 8,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 68.01,
+     "score": 2281,
+     "rival": 2022,
+     "rivalSeconds": 67.64,
+     "won": true,
+     "margin": 259,
+     "tandem": 562,
+     "drift": 1875,
+     "clean": 192,
+     "pace": 214,
+     "zoneShare": 0.796,
+     "closeShare": 0.006,
+     "bothShare": 0.515,
+     "wallHits": 3,
+     "hard": 2,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "-114.08344711461334,3.6731899761220315,-2.2551521239725254,20.16307408109214,11.974416375649454,-1.1364317311328855,-0.16647548122668757,1.5883614525801717,0,0,0,-7.718868366606519,15.121308603845668|8117,0,0|2022,8117",
+     "hash": "-115.35121265518349,5.35059211805488,-1.7361303816591183,24.046089564491567,3.9872800702441094,-1.4246278456542267,-0.2747153306547355,0.7827739777468322,0,0,0,-0.21195337297990596,5.474181660233315|8161,3,2"
+    },
+    "worstMargin": -504,
+    "bestMargin": 969,
+    "zoneMin": 0.648,
+    "zoneMean": 0.816,
+    "rows": [
+     {
+      "score": 2281,
+      "rival": 2022,
+      "won": true,
+      "zone": 0.796,
+      "tandem": 562,
+      "wallHits": 3,
+      "bodyHits": 0
+     },
+     {
+      "score": 1709,
+      "rival": 1857,
+      "won": false,
+      "zone": 0.648,
+      "tandem": 328,
+      "wallHits": 4,
+      "bodyHits": 1
+     },
+     {
+      "score": 2087,
+      "rival": 2020,
+      "won": true,
+      "zone": 0.839,
+      "tandem": 456,
+      "wallHits": 1,
+      "bodyHits": 0
+     },
+     {
+      "score": 2113,
+      "rival": 2014,
+      "won": true,
+      "zone": 0.826,
+      "tandem": 447,
+      "wallHits": 3,
+      "bodyHits": 0
+     },
+     {
+      "score": 1708,
+      "rival": 1702,
+      "won": true,
+      "zone": 0.835,
+      "tandem": 370,
+      "wallHits": 3,
+      "bodyHits": 2
+     },
+     {
+      "score": 3001,
+      "rival": 2032,
+      "won": true,
+      "zone": 0.931,
+      "tandem": 853,
+      "wallHits": 1,
+      "bodyHits": 2
+     },
+     {
+      "score": 1512,
+      "rival": 2016,
+      "won": false,
+      "zone": 0.771,
+      "tandem": 337,
+      "wallHits": 4,
+      "bodyHits": 4
+     },
+     {
+      "score": 1578,
+      "rival": 2008,
+      "won": false,
+      "zone": 0.664,
+      "tandem": 223,
+      "wallHits": 5,
+      "bodyHits": 0
+     },
+     {
+      "score": 1547,
+      "rival": 2042,
+      "won": false,
+      "zone": 0.711,
+      "tandem": 305,
+      "wallHits": 2,
+      "bodyHits": 11
+     },
+     {
+      "score": 2958,
+      "rival": 2022,
+      "won": true,
+      "zone": 0.952,
+      "tandem": 776,
+      "wallHits": 0,
+      "bodyHits": 0
+     },
+     {
+      "score": 2769,
+      "rival": 2013,
+      "won": true,
+      "zone": 1,
+      "tandem": 815,
+      "wallHits": 0,
+      "bodyHits": 0
+     },
+     {
+      "score": 1955,
+      "rival": 1856,
+      "won": true,
+      "zone": 0.82,
+      "tandem": 445,
+      "wallHits": 5,
+      "bodyHits": 1
+     }
+    ]
+   },
+   "careful": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 95.53,
+     "score": 377,
+     "rival": 2022,
+     "rivalSeconds": 67.64,
+     "won": false,
+     "margin": -1645,
+     "tandem": 0,
+     "drift": 0,
+     "clean": 224,
+     "pace": 153,
+     "zoneShare": 0,
+     "closeShare": 0,
+     "bothShare": 0,
+     "wallHits": 2,
+     "hard": 1,
+     "bodyHits": 15,
+     "bodyHard": 15,
+     "respawns": 0,
+     "rivalHash": "-114.08344711461334,3.6731899761220315,-2.2551521239725254,20.16307408109214,11.974416375649454,-1.1364317311328855,-0.16647548122668757,1.5883614525801717,0,0,0,-7.718868366606519,15.121308603845668|8117,0,0|2022,8117",
+     "hash": "-116.12037968649979,6.113235087763096,-2.256640053733357,17.243617245343938,14.13134008599975,0.07081349942301185,0.012295437367465628,8.277762061104912,0,0,0,7.532727065897172,3.904004324118814|11464,17,16"
+    },
+    "worstMargin": -1665,
+    "bestMargin": -1290,
+    "zoneMin": 0,
+    "zoneMean": 0
+   },
+   "still": {
+    "score": 2,
+    "rival": 2022,
+    "won": false
+   }
+  },
+  "r6": {
+   "name": "Sarrow",
+   "track": 20,
+   "car": {
+    "car": "starter",
+    "up": null
+   },
+   "chase": {
+    "wins": 7,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 71.46,
+     "score": 2566,
+     "rival": 3550,
+     "rivalSeconds": 68.68,
+     "won": false,
+     "margin": -984,
+     "tandem": 173,
+     "drift": 2287,
+     "clean": 90,
+     "pace": 189,
+     "zoneShare": 0.099,
+     "closeShare": 0,
+     "bothShare": 0.063,
+     "wallHits": 7,
+     "hard": 4,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "-50.243734143801234,13.811880293263123,-0.03682199236707481,0.7142388264696132,-24.76152674469964,-0.7613762596975652,-0.05241069127142251,1.0669927054297785,0,0,0,1.3822145241341137,-0.695473037881665|8241,0,0|3550,8241",
+     "hash": "-49.65997727610299,13.908456072725674,0.0357419884154921,-2.286875928069303,-24.681886624000036,-0.9816188417384181,-0.07584071022053622,0.9718997580951658,0,0,0,9.249499166429048,-1.7450486129789413|8575,7,4"
+    },
+    "worstMargin": -1588,
+    "bestMargin": 1006,
+    "zoneMin": 0.099,
+    "zoneMean": 0.566,
+    "rows": [
+     {
+      "score": 2566,
+      "rival": 3550,
+      "won": false,
+      "zone": 0.099,
+      "tandem": 173,
+      "wallHits": 7,
+      "bodyHits": 0
+     },
+     {
+      "score": 1646,
+      "rival": 3234,
+      "won": false,
+      "zone": 0.102,
+      "tandem": 0,
+      "wallHits": 13,
+      "bodyHits": 0
+     },
+     {
+      "score": 4231,
+      "rival": 3556,
+      "won": true,
+      "zone": 0.719,
+      "tandem": 1201,
+      "wallHits": 6,
+      "bodyHits": 0
+     },
+     {
+      "score": 2641,
+      "rival": 3568,
+      "won": false,
+      "zone": 0.339,
+      "tandem": 490,
+      "wallHits": 8,
+      "bodyHits": 0
+     },
+     {
+      "score": 3756,
+      "rival": 3315,
+      "won": true,
+      "zone": 0.875,
+      "tandem": 1163,
+      "wallHits": 5,
+      "bodyHits": 2
+     },
+     {
+      "score": 3942,
+      "rival": 3547,
+      "won": true,
+      "zone": 0.8,
+      "tandem": 1300,
+      "wallHits": 4,
+      "bodyHits": 5
+     },
+     {
+      "score": 3831,
+      "rival": 3551,
+      "won": true,
+      "zone": 0.828,
+      "tandem": 1617,
+      "wallHits": 3,
+      "bodyHits": 0
+     },
+     {
+      "score": 4557,
+      "rival": 3551,
+      "won": true,
+      "zone": 0.887,
+      "tandem": 1726,
+      "wallHits": 4,
+      "bodyHits": 0
+     },
+     {
+      "score": 1992,
+      "rival": 2989,
+      "won": false,
+      "zone": 0.283,
+      "tandem": 79,
+      "wallHits": 10,
+      "bodyHits": 0
+     },
+     {
+      "score": 4130,
+      "rival": 3550,
+      "won": true,
+      "zone": 0.824,
+      "tandem": 1500,
+      "wallHits": 6,
+      "bodyHits": 0
+     },
+     {
+      "score": 4077,
+      "rival": 3562,
+      "won": true,
+      "zone": 0.935,
+      "tandem": 1532,
+      "wallHits": 3,
+      "bodyHits": 2
+     },
+     {
+      "score": 2711,
+      "rival": 3183,
+      "won": false,
+      "zone": 0.103,
+      "tandem": 173,
+      "wallHits": 9,
+      "bodyHits": 0
+     }
+    ]
+   },
+   "careful": {
+    "wins": 0,
+    "runs": 12,
+    "undisturbed": {
+     "finished": true,
+     "seconds": 91.7,
+     "score": 387,
+     "rival": 3550,
+     "rivalSeconds": 68.68,
+     "won": false,
+     "margin": -3163,
+     "tandem": 0,
+     "drift": 0,
+     "clean": 240,
+     "pace": 147,
+     "zoneShare": 0.027,
+     "closeShare": 0,
+     "bothShare": 0,
+     "wallHits": 0,
+     "hard": 0,
+     "bodyHits": 0,
+     "bodyHard": 0,
+     "respawns": 0,
+     "rivalHash": "-50.243734143801234,13.811880293263123,-0.03682199236707481,0.7142388264696132,-24.76152674469964,-0.7613762596975652,-0.05241069127142251,1.0669927054297785,0,0,0,1.3822145241341137,-0.695473037881665|8241,0,0|3550,8241",
+     "hash": "-48.672123725146925,13.875239096212868,-0.03743618741126689,0.7581985806170853,-20.530458969374465,0.09972570089513497,0.01761540272602914,8.589535677275865,0,0,0,-1.7240733060584434,-8.69564511022887|11004,0,0"
+    },
+    "worstMargin": -3181,
+    "bestMargin": -2602,
+    "zoneMin": 0.027,
+    "zoneMean": 0.027
+   },
+   "still": {
+    "score": 2,
+    "rival": 3550,
+    "won": false
+   }
+  }
+ },
+ "knownAnswer": {
+  "wins": 0,
+  "runs": 12,
+  "undisturbed": {
+   "finished": true,
+   "seconds": 43.62,
+   "score": 1005,
+   "rival": 1573,
+   "rivalSeconds": 41.04,
+   "won": false,
+   "margin": -568,
+   "tandem": 0,
+   "drift": 726,
+   "clean": 120,
+   "pace": 159,
+   "zoneShare": 0.484,
+   "closeShare": 0,
+   "bothShare": 0.329,
+   "wallHits": 7,
+   "hard": 3,
+   "bodyHits": 0,
+   "bodyHard": 0,
+   "respawns": 0,
+   "rivalHash": "1.650461337018871,-8.084537595594671,0.13061547357614317,-4.067308592612358,-26.123707265620894,-0.4185176184530421,-0.018110329356583563,6.389318320303143,0,0,0,-0.5095676044747195,-6.06759049606069|4925,0,0|1573,4925",
+   "hash": "0.26161940673587086,-8.004609729562864,0.06825549216874832,-2.2935169787576184,-28.046573368988092,-0.14857568132032134,-0.02895702225756275,6.071203050951575,0,0,0,4.05381671078474,-6.391563613627357|5235,7,3"
+  },
+  "worstMargin": -596,
+  "bestMargin": -27,
+  "zoneMin": 0.483,
+  "zoneMean": 0.64
+ }
+}

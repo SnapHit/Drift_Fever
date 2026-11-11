@@ -60,11 +60,13 @@ export function createEffects(THREE, opts) {
   const group = new THREE.Group();
   group.name = 'effects';
   const show = !!o.show, tierName = o.tierName || 'low';
+  /* a second car's effects (the rival's, briefs/RIVALS.md): its pools are share of the player's, and the rain is the player's alone */
+  const share = o.share || 1, size = n => Math.max(8, Math.round(n * share));
   const soft = softSprite(THREE, 128, true), spark = sparkSprite(THREE, 32), drop = rainSprite(THREE);
   const puff = show ? puffSprite(THREE, 128) : null;
-  const smoke = createParticles(THREE, show ? { max: SHOW.SMOKE.POOL[tierName] || SHOW.SMOKE.POOL.low, texture: puff, colour: 0xffffff, tint: true, name: 'smoke', renderOrder: 4 } : { max: tier.smoke || 60, texture: soft, colour: 0xd0c8c0, name: 'smoke', renderOrder: 4 });
+  const smoke = createParticles(THREE, show ? { max: size(SHOW.SMOKE.POOL[tierName] || SHOW.SMOKE.POOL.low), texture: puff, colour: 0xffffff, tint: true, name: 'smoke', renderOrder: 4 } : { max: tier.smoke || 60, texture: soft, colour: 0xd0c8c0, name: 'smoke', renderOrder: 4 });
   const dust = createParticles(THREE, { max: tier.dust || 40, texture: soft, colour: FX.DUST_COLOUR, name: 'dust', renderOrder: 4 });
-  const sparks = createParticles(THREE, show ? { max: SHOW.SPARKS.POOL[tierName] || SHOW.SPARKS.POOL.low, texture: spark, colour: SHOW.SPARKS.COLOUR, additive: true, name: 'sparks', renderOrder: 5 } : { max: tier.sparks || 60, texture: spark, colour: 0xffd090, additive: true, name: 'sparks', renderOrder: 5 });
+  const sparks = createParticles(THREE, show ? { max: size(SHOW.SPARKS.POOL[tierName] || SHOW.SPARKS.POOL.low), texture: spark, colour: SHOW.SPARKS.COLOUR, additive: true, name: 'sparks', renderOrder: 5 } : { max: tier.sparks || 60, texture: spark, colour: 0xffd090, additive: true, name: 'sparks', renderOrder: 5 });
   const flame = createParticles(THREE, { max: show ? 72 : 24, texture: spark, colour: FX.FLAME_COLOUR, additive: true, name: 'flame', renderOrder: 5 });
   const rain = createParticles(THREE, { max: tier.rain || 150, texture: drop, colour: 0xdde4f0, additive: true, fog: false, name: 'rain', renderOrder: 6, opacity: FX.RAIN_ALPHA });
   for (const p of [smoke, dust, sparks, flame, rain]) group.add(p.mesh);
@@ -149,7 +151,7 @@ export function createEffects(THREE, opts) {
       while (due.flame >= 1) { due.flame -= 1; flame.spawn({ x: ex + rand(-0.05, 0.05), y: by + 0.3, z: ez + rand(-0.05, 0.05), vx: c.wvx * 0.6 - fx * rand(3, 6), vy: rand(0.2, 0.8), vz: c.wvz * 0.6 - fz * rand(3, 6), size: FX.FLAME_SIZE * rand(0.7, 1.4), life: FX.FLAME_LIFE * rand(0.7, 1.3), alpha: 0.9 }); }
     } else due.flame = 0;
     /* rain: born above the camera within a radius, falling with the wind */
-    if (preset.rain) {
+    if (preset.rain && !o.noRain) {
       due.rain += dt * FX.RAIN_RATE * ((tier.rain || 150) / 150);
       const cp = camera.position;
       while (due.rain >= 1) { due.rain -= 1; const a = rand(0, 6.283), r = Math.sqrt(Math.random()) * FX.RAIN_RADIUS; rain.spawn({ x: cp.x + Math.sin(a) * r + wind.x * 0.4, y: cp.y + rand(2, 7), z: cp.z + Math.cos(a) * r + wind.z * 0.4, vx: wind.x * 1.5, vy: -FX.RAIN_SPEED, vz: wind.z * 1.5, size: FX.RAIN_SIZE, stretch: FX.RAIN_STRETCH, life: FX.RAIN_LIFE, alpha: 1 }); }

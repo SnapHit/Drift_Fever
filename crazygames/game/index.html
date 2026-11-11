@@ -12,7 +12,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
-  :root { color-scheme: dark; --cyan: #19d8ff; --edge: #f6e7a1; --brand-fill: #fbbf45; --brand-line: #ef5a17; --brand-shadow: #a8300a; }
+  :root { color-scheme: dark; --cyan: #19d8ff; --edge: #f6e7a1; --brand-fill: #fbbf45; --brand-line: #ef5a17; --brand-shadow: #a8300a; --rival: #ff6a3c; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1d33; color: #eef1f7; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   body { touch-action: none; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
   #world { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
@@ -85,6 +85,34 @@
   .opts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .fsbtn { align-self: center; display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 10px 18px; min-height: 44px; border-radius: 22px; border: 2px solid rgba(255,255,255,0.22); background: rgba(10,14,30,0.55); color: #fff; font: inherit; font-weight: 800; font-size: 13px; letter-spacing: 0.08em; }
   #exit { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); width: 36px; height: 36px; border-radius: 18px; border: 0; background: rgba(255,255,255,0.14); color: #fff; font-size: 16px; line-height: 36px; padding: 0; pointer-events: auto; }
+  /* the battle (briefs/RIVALS.md): his total under the player's, the closeness meter under the player's car, his tag, the arrow when he is out of view */
+  #vs { position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 58px); left: 50%; transform: translateX(-50%); display: flex; gap: 7px; align-items: baseline; padding: 3px 12px; border-radius: 12px; background: rgba(10,14,30,0.6); font-weight: 800; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+  #vs[hidden], #meter[hidden], #tag[hidden], #arrow[hidden], #prompt1[hidden] { display: none; }
+  #vs .vsl { font-size: 10px; letter-spacing: 0.2em; opacity: 0.7; }
+  #vsName { color: var(--rival); font-size: 13px; letter-spacing: 0.08em; }
+  #vsN { font-size: clamp(18px, 4vw, 26px); font-variant-numeric: tabular-nums; }
+  #vsLead { font-size: 10px; letter-spacing: 0.14em; opacity: 0.85; }
+  #vs.ahead #vsLead { color: var(--cyan); } #vs.behind #vsLead { color: var(--rival); }
+  #meter { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: repeat(5, 15px); gap: 3px; justify-content: center; will-change: transform; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+  #meter i { display: block; height: 7px; border-radius: 4px; background: rgba(255,255,255,0.22); }
+  #meter.near i.lit { background: #ffcf4d; }
+  #meter.on i.lit { background: #5dff9a; box-shadow: 0 0 8px rgba(93,255,154,0.9); }
+  #meterT { grid-column: 1 / -1; text-align: center; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; white-space: nowrap; margin-top: 2px; }
+  #meter.on #meterT { color: #5dff9a; font-size: 14px; } #meter.near #meterT { color: #ffcf4d; } #meter.far #meterT { color: #ff6a5a; } #meter.ahead #meterT { color: #c8cbd6; opacity: 0.85; }
+  #tag { position: absolute; left: 0; top: 0; padding: 2px 9px; border-radius: 9px; background: var(--rival); color: #fff; font-weight: 900; font-size: 12px; letter-spacing: 0.12em; white-space: nowrap; will-change: transform; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+  #tagMult { margin-left: 6px; color: #fff3a0; }
+  #arrow { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; font-weight: 900; font-size: 12px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); will-change: transform; }
+  #arrow .ar { display: block; color: var(--rival); font-size: 24px; line-height: 1; }
+  @media (orientation: landscape) and (max-height: 500px) { #hud.battle #count { font-size: clamp(64px, 17vh, 110px); top: 40%; } }   /* the count clear of his total on a short screen */
+  #prompt1 { --tx: -50%; position: absolute; left: 50%; top: calc(max(10px, env(safe-area-inset-top)) + 104px); transform: translateX(-50%); padding: 8px 16px; border-radius: 14px; background: rgba(10,14,30,0.8); border: 2px solid #5dff9a; font-weight: 800; font-size: clamp(15px, 2.4vw, 20px); text-align: center; width: max-content; max-width: min(86vw, 520px); box-sizing: border-box; }
+  /* the battle's heading wraps in a box clear of the count: beside it in landscape, over it in portrait */
+  #missions.battle { white-space: normal; max-width: min(34vw, 440px); }
+  #missions.battle strong { text-align: center; }
+  @media (orientation: landscape) and (max-height: 500px) { #missions.battle { top: calc(max(10px, env(safe-area-inset-top)) + 92px); } }
+  @media (orientation: portrait) { #missions.battle { max-width: 88vw; width: max-content; box-sizing: border-box; } }
+  #prompt1.in { animation: promptIn 0.3s ease-out; }
+  .callout.tandem { color: #5dff9a; }
+  .callout.far { color: #ffb34d; font-size: clamp(16px, 3.2vw, 26px); }
   #count { position: absolute; left: 0; right: 0; top: 34%; text-align: center; font-weight: 900; font-size: clamp(72px, 22vw, 160px); line-height: 1; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.7); display: none; }
   #streaks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   #boost { position: absolute; left: 0; right: 0; top: 22%; text-align: center; font-weight: 900; font-style: italic; font-size: clamp(28px, 8vw, 56px); letter-spacing: 0.08em; color: #ffd23f; text-shadow: 0 0 18px rgba(255,140,0,0.8), 0 3px 10px rgba(0,0,0,0.6); opacity: 0; transform: scale(0.8); transition: opacity 0.15s, transform 0.15s; pointer-events: none; }
@@ -242,6 +270,30 @@
   .results .unlock { margin: 0; font-size: 14px; font-weight: 800; text-align: center; opacity: 0.85; }
   .results .unlock.done { color: var(--brand-fill); opacity: 1; font-size: 15px; }
   .results .chapnote { margin: -4px 0 0; font-size: 13px; font-weight: 700; text-align: center; opacity: 0.75; }
+  /* a battle's results (briefs/RIVALS.md 3) */
+  .results .card.battle .who { margin: 0; font-size: clamp(30px, 8vw, 44px); font-weight: 900; letter-spacing: 0.04em; line-height: 1; text-align: center; }
+  .results .card.battle.won .who { color: var(--cyan); } .results .card.battle.lost .who { color: var(--rival); }
+  .results .trackname { margin: -4px 0 0; font-size: 13px; font-weight: 700; opacity: 0.7; }
+  .results .duel { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+  .results .duel .side { display: grid; grid-template-columns: auto 1fr; align-items: baseline; column-gap: 10px; }
+  .results .duel .nm { font-size: 11px; font-weight: 900; letter-spacing: 0.16em; }
+  .results .duel .n { justify-self: end; font-size: 26px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .results .duel i { grid-column: 1 / -1; display: block; height: 8px; border-radius: 4px; }
+  .results .duel .you i { background: var(--cyan); } .results .duel .you .nm { color: var(--cyan); }
+  .results .duel .him i { background: var(--rival); } .results .duel .him .nm { color: var(--rival); }
+  .results .margin { margin: -2px 0 0; font-size: 14px; font-weight: 800; opacity: 0.85; }
+  @media (orientation: landscape) and (max-height: 500px) { .results .card.battle .who { font-size: 30px; } .results .duel .n { font-size: 20px; } .results .duel { gap: 3px; } }
+  .results .rivalgo { border-color: var(--rival); background: rgba(255,106,60,0.22); }
+  /* the career's rival cards */
+  .career .rivalcard { flex: none; display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; min-height: 52px; padding: 6px 12px; border-radius: 12px; border: 2px solid var(--rival); background: linear-gradient(90deg, rgba(255,106,60,0.22), rgba(10,14,30,0.6)); color: #fff; font: inherit; text-align: left; }
+  .career .rivalcard.locked { border-color: rgba(255,255,255,0.14); background: rgba(10,14,30,0.45); opacity: 0.7; }
+  .career .rivalcard.beaten { border-color: rgba(25,216,255,0.6); background: linear-gradient(90deg, rgba(25,216,255,0.16), rgba(10,14,30,0.6)); }
+  .career .rivalcard .vs { flex: 0 0 auto; width: 30px; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; color: var(--rival); text-align: center; }
+  .career .rivalcard.beaten .vs { color: var(--cyan); }
+  .career .rivalcard .name { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; } .career .rivalcard .name b { font-size: 15px; font-weight: 900; letter-spacing: 0.08em; } .career .rivalcard .name small { font-size: 11px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .career .rivalcard .state { flex: 0 1 auto; display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-align: right; max-width: 48%; }
+  .career .rivalcard .state small { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; opacity: 0.8; white-space: normal; }
+  .career .rivalcard .state.go { color: var(--brand-fill); } .career .rivalcard .state.won { color: var(--cyan); }
   .results .missions .done { color: #ffd34d; } .results .missions .fresh b { color: #ffd34d; margin-left: 4px; }
   .pips.m i { width: 10px; height: 10px; border-radius: 5px; } .pips.m i.on { background: #ffd34d; }
   .row .col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }

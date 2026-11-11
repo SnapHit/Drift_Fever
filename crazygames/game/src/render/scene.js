@@ -62,7 +62,14 @@ export const LOOK = {
   /* the spectacle round's marks: wider, darker, and enough of them to
      stay for the whole run (quads per tier) */
   MARK_SHOW:    { width: 0.27, opacity: 0.85, low: 6000, high: 12000 },
-  RUBBER_SHOW:  0.46,         // the rubber laid down the racing line, at most this opaque (TRACK_STYLE.RACING_LINE_ALPHA is 0.3)
+  RUBBER_SHOW:  0.46,
+  /* the rival in the player's lights (briefs/RIVALS.md): the scene's
+     headlight washed him to white a few metres ahead, so his materials
+     see their own copy of it instead, which lights him no more brightly
+     than the real one would REF metres ahead (the beam falls off by its
+     decay) */
+  RIVAL_BEAM:   { ref: 26 },
+        // the rubber laid down the racing line, at most this opaque (TRACK_STYLE.RACING_LINE_ALPHA is 0.3)
   TONE_MAPPING: 'aces',
   BLOOM:        { threshold: 0.85, strength: 0.55, radius: 0.012, taps: 12 },
   LOW_TIER_CORES: 4,
@@ -151,6 +158,7 @@ export function createScene(canvas, opts) {
     adapt.steps.push({ level: adapt.level, at: performance.now() });
     clearWindow();
     if (effects && effects.setDensity) effects.setDensity(density());
+    if (rivalFx && rivalFx.setDensity) rivalFx.setDensity(density());
     if (adapt.level === 2) post = null;
     if (adapt.level >= 3) applyPixels();
   }
@@ -159,6 +167,7 @@ export function createScene(canvas, opts) {
     adapt.level = 0; adapt.gaveBack = true;
     adapt.steps.push({ level: 0, at: performance.now() });
     if (effects && effects.setDensity) effects.setDensity(1);
+    if (rivalFx && rivalFx.setDensity) rivalFx.setDensity(1);
     setPost(T().bloom);
     applyPixels();
   }
@@ -190,6 +199,8 @@ export function createScene(canvas, opts) {
     headlight.visible = !!(T().headlight && p.headlights);
     if (effects) effects.setPreset(p);
     if (show) show.setPreset(p);
+    if (rivalFx) rivalFx.setPreset(p);
+    if (rivalShow) rivalShow.setPreset(p);
     if (FX_ON) setGrade(p);
   }
 
@@ -251,6 +262,8 @@ export function createScene(canvas, opts) {
     clearMarks();
     if (effects) effects.clear();
     if (show) show.clear();
+    if (rivalFx) rivalFx.clear();
+    if (rivalShow) rivalShow.clear();
     if (dressing) dressing.clear();
   }
   /* The car park's walls: a track's come with its mesh. */
@@ -346,6 +359,17 @@ export function createScene(canvas, opts) {
   ghostRoot.visible = false;
   scene.add(ghostRoot);
   let model = null, ghostModel = null;
+  /* the rival (briefs/RIVALS.md): a second car with his own marks, smoke
+     and show, at their own density (SHOW.RIVAL); he fades out after his
+     finish */
+  const rivalRoot = new THREE.Group();
+  rivalRoot.visible = false;
+  scene.add(rivalRoot);
+  let rivalModel = null, rivalLamps = { tails: [], exhaust: null }, rivalFx = null, rivalShow = null, rivalFaded = 1;
+  const rivalRig = { bRear: TUNE.VEHICLE.WHEELBASE - TUNE.VEHICLE.CG_TO_FRONT, half: TUNE.VEHICLE.TRACK / 2 };
+  /* his copy of the player's headlight: not in the scene, so only his materials see it; placed by hand every frame */
+  const rivalBeam = new THREE.SpotLight(LOOK.HEADLIGHT.colour, 0, LOOK.HEADLIGHT.distance, LOOK.HEADLIGHT.angle, LOOK.HEADLIGHT.penumbra, LOOK.HEADLIGHT.decay);
+  rivalBeam.castShadow = false;
   /* Where the rear wheels are from the physics origin, for the marks. */
   const rig = { bRear: TUNE.VEHICLE.WHEELBASE - TUNE.VEHICLE.CG_TO_FRONT, half: TUNE.VEHICLE.TRACK / 2 };
   /* Mount a model at the physics origin: the model's origin is the middle
@@ -389,6 +413,28 @@ export function createScene(canvas, opts) {
     if (!id) { ghostRoot.visible = false; return; }
     ghostModel = mount(ghostRoot, id, paintById(paintId || carById(id).paint).hex, true).model;
   }
+  function setRival(id, paintId) {
+    if (rivalModel) { rivalRoot.remove(rivalModel.group); rivalModel.dispose(); rivalModel = null; }
+    rivalFaded = 1;
+    if (!id) { rivalRoot.visible = false; return; }
+    const r = mount(rivalRoot, id, paintById(paintId || carById(id).paint).hex, false);
+    rivalModel = r.model; rivalRig.bRear = r.bRear; rivalRig.half = r.half; rivalRoot.visible = true;
+    /* the player's headlights never light him: a few metres behind him
+       in a tandem they washed his paint to white. The sky and the sun
+       still do, so he reads as his colour, lit as the scene is */
+    const lit = THREE.TSL.lights([hemi, sun, rivalBeam]);
+    rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
+    if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
+    rivalLamps = carLamps(rivalModel);
+    rebuildRivalFx();
+  }
+  /* see through as he fades: 1 is solid, 0 gone */
+  function fadeRival(a) {
+    if (!rivalModel || a === rivalFaded) return;
+    rivalFaded = a;
+    rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) { if (m.userData.op === undefined) m.userData.op = { t: m.transparent, o: m.opacity, d: m.depthWrite }; const fade = a < 1; m.transparent = fade || m.userData.op.t; m.opacity = m.userData.op.o * a; m.depthWrite = fade ? false : m.userData.op.d; m.needsUpdate = true; } });
+    rivalRoot.visible = a > 0.01;
+  }
   function poseWheels(m, c) {
     if (!m) return;
     const w = m.wheels;
@@ -419,7 +465,7 @@ export function createScene(canvas, opts) {
   scene.add(marks);
   let markHead = 0, markCount = 0;
   const lastMark = { rl: null, rr: null };
-  function clearMarks() { markPos.fill(0); markAlpha.fill(0); markHead = 0; markCount = 0; lastMark.rl = null; lastMark.rr = null; markGeo.attributes.position.needsUpdate = true; markGeo.attributes.alpha.needsUpdate = true; markGeo.setDrawRange(0, 0); }
+  function clearMarks() { markPos.fill(0); markAlpha.fill(0); markHead = 0; markCount = 0; lastMark.rl = null; lastMark.rr = null; lastMark.rl2 = null; lastMark.rr2 = null; markGeo.attributes.position.needsUpdate = true; markGeo.attributes.alpha.needsUpdate = true; markGeo.setDrawRange(0, 0); }
   function layMark(name, x, y, z, hx, hz, strength) {
     // hx, hz: the half width vector across the mark
     const prev = lastMark[name];
@@ -452,6 +498,16 @@ export function createScene(canvas, opts) {
       show = createShow(THREE, { tier: T(), tierName: tier, preset });
       scene.add(show.group);
     }
+    if (rivalModel) rebuildRivalFx();
+  }
+  function rebuildRivalFx() {
+    if (rivalFx) { scene.remove(rivalFx.group); rivalFx.dispose(); rivalFx = null; }
+    if (rivalShow) { scene.remove(rivalShow.group); rivalShow.dispose(); rivalShow = null; }
+    if (!rivalModel) return;
+    rivalFx = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, share: FX_ON ? SHOW.RIVAL.SHARE[tier] || SHOW.RIVAL.SHARE.low : 0.5, noRain: true });
+    if (FX_ON) rivalFx.setDensity(density());
+    scene.add(rivalFx.group);
+    if (FX_ON) { rivalShow = createShow(THREE, { tier: T(), tierName: tier, preset, glows: SHOW.RIVAL.GLOWS[tier] || SHOW.RIVAL.GLOWS.low }); scene.add(rivalShow.group); }
   }
   rebuildEffects();
 
@@ -507,6 +563,38 @@ export function createScene(canvas, opts) {
     sun.target.position.copy(texel);
     sun.position.copy(texel).addScaledVector(sunDir, LOOK.SUN_DISTANCE);
   }
+  /* the marks a car's rear wheels lay while they slide, into the one ring */
+  function skids(pose, c, rig, nl, nr) {
+    const sliding = c.rearSlide >= LOOK.MARK_MIN_SLIDE || c.hb > 0.5 || c.spinning;
+    const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
+    const bRear = rig.bRear, half = rig.half;
+    const strength = Math.min(1, Math.max(c.rearSlide / 2, c.hb, c.spinning ? 0.6 : 0));
+    for (const [name, side] of [[nl, 1], [nr, -1]]) {
+      const wx = pose.x - fx * bRear + lx * half * side, wz = pose.z - fz * bRear + lz * half * side;
+      /* the wheel's height on a banked or sloping road: the car's height plus its roll across and pitch along */
+      const wy = (pose.y || 0) - Math.sin(c.roll || 0) * half * side + Math.sin(c.pitch || 0) * bRear;
+      const mw = FX_ON ? LOOK.MARK_SHOW.width : LOOK.MARK_WIDTH;
+      if (sliding && c.speed > 1.5) layMark(name, wx, wy, wz, lx * mw * 0.5, lz * mw * 0.5, 0.5 + 0.5 * strength);
+      else lastMark[name] = null;
+    }
+  }
+  /* the rival's frame: rv { pose, world, mult, fade } (fade 0 solid, 1 gone) */
+  const rivalCtx = { mult: 1, car: rivalRoot, tails: null, exhaust: null, lights: null, pools: null, density: 1, extraGlows: null };
+  function updateRival(rv, dt) {
+    if (!rv || !rivalModel) { if (rivalRoot.visible) rivalRoot.visible = false; return; }
+    const p = rv.pose, c = rv.world.car;
+    rivalRoot.position.set(p.x, p.y || 0, p.z);
+    rivalRoot.rotation.set(c.pitch || 0, p.yaw, c.roll || 0, 'YXZ');
+    fadeRival(Math.max(0, 1 - (rv.fade || 0)));
+    poseWheels(rivalModel, c);
+    if (rivalFaded <= 0.01) return;
+    skids(p, c, rivalRig, 'rl2', 'rr2');
+    if (FX_ON && rivalFx && rivalShow) {
+      rivalFx.update(dt, camera, p, rv.world, rivalRig, rivalShow.state.heat, clearOf);   // his smoke thins over the player's car, as the player's own does
+      rivalCtx.mult = rv.mult || 1; rivalCtx.tails = rivalLamps.tails; rivalCtx.exhaust = rivalLamps.exhaust; rivalCtx.lights = rivalModel.lights; rivalCtx.pools = rivalFx.pools; rivalCtx.density = density();
+      rivalShow.update(dt, camera, p, rv.world, rivalRig, rivalCtx);
+    } else if (FX_PARTICLES && rivalFx) rivalFx.update(dt, camera, p, rv.world, rivalRig);
+  }
   function update(pose, world, dt, ghost, extra) {
     /* pose: the interpolated car {x, z, yaw}; world.car for the rest;
        ghost: { x, z, yaw, car } interpolated, or null */
@@ -520,18 +608,7 @@ export function createScene(canvas, opts) {
       if (ghost.car) poseWheels(ghostModel, ghost.car);
     } else ghostRoot.visible = false;
     // marks off the rear wheels while they slide
-    const sliding = c.rearSlide >= LOOK.MARK_MIN_SLIDE || c.hb > 0.5 || c.spinning;
-    const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
-    const bRear = rig.bRear, half = rig.half;
-    const strength = Math.min(1, Math.max(c.rearSlide / 2, c.hb, c.spinning ? 0.6 : 0));
-    for (const [name, side] of [['rl', 1], ['rr', -1]]) {
-      const wx = pose.x - fx * bRear + lx * half * side, wz = pose.z - fz * bRear + lz * half * side;
-      /* the wheel's height on a banked or sloping road: the car's height plus its roll across and pitch along */
-      const wy = (pose.y || 0) - Math.sin(c.roll || 0) * half * side + Math.sin(c.pitch || 0) * bRear;
-      const mw = FX_ON ? LOOK.MARK_SHOW.width : LOOK.MARK_WIDTH;
-      if (sliding && c.speed > 1.5) layMark(name, wx, wy, wz, lx * mw * 0.5, lz * mw * 0.5, 0.5 + 0.5 * strength);
-      else lastMark[name] = null;
-    }
+    skids(pose, c, rig, 'rl', 'rr');
     if (FX_ON) {
       const C = SHOW.SMOKE.CLEAR;
       clearOf.x = pose.x; clearOf.y = (pose.y || 0) + 0.7; clearOf.z = pose.z; clearOf.r = C.r; clearOf.keep = C.keep; clearOf.near = C.near; clearOf.far = C.far;
@@ -542,6 +619,20 @@ export function createScene(canvas, opts) {
       dressArgs.dt = dt; dressArgs.pose = pose; dressArgs.sliding = sliding;
       show.update(dt, camera, pose, world, rig, showCtx);
     } else if (FX_PARTICLES) effects.update(dt, camera, pose, world, rig);
+    updateRival(extra && extra.rival, dt);
+    /* his copy of the beam: where the headlight is, dimmed by how near he is */
+    if (rivalModel && rivalRoot.visible) {
+      const rv = extra && extra.rival;
+      let k = 0;
+      if (rv && headlight.visible) {
+        const dx = rv.pose.x - pose.x, dz = rv.pose.z - pose.z, ahead = dx * -Math.sin(pose.yaw) + dz * -Math.cos(pose.yaw);
+        k = ahead > 0 ? Math.min(1, Math.pow(Math.max(1, ahead) / LOOK.RIVAL_BEAM.ref, headlight.decay || 1.6)) : 1;
+      }
+      car.updateMatrixWorld();
+      headlight.getWorldPosition(rivalBeam.position); headlight.target.getWorldPosition(rivalBeam.target.position);
+      rivalBeam.intensity = headlight.intensity * k; rivalBeam.angle = headlight.angle; rivalBeam.distance = headlight.distance; rivalBeam.decay = headlight.decay; rivalBeam.penumbra = headlight.penumbra;
+      rivalBeam.updateMatrixWorld(); rivalBeam.target.updateMatrixWorld();
+    }
     followSun(pose);
     if (cones) {
       for (let i = 0; i < world.cones.length; i++) {
@@ -582,7 +673,7 @@ export function createScene(canvas, opts) {
     if (currentGround) setGround(currentGround);
   }
   return {
-    THREE, renderer, scene, camera, car, ready, show: () => show, effects: () => effects, setGround, setCar, setGhost, update, resize, render, clearMarks, setLook,
+    THREE, renderer, scene, camera, car, ready, show: () => show, effects: () => effects, setGround, setCar, setGhost, setRival, rivalRoot, rivalShow: () => rivalShow, rivalEffects: () => rivalFx, update, resize, render, clearMarks, setLook,
     carModel: () => model,
     frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, done: adapt.done, gaveBack: adapt.gaveBack, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
     info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),

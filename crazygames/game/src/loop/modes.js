@@ -2,7 +2,7 @@
    order, each unlocked by a star on the one before), the daily drift (the
    seed for the local date), free drift (the car park), and the sums that
    turn a run into stars and coins. Pure data and arithmetic. */
-import { LOOP } from '../tune.js';
+import { LOOP, TANDEM } from '../tune.js';
 import { dailySeed, localDate } from '../ground/source.js';
 
 /* The career: one flat list of 24 tracks in three chapters of eight
@@ -141,3 +141,13 @@ export function coinsFor(score, stars, mode) {
 }
 
 export function lapsFor(track) { return track.kind === 'circuit' ? LOOP.LAPS : 1; }
+
+/* A battle (briefs/RIVALS.md): the career track of a rival, run with
+   TANDEM.LAPS laps against him. The track is the career's, generated
+   from the same spec. */
+export function battleSpec(def) {
+  const c = careerSpec(def.track);
+  if (!c) return null;
+  return Object.assign({}, c, { mode: 'battle', key: 'battle:' + def.id, rival: def.id });
+}
+export function battleLaps(track) { return track.kind === 'circuit' ? TANDEM.LAPS : 1; }

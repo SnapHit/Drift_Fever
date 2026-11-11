@@ -21,6 +21,23 @@ export const HUD_SHOW = {
   BREAK_TIME:  700,      // ms a lost chain takes to fall apart
 };
 
+/* THE BATTLE'S HUD (briefs/RIVALS.md 2): the rival's total beside the
+   player's, a closeness meter that rides under the player's car so it
+   reads without looking away from the cars, the tandem bonus while it
+   counts, a tag with the rival's name over his car, and an arrow at the
+   edge of the screen with the distance when he is out of view. */
+export const HUD_BATTLE = {
+  METER_BELOW:   46,       // px under the player's car the meter rides
+  METER_SEGS:    5,        // segments of the meter
+  TAG_UP:        2.3,      // m over the rival's car his tag sits
+  EDGE:          34,       // px from the screen's edge the arrow sits
+  ARROW_TOP:     84,       // px more below the top edge, clear of the totals
+  ARROW_LOW:     0.6,      // and no lower than this share of the height, clear of the pads
+  LIVE_SIDE:     118,      // px the live score moves beside the player's car, away from the rival, so it never sits on him
+  LIVE_DOWN:     34,       // px down from over the roof
+  SMOOTH:        0.12,     // s, the meter's easing
+};
+
 export function createHud(root) {
   const el = document.createElement('div');
   el.id = 'hud';
@@ -34,6 +51,11 @@ export function createHud(root) {
     <div id="missions" hidden></div>
     <canvas id="streaks"></canvas>
     <div id="boost">BOOST</div>
+    <div id="vs" hidden><span class="vsl">VS</span><b id="vsName"></b><span id="vsN">0</span><span id="vsLead"></span></div>
+    <div id="meter" hidden><i></i><i></i><i></i><i></i><i></i><b id="meterT"></b></div>
+    <div id="tag" hidden><b id="tagName"></b><span id="tagMult"></span></div>
+    <div id="arrow" hidden><span class="ar">&#9650;</span><b id="arrowD"></b></div>
+    <div id="prompt1" hidden></div>
     <button type="button" id="exit" aria-label="back to the title">&#10005;</button>
     <button type="button" id="fs" aria-label="full screen" hidden></button>
     <button type="button" id="snd" aria-label="sound" hidden></button>`;
@@ -47,6 +69,13 @@ export function createHud(root) {
   const v = { x: 0, y: 0, z: 0 };
   let lastText = '', lastHeat = 0;
   const totalBox = el.querySelector('#total');
+  const vs = el.querySelector('#vs'), vsName = el.querySelector('#vsName'), vsN = el.querySelector('#vsN'), vsLead = el.querySelector('#vsLead');
+  const meter = el.querySelector('#meter'), segs = [...meter.querySelectorAll('i')], meterT = el.querySelector('#meterT');
+  const tag = el.querySelector('#tag'), tagName = el.querySelector('#tagName'), tagMult = el.querySelector('#tagMult');
+  const arrow = el.querySelector('#arrow'), arrowD = el.querySelector('#arrowD'), prompt1 = el.querySelector('#prompt1');
+  const bat = { rivalX: null, on: false, k: 0, lastN: -1, lastLead: '', lastSeg: -1, lastMode: '', lastT: '', lastTag: null, lastArrow: null, lastMult: '', promptT: 0 };
+  const carPx = { x: 0, y: 0 };
+  let tmpV = null;
   /* a banked chain flies from where the number was to the total */
   function fly(text) {
     const d = document.createElement('div');
@@ -124,6 +153,7 @@ export function createHud(root) {
       missionsEl.innerHTML = (head ? '<i>' + esc(head.label) + '</i><strong>' + esc(head.name) + '</strong>' : '')
         + (list && list.length ? '<b>MISSIONS</b>' + list.map(m => '<span class="' + (m.done ? 'done' : '') + '">' + (m.done ? '&#10003;' : '&#9671;') + ' ' + esc(m.text) + '</span>').join('') : '');
       missionsEl.classList.toggle('headed', !!head);
+      missionsEl.classList.toggle('battle', !!(head && head.battle));
       missionsEl.hidden = false;
     },
     /* a one line notice that rises and fades like the score's callouts */
@@ -140,6 +170,7 @@ export function createHud(root) {
     },
     update(score, pose, camera, THREE, view, dt) {
       const s = score.state;
+      if (!tmpV) tmpV = new THREE.Vector3();
       streaks(pose, view, dt || 1 / 60);
       const boosting = pose.boost > 0;
       if (boosting !== lastBoost) { lastBoost = boosting; boostEl.classList.toggle('on', boosting); }
@@ -147,6 +178,7 @@ export function createHud(root) {
       const kmh = Math.round(pose.speed * 3.6), deg = Math.round(s.angle);
       if (kmh !== lastSpeed) { lastSpeed = kmh; speed.textContent = String(kmh); }
       if (deg !== lastAngle) { lastAngle = deg; angle.textContent = String(deg); }
+      if (bat.on) { const q = tmpV.set(pose.x, (pose.y || 0) + 0.2, pose.z).project(camera); carPx.x = (q.x * 0.5 + 0.5) * view.w; carPx.y = (-q.y * 0.5 + 0.5) * view.h; }
       const visible = s.chain >= 1;
       if (visible !== lastVisible) { lastVisible = visible; live.classList.toggle('on', visible); }
       if (visible) {
@@ -167,6 +199,8 @@ export function createHud(root) {
         // project the car's roof to the screen
         const p = new THREE.Vector3(pose.x, 1.9, pose.z).project(camera);
         v.x = (p.x * 0.5 + 0.5) * view.w; v.y = (-p.y * 0.5 + 0.5) * view.h;
+        /* in a battle, beside the car on the side away from the rival, as far as the screen allows */
+        if (bat.on && bat.rivalX !== null) { const side = bat.rivalX > v.x ? -1 : 1; v.x = Math.max(70, Math.min(view.w - 70, v.x + side * HUD_BATTLE.LIVE_SIDE)); v.y += HUD_BATTLE.LIVE_DOWN; }
         live.style.transform = 'translate(' + Math.round(v.x) + 'px,' + Math.round(v.y) + 'px)';
       }
       if (s.calloutCount < shown) shown = 0;
@@ -182,6 +216,64 @@ export function createHud(root) {
         else if (FX_ON && c.kind === 'lost' && lastText) shatter(lastText);
       }
       shown = s.calloutCount;
+    },
+    /* the battle: { name } or null */
+    setBattle(b) {
+      bat.on = !!b; bat.rivalX = null; vs.hidden = !b; meter.hidden = true; tag.hidden = true; arrow.hidden = true; prompt1.hidden = true; bat.lastN = -1; bat.lastLead = ''; bat.lastSeg = -1; bat.lastMode = ''; bat.lastT = ''; bat.lastTag = null; bat.lastArrow = null; bat.k = 0;
+      el.classList.toggle('battle', !!b);
+      if (b) { vsName.textContent = b.name.toUpperCase(); tagName.textContent = b.name.toUpperCase(); }
+    },
+    /* one line, once, at the moment it applies */
+    prompt(text, seconds) { prompt1.textContent = text; prompt1.hidden = false; prompt1.classList.remove('in'); void prompt1.offsetWidth; prompt1.classList.add('in'); bat.promptT = seconds || 3; },
+    /* every frame of a battle: t the tandem's state, rival, the player's
+       score state, rv the rival's drawn pose (or null) */
+    battle(t, rival, mine, rv, camera, THREE, view, dt, counting) {
+      if (!bat.on) return;
+      const theirs = rival.scoring.state.total;
+      if (theirs !== bat.lastN) { bat.lastN = theirs; vsN.textContent = String(theirs); }
+      const lead = mine.total > theirs ? 'ahead' : mine.total < theirs ? 'behind' : 'level';
+      if (lead !== bat.lastLead) { bat.lastLead = lead; vs.className = lead; vsLead.textContent = lead === 'ahead' ? 'YOU LEAD' : lead === 'behind' ? 'HE LEADS' : 'LEVEL'; }
+      if (bat.promptT > 0) { bat.promptT -= dt; if (bat.promptT <= 0) prompt1.hidden = true; }
+      /* the meter, under the player's car: segments by closeness, and what it means */
+      const live = rival.solid() && t.together;
+      bat.k += ((live && !t.ahead ? t.k : 0) - bat.k) * (1 - Math.exp(-dt / HUD_BATTLE.SMOOTH));
+      const seg = live && !t.ahead ? Math.round(bat.k * HUD_BATTLE.METER_SEGS) : 0;
+      const mode = !live ? 'off' : t.ahead ? 'ahead' : t.mult > 1 ? 'on' : t.k > 0 ? 'near' : 'far';
+      if (mode === 'off') { if (!meter.hidden) meter.hidden = true; }
+      else {
+        if (meter.hidden) meter.hidden = false;
+        if (seg !== bat.lastSeg) { bat.lastSeg = seg; segs.forEach((g, i) => g.classList.toggle('lit', i < seg)); }
+        if (mode !== bat.lastMode) { bat.lastMode = mode; meter.className = mode; }
+        const text = mode === 'on' ? 'x' + t.mult.toFixed(1) + ' TANDEM' : mode === 'ahead' ? 'AHEAD: NO BONUS' : mode === 'near' ? 'CLOSER' : 'TOO FAR';
+        if (text !== bat.lastT) { bat.lastT = text; meterT.textContent = text; }
+        meter.style.transform = 'translate(' + Math.round(carPx.x) + 'px,' + Math.round(carPx.y + HUD_BATTLE.METER_BELOW) + 'px) translate(-50%, 0)';
+      }
+      /* the tag over his car, or the arrow at the edge when he is out of view */
+      if (!rv || rival.state.fade >= 0.95 || !rival.solid() && rival.state.fade > 0.5) { bat.rivalX = null; if (!tag.hidden) tag.hidden = true; if (!arrow.hidden) arrow.hidden = true; return; }
+      const p = tmpV.set(rv.pose.x, (rv.pose.y || 0) + HUD_BATTLE.TAG_UP, rv.pose.z).project(camera);
+      const inView = p.z < 1 && Math.abs(p.x) < 1 && Math.abs(p.y) < 1;
+      bat.rivalX = p.z < 1 ? (p.x * 0.5 + 0.5) * view.w : null;
+      if (inView && bat.promptT > 0) { if (!tag.hidden) tag.hidden = true; if (!arrow.hidden) arrow.hidden = true; }   // the prompt says who he is
+      else if (inView) {
+        if (tag.hidden) tag.hidden = false; if (!arrow.hidden) arrow.hidden = true;
+        tag.style.transform = 'translate(' + Math.round((p.x * 0.5 + 0.5) * view.w) + 'px,' + Math.round((-p.y * 0.5 + 0.5) * view.h) + 'px) translate(-50%, -100%)';
+        const m = rival.scoring.state.chain > 0 && rival.scoring.state.mult > 1 ? 'x' + rival.scoring.state.mult : '';
+        if (m !== bat.lastMult) { bat.lastMult = m; tagMult.textContent = m; }
+      } else {
+        if (!tag.hidden) tag.hidden = true;
+        if (counting) { if (!arrow.hidden) arrow.hidden = true; return; }   // the countdown's sweep has both cars in its frame by design
+        if (arrow.hidden) arrow.hidden = false;
+        /* the direction on the screen: behind the camera the projection flips */
+        let ax = p.x, ay = p.y; if (p.z > 1) { ax = -ax; ay = -ay; }
+        const len = Math.hypot(ax, ay) || 1; ax /= len; ay /= len;
+        const E = HUD_BATTLE.EDGE, hw = view.w / 2 - E, hh = view.h / 2 - E, sc = Math.min(hw / Math.max(1e-6, Math.abs(ax)), hh / Math.max(1e-6, Math.abs(ay)));
+        /* kept clear of the top row of the HUD and of the pads at the bottom */
+        const x = view.w / 2 + ax * sc, y = Math.max(E + HUD_BATTLE.ARROW_TOP, Math.min(view.h * HUD_BATTLE.ARROW_LOW, view.h / 2 - ay * sc)), ang = Math.atan2(ax, ay) * 180 / Math.PI;
+        arrow.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px) translate(-50%, -50%)';
+        arrow.firstElementChild.style.transform = 'rotate(' + Math.round(ang) + 'deg)';
+        const d = Math.round(Math.hypot(rv.pose.x - camera.position.x, rv.pose.z - camera.position.z)) + ' m';
+        if (d !== bat.lastArrow) { bat.lastArrow = d; arrowD.textContent = d; }
+      }
     },
     reset() { shown = 0; callouts.innerHTML = ''; lastTotal = -1; lastLive = -1; lastMult = -1; lastText = ''; for (const d of el.querySelectorAll('.fly, .shard')) d.remove(); },
   };

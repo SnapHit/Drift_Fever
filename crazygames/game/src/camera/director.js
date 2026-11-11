@@ -27,6 +27,12 @@ export const DIRECTOR = {
   SWEEP_RISE:     1.5,     // m it rises as it swings round beside the car (kept under a start gantry's banner, 2.9 m up)
   SWEEP_SIDE:     4.2,     // m out to the side halfway round, staying over the road
   SWEEP_LOOK_UP:  1.6,     // m above the road the sweep looks, over the roof, so the car sits under the countdown's number and not behind it
+  /* a battle's sweep (briefs/RIVALS.md 3): from in front of both cars, looking back at the pair, round the side away from the rival */
+  BATTLE:         true,    // a battle has its own sweep (false: the solo sweep, which can start inside a rival right ahead)
+  BATTLE_AHEAD:   9.0,     // m in front of the rival's car it starts
+  BATTLE_LOW:     1.6,     // m above the road there
+  BATTLE_SIDE:    5.5,     // m out on the side away from him, halfway round
+  BATTLE_PAIR:    0.6,     // share of the way from the player to the rival the look starts at (the pair in frame), easing to the player
   /* the kick when a chain is banked */
   KICK_FROM:      3,       // the multiplier a banked chain needs
   KICK_BACK:      [0.9, 2.2],   // m the view pulls back, at KICK_FROM and at x8
@@ -63,9 +69,25 @@ export function createDirector(THREE) {
 
   /* After chase.update has written cam. mode: 'countdown' (u, 0 to 1),
      'drive', 'finish' (from the line to the results and behind them). */
-  function apply(mode, pose, cam, dt, u, chaseState) {
+  function apply(mode, pose, cam, dt, u, chaseState, battle) {
     const D = DIRECTOR;
     const y0 = pose.y || 0;
+    if (mode === 'countdown' && battle && D.BATTLE) {
+      const k = ease(Math.min(1, u / D.SWEEP_END));
+      if (k >= 1) return;
+      const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
+      /* the rival ahead of the player, and the side away from him */
+      const rx = battle.x - pose.x, rz = battle.z - pose.z, ahead = rx * fx + rz * fz, away = (rx * lx + rz * lz) > 0 ? -1 : 1;
+      const phi = (1 - k) * Math.PI;
+      const front = ahead + D.BATTLE_AHEAD;
+      const along = (Math.cos(phi) < 0 ? -Math.cos(phi) * front : -Math.cos(phi) * D.SWEEP_AHEAD), up = D.BATTLE_LOW + Math.sin(phi) * (D.SWEEP_RISE - (D.BATTLE_LOW - D.SWEEP_LOW)), side = Math.sin(phi) * D.BATTLE_SIDE * away;
+      const px = pose.x + fx * along + lx * side, pz = pose.z + fz * along + lz * side, py = y0 + up;
+      const w = ease(Math.max(0, (k - 0.55) / 0.45)), pair = D.BATTLE_PAIR * (1 - ease(k / 0.7));
+      cam.position.set(lerp(px, chaseState.px, w), lerp(py, chaseState.py, w), lerp(pz, chaseState.pz, w));
+      look.set(lerp(pose.x + rx * pair, chaseState.tx, w), lerp(y0 + D.SWEEP_LOOK_UP * 0.6, chaseState.ty, w), lerp(pose.z + rz * pair, chaseState.tz, w));
+      cam.lookAt(look);
+      return;
+    }
     if (mode === 'countdown') {
       const k = ease(Math.min(1, u / D.SWEEP_END));
       if (k >= 1) return;

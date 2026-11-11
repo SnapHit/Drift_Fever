@@ -1,0 +1,7 @@
+PASS with room: 8 ghosts kept, 0 dropped, 0 failed writes, 29137 characters held
+PASS full (15648 characters, a ghost is 3537): 4 oldest dropped, kept career:4 career:5 career:6 career:7, failed writes 0, refused 4
+PASS reloaded: coins 777, career 4 stars 2, missions [1,0,1], ghosts 4, repairs 0
+PASS the stored save fits and holds the last write: 14705 of 15648
+PASS known answer, every write refused: 0 ghosts dropped, 11 failed writes, 8 ghosts and the coins still in memory, nothing stored
+PASS known answer, 40 characters of storage: 0 ghosts dropped, 11 failed writes
+all passed
