@@ -54,7 +54,7 @@ export function validGhost(g) {
     steps += e[0];
   }
   if (steps !== g.steps) return null;
-  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1, rev: isNum(g.rev) ? g.rev : 1, up: upgradeLevels(g.up) };
+  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1, rev: isNum(g.rev) ? g.rev : 1, up: upgradeLevels(g.up), ...(isNum(g.seed) ? { seed: g.seed } : {}) };
 }
 
 /* Repair anything into a valid save. Counts what it had to fix. */

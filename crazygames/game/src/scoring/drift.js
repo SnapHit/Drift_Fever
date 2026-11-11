@@ -81,7 +81,7 @@ export function createScoring() {
       else s.chain += pts;
       if (angle >= S.BIG_ANGLE && !s.bigAngleSaid) { s.bigAngleSaid = true; callout('BIG ANGLE', 'good'); }
       if (s.driftTime >= S.LONG_CHAIN && !s.longChainSaid) { s.longChainSaid = true; callout('LONG CHAIN', 'good'); }
-      if (s.near && !s.nearSaid) { s.nearSaid = true; callout(world.nearestClip ? 'CLIP' : 'NEAR MISS', 'good'); }
+      if (s.near && !s.nearSaid) { s.nearSaid = true; callout(world.nearestClip ? 'ORANGE WALL x' + S.PROX_BONUS : 'NEAR MISS', 'good'); }
       if (!s.near) s.nearSaid = false;
     } else if (s.drifting) {
       s.gap += dt;

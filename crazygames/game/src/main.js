@@ -383,7 +383,11 @@ function menuGround() {
    replaced by the next ghost worth keeping. */
 function ghostFor(key, track) {
   const rec = save.ghost(key);
-  return rec && rec.gen === (track.version || 1) && rec.rev === carRev(rec.car) ? rec : null;
+  if (!rec || rec.gen !== (track.version || 1) || rec.rev !== carRev(rec.car)) return null;
+  /* a career slot whose seed was replaced: a ghost recorded on another seed, or with none on a slot that has had two, drove another layout */
+  const m = /^career:(\d+)$/.exec(key), c = m ? CAREER[+m[1]] : null;
+  if (c && (rec.seed !== undefined ? rec.seed !== c.seed : c.was !== undefined)) return null;
+  return rec;
 }
 
 /* Which controls the prompts should draw: the source that moved last,
@@ -509,7 +513,7 @@ function finishRun() {
   const prevGhost = ghostFor(spec.key, app.track);
   let ghostSaved = false;
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
-    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
+    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
   app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer: offer ? { id: offer, name: rivalById(offer).name } : null, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;

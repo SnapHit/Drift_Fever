@@ -62,7 +62,9 @@ export function createRival(track, def, laps, opts) {
   function step() {
     const c = world.car;
     prev.x = c.x; prev.y = c.y || 0; prev.z = c.z; prev.yaw = c.yaw;
-    const inp = st.finished ? STOP : q(driver.input(world));
+    let inp = st.finished ? STOP : q(driver.input(world));
+    /* opts.hands (the measurements only, game/test/stars/reach.js): only what a player's hands can give: the throttle always on, no brake, and DRIFT with no steering stops the car */
+    if (o.hands && !st.finished) inp = inp.handbrake && inp.steer === 0 ? STOP : { steer: inp.steer, throttle: 1, brake: 0, handbrake: inp.handbrake };
     st.input = inp;
     world.stepWorld(inp);
     st.steps++;

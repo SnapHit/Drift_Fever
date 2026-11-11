@@ -21,11 +21,16 @@ import { dailySeed, localDate } from '../ground/source.js';
    finish with no respawn, that the careful driver drives clean to a star,
    that generates in under 600 ms, that nothing occludes (the readability
    rule, in every theme) and that has its chapter's least banked corners. */
+/* was: the seed a slot had before it was replaced after play on 11
+   November 2026 ("the corners aren't sharp enough to get a drift
+   going"; game/test/stars/slot.js). A saved ghost with no seed of its
+   own on such a slot drove the old layout and is ignored (main.js
+   ghostFor); stars and bests stay. */
 export const CAREER = [
   /* Rookie */
   { name: 'First slide',   kind: 'circuit', seed: 1101, difficulty: 0.10, length: 560 },
-  { name: 'Harbour run',   kind: 'sprint',  seed: 1202, difficulty: 0.20, length: 800 },
-  { name: 'Crossover',     kind: 'circuit', seed: 1327, difficulty: 0.30, length: 820 },   // 844 m, a figure eight over a bridge
+  { name: 'Harbour run',   kind: 'sprint',  seed: 1248, difficulty: 0.20, length: 800, was: 1202 },   // 748 m, four corners of 27 to 39 m radius and about 100 degrees (seed 1202 had none tighter than 47 m worth sliding)
+  { name: 'Crossover',     kind: 'circuit', seed: 1422, difficulty: 0.30, length: 820, was: 1327 },   // 822 m, a figure eight over a bridge, six corners of 30 m radius (seed 1327's turned 52 to 67 degrees each)
   { name: 'Long shadows',  kind: 'sprint',  seed: 1404, difficulty: 0.40, length: 900 },
   { name: 'Tight city',    kind: 'circuit', seed: 1505, difficulty: 0.55, length: 620 },
   { name: 'Ridge road',    kind: 'sprint',  seed: 1606, difficulty: 0.65, length: 1000 },

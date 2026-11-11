@@ -429,3 +429,32 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   (the rival chasing), a rival's sound. `lab/cars.html` is broken on
   main too (it reads `LOOK.SUN_DIR`, which is gone). Two rounds are
   proposed and not started: garage, playground.
+- 11 November 2026, after play of the tandem battle: three findings.
+  (1) **The battle is counterintuitive and is to be rebuilt as a drift
+  race** (`briefs/DRIFT-RACE.md`, the author's choice): a one on one
+  reads as a race, the tandem paid for staying behind, and the player
+  cannot hold station because he has no throttle or brake (steering
+  and one button; the rival's driver and the scripted chaser both
+  lifted and braked, so the fairness measurement proved nothing about
+  a player). Start level, highest score wins, a bonus for leading at
+  each checkpoint and the line, close slides pay in any position, and
+  the rival gets only a player's controls. Not started.
+  (2) Nothing said what a clipping zone was. The mission now reads
+  "Slide close to N orange walls" and the callout "ORANGE WALL x2".
+  (3) "The corners aren't sharp enough to get a drift going" on Harbour
+  run. A drift corner is one of at most 42 m radius turning at least 85
+  degrees (`game/test/stars/slot.js`); Harbour run and Crossover had
+  none, every other career track has two or more. Both have new seeds,
+  the author's choice over lower targets: Harbour run 1248 (four drift
+  corners) and Crossover 1422 (six), each passing the chapters round's
+  bar, and the plain scripted drifter now earns two stars on each. `was`
+  in `CAREER` names the old seed: stars, bests and missions stay, and a
+  ghost with no seed of its own on those slots is ignored (new career
+  ghosts record their seed; `game/test/stars/ghost.js`). Three stars
+  was never impossible, though: the look-ahead driver held to a
+  player's controls (`opts.hands` in `rivals/rival.js`) scores 2 to
+  6.9 times the three star target in the starter on all 24 tracks
+  (`game/test/stars/reach.js`, `review/stars/reach.jsonl`), by linking
+  one chain through a whole run. So the targets are reachable by a
+  machine and nobody knows yet whether by thumbs.
+

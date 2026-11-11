@@ -67,7 +67,7 @@ export function textFor(m, circuit) {
     case 'hold': return 'Hold one drift for ' + m.target + ' s';
     case 'chain': return 'Bank a chain of ' + m.target + ' points';
     case 'clean': return m.target ? 'Drive a clean lap' : 'Drive a clean run';
-    case 'clip': return 'Clip ' + m.target + ' clipping zones';
+    case 'clip': return 'Slide close to ' + m.target + ' orange walls';   // a clipping zone, in the player's words (after play, 11 November 2026: nothing said what one was)
     case 'time': return 'Finish under ' + m.target + ' s';
     case 'mult': return 'Reach a x' + m.target + ' multiplier';
   }
