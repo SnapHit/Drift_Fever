@@ -33,3 +33,19 @@ export const READ_LADDER = `
   L.action('title');
   return out;
 `;
+
+/* THE CAR A PLAYER WOULD PLAUSIBLY DRIVE when each chapter's rivals open
+   (the brief: the starter with no upgrades for the Rookie pair; for Pro
+   and Legend, say which and why). The starter, because the scripted
+   players were chosen in it and a player is more likely to have spent
+   his coins on steps for the car he knows than on a new one; one step of
+   each by Pro (750 coins) and two of each by Legend (2,250), which a
+   player who has won Pro's 12 or Legend's 14 opening stars has earned
+   many times over (each star at least 130 coins with its new star bonus,
+   each mission 60, each run a tenth of its points, Kestrow's and
+   Tolvo's prizes 700). review/ladder/REPORT.md gives the arithmetic. */
+export const PLAYER_CAR = [
+  { car: 'starter', up: null, label: 'starter, no upgrades' },
+  { car: 'starter', up: { power: 1, grip: 1, steer: 1 }, label: 'starter, one step of each' },
+  { car: 'starter', up: { power: 2, grip: 2, steer: 2 }, label: 'starter, two steps of each' },
+];
