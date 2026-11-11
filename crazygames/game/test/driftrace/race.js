@@ -31,7 +31,7 @@ const q = r => ({ steer: Math.round(r.steer * 1000) / 1000, throttle: Math.round
 export const handsOk = inp => inp.throttle === 1 && inp.brake === 0;
 export const LAUNCH = 3;   // s after GO before the place counts
 
-/* opts: { car, up, rivalOpts, playerOpts (driving numbers for a scripted player), offset [dx, dz] on the player's start,
+/* opts: { blind (a scripted player that does not see him), car, up, rivalOpts, playerOpts (driving numbers for a scripted player), offset [dx, dz] on the player's start,
    solid (false: the rival not solid), noRival (the rival drives but is not in the player's world),
    maxSeconds, onStep, trace } */
 export function runRace(def, who, opts) {
@@ -47,7 +47,7 @@ export function runRace(def, who, opts) {
   const ctx = {};
   if (typeof who === 'function') drive = w => who(w, rival, ctx);
   else if (who === 'still') drive = () => ({ steer: 0, throttle: 0, brake: 0, handbrake: 0 });
-  else { const p = createPlayer(track, who, o.playerOpts); drive = w => p.input(w); }
+  else { const p = createPlayer(track, who, o.playerOpts, o.blind ? null : () => (rival.solid() ? rival.world.car : null)); drive = w => p.input(w); }
   let dist = track.start.along || 0, along = world.along, t = 0, handsBroken = 0;
   const L = track.length, limit = Math.round((o.maxSeconds || 300) / STEP);
   let finished = false, i = 0, respawns = 0, minV = Infinity;
@@ -66,6 +66,7 @@ export function runRace(def, who, opts) {
     const S = TUNE.SCORING, c = world.car, ang = Math.abs(c.slip) * 180 / Math.PI;
     tandem.step(world, rival, dist, ang >= S.MIN_ANGLE && c.speed >= S.MIN_SPEED && c.vx > 0);
     scoring.step(world, STEP, tandem.state);
+    ctx.chain = scoring.state.chain;
     progress.step(world);
     race.step(world, progress.state);
     lead.step(progress.state, rival.progress.state, dist, rival.runDistance());

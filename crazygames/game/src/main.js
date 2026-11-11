@@ -165,7 +165,7 @@ function resetRun() {
   prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
   chase.reset({ yaw: world.car.yaw });
   if (director) director.reset();
-  if (autoDrive && app.state !== 'dev' && app.ground.centre.length) app.driver = app.rival ? createPlayer(app.ground, 'mixed') : createDriver(app.ground, { drift: '*' });
+  if (autoDrive && app.state !== 'dev' && app.ground.centre.length) app.driver = app.rival ? createPlayer(app.ground, 'mixed', null, () => (app.rival && app.rival.solid() ? app.rival.world.car : null)) : createDriver(app.ground, { drift: '*' });
 }
 
 function stepOnce(rec) {
@@ -718,7 +718,7 @@ window.__feel = {
   hash: () => app.world.hash(),
   info: () => ({ ...scene.info(), running, physMs, steps: lastSteps, frameMs, state: app.state }),
   /* opts.player: 'grip', 'slide' or 'mixed', a scripted player with a player's hands (rivals/players.js); else the scripted drifter's options */
-  setDriver(opts) { app.driver = opts ? (opts.player ? createPlayer(app.ground, opts.player, opts.drive) : createDriver(app.ground, opts)) : null; return app.driver; },
+  setDriver(opts) { app.driver = opts ? (opts.player ? createPlayer(app.ground, opts.player, opts.drive, () => (app.rival && app.rival.solid() ? app.rival.world.car : null)) : createDriver(app.ground, opts)) : null; return app.driver; },
   /* Replay a tape (run length entries) from a fresh start, no drawing. Returns the hash. */
   replay(t) {
     resetRun();

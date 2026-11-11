@@ -81,6 +81,13 @@ export const RIVAL_DRIVE = {
   FOLLOW:       0,
   /* a character's own line (0: none): a reward per metre the car is to the outside (positive) of a corner */
   WIDE:         0,
+  /* the scripted players only (rivals/players.js), never the rival, who
+     never reads the player's world: a player sees the other car, so they
+     keep clear of it. Off without an avoid function. */
+  AVOID_R:      6,       // m between centres inside which a try costs
+  AVOID_COST:   5000,    // per metre inside AVOID_R, per second, the other car carried on at its speed
+  AVOID_SHIFT:  3.2,     // m the grip line moves across, away from the other car, when it is in the way ahead
+  AVOID_AHEAD:  22,      // m ahead the grip line looks for it
 };
 
 const wrap = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
@@ -88,7 +95,7 @@ const DEG = 180 / Math.PI;
 
 /* pick (optional, the scripted players of the measurements): pick(corner)
    says whether a slide may be tried in that corner; none is every corner */
-export function createRivalDriver(ground, character, override, follow, pick) {
+export function createRivalDriver(ground, character, override, follow, pick, avoid) {
   const D = Object.assign({}, RIVAL_DRIVE, character || {}, override || {});
   const C = ground.centre, n = C.length, closed = ground.kind === 'circuit', L = ground.length;
   const at = i => closed ? ((i % n) + n) % n : Math.max(0, Math.min(n - 1, i));
@@ -132,7 +139,16 @@ export function createRivalDriver(ground, character, override, follow, pick) {
     const v = car.speed;
     const look = D.LOOK_BASE + D.LOOK_GAIN * v;
     const t = C[at(ci + Math.round(look / 2))];
-    const off = gripOffset(s + look, t.width);
+    let off = gripOffset(s + look, t.width);
+    /* a player keeps clear: the other car in the way ahead moves the line across, to the side with more room */
+    const o = avoidCar;
+    if (o) {
+      const ox = o.x - car.x, oz = o.z - car.z, hx = -Math.sin(t.heading), hz = -Math.cos(t.heading), ahead = ox * hx + oz * hz;
+      if (ahead > -2 && ahead < D.AVOID_AHEAD) {
+        const olat = (o.x - t.x) * -Math.cos(t.heading) + (o.z - t.z) * Math.sin(t.heading);
+        if (Math.abs(olat - off) < D.AVOID_SHIFT) { const room = Math.max(0, t.width / 2 - D.EDGE); off = olat > 0 ? Math.max(-room, olat - D.AVOID_SHIFT) : Math.min(room, olat + D.AVOID_SHIFT); }
+      }
+    }
     const tx = t.x - Math.cos(t.heading) * off, tz = t.z + Math.sin(t.heading) * off;
     const fx = -Math.sin(car.yaw), fz = -Math.cos(car.yaw), lx = -Math.cos(car.yaw), lz = Math.sin(car.yaw);
     const dx = tx - car.x, dz = tz - car.z;
@@ -187,6 +203,7 @@ export function createRivalDriver(ground, character, override, follow, pick) {
       const l2 = (sim.x - cc.x) * LX[ci] + (sim.z - cc.z) * LZ[ci];
       const margin = cc.width / 2 - Math.abs(l2) - reach;
       if (margin < 0) { value -= D.CRASH * (1 - k / H); break; }
+      if (avoidCar) { const tt = (k + 1) * DT, ax = avoidCar.x + avoidCar.wvx * tt - sim.x, az = avoidCar.z + avoidCar.wvz * tt - sim.z, dd = Math.sqrt(ax * ax + az * az); if (dd < D.AVOID_R) value -= D.AVOID_COST * (D.AVOID_R - dd) * DT; }
       if (margin < D.EDGE_SAFE) value -= D.EDGE_COST * (D.EDGE_SAFE - margin) * DT;
       /* travel down the road, not round: the slide only pays for the share of the travel that is along it */
       const along = Math.cos(wrap(Math.atan2(-sim.wvx, -sim.wvz) - cc.heading));
@@ -206,6 +223,7 @@ export function createRivalDriver(ground, character, override, follow, pick) {
     return value;
   }
 
+  let avoidCar = null;
   let choice = -1, dirNow = 0, flickLeft = 0, untilReplan = 0, sinceSlide = 1e9;
   /* a look in progress: the car as it was when the look began, the tries
      still to make, and the best so far. Its tries are spread over the
@@ -234,6 +252,7 @@ export function createRivalDriver(ground, character, override, follow, pick) {
   }
   function input(world) {
     const car = world.car, s = world.along, ci = world.centreIndex;
+    avoidCar = avoid ? avoid() : null;
     const V = car.tune ? car.tune.VEHICLE : null;
     sinceSlide = scores(car) ? 0 : sinceSlide + STEP;
     if (look.on) { for (let k = 0; k < D.TRIES_PER_STEP && look.next <= D.INTO.length; k++) tryNext(); if (look.next > D.INTO.length) commit(car); }

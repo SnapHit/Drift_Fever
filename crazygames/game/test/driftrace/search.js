@@ -65,7 +65,7 @@ if (process.argv[1] && process.argv[1].endsWith('driftrace/search.js')) {
   /* --from grip|slide|mixed: start from a scripted player's numbers, and search near them from the first try */
   if (args.includes('--from')) { const { PLAYERS } = await import('../../src/rivals/players.js'); def.drive = { ...PLAYERS[args[args.indexOf('--from') + 1]].drive }; }
   const ch = CHARACTERS[def.id] || {};
-  const best = search(def, { n: arg('--n', 300), seed: arg('--seed', 1), seconds: arg('--seconds', 60), slack: arg('--slack', 1.5), cap: arg('--cap', 1700), want: ch.want, ranges: Object.assign({}, ch.ranges, args.includes('--character') ? RACE_CHARACTERS[def.id] : {}), disturb: DISTURB.slice(0, arg('--disturb', 6)), localFrom: args.includes('--from') ? 0 : undefined });
+  const best = search(def, { n: arg('--n', 300), seed: arg('--seed', 1), seconds: arg('--seconds', 60), slack: arg('--slack', 1.5), cap: arg('--cap', 1700), want: ch.want, ranges: Object.assign({}, ch.ranges, args.includes('--character') ? RACE_CHARACTERS[def.id] : {}), disturb: args.includes('--all20') ? [{}, ...(await import('./hands.js')).DISTURB] : DISTURB.slice(0, arg('--disturb', 6)), localFrom: args.includes('--from') || args.includes('--local') ? 0 : undefined });
   console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
   console.log('drive: ' + JSON.stringify(best.drive));
 }
