@@ -457,4 +457,35 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   (`game/test/stars/reach.js`, `review/stars/reach.jsonl`), by linking
   one chain through a whole run. So the targets are reachable by a
   machine and nobody knows yet whether by thumbs.
+- 12 November 2026, the drift race (`briefs/DRIFT-RACE.md`,
+  `review/driftrace/REPORT.md`): the tandem battle rebuilt as a race
+  won on points. Both cars start level; the score is the solo score
+  plus a lead bonus to the first car through each checkpoint and lap
+  line and a larger one to the first across the finish
+  (`scoring/lead.js`; `TANDEM.LEAD_SHARE` 2.2 and `LINE_SHARE` 1.0 of
+  the first star), and close slides pay the player up to 1.6 times in
+  any position. The rival banks leads too. **His driver now has only a
+  player's hands** (throttle always on, no brake; a guard in
+  `rivals/rival.js` counts 0 inputs changed over his race), and so has
+  every scripted player in `game/test/driftrace/`. Kestrow runs four
+  laps of First slide in 75 s for 2,662 of his own. The report's
+  numbers were measured at the round's first shares (0.45 and 0.3), at
+  which a player who led all the way and never slid lost 1,182 to
+  2,680, so leading was worth nothing; the reviewer raised them so that
+  player about ties (2,672 to 2,662) and any sliding wins it, and a
+  player who slides well but trails all the way now loses narrowly
+  (4,196 to 4,585). At these numbers, over 20 disturbed races, the grip
+  player wins 9, the slide player 12 and the mixed player 6. Still
+  failing the brief's bar: the mixed player does not win every race,
+  the place does not change hands in 3 of 20 mixed races, a player
+  parked on his line is carried for 1.2 s (bar 1 s), and the pin
+  release never acts in any scenario. Only Kestrow is in the game; the
+  other five drive with a player's hands now and are unmeasured. Open
+  for play: whether the race feels like one, the size of the lead
+  bonus, contact into the first corner from a level start, the camera's
+  move from the grid into the chase view, frame rate (JavaScript p95
+  15.1 ms of 16.7 at 6x throttle with a scripted player). Kestrow
+  steers at depths a gamepad can give and a phone cannot (a phone's
+  steering is -1, 0 or +1). `spectacle/night.js` fails one low tier
+  moment on Crossover since its new seed.
 

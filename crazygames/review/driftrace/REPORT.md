@@ -1,5 +1,16 @@
 # The drift race: report (11 and 12 November 2026)
 
+> **Reviewer's note, 12 November 2026.** After this report was written the
+> lead and line bonuses were raised on review (`TANDEM.LEAD_SHARE` 0.45 to
+> 2.2, `LINE_SHARE` 0.3 to 1.0), because at the first numbers a player who
+> led all the way and never slid lost 1,182 to 2,680. The numbers below are
+> at the first shares. At the new ones, over 20 disturbed races: grip wins
+> 9, slide 12, mixed 6; the all-the-way leader who never slides about ties
+> (2,672 to 2,662); the slider who trails all the way loses 4,196 to 4,585.
+> The won results frames are recorded at the first shares (a probe-only
+> setting), so their totals are not a real race's.
+
+
 Branch `crazygames-driftrace`, brief `briefs/DRIFT-RACE.md`. Every number
 below was measured in this sandbox: headless Chromium drawing in software
 (forced WebGL 2 on SwiftShader), and Node for the many-run parts. The JSON

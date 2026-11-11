@@ -48,8 +48,11 @@ function check(b, moving) {
    the wheel straight for its first LOST_HOLD seconds (stopped on the
    grid), then drives as the grip player. */
 const LOST_HOLD = 8;
-async function record(kind, hold) {
+/* a probe-only setting for the race the card shows as won: the lead and line bonuses as small as they first were, at which the slide player beats Kestrow from behind (at the game's numbers no scripted player wins the undisturbed race). The card and its layout are real; its totals are not a real race's. */
+const SMALL = "window.__loop.TANDEM.LEAD_SHARE = 0.45; window.__loop.TANDEM.LINE_SHARE = 0.3;";
+async function record(kind, hold, small) {
   const pg = await R.page(env, R.LANDSCAPE, '');
+  if (small) await pg.page.evaluate(SMALL);
   await R.battleRun(pg.page, 'r1', { player: kind });
   if (hold) await pg.page.evaluate(h => { const A = window.__loop.app, d = A.driver; let n = 0; A.driver = { input: w => (n++ < h * 120 ? { steer: 0, throttle: 1, brake: 0, handbrake: 1 } : d.input(w)) }; }, hold);
   await R.until(pg.page, "f.state==='results'", 60 * 200, 120);
@@ -57,7 +60,7 @@ async function record(kind, hold) {
   await pg.close();
   return r;
 }
-const lost = await record('grip', LOST_HOLD), won = await record('slide', 0);
+const lost = await record('grip', LOST_HOLD), won = await record('slide', 0, true);
 console.log('tapes: lost ' + lost.score + ' to ' + lost.rival + ' (' + (lost.won ? 'won' : 'lost') + '), won ' + won.score + ' to ' + won.rival + ' (' + (won.won ? 'won' : 'lost') + ')');
 
 for (const vp of SIZES) {
@@ -87,6 +90,7 @@ for (const vp of SIZES) {
     const pg = await R.page(env, vp, '', { touch });
     const p = pg.page;
     await p.evaluate(() => { const S = window.__loop.save; S.reset(); S.setOnboarded(); S.careerResult(0, 1, 500); });
+    if (name === 'won') await p.evaluate(SMALL);
     await p.evaluate(tape => { window.__loop.replayRun(window.__loop.battleSpec('r1'), tape); }, t.tape);
     await R.runFrames(p, 90);
     const r = await p.evaluate(() => {

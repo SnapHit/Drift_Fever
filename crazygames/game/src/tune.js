@@ -346,8 +346,8 @@ export const TANDEM = {
   /* the grid: level, side by side, either side of the centre line */
   GRID_SIDE:        2.2,     // m each car starts from the centre line, the rival on his side (roster) and the player on the other
   /* being ahead pays: at each checkpoint and each lap's line the first car there banks a lead bonus, and the first across the finish a larger one */
-  LEAD_SHARE:       0.45,    // of the track's first star, shared over the race's lead gates (every checkpoint and lap line before the finish)
-  LINE_SHARE:       0.3,     // of the first star, to the first car across the finish
+  LEAD_SHARE:       2.2,     // of the track's first star, shared over the race's lead gates (every checkpoint and lap line before the finish). Was 0.45, at which leading all the way was worth a sixth of his score: with this and LINE_SHARE, a player who leads Kestrow all the way and never slides about ties him, so any sliding wins it
+  LINE_SHARE:       1.0,     // of the first star, to the first car across the finish (was 0.3)
   /* close pays, in any position: while both cars slide and are close, the player's drift points count more. Distances are between the two cars' centres */
   NEAR:             4.5,     // m: this close or closer is the full bonus
   FAR:              12,      // m: past this there is no bonus

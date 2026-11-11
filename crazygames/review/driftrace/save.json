@@ -17,13 +17,13 @@
   "entry": {
    "won": false,
    "best": -227,
-   "when": 1794406050114
+   "when": 1794411012891
   },
   "changed": [
    "coins",
    "rivals"
   ],
-  "coins": 204,
+  "coins": 211,
   "ghostsSame": true
  },
  "wrongShape": {

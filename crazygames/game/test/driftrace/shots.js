@@ -49,8 +49,11 @@ async function shootWhen(pg, cond, max, name, steer) {
   return f;
 }
 /* the results' tapes: won by the slide player; lost by the grip player held on the grid with DRIFT for its first 8 s */
-async function record(kind, hold) {
+/* a probe-only setting for the race the card shows as won: the lead and line bonuses as small as they first were, at which the slide player beats Kestrow from behind (at the game's numbers no scripted player wins the undisturbed race). The card and its layout are real; its totals are not a real race's. */
+const SMALL = "window.__loop.TANDEM.LEAD_SHARE = 0.45; window.__loop.TANDEM.LINE_SHARE = 0.3;";
+async function record(kind, hold, small) {
   const pg = await R.page(env, R.LANDSCAPE, '');
+  if (small) await pg.page.evaluate(SMALL);
   await R.battleRun(pg.page, 'r1', { player: kind });
   if (hold) await pg.page.evaluate(h => { const A = window.__loop.app, d = A.driver; let n = 0; A.driver = { input: w => (n++ < h * 120 ? { steer: 0, throttle: 1, brake: 0, handbrake: 1 } : d.input(w)) }; }, hold);
   await R.until(pg.page, "f.state==='results'", 60 * 200, 120);
@@ -58,7 +61,7 @@ async function record(kind, hold) {
   await pg.close();
   return r;
 }
-const lost = await record('grip', 8), won = await record('slide', 0);
+const lost = await record('grip', 8), won = await record('slide', 0, true);
 console.log('tapes: won ' + won.score + ' to ' + won.rival + ' (' + won.won + '), lost ' + lost.score + ' to ' + lost.rival + ' (' + lost.won + ')');
 const SWIPE = `if (!A.swipe && A.state === 'drive' && R && R.state.sliding && t.gap < 9 && F.scoring.state.chain > 0 && R.runDistance() > 60) { A.swipe = 1; window.__feel.setDriver(null); }
   if (A.swipe) { const c = F.world.car, r = R.world.car, fx = -Math.sin(c.yaw), fz = -Math.cos(c.yaw), lx = -Math.cos(c.yaw), lz = Math.sin(c.yaw), dx = r.x - c.x, dz = r.z - c.z; F.inject = { steer: Math.max(-1, Math.min(1, -Math.atan2(dx * lx + dz * lz, dx * fx + dz * fz) * 4)), throttle: 1, brake: 0, handbrake: 0 }; }`;
@@ -95,6 +98,7 @@ for (const preset of PRESETS) for (const vp of SIZES) {
   for (const [name, t] of [['won', won], ['lost', lost]]) {
     const pg = await R.page(env, vp, q, { touch });
     await pg.page.evaluate(() => { const S = window.__loop.save; S.reset(); S.setOnboarded(); S.careerResult(0, 1, 500); });
+    if (name === 'won') await pg.page.evaluate(SMALL);
     await pg.page.evaluate(tape => { window.__loop.replayRun(window.__loop.battleSpec('r1'), tape); window.__feel.draw = true; }, t.tape);
     await R.runFrames(pg.page, 100);
     await pg.page.screenshot({ path: file(vp, preset, name), timeout: 180000 });
