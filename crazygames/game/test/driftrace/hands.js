@@ -29,7 +29,7 @@ import { measureRival, measureCore } from '../rivals/sim.js';
 import { RIVALS, rivalById } from '../../src/rivals/roster.js';
 
 export const BAR = { respawns: 0, hard: 0, contacts: 2, minKmh: 40, corner: 0.3, total: 0.25 };
-export const KNOWN = { ENTRY: 32, VMAX: 40, PROGRESS: 260, EDGE_COST: 200, CRASH: 3000 };
+export const KNOWN = { HB_OVER: 40, PROGRESS: 400, EDGE_SAFE: 0.3, EDGE_COST: 100, CRASH: 2000, ANGLE_CAP: 50, SLIDE_GAIN: 1.2 };   // too fast with a player's hands: never brakes, chases ground, the edge nearly free
 /* twenty disturbances, all different: offsets in cm and grip in tenths of a per cent from a fixed sequence */
 export const DISTURB = Array.from({ length: 20 }, (_, k) => ({ offset: [((k * 7) % 11 - 5) / 100, ((k * 3 + 4) % 11 - 5) / 100], grip: ((k * 5 + 2) % 11 - 5) / 1000 }));
 

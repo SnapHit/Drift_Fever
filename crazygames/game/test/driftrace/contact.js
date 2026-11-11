@@ -28,8 +28,10 @@
    than HELD s, no NaN, his hash unchanged, and in FOLLOW the player gets
    past him (ahead of him by PAST m) within the lap after the following
    lap. Known answers: with the pin release off (TANDEM.PIN_SLACK
-   Infinity) the following case fails; with him not solid the overlap
-   check fails.
+   Infinity) the following case fails (the brief's; it can only be
+   judged when the case itself passes, and only means something if the
+   release was used), and the parked player is held or thrown off; with
+   him not solid the overlap check fails.
 
    node game/test/driftrace/contact.js [r1]   writes review/driftrace/contact.json */
 import path from 'node:path';
@@ -175,9 +177,12 @@ verdict(withChain > 0, 'across the four, ' + withChain + ' hard contacts came wi
 const F = out.scenarios.FOLLOW;
 verdict(F.past !== null, 'FOLLOW: behind him from ' + (F.followFrom === null ? 'never' : Math.round(F.followFrom) + ' m') + ', ' + F.behindT.toFixed(1) + ' s behind in all; after a lap behind it gets past him: ' + (F.past !== null ? 'yes, ' + F.past + ' m into the next lap' : 'NO'));
 /* known answers */
-const pin = TANDEM.PIN_SLACK; TANDEM.PIN_SLACK = Infinity;
+const pin = [TANDEM.PIN_SLACK]; TANDEM.PIN_SLACK = Infinity;
 const np = run('FOLLOW', { up: FOLLOW_UP });
-TANDEM.PIN_SLACK = pin;
+const npPark = run('PARK', {});
+[TANDEM.PIN_SLACK] = pin;
+out.knownAnswerPinPark = npPark;
+verdict(npPark.maxHeld > HELD || npPark.respawns > 0, 'known answer: with the pin release off the parked player is ' + (npPark.maxHeld > HELD ? 'held ' + npPark.maxHeld + ' s' : 'not held') + ', respawned ' + npPark.respawns + ' times after the contact: ' + (npPark.maxHeld > HELD || npPark.respawns > 0 ? 'CAUGHT' : 'MISSED'));
 out.knownAnswerPin = np;
 /* the known answer can only be caught if the case itself passes, and only for the right reason if the pin release did something in it */
 const kaCaught = F.past !== null && (np.past === null || np.maxHeld > HELD);
