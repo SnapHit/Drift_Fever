@@ -82,7 +82,7 @@ for (const preset of PRESETS) for (const vp of SIZES) {
     const pg = await R.page(env, vp, q, { touch });
     await pg.page.evaluate(played);
     await R.battleRun(pg.page, 'r1', { player: kind });
-    await shootWhen(pg, "A.state==='drive' && A.runTime > 12 && t.L && t.L.place === " + place + " && t.L.gap > 0.4 && t.L.gap < 1.6 && t.gap < 30", 60 * 80, file(vp, preset, moment));
+    await shootWhen(pg, "A.state==='drive' && A.runTime > (" + place + " === 1 ? 12 : 4) && t.L && t.L.place === " + place + " && t.L.gap > 0.3 && t.L.gap < 2.5 && t.gap < 35", 60 * 80, file(vp, preset, moment));
     await pg.close();
   }
   {
