@@ -1,0 +1,106 @@
+{
+ "shots": {
+  "1280x720-title-none": true,
+  "1280x720-title-waiting": true,
+  "1280x720-title-beaten": true,
+  "1280x720-rivals-none": true,
+  "1280x720-rivals-mid": true,
+  "1280x720-rivals-beaten": true,
+  "1280x720-offer-career": true,
+  "1280x720-offer-won": true,
+  "1280x720-offer-lost": true,
+  "1280x720-rivals-shipped": true,
+  "390x844-title-none": true,
+  "390x844-title-waiting": true,
+  "390x844-title-beaten": true,
+  "390x844-rivals-none": true,
+  "390x844-rivals-mid": true,
+  "390x844-rivals-beaten": true,
+  "390x844-offer-career": true,
+  "390x844-offer-won": true,
+  "390x844-offer-lost": true,
+  "390x844-rivals-shipped": true,
+  "844x390-title-none": true,
+  "844x390-title-waiting": true,
+  "844x390-title-beaten": true,
+  "844x390-rivals-none": true,
+  "844x390-rivals-mid": true,
+  "844x390-rivals-beaten": true,
+  "844x390-offer-career": true,
+  "844x390-offer-won": true,
+  "844x390-offer-lost": true,
+  "844x390-rivals-shipped": true,
+  "1280x720-side-tolvo-dusk": {
+   "k": 394,
+   "gap": 2.05,
+   "mult": 1.6,
+   "t": 3.5
+  },
+  "390x844-side-tolvo-dusk": {
+   "k": 394,
+   "gap": 2.05,
+   "mult": 1.6,
+   "t": 3.5
+  },
+  "844x390-side-tolvo-dusk": {
+   "k": 394,
+   "gap": 2.05,
+   "mult": 1.6,
+   "t": 3.5
+  },
+  "1280x720-side-tolvo-night": {
+   "k": 394,
+   "gap": 2.05,
+   "mult": 1.6,
+   "t": 3.5
+  },
+  "390x844-side-tolvo-night": {
+   "k": 394,
+   "gap": 2.05,
+   "mult": 1.6,
+   "t": 3.5
+  },
+  "844x390-side-tolvo-night": {
+   "k": 394,
+   "gap": 2.05,
+   "mult": 1.6,
+   "t": 3.5
+  },
+  "1280x720-side-varsk-dusk": {
+   "k": 421,
+   "gap": 5.85,
+   "mult": 1.49,
+   "t": 4
+  },
+  "390x844-side-varsk-dusk": {
+   "k": 421,
+   "gap": 5.85,
+   "mult": 1.49,
+   "t": 4
+  },
+  "844x390-side-varsk-dusk": {
+   "k": 421,
+   "gap": 5.85,
+   "mult": 1.49,
+   "t": 4
+  },
+  "1280x720-side-varsk-night": {
+   "k": 421,
+   "gap": 5.85,
+   "mult": 1.49,
+   "t": 4
+  },
+  "390x844-side-varsk-night": {
+   "k": 421,
+   "gap": 5.85,
+   "mult": 1.49,
+   "t": 4
+  },
+  "844x390-side-varsk-night": {
+   "k": 421,
+   "gap": 5.85,
+   "mult": 1.49,
+   "t": 4
+  }
+ }
+}
