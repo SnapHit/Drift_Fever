@@ -6,13 +6,13 @@
 import { ROSTER, PAINTS, carById, upgradeLevels, UPGRADE_STATS, UPGRADE_NAMES } from '../garage/roster.js';
 import { CAREER, CHAPTERS, careerUnlocked, careerStars, chapterStars, chapterOpen, starsToOpen } from '../loop/modes.js';
 import { missionTally } from '../loop/missions.js';
-import { LOOP } from '../tune.js';
+import { LOOP, TANDEM } from '../tune.js';
 import { fullscreenSupported, isFullscreen, fullscreenIcon } from './fullscreen.js';
 import { soundIcon } from '../audio/sound.js';
 import { FIELDS } from '../lab/code.js';
 import { crossoverOffered, format as formatCode } from '../lab/lab.js';
 import { FX_ON } from '../fx.js';
-import { RIVALS, rivalOpen, rivalsLive } from '../rivals/roster.js';
+import { RIVALS, rivalOpen, rivalsLive, rivalNeeds, rivalState, ladderSummary, rivalPaint } from '../rivals/roster.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
@@ -55,6 +55,7 @@ export function createScreens(root, onAction) {
       <div class="menu">
         <button type="button" class="big primary" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
         <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total}/${CAREER.length * 3} stars &middot; ${info.missions}/${info.missionsOf} missions</small></button>
+        ${rivalsButton(save)}
         <button type="button" class="big" data-action="free"><b>FREE DRIFT</b><small>the car park, no timer</small></button>
         <button type="button" class="big" data-action="garage"><b>GARAGE</b><small>${esc(carById(save.car).name)}</small></button>
         <button type="button" class="big" data-action="lab"><b>TRACK LAB</b><small>${info.labCodes ? info.labCodes + ' of your tracks saved' : 'make and share tracks'}</small></button>
@@ -68,8 +69,56 @@ export function createScreens(root, onAction) {
       <p class="hint">Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.</p>`);
   }
 
+  /* THE RIVALS BUTTON on the title (briefs/RIVALS-LADDER.md): how many
+     are beaten, and a mark while a rival is earned and not yet beaten, so
+     there is always a reason to tap it; before the first is earned, what
+     earns him. */
+  function rivalsButton(save) {
+    const L = ladderSummary(save);
+    let line;
+    if (!L.earned) line = esc((L.first[0] || { text: 'Win a star' }).text) + ' to race ' + esc(RIVALS[0].name);
+    else if (L.ready.length) line = L.beaten + '/' + L.live + ' beaten &middot; ' + esc(RIVALS.find(r => r.id === L.ready[0]).name) + ' is waiting';
+    else line = L.beaten + '/' + L.live + ' beaten' + (L.beaten === L.live ? ' &middot; every one' : '');
+    return `<button type="button" class="big rivalsbtn${L.ready.length ? ' ready' : ''}" data-action="rivals"><b>RIVALS${L.ready.length ? '<i class="mark" aria-label="a race is waiting">RACE</i>' : ''}</b><small>${line}</small></button>`;
+  }
+
+  /* A rival's portrait (his car in his paint) or, until it is drawn, a swatch of his paint */
+  function portraitOf(d, playerPaint, info) {
+    const paint = rivalPaint(d, playerPaint), url = info && info.portrait ? info.portrait(d.car, paint) : '';
+    const hex = (PAINTS.find(p => p.id === paint) || PAINTS[0]).hex.toString(16).padStart(6, '0');
+    return url ? `<img class="pic" src="${url}" alt="${esc(carById(d.car).name)} in ${esc(paint)}">` : `<span class="pic sw" style="--p:#${hex}"></span>`;
+  }
+  /* THE RIVALS SCREEN: all six in ladder order from the first visit, each
+     a card with his portrait, his name, how he drives, his track, his car
+     and his prize, and his state: locked with what earns him (ticked when
+     done), open to race, or beaten with the best margin and still open.
+     A card not yet earned is still a button, so the keyboard reaches it,
+     but it does nothing. The list scrolls in its own box under the
+     header, as the career's does. info: { portrait(car, paint) } */
+  function rivals(save, info) {
+    const L = ladderSummary(save), mine = save.cars[save.car] ? save.cars[save.car].paint : 'cyan';
+    const cards = RIVALS.map((d, k) => {
+      const st = rivalState(save, k), e = save.rivals && save.rivals[d.id], c = CAREER[d.track];
+      const where = esc(c.name) + ' &middot; ' + (c.kind === 'circuit' ? (d.laps || TANDEM.LAPS) + ' laps' : 'sprint') + ' &middot; ' + esc(carById(d.car).name);
+      let state;
+      if (st === 'beaten') state = `<span class="st won"><b>BEATEN</b><small>best +${fmt(Math.max(0, e.best))}</small><small>race again</small></span>`;
+      else if (st === 'open') state = `<span class="st go"><b>RACE</b><small>${e ? 'best ' + (e.best >= 0 ? '+' : '') + fmt(e.best) : 'earned, not yet raced'}</small></span>`;
+      else if (st === 'off') state = `<span class="st off"><b>SOON</b><small>not in the game yet</small></span>`;
+      else state = `<span class="st lockd"><b>&#128274; TO EARN HIM</b>${rivalNeeds(save, k).map(n => `<small class="${n.done ? 'done' : ''}">${n.done ? '&#10003;' : '&#9675;'} ${esc(n.text)}</small>`).join('')}</span>`;
+      const go = st === 'open' || st === 'beaten';
+      return `<button type="button" class="rcard ${st}" data-rival="${esc(d.id)}" ${go ? `data-action="battle" data-arg="${esc(d.id)}"` : 'aria-disabled="true"'} style="--rp:#${(PAINTS.find(p => p.id === rivalPaint(d, mine)) || PAINTS[0]).hex.toString(16).padStart(6, '0')}">
+        <span class="rung">${k + 1}</span>
+        ${portraitOf(d, mine, info)}
+        <span class="who"><b>${esc(d.name.toUpperCase())}</b><small class="style">${esc(d.style)}</small><small class="where">${where}</small><small class="prize"><span class="coin">&#9679;</span> ${fmt(d.prize)} first win</small></span>
+        ${state}
+      </button>`;
+    }).join('');
+    show('rivals', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>RIVALS</h2><span class="tally">${L.beaten}/${L.live} beaten</span></header><p class="rule">Earn each one with a star on his track and a win over the one before. Race him again whenever you like.</p><div class="list">${cards}</div>`);
+  }
+
   /* A rival's card on the career screen, after his track (briefs/RIVALS.md
-     3): locked (and what opens him), open, or beaten with the best margin. */
+     3): locked (and what earns him, in the player's words), open, or
+     beaten with the best margin. */
   function rivalCard(save, index) {
     const k = RIVALS.findIndex(r => r.track === index);
     if (k < 0 || k >= rivalsLive()) return '';
@@ -78,11 +127,7 @@ export function createScreens(root, onAction) {
     let what;
     if (beaten) what = `<span class="state won">BEATEN<small>best +${fmt(Math.max(0, e.best))}</small></span>`;
     else if (open) what = `<span class="state go">RACE<small>${e ? 'best ' + (e.best >= 0 ? '+' : '') + fmt(e.best) : 'prize ' + fmt(d.prize)}</small></span>`;
-    else {
-      const needStar = !((save.career[String(d.track)] || {}).stars >= 1), prev = RIVALS[k - 1], needWin = k > 0 && !(save.rivals && save.rivals[prev.id] && save.rivals[prev.id].won);
-      const why = [needStar ? 'a star on ' + esc(CAREER[d.track].name) : '', needWin ? 'a win over ' + esc(prev.name) : ''].filter(Boolean).join(' and ');
-      what = `<span class="state lockd">&#128274;<small>${why}</small></span>`;
-    }
+    else what = `<span class="state lockd">&#128274;<small>${rivalNeeds(save, k).filter(n => !n.done).map(n => esc(n.text)).join(' &middot; ')}</small></span>`;
     return `<button type="button" class="rivalcard${open ? '' : ' locked'}${beaten ? ' beaten' : ''}" data-action="battle" data-arg="${esc(d.id)}" ${open ? '' : 'disabled'}>
         <span class="vs">VS</span>
         <span class="name"><b>${esc(d.name.toUpperCase())}</b><small>${esc(d.style)} &middot; drift race</small></span>
@@ -197,8 +242,12 @@ export function createScreens(root, onAction) {
     const who = r.won ? 'YOU WIN' : esc(r.rival.name.toUpperCase()) + ' WINS';
     const top = Math.max(1, r.score, r.rival.total), bar = n => Math.max(2, Math.round(n / top * 100));
     const coinsN = FX_ON ? `<b class="coinsN" data-to="${Math.round(r.coins)}">+${fmt(r.coins)}</b>` : `<b>+${fmt(r.coins)}</b>`;
-    const next = r.offer ? `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="battle" data-arg="${esc(r.offer.id)}"><b>NEXT RIVAL</b><small>${esc(r.offer.name)}</small></button>`
-      : `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="career"><b>CAREER</b><small>${'back to the tracks'}</small></button>`;
+    /* the next rival (briefs/RIVALS-LADDER.md): offered when he is earned, else what still earns him; the rivals screen always */
+    const N = r.next, goNext = !!(N && N.id && N.open);
+    const next = goNext ? `<button type="button" class="big${r.won ? ' primary' : ''}" data-action="battle" data-arg="${esc(N.id)}"><b>NEXT: ${esc(N.name.toUpperCase())}</b><small>${N.beaten ? 'beaten, race again' : 'drift race'}</small></button>` : '';
+    const nextLine = !N ? '' : N.last ? `<p class="unlock done">${r.won ? 'The whole ladder is yours' : 'The last rival on the ladder'}</p>`
+      : N.open ? (r.offer ? `<p class="unlock done">&#128275; Next rival earned: ${esc(N.name)}</p>` : '')
+      : `<p class="unlock nextr">Next, ${esc(N.name)}: ${N.needs.map(n => `<span class="${n.done ? 'done' : ''}">${n.done ? '&#10003;' : '&#9675;'} ${esc(n.text)}</span>`).join(' ')}</p>`;
     const P = r.parts || {}, Q = r.rivalParts || {}, gates = Math.max(0, (r.gates || 1) - 1);
     const row = (label, x, y, hint) => `<tr><th>${label}${hint ? ` <small>${hint}</small>` : ''}</th><td>${x}</td><td>${y}</td></tr>`;
     const n = v => fmt(v || 0);
@@ -217,9 +266,9 @@ export function createScreens(root, onAction) {
         <p class="margin">${r.won ? (r.margin ? 'by ' + fmt(r.margin) : 'a tie is yours') : fmt(-r.margin) + ' short'}</p>${b}
         ${table}
         <div class="facts"><span>${coinsN}<small>coins${r.prize ? ' &middot; first win +' + fmt(r.prize) : ''}</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>race</small></span><span><b>${r.best2 !== undefined && r.best2 > -1e9 ? (r.best2 >= 0 ? '+' : '') + fmt(r.best2) : ''}</b><small>best margin</small></span></div>
-        ${r.offer ? `<p class="unlock done">&#128275; Next rival open: ${esc(r.offer.name)}</p>` : ''}
-        <button type="button" class="big${r.won ? '' : ' primary'}" data-action="again"><b>REMATCH</b><small>DRIFT / BRAKE, Enter or R</small></button>
-        <div class="row2">${next}<button type="button" class="big" data-action="title"><b>MENU</b></button></div>${z}
+        ${nextLine}
+        <button type="button" class="big${r.won && goNext ? '' : ' primary'}" data-action="again"><b>REMATCH</b><small>DRIFT / BRAKE, Enter or R</small></button>
+        <div class="row2">${next}<button type="button" class="big" data-action="rivals"><b>RIVALS</b></button><button type="button" class="big" data-action="title"><b>MENU</b></button></div>${z}
       </div>`);
   }
 
@@ -246,17 +295,17 @@ export function createScreens(root, onAction) {
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
         ${r.note ? `<p class="chapnote">${esc(r.note.text)}</p>` : ''}
-        ${r.offer ? `<button type="button" class="big rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RIVAL: ${esc(r.offer.name.toUpperCase())}</b><small>a drift race is open</small></button>` : ''}
         <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}
+          ${r.offer ? `<button type="button" class="big rivalgo" data-action="battle" data-arg="${esc(r.offer.id)}"><b>RACE ${esc(r.offer.name.toUpperCase())}</b><small>${r.offer.fresh ? 'just earned' : 'drift race'}</small></button>` : ''}
           ${r.code ? `<button type="button" class="big" data-action="lab"><b>LAB</b><small>change the track</small></button>` : ''}
           <button type="button" class="big" data-action="title"><b>MENU</b></button>
         </div>${z}
       </div>`);
   }
 
-  return { el, show, hide, title, career, garage, lab, results, get current() { return current; } };
+  return { el, show, hide, title, career, rivals, garage, lab, results, get current() { return current; } };
 }
 
 export { fmt };

@@ -6,6 +6,7 @@
    (rivals/driver.js RIVAL_DRIVE). First guesses for the author to set
    by play; the measurements in game/test/rivals/ say how each drives. */
 import { TANDEM } from '../tune.js';
+import { CAREER } from '../loop/modes.js';
 
 export const RIVALS = [
   { id: 'r1', name: 'Kestrow', car: 'starter', paint: 'flame', track: 0, side: 1, prize: 300, laps: 4,
@@ -51,6 +52,37 @@ export function rivalOpen(save, id) {
   return !!(prev && prev.won);
 }
 export function openRivals(save) { return RIVALS.filter(r => rivalOpen(save, r.id)).map(r => r.id); }
+
+/* THE LADDER, as the screens tell it (briefs/RIVALS-LADDER.md). What
+   earns rival k, in the player's words, each ticked when done: a star on
+   his career track, and a win over the rival before him. */
+export function rivalNeeds(save, k) {
+  const d = RIVALS[k];
+  if (!d) return [];
+  const e = save.career[String(d.track)], prev = k > 0 ? RIVALS[k - 1] : null, pe = prev && save.rivals && save.rivals[prev.id];
+  const out = [{ kind: 'star', text: 'Win a star on ' + CAREER[d.track].name, done: !!(e && e.stars >= 1), track: d.track }];
+  if (prev) out.push({ kind: 'win', text: 'Beat ' + prev.name, done: !!(pe && pe.won), rival: prev.id });
+  return out;
+}
+/* A rival's state: 'off' (not in the game yet), 'locked', 'open' (earned
+   and not yet beaten) or 'beaten'. Earned is earned for good: a beaten
+   rival stays raceable. */
+export function rivalState(save, k) {
+  const d = RIVALS[k];
+  if (!d || k >= rivalsLive()) return 'off';
+  if (!rivalOpen(save, d.id)) return 'locked';
+  const e = save.rivals && save.rivals[d.id];
+  return e && e.won ? 'beaten' : 'open';
+}
+/* The title's line: how many of the live rivals are beaten, the ones open
+   and not yet beaten (each a reason to tap), and before the first is
+   earned, what earns him. */
+export function ladderSummary(save) {
+  const live = rivalsLive(), states = RIVALS.slice(0, live).map((_, k) => rivalState(save, k));
+  const beaten = states.filter(s => s === 'beaten').length, ready = RIVALS.filter((_, k) => states[k] === 'open').map(r => r.id);
+  const earned = states.filter(s => s === 'open' || s === 'beaten').length;
+  return { live, beaten, ready, earned, first: earned ? null : rivalNeeds(save, 0).filter(n => !n.done) };
+}
 
 /* The rival's paint, never the player's (the readability rule: the
    player's car is the most findable). */
