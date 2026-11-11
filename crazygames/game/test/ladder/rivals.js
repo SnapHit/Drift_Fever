@@ -47,7 +47,7 @@ const args = process.argv.slice(2), arg = (k, d) => args.includes(k) ? +args[arg
 const RUNS = arg('--runs', 20);
 const ids = args.filter(a => /^r\d$/.test(a));
 const list = ids.length ? ids.map(rivalById) : RIVALS;
-const file = path.join(R.ladderDir, 'rivals.json');
+const file = process.env.LADDER_OUT || path.join(R.ladderDir, 'rivals.json');   // LADDER_OUT: a candidate's numbers kept apart from the record while he is searched
 const out = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { rows: {} };
 out.bar = BAR; out.runs = RUNS; out.playerCar = PLAYER_CAR;
 
