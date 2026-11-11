@@ -57,7 +57,7 @@ async function record(kind, hold) {
   await pg.close();
   return r;
 }
-const lost = await record('grip', LOST_HOLD), won = await record('mixed', 0);
+const lost = await record('grip', LOST_HOLD), won = await record('slide', 0);
 console.log('tapes: lost ' + lost.score + ' to ' + lost.rival + ' (' + (lost.won ? 'won' : 'lost') + '), won ' + won.score + ' to ' + won.rival + ' (' + (won.won ? 'won' : 'lost') + ')');
 
 for (const vp of SIZES) {

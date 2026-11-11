@@ -140,6 +140,7 @@ function run(name, opts) {
     if (world.passThrough) st.passThroughSteps++;
     if (rival.solid()) st.minGap = Math.min(st.minGap, Math.hypot(c.x - r.x, c.z - r.z));
     sinceHit += STEP;
+    if (world.hit && world.hit.kind === 'rival' && process.env.TRACE === name) console.log('  hit ' + t.toFixed(2) + ' s, ' + world.hit.speed.toFixed(1) + ' m/s' + (world.hit.hard ? ' hard' : '') + ', chain before ' + Math.round(st.chainBefore) + ', after ' + Math.round(scoring.chain) + ', slip ' + (Math.abs(c.slip) * 57.3).toFixed(0));
     if (world.hit && world.hit.kind === 'rival') { sinceHit = 0; st.contacts++; if (world.hit.hard) { st.hardContacts++; if (st.chainBefore > 0) { st.hardWithChain++; if (scoring.chain > 0) st.hardKeptChain++; } } }
     st.chainBefore = scoring.chain;
     if (sinceHit <= 2) { if (world.respawned) st.respawns++; st.maxOff = Math.max(st.maxOff, Math.abs(world.lateral) - world.halfWidth); }

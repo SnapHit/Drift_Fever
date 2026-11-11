@@ -48,7 +48,7 @@ async function shootWhen(pg, cond, max, name, steer) {
   console.log((f ? 'shot ' : 'MISSING ') + path.basename(name) + (f ? ' ' + JSON.stringify(f) : ''));
   return f;
 }
-/* the results' tapes: won by the mixed player; lost by the grip player held on the grid with DRIFT for its first 8 s */
+/* the results' tapes: won by the slide player; lost by the grip player held on the grid with DRIFT for its first 8 s */
 async function record(kind, hold) {
   const pg = await R.page(env, R.LANDSCAPE, '');
   await R.battleRun(pg.page, 'r1', { player: kind });
@@ -58,7 +58,7 @@ async function record(kind, hold) {
   await pg.close();
   return r;
 }
-const lost = await record('grip', 8), won = await record('mixed', 0);
+const lost = await record('grip', 8), won = await record('slide', 0);
 console.log('tapes: won ' + won.score + ' to ' + won.rival + ' (' + won.won + '), lost ' + lost.score + ' to ' + lost.rival + ' (' + lost.won + ')');
 const SWIPE = `if (!A.swipe && A.state === 'drive' && R && R.state.sliding && t.gap < 9 && F.scoring.state.chain > 0 && R.runDistance() > 60) { A.swipe = 1; window.__feel.setDriver(null); }
   if (A.swipe) { const c = F.world.car, r = R.world.car, fx = -Math.sin(c.yaw), fz = -Math.cos(c.yaw), lx = -Math.cos(c.yaw), lz = Math.sin(c.yaw), dx = r.x - c.x, dz = r.z - c.z; F.inject = { steer: Math.max(-1, Math.min(1, -Math.atan2(dx * lx + dz * lz, dx * fx + dz * fz) * 4)), throttle: 1, brake: 0, handbrake: 0 }; }`;
