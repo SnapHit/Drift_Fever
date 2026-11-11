@@ -1,0 +1,2466 @@
+{
+ "rival": "r1",
+ "runs": 20,
+ "players": {
+  "grip": {
+   "runs": 20,
+   "wins": 9,
+   "seconds": [
+    73.48,
+    75.97
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    -1.9,
+    1.24
+   ],
+   "aheadShare": [
+    0.254,
+    1
+   ],
+   "leadGates": [
+    4,
+    15
+   ],
+   "changes": [
+    0,
+    14
+   ],
+   "lineWon": 16,
+   "total": [
+    1174,
+    2670
+   ],
+   "rival": [
+    2526,
+    4263
+   ],
+   "margin": [
+    -2983,
+    114
+   ],
+   "allAhead": 2,
+   "allBehind": 0,
+   "wallHits": 2,
+   "hard": 1,
+   "bodyHits": 17,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 119,
+    "clean": 216,
+    "pace": 373,
+    "leads": 1232,
+    "line": 603,
+    "close": 41
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 88,
+    "line": 0,
+    "close": 0
+   },
+   "races": [
+    {
+     "seconds": 74.49,
+     "rivalSeconds": 75.2,
+     "total": 2584,
+     "rival": 2750,
+     "won": false,
+     "aheadShare": 0.93,
+     "leadGates": 14,
+     "rivalGates": 1,
+     "lineTo": "player",
+     "changes": 6,
+     "parts": {
+      "drift": 119,
+      "clean": 216,
+      "pace": 373,
+      "leads": 1232,
+      "line": 603,
+      "close": 41
+     },
+     "rivalParts": {
+      "drift": 1909,
+      "clean": 384,
+      "pace": 369,
+      "leads": 88,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 13
+    },
+    {
+     "seconds": 74.04,
+     "rivalSeconds": 74.83,
+     "total": 2652,
+     "rival": 2599,
+     "won": true,
+     "aheadShare": 0.999,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 8,
+     "parts": {
+      "drift": 18,
+      "clean": 336,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1844,
+      "clean": 384,
+      "pace": 371,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 74.83,
+     "rivalSeconds": 74.15,
+     "total": 1499,
+     "rival": 3711,
+     "won": false,
+     "aheadShare": 0.586,
+     "leadGates": 9,
+     "rivalGates": 6,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 144,
+      "clean": 192,
+      "pace": 371,
+      "leads": 792,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1822,
+      "clean": 384,
+      "pace": 374,
+      "leads": 528,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 17
+    },
+    {
+     "seconds": 73.48,
+     "rivalSeconds": 74.23,
+     "total": 2608,
+     "rival": 2674,
+     "won": false,
+     "aheadShare": 0.992,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 4,
+     "parts": {
+      "drift": 18,
+      "clean": 288,
+      "pace": 378,
+      "leads": 1320,
+      "line": 603,
+      "close": 1
+     },
+     "rivalParts": {
+      "drift": 1916,
+      "clean": 384,
+      "pace": 374,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 5
+    },
+    {
+     "seconds": 73.67,
+     "rivalSeconds": 74.59,
+     "total": 2630,
+     "rival": 2570,
+     "won": true,
+     "aheadShare": 0.996,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 14,
+     "parts": {
+      "drift": 18,
+      "clean": 312,
+      "pace": 377,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1814,
+      "clean": 384,
+      "pace": 372,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 5
+    },
+    {
+     "seconds": 73.98,
+     "rivalSeconds": 75.51,
+     "total": 2644,
+     "rival": 2598,
+     "won": true,
+     "aheadShare": 0.985,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 4,
+     "parts": {
+      "drift": 10,
+      "clean": 336,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1846,
+      "clean": 384,
+      "pace": 368,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 74.31,
+     "rivalSeconds": 76.21,
+     "total": 2666,
+     "rival": 2901,
+     "won": false,
+     "aheadShare": 0.988,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 2,
+     "parts": {
+      "drift": 9,
+      "clean": 360,
+      "pace": 374,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 2177,
+      "clean": 360,
+      "pace": 364,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 1
+    },
+    {
+     "seconds": 74.02,
+     "rivalSeconds": 75.25,
+     "total": 2640,
+     "rival": 2526,
+     "won": true,
+     "aheadShare": 0.989,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 4,
+     "parts": {
+      "drift": 6,
+      "clean": 336,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1773,
+      "clean": 384,
+      "pace": 369,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 75.97,
+     "rivalSeconds": 75.08,
+     "total": 1378,
+     "rival": 4263,
+     "won": false,
+     "aheadShare": 0.254,
+     "leadGates": 4,
+     "rivalGates": 11,
+     "lineTo": "rival",
+     "changes": 5,
+     "parts": {
+      "drift": 314,
+      "clean": 240,
+      "pace": 365,
+      "leads": 352,
+      "line": 0,
+      "close": 107
+     },
+     "rivalParts": {
+      "drift": 1938,
+      "clean": 384,
+      "pace": 370,
+      "leads": 968,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 15
+    },
+    {
+     "seconds": 75.12,
+     "rivalSeconds": 74.15,
+     "total": 1397,
+     "rival": 3711,
+     "won": false,
+     "aheadShare": 0.554,
+     "leadGates": 9,
+     "rivalGates": 6,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 19,
+      "clean": 216,
+      "pace": 370,
+      "leads": 792,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1822,
+      "clean": 384,
+      "pace": 374,
+      "leads": 528,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 11
+    },
+    {
+     "seconds": 74.09,
+     "rivalSeconds": 74.75,
+     "total": 2626,
+     "rival": 2738,
+     "won": false,
+     "aheadShare": 1,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 0,
+     "parts": {
+      "drift": 15,
+      "clean": 312,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 1
+     },
+     "rivalParts": {
+      "drift": 1983,
+      "clean": 384,
+      "pace": 371,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 4
+    },
+    {
+     "seconds": 73.57,
+     "rivalSeconds": 74.3,
+     "total": 2599,
+     "rival": 2584,
+     "won": true,
+     "aheadShare": 0.994,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 8,
+     "parts": {
+      "drift": 11,
+      "clean": 288,
+      "pace": 377,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1826,
+      "clean": 384,
+      "pace": 374,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 5
+    },
+    {
+     "seconds": 73.97,
+     "rivalSeconds": 75.51,
+     "total": 2651,
+     "rival": 2598,
+     "won": true,
+     "aheadShare": 0.99,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 4,
+     "parts": {
+      "drift": 17,
+      "clean": 336,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1846,
+      "clean": 384,
+      "pace": 368,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 73.93,
+     "rivalSeconds": 74.6,
+     "total": 2644,
+     "rival": 2707,
+     "won": false,
+     "aheadShare": 0.992,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 6,
+     "parts": {
+      "drift": 9,
+      "clean": 336,
+      "pace": 376,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1951,
+      "clean": 384,
+      "pace": 372,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 74.01,
+     "rivalSeconds": 74.83,
+     "total": 2645,
+     "rival": 2599,
+     "won": true,
+     "aheadShare": 1,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 6,
+     "parts": {
+      "drift": 10,
+      "clean": 336,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 1
+     },
+     "rivalParts": {
+      "drift": 1844,
+      "clean": 384,
+      "pace": 371,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 74.01,
+     "rivalSeconds": 75.08,
+     "total": 2645,
+     "rival": 2692,
+     "won": false,
+     "aheadShare": 0.989,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 6,
+     "parts": {
+      "drift": 11,
+      "clean": 336,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1938,
+      "clean": 384,
+      "pace": 370,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 75.47,
+     "rivalSeconds": 74.23,
+     "total": 1174,
+     "rival": 4157,
+     "won": false,
+     "aheadShare": 0.289,
+     "leadGates": 5,
+     "rivalGates": 10,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 122,
+      "clean": 240,
+      "pace": 368,
+      "leads": 440,
+      "line": 0,
+      "close": 4
+     },
+     "rivalParts": {
+      "drift": 1916,
+      "clean": 384,
+      "pace": 374,
+      "leads": 880,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 8
+    },
+    {
+     "seconds": 73.63,
+     "rivalSeconds": 74.59,
+     "total": 2623,
+     "rival": 2570,
+     "won": true,
+     "aheadShare": 0.994,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 10,
+     "parts": {
+      "drift": 11,
+      "clean": 312,
+      "pace": 377,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1814,
+      "clean": 384,
+      "pace": 372,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 4
+    },
+    {
+     "seconds": 73.57,
+     "rivalSeconds": 74.3,
+     "total": 2599,
+     "rival": 2584,
+     "won": true,
+     "aheadShare": 1,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 0,
+     "parts": {
+      "drift": 11,
+      "clean": 288,
+      "pace": 377,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1826,
+      "clean": 384,
+      "pace": 374,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 4
+    },
+    {
+     "seconds": 74.33,
+     "rivalSeconds": 76.21,
+     "total": 2670,
+     "rival": 2901,
+     "won": false,
+     "aheadShare": 0.987,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 4,
+     "parts": {
+      "drift": 13,
+      "clean": 360,
+      "pace": 374,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 2177,
+      "clean": 360,
+      "pace": 364,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 2
+    }
+   ]
+  },
+  "slide": {
+   "runs": 20,
+   "wins": 12,
+   "seconds": [
+    85.99,
+    89.85
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    11.16,
+    15.55
+   ],
+   "aheadShare": [
+    0.003,
+    0.107
+   ],
+   "leadGates": [
+    0,
+    2
+   ],
+   "changes": [
+    1,
+    3
+   ],
+   "lineWon": 0,
+   "total": [
+    2068,
+    5964
+   ],
+   "rival": [
+    4405,
+    4824
+   ],
+   "margin": [
+    -2453,
+    1549
+   ],
+   "allAhead": 0,
+   "allBehind": 0,
+   "wallHits": 5,
+   "hard": 3,
+   "bodyHits": 11,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 3549,
+    "clean": 336,
+    "pace": 311,
+    "leads": 0,
+    "line": 0,
+    "close": 0
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 1320,
+    "line": 603,
+    "close": 0
+   },
+   "races": [
+    {
+     "seconds": 89.15,
+     "rivalSeconds": 75.2,
+     "total": 4196,
+     "rival": 4585,
+     "won": false,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 3549,
+      "clean": 336,
+      "pace": 311,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1909,
+      "clean": 384,
+      "pace": 369,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 1
+    },
+    {
+     "seconds": 85.99,
+     "rivalSeconds": 74.83,
+     "total": 4677,
+     "rival": 4434,
+     "won": true,
+     "aheadShare": 0.079,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 4002,
+      "clean": 264,
+      "pace": 323,
+      "leads": 88,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1844,
+      "clean": 384,
+      "pace": 371,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 8
+    },
+    {
+     "seconds": 86.68,
+     "rivalSeconds": 74.15,
+     "total": 5964,
+     "rival": 4415,
+     "won": true,
+     "aheadShare": 0.079,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 5059,
+      "clean": 336,
+      "pace": 320,
+      "leads": 88,
+      "line": 0,
+      "close": 161
+     },
+     "rivalParts": {
+      "drift": 1822,
+      "clean": 384,
+      "pace": 374,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 11
+    },
+    {
+     "seconds": 88.06,
+     "rivalSeconds": 74.23,
+     "total": 2281,
+     "rival": 4509,
+     "won": false,
+     "aheadShare": 0.04,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 1532,
+      "clean": 336,
+      "pace": 315,
+      "leads": 88,
+      "line": 0,
+      "close": 10
+     },
+     "rivalParts": {
+      "drift": 1916,
+      "clean": 384,
+      "pace": 374,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 3,
+     "bodyHits": 0
+    },
+    {
+     "seconds": 87.96,
+     "rivalSeconds": 74.59,
+     "total": 5120,
+     "rival": 4493,
+     "won": true,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 4468,
+      "clean": 336,
+      "pace": 316,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1814,
+      "clean": 384,
+      "pace": 372,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 87.76,
+     "rivalSeconds": 75.51,
+     "total": 4852,
+     "rival": 4433,
+     "won": true,
+     "aheadShare": 0.061,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 4136,
+      "clean": 312,
+      "pace": 316,
+      "leads": 88,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1846,
+      "clean": 384,
+      "pace": 368,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 6
+    },
+    {
+     "seconds": 88.63,
+     "rivalSeconds": 76.21,
+     "total": 5430,
+     "rival": 4824,
+     "won": true,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 4781,
+      "clean": 336,
+      "pace": 313,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 2177,
+      "clean": 360,
+      "pace": 364,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 87.35,
+     "rivalSeconds": 75.25,
+     "total": 5400,
+     "rival": 4449,
+     "won": true,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 4722,
+      "clean": 360,
+      "pace": 318,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1773,
+      "clean": 384,
+      "pace": 369,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 87.79,
+     "rivalSeconds": 75.08,
+     "total": 5753,
+     "rival": 4439,
+     "won": true,
+     "aheadShare": 0.107,
+     "leadGates": 2,
+     "rivalGates": 13,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 4973,
+      "clean": 288,
+      "pace": 316,
+      "leads": 176,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1938,
+      "clean": 384,
+      "pace": 370,
+      "leads": 1144,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 9
+    },
+    {
+     "seconds": 88.63,
+     "rivalSeconds": 74.15,
+     "total": 3704,
+     "rival": 4503,
+     "won": false,
+     "aheadShare": 0.037,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 3079,
+      "clean": 312,
+      "pace": 313,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1822,
+      "clean": 384,
+      "pace": 374,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 3,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 87.91,
+     "rivalSeconds": 74.75,
+     "total": 5187,
+     "rival": 4661,
+     "won": true,
+     "aheadShare": 0.007,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 4535,
+      "clean": 336,
+      "pace": 316,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1983,
+      "clean": 384,
+      "pace": 371,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 87.77,
+     "rivalSeconds": 74.3,
+     "total": 4093,
+     "rival": 4507,
+     "won": false,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 3417,
+      "clean": 360,
+      "pace": 316,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1826,
+      "clean": 384,
+      "pace": 374,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 1
+    },
+    {
+     "seconds": 89.05,
+     "rivalSeconds": 75.51,
+     "total": 2068,
+     "rival": 4521,
+     "won": false,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1444,
+      "clean": 312,
+      "pace": 312,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1846,
+      "clean": 384,
+      "pace": 368,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 4,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 87.47,
+     "rivalSeconds": 74.6,
+     "total": 5602,
+     "rival": 4630,
+     "won": true,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 4925,
+      "clean": 360,
+      "pace": 317,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1951,
+      "clean": 384,
+      "pace": 372,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 1
+    },
+    {
+     "seconds": 89.13,
+     "rivalSeconds": 74.83,
+     "total": 3289,
+     "rival": 4522,
+     "won": false,
+     "aheadShare": 0.005,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 2666,
+      "clean": 312,
+      "pace": 311,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1844,
+      "clean": 384,
+      "pace": 371,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 88.25,
+     "rivalSeconds": 75.08,
+     "total": 5408,
+     "rival": 4615,
+     "won": true,
+     "aheadShare": 0.004,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 4757,
+      "clean": 336,
+      "pace": 315,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1938,
+      "clean": 384,
+      "pace": 370,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 87.38,
+     "rivalSeconds": 74.23,
+     "total": 5061,
+     "rival": 4509,
+     "won": true,
+     "aheadShare": 0.057,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 4279,
+      "clean": 312,
+      "pace": 318,
+      "leads": 88,
+      "line": 0,
+      "close": 64
+     },
+     "rivalParts": {
+      "drift": 1916,
+      "clean": 384,
+      "pace": 374,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 89.06,
+     "rivalSeconds": 74.59,
+     "total": 2939,
+     "rival": 4405,
+     "won": false,
+     "aheadShare": 0.076,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 2251,
+      "clean": 288,
+      "pace": 312,
+      "leads": 88,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1814,
+      "clean": 384,
+      "pace": 372,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 5,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 89.85,
+     "rivalSeconds": 74.3,
+     "total": 4288,
+     "rival": 4507,
+     "won": false,
+     "aheadShare": 0.03,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 3643,
+      "clean": 336,
+      "pace": 309,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 1826,
+      "clean": 384,
+      "pace": 374,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 4,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 89.32,
+     "rivalSeconds": 76.21,
+     "total": 5068,
+     "rival": 4824,
+     "won": true,
+     "aheadShare": 0.003,
+     "leadGates": 0,
+     "rivalGates": 15,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 4421,
+      "clean": 336,
+      "pace": 311,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 2177,
+      "clean": 360,
+      "pace": 364,
+      "leads": 1320,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 3
+    }
+   ]
+  },
+  "mixed": {
+   "runs": 20,
+   "wins": 6,
+   "seconds": [
+    73.31,
+    82.68
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    -1.5,
+    7.93
+   ],
+   "aheadShare": [
+    0.056,
+    1
+   ],
+   "leadGates": [
+    1,
+    15
+   ],
+   "changes": [
+    0,
+    12
+   ],
+   "lineWon": 6,
+   "total": [
+    2068,
+    4188
+   ],
+   "rival": [
+    2580,
+    4573
+   ],
+   "margin": [
+    -2459,
+    1496
+   ],
+   "allAhead": 3,
+   "allBehind": 0,
+   "wallHits": 6,
+   "hard": 4,
+   "bodyHits": 34,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 1363,
+    "clean": 288,
+    "pace": 357,
+    "leads": 528,
+    "line": 0,
+    "close": 80
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 792,
+    "line": 603,
+    "close": 0
+   },
+   "races": [
+    {
+     "seconds": 77.82,
+     "rivalSeconds": 75.2,
+     "total": 2616,
+     "rival": 4057,
+     "won": false,
+     "aheadShare": 0.401,
+     "leadGates": 6,
+     "rivalGates": 9,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 1363,
+      "clean": 288,
+      "pace": 357,
+      "leads": 528,
+      "line": 0,
+      "close": 80
+     },
+     "rivalParts": {
+      "drift": 1909,
+      "clean": 384,
+      "pace": 369,
+      "leads": 792,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 77.33,
+     "rivalSeconds": 74.83,
+     "total": 2290,
+     "rival": 4434,
+     "won": false,
+     "aheadShare": 0.059,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1524,
+      "clean": 312,
+      "pace": 359,
+      "leads": 88,
+      "line": 0,
+      "close": 7
+     },
+     "rivalParts": {
+      "drift": 1844,
+      "clean": 384,
+      "pace": 371,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 6
+    },
+    {
+     "seconds": 78.01,
+     "rivalSeconds": 74.15,
+     "total": 2416,
+     "rival": 4415,
+     "won": false,
+     "aheadShare": 0.061,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1654,
+      "clean": 312,
+      "pace": 356,
+      "leads": 88,
+      "line": 0,
+      "close": 6
+     },
+     "rivalParts": {
+      "drift": 1822,
+      "clean": 384,
+      "pace": 374,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 4,
+     "bodyHits": 1
+    },
+    {
+     "seconds": 77.28,
+     "rivalSeconds": 74.23,
+     "total": 2454,
+     "rival": 4245,
+     "won": false,
+     "aheadShare": 0.289,
+     "leadGates": 4,
+     "rivalGates": 11,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1394,
+      "clean": 336,
+      "pace": 359,
+      "leads": 352,
+      "line": 0,
+      "close": 13
+     },
+     "rivalParts": {
+      "drift": 1916,
+      "clean": 384,
+      "pace": 374,
+      "leads": 968,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 3,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 78.03,
+     "rivalSeconds": 74.59,
+     "total": 2969,
+     "rival": 4405,
+     "won": false,
+     "aheadShare": 0.064,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 2148,
+      "clean": 312,
+      "pace": 356,
+      "leads": 88,
+      "line": 0,
+      "close": 65
+     },
+     "rivalParts": {
+      "drift": 1814,
+      "clean": 384,
+      "pace": 372,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 74.01,
+     "rivalSeconds": 75.51,
+     "total": 3645,
+     "rival": 2598,
+     "won": true,
+     "aheadShare": 0.985,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 2,
+     "parts": {
+      "drift": 1099,
+      "clean": 240,
+      "pace": 375,
+      "leads": 1320,
+      "line": 603,
+      "close": 8
+     },
+     "rivalParts": {
+      "drift": 1846,
+      "clean": 384,
+      "pace": 368,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 22
+    },
+    {
+     "seconds": 74.82,
+     "rivalSeconds": 76.21,
+     "total": 3834,
+     "rival": 2901,
+     "won": true,
+     "aheadShare": 1,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 0,
+     "parts": {
+      "drift": 1201,
+      "clean": 312,
+      "pace": 371,
+      "leads": 1320,
+      "line": 603,
+      "close": 27
+     },
+     "rivalParts": {
+      "drift": 2177,
+      "clean": 360,
+      "pace": 364,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 77.13,
+     "rivalSeconds": 75.25,
+     "total": 2556,
+     "rival": 4361,
+     "won": false,
+     "aheadShare": 0.058,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1765,
+      "clean": 336,
+      "pace": 360,
+      "leads": 88,
+      "line": 0,
+      "close": 7
+     },
+     "rivalParts": {
+      "drift": 1773,
+      "clean": 384,
+      "pace": 369,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 2
+    },
+    {
+     "seconds": 74.34,
+     "rivalSeconds": 75.08,
+     "total": 4188,
+     "rival": 2692,
+     "won": true,
+     "aheadShare": 1,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 0,
+     "parts": {
+      "drift": 1543,
+      "clean": 336,
+      "pace": 373,
+      "leads": 1320,
+      "line": 603,
+      "close": 13
+     },
+     "rivalParts": {
+      "drift": 1938,
+      "clean": 384,
+      "pace": 370,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 73.31,
+     "rivalSeconds": 74.15,
+     "total": 4066,
+     "rival": 2580,
+     "won": true,
+     "aheadShare": 1,
+     "leadGates": 15,
+     "rivalGates": 0,
+     "lineTo": "player",
+     "changes": 0,
+     "parts": {
+      "drift": 1419,
+      "clean": 312,
+      "pace": 379,
+      "leads": 1320,
+      "line": 603,
+      "close": 33
+     },
+     "rivalParts": {
+      "drift": 1822,
+      "clean": 384,
+      "pace": 374,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 3
+    },
+    {
+     "seconds": 82.68,
+     "rivalSeconds": 74.75,
+     "total": 2138,
+     "rival": 4573,
+     "won": false,
+     "aheadShare": 0.097,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1417,
+      "clean": 264,
+      "pace": 336,
+      "leads": 88,
+      "line": 0,
+      "close": 33
+     },
+     "rivalParts": {
+      "drift": 1983,
+      "clean": 384,
+      "pace": 371,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 3,
+     "bodyHits": 14
+    },
+    {
+     "seconds": 75.44,
+     "rivalSeconds": 74.3,
+     "total": 2495,
+     "rival": 3627,
+     "won": false,
+     "aheadShare": 0.644,
+     "leadGates": 10,
+     "rivalGates": 5,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 988,
+      "clean": 216,
+      "pace": 368,
+      "leads": 880,
+      "line": 0,
+      "close": 43
+     },
+     "rivalParts": {
+      "drift": 1826,
+      "clean": 384,
+      "pace": 374,
+      "leads": 440,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 10
+    },
+    {
+     "seconds": 76.19,
+     "rivalSeconds": 75.51,
+     "total": 2971,
+     "rival": 3465,
+     "won": false,
+     "aheadShare": 0.782,
+     "leadGates": 12,
+     "rivalGates": 3,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1232,
+      "clean": 312,
+      "pace": 364,
+      "leads": 1056,
+      "line": 0,
+      "close": 7
+     },
+     "rivalParts": {
+      "drift": 1846,
+      "clean": 384,
+      "pace": 368,
+      "leads": 264,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 4
+    },
+    {
+     "seconds": 75.83,
+     "rivalSeconds": 74.6,
+     "total": 2684,
+     "rival": 3486,
+     "won": false,
+     "aheadShare": 0.821,
+     "leadGates": 13,
+     "rivalGates": 2,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 890,
+      "clean": 264,
+      "pace": 366,
+      "leads": 1144,
+      "line": 0,
+      "close": 20
+     },
+     "rivalParts": {
+      "drift": 1951,
+      "clean": 384,
+      "pace": 372,
+      "leads": 176,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 1,
+     "bodyHits": 5
+    },
+    {
+     "seconds": 77.26,
+     "rivalSeconds": 74.83,
+     "total": 2236,
+     "rival": 4434,
+     "won": false,
+     "aheadShare": 0.059,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1467,
+      "clean": 312,
+      "pace": 359,
+      "leads": 88,
+      "line": 0,
+      "close": 10
+     },
+     "rivalParts": {
+      "drift": 1844,
+      "clean": 384,
+      "pace": 371,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 3,
+     "bodyHits": 5
+    },
+    {
+     "seconds": 76.48,
+     "rivalSeconds": 75.08,
+     "total": 2068,
+     "rival": 4527,
+     "won": false,
+     "aheadShare": 0.072,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 3,
+     "parts": {
+      "drift": 1308,
+      "clean": 288,
+      "pace": 363,
+      "leads": 88,
+      "line": 0,
+      "close": 21
+     },
+     "rivalParts": {
+      "drift": 1938,
+      "clean": 384,
+      "pace": 370,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 6
+    },
+    {
+     "seconds": 74.14,
+     "rivalSeconds": 74.23,
+     "total": 3326,
+     "rival": 3290,
+     "won": true,
+     "aheadShare": 0.601,
+     "leadGates": 8,
+     "rivalGates": 7,
+     "lineTo": "player",
+     "changes": 2,
+     "parts": {
+      "drift": 1252,
+      "clean": 264,
+      "pace": 374,
+      "leads": 704,
+      "line": 603,
+      "close": 129
+     },
+     "rivalParts": {
+      "drift": 1916,
+      "clean": 384,
+      "pace": 374,
+      "leads": 616,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "bodyHits": 6
+    },
+    {
+     "seconds": 78.33,
+     "rivalSeconds": 74.59,
+     "total": 2072,
+     "rival": 4405,
+     "won": false,
+     "aheadShare": 0.056,
+     "leadGates": 1,
+     "rivalGates": 14,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1334,
+      "clean": 288,
+      "pace": 354,
+      "leads": 88,
+      "line": 0,
+      "close": 8
+     },
+     "rivalParts": {
+      "drift": 1814,
+      "clean": 384,
+      "pace": 372,
+      "leads": 1232,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 6,
+     "bodyHits": 1
+    },
+    {
+     "seconds": 74.14,
+     "rivalSeconds": 74.3,
+     "total": 3225,
+     "rival": 2848,
+     "won": true,
+     "aheadShare": 0.812,
+     "leadGates": 12,
+     "rivalGates": 3,
+     "lineTo": "player",
+     "changes": 12,
+     "parts": {
+      "drift": 988,
+      "clean": 96,
+      "pace": 374,
+      "leads": 1056,
+      "line": 603,
+      "close": 108
+     },
+     "rivalParts": {
+      "drift": 1826,
+      "clean": 384,
+      "pace": 374,
+      "leads": 264,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 2,
+     "bodyHits": 34
+    },
+    {
+     "seconds": 77.35,
+     "rivalSeconds": 76.21,
+     "total": 2665,
+     "rival": 4472,
+     "won": false,
+     "aheadShare": 0.29,
+     "leadGates": 4,
+     "rivalGates": 11,
+     "lineTo": "rival",
+     "changes": 1,
+     "parts": {
+      "drift": 1656,
+      "clean": 288,
+      "pace": 359,
+      "leads": 352,
+      "line": 0,
+      "close": 10
+     },
+     "rivalParts": {
+      "drift": 2177,
+      "clean": 360,
+      "pace": 364,
+      "leads": 968,
+      "line": 603,
+      "close": 0
+     },
+     "wallHits": 5,
+     "bodyHits": 5
+    }
+   ]
+  }
+ },
+ "noLeads": {
+  "grip": {
+   "runs": 20,
+   "wins": 0,
+   "seconds": [
+    73.48,
+    75.97
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    -1.9,
+    1.24
+   ],
+   "aheadShare": [
+    0.254,
+    1
+   ],
+   "leadGates": [
+    4,
+    15
+   ],
+   "changes": [
+    0,
+    14
+   ],
+   "lineWon": 16,
+   "total": [
+    605,
+    1026
+   ],
+   "rival": [
+    2526,
+    2901
+   ],
+   "margin": [
+    -2158,
+    -1666
+   ],
+   "allAhead": 2,
+   "allBehind": 0,
+   "wallHits": 2,
+   "hard": 1,
+   "bodyHits": 17,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 119,
+    "clean": 216,
+    "pace": 373,
+    "leads": 0,
+    "line": 0,
+    "close": 41
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 0,
+    "line": 0,
+    "close": 0
+   }
+  },
+  "slide": {
+   "runs": 20,
+   "wins": 18,
+   "seconds": [
+    85.99,
+    89.85
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    11.16,
+    15.55
+   ],
+   "aheadShare": [
+    0.003,
+    0.107
+   ],
+   "leadGates": [
+    0,
+    2
+   ],
+   "changes": [
+    1,
+    3
+   ],
+   "lineWon": 0,
+   "total": [
+    2068,
+    5876
+   ],
+   "rival": [
+    2526,
+    2901
+   ],
+   "margin": [
+    -530,
+    3296
+   ],
+   "allAhead": 0,
+   "allBehind": 0,
+   "wallHits": 5,
+   "hard": 3,
+   "bodyHits": 11,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 3549,
+    "clean": 336,
+    "pace": 311,
+    "leads": 0,
+    "line": 0,
+    "close": 0
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 0,
+    "line": 0,
+    "close": 0
+   }
+  },
+  "mixed": {
+   "runs": 20,
+   "wins": 1,
+   "seconds": [
+    73.31,
+    82.68
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    -1.5,
+    7.93
+   ],
+   "aheadShare": [
+    0.056,
+    1
+   ],
+   "leadGates": [
+    1,
+    15
+   ],
+   "changes": [
+    0,
+    12
+   ],
+   "lineWon": 6,
+   "total": [
+    1540,
+    2881
+   ],
+   "rival": [
+    2526,
+    2901
+   ],
+   "margin": [
+    -1167,
+    311
+   ],
+   "allAhead": 3,
+   "allBehind": 0,
+   "wallHits": 6,
+   "hard": 4,
+   "bodyHits": 34,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 1363,
+    "clean": 288,
+    "pace": 357,
+    "leads": 0,
+    "line": 0,
+    "close": 80
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 0,
+    "line": 0,
+    "close": 0
+   }
+  }
+ },
+ "noClose": {
+  "grip": {
+   "runs": 20,
+   "wins": 9,
+   "seconds": [
+    73.48,
+    75.97
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    -1.9,
+    1.24
+   ],
+   "aheadShare": [
+    0.254,
+    1
+   ],
+   "leadGates": [
+    4,
+    15
+   ],
+   "changes": [
+    0,
+    14
+   ],
+   "lineWon": 16,
+   "total": [
+    1170,
+    2670
+   ],
+   "rival": [
+    2526,
+    4263
+   ],
+   "margin": [
+    -2992,
+    114
+   ],
+   "allAhead": 2,
+   "allBehind": 0,
+   "wallHits": 2,
+   "hard": 1,
+   "bodyHits": 17,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 119,
+    "clean": 216,
+    "pace": 373,
+    "leads": 1232,
+    "line": 603,
+    "close": 0
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 88,
+    "line": 0,
+    "close": 0
+   }
+  },
+  "slide": {
+   "runs": 20,
+   "wins": 12,
+   "seconds": [
+    85.99,
+    89.85
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    11.16,
+    15.55
+   ],
+   "aheadShare": [
+    0.003,
+    0.107
+   ],
+   "leadGates": [
+    0,
+    2
+   ],
+   "changes": [
+    1,
+    3
+   ],
+   "lineWon": 0,
+   "total": [
+    2068,
+    5803
+   ],
+   "rival": [
+    4405,
+    4824
+   ],
+   "margin": [
+    -2453,
+    1388
+   ],
+   "allAhead": 0,
+   "allBehind": 0,
+   "wallHits": 5,
+   "hard": 3,
+   "bodyHits": 11,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 3549,
+    "clean": 336,
+    "pace": 311,
+    "leads": 0,
+    "line": 0,
+    "close": 0
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 1320,
+    "line": 603,
+    "close": 0
+   }
+  },
+  "mixed": {
+   "runs": 20,
+   "wins": 5,
+   "seconds": [
+    73.31,
+    82.68
+   ],
+   "rivalSeconds": [
+    74.15,
+    76.21
+   ],
+   "timeGap": [
+    -1.5,
+    7.93
+   ],
+   "aheadShare": [
+    0.056,
+    1
+   ],
+   "leadGates": [
+    1,
+    15
+   ],
+   "changes": [
+    0,
+    12
+   ],
+   "lineWon": 6,
+   "total": [
+    2048,
+    4177
+   ],
+   "rival": [
+    2580,
+    4573
+   ],
+   "margin": [
+    -2479,
+    1485
+   ],
+   "allAhead": 3,
+   "allBehind": 0,
+   "wallHits": 6,
+   "hard": 4,
+   "bodyHits": 34,
+   "respawns": 0,
+   "handsBroken": 0,
+   "parts": {
+    "drift": 1361,
+    "clean": 288,
+    "pace": 357,
+    "leads": 528,
+    "line": 0,
+    "close": 0
+   },
+   "rivalParts": {
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "leads": 792,
+    "line": 603,
+    "close": 0
+   }
+  }
+ },
+ "edges": {
+  "perGate": 88,
+  "gates": 15,
+  "line": 603,
+  "rivalSolo": 2662,
+  "leadsNeverSlides": {
+   "races": 2,
+   "ofRuns": 20,
+   "playerSolo": 749,
+   "playerTotalIfLedAll": 2672,
+   "rivalTotalIfLedAll": 2662,
+   "drift": 119,
+   "aheadShare": 0.93,
+   "won": false,
+   "total": 2584,
+   "rival": 2750
+  },
+  "slidesTrailsAll": {
+   "races": 0,
+   "ofRuns": 20,
+   "playerSolo": 4196,
+   "playerTotalIfTrailedAll": 4196,
+   "rivalTotalIfTrailedAll": 4585,
+   "aheadShare": 0.004,
+   "won": false,
+   "total": 4196,
+   "rival": 4585
+  }
+ },
+ "still": {
+  "total": 0,
+  "rival": 4585,
+  "won": false
+ },
+ "knownAnswers": {
+  "slow": [
+   {
+    "allAhead": 4,
+    "runs": 4,
+    "rivalSeconds": [
+     98.98,
+     108.7
+    ]
+   },
+   {
+    "allAhead": 4,
+    "runs": 4,
+    "rivalSeconds": [
+     98.98,
+     108.7
+    ]
+   },
+   {
+    "allAhead": 4,
+    "runs": 4,
+    "rivalSeconds": [
+     98.98,
+     108.7
+    ]
+   }
+  ],
+  "strong": {
+   "wins": 1,
+   "runs": 4,
+   "total": [
+    4113,
+    4537
+   ],
+   "rival": [
+    4014,
+    5864
+   ]
+  }
+ }
+}

@@ -93,12 +93,20 @@
   #vsN { font-size: clamp(18px, 4vw, 26px); font-variant-numeric: tabular-nums; }
   #vsLead { font-size: 10px; letter-spacing: 0.14em; opacity: 0.85; }
   #vs.ahead #vsLead { color: var(--cyan); } #vs.behind #vsLead { color: var(--rival); }
-  #meter { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: repeat(5, 15px); gap: 3px; justify-content: center; will-change: transform; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
-  #meter i { display: block; height: 7px; border-radius: 4px; background: rgba(255,255,255,0.22); }
-  #meter.near i.lit { background: #ffcf4d; }
-  #meter.on i.lit { background: #5dff9a; box-shadow: 0 0 8px rgba(93,255,154,0.9); }
-  #meterT { grid-column: 1 / -1; text-align: center; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; white-space: nowrap; margin-top: 2px; }
-  #meter.on #meterT { color: #5dff9a; font-size: 14px; } #meter.near #meterT { color: #ffcf4d; } #meter.far #meterT { color: #ff6a5a; } #meter.ahead #meterT { color: #c8cbd6; opacity: 0.85; }
+  #meter { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; will-change: transform; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.85)); pointer-events: none; }
+  #place { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; font-weight: 900; }
+  #placeN { font-size: 20px; letter-spacing: 0.06em; line-height: 1; }
+  #gapT { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  #place.first #placeN, #place.first #gapT { color: var(--cyan); } #place.second #placeN, #place.second #gapT { color: var(--rival); } #place.grid #placeN { color: #c8cbd6; font-size: 14px; letter-spacing: 0.16em; }
+  #close { display: grid; grid-template-columns: repeat(5, 15px); gap: 3px; justify-content: center; }
+  #close[hidden] { display: none; }
+  #close i { display: block; height: 7px; border-radius: 4px; background: rgba(255,255,255,0.22); }
+  #close i.lit { background: #5dff9a; box-shadow: 0 0 8px rgba(93,255,154,0.9); }
+  #meterT { grid-column: 1 / -1; text-align: center; font-size: 13px; font-weight: 900; letter-spacing: 0.12em; white-space: nowrap; color: #5dff9a; }
+  .leadpop { position: absolute; transform: translate(-50%, -50%); padding: 3px 10px; border-radius: 10px; font-weight: 900; font-size: 16px; letter-spacing: 0.06em; white-space: nowrap; pointer-events: none; text-shadow: 0 1px 4px rgba(0,0,0,0.7); animation: leadPop 1.3s ease-out forwards; }
+  .leadpop.you { background: rgba(25,216,255,0.92); color: #04121c; text-shadow: none; } .leadpop.him { background: var(--rival); color: #fff; }
+  .leadpop.line { font-size: 20px; }
+  @keyframes leadPop { 0% { opacity: 0; transform: translate(-50%, -30%) scale(0.7); } 12% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); } 25% { transform: translate(-50%, -60%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -260%) scale(1); } }
   #tag { position: absolute; left: 0; top: 0; padding: 2px 9px; border-radius: 9px; background: var(--rival); color: #fff; font-weight: 900; font-size: 12px; letter-spacing: 0.12em; white-space: nowrap; will-change: transform; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
   #tagMult { margin-left: 6px; color: #fff3a0; }
   #arrow { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; font-weight: 900; font-size: 12px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); will-change: transform; }
@@ -281,6 +289,12 @@
   .results .duel i { grid-column: 1 / -1; display: block; height: 8px; border-radius: 4px; }
   .results .duel .you i { background: var(--cyan); } .results .duel .you .nm { color: var(--cyan); }
   .results .duel .him i { background: var(--rival); } .results .duel .him .nm { color: var(--rival); }
+  .results table.race { border-collapse: collapse; font-size: 12px; margin: 0 auto; font-variant-numeric: tabular-nums; }
+  .results table.race th, .results table.race td { padding: 1px 8px; text-align: right; white-space: nowrap; line-height: 1.25; }
+  .results table.race tbody th { text-align: left; font-weight: 700; opacity: 0.8; }
+  .results table.race thead th { font-size: 10px; font-weight: 900; letter-spacing: 0.14em; }
+  .results table.race thead th.you { color: var(--cyan); } .results table.race thead th.him { color: var(--rival); }
+  .results table.race td { font-weight: 800; } .results table.race small { font-weight: 600; opacity: 0.7; font-size: 10px; }
   .results .margin { margin: -2px 0 0; font-size: 14px; font-weight: 800; opacity: 0.85; }
   @media (orientation: landscape) and (max-height: 500px) { .results .card.battle .who { font-size: 30px; } .results .duel .n { font-size: 20px; } .results .duel { gap: 3px; } }
   .results .rivalgo { border-color: var(--rival); background: rgba(255,106,60,0.22); }

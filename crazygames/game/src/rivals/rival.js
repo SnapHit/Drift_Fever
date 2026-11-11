@@ -4,10 +4,12 @@
    driver (rivals/driver.js) that reads only his world, never the
    player's: his run is the same whatever the player does. No rubber
    band. He scores by the same rules as a solo run (the chain, the
-   multiplier, clean sectors, pace), with no tandem bonus.
+   multiplier, clean sectors, pace), with no close bonus; the race's
+   lead and line bonuses (scoring/lead.js) are kept apart from his own
+   scoring, so his driving hash never depends on the player.
 
-   He starts ahead of the player on the grid, staggered to one side
-   (TANDEM.STAGGER_AHEAD and _SIDE). When he crosses his line his open
+   He starts level with the player, side by side (TANDEM.GRID_SIDE),
+   and has a player's hands (below). When he crosses his line his open
    chain is banked and his pace paid, exactly as the player's are; he
    then brakes to a stop and fades out (TANDEM.FADE), and is no longer
    solid. finishRun() runs him on to his line when the player finishes
@@ -25,13 +27,14 @@ import { createRivalDriver } from './driver.js';
 const STOP = { steer: 0, throttle: 0, brake: 0, handbrake: 1 };
 const q = r => ({ steer: Math.round(r.steer * 1000) / 1000, throttle: Math.round(r.throttle * 100) / 100, brake: Math.round(r.brake * 100) / 100, handbrake: r.handbrake ? 1 : 0 });
 
-/* Where the rival starts: STAGGER_AHEAD along the centre line from the
-   player's start, STAGGER_SIDE to the side (left positive), facing down
-   the road. side overrides the sign. */
+/* A place on the grid: level with the player's start, GRID_SIDE to
+   one side of the centre line (side +1 left, -1 right), facing down the
+   road. The rival takes his side (def.side) and the player the other
+   (briefs/DRIFT-RACE.md: start level, side by side). */
 export function gridStart(track, side) {
-  const C = track.centre, along = (track.start.along || 0) + TANDEM.STAGGER_AHEAD;
+  const C = track.centre, along = track.start.along || 0;
   const c = C[Math.max(0, Math.min(C.length - 1, Math.round(along / 2)))];
-  const s = TANDEM.STAGGER_SIDE * (side === undefined ? 1 : side);
+  const s = TANDEM.GRID_SIDE * (side === undefined ? 1 : side);
   const lx = -Math.cos(c.heading), lz = Math.sin(c.heading);
   return { along, x: c.x + lx * s, y: c.y || 0, z: c.z + lz * s, yaw: c.heading, heading: c.heading };
 }
@@ -49,13 +52,14 @@ export function createRival(track, def, laps, opts) {
   const scoring = createScoring();
   const progress = createProgress(track, laps);
   const race = createRace(track, laps, scoring);
-  const driver = createRivalDriver(ground, def.drive, o.driveOverride);
-  const st = { dist: start.along, along: world.along, input: null, steps: 0, runTime: 0, finished: false, finishStep: -1, finishTime: 0, fade: 0, done: false, total: 0, sliding: false };
+  /* opts.free: the rivals round's driver, which lifted and braked (the known answer of the hands measurement only) */
+  const driver = createRivalDriver(ground, def.drive, o.free ? Object.assign({}, o.driveOverride, { HANDS: 0 }) : o.driveOverride);
+  const st = { dist: start.along, along: world.along, input: null, steps: 0, runTime: 0, finished: false, finishStep: -1, finishTime: 0, fade: 0, done: false, total: 0, sliding: false, overruled: 0 };
   const prev = { x: world.car.x, y: world.car.y || 0, z: world.car.z, yaw: world.car.yaw };
 
   function reset() {
     world.reset(); scoring.reset(); progress.reset(); race.reset(); driver.reset();
-    st.steps = 0; st.runTime = 0; st.finished = false; st.finishStep = -1; st.finishTime = 0; st.fade = 0; st.done = false; st.total = 0; st.sliding = false; st.finishHash = null; st.dist = start.along; st.along = world.along;
+    st.steps = 0; st.runTime = 0; st.finished = false; st.finishStep = -1; st.finishTime = 0; st.fade = 0; st.done = false; st.total = 0; st.sliding = false; st.finishHash = null; st.overruled = 0; st.dist = start.along; st.along = world.along;
     prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
   }
   /* one step, in lockstep with the player's */
@@ -63,8 +67,12 @@ export function createRival(track, def, laps, opts) {
     const c = world.car;
     prev.x = c.x; prev.y = c.y || 0; prev.z = c.z; prev.yaw = c.yaw;
     let inp = st.finished ? STOP : q(driver.input(world));
-    /* opts.hands (the measurements only, game/test/stars/reach.js): only what a player's hands can give: the throttle always on, no brake, and DRIFT with no steering stops the car */
-    if (o.hands && !st.finished) inp = inp.handbrake && inp.steer === 0 ? STOP : { steer: inp.steer, throttle: 1, brake: 0, handbrake: inp.handbrake };
+    /* The rule (briefs/DRIFT-RACE.md): he has a player's hands, the
+       throttle always on, no brake, DRIFT with or without steering. His
+       driver plans with exactly that (RIVAL_DRIVE.HANDS), so this guard
+       should never change a thing; st.overruled counts the steps it did,
+       and the measurements say it stays at nothing. */
+    if (!o.free && !st.finished && (inp.throttle !== 1 || inp.brake !== 0)) { st.overruled++; inp = { steer: inp.steer, throttle: 1, brake: 0, handbrake: inp.handbrake }; }
     st.input = inp;
     world.stepWorld(inp);
     st.steps++;

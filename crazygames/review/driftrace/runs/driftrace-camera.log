@@ -1,0 +1,4 @@
+PASS r1 1280x720: 182 frames of the sweep, inside the player 0, inside him 0 (closest 5.43 and 9.12 m); at GO both in view: player true, rival true; side by side: 0 m along, 4.4 m across (level)
+PASS r1 390x844: 182 frames of the sweep, inside the player 0, inside him 0 (closest 5.44 and 9.18 m); at GO both in view: player true, rival true; side by side: 0 m along, 4.4 m across (level)
+PASS known answer: with him 8 m back on the grid the side by side check fails (-8 m along): CAUGHT
+all passed

@@ -1,0 +1,190 @@
+
+== 1. clicks to gameplay
+PASS first visit: the car moves with no click: state at load countdown, moving after 3 s, 0 clicks
+PASS returning visit: the title, then one click to a moving car: state at load title, moved before any click: false, clicks 1
+PASS known answer: a forced title first counts one click: state title, clicks 1
+
+== 2. onboarding
+PASS the prompts come in order, each once, and the car is never paused: shown steer, clean, drift, chain, brake; 10 changes
+PASS SKIP (one real click) ends the prompts, the car keeps driving, the save remembers: speed 21.0 -> 19.1 m/s, onboarded true
+PASS on the next visit the title shows and no prompt comes in a run: state title
+PASS known answer: the flag put back brings the onboarding back: state countdown, active true
+PASS real key presses complete steer, slide and brake, each done and none timed out: steer done 1.2 s after ArrowLeft, drift done 1.2 s after ArrowRight+ , brake done 1.2 s after  
+PASS real touches on the pads complete steer, slide and brake, each done and none timed out: steer done 1.2 s after left, drift done 1.2 s after right+hb, brake done 1.2 s after hb
+PASS known answer: with no input all three prompts time out: {"steer":"timeout","drift":"timeout","brake":"timeout"}
+PASS on touch the steer prompt sits above the steer buttons with an arrow: Steer with the left and right buttons▼ (prompt at-left)
+
+== 3. missions
+  drifter career 1  [    ] hold 4 (1.4); [    ] chain 110 (87.0); [done] clean 1 (4.0); [    ] clip 2 (0.0); [done] time 82 (69.6); [done] mult 2 (2.0)
+  drifter career 2  [    ] hold 2 (1.4); [done] chain 100 (197.0); [done] clean 0 (3.0); [    ] clip 3 (0.0); [done] time 37 (31.3); [done] mult 2 (2.0)
+  drifter career 3  [    ] hold 3 (2.0); [    ] chain 170 (162.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 130 (117.7); [done] mult 2 (2.0)
+  drifter career 4  [    ] hold 4 (1.4); [done] chain 100 (155.0); [done] clean 0 (3.0); [    ] clip 4 (1.0); [done] time 45 (38.0); [done] mult 2 (2.0)
+  drifter career 5  [    ] hold 2 (1.2); [done] chain 130 (137.0); [    ] clean 1 (3.0); [    ] clip 4 (1.0); [done] time 107 (101.3); [done] mult 3 (3.0)
+  drifter career 6  [    ] hold 4 (1.5); [    ] chain 100 (85.0); [    ] clean 0 (1.0); [    ] clip 5 (0.0); [done] time 52 (41.8); [    ] mult 3 (2.0)
+  drifter career 7  [    ] hold 2 (0.6); [    ] chain 120 (11.0); [    ] clean 1 (3.0); [    ] clip 3 (0.0); [done] time 109 (90.0); [    ] mult 3 (1.0)
+  drifter career 8  [done] hold 2 (2.0); [    ] chain 100 (73.0); [    ] clean 0 (2.0); [    ] clip 7 (0.0); [done] time 54 (46.9); [done] mult 3 (3.0)
+  drifter career 9  [    ] hold 2 (1.5); [done] chain 160 (161.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 132 (117.8); [done] mult 2 (2.0)
+  drifter career 10 [    ] hold 2 (1.2); [    ] chain 100 (62.0); [    ] clean 0 (2.0); [    ] clip 7 (0.0); [done] time 57 (48.2); [    ] mult 3 (2.0)
+  drifter career 11 [    ] hold 2 (1.4); [    ] chain 130 (69.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 113 (107.7); [    ] mult 3 (2.0)
+  drifter career 12 [done] hold 2 (2.0); [done] chain 100 (394.0); [    ] clean 0 (1.0); [    ] clip 6 (0.0); [done] time 64 (55.3); [done] mult 3 (3.0)
+  drifter career 13 [    ] hold 2 (1.4); [    ] chain 150 (88.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 134 (119.8); [    ] mult 3 (2.0)
+  drifter career 14 [    ] hold 3 (1.0); [    ] chain 100 (63.0); [    ] clean 0 (2.0); [    ] clip 5 (0.0); [done] time 58 (56.2); [    ] mult 3 (2.0)
+  drifter career 15 [done] hold 2 (2.0); [done] chain 120 (466.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 111 (91.0); [done] mult 3 (3.0)
+  drifter career 16 [    ] hold 2 (1.2); [done] chain 100 (112.0); [    ] clean 0 (2.0); [    ] clip 7 (0.0); [done] time 66 (59.5); [done] mult 3 (3.0)
+  drifter career 17 [    ] hold 2 (1.9); [done] chain 150 (177.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 132 (128.0); [done] mult 3 (3.0)
+  drifter career 18 [    ] hold 3 (1.5); [done] chain 100 (523.0); [    ] clean 0 (2.0); [    ] clip 5 (0.0); [done] time 62 (53.1); [done] mult 3 (3.0)
+  drifter career 19 [    ] hold 2 (1.4); [    ] chain 140 (80.0); [done] clean 1 (4.0); [    ] clip 2 (0.0); [done] time 127 (109.5); [    ] mult 3 (2.0)
+  drifter career 20 [    ] hold 2 (0.7); [    ] chain 100 (48.0); [    ] clean 0 (2.0); [    ] clip 9 (0.0); [done] time 66 (56.2); [    ] mult 3 (2.0)
+  drifter career 21 [done] hold 2 (2.0); [done] chain 140 (254.0); [done] clean 1 (4.0); [    ] clip 2 (0.0); [done] time 130 (108.1); [done] mult 3 (3.0)
+  drifter career 22 [done] hold 2 (2.0); [done] chain 100 (606.0); [    ] clean 0 (2.0); [    ] clip 7 (0.0); [done] time 68 (66.2); [done] mult 3 (3.0)
+  drifter career 23 [    ] hold 3 (2.1); [done] chain 140 (168.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 132 (125.2); [done] mult 3 (3.0)
+  drifter career 24 [done] hold 2 (2.0); [done] chain 100 (317.0); [    ] clean 0 (2.0); [    ] clip 9 (0.0); [done] time 72 (62.4); [done] mult 3 (3.0)
+  drifter daily     [    ] hold 3 (1.2); [    ] chain 140 (85.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 116 (88.0); [done] mult 2 (2.0)
+  careful career 1  [    ] hold 4 (0.0); [    ] chain 110 (0.0); [done] clean 1 (4.0); [    ] clip 2 (0.0); [done] time 82 (76.9); [    ] mult 2 (1.0)
+  careful career 2  [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 3 (0.0); [    ] time 37 (37.6); [    ] mult 2 (1.0)
+  careful career 3  [    ] hold 3 (0.0); [    ] chain 170 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 130 (137.4); [    ] mult 2 (1.0)
+  careful career 4  [    ] hold 4 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 4 (0.0); [    ] time 45 (46.3); [    ] mult 2 (1.0)
+  careful career 5  [    ] hold 2 (0.0); [    ] chain 130 (0.0); [done] clean 1 (4.0); [    ] clip 4 (0.0); [    ] time 107 (123.2); [    ] mult 3 (1.0)
+  careful career 6  [    ] hold 4 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 5 (0.0); [done] time 52 (52.0); [    ] mult 3 (1.0)
+  careful career 7  [    ] hold 2 (0.0); [    ] chain 120 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 109 (115.0); [    ] mult 3 (1.0)
+  careful career 8  [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 7 (0.0); [    ] time 54 (62.3); [    ] mult 3 (1.0)
+  careful career 9  [    ] hold 2 (0.0); [    ] chain 160 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 132 (135.6); [    ] mult 2 (1.0)
+  careful career 10 [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 7 (0.0); [    ] time 57 (62.4); [    ] mult 3 (1.0)
+  careful career 11 [    ] hold 2 (0.0); [    ] chain 130 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 113 (128.7); [    ] mult 3 (1.0)
+  careful career 12 [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 6 (0.0); [    ] time 64 (70.9); [    ] mult 3 (1.0)
+  careful career 13 [    ] hold 2 (0.0); [    ] chain 150 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 134 (142.4); [    ] mult 3 (1.0)
+  careful career 14 [    ] hold 3 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 5 (0.0); [    ] time 58 (68.3); [    ] mult 3 (1.0)
+  careful career 15 [    ] hold 2 (0.0); [    ] chain 120 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 111 (122.5); [    ] mult 3 (1.0)
+  careful career 16 [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 7 (0.0); [    ] time 66 (80.6); [    ] mult 3 (1.0)
+  careful career 17 [    ] hold 2 (0.0); [    ] chain 150 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 132 (139.8); [    ] mult 3 (1.0)
+  careful career 18 [    ] hold 3 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 5 (0.0); [    ] time 62 (65.8); [    ] mult 3 (1.0)
+  careful career 19 [    ] hold 2 (0.0); [    ] chain 140 (0.0); [done] clean 1 (4.0); [    ] clip 2 (0.0); [    ] time 127 (134.1); [    ] mult 3 (1.0)
+  careful career 20 [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 9 (0.0); [    ] time 66 (75.6); [    ] mult 3 (1.0)
+  careful career 21 [    ] hold 2 (0.0); [    ] chain 140 (0.0); [done] clean 1 (4.0); [    ] clip 2 (0.0); [    ] time 130 (136.9); [    ] mult 3 (1.0)
+  careful career 22 [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 7 (0.0); [    ] time 68 (82.9); [    ] mult 3 (1.0)
+  careful career 23 [    ] hold 3 (0.0); [    ] chain 140 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [    ] time 132 (142.0); [    ] mult 3 (1.0)
+  careful career 24 [    ] hold 2 (0.0); [    ] chain 100 (0.0); [done] clean 0 (3.0); [    ] clip 9 (0.0); [    ] time 72 (82.2); [    ] mult 3 (1.0)
+  careful daily     [    ] hold 3 (0.0); [    ] chain 140 (0.0); [done] clean 1 (4.0); [    ] clip 3 (0.0); [done] time 116 (105.2); [    ] mult 2 (1.0)
+  clipper career 1  [    ] hold 4 (1.0); [    ] chain 110 (0.0); [    ] clean 1 (0.0); [done] clip 2 (2.0); [    ] time 82 (85.5); [    ] mult 2 (1.0)
+  clipper career 2  [    ] hold 2 (1.0); [    ] chain 100 (0.0); [    ] clean 0 (1.0); [done] clip 3 (3.0); [    ] time 37 (43.9); [    ] mult 2 (1.0)
+  clipper career 3  [    ] hold 3 (1.0); [    ] chain 170 (3.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 130 (146.8); [    ] mult 2 (1.0)
+  clipper career 4  [    ] hold 4 (2.8); [done] chain 100 (280.0); [    ] clean 0 (0.0); [done] clip 4 (4.0); [    ] time 45 (49.2); [done] mult 2 (2.0)
+  clipper career 5  [    ] hold 2 (1.5); [    ] chain 130 (3.0); [    ] clean 1 (0.0); [done] clip 4 (4.0); [    ] time 107 (134.4); [    ] mult 3 (2.0)
+  clipper career 6  [    ] hold 4 (1.5); [    ] chain 100 (7.0); [    ] clean 0 (0.0); [done] clip 5 (5.0); [    ] time 52 (56.6); [    ] mult 3 (2.0)
+  clipper career 7  [    ] hold 2 (1.1); [    ] chain 120 (12.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 109 (121.9); [    ] mult 3 (1.0)
+  clipper career 8  [    ] hold 2 (1.5); [    ] chain 100 (7.0); [    ] clean 0 (0.0); [done] clip 7 (7.0); [    ] time 54 (66.6); [    ] mult 3 (2.0)
+  clipper career 9  [    ] hold 2 (0.9); [    ] chain 160 (3.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 132 (150.6); [    ] mult 2 (1.0)
+  clipper career 10 [    ] hold 2 (1.1); [    ] chain 100 (14.0); [    ] clean 0 (0.0); [done] clip 7 (7.0); [    ] time 57 (74.2); [    ] mult 3 (2.0)
+  clipper career 11 [    ] hold 2 (1.5); [    ] chain 130 (3.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 113 (144.0); [    ] mult 3 (2.0)
+  clipper career 12 [    ] hold 2 (1.8); [    ] chain 100 (3.0); [    ] clean 0 (0.0); [done] clip 6 (6.0); [    ] time 64 (80.1); [    ] mult 3 (2.0)
+  clipper career 13 [    ] hold 2 (0.9); [    ] chain 150 (4.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 134 (149.6); [    ] mult 3 (1.0)
+  clipper career 14 [    ] hold 3 (1.6); [    ] chain 100 (2.0); [    ] clean 0 (0.0); [done] clip 5 (5.0); [    ] time 58 (72.7); [    ] mult 3 (2.0)
+  clipper career 15 [    ] hold 2 (1.8); [    ] chain 120 (3.0); [    ] clean 1 (1.0); [done] clip 3 (3.0); [    ] time 111 (137.8); [    ] mult 3 (2.0)
+  clipper career 16 [    ] hold 2 (1.3); [    ] chain 100 (6.0); [    ] clean 0 (0.0); [done] clip 7 (7.0); [    ] time 66 (84.1); [    ] mult 3 (2.0)
+  clipper career 17 [    ] hold 2 (0.9); [    ] chain 150 (0.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 132 (159.8); [    ] mult 3 (1.0)
+  clipper career 18 [    ] hold 3 (1.1); [    ] chain 100 (12.0); [    ] clean 0 (0.0); [done] clip 5 (5.0); [    ] time 62 (71.8); [    ] mult 3 (1.0)
+  clipper career 19 [    ] hold 2 (1.5); [    ] chain 140 (0.0); [    ] clean 1 (0.0); [done] clip 2 (2.0); [    ] time 127 (145.4); [    ] mult 3 (2.0)
+  clipper career 20 [    ] hold 2 (0.9); [    ] chain 100 (6.0); [    ] clean 0 (0.0); [done] clip 9 (9.0); [    ] time 66 (89.4); [    ] mult 3 (1.0)
+  clipper career 21 [    ] hold 2 (1.5); [    ] chain 140 (0.0); [    ] clean 1 (2.0); [done] clip 2 (2.0); [    ] time 130 (150.1); [    ] mult 3 (2.0)
+  clipper career 22 [done] hold 2 (2.0); [done] chain 100 (124.0); [    ] clean 0 (0.0); [done] clip 7 (7.0); [    ] time 68 (86.9); [    ] mult 3 (2.0)
+  clipper career 23 [    ] hold 3 (0.9); [    ] chain 140 (3.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 132 (154.1); [    ] mult 3 (1.0)
+  clipper career 24 [    ] hold 2 (1.9); [    ] chain 100 (6.0); [    ] clean 0 (0.0); [done] clip 9 (9.0); [    ] time 72 (93.2); [    ] mult 3 (2.0)
+  clipper daily     [    ] hold 3 (0.8); [    ] chain 140 (6.0); [    ] clean 1 (0.0); [done] clip 3 (3.0); [    ] time 116 (118.6); [done] mult 2 (2.0)
+PASS every mission kind is completed by a scripted driver on some track: hold on 6 of 25, chain on 13 of 25, clean on 25 of 25, clip on 25 of 25, time on 25 of 25, mult on 17 of 25
+PASS no mission kind is completed on every track by every driver: none trivial
+PASS the tape replayed completes the same missions at the same steps, with the same score: clip@2589; score 183 -> 183
+PASS the tape with the handbrake taken out changes the outcome: did not finish
+PASS known answer: with every numeric target a hundred times larger the clipper completes none of them: Hold one drift for 200 s; Bank a chain of 11250 points; Drive a clean lap; Slide close to 150 orange walls; Finish under 1 s; Reach a x200 multiplier -> 0 of 5 done
+PASS free drift after a mission run has no judge and runs without error: state free, speed 6.7
+
+== 4. the Track Lab
+PASS 390x844: every Lab control reachable, none under the bar at 5 scroll positions, the scroll end clears the bar, the code and COPY on screen unscrolled: 25 controls, 1 scroll box, unreachable , under the bar 0
+PASS 390x844: the coin badge (● 12,345) and the career tally do not overlap: badge 282-374, tally 173-262
+PASS 844x390: every Lab control reachable, none under the bar at 9 scroll positions, the scroll end clears the bar, the code and COPY on screen unscrolled: 25 controls, 1 scroll box, unreachable , under the bar 0
+PASS 844x390: the coin badge (● 12,345) and the career tally do not overlap: badge 736-828, tally 440-574
+PASS 800x450: every Lab control reachable, none under the bar at 7 scroll positions, the scroll end clears the bar, the code and COPY on screen unscrolled: 25 controls, 1 scroll box, unreachable , under the bar 0
+PASS 800x450: the coin badge (● 12,345) and the career tally do not overlap: badge 692-784, tally 418-552
+PASS 1280x720: every Lab control reachable, none under the bar at 0 scroll positions, the scroll end clears the bar, the code and COPY on screen unscrolled: 25 controls, 0 scroll boxes, unreachable , under the bar 0
+PASS 1280x720: the coin badge (● 12,345) and the career tally do not overlap: badge 1172-1264, tally 658-792
+PASS known answer: the sticky bar layout fails the same check at the three smaller sizes: fails at 390x844, 844x390, 800x450
+PASS the Lab opens from the title with a plan drawn, and every setting changes the track and the code by a click: kind=sprint -> 131WPWE0WXHN, length=long -> 131WPCF0F1EH, style=technical -> 131WPCB00NEH, bank=off -> 131WPC30AKFH, theme=desert -> 131WPC32TXGH, time=night -> 131WPC3ATVCJ, kind=circuit -> 131WP43A4F31, cross=on -> 131WP4KA8V51
+PASS the backdrop follows the theme and the time of day, and a long circuit with the crossover on has a bridge: scene desert night, bridges 1 (before the toggle 0)
+PASS a Lab run reaches results with its code, a LAB button and no NEXT, pays at the Lab's rate, and keeps a best and a ghost for the code: score 1401, coins 85 (expected 85), code copied
+PASS going again on a Lab track runs its saved ghost: ghost steps 116
+PASS a code typed in lower case with a dash and a space loads its track: H4C0088HV6CA
+PASS known answer: the same code with its last character changed is refused with a message and the track stays: Not a track code: that is not a track code (a character may be wrong).
+PASS after 9 codes driven the save keeps the last 6 with their ghosts and drops the oldest: 6 codes, 6 lab ghosts, save 358936 bytes
+PASS no page errors through the Lab
+PASS a ?track= link lands on its track in the Lab, one click from a moving car: A shared track: H3TT-J0XB-EKQE; clicks 1
+PASS a tampered link is refused with a plain message on the Lab, a fresh track shown, no error: That link is not a track code: that is not a track code (a character may be wrong).
+
+== 5. saves
+PASS a save in main's shape loads with coins, cars, upgrades, stars, the daily and the ghosts kept, no fixes, the new fields at their defaults, and the title (it has finished runs): coins 1564, car hatch, ghosts career:0
+PASS a corrupted save with the new fields wrong loads to a valid state (the good mission and code kept), the game runs and the Lab opens: 7 fixes, missions {"career:2":[1,1,1]}, lab {"ABCDEFGH5678":{"best":50,"stars":3,"when":5}}
+PASS known answer: the corrupted save fails the invariants raw and passes them repaired: 7 fixes
+PASS with localStorage throwing the first visit lands in the onboarding run, it finishes, and the Lab works, no error: storage available false, 7 writes went nowhere
+
+== 6. perf
+6x: js without submit p95 6.1 worst 70.6 ms; physics p95 3.3; main here: 3.6
+FAIL JavaScript p95 at 6x with the ghost and the missions judged is within noise of main's in this sandbox and under the budget: 6.1 ms against 3.6 (noise 1.5)
+PASS known answer: 20 ms of busy work per frame flips the verdict: 6.1 -> 28 ms
+
+== shots
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-steer-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-drift-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-brake-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-chain-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-clean-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/title-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/career-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/countdown-missions-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/mission-complete-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/results-missions-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-results-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-bad-code-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-link-390x844.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-steer-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-drift-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-brake-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-chain-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-clean-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/title-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/career-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/countdown-missions-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/mission-complete-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/results-missions-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-results-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-bad-code-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-link-844x390.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-steer-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-drift-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-brake-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-chain-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-clean-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/title-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/career-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/countdown-missions-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/mission-complete-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/results-missions-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-results-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-bad-code-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-link-800x450.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-steer-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-drift-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-brake-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-chain-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/onboard-clean-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/title-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/career-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/countdown-missions-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/mission-complete-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/results-missions-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-results-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-bad-code-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/retention/shots/lab-link-1280x720.png
+
+1 FAILED; wrote review/retention/clicks.json, onboard.json, missions.json, lab.json, saves.json, perf.json, shots.json

@@ -1,0 +1,784 @@
+{
+ "bar": {
+  "respawns": 0,
+  "hard": 0,
+  "contacts": 2,
+  "minKmh": 40,
+  "corner": 0.3,
+  "total": 0.25
+ },
+ "disturbances": [
+  {
+   "offset": [
+    -0.05,
+    -0.01
+   ],
+   "grip": -0.003
+  },
+  {
+   "offset": [
+    0.02,
+    0.02
+   ],
+   "grip": 0.002
+  },
+  {
+   "offset": [
+    -0.02,
+    0.05
+   ],
+   "grip": -0.004
+  },
+  {
+   "offset": [
+    0.05,
+    -0.03
+   ],
+   "grip": 0.001
+  },
+  {
+   "offset": [
+    0.01,
+    0
+   ],
+   "grip": -0.005
+  },
+  {
+   "offset": [
+    -0.03,
+    0.03
+   ],
+   "grip": 0
+  },
+  {
+   "offset": [
+    0.04,
+    -0.05
+   ],
+   "grip": 0.005
+  },
+  {
+   "offset": [
+    0,
+    -0.02
+   ],
+   "grip": -0.001
+  },
+  {
+   "offset": [
+    -0.04,
+    0.01
+   ],
+   "grip": 0.004
+  },
+  {
+   "offset": [
+    0.03,
+    0.04
+   ],
+   "grip": -0.002
+  },
+  {
+   "offset": [
+    -0.01,
+    -0.04
+   ],
+   "grip": 0.003
+  },
+  {
+   "offset": [
+    -0.05,
+    -0.01
+   ],
+   "grip": -0.003
+  },
+  {
+   "offset": [
+    0.02,
+    0.02
+   ],
+   "grip": 0.002
+  },
+  {
+   "offset": [
+    -0.02,
+    0.05
+   ],
+   "grip": -0.004
+  },
+  {
+   "offset": [
+    0.05,
+    -0.03
+   ],
+   "grip": 0.001
+  },
+  {
+   "offset": [
+    0.01,
+    0
+   ],
+   "grip": -0.005
+  },
+  {
+   "offset": [
+    -0.03,
+    0.03
+   ],
+   "grip": 0
+  },
+  {
+   "offset": [
+    0.04,
+    -0.05
+   ],
+   "grip": 0.005
+  },
+  {
+   "offset": [
+    0,
+    -0.02
+   ],
+   "grip": -0.001
+  },
+  {
+   "offset": [
+    -0.04,
+    0.01
+   ],
+   "grip": 0.004
+  }
+ ],
+ "rivals": [
+  {
+   "id": "r1",
+   "name": "Kestrow",
+   "track": 0,
+   "page": {
+    "rival": "r1",
+    "track": 0,
+    "finished": true,
+    "seconds": 75.2,
+    "total": 2662,
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "best": 216,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 83,
+    "minAt": 72.9,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.598,
+      "angle": 23.6,
+      "max": 33.2,
+      "s": 3.36
+     },
+     {
+      "name": "sweeper 1 L1",
+      "share": 0.485,
+      "angle": 21.7,
+      "max": 27.5,
+      "s": 5.19
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.628,
+      "angle": 22.9,
+      "max": 27.3,
+      "s": 4.42
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.787,
+      "angle": 17.2,
+      "max": 24.1,
+      "s": 3.52
+     },
+     {
+      "name": "sweeper 1 L2",
+      "share": 0.418,
+      "angle": 21.2,
+      "max": 27.4,
+      "s": 5.31
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.654,
+      "angle": 23.2,
+      "max": 27.3,
+      "s": 4.36
+     },
+     {
+      "name": "tight 1 L3",
+      "share": 0.774,
+      "angle": 16.9,
+      "max": 22.6,
+      "s": 3.54
+     },
+     {
+      "name": "sweeper 1 L3",
+      "share": 0.424,
+      "angle": 21.2,
+      "max": 27.3,
+      "s": 5.31
+     },
+     {
+      "name": "opening 1 L3",
+      "share": 0.66,
+      "angle": 23.2,
+      "max": 27.3,
+      "s": 4.36
+     },
+     {
+      "name": "tight 1 L4",
+      "share": 0.646,
+      "angle": 23.2,
+      "max": 30.3,
+      "s": 3.34
+     },
+     {
+      "name": "sweeper 1 L4",
+      "share": 0.496,
+      "angle": 21.8,
+      "max": 27.4,
+      "s": 5.24
+     },
+     {
+      "name": "opening 1 L4",
+      "share": 0.623,
+      "angle": 26.6,
+      "max": 44.8,
+      "s": 4.48
+     }
+    ],
+    "worstCorner": 0.4175824175824124,
+    "meanCorner": 0.5993355640277626,
+    "hash": "-1.3369512014889298,-8.12145995196981,0.10127703632114296,-3.9038700374478355,-29.009678204836902,-0.558557563211065,-0.09317010858562311,2.899659126496913,0,0,0,11.450253049335458,-4.717873106137545|9024,0,0|2662,9024",
+    "hands": {
+     "brakeSteps": 0,
+     "liftSteps": 0,
+     "maxBrake": 0,
+     "minThrottle": 1,
+     "overruled": 0
+    }
+   },
+   "node": {
+    "rival": "r1",
+    "track": 0,
+    "finished": true,
+    "seconds": 75.2,
+    "total": 2662,
+    "drift": 1909,
+    "clean": 384,
+    "pace": 369,
+    "best": 216,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 83,
+    "minAt": 72.9,
+    "corners": [
+     {
+      "name": "tight 1 L1",
+      "share": 0.598,
+      "angle": 23.6,
+      "max": 33.2,
+      "s": 3.36
+     },
+     {
+      "name": "sweeper 1 L1",
+      "share": 0.485,
+      "angle": 21.7,
+      "max": 27.5,
+      "s": 5.19
+     },
+     {
+      "name": "opening 1 L1",
+      "share": 0.628,
+      "angle": 22.9,
+      "max": 27.3,
+      "s": 4.42
+     },
+     {
+      "name": "tight 1 L2",
+      "share": 0.787,
+      "angle": 17.2,
+      "max": 24.1,
+      "s": 3.52
+     },
+     {
+      "name": "sweeper 1 L2",
+      "share": 0.418,
+      "angle": 21.2,
+      "max": 27.4,
+      "s": 5.31
+     },
+     {
+      "name": "opening 1 L2",
+      "share": 0.654,
+      "angle": 23.2,
+      "max": 27.3,
+      "s": 4.36
+     },
+     {
+      "name": "tight 1 L3",
+      "share": 0.774,
+      "angle": 16.9,
+      "max": 22.6,
+      "s": 3.54
+     },
+     {
+      "name": "sweeper 1 L3",
+      "share": 0.424,
+      "angle": 21.2,
+      "max": 27.3,
+      "s": 5.31
+     },
+     {
+      "name": "opening 1 L3",
+      "share": 0.66,
+      "angle": 23.2,
+      "max": 27.3,
+      "s": 4.36
+     },
+     {
+      "name": "tight 1 L4",
+      "share": 0.646,
+      "angle": 23.2,
+      "max": 30.3,
+      "s": 3.34
+     },
+     {
+      "name": "sweeper 1 L4",
+      "share": 0.496,
+      "angle": 21.8,
+      "max": 27.4,
+      "s": 5.24
+     },
+     {
+      "name": "opening 1 L4",
+      "share": 0.623,
+      "angle": 26.6,
+      "max": 44.8,
+      "s": 4.48
+     }
+    ],
+    "worstCorner": 0.4175824175824124,
+    "meanCorner": 0.5993355640277626,
+    "hash": "-1.336951201488799,-8.121459951968617,0.10127703632114515,-3.9038700374479047,-29.00967820483693,-0.5585575632110638,-0.09317010858562293,2.8996591264969087,0,0,0,11.450253049335446,-4.717873106137565|9024,0,0|2662,9024",
+    "hands": {
+     "brakeSteps": 0,
+     "liftSteps": 0,
+     "maxBrake": 0,
+     "minThrottle": 1,
+     "overruled": 0
+    }
+   },
+   "worst": {
+    "handsBad": 0,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 2,
+    "minKmh": 74.7,
+    "worstCorner": 0.36,
+    "totalLow": 2526,
+    "totalHigh": 2901,
+    "seconds": 76.21
+   },
+   "missing": 0,
+   "disturbed": [
+    {
+     "total": 2707,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83.1,
+     "worstCorner": 0.482,
+     "seconds": 74.6,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2674,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 86.9,
+     "worstCorner": 0.485,
+     "seconds": 74.23,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2901,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 74.7,
+     "worstCorner": 0.378,
+     "seconds": 76.21,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2580,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 85.6,
+     "worstCorner": 0.363,
+     "seconds": 74.15,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2598,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 85.5,
+     "worstCorner": 0.374,
+     "seconds": 75.51,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2692,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.4,
+     "worstCorner": 0.418,
+     "seconds": 75.08,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2584,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 86.8,
+     "worstCorner": 0.441,
+     "seconds": 74.3,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2599,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.8,
+     "worstCorner": 0.417,
+     "seconds": 74.83,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2570,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.445,
+     "seconds": 74.59,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2526,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 79.2,
+     "worstCorner": 0.392,
+     "seconds": 75.25,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2738,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 85.6,
+     "worstCorner": 0.42,
+     "seconds": 74.75,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2707,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83.1,
+     "worstCorner": 0.482,
+     "seconds": 74.6,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2674,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 86.9,
+     "worstCorner": 0.485,
+     "seconds": 74.23,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2901,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 74.7,
+     "worstCorner": 0.378,
+     "seconds": 76.21,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2580,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 85.6,
+     "worstCorner": 0.363,
+     "seconds": 74.15,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2598,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 85.5,
+     "worstCorner": 0.374,
+     "seconds": 75.51,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2692,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.4,
+     "worstCorner": 0.418,
+     "seconds": 75.08,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2584,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 86.8,
+     "worstCorner": 0.441,
+     "seconds": 74.3,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2599,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 77.8,
+     "worstCorner": 0.417,
+     "seconds": 74.83,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    {
+     "total": 2570,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 82.9,
+     "worstCorner": 0.445,
+     "seconds": 74.59,
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    }
+   ]
+  }
+ ],
+ "knownAnswerHands": {
+  "hands": {
+   "brakeSteps": 648,
+   "liftSteps": 1066,
+   "maxBrake": 0.39,
+   "minThrottle": 0,
+   "overruled": 0
+  },
+  "total": 3196,
+  "seconds": 81.23
+ },
+ "knownAnswer": {
+  "drive": {
+   "HB_OVER": 40,
+   "PROGRESS": 400,
+   "EDGE_SAFE": 0.3,
+   "EDGE_COST": 100,
+   "CRASH": 2000,
+   "ANGLE_CAP": 50,
+   "SLIDE_GAIN": 1.2
+  },
+  "runs": [
+   {
+    "total": 2119,
+    "hard": 3,
+    "contacts": 5,
+    "minKmh": 55.5,
+    "worstCorner": 0.0808080808080803
+   },
+   {
+    "total": 2103,
+    "hard": 0,
+    "contacts": 3,
+    "minKmh": 87.2,
+    "worstCorner": 0.025408348457350172
+   },
+   {
+    "total": 1854,
+    "hard": 3,
+    "contacts": 7,
+    "minKmh": 51.5,
+    "worstCorner": 0.13718411552346518
+   },
+   {
+    "total": 1748,
+    "hard": 3,
+    "contacts": 7,
+    "minKmh": 52.6,
+    "worstCorner": 0.12765957446808454
+   },
+   {
+    "total": 2016,
+    "hard": 2,
+    "contacts": 6,
+    "minKmh": 53.8,
+    "worstCorner": 0.1367673179396086
+   },
+   {
+    "total": 2138,
+    "hard": 2,
+    "contacts": 8,
+    "minKmh": 68.7,
+    "worstCorner": 0.09302325581395318
+   }
+  ],
+  "missing": 6
+ }
+}

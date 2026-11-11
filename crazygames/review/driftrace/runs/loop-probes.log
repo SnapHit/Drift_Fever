@@ -1,0 +1,61 @@
+
+== 1. ghost
+PASS the recorded run was saved as the ghost: 8396 steps, 3950 tape entries, score 895
+PASS the ghost ends in exactly the recorded state: ghost steps 8396, done true
+PASS the ghost matches the recording frame for frame: 4176 frames compared, 0 differ, worst 0, lockstep broken 0
+PASS known answer: one perturbed tape entry changes the ghost's end state: entry 1975
+
+== 2. runs
+PASS run career 1 (circuit, 518 m) finishes with a results screen: 70.0 s, score 895, stars 1, 0 contacts, 0 respawns
+PASS run career 2 (sprint, 748 m) finishes with a results screen: 31.6 s, score 468, stars 2, 0 contacts, 0 respawns
+PASS run career 3 (circuit, 822 m) finishes with a results screen: 118.1 s, score 1384, stars 2, 0 contacts, 0 respawns
+PASS run career 4 (sprint, 898 m) finishes with a results screen: 38.4 s, score 448, stars 1, 0 contacts, 0 respawns
+PASS run career 5 (circuit, 678 m) finishes with a results screen: 101.6 s, score 1028, stars 2, 4 contacts, 0 respawns
+PASS run career 6 (sprint, 1018 m) finishes with a results screen: 42.1 s, score 389, stars 1, 5 contacts, 0 respawns
+PASS run daily (circuit, 734 m) finishes with a results screen: 88.4 s, score 1199, stars 2, 0 contacts, 0 respawns
+PASS three generated circuits and three generated sprints completed: 4 circuits, 3 sprints
+PASS known answer: with 99 laps the run does not finish in the budget: 6 laps done, state drive
+
+== 3. save
+PASS saved progress survives a reload: coins 4526, car hatch, paint lime, ghost steps 3796
+PASS the career ladder unlocks in order, one star at a time: {"lockedAtStart":true,"refusedWhileLocked":true,"stillLockedWithNoStar":true,"openAfterOneStar":true,"startsWhenOpen":true}
+PASS the game runs to a results screen with localStorage's property throwing: score 895, failed writes 0 of 5, page errors 0
+PASS the game runs to a results screen with localStorage's methods throwing: score 895, failed writes 5 of 5, page errors 0
+PASS a save that is not JSON loads to a valid state and the game runs: repaired 1, coins 0, car starter, ghosts kept 0
+PASS a save that is JSON of the wrong shape loads to a valid state and the game runs: repaired 7, coins 0, car starter, ghosts kept 1
+PASS known answer: the wrong shaped save fails the invariants raw and passes them repaired: 7 fixes, ghosts kept career:1
+
+== 4. perf
+throttle 1x: frame p95 243.7 worst 14710.3 ms; js without submit p95 0.5 worst 9.5; physics p95 0.2 worst 9.2 (2 steps, ghost in 390 frames); submit p95 243.4; first frames worst 818; webgl2 low
+throttle 4x: frame p95 403.4 worst 25767 ms; js without submit p95 2.7 worst 22.1; physics p95 1 worst 4.8 (2 steps, ghost in 390 frames); submit p95 403.2; first frames worst 807.1; webgl2 low
+throttle 6x: frame p95 423.8 worst 25508.7 ms; js without submit p95 5.3 worst 32.5; physics p95 1.7 worst 10.8 (2 steps, ghost in 390 frames); submit p95 422.4; first frames worst 1065; webgl2 low
+PASS JavaScript frame p95 at 6x throttle under 16.7 ms, on a generated circuit with a ghost: 5.3 ms, worst 32.5, ghost running in 390 of 390 frames
+PASS known answer: 20 ms of busy work per frame raises the p95 by about 20 ms and fails the budget: p95 2.7 -> 25.1 ms at 4x
+
+== shots
+wrote /home/claude/driftrace/crazygames/review/loop/shots/title-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/career-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/garage-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/countdown-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/drive-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/results-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/ghost-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/free-1280x720.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/title-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/career-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/garage-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/countdown-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/drive-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/results-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/ghost-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/free-390x844.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/title-844x390.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/career-844x390.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/garage-844x390.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/countdown-844x390.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/drive-844x390.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/results-844x390.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/ghost-844x390.png
+wrote /home/claude/driftrace/crazygames/review/loop/shots/free-844x390.png
+
+all passed; wrote review/loop/ghost.json, runs.json, save.json, perf.json, shots.json

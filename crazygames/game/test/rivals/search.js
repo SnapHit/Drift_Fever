@@ -87,7 +87,7 @@ export function search(def, opts) {
   return best;
 }
 
-if (process.argv[1] && process.argv[1].endsWith('search.js')) {
+if (process.argv[1] && process.argv[1].endsWith('rivals/search.js')) {
   const args = process.argv.slice(2);
   const def = { ...rivalById(args.find(a => /^r\d/.test(a)) || 'r1') };
   const n = args.includes('--n') ? +args[args.indexOf('--n') + 1] : 300, seed = args.includes('--seed') ? +args[args.indexOf('--seed') + 1] : 1;

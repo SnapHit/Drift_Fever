@@ -26,16 +26,19 @@ export function lapsOf(track) { return track.kind === 'circuit' ? TANDEM.LAPS : 
 export function measureCore(deps, def, opts) {
   const { createRival, trackFor, careerSpec, battleLaps, STEP, LAUNCH } = deps;
   const o = opts || {};
-  const track = trackFor(careerSpec(def.track)), laps = battleLaps(track);
+  const track = trackFor(careerSpec(def.track)), laps = battleLaps(track, def);
   const r = createRival(track, def, laps, o);
   const w = r.world;
   const corners = [];
   for (let lap = 0; lap < laps; lap++) for (const c of track.corners) corners.push({ name: c.name + (laps > 1 ? ' L' + (lap + 1) : ''), from: c.from + lap * track.length, to: c.to + lap * track.length, t: 0, slide: 0, angleSum: 0, maxAngle: 0 });
-  let respawns = 0, minV = Infinity, minVAt = 0;
+  let respawns = 0, minV = Infinity, minVAt = 0, brakeSteps = 0, liftSteps = 0, maxBrake = 0, minThrottle = 1;
   const trace = [];
   const limit = Math.round((o.maxSeconds || 300) / STEP);
   for (let i = 0; i < limit && !r.state.finished; i++) {
     r.step();
+    /* a player's hands: no brake ever, the throttle full except in DRIFT with no steering */
+    const inp = r.state.input;
+    if (inp && !r.state.finished) { if (inp.brake > 0) brakeSteps++; if (inp.brake > maxBrake) maxBrake = inp.brake; if (inp.throttle < 1 && !(inp.handbrake && inp.steer === 0)) { liftSteps++; if (inp.throttle < minThrottle) minThrottle = inp.throttle; } }
     if (w.respawned) respawns++;
     if (w.hit && o.hits) o.hits.push({ t: +r.state.runTime.toFixed(2), d: +r.runDistance().toFixed(1), lat: +w.lateral.toFixed(2), hw: +w.halfWidth.toFixed(1), v: +w.car.speed.toFixed(1), speed: +w.hit.speed.toFixed(1), hard: w.hit.hard, md: r.driver.mode });
     const t = r.state.runTime;
@@ -54,6 +57,7 @@ export function measureCore(deps, def, opts) {
     corners: corners.map(c => ({ name: c.name, share: c.t ? +(c.slide / c.t).toFixed(3) : 0, angle: c.slide ? +(c.angleSum / c.slide).toFixed(1) : 0, max: +c.maxAngle.toFixed(1), s: +c.t.toFixed(2) })),
     worstCorner: shares.length ? Math.min(...shares) : 0, meanCorner: shares.length ? shares.reduce((a, b) => a + b, 0) / shares.length : 0,
     hash: r.hash(), trace,
+    hands: { brakeSteps, liftSteps, maxBrake, minThrottle, overruled: r.state.overruled || 0 },
   };
 }
 

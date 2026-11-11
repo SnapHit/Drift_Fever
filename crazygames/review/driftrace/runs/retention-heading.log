@@ -1,0 +1,29 @@
+PASS 390x844 heading over the first visit countdown: "CAREER · ROOKIE · TRACK 1 OF 8" "First slide"
+PASS 390x844 heading inside the view and clear of the score, the prompt and the pads: {"l":59,"t":110,"r":331,"b":173}
+PASS 390x844 heading gone after GO (GO at frame 85 of the last 420, hidden at the end true)
+PASS 390x844 a star on career 1: "🔓 Track 2 of 8 unlocked: Harbour run", NEXT primary true, stars 1, the card scrolls false
+PASS 390x844 no page errors
+PASS 390x844 known answer, no star: "Win a star to unlock track 2 of 8", NEXT shown false, GO AGAIN primary true
+PASS 390x844 known answer no page errors
+PASS 844x390 heading over the first visit countdown: "CAREER · ROOKIE · TRACK 1 OF 8" "First slide"
+PASS 844x390 heading inside the view and clear of the score, the prompt and the pads: {"l":12,"t":94,"r":281,"b":152}
+PASS 844x390 heading gone after GO (GO at frame 85 of the last 420, hidden at the end true)
+PASS 844x390 a star on career 1: "🔓 Track 2 of 8 unlocked: Harbour run", NEXT primary true, stars 1, the card scrolls false
+PASS 844x390 no page errors
+PASS 844x390 known answer, no star: "Win a star to unlock track 2 of 8", NEXT shown false, GO AGAIN primary true
+PASS 844x390 known answer no page errors
+PASS 800x450 heading over the first visit countdown: "CAREER · ROOKIE · TRACK 1 OF 8" "First slide"
+PASS 800x450 heading inside the view and clear of the score, the prompt and the pads: {"l":12,"t":108,"r":281,"b":165}
+PASS 800x450 heading gone after GO (GO at frame 85 of the last 420, hidden at the end true)
+PASS 800x450 a star on career 1: "🔓 Track 2 of 8 unlocked: Harbour run", NEXT primary true, stars 1, the card scrolls false
+PASS 800x450 no page errors
+PASS 800x450 known answer, no star: "Win a star to unlock track 2 of 8", NEXT shown false, GO AGAIN primary true
+PASS 800x450 known answer no page errors
+PASS 1280x720 heading over the first visit countdown: "CAREER · ROOKIE · TRACK 1 OF 8" "First slide"
+PASS 1280x720 heading inside the view and clear of the score, the prompt and the pads: {"l":12,"t":194,"r":285,"b":262}
+PASS 1280x720 heading gone after GO (GO at frame 85 of the last 420, hidden at the end true)
+PASS 1280x720 a star on career 1: "🔓 Track 2 of 8 unlocked: Harbour run", NEXT primary true, stars 1, the card scrolls false
+PASS 1280x720 no page errors
+PASS 1280x720 known answer, no star: "Win a star to unlock track 2 of 8", NEXT shown false, GO AGAIN primary true
+PASS 1280x720 known answer no page errors
+all passed

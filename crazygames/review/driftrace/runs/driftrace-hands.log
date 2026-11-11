@@ -1,0 +1,5 @@
+PASS r1 Kestrow on career 1 in the page, 4 laps: hands only a player's (brake never on, throttle always full, the guard never used); 75.2 s, total 2662, respawns 0, hard hits 0, contacts 0, lowest 83 km/h, the least sliding corner 42% (mean 60%); in Node total 2662, a different hash (the engines' Math)
+PASS r1 under 20 disturbances: 0 miss the bar (0 on the hands); worst respawns 0, hard hits 0, contacts 2, lowest 74.7 km/h, least sliding corner 36%, total 2526 to 2901
+PASS known answer: the old Kestrow (the rivals round's numbers, a driver that lifts and brakes) fails the hands: CAUGHT (braked on 648 steps (up to 0.39), lifted on 1066 steps (down to 0))
+PASS known answer: the first rival made too fast ({"HB_OVER":40,"PROGRESS":400,"EDGE_SAFE":0.3,"EDGE_COST":100,"CRASH":2000,"ANGLE_CAP":50,"SLIDE_GAIN":1.2}) misses the bar in 6 of 6 runs: CAUGHT (3 hard hits, 5 contacts, a corner 8% sliding)
+all passed

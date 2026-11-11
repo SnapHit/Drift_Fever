@@ -1,0 +1,23 @@
+tapes: lost 718 to 3113 (lost), won 4196 to 3113 (won)
+PASS 390x844 countdown: no overlaps
+PASS 390x844 HUD mid race, the close bonus at x1.6: no overlaps; place and gap shown, live score shown, tag shown
+PASS 390x844 results won: card 65 to 637 of 844 px, REMATCH bottom 545, CAREERback to the tracks bottom 617, MENU bottom 617, scrolls false, no overlaps
+PASS 390x844 results lost: card 65 to 628 of 844 px, REMATCH bottom 521, CAREERwin a star, then come ba bottom 608, MENU bottom 608, scrolls false, no overlaps
+PASS 390x844 career: 1 rival cards (beaten), nothing meets
+PASS 390x844 known answer: the cards pulled 30 px up meet: 1 meetings: CAUGHT
+PASS 844x390 countdown: no overlaps
+PASS 844x390 HUD mid race, the close bonus at x1.6: no overlaps; place and gap shown, live score shown, tag shown
+PASS 844x390 results won: card 32 to 356 of 390 px, REMATCH bottom 274, CAREERback to the tracks bottom 342, MENU bottom 342, scrolls false, no overlaps
+PASS 844x390 results lost: card 24 to 364 of 390 px, REMATCH bottom 267, CAREERwin a star, then come ba bottom 350, MENU bottom 350, scrolls false, no overlaps
+PASS 844x390 career: 1 rival cards (beaten), nothing meets
+PASS 800x450 countdown: no overlaps
+PASS 800x450 HUD mid race, the close bonus at x1.6: no overlaps; place and gap shown, live score shown, tag shown
+PASS 800x450 results won: card 62 to 386 of 450 px, REMATCH bottom 304, CAREERback to the tracks bottom 372, MENU bottom 372, scrolls false, no overlaps
+PASS 800x450 results lost: card 54 to 394 of 450 px, REMATCH bottom 297, CAREERwin a star, then come ba bottom 380, MENU bottom 380, scrolls false, no overlaps
+PASS 800x450 career: 1 rival cards (beaten), nothing meets
+PASS 1280x720 countdown: no overlaps
+PASS 1280x720 HUD mid race, the close bonus at x1.6: no overlaps; place and gap shown, live score shown, tag shown
+PASS 1280x720 results won: card 57 to 619 of 720 px, REMATCH bottom 527, CAREERback to the tracks bottom 599, MENU bottom 599, scrolls false, no overlaps
+PASS 1280x720 results lost: card 57 to 634 of 720 px, REMATCH bottom 527, CAREERwin a star, then come ba bottom 614, MENU bottom 614, scrolls false, no overlaps
+PASS 1280x720 career: 1 rival cards (beaten), nothing meets
+all passed

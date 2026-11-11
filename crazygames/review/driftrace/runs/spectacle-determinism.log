@@ -1,0 +1,16 @@
+longest Legend track: {"index":22,"name":"The vice","metres":2508,"kind":"circuit"}
+
+== career 1
+PASS career 1: the live run with the round on reached the results in 4417 frames, score 895, 8396 steps, the line at step 8356
+PASS career 1: its tape replayed with the round on: hash same, score 895 against 895
+PASS career 1: its tape replayed with ?fx=0: hash same, score 895 against 895
+PASS career 1: the same driver with ?fx=0 scores 895 (round on 895), the same inputs to the line at step 8356, its tape replays with the round on to its own hash true; steps to the results 8396 against 8396
+PASS career 1 known answer: the tape with entry 1807 of 3950 steered the other way (2 steps) replays to a different hash: CAUGHT (score 934)
+
+== longest Legend (The vice, 2508 m)
+PASS longest Legend (The vice, 2508 m): the live run with the round on reached the results in 7750 frames, score 1678, 15062 steps, the line at step 15022
+PASS longest Legend (The vice, 2508 m): its tape replayed with the round on: hash same, score 1678 against 1678
+PASS longest Legend (The vice, 2508 m): its tape replayed with ?fx=0: hash same, score 1678 against 1678
+PASS longest Legend (The vice, 2508 m): the same driver with ?fx=0 scores 1678 (round on 1678), the same inputs to the line at step 15022, its tape replays with the round on to its own hash true; steps to the results 15062 against 15062
+PASS longest Legend (The vice, 2508 m) known answer: the tape with entry 4043 of 8800 steered the other way (12 steps) replays to a different hash: CAUGHT (score null)
+all passed

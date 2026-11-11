@@ -1,0 +1,12 @@
+pace {"zeroTo100s":2.75,"kmhAfter5s":142.1,"topKmh":183.9}
+spins 0 of 12 
+grip and build {"kmh":43,"gripRadiusM":10.9,"gripMaxSlideDeg":3.1,"driftTo30s":0.75,"driftPeakDegPerS":86}
+grip and build {"kmh":72,"gripRadiusM":18.3,"gripMaxSlideDeg":2.6,"driftTo30s":0.72,"driftPeakDegPerS":61}
+grip and build {"kmh":101,"gripRadiusM":35.1,"gripMaxSlideDeg":7.9,"driftTo30s":0.71,"driftPeakDegPerS":59}
+stuck [{"mode":"throttle","escapedAfterS":1.35,"stuck":false},{"mode":"reverse","escapedAfterS":0.96,"stuck":false}]
+park arc {"secondsBeforeDrift":2,"kmhAtTurn":79,"slowestKmhInDrift":68,"turnedDeg":243,"radiusM":20.1,"closestToBarrierM":13.7,"wallHits":0}
+park arc {"secondsBeforeDrift":2.6,"kmhAtTurn":97,"slowestKmhInDrift":7,"turnedDeg":160,"radiusM":14.3,"closestToBarrierM":1.2,"wallHits":3}
+park arc {"secondsBeforeDrift":3.2,"kmhAtTurn":111,"slowestKmhInDrift":0,"turnedDeg":248,"radiusM":2.1,"closestToBarrierM":2.5,"wallHits":1}
+drift with no steer {"kmhAfter2s":20,"slideDeg":0}
+known answer, old drift {"secondsBeforeDrift":2.6,"kmhAtTurn":97,"slowestKmhInDrift":1,"turnedDeg":134,"radiusM":15.5,"closestToBarrierM":2,"wallHits":2}
+known answers {"firstPrototypeSpins":8,"noRecovery":{"mode":"throttle","escapedAfterS":null,"stuck":true}}
