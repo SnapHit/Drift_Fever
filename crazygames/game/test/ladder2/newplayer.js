@@ -135,7 +135,8 @@ const LAYOUT = () => {
 /* ---- one profile, rehearsed or tested ---- */
 async function journey(profileName, mode, tapes, opts) {
   const P = PROFILES[profileName], o = opts || {};
-  const context = await browser.newContext(P.ctx);
+  /* a rehearsal may run at a smaller window (o.ctx): the physics does not read the window, and the test's comparison with it says so */
+  const context = await browser.newContext(o.ctx || P.ctx);
   if (o.seed) await context.addInitScript(([k, v]) => { try { if (!sessionStorage.getItem('np-seeded')) { localStorage.setItem(k, v); sessionStorage.setItem('np-seeded', '1'); } } catch (e) {} }, o.seed);
   const log = { profile: profileName, mode, steps: [], errors: [], requests: { total: 0, otherHost: [], failed: [] }, runs: [] };
   const watch = page => {
@@ -218,6 +219,10 @@ async function journey(profileName, mode, tapes, opts) {
     /* from the frame the run's countdown is on screen to its results */
     const tape = mode === 'test' ? tapes[log.runs.length] : [];
     if (mode === 'rehearse') await page.evaluate(async () => { window.__np = window.__np || { e: 0 }; window.__np.mod = await import('/src/rivals/players.js'); window.__np.p = null; });
+    /* the presses are counted from the frame GO is drawn (the HUD's count reads GO), as a player starts on GO: the countdown's frames before it can differ by one between two loads */
+    const begun = frameNo;
+    for (let w = 0; w < NP.WAIT_FRAMES && !(await page.evaluate(() => { const c = document.getElementById('count'); return !!(c && c.classList.contains('go') && c.textContent === 'GO'); })); w++) await tick();
+    const goAfter = frameNo - begun;
     const start = frameNo, prompts = [], seen = new Set();
     let ti = 0, st = null, k = 0;
     for (; k < NP.RUN_FRAMES; k++) {
@@ -236,7 +241,7 @@ async function journey(profileName, mode, tapes, opts) {
     }
     if (mode === 'rehearse') { for (const n of ['left', 'right', 'hb']) if (held[n]) tape.push([frameNo - start, n, 0]); }
     await releaseAll();
-    const r = { name, frames: frameNo - start, results: st && st.results, prompts, presses: tape.length };
+    const r = { name, frames: frameNo - start, goAfter, results: st && st.results, prompts, presses: tape.length };
     log.runs.push(r);
     if (mode === 'rehearse') r.tape = tape;
     return r;
@@ -322,6 +327,7 @@ for (const name of Object.keys(PROFILES)) {
   const from = name !== 'phone' && !args.includes('--rehearse-all') ? (out.profiles.phone || prior.phone) : null;
   let reh;
   if (from) { console.log('== ' + name + ': the phone\'s rehearsal, its presses sent as keys'); reh = { runs: from.rehearsal.runs.map((r, k) => ({ ...r, tape: from.tapes[k] })), error: from.rehearsal.error, borrowed: 'phone' }; }
+  else if (name === 'desktop') { console.log('== desktop: the rehearsal, keys, in a 390x844 window (drawn three times faster in software)'); reh = await journey(name, 'rehearse', null, { ctx: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 } }); reh.window = '390x844'; }
   else { console.log('== ' + name + ': the rehearsal'); reh = await journey(name, 'rehearse'); }
   const tapes = reh.runs.map(r => r.tape);
   console.log('   rehearsal: ' + reh.runs.map(r => r.name + ' ' + JSON.stringify(r.results) + ' in ' + r.frames + ' frames, ' + r.presses + ' presses').join('; ') + (reh.error ? ' :: stopped: ' + reh.error.split('\n')[0] : ''));

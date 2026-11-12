@@ -1,0 +1,61 @@
+PASS Kestrow (r1) drives well, career 1 First slide, 4 laps, starter: in Node 75.2 s, 2662 points, respawns 0, hard 0, contacts 0, lowest 83 km/h, least sliding corner 42%, hands a player's; under 20 disturbances 0 miss (worst: hard 0, contacts 2, lowest 74.7 km/h, corner 36%, total 2526 to 2901, guard 0); plateau: 13 of 38 variants miss (16 of 190 runs), reported only: Kestrow is the author's :: SLIDE_GAIN 0.35 to 0.3535, PROGRESS 30 to 30.3, KEEP 397 to 393.03, ANGLE_CAP 20.41 to 20.6141
+     grip  wins 16; finish 72.75 to 73.24 s against his 74.15 to 76.21; place changes 0 to 0; totals 2705 to 2818 against 2526 to 2901; ahead all the way 20, behind 0; walls 0 (hard 0), contacts 8, respawns 0, hands broken 0
+     slide wins 1; finish 75.06 to 78.8 s against his 74.15 to 76.21; place changes 1 to 4; totals 2241 to 4223 against 3711 to 4736; ahead all the way 0, behind 0; walls 12 (hard 5), contacts 15, respawns 0, hands broken 0
+     mixed wins 1; finish 74.41 to 79.62 s against his 74.15 to 76.21; place changes 1 to 13; totals 1928 to 4052 against 2598 to 4736; ahead all the way 0, behind 0; walls 5 (hard 5), contacts 13, respawns 0, hands broken 0
+FAIL Kestrow is a race: wins of 20, grip 16, slide 1, mixed 1, 18 of 60 (at least two of three win 3 or more, none wins all 20)
+FAIL Kestrow: no player ahead all the way, or behind all the way, in every race (grip 20 / 0, slide 0 / 0, mixed 0 / 0)
+PASS Kestrow: a player who never moves loses (0 against 4585)
+PASS Kestrow: every measuring player had only the player's hands on every step
+     Kestrow with the players as they were (their own numbers): grip 9, slide 12, mixed 6, 27 of 60 (the record)
+FAIL Tolvo (r2) drives well, career 5 Tight city, 3 laps, hatch: in Node 83.48 s, 4849 points, respawns 0, hard 0, contacts 0, lowest 64.3 km/h, least sliding corner 34%, hands a player's; under 20 disturbances 0 miss (worst: hard 0, contacts 0, lowest 64.5 km/h, corner 31%, total 4177 to 5005, guard 0); plateau: 9 of 38 variants miss (15 of 180 runs) :: SLIDE_GAIN 0.35 to 0.3535, KEEP 325 to 328.25, KEEP 325 to 321.75, ANGLE_CAP 21.56 to 21.7756
+     grip  wins 0; finish 85.32 to 89.85 s against his 81.08 to 83.48; place changes 0 to 0; totals 434 to 1839 against 5809 to 6637; ahead all the way 0, behind 20; walls 15 (hard 7), contacts 2, respawns 0, hands broken 0
+     slide wins 8; finish 77.36 to 84.23 s against his 81.08 to 83.48; place changes 2 to 21; totals 2048 to 7796 against 4581 to 6637; ahead all the way 0, behind 0; walls 35 (hard 9), contacts 17, respawns 0, hands broken 0
+     mixed wins 7; finish 81.92 to 86.38 s against his 81.08 to 83.48; place changes 2 to 14; totals 2725 to 9278 against 5073 to 6637; ahead all the way 0, behind 0; walls 25 (hard 9), contacts 15, respawns 0, hands broken 0
+PASS Tolvo is a race: wins of 20, grip 0, slide 8, mixed 7, 15 of 60 (at least two of three win 3 or more, none wins all 20)
+FAIL Tolvo: no player ahead all the way, or behind all the way, in every race (grip 0 / 20, slide 0 / 0, mixed 0 / 0)
+PASS Tolvo: a player who never moves loses (0 against 6481)
+PASS Tolvo: every measuring player had only the player's hands on every step
+FAIL Varsk (r3) drives well, career 9 Upper deck, 3 laps, fastback: in Node 91.18 s, 4333 points, respawns 0, hard 0, contacts 0, lowest 87.1 km/h, least sliding corner 36%, hands a player's; under 20 disturbances 2 miss (worst: hard 1, contacts 4, lowest 66 km/h, corner 0%, total 4021 to 4836, guard 0) :: 1 hard hits, 4 contacts, a corner 0% sliding; 1 hard hits, 4 contacts, a corner 0% sliding; plateau: 9 of 38 variants miss (11 of 180 runs) :: KEEP 572 to 577.72, ANGLE_CAP 22.29 to 22.5129, ENTRY 26.44 to 26.7044, ENTRY 26.44 to 26.1756
+     grip  wins 0; finish 90.12 to 92.64 s against his 90.78 to 91.93; place changes 0 to 2; totals 756 to 2135 against 5017 to 6869; ahead all the way 0, behind 18; walls 10 (hard 3), contacts 12, respawns 0, hands broken 0
+     slide wins 5; finish 92.36 to 94.23 s against his 90.78 to 91.93; place changes 0 to 0; totals 4238 to 6595 against 6054 to 6869; ahead all the way 0, behind 20; walls 7 (hard 5), contacts 0, respawns 0, hands broken 0
+     mixed wins 0; finish 91.15 to 94.43 s against his 90.78 to 91.93; place changes 0 to 10; totals 1108 to 2661 against 5810 to 6869; ahead all the way 0, behind 16; walls 15 (hard 6), contacts 26, respawns 0, hands broken 0
+FAIL Varsk is a race: wins of 20, grip 0, slide 5, mixed 0, 5 of 60 (at least two of three win 3 or more, none wins all 20)
+FAIL Varsk: no player ahead all the way, or behind all the way, in every race (grip 0 / 18, slide 0 / 20, mixed 0 / 16)
+PASS Varsk: a player who never moves loses (0 against 6366)
+PASS Varsk: every measuring player had only the player's hands on every step
+FAIL Dovane (r4) drives well, career 13 Over and under, 2 laps, tourer: in Node 57.88 s, 1897 points, respawns 0, hard 2, contacts 6, lowest 29.5 km/h, least sliding corner 26%, hands a player's :: 2 hard hits, 6 contacts, 29.5 km/h, a corner 26% sliding; under 20 disturbances 18 miss (worst: hard 9, contacts 11, lowest 19.6 km/h, corner 0%, total 1408 to 2232, guard 0) :: 3 hard hits, 7 contacts, 38.1 km/h; a corner 0% sliding; 9 hard hits, 11 contacts, 22.7 km/h, a corner 12% sliding; plateau: 34 of 34 variants miss (164 of 170 runs) :: SLIDE_GAIN 1.353 to 1.3665, SLIDE_GAIN 1.353 to 1.3395, PROGRESS 87 to 87.87, PROGRESS 87 to 86.13
+     grip  wins 0; finish 64.77 to 65.62 s against his 54.5 to 62.51; place changes 0 to 6; totals 447 to 1116 against 2542 to 3515; ahead all the way 0, behind 17; walls 2 (hard 2), contacts 11, respawns 0, hands broken 0
+     slide wins 1; finish 59.92 to 64.63 s against his 54.5 to 62.51; place changes 0 to 4; totals 1818 to 3001 against 2416 to 3515; ahead all the way 0, behind 16; walls 18 (hard 3), contacts 6, respawns 0, hands broken 0
+     mixed wins 2; finish 57.77 to 64.02 s against his 54.5 to 62.51; place changes 0 to 5; totals 1176 to 2624 against 1786 to 3515; ahead all the way 0, behind 16; walls 8 (hard 5), contacts 10, respawns 0, hands broken 0
+FAIL Dovane is a race: wins of 20, grip 0, slide 1, mixed 2, 3 of 60 (at least two of three win 3 or more, none wins all 20)
+PASS Dovane: no player ahead all the way, or behind all the way, in every race (grip 0 / 17, slide 0 / 16, mixed 0 / 16)
+PASS Dovane: a player who never moves loses (0 against 3180)
+PASS Dovane: every measuring player had only the player's hands on every step
+FAIL Halvik (r5) drives well, career 17 Knot yard, 2 laps, driftbuild: in Node 70.15 s, 1234 points, respawns 0, hard 5, contacts 5, lowest 33.8 km/h, least sliding corner 19%, hands a player's :: 5 hard hits, 5 contacts, 33.8 km/h, a corner 19% sliding; under 20 disturbances 20 miss (worst: hard 6, contacts 7, lowest 23.5 km/h, corner 14%, total 1096 to 1766, guard 0) :: 5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding; 2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234; 6 hard hits, 6 contacts, 23.5 km/h, a corner 20% sliding; plateau: 34 of 34 variants miss (170 of 170 runs) :: SLIDE_GAIN 0.945 to 0.9544, SLIDE_GAIN 0.945 to 0.9355, PROGRESS 92 to 92.92, PROGRESS 92 to 91.08
+     grip  wins 19; finish 67.13 to 67.69 s against his 68.73 to 71.24; place changes 0 to 0; totals 1694 to 2379 against 1096 to 1766; ahead all the way 20, behind 0; walls 2 (hard 1), contacts 4, respawns 0, hands broken 0
+     slide wins 19; finish 72.08 to 74.08 s against his 68.73 to 71.24; place changes 1 to 7; totals 2043 to 4232 against 2234 to 2926; ahead all the way 0, behind 0; walls 6 (hard 3), contacts 20, respawns 0, hands broken 0
+     mixed wins 13; finish 68.7 to 73.38 s against his 68.73 to 71.24; place changes 1 to 32; totals 1617 to 4730 against 1520 to 2904; ahead all the way 0, behind 0; walls 10 (hard 4), contacts 26, respawns 0, hands broken 0
+PASS Halvik is a race: wins of 20, grip 19, slide 19, mixed 13, 51 of 60 (at least two of three win 3 or more, none wins all 20)
+FAIL Halvik: no player ahead all the way, or behind all the way, in every race (grip 20 / 0, slide 0 / 0, mixed 0 / 0)
+PASS Halvik: a player who never moves loses (0 against 2496)
+PASS Halvik: every measuring player had only the player's hands on every step
+FAIL Sarrow (r6) drives well, career 21 Endless eight, 2 laps, fastback: in Node 77.59 s, 3366 points, respawns 0, hard 9, contacts 15, lowest 15.4 km/h, least sliding corner 22%, hands a player's :: 9 hard hits, 15 contacts, 15.4 km/h, a corner 22% sliding; under 20 disturbances 20 miss (worst: hard 10, contacts 37, lowest 16.1 km/h, corner 0%, total 460 to 4484, guard 0) :: 6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366; 8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366; 7 hard hits, 18 contacts, 18.2 km/h, a corner 22% sliding, total 737 against 3366; plateau: 34 of 34 variants miss (170 of 170 runs) :: SLIDE_GAIN 0.714 to 0.7211, SLIDE_GAIN 0.714 to 0.7069, PROGRESS 51 to 51.51, PROGRESS 51 to 50.49
+     grip  wins 11; finish 65.87 to 76.94 s against his 74.85 to 80.44; place changes 2 to 14; totals 870 to 1791 against 460 to 5064; ahead all the way 0, behind 0; walls 9 (hard 8), contacts 42, respawns 0, hands broken 0
+     slide wins 16; finish 70.73 to 77.58 s against his 74.85 to 80.44; place changes 1 to 9; totals 1589 to 7887 against 460 to 4484; ahead all the way 0, behind 0; walls 23 (hard 6), contacts 22, respawns 0, hands broken 0
+     mixed wins 18; finish 68.75 to 73.65 s against his 74.85 to 80.44; place changes 1 to 10; totals 2976 to 8420 against 460 to 4484; ahead all the way 0, behind 0; walls 18 (hard 7), contacts 20, respawns 0, hands broken 0
+PASS Sarrow is a race: wins of 20, grip 11, slide 16, mixed 18, 45 of 60 (at least two of three win 3 or more, none wins all 20)
+PASS Sarrow: no player ahead all the way, or behind all the way, in every race (grip 0 / 0, slide 0 / 0, mixed 0 / 0)
+PASS Sarrow: a player who never moves loses (0 against 4546)
+PASS Sarrow: every measuring player had only the player's hands on every step
+
+rival     track                 laps  car          s       total  x3star  grip slide mixed  all  line  players drove
+Kestrow   1 First slide         4     starter      75.2    2662   1.26    16   1     1     18   27    starter, no upgrades  [m3 FAILS]
+Tolvo     5 Tight city          3     hatch        83.48   4849   2.72    0    8     7     15   24    starter, no upgrades  [m2 FAILS m3 FAILS]
+Varsk     9 Upper deck          3     fastback     91.18   4333   1.94    0    5     0     5    21    starter, one step of each  [m2 FAILS m3 FAILS]
+Dovane    13 Over and under     2     tourer       57.88   1897   1.35    0    1     2     3    18    starter, one step of each  [m2 FAILS m3 FAILS]
+Halvik    17 Knot yard          2     driftbuild   70.15   1234   0.89    19   19    13    51   15    starter, two steps of each  [m2 FAILS m3 FAILS]
+Sarrow    21 Endless eight      2     fastback     77.59   3366   2.61    11   16    18    45   12    starter, two steps of each  [m2 FAILS ]
+FAIL the band over the 6 rivals measured: Kestrow 18 (line 27, OUTSIDE); Tolvo 15 (line 24, OUTSIDE); Varsk 5 (line 21, OUTSIDE); Dovane 3 (line 18, OUTSIDE); Halvik 51 (line 15, OUTSIDE, DOES NOT FALL); Sarrow 45 (line 12, OUTSIDE)
+PASS known answer: two rivals swapped fails the band: Kestrow and Tolvo caught, Tolvo and Varsk caught, Varsk and Dovane caught, Dovane and Halvik caught, Halvik and Sarrow caught
+13 failed
+exit 1

@@ -1,0 +1,4619 @@
+{
+ "rows": {
+  "r1": {
+   "id": "r1",
+   "name": "Kestrow",
+   "style": "Smooth and wide",
+   "track": 0,
+   "trackName": "First slide",
+   "kind": "circuit",
+   "laps": 4,
+   "car": "starter",
+   "up": null,
+   "paint": "flame",
+   "chapter": "Rookie",
+   "playerCar": "starter, no upgrades",
+   "players": "0:starter:000",
+   "seconds": 75.2,
+   "total": 2662,
+   "target3": 2110,
+   "multiple": 1.262,
+   "wins": {
+    "grip": 16,
+    "slide": 1,
+    "mixed": 1,
+    "all": 18
+   },
+   "record": {
+    "players": {
+     "grip": {
+      "wins": 9,
+      "allAhead": 2,
+      "allBehind": 0,
+      "seconds": [
+       73.48,
+       75.97
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       1174,
+       2670
+      ],
+      "rival": [
+       2526,
+       4263
+      ],
+      "margin": [
+       -2983,
+       114
+      ],
+      "aheadShare": [
+       0.254,
+       1
+      ],
+      "changes": [
+       0,
+       14
+      ],
+      "lineWon": 16,
+      "wallHits": 2,
+      "hard": 1,
+      "bodyHits": 17,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "slide": {
+      "wins": 12,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       85.99,
+       89.85
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       2068,
+       5964
+      ],
+      "rival": [
+       4405,
+       4824
+      ],
+      "margin": [
+       -2453,
+       1549
+      ],
+      "aheadShare": [
+       0.003,
+       0.107
+      ],
+      "changes": [
+       1,
+       3
+      ],
+      "lineWon": 0,
+      "wallHits": 5,
+      "hard": 3,
+      "bodyHits": 11,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "mixed": {
+      "wins": 6,
+      "allAhead": 3,
+      "allBehind": 0,
+      "seconds": [
+       73.31,
+       82.68
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       2068,
+       4188
+      ],
+      "rival": [
+       2580,
+       4573
+      ],
+      "margin": [
+       -2459,
+       1496
+      ],
+      "aheadShare": [
+       0.056,
+       1
+      ],
+      "changes": [
+       0,
+       12
+      ],
+      "lineWon": 6,
+      "wallHits": 6,
+      "hard": 4,
+      "bodyHits": 34,
+      "respawns": 0,
+      "handsBroken": 0
+     }
+    },
+    "wins": {
+     "grip": 9,
+     "slide": 12,
+     "mixed": 6,
+     "all": 27
+    }
+   },
+   "m2": {
+    "pass": true,
+    "drive": true,
+    "page": null,
+    "node": {
+     "rival": "r1",
+     "track": 0,
+     "finished": true,
+     "seconds": 75.2,
+     "total": 2662,
+     "drift": 1909,
+     "clean": 384,
+     "pace": 369,
+     "best": 216,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83,
+     "minAt": 72.9,
+     "corners": [
+      {
+       "name": "tight 1 L1",
+       "share": 0.598,
+       "angle": 23.6,
+       "max": 33.2,
+       "s": 3.36
+      },
+      {
+       "name": "sweeper 1 L1",
+       "share": 0.485,
+       "angle": 21.7,
+       "max": 27.5,
+       "s": 5.19
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.628,
+       "angle": 22.9,
+       "max": 27.3,
+       "s": 4.42
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.787,
+       "angle": 17.2,
+       "max": 24.1,
+       "s": 3.52
+      },
+      {
+       "name": "sweeper 1 L2",
+       "share": 0.418,
+       "angle": 21.2,
+       "max": 27.4,
+       "s": 5.31
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.654,
+       "angle": 23.2,
+       "max": 27.3,
+       "s": 4.36
+      },
+      {
+       "name": "tight 1 L3",
+       "share": 0.774,
+       "angle": 16.9,
+       "max": 22.6,
+       "s": 3.54
+      },
+      {
+       "name": "sweeper 1 L3",
+       "share": 0.424,
+       "angle": 21.2,
+       "max": 27.3,
+       "s": 5.31
+      },
+      {
+       "name": "opening 1 L3",
+       "share": 0.66,
+       "angle": 23.2,
+       "max": 27.3,
+       "s": 4.36
+      },
+      {
+       "name": "tight 1 L4",
+       "share": 0.646,
+       "angle": 23.2,
+       "max": 30.3,
+       "s": 3.34
+      },
+      {
+       "name": "sweeper 1 L4",
+       "share": 0.496,
+       "angle": 21.8,
+       "max": 27.4,
+       "s": 5.24
+      },
+      {
+       "name": "opening 1 L4",
+       "share": 0.623,
+       "angle": 26.6,
+       "max": 44.8,
+       "s": 4.48
+      }
+     ],
+     "worstCorner": 0.4175824175824124,
+     "meanCorner": 0.5993355640277626,
+     "hash": "-1.336951201488799,-8.121459951968617,0.10127703632114515,-3.9038700374479047,-29.00967820483693,-0.5585575632110638,-0.09317010858562293,2.8996591264969087,0,0,0,11.450253049335446,-4.717873106137565|9024,0,0|2662,9024",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 74.7,
+     "worstCorner": 0.363,
+     "total": [
+      2526,
+      2901
+     ],
+     "seconds": [
+      74.15,
+      76.21
+     ],
+     "guard": 0
+    },
+    "missing": 0,
+    "own": [],
+    "plateau": {
+     "pass": false,
+     "variants": 38,
+     "runs": 190,
+     "missedVariants": 13,
+     "missedRuns": 16,
+     "missed": [
+      {
+       "key": "SLIDE_GAIN",
+       "from": 0.35,
+       "to": 0.3535,
+       "missing": 1,
+       "why": [
+        "1 hard hits"
+       ],
+       "worstCorner": 0.363,
+       "hard": 1,
+       "contacts": 1,
+       "total": [
+        2365,
+        2693
+       ]
+      },
+      {
+       "key": "PROGRESS",
+       "from": 30,
+       "to": 30.3,
+       "missing": 1,
+       "why": [
+        "1 hard hits, 13 contacts, a corner 12% sliding"
+       ],
+       "worstCorner": 0.117,
+       "hard": 1,
+       "contacts": 13,
+       "total": [
+        2240,
+        2901
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 397,
+       "to": 393.03,
+       "missing": 1,
+       "why": [
+        "1 hard hits"
+       ],
+       "worstCorner": 0.363,
+       "hard": 1,
+       "contacts": 1,
+       "total": [
+        2365,
+        2906
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 20.41,
+       "to": 20.6141,
+       "missing": 2,
+       "why": [
+        "4 contacts, a corner 20% sliding",
+        "1 hard hits"
+       ],
+       "worstCorner": 0.2,
+       "hard": 1,
+       "contacts": 4,
+       "total": [
+        2242,
+        2836
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 20.41,
+       "to": 20.2059,
+       "missing": 1,
+       "why": [
+        "1 hard hits, 13 contacts, a corner 12% sliding"
+       ],
+       "worstCorner": 0.117,
+       "hard": 1,
+       "contacts": 13,
+       "total": [
+        2240,
+        2844
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 26.25,
+       "to": 26.5125,
+       "missing": 2,
+       "why": [
+        "9 contacts, a corner 14% sliding",
+        "4 contacts, a corner 20% sliding"
+       ],
+       "worstCorner": 0.141,
+       "hard": 0,
+       "contacts": 9,
+       "total": [
+        2406,
+        2840
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.427,
+       "to": 0.4313,
+       "missing": 1,
+       "why": [
+        "11 contacts, a corner 15% sliding"
+       ],
+       "worstCorner": 0.153,
+       "hard": 0,
+       "contacts": 11,
+       "total": [
+        2221,
+        2703
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.427,
+       "to": 0.4227,
+       "missing": 1,
+       "why": [
+        "4 contacts, a corner 18% sliding"
+       ],
+       "worstCorner": 0.183,
+       "hard": 0,
+       "contacts": 4,
+       "total": [
+        2553,
+        2616
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 33.45,
+       "to": 33.7845,
+       "missing": 1,
+       "why": [
+        "7 contacts, a corner 20% sliding"
+       ],
+       "worstCorner": 0.197,
+       "hard": 0,
+       "contacts": 7,
+       "total": [
+        2578,
+        2808
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 33.45,
+       "to": 33.1155,
+       "missing": 2,
+       "why": [
+        "1 hard hits, 8 contacts, a corner 13% sliding",
+        "5 contacts, a corner 21% sliding"
+       ],
+       "worstCorner": 0.127,
+       "hard": 1,
+       "contacts": 8,
+       "total": [
+        2409,
+        2695
+       ]
+      },
+      {
+       "key": "HB_OVER",
+       "from": 0.65,
+       "to": 0.6435,
+       "missing": 1,
+       "why": [
+        "9 contacts, a corner 18% sliding"
+       ],
+       "worstCorner": 0.179,
+       "hard": 0,
+       "contacts": 9,
+       "total": [
+        2333,
+        2980
+       ]
+      },
+      {
+       "key": "HB_STEER",
+       "from": 0.3,
+       "to": 0.303,
+       "missing": 1,
+       "why": [
+        "4 contacts, a corner 18% sliding"
+       ],
+       "worstCorner": 0.185,
+       "hard": 0,
+       "contacts": 4,
+       "total": [
+        2433,
+        2797
+       ]
+      },
+      {
+       "key": "HB_STEER",
+       "from": 0.3,
+       "to": 0.297,
+       "missing": 1,
+       "why": [
+        "1 hard hits"
+       ],
+       "worstCorner": 0.359,
+       "hard": 1,
+       "contacts": 1,
+       "total": [
+        2447,
+        2696
+       ]
+      }
+     ]
+    }
+   },
+   "m3": {
+    "pass": false,
+    "players": {
+     "grip": {
+      "wins": 16,
+      "allAhead": 20,
+      "allBehind": 0,
+      "seconds": [
+       72.75,
+       73.24
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       2705,
+       2818
+      ],
+      "rival": [
+       2526,
+       2901
+      ],
+      "margin": [
+       -138,
+       248
+      ],
+      "aheadShare": [
+       1,
+       1
+      ],
+      "changes": [
+       0,
+       0
+      ],
+      "lineWon": 20,
+      "wallHits": 0,
+      "hard": 0,
+      "bodyHits": 8,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "slide": {
+      "wins": 1,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       75.06,
+       78.8
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       2241,
+       4223
+      ],
+      "rival": [
+       3711,
+       4736
+      ],
+      "margin": [
+       -2192,
+       512
+      ],
+      "aheadShare": [
+       0.049,
+       0.59
+      ],
+      "changes": [
+       1,
+       4
+      ],
+      "lineWon": 1,
+      "wallHits": 12,
+      "hard": 5,
+      "bodyHits": 15,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "mixed": {
+      "wins": 1,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       74.41,
+       79.62
+      ],
+      "rivalSeconds": [
+       74.15,
+       76.21
+      ],
+      "total": [
+       1928,
+       4052
+      ],
+      "rival": [
+       2598,
+       4736
+      ],
+      "margin": [
+       -2731,
+       1454
+      ],
+      "aheadShare": [
+       0.042,
+       0.99
+      ],
+      "changes": [
+       1,
+       13
+      ],
+      "lineWon": 1,
+      "wallHits": 5,
+      "hard": 5,
+      "bodyHits": 13,
+      "respawns": 0,
+      "handsBroken": 0
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 4585,
+     "won": false
+    }
+   },
+   "drive": {
+    "SLIDE_GAIN": 0.35,
+    "PROGRESS": 30,
+    "KEEP": 397,
+    "ANGLE_CAP": 20.41,
+    "EDGE_SAFE": 2.47,
+    "EDGE_COST": 2670,
+    "ENTRY": 26.25,
+    "VMAX": 34,
+    "CHAIN_KEEP": 273,
+    "CHAIN_MARGIN": 0.33,
+    "AY_MAX": 7.4,
+    "OUTSIDE": 0.427,
+    "SETUP": 33.45,
+    "WINDOW_PRE": 5.32,
+    "WINDOW_POST": -3.75,
+    "LINK": 4.31,
+    "HB_TIME": 0.108,
+    "HB_OVER": 0.65,
+    "HB_STEER": 0.3
+   },
+   "measured": "2026-11-12"
+  },
+  "r2": {
+   "id": "r2",
+   "name": "Tolvo",
+   "style": "Quick, linking shallow slides",
+   "track": 4,
+   "trackName": "Tight city",
+   "kind": "circuit",
+   "laps": 3,
+   "car": "hatch",
+   "up": null,
+   "paint": "amber",
+   "chapter": "Rookie",
+   "playerCar": "starter, no upgrades",
+   "players": "4:starter:000",
+   "seconds": 83.48,
+   "total": 4849,
+   "target3": 1780,
+   "multiple": 2.724,
+   "wins": {
+    "grip": 0,
+    "slide": 8,
+    "mixed": 7,
+    "all": 15
+   },
+   "record": null,
+   "m2": {
+    "pass": false,
+    "drive": true,
+    "page": null,
+    "node": {
+     "rival": "r2",
+     "track": 4,
+     "finished": true,
+     "seconds": 83.48,
+     "total": 4849,
+     "drift": 4237,
+     "clean": 336,
+     "pace": 276,
+     "best": 1160,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.3,
+     "minAt": 25,
+     "corners": [
+      {
+       "name": "tightening 1 L1",
+       "share": 0.914,
+       "angle": 18.4,
+       "max": 26.9,
+       "s": 2.7
+      },
+      {
+       "name": "esses 1 L1",
+       "share": 0.367,
+       "angle": 18.8,
+       "max": 22.2,
+       "s": 2.07
+      },
+      {
+       "name": "esses 2 L1",
+       "share": 0.551,
+       "angle": 18.8,
+       "max": 22.4,
+       "s": 1.39
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.855,
+       "angle": 18.5,
+       "max": 26.9,
+       "s": 2.47
+      },
+      {
+       "name": "double 1 L1",
+       "share": 0.812,
+       "angle": 26.9,
+       "max": 42.6,
+       "s": 4.03
+      },
+      {
+       "name": "double 2 L1",
+       "share": 0.846,
+       "angle": 32.1,
+       "max": 41,
+       "s": 3.51
+      },
+      {
+       "name": "tight 1 L1",
+       "share": 0.455,
+       "angle": 24,
+       "max": 28.2,
+       "s": 3.24
+      },
+      {
+       "name": "tightening 1 L2",
+       "share": 0.91,
+       "angle": 18.2,
+       "max": 26,
+       "s": 2.69
+      },
+      {
+       "name": "esses 1 L2",
+       "share": 0.34,
+       "angle": 18.8,
+       "max": 22.1,
+       "s": 2.06
+      },
+      {
+       "name": "esses 2 L2",
+       "share": 0.565,
+       "angle": 22.5,
+       "max": 28.5,
+       "s": 1.4
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.845,
+       "angle": 18.5,
+       "max": 26.8,
+       "s": 2.47
+      },
+      {
+       "name": "double 1 L2",
+       "share": 0.808,
+       "angle": 27.4,
+       "max": 43,
+       "s": 4.04
+      },
+      {
+       "name": "double 2 L2",
+       "share": 0.921,
+       "angle": 25.3,
+       "max": 28.4,
+       "s": 3.27
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.478,
+       "angle": 24.1,
+       "max": 28.2,
+       "s": 3.38
+      },
+      {
+       "name": "tightening 1 L3",
+       "share": 0.723,
+       "angle": 22.6,
+       "max": 28.3,
+       "s": 2.73
+      },
+      {
+       "name": "esses 1 L3",
+       "share": 0.354,
+       "angle": 21.8,
+       "max": 27.9,
+       "s": 2.05
+      },
+      {
+       "name": "esses 2 L3",
+       "share": 0.497,
+       "angle": 18.8,
+       "max": 22.2,
+       "s": 1.41
+      },
+      {
+       "name": "opening 1 L3",
+       "share": 0.867,
+       "angle": 18.4,
+       "max": 26.8,
+       "s": 2.45
+      },
+      {
+       "name": "double 1 L3",
+       "share": 0.758,
+       "angle": 29,
+       "max": 42.3,
+       "s": 3.75
+      },
+      {
+       "name": "double 2 L3",
+       "share": 0.861,
+       "angle": 24.7,
+       "max": 28.3,
+       "s": 3.36
+      },
+      {
+       "name": "tight 1 L3",
+       "share": 0.526,
+       "angle": 23.6,
+       "max": 28.2,
+       "s": 2.93
+      }
+     ],
+     "worstCorner": 0.3400809716599198,
+     "meanCorner": 0.6786242133815166,
+     "hash": "1.6849709030136026,-8.086893196536536,0.04547878932868002,-0.957201998120518,-28.655338367137865,0.152100834756175,0.022796444626790938,6.08323135544407,0,0,0,-7.409482420480474,-6.0233930978333206|10018,0,0|4849,10018",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 64.5,
+     "worstCorner": 0.308,
+     "total": [
+      4177,
+      5005
+     ],
+     "seconds": [
+      81.08,
+      83.23
+     ],
+     "guard": 0
+    },
+    "missing": 0,
+    "own": [],
+    "plateau": {
+     "pass": false,
+     "variants": 38,
+     "runs": 180,
+     "missedVariants": 9,
+     "missedRuns": 15,
+     "missed": [
+      {
+       "key": "SLIDE_GAIN",
+       "from": 0.35,
+       "to": 0.3535,
+       "missing": 3,
+       "why": [
+        "2 hard hits, 30.3 km/h, a corner 10% sliding",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 2,
+       "contacts": 2,
+       "total": [
+        4307,
+        4550
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 325,
+       "to": 328.25,
+       "missing": 1,
+       "why": [
+        "total 3353 against 4849"
+       ],
+       "worstCorner": 0.303,
+       "hard": 0,
+       "contacts": 0,
+       "total": [
+        3353,
+        5394
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 325,
+       "to": 321.75,
+       "missing": 1,
+       "why": [
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 0,
+       "contacts": 0,
+       "total": [
+        4177,
+        5200
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 21.56,
+       "to": 21.7756,
+       "missing": 3,
+       "why": [
+        "2 hard hits, 32.6 km/h, a corner 7% sliding",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 2,
+       "contacts": 2,
+       "total": [
+        4031,
+        5603
+       ]
+      },
+      {
+       "key": "EDGE_SAFE",
+       "from": 2.37,
+       "to": 2.3937,
+       "missing": 1,
+       "why": [
+        "2 hard hits, 17 contacts, a corner 28% sliding"
+       ],
+       "worstCorner": 0.282,
+       "hard": 2,
+       "contacts": 17,
+       "total": [
+        4179,
+        4739
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 26.2,
+       "to": 26.462,
+       "missing": 1,
+       "why": [
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 0,
+       "contacts": 0,
+       "total": [
+        3945,
+        4920
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 26.2,
+       "to": 25.938,
+       "missing": 1,
+       "why": [
+        "2 hard hits, 35.7 km/h, a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 2,
+       "contacts": 2,
+       "total": [
+        4153,
+        5208
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 33.14,
+       "to": 32.8086,
+       "missing": 3,
+       "why": [
+        "3 hard hits, 23 contacts, a corner 2% sliding, total 2838 against 4849",
+        "1 hard hits, 6 contacts, a corner 18% sliding"
+       ],
+       "worstCorner": 0.016,
+       "hard": 4,
+       "contacts": 23,
+       "total": [
+        2838,
+        5450
+       ]
+      },
+      {
+       "key": "HB_STEER",
+       "from": 0.35,
+       "to": 0.3465,
+       "missing": 1,
+       "why": [
+        "1 hard hits, 6 contacts, a corner 24% sliding"
+       ],
+       "worstCorner": 0.24,
+       "hard": 1,
+       "contacts": 6,
+       "total": [
+        3676,
+        5150
+       ]
+      }
+     ]
+    }
+   },
+   "m3": {
+    "pass": false,
+    "players": {
+     "grip": {
+      "wins": 0,
+      "allAhead": 0,
+      "allBehind": 20,
+      "seconds": [
+       85.32,
+       89.85
+      ],
+      "rivalSeconds": [
+       81.08,
+       83.48
+      ],
+      "total": [
+       434,
+       1839
+      ],
+      "rival": [
+       5809,
+       6637
+      ],
+      "margin": [
+       -5768,
+       -4363
+      ],
+      "aheadShare": [
+       0,
+       0
+      ],
+      "changes": [
+       0,
+       0
+      ],
+      "lineWon": 0,
+      "wallHits": 15,
+      "hard": 7,
+      "bodyHits": 2,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "slide": {
+      "wins": 8,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       77.36,
+       84.23
+      ],
+      "rivalSeconds": [
+       81.08,
+       83.48
+      ],
+      "total": [
+       2048,
+       7796
+      ],
+      "rival": [
+       4581,
+       6637
+      ],
+      "margin": [
+       -4382,
+       3215
+      ],
+      "aheadShare": [
+       0.035,
+       0.745
+      ],
+      "changes": [
+       2,
+       21
+      ],
+      "lineWon": 7,
+      "wallHits": 35,
+      "hard": 9,
+      "bodyHits": 17,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "mixed": {
+      "wins": 7,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       81.92,
+       86.38
+      ],
+      "rivalSeconds": [
+       81.08,
+       83.48
+      ],
+      "total": [
+       2725,
+       9278
+      ],
+      "rival": [
+       5073,
+       6637
+      ],
+      "margin": [
+       -3375,
+       4205
+      ],
+      "aheadShare": [
+       0.019,
+       0.672
+      ],
+      "changes": [
+       2,
+       14
+      ],
+      "lineWon": 2,
+      "wallHits": 25,
+      "hard": 9,
+      "bodyHits": 15,
+      "respawns": 0,
+      "handsBroken": 0
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 6481,
+     "won": false
+    }
+   },
+   "drive": {
+    "SLIDE_GAIN": 0.35,
+    "PROGRESS": 45,
+    "KEEP": 325,
+    "ANGLE_CAP": 21.56,
+    "EDGE_SAFE": 2.37,
+    "EDGE_COST": 2875,
+    "ENTRY": 26.2,
+    "VMAX": 33.14,
+    "CHAIN_KEEP": 0,
+    "CHAIN_MARGIN": 0.34,
+    "AY_MAX": 7.28,
+    "OUTSIDE": 0.157,
+    "SETUP": 39.95,
+    "WINDOW_PRE": 3.98,
+    "WINDOW_POST": -5.28,
+    "LINK": 4.81,
+    "HB_TIME": 0.1,
+    "HB_OVER": 0.75,
+    "HB_STEER": 0.35
+   },
+   "measured": "2026-11-12"
+  },
+  "r3": {
+   "id": "r3",
+   "name": "Varsk",
+   "style": "Late and aggressive",
+   "track": 8,
+   "trackName": "Upper deck",
+   "kind": "circuit",
+   "laps": 3,
+   "car": "fastback",
+   "up": null,
+   "paint": "lime",
+   "chapter": "Pro",
+   "playerCar": "starter, one step of each",
+   "players": "8:starter:111",
+   "seconds": 91.18,
+   "total": 4333,
+   "target3": 2230,
+   "multiple": 1.943,
+   "wins": {
+    "grip": 0,
+    "slide": 5,
+    "mixed": 0,
+    "all": 5
+   },
+   "record": null,
+   "m2": {
+    "pass": false,
+    "drive": false,
+    "page": null,
+    "node": {
+     "rival": "r3",
+     "track": 8,
+     "finished": true,
+     "seconds": 91.18,
+     "total": 4333,
+     "drift": 3538,
+     "clean": 408,
+     "pace": 387,
+     "best": 365,
+     "respawns": 0,
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 87.1,
+     "minAt": 82.6,
+     "corners": [
+      {
+       "name": "tight 1 L1",
+       "share": 0.652,
+       "angle": 19.4,
+       "max": 25,
+       "s": 2.3
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.488,
+       "angle": 23,
+       "max": 27.9,
+       "s": 3.26
+      },
+      {
+       "name": "multi 1 L1",
+       "share": 0.449,
+       "angle": 22.6,
+       "max": 27.9,
+       "s": 2.12
+      },
+      {
+       "name": "multi 2 L1",
+       "share": 0.385,
+       "angle": 23.8,
+       "max": 28.3,
+       "s": 1.67
+      },
+      {
+       "name": "multi 3 L1",
+       "share": 0.617,
+       "angle": 23.1,
+       "max": 27.2,
+       "s": 2.31
+      },
+      {
+       "name": "tight 2 L1",
+       "share": 0.872,
+       "angle": 19.7,
+       "max": 27.5,
+       "s": 2.21
+      },
+      {
+       "name": "opening 2 L1",
+       "share": 0.481,
+       "angle": 22.8,
+       "max": 27.8,
+       "s": 3.27
+      },
+      {
+       "name": "multi 4 L1",
+       "share": 0.45,
+       "angle": 22.7,
+       "max": 28.1,
+       "s": 2.09
+      },
+      {
+       "name": "multi 5 L1",
+       "share": 0.555,
+       "angle": 24.8,
+       "max": 28.5,
+       "s": 1.76
+      },
+      {
+       "name": "multi 6 L1",
+       "share": 0.588,
+       "angle": 23.2,
+       "max": 28.1,
+       "s": 2.32
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.874,
+       "angle": 19,
+       "max": 26.9,
+       "s": 2.24
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.487,
+       "angle": 22.9,
+       "max": 27.9,
+       "s": 3.27
+      },
+      {
+       "name": "multi 1 L2",
+       "share": 0.458,
+       "angle": 25.1,
+       "max": 34.4,
+       "s": 2.09
+      },
+      {
+       "name": "multi 2 L2",
+       "share": 0.43,
+       "angle": 24.1,
+       "max": 28.1,
+       "s": 1.67
+      },
+      {
+       "name": "multi 3 L2",
+       "share": 0.523,
+       "angle": 24.1,
+       "max": 26.5,
+       "s": 2.32
+      },
+      {
+       "name": "tight 2 L2",
+       "share": 0.906,
+       "angle": 20.6,
+       "max": 28.1,
+       "s": 2.32
+      },
+      {
+       "name": "opening 2 L2",
+       "share": 0.508,
+       "angle": 23.1,
+       "max": 28.1,
+       "s": 3.25
+      },
+      {
+       "name": "multi 4 L2",
+       "share": 0.437,
+       "angle": 25.3,
+       "max": 34.4,
+       "s": 2.12
+      },
+      {
+       "name": "multi 5 L2",
+       "share": 0.53,
+       "angle": 24.5,
+       "max": 28.2,
+       "s": 1.81
+      },
+      {
+       "name": "multi 6 L2",
+       "share": 0.591,
+       "angle": 22.6,
+       "max": 28,
+       "s": 2.34
+      },
+      {
+       "name": "tight 1 L3",
+       "share": 0.9,
+       "angle": 19.9,
+       "max": 28.1,
+       "s": 2.24
+      },
+      {
+       "name": "opening 1 L3",
+       "share": 0.482,
+       "angle": 22.8,
+       "max": 27.8,
+       "s": 3.27
+      },
+      {
+       "name": "multi 1 L3",
+       "share": 0.437,
+       "angle": 22.7,
+       "max": 28,
+       "s": 2.06
+      },
+      {
+       "name": "multi 2 L3",
+       "share": 0.487,
+       "angle": 24.4,
+       "max": 28.4,
+       "s": 1.66
+      },
+      {
+       "name": "multi 3 L3",
+       "share": 0.537,
+       "angle": 24.1,
+       "max": 26,
+       "s": 2.36
+      },
+      {
+       "name": "tight 2 L3",
+       "share": 0.906,
+       "angle": 20.3,
+       "max": 27.7,
+       "s": 2.31
+      },
+      {
+       "name": "opening 2 L3",
+       "share": 0.505,
+       "angle": 22.9,
+       "max": 28,
+       "s": 3.25
+      },
+      {
+       "name": "multi 4 L3",
+       "share": 0.355,
+       "angle": 22.1,
+       "max": 29.3,
+       "s": 2.04
+      },
+      {
+       "name": "multi 5 L3",
+       "share": 0.863,
+       "angle": 24,
+       "max": 28.5,
+       "s": 1.88
+      },
+      {
+       "name": "multi 6 L3",
+       "share": 0.459,
+       "angle": 29.1,
+       "max": 41.7,
+       "s": 2.36
+      }
+     ],
+     "worstCorner": 0.3551020408163273,
+     "meanCorner": 0.5737751537426663,
+     "hash": "79.44510248456527,1.345432469906996,2.5937220001251853,-10.709299578044046,24.52145357544681,0.8612753328888526,0.24735026618253958,4.74332250237134,0,0,1.0666666666666653,-6.1932906966222205,1.3008187768584643|10942,0,0|4333,10942",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 1,
+     "contacts": 4,
+     "minKmh": 66,
+     "worstCorner": 0,
+     "total": [
+      4021,
+      4836
+     ],
+     "seconds": [
+      90.78,
+      91.93
+     ],
+     "guard": 0
+    },
+    "missing": 2,
+    "own": [],
+    "plateau": {
+     "pass": false,
+     "variants": 38,
+     "runs": 180,
+     "missedVariants": 9,
+     "missedRuns": 11,
+     "missed": [
+      {
+       "key": "KEEP",
+       "from": 572,
+       "to": 577.72,
+       "missing": 1,
+       "why": [
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 0,
+       "contacts": 2,
+       "total": [
+        4028,
+        4636
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 22.29,
+       "to": 22.5129,
+       "missing": 1,
+       "why": [
+        "a corner 3% sliding"
+       ],
+       "worstCorner": 0.03,
+       "hard": 0,
+       "contacts": 2,
+       "total": [
+        4012,
+        4482
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 26.44,
+       "to": 26.7044,
+       "missing": 1,
+       "why": [
+        "3 hard hits, 6 contacts, a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 3,
+       "contacts": 6,
+       "total": [
+        3831,
+        5028
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 26.44,
+       "to": 26.1756,
+       "missing": 1,
+       "why": [
+        "2 hard hits, 4 contacts, a corner 2% sliding"
+       ],
+       "worstCorner": 0.016,
+       "hard": 2,
+       "contacts": 4,
+       "total": [
+        3568,
+        4770
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 33.75,
+       "to": 33.4125,
+       "missing": 2,
+       "why": [
+        "1 hard hits, 35.4 km/h, a corner 19% sliding",
+        "1 hard hits, 3 contacts, a corner 14% sliding"
+       ],
+       "worstCorner": 0.142,
+       "hard": 1,
+       "contacts": 3,
+       "total": [
+        4030,
+        4210
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.433,
+       "to": 0.4373,
+       "missing": 2,
+       "why": [
+        "total 5567 against 4333",
+        "2 hard hits, a corner 13% sliding"
+       ],
+       "worstCorner": 0.135,
+       "hard": 2,
+       "contacts": 2,
+       "total": [
+        4006,
+        5567
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 49.32,
+       "to": 49.8132,
+       "missing": 1,
+       "why": [
+        "3 contacts, a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 0,
+       "contacts": 3,
+       "total": [
+        4249,
+        4431
+       ]
+      },
+      {
+       "key": "HB_TIME",
+       "from": 0.313,
+       "to": 0.3099,
+       "missing": 1,
+       "why": [
+        "total 5618 against 4333"
+       ],
+       "worstCorner": 0.339,
+       "hard": 0,
+       "contacts": 0,
+       "total": [
+        4043,
+        5618
+       ]
+      },
+      {
+       "key": "HB_STEER",
+       "from": 0.31,
+       "to": 0.3131,
+       "missing": 1,
+       "why": [
+        "2 hard hits, 3 contacts, a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 2,
+       "contacts": 3,
+       "total": [
+        4210,
+        4801
+       ]
+      }
+     ]
+    }
+   },
+   "m3": {
+    "pass": false,
+    "players": {
+     "grip": {
+      "wins": 0,
+      "allAhead": 0,
+      "allBehind": 18,
+      "seconds": [
+       90.12,
+       92.64
+      ],
+      "rivalSeconds": [
+       90.78,
+       91.93
+      ],
+      "total": [
+       756,
+       2135
+      ],
+      "rival": [
+       5017,
+       6869
+      ],
+      "margin": [
+       -6006,
+       -2882
+      ],
+      "aheadShare": [
+       0,
+       0.557
+      ],
+      "changes": [
+       0,
+       2
+      ],
+      "lineWon": 1,
+      "wallHits": 10,
+      "hard": 3,
+      "bodyHits": 12,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "slide": {
+      "wins": 5,
+      "allAhead": 0,
+      "allBehind": 20,
+      "seconds": [
+       92.36,
+       94.23
+      ],
+      "rivalSeconds": [
+       90.78,
+       91.93
+      ],
+      "total": [
+       4238,
+       6595
+      ],
+      "rival": [
+       6054,
+       6869
+      ],
+      "margin": [
+       -2217,
+       541
+      ],
+      "aheadShare": [
+       0,
+       0
+      ],
+      "changes": [
+       0,
+       0
+      ],
+      "lineWon": 0,
+      "wallHits": 7,
+      "hard": 5,
+      "bodyHits": 0,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "mixed": {
+      "wins": 0,
+      "allAhead": 0,
+      "allBehind": 16,
+      "seconds": [
+       91.15,
+       94.43
+      ],
+      "rivalSeconds": [
+       90.78,
+       91.93
+      ],
+      "total": [
+       1108,
+       2661
+      ],
+      "rival": [
+       5810,
+       6869
+      ],
+      "margin": [
+       -5463,
+       -3546
+      ],
+      "aheadShare": [
+       0,
+       0.413
+      ],
+      "changes": [
+       0,
+       10
+      ],
+      "lineWon": 0,
+      "wallHits": 15,
+      "hard": 6,
+      "bodyHits": 26,
+      "respawns": 0,
+      "handsBroken": 0
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 6366,
+     "won": false
+    }
+   },
+   "drive": {
+    "SLIDE_GAIN": 0.447,
+    "PROGRESS": 34,
+    "KEEP": 572,
+    "ANGLE_CAP": 22.29,
+    "EDGE_SAFE": 2.47,
+    "EDGE_COST": 2844,
+    "ENTRY": 26.44,
+    "VMAX": 33.75,
+    "CHAIN_KEEP": 139,
+    "CHAIN_MARGIN": 0.4,
+    "AY_MAX": 7.22,
+    "OUTSIDE": 0.433,
+    "SETUP": 49.32,
+    "WINDOW_PRE": 5.4,
+    "WINDOW_POST": -4.1,
+    "LINK": 0,
+    "HB_TIME": 0.313,
+    "HB_OVER": 0.85,
+    "HB_STEER": 0.31
+   },
+   "measured": "2026-11-12"
+  },
+  "r4": {
+   "id": "r4",
+   "name": "Dovane",
+   "style": "Long, linked slides",
+   "track": 12,
+   "trackName": "Over and under",
+   "kind": "circuit",
+   "laps": 2,
+   "car": "tourer",
+   "up": null,
+   "paint": "wine",
+   "chapter": "Pro",
+   "playerCar": "starter, one step of each",
+   "players": "12:starter:111",
+   "seconds": 57.88,
+   "total": 1897,
+   "target3": 1400,
+   "multiple": 1.355,
+   "wins": {
+    "grip": 0,
+    "slide": 1,
+    "mixed": 2,
+    "all": 3
+   },
+   "record": null,
+   "m2": {
+    "pass": false,
+    "drive": false,
+    "page": null,
+    "node": {
+     "rival": "r4",
+     "track": 12,
+     "finished": true,
+     "seconds": 57.88,
+     "total": 1897,
+     "drift": 1475,
+     "clean": 165,
+     "pace": 257,
+     "best": 200,
+     "respawns": 0,
+     "hard": 2,
+     "contacts": 6,
+     "minKmh": 29.5,
+     "minAt": 42.6,
+     "corners": [
+      {
+       "name": "tight 1 L1",
+       "share": 0.455,
+       "angle": 25.4,
+       "max": 39.2,
+       "s": 3.32
+      },
+      {
+       "name": "tightening 1 L1",
+       "share": 0.992,
+       "angle": 24,
+       "max": 33,
+       "s": 2.15
+      },
+      {
+       "name": "opening 1 L1",
+       "share": 0.803,
+       "angle": 20,
+       "max": 25.1,
+       "s": 2.67
+      },
+      {
+       "name": "tight 2 L1",
+       "share": 0.739,
+       "angle": 21.4,
+       "max": 30.4,
+       "s": 2.65
+      },
+      {
+       "name": "tightening 2 L1",
+       "share": 0.858,
+       "angle": 28.4,
+       "max": 38.6,
+       "s": 2.17
+      },
+      {
+       "name": "opening 2 L1",
+       "share": 0.812,
+       "angle": 24.2,
+       "max": 30.5,
+       "s": 2.44
+      },
+      {
+       "name": "tight 1 L2",
+       "share": 0.693,
+       "angle": 32.4,
+       "max": 47.1,
+       "s": 3.04
+      },
+      {
+       "name": "tightening 1 L2",
+       "share": 0.961,
+       "angle": 23.2,
+       "max": 27.7,
+       "s": 2.12
+      },
+      {
+       "name": "opening 1 L2",
+       "share": 0.79,
+       "angle": 24.6,
+       "max": 29.5,
+       "s": 2.57
+      },
+      {
+       "name": "tight 2 L2",
+       "share": 0.628,
+       "angle": 28.1,
+       "max": 41,
+       "s": 2.73
+      },
+      {
+       "name": "tightening 2 L2",
+       "share": 0.263,
+       "angle": 16.7,
+       "max": 23.1,
+       "s": 2.16
+      },
+      {
+       "name": "opening 2 L2",
+       "share": 0.809,
+       "angle": 19,
+       "max": 24.5,
+       "s": 2.66
+      }
+     ],
+     "worstCorner": 0.26254826254826336,
+     "meanCorner": 0.7335060936059418,
+     "hash": "116.6517698989561,17.96999784662541,2.0651260747930644,-22.048409451057683,16.589893957421847,0.26851931429925935,0.15853590494077754,5.1642294111321645,0,0,2.7666666666666595,-7.97238464186132,-4.174018648650168|6946,6,2|1897,6946",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 9,
+     "contacts": 11,
+     "minKmh": 19.6,
+     "worstCorner": 0,
+     "total": [
+      1408,
+      2232
+     ],
+     "seconds": [
+      54.5,
+      62.51
+     ],
+     "guard": 0
+    },
+    "missing": 18,
+    "own": [
+     "2 hard hits",
+     "6 contacts",
+     "29.5 km/h",
+     "a corner 26% sliding"
+    ],
+    "plateau": {
+     "pass": false,
+     "variants": 34,
+     "runs": 170,
+     "missedVariants": 34,
+     "missedRuns": 164,
+     "missed": [
+      {
+       "key": "SLIDE_GAIN",
+       "from": 1.353,
+       "to": 1.3665,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "SLIDE_GAIN",
+       "from": 1.353,
+       "to": 1.3395,
+       "missing": 4,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "9 hard hits, 10 contacts, 22.7 km/h, a corner 12% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 10,
+       "total": [
+        1585,
+        2206
+       ]
+      },
+      {
+       "key": "PROGRESS",
+       "from": 87,
+       "to": 87.87,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "PROGRESS",
+       "from": 87,
+       "to": 86.13,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 974,
+       "to": 983.74,
+       "missing": 4,
+       "why": [
+        "7 contacts, total 2945 against 1897",
+        "9 hard hits, 10 contacts, 22.7 km/h, a corner 12% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 10,
+       "total": [
+        1590,
+        2945
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 974,
+       "to": 964.26,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 10,
+       "total": [
+        1405,
+        2056
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 35.87,
+       "to": 36.2287,
+       "missing": 4,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "10 hard hits, 12 contacts, 22.7 km/h, a corner 1% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 10,
+       "contacts": 12,
+       "total": [
+        1505,
+        2224
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 35.87,
+       "to": 35.5113,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "9 hard hits, 13 contacts, 23.1 km/h, a corner 13% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 13,
+       "total": [
+        1585,
+        1835
+       ]
+      },
+      {
+       "key": "EDGE_SAFE",
+       "from": 2.63,
+       "to": 2.6563,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "EDGE_SAFE",
+       "from": 2.63,
+       "to": 2.6037,
+       "missing": 5,
+       "why": [
+        "4 hard hits, 8 contacts, 38.1 km/h, a corner 20% sliding",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "EDGE_COST",
+       "from": 428,
+       "to": 432.28,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "EDGE_COST",
+       "from": 428,
+       "to": 423.72,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 24.37,
+       "to": 24.6137,
+       "missing": 4,
+       "why": [
+        "a corner 0% sliding",
+        "2 hard hits, 32.7 km/h, a corner 26% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 8,
+       "contacts": 11,
+       "total": [
+        1620,
+        2337
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 24.37,
+       "to": 24.1263,
+       "missing": 5,
+       "why": [
+        "2 hard hits, a corner 7% sliding",
+        "2 hard hits, 10 contacts, 33.1 km/h, a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 5,
+       "contacts": 10,
+       "total": [
+        1824,
+        2113
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 30.93,
+       "to": 31.2393,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 5 contacts, 38.6 km/h, a corner 10% sliding",
+        "5 hard hits, 6 contacts, 24.6 km/h, a corner 16% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 5,
+       "contacts": 6,
+       "total": [
+        1828,
+        2605
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 30.93,
+       "to": 30.6207,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 21.3 km/h, a corner 12% sliding",
+        "6 contacts, a corner 14% sliding"
+       ],
+       "worstCorner": 0.012,
+       "hard": 5,
+       "contacts": 7,
+       "total": [
+        1619,
+        2577
+       ]
+      },
+      {
+       "key": "CHAIN_KEEP",
+       "from": 2979,
+       "to": 3008.79,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "CHAIN_KEEP",
+       "from": 2979,
+       "to": 2949.21,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "CHAIN_MARGIN",
+       "from": 0.42,
+       "to": 0.4242,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "CHAIN_MARGIN",
+       "from": 0.42,
+       "to": 0.4158,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "AY_MAX",
+       "from": 7.42,
+       "to": 7.4942,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "AY_MAX",
+       "from": 7.42,
+       "to": 7.3458,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.609,
+       "to": 0.6151,
+       "missing": 4,
+       "why": [
+        "7 hard hits, 8 contacts, 21.1 km/h, a corner 0% sliding",
+        "1 hard hits, a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 7,
+       "contacts": 8,
+       "total": [
+        1587,
+        2327
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.609,
+       "to": 0.6029,
+       "missing": 5,
+       "why": [
+        "1 hard hits, a corner 4% sliding",
+        "a corner 19% sliding, total 2577 against 1897"
+       ],
+       "worstCorner": 0.035,
+       "hard": 2,
+       "contacts": 3,
+       "total": [
+        1909,
+        2577
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 44.06,
+       "to": 44.5006,
+       "missing": 5,
+       "why": [
+        "2 hard hits, 34.3 km/h, a corner 2% sliding",
+        "1 hard hits, 10 contacts, a corner 10% sliding"
+       ],
+       "worstCorner": 0.024,
+       "hard": 9,
+       "contacts": 10,
+       "total": [
+        1634,
+        2133
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 44.06,
+       "to": 43.6194,
+       "missing": 5,
+       "why": [
+        "a corner 0% sliding",
+        "3 contacts, total 2575 against 1897"
+       ],
+       "worstCorner": 0,
+       "hard": 11,
+       "contacts": 14,
+       "total": [
+        1358,
+        2575
+       ]
+      },
+      {
+       "key": "WINDOW_PRE",
+       "from": 21.02,
+       "to": 21.2302,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 10,
+       "contacts": 13,
+       "total": [
+        1355,
+        2056
+       ]
+      },
+      {
+       "key": "WINDOW_PRE",
+       "from": 21.02,
+       "to": 20.8098,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "1 hard hits, a corner 9% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 10,
+       "contacts": 12,
+       "total": [
+        1370,
+        1952
+       ]
+      },
+      {
+       "key": "WINDOW_POST",
+       "from": 1.05,
+       "to": 1.0605,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "WINDOW_POST",
+       "from": 1.05,
+       "to": 1.0395,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "LINK",
+       "from": 26.64,
+       "to": 26.9064,
+       "missing": 4,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "9 hard hits, 11 contacts, 22.7 km/h, a corner 12% sliding"
+       ],
+       "worstCorner": 0.115,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1524,
+        2163
+       ]
+      },
+      {
+       "key": "LINK",
+       "from": 26.64,
+       "to": 26.3736,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "8 contacts"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1637,
+        2171
+       ]
+      },
+      {
+       "key": "HB_TIME",
+       "from": 0.13,
+       "to": 0.1313,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 7 contacts, 38.1 km/h",
+        "a corner 0% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 9,
+       "contacts": 11,
+       "total": [
+        1585,
+        2056
+       ]
+      },
+      {
+       "key": "HB_TIME",
+       "from": 0.13,
+       "to": 0.1287,
+       "missing": 5,
+       "why": [
+        "7 hard hits, 8 contacts, 23.1 km/h, a corner 0% sliding",
+        "3 hard hits, 5 contacts, 37.7 km/h, a corner 1% sliding"
+       ],
+       "worstCorner": 0,
+       "hard": 7,
+       "contacts": 8,
+       "total": [
+        1574,
+        2434
+       ]
+      }
+     ]
+    }
+   },
+   "m3": {
+    "pass": false,
+    "players": {
+     "grip": {
+      "wins": 0,
+      "allAhead": 0,
+      "allBehind": 17,
+      "seconds": [
+       64.77,
+       65.62
+      ],
+      "rivalSeconds": [
+       54.5,
+       62.51
+      ],
+      "total": [
+       447,
+       1116
+      ],
+      "rival": [
+       2542,
+       3515
+      ],
+      "margin": [
+       -3029,
+       -1426
+      ],
+      "aheadShare": [
+       0,
+       0.437
+      ],
+      "changes": [
+       0,
+       6
+      ],
+      "lineWon": 0,
+      "wallHits": 2,
+      "hard": 2,
+      "bodyHits": 11,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "slide": {
+      "wins": 1,
+      "allAhead": 0,
+      "allBehind": 16,
+      "seconds": [
+       59.92,
+       64.63
+      ],
+      "rivalSeconds": [
+       54.5,
+       62.51
+      ],
+      "total": [
+       1818,
+       3001
+      ],
+      "rival": [
+       2416,
+       3515
+      ],
+      "margin": [
+       -1642,
+       585
+      ],
+      "aheadShare": [
+       0,
+       0.49
+      ],
+      "changes": [
+       0,
+       4
+      ],
+      "lineWon": 0,
+      "wallHits": 18,
+      "hard": 3,
+      "bodyHits": 6,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "mixed": {
+      "wins": 2,
+      "allAhead": 0,
+      "allBehind": 16,
+      "seconds": [
+       57.77,
+       64.02
+      ],
+      "rivalSeconds": [
+       54.5,
+       62.51
+      ],
+      "total": [
+       1176,
+       2624
+      ],
+      "rival": [
+       1786,
+       3515
+      ],
+      "margin": [
+       -1992,
+       735
+      ],
+      "aheadShare": [
+       0,
+       0.564
+      ],
+      "changes": [
+       0,
+       5
+      ],
+      "lineWon": 2,
+      "wallHits": 8,
+      "hard": 5,
+      "bodyHits": 10,
+      "respawns": 0,
+      "handsBroken": 0
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 3180,
+     "won": false
+    }
+   },
+   "drive": {
+    "SLIDE_GAIN": 1.353,
+    "PROGRESS": 87,
+    "KEEP": 974,
+    "ANGLE_CAP": 35.87,
+    "EDGE_SAFE": 2.63,
+    "EDGE_COST": 428,
+    "ENTRY": 24.37,
+    "VMAX": 30.93,
+    "CHAIN_KEEP": 2979,
+    "CHAIN_MARGIN": 0.42,
+    "AY_MAX": 7.42,
+    "OUTSIDE": 0.609,
+    "SETUP": 44.06,
+    "WINDOW_PRE": 21.02,
+    "WINDOW_POST": 1.05,
+    "LINK": 26.64,
+    "HB_TIME": 0.13
+   },
+   "measured": "2026-11-12"
+  },
+  "r5": {
+   "id": "r5",
+   "name": "Halvik",
+   "style": "The biggest angles",
+   "track": 16,
+   "trackName": "Knot yard",
+   "kind": "circuit",
+   "laps": 2,
+   "car": "driftbuild",
+   "up": null,
+   "paint": "magenta",
+   "chapter": "Legend",
+   "playerCar": "starter, two steps of each",
+   "players": "16:starter:222",
+   "seconds": 70.15,
+   "total": 1234,
+   "target3": 1380,
+   "multiple": 0.894,
+   "wins": {
+    "grip": 19,
+    "slide": 19,
+    "mixed": 13,
+    "all": 51
+   },
+   "record": null,
+   "m2": {
+    "pass": false,
+    "drive": false,
+    "page": null,
+    "node": {
+     "rival": "r5",
+     "track": 16,
+     "finished": true,
+     "seconds": 70.15,
+     "total": 1234,
+     "drift": 866,
+     "clean": 160,
+     "pace": 208,
+     "best": 142,
+     "respawns": 0,
+     "hard": 5,
+     "contacts": 5,
+     "minKmh": 33.8,
+     "minAt": 39.4,
+     "corners": [
+      {
+       "name": "tightening 1 L1",
+       "share": 0.455,
+       "angle": 34.9,
+       "max": 49.6,
+       "s": 3.73
+      },
+      {
+       "name": "tightening 2 L1",
+       "share": 0.617,
+       "angle": 38,
+       "max": 49.6,
+       "s": 3.17
+      },
+      {
+       "name": "tightening 3 L1",
+       "share": 0.557,
+       "angle": 38.7,
+       "max": 49.4,
+       "s": 3.2
+      },
+      {
+       "name": "tightening 4 L1",
+       "share": 0.429,
+       "angle": 35.8,
+       "max": 49.6,
+       "s": 3.82
+      },
+      {
+       "name": "tightening 5 L1",
+       "share": 0.617,
+       "angle": 38.1,
+       "max": 49.6,
+       "s": 3.17
+      },
+      {
+       "name": "tightening 6 L1",
+       "share": 0.2,
+       "angle": 19.1,
+       "max": 24.8,
+       "s": 3.79
+      },
+      {
+       "name": "tightening 1 L2",
+       "share": 0.457,
+       "angle": 34.8,
+       "max": 49.6,
+       "s": 3.74
+      },
+      {
+       "name": "tightening 2 L2",
+       "share": 0.608,
+       "angle": 35.9,
+       "max": 45.3,
+       "s": 3.12
+      },
+      {
+       "name": "tightening 3 L2",
+       "share": 0.187,
+       "angle": 17,
+       "max": 21.2,
+       "s": 3.83
+      },
+      {
+       "name": "tightening 4 L2",
+       "share": 0.429,
+       "angle": 35.8,
+       "max": 49.6,
+       "s": 3.82
+      },
+      {
+       "name": "tightening 5 L2",
+       "share": 0.595,
+       "angle": 37.7,
+       "max": 49.6,
+       "s": 3.21
+      },
+      {
+       "name": "tightening 6 L2",
+       "share": 0.385,
+       "angle": 19.3,
+       "max": 28.3,
+       "s": 3.78
+      }
+     ],
+     "worstCorner": 0.18695652173913094,
+     "meanCorner": 0.4613689030937857,
+     "hash": "-114.97512945055443,4.733113411027719,-2.318388298799166,20.325752557888425,14.768687611895066,-0.46765083787634076,-0.032833485876629945,6.350647278908715,0,0,0,-4.2359100388311015,15.799713706085152|8418,5,5|1234,8418",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 6,
+     "contacts": 7,
+     "minKmh": 23.5,
+     "worstCorner": 0.14,
+     "total": [
+      1096,
+      1766
+     ],
+     "seconds": [
+      68.73,
+      71.24
+     ],
+     "guard": 0
+    },
+    "missing": 20,
+    "own": [
+     "5 hard hits",
+     "5 contacts",
+     "33.8 km/h",
+     "a corner 19% sliding"
+    ],
+    "plateau": {
+     "pass": false,
+     "variants": 34,
+     "runs": 170,
+     "missedVariants": 34,
+     "missedRuns": 170,
+     "missed": [
+      {
+       "key": "SLIDE_GAIN",
+       "from": 0.945,
+       "to": 0.9544,
+       "missing": 5,
+       "why": [
+        "4 hard hits, 4 contacts, 33.3 km/h, a corner 21% sliding",
+        "1 hard hits, total 1723 against 1234"
+       ],
+       "worstCorner": 0.194,
+       "hard": 4,
+       "contacts": 4,
+       "total": [
+        1484,
+        1730
+       ]
+      },
+      {
+       "key": "SLIDE_GAIN",
+       "from": 0.945,
+       "to": 0.9355,
+       "missing": 5,
+       "why": [
+        "4 hard hits, 4 contacts, 35 km/h, a corner 15% sliding, total 1886 against 1234",
+        "4 hard hits, 7 contacts, 32.8 km/h, a corner 21% sliding"
+       ],
+       "worstCorner": 0.114,
+       "hard": 7,
+       "contacts": 8,
+       "total": [
+        928,
+        1886
+       ]
+      },
+      {
+       "key": "PROGRESS",
+       "from": 92,
+       "to": 92.92,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.138,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1785
+       ]
+      },
+      {
+       "key": "PROGRESS",
+       "from": 92,
+       "to": 91.08,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 21% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1819
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 1500,
+       "to": 1515,
+       "missing": 5,
+       "why": [
+        "4 hard hits, 4 contacts, 35 km/h, a corner 15% sliding, total 1886 against 1234",
+        "3 hard hits, 4 contacts, 34 km/h, a corner 20% sliding"
+       ],
+       "worstCorner": 0.114,
+       "hard": 6,
+       "contacts": 6,
+       "total": [
+        1266,
+        1886
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 1500,
+       "to": 1485,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 8 contacts, 33.3 km/h, a corner 21% sliding",
+        "2 hard hits, 3 contacts, total 1555 against 1234"
+       ],
+       "worstCorner": 0.135,
+       "hard": 4,
+       "contacts": 8,
+       "total": [
+        1472,
+        1626
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 50.2,
+       "to": 50.702,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 50.2,
+       "to": 49.698,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "EDGE_SAFE",
+       "from": 1.66,
+       "to": 1.6766,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "EDGE_SAFE",
+       "from": 1.66,
+       "to": 1.6434,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1672 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "EDGE_COST",
+       "from": 2786,
+       "to": 2813.86,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "EDGE_COST",
+       "from": 2786,
+       "to": 2758.14,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1672 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 19.5,
+       "to": 19.695,
+       "missing": 5,
+       "why": [
+        "4 hard hits, 9 contacts, 23.1 km/h, total 1650 against 1234",
+        "6 hard hits, 7 contacts, 24.4 km/h, a corner 14% sliding"
+       ],
+       "worstCorner": 0.136,
+       "hard": 6,
+       "contacts": 9,
+       "total": [
+        1101,
+        1839
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 19.5,
+       "to": 19.305,
+       "missing": 5,
+       "why": [
+        "4 hard hits, 7 contacts, 25 km/h, a corner 20% sliding, total 2035 against 1234",
+        "5 hard hits, 7 contacts, 32.6 km/h, a corner 15% sliding"
+       ],
+       "worstCorner": 0.146,
+       "hard": 5,
+       "contacts": 7,
+       "total": [
+        1238,
+        2035
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 32.1,
+       "to": 32.421,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 32.1,
+       "to": 31.779,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "CHAIN_KEEP",
+       "from": 197,
+       "to": 198.97,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "CHAIN_KEEP",
+       "from": 197,
+       "to": 195.03,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "CHAIN_MARGIN",
+       "from": 0.24,
+       "to": 0.2424,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "CHAIN_MARGIN",
+       "from": 0.24,
+       "to": 0.2376,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "AY_MAX",
+       "from": 7.38,
+       "to": 7.4538,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "AY_MAX",
+       "from": 7.38,
+       "to": 7.3062,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.092,
+       "to": 0.0929,
+       "missing": 5,
+       "why": [
+        "2 hard hits, 4 contacts, 34.7 km/h, a corner 15% sliding, total 2127 against 1234",
+        "3 hard hits, 5 contacts"
+       ],
+       "worstCorner": 0.148,
+       "hard": 5,
+       "contacts": 8,
+       "total": [
+        1103,
+        2127
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.092,
+       "to": 0.0911,
+       "missing": 5,
+       "why": [
+        "3 hard hits, 3 contacts, 35 km/h, a corner 15% sliding, total 1888 against 1234",
+        "3 hard hits, 4 contacts, a corner 20% sliding"
+       ],
+       "worstCorner": 0.143,
+       "hard": 6,
+       "contacts": 6,
+       "total": [
+        1227,
+        1888
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 70.99,
+       "to": 71.6999,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 7 contacts, 24.9 km/h, a corner 16% sliding",
+        "3 hard hits, 3 contacts, 32.1 km/h, a corner 20% sliding, total 1859 against 1234"
+       ],
+       "worstCorner": 0.139,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1523,
+        2015
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 70.99,
+       "to": 70.2801,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 5 contacts, 23.8 km/h, a corner 15% sliding, total 2057 against 1234",
+        "2 hard hits, a corner 15% sliding, total 1673 against 1234"
+       ],
+       "worstCorner": 0.151,
+       "hard": 6,
+       "contacts": 8,
+       "total": [
+        1228,
+        2057
+       ]
+      },
+      {
+       "key": "WINDOW_PRE",
+       "from": 13.45,
+       "to": 13.5845,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "WINDOW_PRE",
+       "from": 13.45,
+       "to": 13.3155,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "WINDOW_POST",
+       "from": 5.64,
+       "to": 5.6964,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "WINDOW_POST",
+       "from": 5.64,
+       "to": 5.5836,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "LINK",
+       "from": 11.96,
+       "to": 12.0796,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "LINK",
+       "from": 11.96,
+       "to": 11.8404,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      },
+      {
+       "key": "HB_TIME",
+       "from": 0.279,
+       "to": 0.2818,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 33.1 km/h, a corner 8% sliding, total 1634 against 1234",
+        "5 hard hits, 6 contacts, 29.5 km/h, a corner 19% sliding"
+       ],
+       "worstCorner": 0.078,
+       "hard": 5,
+       "contacts": 7,
+       "total": [
+        1107,
+        2142
+       ]
+      },
+      {
+       "key": "HB_TIME",
+       "from": 0.279,
+       "to": 0.2762,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 7 contacts, 24.8 km/h, a corner 16% sliding",
+        "2 hard hits, 3 contacts, a corner 23% sliding, total 1664 against 1234"
+       ],
+       "worstCorner": 0.14,
+       "hard": 6,
+       "contacts": 7,
+       "total": [
+        1387,
+        1766
+       ]
+      }
+     ]
+    }
+   },
+   "m3": {
+    "pass": false,
+    "players": {
+     "grip": {
+      "wins": 19,
+      "allAhead": 20,
+      "allBehind": 0,
+      "seconds": [
+       67.13,
+       67.69
+      ],
+      "rivalSeconds": [
+       68.73,
+       71.24
+      ],
+      "total": [
+       1694,
+       2379
+      ],
+      "rival": [
+       1096,
+       1766
+      ],
+      "margin": [
+       -56,
+       854
+      ],
+      "aheadShare": [
+       1,
+       1
+      ],
+      "changes": [
+       0,
+       0
+      ],
+      "lineWon": 20,
+      "wallHits": 2,
+      "hard": 1,
+      "bodyHits": 4,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "slide": {
+      "wins": 19,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       72.08,
+       74.08
+      ],
+      "rivalSeconds": [
+       68.73,
+       71.24
+      ],
+      "total": [
+       2043,
+       4232
+      ],
+      "rival": [
+       2234,
+       2926
+      ],
+      "margin": [
+       -470,
+       1698
+      ],
+      "aheadShare": [
+       0.093,
+       0.567
+      ],
+      "changes": [
+       1,
+       7
+      ],
+      "lineWon": 0,
+      "wallHits": 6,
+      "hard": 3,
+      "bodyHits": 20,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "mixed": {
+      "wins": 13,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       68.7,
+       73.38
+      ],
+      "rivalSeconds": [
+       68.73,
+       71.24
+      ],
+      "total": [
+       1617,
+       4730
+      ],
+      "rival": [
+       1520,
+       2904
+      ],
+      "margin": [
+       -1287,
+       2779
+      ],
+      "aheadShare": [
+       0.066,
+       0.916
+      ],
+      "changes": [
+       1,
+       32
+      ],
+      "lineWon": 1,
+      "wallHits": 10,
+      "hard": 4,
+      "bodyHits": 26,
+      "respawns": 0,
+      "handsBroken": 0
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 2496,
+     "won": false
+    }
+   },
+   "drive": {
+    "SLIDE_GAIN": 0.945,
+    "PROGRESS": 92,
+    "KEEP": 1500,
+    "ANGLE_CAP": 50.2,
+    "EDGE_SAFE": 1.66,
+    "EDGE_COST": 2786,
+    "ENTRY": 19.5,
+    "VMAX": 32.1,
+    "CHAIN_KEEP": 197,
+    "CHAIN_MARGIN": 0.24,
+    "AY_MAX": 7.38,
+    "OUTSIDE": 0.092,
+    "SETUP": 70.99,
+    "WINDOW_PRE": 13.45,
+    "WINDOW_POST": 5.64,
+    "LINK": 11.96,
+    "HB_TIME": 0.279
+   },
+   "measured": "2026-11-12"
+  },
+  "r6": {
+   "id": "r6",
+   "name": "Sarrow",
+   "style": "Fast, deep and linked",
+   "track": 20,
+   "trackName": "Endless eight",
+   "kind": "circuit",
+   "laps": 2,
+   "car": "fastback",
+   "up": null,
+   "paint": "white",
+   "chapter": "Legend",
+   "playerCar": "starter, two steps of each",
+   "players": "20:starter:222",
+   "seconds": 77.59,
+   "total": 3366,
+   "target3": 1290,
+   "multiple": 2.609,
+   "wins": {
+    "grip": 11,
+    "slide": 16,
+    "mixed": 18,
+    "all": 45
+   },
+   "record": null,
+   "m2": {
+    "pass": false,
+    "drive": false,
+    "page": null,
+    "node": {
+     "rival": "r6",
+     "track": 20,
+     "finished": true,
+     "seconds": 77.59,
+     "total": 3366,
+     "drift": 3162,
+     "clean": 30,
+     "pace": 174,
+     "best": 3032,
+     "respawns": 0,
+     "hard": 9,
+     "contacts": 15,
+     "minKmh": 15.4,
+     "minAt": 54.6,
+     "corners": [
+      {
+       "name": "multi 1 L1",
+       "share": 0.494,
+       "angle": 23.6,
+       "max": 40.6,
+       "s": 3.44
+      },
+      {
+       "name": "multi 2 L1",
+       "share": 0.486,
+       "angle": 25.8,
+       "max": 46.2,
+       "s": 2.06
+      },
+      {
+       "name": "multi 3 L1",
+       "share": 0.591,
+       "angle": 36.9,
+       "max": 47.4,
+       "s": 2.02
+      },
+      {
+       "name": "hairpin 1 L1",
+       "share": 0.901,
+       "angle": 40.2,
+       "max": 47.9,
+       "s": 3.18
+      },
+      {
+       "name": "multi 4 L1",
+       "share": 0.226,
+       "angle": 15.4,
+       "max": 19.4,
+       "s": 3.17
+      },
+      {
+       "name": "multi 5 L1",
+       "share": 0.701,
+       "angle": 21.1,
+       "max": 31.7,
+       "s": 2.2
+      },
+      {
+       "name": "multi 6 L1",
+       "share": 0.652,
+       "angle": 23.4,
+       "max": 36.4,
+       "s": 2.27
+      },
+      {
+       "name": "hairpin 2 L1",
+       "share": 0.904,
+       "angle": 39.2,
+       "max": 47.9,
+       "s": 3.12
+      },
+      {
+       "name": "multi 1 L2",
+       "share": 0.637,
+       "angle": 33.2,
+       "max": 47.9,
+       "s": 2.71
+      },
+      {
+       "name": "multi 2 L2",
+       "share": 0.402,
+       "angle": 17.1,
+       "max": 22.8,
+       "s": 1.78
+      },
+      {
+       "name": "multi 3 L2",
+       "share": 0.293,
+       "angle": 27,
+       "max": 37.2,
+       "s": 3.1
+      },
+      {
+       "name": "hairpin 1 L2",
+       "share": 0.219,
+       "angle": 18.5,
+       "max": 26.1,
+       "s": 4.53
+      },
+      {
+       "name": "multi 4 L2",
+       "share": 0.329,
+       "angle": 15.9,
+       "max": 24.2,
+       "s": 2.68
+      },
+      {
+       "name": "multi 5 L2",
+       "share": 0.398,
+       "angle": 25.5,
+       "max": 37.7,
+       "s": 2.72
+      },
+      {
+       "name": "multi 6 L2",
+       "share": 0.578,
+       "angle": 30.2,
+       "max": 46.7,
+       "s": 2.35
+      },
+      {
+       "name": "hairpin 2 L2",
+       "share": 0.245,
+       "angle": 20.5,
+       "max": 28.3,
+       "s": 4.87
+      }
+     ],
+     "worstCorner": 0.21915285451196959,
+     "meanCorner": 0.5034137361951518,
+     "hash": "-52.036754476708076,13.910356219837649,-0.2195027145227392,5.2313810683529125,-25.763360360020023,-0.19480198824447822,-0.001770645338577339,2.8305833076033537,0.9,0,0.11666666666666665,3.648667479307794,-2.1871018331749035|9311,15,9|3366,9311",
+     "hands": {
+      "brakeSteps": 0,
+      "liftSteps": 0,
+      "maxBrake": 0,
+      "minThrottle": 1,
+      "overruled": 0
+     }
+    },
+    "worst": {
+     "respawns": 0,
+     "hard": 10,
+     "contacts": 37,
+     "minKmh": 16.1,
+     "worstCorner": 0,
+     "total": [
+      460,
+      4484
+     ],
+     "seconds": [
+      74.85,
+      80.44
+     ],
+     "guard": 0
+    },
+    "missing": 20,
+    "own": [
+     "9 hard hits",
+     "15 contacts",
+     "15.4 km/h",
+     "a corner 22% sliding"
+    ],
+    "plateau": {
+     "pass": false,
+     "variants": 34,
+     "runs": 170,
+     "missedVariants": 34,
+     "missedRuns": 170,
+     "missed": [
+      {
+       "key": "SLIDE_GAIN",
+       "from": 0.714,
+       "to": 0.7211,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.139,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2814
+       ]
+      },
+      {
+       "key": "SLIDE_GAIN",
+       "from": 0.714,
+       "to": 0.7069,
+       "missing": 5,
+       "why": [
+        "9 hard hits, 28 contacts, 21.3 km/h, a corner 18% sliding, total 788 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 9,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "PROGRESS",
+       "from": 51,
+       "to": 51.51,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "PROGRESS",
+       "from": 51,
+       "to": 50.49,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.139,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2814
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 405,
+       "to": 409.05,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "KEEP",
+       "from": 405,
+       "to": 400.95,
+       "missing": 5,
+       "why": [
+        "9 hard hits, 45 contacts, 33.7 km/h, a corner 16% sliding, total 1065 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 9,
+       "contacts": 45,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 52.72,
+       "to": 53.2472,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "ANGLE_CAP",
+       "from": 52.72,
+       "to": 52.1928,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "EDGE_SAFE",
+       "from": 1.03,
+       "to": 1.0403,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "EDGE_SAFE",
+       "from": 1.03,
+       "to": 1.0197,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "EDGE_COST",
+       "from": 671,
+       "to": 677.71,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "EDGE_COST",
+       "from": 671,
+       "to": 664.29,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 23.61,
+       "to": 23.8461,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "ENTRY",
+       "from": 23.61,
+       "to": 23.3739,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 24.77,
+       "to": 25.0177,
+       "missing": 5,
+       "why": [
+        "7 hard hits, 12 contacts, 27.8 km/h, a corner 15% sliding, total 1184 against 3366",
+        "5 hard hits, 17 contacts, 21 km/h, a corner 13% sliding, total 1369 against 3366"
+       ],
+       "worstCorner": 0.097,
+       "hard": 7,
+       "contacts": 17,
+       "total": [
+        1184,
+        1690
+       ]
+      },
+      {
+       "key": "VMAX",
+       "from": 24.77,
+       "to": 24.5223,
+       "missing": 5,
+       "why": [
+        "7 hard hits, 26 contacts, 24 km/h, a corner 0% sliding, total 1223 against 3366",
+        "11 hard hits, 25 contacts, 16 km/h, a corner 23% sliding, total 1667 against 3366"
+       ],
+       "worstCorner": 0,
+       "hard": 11,
+       "contacts": 26,
+       "total": [
+        1037,
+        2802
+       ]
+      },
+      {
+       "key": "CHAIN_KEEP",
+       "from": 2000,
+       "to": 2020,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "CHAIN_KEEP",
+       "from": 2000,
+       "to": 1980,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "CHAIN_MARGIN",
+       "from": 0.39,
+       "to": 0.3939,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "7 hard hits, 14 contacts, 32 km/h, a corner 10% sliding, total 1673 against 3366"
+       ],
+       "worstCorner": 0.086,
+       "hard": 8,
+       "contacts": 34,
+       "total": [
+        698,
+        2958
+       ]
+      },
+      {
+       "key": "CHAIN_MARGIN",
+       "from": 0.39,
+       "to": 0.3861,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "AY_MAX",
+       "from": 7.1,
+       "to": 7.171,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "AY_MAX",
+       "from": 7.1,
+       "to": 7.029,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.723,
+       "to": 0.7302,
+       "missing": 5,
+       "why": [
+        "7 hard hits, 11 contacts, 29.1 km/h, a corner 27% sliding, total 1643 against 3366",
+        "6 hard hits, 16 contacts, 16 km/h, a corner 11% sliding, total 477 against 3366"
+       ],
+       "worstCorner": 0.074,
+       "hard": 12,
+       "contacts": 32,
+       "total": [
+        477,
+        1643
+       ]
+      },
+      {
+       "key": "OUTSIDE",
+       "from": 0.723,
+       "to": 0.7158,
+       "missing": 5,
+       "why": [
+        "4 hard hits, 10 contacts, 31.5 km/h, a corner 7% sliding, total 1516 against 3366",
+        "8 hard hits, 25 contacts, 20 km/h, a corner 19% sliding, total 981 against 3366"
+       ],
+       "worstCorner": 0,
+       "hard": 13,
+       "contacts": 28,
+       "total": [
+        674,
+        1603
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 33.14,
+       "to": 33.4714,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 32.1 km/h, total 1658 against 3366",
+        "1 respawns, 10 hard hits, 17 contacts, 0 km/h, a corner 22% sliding, total 662 against 3366"
+       ],
+       "worstCorner": 0,
+       "hard": 12,
+       "contacts": 17,
+       "total": [
+        662,
+        1744
+       ]
+      },
+      {
+       "key": "SETUP",
+       "from": 33.14,
+       "to": 32.8086,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 14 contacts, 21.1 km/h, a corner 13% sliding, total 1862 against 3366",
+        "7 hard hits, 11 contacts, 34.6 km/h, a corner 23% sliding, total 923 against 3366"
+       ],
+       "worstCorner": 0,
+       "hard": 7,
+       "contacts": 27,
+       "total": [
+        610,
+        1862
+       ]
+      },
+      {
+       "key": "WINDOW_PRE",
+       "from": 8.88,
+       "to": 8.9688,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "WINDOW_PRE",
+       "from": 8.88,
+       "to": 8.7912,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "WINDOW_POST",
+       "from": 1.18,
+       "to": 1.1918,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "WINDOW_POST",
+       "from": 1.18,
+       "to": 1.1682,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "LINK",
+       "from": 59.53,
+       "to": 60.1253,
+       "missing": 5,
+       "why": [
+        "5 hard hits, 11 contacts, 24.1 km/h, a corner 27% sliding, total 1619 against 3366",
+        "4 hard hits, 11 contacts, a corner 15% sliding, total 1780 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2958
+       ]
+      },
+      {
+       "key": "LINK",
+       "from": 59.53,
+       "to": 58.9347,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 21% sliding, total 1615 against 3366",
+        "8 hard hits, 17 contacts, 39.6 km/h, a corner 15% sliding, total 1039 against 3366"
+       ],
+       "worstCorner": 0.15,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        737,
+        2533
+       ]
+      },
+      {
+       "key": "HB_TIME",
+       "from": 0.439,
+       "to": 0.4434,
+       "missing": 5,
+       "why": [
+        "6 hard hits, 13 contacts, 24.1 km/h, a corner 22% sliding, total 1615 against 3366",
+        "6 hard hits, 13 contacts, 39.3 km/h, a corner 8% sliding, total 1435 against 3366"
+       ],
+       "worstCorner": 0,
+       "hard": 8,
+       "contacts": 37,
+       "total": [
+        661,
+        4307
+       ]
+      },
+      {
+       "key": "HB_TIME",
+       "from": 0.439,
+       "to": 0.4346,
+       "missing": 5,
+       "why": [
+        "8 hard hits, 30 contacts, a corner 21% sliding, total 761 against 3366",
+        "10 hard hits, 14 contacts, 19 km/h, a corner 9% sliding, total 1038 against 3366"
+       ],
+       "worstCorner": 0.094,
+       "hard": 14,
+       "contacts": 33,
+       "total": [
+        442,
+        1038
+       ]
+      }
+     ]
+    }
+   },
+   "m3": {
+    "pass": true,
+    "players": {
+     "grip": {
+      "wins": 11,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       65.87,
+       76.94
+      ],
+      "rivalSeconds": [
+       74.85,
+       80.44
+      ],
+      "total": [
+       870,
+       1791
+      ],
+      "rival": [
+       460,
+       5064
+      ],
+      "margin": [
+       -4194,
+       1145
+      ],
+      "aheadShare": [
+       0.08,
+       0.969
+      ],
+      "changes": [
+       2,
+       14
+      ],
+      "lineWon": 19,
+      "wallHits": 9,
+      "hard": 8,
+      "bodyHits": 42,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "slide": {
+      "wins": 16,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       70.73,
+       77.58
+      ],
+      "rivalSeconds": [
+       74.85,
+       80.44
+      ],
+      "total": [
+       1589,
+       7887
+      ],
+      "rival": [
+       460,
+       4484
+      ],
+      "margin": [
+       -1848,
+       5244
+      ],
+      "aheadShare": [
+       0.216,
+       0.962
+      ],
+      "changes": [
+       1,
+       9
+      ],
+      "lineWon": 19,
+      "wallHits": 23,
+      "hard": 6,
+      "bodyHits": 22,
+      "respawns": 0,
+      "handsBroken": 0
+     },
+     "mixed": {
+      "wins": 18,
+      "allAhead": 0,
+      "allBehind": 0,
+      "seconds": [
+       68.75,
+       73.65
+      ],
+      "rivalSeconds": [
+       74.85,
+       80.44
+      ],
+      "total": [
+       2976,
+       8420
+      ],
+      "rival": [
+       460,
+       4484
+      ],
+      "margin": [
+       -446,
+       7960
+      ],
+      "aheadShare": [
+       0.38,
+       0.96
+      ],
+      "changes": [
+       1,
+       10
+      ],
+      "lineWon": 20,
+      "wallHits": 18,
+      "hard": 7,
+      "bodyHits": 20,
+      "respawns": 0,
+      "handsBroken": 0
+     }
+    },
+    "still": {
+     "total": 0,
+     "rival": 4546,
+     "won": false
+    }
+   },
+   "drive": {
+    "SLIDE_GAIN": 0.714,
+    "PROGRESS": 51,
+    "KEEP": 405,
+    "ANGLE_CAP": 52.72,
+    "EDGE_SAFE": 1.03,
+    "EDGE_COST": 671,
+    "ENTRY": 23.61,
+    "VMAX": 24.77,
+    "CHAIN_KEEP": 2000,
+    "CHAIN_MARGIN": 0.39,
+    "AY_MAX": 7.1,
+    "OUTSIDE": 0.723,
+    "SETUP": 33.14,
+    "WINDOW_PRE": 8.88,
+    "WINDOW_POST": 1.18,
+    "LINK": 59.53,
+    "HB_TIME": 0.439
+   },
+   "measured": "2026-11-12"
+  }
+ },
+ "bar": {
+  "respawns": 0,
+  "hard": 0,
+  "contacts": 2,
+  "minKmh": 40,
+  "corner": 0.3,
+  "total": 0.25
+ },
+ "runs": 20,
+ "playerCar": [
+  {
+   "car": "starter",
+   "up": null,
+   "label": "starter, no upgrades"
+  },
+  {
+   "car": "starter",
+   "up": {
+    "power": 1,
+    "grip": 1,
+    "steer": 1
+   },
+   "label": "starter, one step of each"
+  },
+  {
+   "car": "starter",
+   "up": {
+    "power": 2,
+    "grip": 2,
+    "steer": 2
+   },
+   "label": "starter, two steps of each"
+  }
+ ],
+ "band": {
+  "FROM": 27,
+  "TO": 12,
+  "WITHIN": 5
+ },
+ "bandCheck": [
+  {
+   "name": "Kestrow",
+   "k": 0,
+   "wins": 18,
+   "line": 27,
+   "within": false,
+   "falls": true
+  },
+  {
+   "name": "Tolvo",
+   "k": 1,
+   "wins": 15,
+   "line": 24,
+   "within": false,
+   "falls": true
+  },
+  {
+   "name": "Varsk",
+   "k": 2,
+   "wins": 5,
+   "line": 21,
+   "within": false,
+   "falls": true
+  },
+  {
+   "name": "Dovane",
+   "k": 3,
+   "wins": 3,
+   "line": 18,
+   "within": false,
+   "falls": true
+  },
+  {
+   "name": "Halvik",
+   "k": 4,
+   "wins": 51,
+   "line": 15,
+   "within": false,
+   "falls": false
+  },
+  {
+   "name": "Sarrow",
+   "k": 5,
+   "wins": 45,
+   "line": 12,
+   "within": false,
+   "falls": true
+  }
+ ],
+ "knownAnswer": [
+  {
+   "swapped": "Kestrow and Tolvo",
+   "caught": true
+  },
+  {
+   "swapped": "Tolvo and Varsk",
+   "caught": true
+  },
+  {
+   "swapped": "Varsk and Dovane",
+   "caught": true
+  },
+  {
+   "swapped": "Dovane and Halvik",
+   "caught": true
+  },
+  {
+   "swapped": "Halvik and Sarrow",
+   "caught": true
+  }
+ ]
+}
