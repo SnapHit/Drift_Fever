@@ -57,26 +57,45 @@
    test track1 frame 1200: drive, 250 points (08:42:53)
    test track1 frame 1800: drive, 675 points (08:52:07)
    test track1 frame 2400: drive, 723 points (08:58:23)
- are "tcp" and on UNIX "unix")
-[pid=9782][err] [9782:9796:1112/164918.733986:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
-[pid=9782][err] [9782:9796:1112/164918.734282:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
-[pid=9782][err] [9782:9796:1112/164918.734472:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
-[pid=9782][err] [9782:9782:1112/164918.734768:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
-[pid=9782][err] [9782:9796:1112/164918.738009:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
-[pid=9782][err] [9782:9796:1112/164918.738325:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
-[pid=9782][err] [9782:9782:1112/164918.738664:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
-[pid=9782][err] [9782:9782:1112/164918.738903:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
-[pid=9782][err] [9782:9782:1112/164918.739525:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: unknown error type: 
-[pid=9782][err] [9782:9797:1112/165025.926302:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
-[pid=9782][err] [9782:9797:1112/165025.928020:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
-[pid=9782][err] [9782:9797:1112/165025.929962:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
-[pid=9782][err] [9826:9865:1112/165028.149981:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
-[pid=9782][err] [9826:9865:1112/165030.400395:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
-[pid=9782][err] [9782:9797:1112/165030.400590:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -101
-[pid=9782][err] [9782:9797:1112/165049.463320:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[pid=9782][err] [9782:9797:1112/165133.064407:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[pid=9782][err] [9825:9825:1112/165136.203078:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now.
-[pid=9782][err] [9825:9825:1112/165136.203598:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now.
+   test track1 frame 3000: drive, 1096 points (09:04:18)
+   test track1 frame 3600: drive, 1144 points (09:07:46)
+   test step track1-results at frame 7944 (09:08:59)
+   test step race-start at frame 7946 (09:09:38)
+   test race frame 0: drive, 0 points (09:10:04)
+   test race frame 600: drive, 0 points (09:14:54)
+   test race frame 1200: drive, 27 points (09:18:44)
+   test race frame 1800: drive, 33 points (09:23:26)
+   test race frame 2400: drive, 33 points (09:27:33)
+   test race frame 3000: drive, 69 points (09:32:00)
+   test race frame 3600: drive, 93 points (09:35:54)
+   test race frame 4200: drive, 506 points (09:40:52)
+   test race frame 4800: drive, 554 points (09:44:33)
+   test step race-results at frame 13148 (09:46:06)
+   test step rivals at frame 13150 (09:47:02)
+   test step title-again at frame 13152 (09:47:03)
+   test step second-visit at frame 13154 (09:47:16)
+   test step first-visit at frame 2 (09:47:42)
+PASS desktop: the journey ran to its end
+PASS desktop: the first visit lands in the onboarding run (state countdown)
+PASS desktop: the onboarding's prompts appear: "Steer ◀ ▶ or A D" at frame 1; "Hold SPACE while steering to slide SPACE + ◀ ▶" at frame 216; "Clean sector. A sector with no wall hits pays a clean bonus." at frame 373; "SPACE on its own brakes SPACE" at frame 463; "+178 x3 banked. Straighten up to bank a drift chain. The longer the slide, the bigger the multiplier." at frame 655
+PASS desktop: the onboarding run ends in results ({"score":1712,"stars":3,"rival":null,"offer":"r1"})
+PASS desktop: reached by taps alone: title (screen title)
+PASS desktop: reached by taps alone: career (screen career)
+PASS desktop: reached by taps alone: track1-results (screen results)
+PASS desktop: reached by taps alone: race-results (screen results)
+PASS desktop: reached by taps alone: rivals (screen rivals)
+PASS desktop: reached by taps alone: title-again (screen title)
+PASS desktop: the results of track one offer Kestrow once a star is won: {"score":1712,"stars":3,"rival":null,"offer":"r1"}, offer "KESTROW race him"
+PASS desktop: a second visit lands on the title (title) with the progress kept: DAILY DRIFT 2026-11-12 sprint | CAREER 3/72 stars · 2/72 missions | RIVALSRACE 0/2 beaten · Kestrow is waiting | FREE DRIFT the car park, no timer | GARAGE Starter coupe | TRACK LAB make and share tracks
+PASS desktop: every run of the test played the rehearsal's presses to the rehearsal's result (onboarding same, track1 same, race same)
+PASS desktop: no page error and no console error (0)
+FAIL desktop: 151 requests, none to another host (0), none failed (4: http://127.0.0.1:46279/music/track-1.m4a net::ERR_ABORTED (after step 2, onboarding-prompt1) | http://127.0.0.1:46279/music/track-2.m4a net::ERR_ABORTED (after step 2, onboarding-prompt1) | http://127.0.0.1:46279/music/track-4.m4a net::ERR_ABORTED (after step 2, onboarding-prompt1))
+PASS desktop: on every screen nothing overlaps and no button is outside the view (16 screens)
+PASS desktop: the title does not scroll (3 times)
+PASS desktop: known answer: a profile holding a returning player's save does not land in the onboarding run (state title), so the first-visit check fails on it: CAUGHT
+   time to the first playable frame (real clock, software drawing): load event 5071 ms, the game ready 5109 ms, the countdown on screen 5109 ms, GO 19239 ms
+1 failed
+82][err] [9825:9825:1112/165136.203598:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now.
 [pid=9782][err] [9825:9825:1112/165136.204114:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now.
 [pid=9782][err] [9825:9825:1112/165138.617061:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now. (this message will no longer repeat)
 [pid=9782][err] Warning: vkCreateInstance: Found no drivers!
@@ -105,3 +124,4 @@
     at async file:///home/claude/ladder2/crazygames/game/test/ladder2/newplayer.js:329:63
 
 Node.js v22.22.0
+exit 1
