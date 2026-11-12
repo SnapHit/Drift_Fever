@@ -1,0 +1,7 @@
+Kestrow: career 1 First slide, 4 laps, starter; 75.2 s, 2662 points, 35.4 a second against 18.3: x1.934
+FAIL Kestrow headroom and pace, worst of 3 races 78.73/75.2 s +20%, 80.39/74.83 s +46%, 82.08/74.15 s +42%: the strong driver (starter, no upgrades) races him: 78.73 s against 75.2, 5070 against 4233 (+20%, bar +25%), walls 3, contacts 14, respawns 0, hands broken 0
+
+rival     track                 laps car          s      points rate   3*rate  mult   step    strong s / his s     strong / his        sanity W/L  parked
+Kestrow   1 First slide         4   starter      75.2   2662   35.4   18.3    1.93   bottom  78.73 / 75.2         5070 / 4233 +20%    -
+PASS the staircase (each at least +5% on the one before): Kestrow x1.93
+1 failed

@@ -17,7 +17,7 @@
    The probes (ladder3/drive.js, ladder3/ruler.js) are the record; this
    is the search.
 
-   node game/test/ladder3/search.js r2 --band 2.1,2.45 [--track 4] [--laps 3] [--car hatch] [--up 1] [--n 200] [--seed 1] [--from r2|JSON] [--from-log file] [--local] [--range KEY=a,b] [--jogs 6] [--disturbed 6] [--want-angle 24] */
+   node game/test/ladder3/search.js r2 --band 2.1,2.45 [--track 4] [--laps 3] [--car hatch] [--up 1] [--n 200] [--seed 1] [--from r2|JSON] [--from-log file] [--local] [--range KEY=a,b] [--jogs 6] [--disturbed 6] [--want-angle 24] [--seconds 62,118] [--no-character] */
 import fs from 'node:fs';
 import { measureRival } from '../rivals/sim.js';
 import { mark, CHARACTERS } from '../rivals/search.js';
@@ -38,25 +38,41 @@ const jrnd = () => { js = (js * 48271) % 2147483647; return js / 2147483647; };
 const KEYS = Object.keys(HAND_RANGES);
 function jogSigns(n) { js = 7; return Array.from({ length: n }, () => Object.fromEntries(KEYS.map(k => [k, jrnd() < 0.5 ? -1 : 1]))); }
 
+/* A candidate's value falls as runs are added (the mark is his worst
+   run, every other term a sum of costs; only the mark's spread of totals
+   over their mean can move back, by a few hundred at most against costs
+   of thousands), so a candidate already below the best (o.prune) is not
+   run further: in practice the same winner, sooner.
+   The runs are taken undisturbed first, then a jog and a disturbance in
+   turn. */
 export function judge(def, drive, o) {
-  const star = o.star;
-  const runs = [{}].concat(DISTURB.slice(0, o.disturbed)).map(d => measureRival({ ...def, drive }, { ...d, maxSeconds: 200 }));
-  const jogRuns = jogSigns(o.jogs).map((sg, k) => { const d2 = {}; for (const key of Object.keys(drive)) d2[key] = drive[key] * (1 + 0.01 * (sg[key] || 1)); return measureRival({ ...def, drive: d2 }, { ...DISTURB[(k * 3 + 9) % 20], maxSeconds: 200 }); });
-  const all = runs.concat(jogRuns);
-  let v = mark(all, o.want).value;
-  const base = runs[0], mult = r => r.total / r.seconds / star;
-  for (const r of all) {
-    if (!r.finished) v -= 30000;
-    v -= r.respawns * 8000 + r.hard * 4000 + r.contacts * 1500 + (r.hands.overruled ? 20000 : 0);
-    v -= Math.max(0, MARGIN.minKmh - r.minKmh) * 300;
-    v -= Math.max(0, MARGIN.corner - r.worstCorner) * 60000;
-    v -= Math.max(0, Math.abs(r.total - base.total) - MARGIN.total * base.total) * 30;
-    v -= (Math.max(0, MARGIN.seconds[0] - r.seconds) + Math.max(0, r.seconds - MARGIN.seconds[1])) * 400;
-    const m = mult(r);
-    v -= (Math.max(0, o.band[0] - m) + Math.max(0, m - o.band[1])) * 20000;
+  const star = o.star, mult = r => r.total / r.seconds / star;
+  const specs = [() => measureRival({ ...def, drive }, { maxSeconds: 200 })];
+  const signs = jogSigns(o.jogs), dist = DISTURB.slice(0, o.disturbed);
+  for (let k = 0; k < Math.max(signs.length, dist.length); k++) {
+    if (k < signs.length) specs.push(() => { const d2 = {}; for (const key of Object.keys(drive)) d2[key] = drive[key] * (1 + 0.01 * (signs[k][key] || 1)); return measureRival({ ...def, drive: d2 }, { ...DISTURB[(k * 3 + 9) % 20], maxSeconds: 200 }); });
+    if (k < dist.length) specs.push(() => measureRival({ ...def, drive }, { ...dist[k], maxSeconds: 200 }));
   }
-  const secs = all.map(r => r.seconds), tots = all.map(r => r.total), ms = all.map(mult);
-  return { value: v, detail: { seconds: [Math.min(...secs), Math.max(...secs)], totals: [Math.min(...tots), Math.max(...tots)], base: base.total, mult: [+Math.min(...ms).toFixed(2), +Math.max(...ms).toFixed(2)], contacts: Math.max(...all.map(r => r.contacts)), hard: Math.max(...all.map(r => r.hard)), respawns: Math.max(...all.map(r => r.respawns)), minKmh: Math.min(...all.map(r => r.minKmh)), worstCorner: +Math.min(...all.map(r => r.worstCorner)).toFixed(3), angle: +(base.corners.reduce((a, c) => a + c.angle, 0) / base.corners.length).toFixed(1) } };
+  const score = all => {
+    let v = mark(all, o.want).value;
+    const base = all[0];
+    for (const r of all) {
+      if (!r.finished) v -= 30000;
+      v -= r.respawns * 8000 + r.hard * 4000 + r.contacts * 1500 + (r.hands.overruled ? 20000 : 0);
+      v -= Math.max(0, MARGIN.minKmh - r.minKmh) * 300;
+      v -= Math.max(0, MARGIN.corner - r.worstCorner) * 60000;
+      v -= Math.max(0, Math.abs(r.total - base.total) - MARGIN.total * base.total) * 30;
+      v -= (Math.max(0, MARGIN.seconds[0] - r.seconds) + Math.max(0, r.seconds - MARGIN.seconds[1])) * 400;
+      const m = mult(r);
+      v -= (Math.max(0, o.band[0] - m) + Math.max(0, m - o.band[1])) * 20000;
+    }
+    return v;
+  };
+  const all = [];
+  let v = 0;
+  for (const f of specs) { all.push(f()); v = score(all); if (o.prune !== undefined && v < o.prune) break; }
+  const base = all[0], secs = all.map(r => r.seconds), tots = all.map(r => r.total), ms = all.map(mult);
+  return { value: v, runs: all.length, detail: { runs: all.length, seconds: [Math.min(...secs), Math.max(...secs)], totals: [Math.min(...tots), Math.max(...tots)], base: base.total, mult: [+Math.min(...ms).toFixed(2), +Math.max(...ms).toFixed(2)], contacts: Math.max(...all.map(r => r.contacts)), hard: Math.max(...all.map(r => r.hard)), respawns: Math.max(...all.map(r => r.respawns)), minKmh: Math.min(...all.map(r => r.minKmh)), worstCorner: +Math.min(...all.map(r => r.worstCorner)).toFixed(3), angle: +(base.corners.reduce((a, c) => a + c.angle, 0) / base.corners.length).toFixed(1) } };
 }
 
 let rs = 1;
@@ -76,7 +92,7 @@ export function searchPlateau(def, o) {
       if (local) { if (rnd() < 0.3) { const cur = drive[key] !== undefined ? drive[key] : RIVAL_DRIVE[key]; drive[key] = round(key, Math.max(a, Math.min(b, cur + (rnd() - 0.5) * (b - a) * 0.25))); } }
       else drive[key] = round(key, a + (b - a) * rnd());
     }
-    const r = judge(def, drive, o);
+    const r = judge(def, drive, { ...o, prune: best.value });
     if (r.value > best.value) { best = { drive, ...r }; console.log(k + ' ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail) + ' ' + JSON.stringify(drive)); }
   }
   return best;
@@ -95,6 +111,7 @@ if (process.argv[1] && process.argv[1].endsWith('ladder3/search.js')) {
   const want = args.includes('--want-angle') ? { angle: +arg('--want-angle') } : (CHARACTERS[def.id] || {}).want;
   const star = threeStarRate(trackFor(careerSpec(def.track)));
   const band = arg('--band', '0,99').split(',').map(Number);
+  if (args.includes('--seconds')) MARGIN.seconds = arg('--seconds').split(',').map(Number);   // the race's time wanted, inside 60 to 120 s
   console.log('searching ' + def.name + ' on career ' + (def.track + 1) + ', ' + def.laps + ' laps, ' + def.car + ' ' + JSON.stringify(def.up || null) + ', three star rate ' + star.toFixed(2) + ', band x' + band.join(' to x') + ', want ' + JSON.stringify(want) + ', ranges ' + JSON.stringify(ranges));
   const best = searchPlateau(def, { n: +arg('--n', 200), seed: +arg('--seed', 1), band, star, want, ranges, jogs: +arg('--jogs', 6), disturbed: +arg('--disturbed', 6), localFrom: args.includes('--local') ? 0 : undefined });
   console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
