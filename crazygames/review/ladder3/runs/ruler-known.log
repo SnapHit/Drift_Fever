@@ -1,0 +1,13 @@
+
+rival     track                 laps car          s      points rate   3*rate  mult   step    strong s / his s     strong / his        sanity W/L  parked
+Kestrow   1 First slide         4   starter      75.2   2662   35.4   18.3    1.93   bottom  78.73 / 75.2         5070 / 4233 +20%    18/42       loses
+Tolvo     5 Tight city          3   hatch        83.48  4849   58.09  15.75   3.69   +90.6%  84.08 / 83.48        4577 / 6481 -29%    11/49       loses
+Varsk     9 Upper deck          3   fastback     93.73  6581   70.21  16.08   4.37   +18.4%  95.21 / 93.73        7445 / 8614 -14%    0/60        loses
+Dovane    13 Over and under     2   tourer       57.88  1897   32.77  14.96   2.19   -49.8%  60.18 / 57.88        3478 / 3180 +9%     23/37       loses
+Halvik    17 Knot yard          2   driftbuild   70.15  1234   17.59  14.93   1.18   -46.2%  58.43 / 70.15        3159 / 1234 +156%   46/14       loses
+Sarrow    21 Endless eight      2   fastback     77.59  3366   43.38  14.05   3.09   +162.1% 70.87 / 77.59        7407 / 3366 +120%   46/14       loses
+FAIL the staircase (each at least +5% on the one before): Kestrow x1.93, Tolvo x3.69 (+90.6%), Varsk x4.37 (+18.4%), Dovane x2.19 (-49.8%, FAILS), Halvik x1.18 (-46.2%, FAILS), Sarrow x3.09 (+162.1%)
+PASS known answer: two rivals swapped fails the staircase: Kestrow and Tolvo caught, Tolvo and Varsk caught, Varsk and Dovane caught, Dovane and Halvik caught, Halvik and Sarrow caught
+PASS known answer: Kestrow given the strong driver's own driving and car: 82.1 s against 79.38, 4501 against 6324 (-29%): CAUGHT, the headroom fails
+PASS known answer: Tolvo given the strong driver's own driving and car: 83.13 s against 82.05, 7138 against 8345 (-14%): CAUGHT, the headroom fails
+1 failed

@@ -1,0 +1,580 @@
+{
+ "rows": {
+  "r4": {
+   "id": "r4",
+   "name": "Dovane",
+   "style": "Long, linked slides",
+   "track": 12,
+   "trackName": "Over and under",
+   "laps": 2,
+   "car": "tourer",
+   "up": null,
+   "seconds": 57.88,
+   "points": 1897,
+   "parts": {
+    "drift": 1475,
+    "clean": 165,
+    "pace": 257
+   },
+   "rate": 32.77,
+   "threeStarRate": 14.96,
+   "multiple": 2.19,
+   "driving": {
+    "respawns": 0,
+    "hard": 2,
+    "contacts": 6,
+    "worstCorner": 0.263,
+    "guard": 0
+   },
+   "playerCar": "starter, one step of each",
+   "strong": {
+    "drive": {
+     "SLIDE_GAIN": 1.267,
+     "PROGRESS": 109,
+     "KEEP": 123,
+     "ANGLE_CAP": 35.506,
+     "EDGE_SAFE": 2.871,
+     "EDGE_COST": 2463,
+     "ENTRY": 23.372,
+     "VMAX": 32.799,
+     "CHAIN_KEEP": 2603,
+     "CHAIN_MARGIN": 0.385,
+     "AY_MAX": 7.375,
+     "OUTSIDE": 0.296,
+     "SETUP": 60.618,
+     "WINDOW_PRE": 11.438,
+     "WINDOW_POST": -7.308,
+     "LINK": 54.735,
+     "HB_TIME": 0.208,
+     "HB_OVER": 4.638,
+     "HB_STEER": 0.21
+    },
+    "from": "random",
+    "value": -0.085,
+    "race": {
+     "seconds": 60.18,
+     "rivalSeconds": 57.88,
+     "total": 3478,
+     "rival": 3180,
+     "parts": {
+      "drift": 3087,
+      "clean": 132,
+      "pace": 251,
+      "leads": 0,
+      "line": 0,
+      "close": 8
+     },
+     "rivalParts": {
+      "drift": 1475,
+      "clean": 165,
+      "pace": 257,
+      "leads": 882,
+      "line": 401,
+      "close": 0
+     },
+     "wallHits": 8,
+     "hard": 2,
+     "bodyHits": 8,
+     "respawns": 0,
+     "handsBroken": 0
+    },
+    "ahead": false,
+    "share": 0.094,
+    "pass": false,
+    "runs": [
+     {
+      "seconds": 60.18,
+      "rivalSeconds": 57.88,
+      "total": 3478,
+      "rival": 3180,
+      "ahead": false,
+      "share": 0.094,
+      "pass": false
+     },
+     {
+      "seconds": 59.31,
+      "rivalSeconds": 56.79,
+      "total": 2872,
+      "rival": 2759,
+      "ahead": false,
+      "share": 0.041,
+      "pass": false
+     },
+     {
+      "seconds": 62.66,
+      "rivalSeconds": 58.95,
+      "total": 3392,
+      "rival": 2868,
+      "ahead": false,
+      "share": 0.183,
+      "pass": false
+     }
+    ],
+    "worstShare": 0.041
+   },
+   "strongLiteral": {
+    "solo": {
+     "total": 4365,
+     "seconds": 60.3,
+     "contacts": 10
+    },
+    "drive": {
+     "SLIDE_GAIN": 0.815,
+     "PROGRESS": 118,
+     "KEEP": 1125,
+     "ANGLE_CAP": 29.809,
+     "EDGE_SAFE": 1.57,
+     "EDGE_COST": 2856,
+     "ENTRY": 26.505,
+     "VMAX": 29.671,
+     "CHAIN_KEEP": 3945,
+     "CHAIN_MARGIN": 0.391,
+     "AY_MAX": 8.026,
+     "OUTSIDE": 0.475,
+     "SETUP": 39.047,
+     "WINDOW_PRE": 18.075,
+     "WINDOW_POST": 1.438,
+     "LINK": 5.383,
+     "HB_TIME": 0.465
+    },
+    "race": {
+     "seconds": 65.05,
+     "rivalSeconds": 57.88,
+     "total": 2200,
+     "rival": 3180,
+     "wallHits": 4
+    },
+    "ahead": false,
+    "share": -0.308,
+    "pass": false
+   },
+   "sanity": {
+    "players": "their own numbers",
+    "wins": {
+     "grip": 0,
+     "slide": 14,
+     "mixed": 9
+    },
+    "won": 23,
+    "lost": 37,
+    "handsBroken": 0,
+    "still": {
+     "total": 0,
+     "rival": 3180,
+     "won": false
+    },
+    "pass": true
+   },
+   "measured": "2026-11-12"
+  },
+  "r5": {
+   "id": "r5",
+   "name": "Halvik",
+   "style": "The biggest angles",
+   "track": 16,
+   "trackName": "Knot yard",
+   "laps": 2,
+   "car": "driftbuild",
+   "up": null,
+   "seconds": 70.15,
+   "points": 1234,
+   "parts": {
+    "drift": 866,
+    "clean": 160,
+    "pace": 208
+   },
+   "rate": 17.59,
+   "threeStarRate": 14.93,
+   "multiple": 1.178,
+   "driving": {
+    "respawns": 0,
+    "hard": 5,
+    "contacts": 5,
+    "worstCorner": 0.187,
+    "guard": 0
+   },
+   "playerCar": "starter, two steps of each",
+   "strong": {
+    "drive": {
+     "SLIDE_GAIN": 1.102,
+     "PROGRESS": 21,
+     "KEEP": 139,
+     "ANGLE_CAP": 32.458,
+     "EDGE_SAFE": 1.628,
+     "EDGE_COST": 508,
+     "ENTRY": 20.76,
+     "VMAX": 31.209,
+     "CHAIN_KEEP": 1999,
+     "CHAIN_MARGIN": 0.257,
+     "AY_MAX": 5.121,
+     "OUTSIDE": 0.649,
+     "SETUP": 67.475,
+     "WINDOW_PRE": 14.294,
+     "WINDOW_POST": -1.466,
+     "LINK": 55.117,
+     "HB_TIME": 0.119,
+     "HB_OVER": 4.169,
+     "HB_STEER": 0.195
+    },
+    "from": "local",
+    "value": 1.56,
+    "race": {
+     "seconds": 58.43,
+     "rivalSeconds": 70.15,
+     "total": 3159,
+     "rival": 1234,
+     "parts": {
+      "drift": 1519,
+      "clean": 128,
+      "pace": 250,
+      "leads": 868,
+      "line": 394,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 866,
+      "clean": 160,
+      "pace": 208,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 9,
+     "hard": 5,
+     "bodyHits": 0,
+     "respawns": 0,
+     "handsBroken": 0
+    },
+    "ahead": true,
+    "share": 1.56,
+    "pass": true,
+    "runs": [
+     {
+      "seconds": 58.43,
+      "rivalSeconds": 70.15,
+      "total": 3159,
+      "rival": 1234,
+      "ahead": true,
+      "share": 1.56,
+      "pass": true
+     },
+     {
+      "seconds": 60.41,
+      "rivalSeconds": 70.66,
+      "total": 4942,
+      "rival": 1509,
+      "ahead": true,
+      "share": 2.275,
+      "pass": true
+     },
+     {
+      "seconds": 60.31,
+      "rivalSeconds": 69.4,
+      "total": 4641,
+      "rival": 1766,
+      "ahead": true,
+      "share": 1.628,
+      "pass": true
+     }
+    ],
+    "worstShare": 1.56
+   },
+   "strongLiteral": {
+    "solo": {
+     "total": 7337,
+     "seconds": 71.69,
+     "contacts": 1
+    },
+    "drive": {
+     "SLIDE_GAIN": 1.04,
+     "PROGRESS": 32,
+     "KEEP": 322,
+     "ANGLE_CAP": 35.965,
+     "EDGE_SAFE": 2.805,
+     "EDGE_COST": 2439,
+     "ENTRY": 16.985,
+     "VMAX": 27.737,
+     "CHAIN_KEEP": 2681,
+     "CHAIN_MARGIN": 0.412,
+     "AY_MAX": 7.897,
+     "OUTSIDE": 0.665,
+     "SETUP": 25.651,
+     "WINDOW_PRE": 29.486,
+     "WINDOW_POST": 5.442,
+     "LINK": 54.536,
+     "HB_TIME": 0.208
+    },
+    "race": {
+     "seconds": 75.89,
+     "rivalSeconds": 70.15,
+     "total": 3021,
+     "rival": 2248,
+     "wallHits": 12
+    },
+    "ahead": false,
+    "share": 0.344,
+    "pass": false
+   },
+   "sanity": {
+    "players": "their own numbers",
+    "wins": {
+     "grip": 14,
+     "slide": 12,
+     "mixed": 20
+    },
+    "won": 46,
+    "lost": 14,
+    "handsBroken": 0,
+    "still": {
+     "total": 0,
+     "rival": 2496,
+     "won": false
+    },
+    "pass": true
+   },
+   "measured": "2026-11-12"
+  },
+  "r6": {
+   "id": "r6",
+   "name": "Sarrow",
+   "style": "Fast, deep and linked",
+   "track": 20,
+   "trackName": "Endless eight",
+   "laps": 2,
+   "car": "fastback",
+   "up": null,
+   "seconds": 77.59,
+   "points": 3366,
+   "parts": {
+    "drift": 3162,
+    "clean": 30,
+    "pace": 174
+   },
+   "rate": 43.38,
+   "threeStarRate": 14.05,
+   "multiple": 3.087,
+   "driving": {
+    "respawns": 0,
+    "hard": 9,
+    "contacts": 15,
+    "worstCorner": 0.219,
+    "guard": 0
+   },
+   "playerCar": "starter, two steps of each",
+   "strong": {
+    "drive": {
+     "SLIDE_GAIN": 0.2,
+     "PROGRESS": 76,
+     "KEEP": 607,
+     "ANGLE_CAP": 42.426,
+     "EDGE_SAFE": 2.395,
+     "EDGE_COST": 2257,
+     "ENTRY": 23.3,
+     "VMAX": 22,
+     "CHAIN_KEEP": 0,
+     "CHAIN_MARGIN": 0.587,
+     "AY_MAX": 5.75,
+     "OUTSIDE": 0.284,
+     "SETUP": 54.92,
+     "WINDOW_PRE": 17.12,
+     "WINDOW_POST": -6.22,
+     "LINK": 34.606,
+     "HB_TIME": 0.403,
+     "HB_OVER": 2.46,
+     "HB_STEER": 0.47
+    },
+    "from": "local",
+    "value": 0.776,
+    "race": {
+     "seconds": 70.87,
+     "rivalSeconds": 77.59,
+     "total": 7407,
+     "rival": 3366,
+     "parts": {
+      "drift": 5827,
+      "clean": 210,
+      "pace": 190,
+      "leads": 812,
+      "line": 368,
+      "close": 0
+     },
+     "rivalParts": {
+      "drift": 3162,
+      "clean": 30,
+      "pace": 174,
+      "leads": 0,
+      "line": 0,
+      "close": 0
+     },
+     "wallHits": 0,
+     "hard": 0,
+     "bodyHits": 1,
+     "respawns": 0,
+     "handsBroken": 0
+    },
+    "ahead": true,
+    "share": 1.201,
+    "pass": true,
+    "runs": [
+     {
+      "seconds": 70.87,
+      "rivalSeconds": 77.59,
+      "total": 7407,
+      "rival": 3366,
+      "ahead": true,
+      "share": 1.201,
+      "pass": true
+     },
+     {
+      "seconds": 73.63,
+      "rivalSeconds": 75.87,
+      "total": 4233,
+      "rival": 460,
+      "ahead": true,
+      "share": 8.202,
+      "pass": true
+     },
+     {
+      "seconds": 71.32,
+      "rivalSeconds": 74.85,
+      "total": 5460,
+      "rival": 3074,
+      "ahead": true,
+      "share": 0.776,
+      "pass": true
+     }
+    ],
+    "worstShare": 0.776
+   },
+   "strongLiteral": {
+    "solo": {
+     "total": 5777,
+     "seconds": 63.02,
+     "contacts": 3
+    },
+    "drive": {
+     "SLIDE_GAIN": 0.747,
+     "PROGRESS": 79,
+     "KEEP": 1500,
+     "ANGLE_CAP": 37.637,
+     "EDGE_SAFE": 2.078,
+     "EDGE_COST": 2396,
+     "ENTRY": 25.021,
+     "VMAX": 29.706,
+     "CHAIN_KEEP": 3612,
+     "CHAIN_MARGIN": 0.307,
+     "AY_MAX": 6.951,
+     "OUTSIDE": 0.602,
+     "SETUP": 37.437,
+     "WINDOW_PRE": 14.537,
+     "WINDOW_POST": 16.017,
+     "LINK": 35.149,
+     "HB_TIME": 0.159
+    },
+    "race": {
+     "seconds": 69.7,
+     "rivalSeconds": 77.59,
+     "total": 2583,
+     "rival": 3830,
+     "wallHits": 13
+    },
+    "ahead": true,
+    "share": -0.326,
+    "pass": false
+   },
+   "sanity": {
+    "players": "their own numbers",
+    "wins": {
+     "grip": 13,
+     "slide": 18,
+     "mixed": 15
+    },
+    "won": 46,
+    "lost": 14,
+    "handsBroken": 0,
+    "still": {
+     "total": 0,
+     "rival": 4546,
+     "won": false
+    },
+    "pass": true
+   },
+   "measured": "2026-11-12"
+  }
+ },
+ "definition": {
+  "STAIR": {
+   "STEP": 0.05
+  },
+  "HEAD": {
+   "SHARE": 0.25
+  },
+  "SANITY": {
+   "RUNS": 20
+  },
+  "STRONG": {
+   "N": 40,
+   "RUNS": 3,
+   "LATE": 0.05
+  },
+  "PAR_SPEED": 18,
+  "playerCar": [
+   {
+    "car": "starter",
+    "up": null,
+    "label": "starter, no upgrades"
+   },
+   {
+    "car": "starter",
+    "up": {
+     "power": 1,
+     "grip": 1,
+     "steer": 1
+    },
+    "label": "starter, one step of each"
+   },
+   {
+    "car": "starter",
+    "up": {
+     "power": 2,
+     "grip": 2,
+     "steer": 2
+    },
+    "label": "starter, two steps of each"
+   }
+  ]
+ },
+ "staircase": [
+  {
+   "id": "r4",
+   "name": "Dovane",
+   "multiple": 2.19,
+   "step": null,
+   "pass": true
+  },
+  {
+   "id": "r5",
+   "name": "Halvik",
+   "multiple": 1.178,
+   "step": -0.462,
+   "pass": false
+  },
+  {
+   "id": "r6",
+   "name": "Sarrow",
+   "multiple": 3.087,
+   "step": 1.621,
+   "pass": true
+  }
+ ],
+ "knownSwap": [
+  {
+   "swapped": "Dovane and Halvik",
+   "caught": false
+  },
+  {
+   "swapped": "Halvik and Sarrow",
+   "caught": true
+  }
+ ]
+}
