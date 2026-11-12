@@ -520,4 +520,30 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   scripted players that are a fair measure on Pro and Legend tracks,
   then rivals three to six. Two rounds are proposed and not started:
   garage, playground.
-
+- 12 November 2026, the rest of the ladder (`briefs/RIVALS-LADDER-2.md`,
+  `review/ladder2/REPORT.md`): **stopped at its first priority; still
+  two rivals in the game, nothing a player sees changed.** The brief
+  was at fault. Its staircase (the three scripted players' wins of 60
+  falling from 27 against Kestrow to 12 against Sarrow) was anchored on
+  the old players and then asked for new ones: with players searched
+  per track to finish within 10 per cent of each other, Kestrow scores
+  18 (grip 16, slide 1, mixed 1), because the slide and mixed players
+  got quicker by sliding less. A ruler tuned for pace is a poor ruler
+  for a race won on points. Kept from the round: `PLAYERS.AT` in
+  `rivals/players.js` (per track players, used only by probes; pass on
+  First slide alone); `game/test/ladder2/plateau.js` (each driving
+  number one per cent either way: Tolvo misses 9 of 38 moves, Kestrow
+  13 of 38); all six measured as they stand (Varsk to Sarrow fail the
+  driving bar itself, whatever the ruler); and the new player test,
+  `game/test/ladder2/newplayer.js`: the shipped build from an empty
+  profile by real touches at 390x844 and keys at 1280x720, replaying
+  rehearsed presses, `--origin` for the deployed build. It passes but
+  for aborted music streams, most likely the sandbox's Chromium having
+  no AAC decoder. What it found for a newcomer is in the report (a
+  rival offered before the title is seen, "0 LEVEL", the race table,
+  Tolvo's track locked without saying so, four SOON cards, 36 px HUD
+  buttons). Next for the ladder, if the author agrees: search each
+  remaining rival's driving first, and set difficulty by his own
+  points a second against his track's three star rate and a pace the
+  strong driver with a player's hands can beat, with the scripted
+  players only as a sanity check.

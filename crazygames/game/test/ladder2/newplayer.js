@@ -52,7 +52,7 @@
    (the one main wrote, review/ladder2/main.json) does not land in the
    onboarding run, so the first-visit check fails.
 
-   node game/test/ladder2/newplayer.js [--only phone|desktop] [--no-build]   writes review/ladder2/newplayer.json and shots/np-*.png */
+   node game/test/ladder2/newplayer.js [--only phone|desktop] [--no-build] [--origin https://host]   writes review/ladder2/newplayer.json and shots/np-*.png */
 import path from 'node:path';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -62,7 +62,8 @@ import { chromium } from 'playwright';
 const here = path.dirname(new URL(import.meta.url).pathname);
 const root = path.resolve(here, '..', '..', '..');
 const dist = path.join(root, 'dist');
-const outDir = path.join(root, 'review', 'ladder2'), shots = path.join(outDir, 'shots');
+const args0 = process.argv.slice(2), LIVE = args0.includes('--origin') ? args0[args0.indexOf('--origin') + 1].replace(/\/+$/, '') : null;   // --origin: the deployed build at that address, not dist/ (written beside, to live/, so the local record stays)
+const outDir = path.join(root, 'review', 'ladder2', LIVE ? 'live' : ''), shots = path.join(outDir, 'shots');
 fs.mkdirSync(shots, { recursive: true });
 const args = process.argv.slice(2), only = args.includes('--only') ? args[args.indexOf('--only') + 1] : null;
 export const NP = { FRAME_MS: 16, RUN_FRAMES: 60 * 240, WAIT_FRAMES: 60 * 20, KIND: 'mixed' };   // a frame of the browser's clock; the most frames a run or a wait may take; the scripted player rehearsed
@@ -71,7 +72,7 @@ let failed = 0;
 const verdict = (ok, text) => { if (!ok) failed++; console.log((ok ? 'PASS ' : 'FAIL ') + text); return ok; };
 
 /* ---- the build as it ships, served as the Worker serves dist/ ---- */
-if (!args.includes('--no-build')) execSync('npm run build', { cwd: root, stdio: 'inherit' });
+if (!LIVE && !args.includes('--no-build')) execSync('npm run build', { cwd: root, stdio: 'inherit' });
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.wav': 'audio/wav', '.m4a': 'audio/mp4', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.txt': 'text/plain', '.webp': 'image/webp' };
 const server = http.createServer((req, res) => {
   let u = decodeURIComponent(req.url.split('?')[0]);
@@ -82,7 +83,7 @@ const server = http.createServer((req, res) => {
   res.end(fs.readFileSync(p));
 });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
-const origin = 'http://127.0.0.1:' + server.address().port;
+const origin = LIVE || 'http://127.0.0.1:' + server.address().port;
 const URL0 = origin + '/';
 
 function findChromium() {
@@ -318,8 +319,8 @@ async function timing(profileName) {
   return { profile: profileName, loadEventMs: tLoad, readyMs: tReady, countdownOnScreenMs: tCount, goMs: tDrive, nav };
 }
 
-const out = { url: URL0, note: 'dist/ as npm run build makes it, served from 127.0.0.1; headless Chromium, software WebGL 2 (SwiftShader); each profile a new empty context; the clock paused and advanced 16 ms a frame', profiles: {} };
-const mainSave = JSON.parse(fs.readFileSync(path.join(outDir, 'main.json'), 'utf8')).save;
+const out = { url: URL0, note: LIVE ? 'the deployed build at ' + LIVE + '; headless Chromium, software WebGL 2 (SwiftShader); each profile a new empty context; the clock paused and advanced 16 ms a frame' : 'dist/ as npm run build makes it, served from 127.0.0.1; headless Chromium, software WebGL 2 (SwiftShader); each profile a new empty context; the clock paused and advanced 16 ms a frame', profiles: {} };
+const mainSave = JSON.parse(fs.readFileSync(path.join(root, 'review', 'ladder2', 'main.json'), 'utf8')).save;
 for (const name of Object.keys(PROFILES)) {
   if (only && only !== name) continue;
   /* the desktop plays the phone's rehearsed presses as keys: the game reads the same three inputs from either, so the runs are the same (the comparison below says so); --rehearse-all rehearses each profile */
