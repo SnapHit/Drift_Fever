@@ -25,6 +25,8 @@
       through a sigma delta, so a half turn is the button pressed every
       other frame) and sent as real touches or keys, and every press and
       release is written down with its frame;
+      The desktop plays the phone's rehearsal as keys (the game reads the
+      same steer and DRIFT from either), unless --rehearse-all;
    2. the test: in a new empty context, the journey again, and in every
       run the recorded presses and releases are sent at their frames.
       Nothing in the test reads the game to decide an input. Menus are
@@ -140,7 +142,7 @@ async function journey(profileName, mode, tapes, opts) {
     page.on('pageerror', e => log.errors.push({ at: log.steps.length, text: 'pageerror: ' + String(e) }));
     page.on('console', m => { if (m.type() === 'error') log.errors.push({ at: log.steps.length, text: 'console: ' + m.text() }); });
     page.on('request', r => { log.requests.total++; const u = r.url(); if (!u.startsWith(origin) && !u.startsWith('data:') && !u.startsWith('blob:')) log.requests.otherHost.push(u); });
-    page.on('requestfailed', r => log.requests.failed.push(r.url() + ' ' + (r.failure() && r.failure().errorText)));
+    page.on('requestfailed', r => log.requests.failed.push(r.url() + ' ' + (r.failure() && r.failure().errorText) + ' (after step ' + log.steps.length + (log.steps.length ? ', ' + log.steps[log.steps.length - 1].name : '') + ')'));
     page.on('response', r => { if (r.status() >= 400) log.requests.failed.push(r.url() + ' ' + r.status()); });
   };
   let page = await context.newPage();
@@ -154,6 +156,9 @@ async function journey(profileName, mode, tapes, opts) {
   const layout = () => page.evaluate(LAYOUT);
   let shotN = 0;
   async function step(name, what, extra) {
+    /* a results card counts its score, stars and coins up: two seconds to settle before the frame, as a player would see it */
+    if (/results$/.test(name)) await tick(120);
+    console.log('   ' + mode + ' step ' + name + ' at frame ' + frameNo + ' (' + new Date().toISOString().slice(11, 19) + ')');
     const st = await read(), lay = await layout();
     const file = 'np-' + profileName + '-' + String(++shotN).padStart(2, '0') + '-' + name + '.png';
     /* through the protocol: Playwright's own screenshot waits on an animation frame, which the paused clock never gives */
@@ -227,6 +232,7 @@ async function journey(profileName, mode, tapes, opts) {
       st = await read();
       for (const t of [st.prompt, st.info]) if (t && !seen.has(t)) { seen.add(t); prompts.push({ frame: frameNo - start, text: t }); if (mode === 'test') await step(name + '-prompt' + prompts.length, 'a prompt appears: ' + t); }
       if (st.state === 'results' && st.results) break;
+      if (k % 600 === 0) console.log('   ' + mode + ' ' + name + ' frame ' + k + ': ' + st.state + ', ' + Math.round(st.total) + ' points (' + new Date().toISOString().slice(11, 19) + ')');
     }
     if (mode === 'rehearse') { for (const n of ['left', 'right', 'hb']) if (held[n]) tape.push([frameNo - start, n, 0]); }
     await releaseAll();
@@ -311,8 +317,12 @@ const out = { url: URL0, note: 'dist/ as npm run build makes it, served from 127
 const mainSave = JSON.parse(fs.readFileSync(path.join(outDir, 'main.json'), 'utf8')).save;
 for (const name of Object.keys(PROFILES)) {
   if (only && only !== name) continue;
-  console.log('== ' + name + ': the rehearsal');
-  const reh = await journey(name, 'rehearse');
+  /* the desktop plays the phone's rehearsed presses as keys: the game reads the same three inputs from either, so the runs are the same (the comparison below says so); --rehearse-all rehearses each profile */
+  const prior = fs.existsSync(path.join(outDir, 'newplayer.json')) ? JSON.parse(fs.readFileSync(path.join(outDir, 'newplayer.json'), 'utf8')).profiles || {} : {};
+  const from = name !== 'phone' && !args.includes('--rehearse-all') ? (out.profiles.phone || prior.phone) : null;
+  let reh;
+  if (from) { console.log('== ' + name + ': the phone\'s rehearsal, its presses sent as keys'); reh = { runs: from.rehearsal.runs.map((r, k) => ({ ...r, tape: from.tapes[k] })), error: from.rehearsal.error, borrowed: 'phone' }; }
+  else { console.log('== ' + name + ': the rehearsal'); reh = await journey(name, 'rehearse'); }
   const tapes = reh.runs.map(r => r.tape);
   console.log('   rehearsal: ' + reh.runs.map(r => r.name + ' ' + JSON.stringify(r.results) + ' in ' + r.frames + ' frames, ' + r.presses + ' presses').join('; ') + (reh.error ? ' :: stopped: ' + reh.error.split('\n')[0] : ''));
   console.log('== ' + name + ': the test');
@@ -341,8 +351,11 @@ for (const name of Object.keys(PROFILES)) {
   const kn = known.steps[0];
   verdict(kn && !(kn.state === 'countdown'), name + ': known answer: a profile holding a returning player\'s save does not land in the onboarding run (state ' + (kn && kn.state) + '), so the first-visit check fails on it: ' + (kn && kn.state !== 'countdown' ? 'CAUGHT' : 'MISSED'));
   console.log('   time to the first playable frame (real clock, software drawing): load event ' + tm.loadEventMs + ' ms, the game ready ' + tm.readyMs + ' ms, the countdown on screen ' + tm.countdownOnScreenMs + ' ms, GO ' + tm.goMs + ' ms');
-  out.profiles[name] = { rehearsal: { runs: reh.runs.map(r => ({ name: r.name, results: r.results, frames: r.frames, presses: r.presses })), error: reh.error || null }, test: { ...log, runs: log.runs }, tapes, timing: tm, knownAnswer: { state: kn && kn.state, caught: !!(kn && kn.state !== 'countdown') } };
+  out.profiles[name] = { rehearsal: { runs: reh.runs.map(r => ({ name: r.name, results: r.results, frames: r.frames, presses: r.presses })), error: reh.error || null, borrowed: reh.borrowed || null }, test: { ...log, runs: log.runs }, tapes, timing: tm, knownAnswer: { state: kn && kn.state, caught: !!(kn && kn.state !== 'countdown') } };
 }
+/* the profiles not run this time are kept from the file */
+const was = fs.existsSync(path.join(outDir, 'newplayer.json')) ? JSON.parse(fs.readFileSync(path.join(outDir, 'newplayer.json'), 'utf8')) : null;
+if (was && was.profiles) for (const k of Object.keys(was.profiles)) if (!out.profiles[k]) out.profiles[k] = was.profiles[k];
 fs.writeFileSync(path.join(outDir, 'newplayer.json'), JSON.stringify(out, null, 1));
 await browser.close(); server.close();
 console.log(failed ? failed + ' failed' : 'all passed');

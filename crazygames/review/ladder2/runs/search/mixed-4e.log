@@ -1,0 +1,4 @@
+searching the mixed player on career 5 Tight city, 3 laps, starter null
+start 6754 {"seconds":80.33,"total":8339,"drift":7716,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0.62,"angle":30.1}
+best 6754 {"seconds":80.33,"total":8339,"drift":7716,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0.62,"angle":30.1}
+drive: {"SLIDE_GAIN":0.393,"PROGRESS":101,"KEEP":508,"ANGLE_CAP":35.38,"EDGE_SAFE":1.77,"EDGE_COST":2525,"ENTRY":29,"VMAX":26.08,"CHAIN_KEEP":0,"CHAIN_MARGIN":0.21,"AY_MAX":5.32,"OUTSIDE":0.64,"SETUP":28.63,"WINDOW_PRE":11.15,"WINDOW_POST":20,"LINK":46.97,"HB_TIME":0.162,"HB_OVER":1.51,"HB_STEER":0.06}

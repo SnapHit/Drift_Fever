@@ -1,0 +1,7 @@
+searching the grip player on career 13 Over and under, 3 laps, starter {"power":1,"grip":1,"steer":1}
+start -5834 {"seconds":97.23,"total":745,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":0}
+8 -5832 {"seconds":97.2,"total":745,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":0} {"EDGE_SAFE":1.51,"ENTRY":14.96,"VMAX":32.51,"AY_MAX":8.94,"OUTSIDE":0.376,"SETUP":44.18,"HB_OVER":4.79,"HB_STEER":0.4}
+12 -5831 {"seconds":97.18,"total":745,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":12.1} {"EDGE_SAFE":1.54,"ENTRY":14.96,"VMAX":33.72,"AY_MAX":8.94,"OUTSIDE":0.376,"SETUP":48.27,"HB_OVER":4.79,"HB_STEER":0.4}
+160 -5821 {"seconds":97.02,"total":746,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":0} {"EDGE_SAFE":1.54,"ENTRY":14.96,"VMAX":33.21,"AY_MAX":8.94,"OUTSIDE":0.324,"SETUP":48.27,"HB_OVER":4.79,"HB_STEER":0.4}
+best -5821 {"seconds":97.02,"total":746,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":0}
+drive: {"EDGE_SAFE":1.54,"ENTRY":14.96,"VMAX":33.21,"AY_MAX":8.94,"OUTSIDE":0.324,"SETUP":48.27,"HB_OVER":4.79,"HB_STEER":0.4}

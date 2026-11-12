@@ -1,0 +1,5 @@
+searching the mixed player on career 5 Tight city, 3 laps, starter null
+start -15959 {"seconds":81.3,"total":5081,"drift":4546,"walls":4,"hard":2,"respawns":0,"worstCorner":0,"worstTight":0,"angle":31.6}
+31 -12267 {"seconds":82.25,"total":7605,"drift":7045,"walls":4,"hard":2,"respawns":0,"worstCorner":0,"worstTight":0,"angle":28.7} {"SLIDE_GAIN":0.416,"PROGRESS":78,"KEEP":685,"ANGLE_CAP":35.52,"EDGE_SAFE":1.74,"EDGE_COST":2318,"ENTRY":29,"VMAX":26.08,"CHAIN_KEEP":264,"CHAIN_MARGIN":0.24,"AY_MAX":5.32,"OUTSIDE":0.573,"SETUP":34.27,"WINDOW_PRE":6.38,"WINDOW_POST":20,"LINK":46.97,"HB_TIME":0.162,"HB_OVER":1.54,"HB_STEER":0.08}
+best -12267 {"seconds":82.25,"total":7605,"drift":7045,"walls":4,"hard":2,"respawns":0,"worstCorner":0,"worstTight":0,"angle":28.7}
+drive: {"SLIDE_GAIN":0.416,"PROGRESS":78,"KEEP":685,"ANGLE_CAP":35.52,"EDGE_SAFE":1.74,"EDGE_COST":2318,"ENTRY":29,"VMAX":26.08,"CHAIN_KEEP":264,"CHAIN_MARGIN":0.24,"AY_MAX":5.32,"OUTSIDE":0.573,"SETUP":34.27,"WINDOW_PRE":6.38,"WINDOW_POST":20,"LINK":46.97,"HB_TIME":0.162,"HB_OVER":1.54,"HB_STEER":0.08}

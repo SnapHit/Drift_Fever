@@ -31,7 +31,7 @@
    deck, where the last round found the slide player 14 to 17 s slower,
    fail the spread.
 
-   node game/test/ladder2/players.js search grip|slide|mixed --track 8 [--laps 3] [--car starter] [--up 1] [--n 150] [--seed 1] [--pace 95] [--from own|JSON|r1] [--from-log file] [--local] [--range KEY=a,b]
+   node game/test/ladder2/players.js search grip|slide|mixed --track 8 [--laps 3] [--car starter] [--up 1] [--n 150] [--seed 1] [--pace 95] [--from own|JSON|r1] [--from-log file] [--local] [--range KEY=a,b] [--offs 6: judge on the undisturbed start and the first 5 race offsets]
    node game/test/ladder2/players.js measure [--place 8:3:starter:1 ...] [--own]   writes review/ladder2/players.json */
 import path from 'node:path';
 import fs from 'node:fs';
@@ -154,7 +154,7 @@ if (process.argv[1] && process.argv[1].endsWith('ladder2/players.js')) {
     if (args.includes('--from-log')) { f = lastDrive(fs.readFileSync(arg('--from-log'), 'utf8')) || f; }
     const from = f === 'own' ? PLAYERS[kind].drive : f === 'at' ? (PLAYERS.AT[placeKey(where)] || {})[kind] || PLAYERS[kind].drive : f.startsWith('{') ? JSON.parse(f) : PLAYERS[f] ? PLAYERS[f].drive : rivalById(f).drive;
     console.log('searching the ' + kind + ' player on career ' + (where.index + 1) + ' ' + CAREER[where.index].name + ', ' + where.laps + ' laps, ' + where.car + ' ' + JSON.stringify(where.up) + (arg('--pace') ? ', pace at most ' + arg('--pace') + ' s' : ''));
-    const best = searchPlayer(where, kind, from, { n: +arg('--n', 150), seed: +arg('--seed', 1), pace: arg('--pace') ? +arg('--pace') : 0, localFrom: args.includes('--local') ? 0 : undefined, ranges });
+    const best = searchPlayer(where, kind, from, { n: +arg('--n', 150), seed: +arg('--seed', 1), pace: arg('--pace') ? +arg('--pace') : 0, localFrom: args.includes('--local') ? 0 : undefined, ranges, offs: args.includes('--offs') ? [[0, 0], ...OFFSETS.slice(0, +arg('--offs') - 1)] : undefined });
     console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
     console.log('drive: ' + JSON.stringify(best.drive));
   } else if (args[0] === 'measure') {

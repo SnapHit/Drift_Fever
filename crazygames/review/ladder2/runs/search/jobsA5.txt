@@ -1,0 +1,3 @@
+slide-12a game/test/ladder2/players.js search slide --track 12 --laps 3 --up 1 --side -1 --n 150 --from r1 --pace 91 --offs 4
+slide-16a game/test/ladder2/players.js search slide --track 16 --laps 3 --up 2 --side 1 --n 150 --from r1 --pace 108 --offs 4
+slide-20a game/test/ladder2/players.js search slide --track 20 --laps 3 --up 2 --side -1 --n 150 --from r1 --pace 110 --offs 4
