@@ -139,6 +139,12 @@ music's own retry (each of the four files once, then stop), which is
 what a browser with no AAC decoder does; the sandbox's Chromium has
 none. Most likely the sandbox, not the game; not proved.
 
+Run again against the deployed preview on 12 and 13 November
+(`--origin`, `review/ladder2/live/`): the same result at both sizes.
+Every step passes, every run matches its rehearsal, no error, 151
+requests with none to another host; the only failure is the same
+aborted music (4 on the phone, 3 on the desktop).
+
 What would confuse a newcomer:
 - A rival offered on the very first results, before he has seen the
   title.
