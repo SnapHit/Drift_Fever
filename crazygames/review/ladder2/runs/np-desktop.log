@@ -1,1 +1,107 @@
 == desktop: the rehearsal, keys, in a 390x844 window (drawn three times faster in software)
+   rehearse step first-visit at frame 2 (06:08:12)
+   rehearse onboarding frame 0: drive, 0 points (06:08:43)
+   rehearse onboarding frame 600: drive, 202 points (06:13:04)
+   rehearse onboarding frame 1200: drive, 250 points (06:15:52)
+   rehearse onboarding frame 1800: drive, 675 points (06:20:15)
+   rehearse onboarding frame 2400: drive, 723 points (06:23:21)
+   rehearse onboarding frame 3000: drive, 1096 points (06:27:41)
+   rehearse onboarding frame 3600: drive, 1144 points (06:30:44)
+   rehearse step onboarding-results at frame 3969 (06:31:56)
+   rehearse step title at frame 3971 (06:32:28)
+   rehearse step career at frame 3973 (06:32:28)
+   rehearse step track1-start at frame 3975 (06:32:38)
+   rehearse track1 frame 0: drive, 0 points (06:33:46)
+   rehearse track1 frame 600: drive, 202 points (06:37:46)
+   rehearse track1 frame 1200: drive, 250 points (06:40:53)
+   rehearse track1 frame 1800: drive, 675 points (06:45:21)
+   rehearse track1 frame 2400: drive, 723 points (06:48:29)
+   rehearse track1 frame 3000: drive, 1096 points (06:52:52)
+   rehearse track1 frame 3600: drive, 1144 points (06:56:04)
+   rehearse step track1-results at frame 7944 (06:57:08)
+   rehearse step race-start at frame 7946 (06:57:40)
+   rehearse race frame 0: drive, 0 points (06:58:01)
+   rehearse race frame 600: drive, 0 points (07:02:28)
+   rehearse race frame 1200: drive, 27 points (07:05:58)
+   rehearse race frame 1800: drive, 33 points (07:10:16)
+   rehearse race frame 2400: drive, 33 points (07:14:12)
+   rehearse race frame 3000: drive, 69 points (07:18:10)
+   rehearse race frame 3600: drive, 93 points (07:21:51)
+   rehearse race frame 4200: drive, 506 points (07:26:40)
+   rehearse race frame 4800: drive, 554 points (07:30:00)
+   rehearse step race-results at frame 13148 (07:31:24)
+   rehearse step rivals at frame 13150 (07:32:10)
+   rehearse step title-again at frame 13152 (07:32:12)
+   rehearse step second-visit at frame 13154 (07:32:24)
+   rehearsal: onboarding {"score":1712,"stars":3,"rival":null,"offer":"r1"} in 3661 frames, 2128 presses; track1 {"score":1712,"stars":3,"rival":null,"offer":"r1"} in 3661 frames, 2128 presses; race {"score":1637,"rival":4145,"won":false,"offer":null} in 4894 frames, 2328 presses
+== desktop: the test
+   test step first-visit at frame 2 (07:32:31)
+   test step onboarding-prompt1 at frame 189 (07:33:45)
+   test onboarding frame 0: drive, 0 points (07:34:57)
+   test step onboarding-prompt2 at frame 404 (07:37:30)
+   test step onboarding-prompt3 at frame 561 (07:39:42)
+   test step onboarding-prompt4 at frame 651 (07:39:54)
+   test onboarding frame 600: drive, 202 points (07:42:49)
+   test step onboarding-prompt5 at frame 843 (07:43:35)
+   test onboarding frame 1200: drive, 250 points (07:49:23)
+   test onboarding frame 1800: drive, 675 points (07:59:08)
+   test onboarding frame 2400: drive, 723 points (08:05:36)
+   test onboarding frame 3000: drive, 1096 points (08:15:31)
+   test onboarding frame 3600: drive, 1144 points (08:22:17)
+   test step onboarding-results at frame 3969 (08:24:55)
+   test step title at frame 3971 (08:26:13)
+   test step career at frame 3973 (08:26:13)
+   test step track1-start at frame 3975 (08:26:19)
+   test track1 frame 0: drive, 0 points (08:28:45)
+   test track1 frame 600: drive, 202 points (08:36:32)
+   test track1 frame 1200: drive, 250 points (08:42:53)
+   test track1 frame 1800: drive, 675 points (08:52:07)
+   test track1 frame 2400: drive, 723 points (08:58:23)
+ are "tcp" and on UNIX "unix")
+[pid=9782][err] [9782:9796:1112/164918.733986:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=9782][err] [9782:9796:1112/164918.734282:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=9782][err] [9782:9796:1112/164918.734472:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=9782][err] [9782:9782:1112/164918.734768:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=9782][err] [9782:9796:1112/164918.738009:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=9782][err] [9782:9796:1112/164918.738325:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=9782][err] [9782:9782:1112/164918.738664:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=9782][err] [9782:9782:1112/164918.738903:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=9782][err] [9782:9782:1112/164918.739525:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: unknown error type: 
+[pid=9782][err] [9782:9797:1112/165025.926302:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
+[pid=9782][err] [9782:9797:1112/165025.928020:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
+[pid=9782][err] [9782:9797:1112/165025.929962:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
+[pid=9782][err] [9826:9865:1112/165028.149981:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9826:9865:1112/165030.400395:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9782:9797:1112/165030.400590:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -101
+[pid=9782][err] [9782:9797:1112/165049.463320:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[pid=9782][err] [9782:9797:1112/165133.064407:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[pid=9782][err] [9825:9825:1112/165136.203078:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now.
+[pid=9782][err] [9825:9825:1112/165136.203598:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now.
+[pid=9782][err] [9825:9825:1112/165136.204114:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now.
+[pid=9782][err] [9825:9825:1112/165138.617061:ERROR:gpu/command_buffer/service/gl_utils.cc:391] [.WebGL-0x1e8c00112600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): Running out of reserved outsideRenderPass queueSerial. ending renderPass now. (this message will no longer repeat)
+[pid=9782][err] Warning: vkCreateInstance: Found no drivers!
+[pid=9782][err] Warning: vkCreateInstance failed with VK_ERROR_INCOMPATIBLE_DRIVER
+[pid=9782][err]     at CheckVkSuccessImpl (../../third_party/dawn/src/dawn/native/vulkan/VulkanError.cpp:106)
+[pid=9782][err] 
+[pid=9782][err] [9782:9782:1112/165218.730365:ERROR:services/on_device_model/public/cpp/service_client.cc:36] Unexpected on_device_model service disconnect: Error loading backend.
+[pid=9782][err] [9782:9797:1112/165309.890870:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[pid=9782][err] [9782:9797:1112/165551.798234:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:483] ConnectionHandler failed with net error: -2
+[pid=9782][err] [9826:9865:1112/165553.885951:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9826:9865:1112/165556.164662:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9782:9797:1112/165556.164857:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -101
+[pid=9782][err] [9782:9797:1112/165607.069418:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[pid=9782][err] [9782:9797:1112/170123.759554:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:483] ConnectionHandler failed with net error: -2
+[pid=9782][err] [9826:9865:1112/170125.775268:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9826:9865:1112/170128.044981:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9782:9797:1112/170128.045480:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -101
+[pid=9782][err] [9782:9797:1112/170252.034745:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[pid=9782][err] [9782:9797:1112/170649.823394:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:483] ConnectionHandler failed with net error: -2
+[pid=9782][err] [9826:9865:1112/170651.830457:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9826:9865:1112/170654.097077:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101
+[pid=9782][err] [9782:9797:1112/170654.097484:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -101
+[pid=9782] <gracefully close start>
+[pid=9782][err] [9782:9797:1112/170817.224474:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:483] ConnectionHandler failed with net error: -2
+    at async journey (/home/claude/ladder2/crazygames/game/test/ladder2/newplayer.js:294:3)
+    at async file:///home/claude/ladder2/crazygames/game/test/ladder2/newplayer.js:329:63
+
+Node.js v22.22.0
