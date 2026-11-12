@@ -1,0 +1,19 @@
+== game/test/ladder2/determinism.js (16:12:07)
+game/test/ladder2/determinism.js exit 0
+== game/test/ladder/earning.js (16:13:02)
+game/test/ladder/earning.js exit 0
+== game/test/ladder/layout.js (16:18:08)
+game/test/ladder/layout.js exit 0
+== game/test/driftrace/contact.js r1 --out review/ladder3/contact-r1.json (16:30:39)
+game/test/driftrace/contact.js r1 --out review/ladder3/contact-r1.json exit 1
+== game/test/driftrace/contact.js r2 --out review/ladder3/contact-r2.json (16:30:48)
+game/test/driftrace/contact.js r2 --out review/ladder3/contact-r2.json exit 1
+== game/test/driftrace/perf.js r1 r2 (16:30:58)
+game/test/driftrace/perf.js r1 r2 exit 0
+== game/test/ladder/save.js (16:50:42)
+game/test/ladder/save.js exit 0
+== game/test/loop/quota.js (16:51:05)
+game/test/loop/quota.js exit 0
+== game/test/ladder2/newplayer.js (16:51:06)
+game/test/ladder2/newplayer.js exit 1
+ALL DONE (19:56:45)

@@ -1,0 +1,20 @@
+Kestrow: career 1 First slide, 4 laps, starter; 75.2 s, 2662 points, 35.4 a second against 18.3: x1.934
+     reach.js to the letter (best solo 6089 in 92.61 s from the centre) races him: 92.09 s against 75.2, 3267 against 4497 (-27%), FAILS
+FAIL Kestrow headroom and pace, worst of 3 races 78.73/75.2 s +20%, 80.39/74.83 s +46%, 82.08/74.15 s +42%: the strong driver (starter, no upgrades) races him: 78.73 s against 75.2, 5070 against 4233 (+20%, bar +25%), walls 3, contacts 14, respawns 0, hands broken 0
+PASS Kestrow sanity (PLAYERS.AT (searched on First slide, where it passed)): wins of 20 grip 16, slide 1, mixed 1 (18 won, 42 lost of 60); parked 0 against 4585, loses
+Tolvo: career 5 Tight city, 3 laps, hatch; 83.48 s, 4849 points, 58.09 a second against 15.75: x3.687
+     reach.js to the letter (best solo 8771 in 90.23 s from the centre) races him: 94.31 s against 83.48, 1523 against 6379 (-76%), FAILS
+FAIL Tolvo headroom and pace, worst of 3 races 84.08/83.48 s -29%, 84/82.13 s -21%, 83.13/81.84 s -16%: the strong driver (starter, no upgrades) races him: 84.08 s against 83.48, 4577 against 6481 (-29%, bar +25%), walls 3, contacts 1, respawns 0, hands broken 0
+PASS Tolvo sanity (their own numbers): wins of 20 grip 0, slide 3, mixed 8 (11 won, 49 lost of 60); parked 0 against 6481, loses
+Varsk: career 9 Upper deck, 3 laps, fastback; 93.73 s, 6581 points, 70.21 a second against 16.08: x4.366
+     reach.js to the letter (best solo 12283 in 110.68 s from the centre) races him: 112.87 s against 93.73, 4785 against 8614 (-44%), FAILS
+FAIL Varsk headroom and pace, worst of 3 races 95.21/93.73 s -14%, 97.82/93.93 s -1%, 95.99/93.33 s -5%: the strong driver (starter, one step of each) races him: 95.21 s against 93.73, 7445 against 8614 (-14%, bar +25%), walls 1, contacts 0, respawns 0, hands broken 0
+FAIL Varsk sanity (their own numbers): wins of 20 grip 0, slide 0, mixed 0 (0 won, 60 lost of 60); parked 0 against 8614, loses
+
+rival     track                 laps car          s      points rate   3*rate  mult   step    strong s / his s     strong / his        sanity W/L  parked
+Kestrow   1 First slide         4   starter      75.2   2662   35.4   18.3    1.93   bottom  78.73 / 75.2         5070 / 4233 +20%    18/42       loses
+Tolvo     5 Tight city          3   hatch        83.48  4849   58.09  15.75   3.69   +90.6%  84.08 / 83.48        4577 / 6481 -29%    11/49       loses
+Varsk     9 Upper deck          3   fastback     93.73  6581   70.21  16.08   4.37   +18.4%  95.21 / 93.73        7445 / 8614 -14%    0/60        loses
+PASS the staircase (each at least +5% on the one before): Kestrow x1.93, Tolvo x3.69 (+90.6%), Varsk x4.37 (+18.4%)
+PASS known answer: two rivals swapped fails the staircase: Kestrow and Tolvo caught, Tolvo and Varsk caught
+4 failed

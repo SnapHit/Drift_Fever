@@ -1,0 +1,9 @@
+Tolvo: career 5 Tight city, 3 laps, hatch; 83.48 s, 4849 points, 58.09 a second against 15.75: x3.687
+FAIL Tolvo headroom and pace, worst of 3 races 84.08/83.48 s -29%, 84/82.13 s -21%, 83.13/81.84 s -16%: the strong driver (starter, no upgrades) races him: 84.08 s against 83.48, 4577 against 6481 (-29%, bar +25%), walls 3, contacts 1, respawns 0, hands broken 0
+
+rival     track                 laps car          s      points rate   3*rate  mult   step    strong s / his s     strong / his        sanity W/L  parked
+Kestrow   1 First slide         4   starter      75.2   2662   35.4   18.3    1.93   bottom  78.73 / 75.2         5070 / 4233 +20%    -
+Tolvo     5 Tight city          3   hatch        83.48  4849   58.09  15.75   3.69   +90.6%  84.08 / 83.48        4577 / 6481 -29%    -
+PASS the staircase (each at least +5% on the one before): Kestrow x1.93, Tolvo x3.69 (+90.6%)
+PASS known answer: two rivals swapped fails the staircase: Kestrow and Tolvo caught
+1 failed

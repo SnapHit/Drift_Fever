@@ -1,0 +1,5 @@
+Varsk 93.23 6433 x4.291
+  strong 97.55 vs 93.23 9449 vs 8466 12% FAIL {"drift":8713,"clean":374,"pace":362,"leads":0,"line":0,"close":0}
+  strong 98.61 vs 93.23 11180 vs 8612 30% FAIL {"drift":10414,"clean":408,"pace":358,"leads":0,"line":0,"close":0}
+  strong 97.47 vs 93.31 9030 vs 8123 11% FAIL {"drift":8260,"clean":408,"pace":362,"leads":0,"line":0,"close":0}
+strong drive local {"SLIDE_GAIN":0.653,"PROGRESS":82,"KEEP":595,"ANGLE_CAP":30.738,"EDGE_SAFE":2.545,"EDGE_COST":2878,"ENTRY":20.618,"VMAX":24.717,"CHAIN_KEEP":107,"CHAIN_MARGIN":0.129,"AY_MAX":6.613,"OUTSIDE":0.518,"SETUP":20.004,"WINDOW_PRE":17.96,"WINDOW_POST":8.085,"LINK":45.786,"HB_TIME":0.222,"HB_OVER":4.795,"HB_STEER":0.13}

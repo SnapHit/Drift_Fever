@@ -1,0 +1,20 @@
+Dovane: career 13 Over and under, 2 laps, tourer; 57.88 s, 1897 points, 32.77 a second against 14.96: x2.19
+     reach.js to the letter (best solo 4365 in 60.3 s from the centre) races him: 65.05 s against 57.88, 2200 against 3180 (-31%), FAILS
+FAIL Dovane headroom and pace, worst of 3 races 60.18/57.88 s +9%, 59.31/56.79 s +4%, 62.66/58.95 s +18%: the strong driver (starter, one step of each) races him: 60.18 s against 57.88, 3478 against 3180 (+9%, bar +25%), walls 8, contacts 8, respawns 0, hands broken 0
+PASS Dovane sanity (their own numbers): wins of 20 grip 0, slide 14, mixed 9 (23 won, 37 lost of 60); parked 0 against 3180, loses
+Halvik: career 17 Knot yard, 2 laps, driftbuild; 70.15 s, 1234 points, 17.59 a second against 14.93: x1.178
+     reach.js to the letter (best solo 7337 in 71.69 s from the centre) races him: 75.89 s against 70.15, 3021 against 2248 (34%), FAILS
+PASS Halvik headroom and pace, worst of 3 races 58.43/70.15 s +156%, 60.41/70.66 s +228%, 60.31/69.4 s +163%: the strong driver (starter, two steps of each) races him: 58.43 s against 70.15, 3159 against 1234 (+156%, bar +25%), walls 9, contacts 0, respawns 0, hands broken 0
+PASS Halvik sanity (their own numbers): wins of 20 grip 14, slide 12, mixed 20 (46 won, 14 lost of 60); parked 0 against 2496, loses
+Sarrow: career 21 Endless eight, 2 laps, fastback; 77.59 s, 3366 points, 43.38 a second against 14.05: x3.087
+     reach.js to the letter (best solo 5777 in 63.02 s from the centre) races him: 69.7 s against 77.59, 2583 against 3830 (-33%), FAILS
+PASS Sarrow headroom and pace, worst of 3 races 70.87/77.59 s +120%, 73.63/75.87 s +820%, 71.32/74.85 s +78%: the strong driver (starter, two steps of each) races him: 70.87 s against 77.59, 7407 against 3366 (+120%, bar +25%), walls 0, contacts 1, respawns 0, hands broken 0
+PASS Sarrow sanity (their own numbers): wins of 20 grip 13, slide 18, mixed 15 (46 won, 14 lost of 60); parked 0 against 4546, loses
+
+rival     track                 laps car          s      points rate   3*rate  mult   step    strong s / his s     strong / his        sanity W/L  parked
+Dovane    13 Over and under     2   tourer       57.88  1897   32.77  14.96   2.19   bottom  60.18 / 57.88        3478 / 3180 +9%     23/37       loses
+Halvik    17 Knot yard          2   driftbuild   70.15  1234   17.59  14.93   1.18   -46.2%  58.43 / 70.15        3159 / 1234 +156%   46/14       loses
+Sarrow    21 Endless eight      2   fastback     77.59  3366   43.38  14.05   3.09   +162.1% 70.87 / 77.59        7407 / 3366 +120%   46/14       loses
+FAIL the staircase (each at least +5% on the one before): Dovane x2.19, Halvik x1.18 (-46.2%, FAILS), Sarrow x3.09 (+162.1%)
+FAIL known answer: two rivals swapped fails the staircase: Dovane and Halvik MISSED, Halvik and Sarrow caught
+3 failed

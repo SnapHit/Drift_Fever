@@ -1,0 +1,8 @@
+PASS career 1, First slide: main's tape replays on this branch to main's score through the run structure (895 against 895) and to main's hash through the world (same)
+PASS career 1, First slide known answer: entry 1807 steered the other way replays to a different hash: CAUGHT (score 934)
+PASS career 23, The vice: main's tape replays on this branch to main's score through the run structure (1678 against 1678) and to main's hash through the world (same)
+PASS career 23, The vice known answer: entry 4043 steered the other way replays to a different hash: CAUGHT (score no finish)
+PASS the race against Kestrow recorded on main (2114 against 4497, 9424 steps) replays on this branch: totals 2114 and 4497, player hash same, his hash same
+PASS known answer: the race tape with entry 2173 steered the other way replays to a different player hash (CAUGHT) and leaves his (yes)
+PASS known answer: his corner entry speed 26.25 to 25.75 m/s gives a different rival hash: CAUGHT
+all passed

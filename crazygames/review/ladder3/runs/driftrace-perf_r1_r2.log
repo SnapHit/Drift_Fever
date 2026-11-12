@@ -1,0 +1,17 @@
+  low, race against r1: JS p95 13.5 ms (worst 51.9), physics p95 8.8 ms, draw calls 102, triangles 179171 (night; 270 frames driving, 270 with him within 40 m)
+  low, the same track solo (r1's): JS p95 5.9 ms (worst 92), physics p95 1.5 ms, draw calls 76, triangles 176109 (night; 270 frames driving, solo)
+  high, race against r1: JS p95 15.1 ms (worst 44.2), physics p95 10.5 ms, draw calls 104, triangles 455281 (night; 270 frames driving, 270 with him within 40 m)
+  high, the same track solo (r1's): JS p95 6.8 ms (worst 58.8), physics p95 1.6 ms, draw calls 78, triangles 452155 (night; 270 frames driving, solo)
+  low, race against r2: JS p95 10.5 ms (worst 159.4), physics p95 7.5 ms, draw calls 101, triangles 181027 (dusk; 270 frames driving, 270 with him within 40 m)
+  low, the same track solo (r2's): JS p95 5.9 ms (worst 43.1), physics p95 1.9 ms, draw calls 67, triangles 177583 (dusk; 270 frames driving, solo)
+  high, race against r2: JS p95 12.6 ms (worst 108), physics p95 7.9 ms, draw calls 104, triangles 460059 (dusk; 270 frames driving, 270 with him within 40 m)
+  high, the same track solo (r2's): JS p95 5.4 ms (worst 13.8), physics p95 1.7 ms, draw calls 69, triangles 456483 (dusk; 270 frames driving, solo)
+  low, race against r1, the mixed scripted player playing (a second look ahead): JS p95 12.9 ms (worst 77), physics p95 8.1 ms, draw calls 104, triangles 179375 (night; 270 frames driving, 270 with him within 40 m)
+PASS low tier, a race, JavaScript p95 at 6x under 16.7 ms: worst 13.5 ms (low, race against r1)
+  low, race against r1 against solo: JS p95 5.9 -> 13.5 ms, physics p95 1.5 -> 8.8, draw calls 76 -> 102, triangles 176109 -> 179171
+  high, race against r1 against solo: JS p95 6.8 -> 15.1 ms, physics p95 1.6 -> 10.5, draw calls 78 -> 104, triangles 452155 -> 455281
+  low, race against r2 against solo: JS p95 5.9 -> 10.5 ms, physics p95 1.9 -> 7.5, draw calls 67 -> 101, triangles 177583 -> 181027
+  high, race against r2 against solo: JS p95 5.4 -> 12.6 ms, physics p95 1.7 -> 7.9, draw calls 69 -> 104, triangles 456483 -> 460059
+  known answer: 20 ms of busy work per frame, low, race against r1: JS p95 30.5 ms (worst 51.3), physics p95 5.9 ms, draw calls 91, triangles 180809 (night; 270 frames driving, 0 with him within 40 m)
+PASS known answer: 20 ms of busy work per frame fails the budget: p95 30.5 ms: CAUGHT
+all passed
