@@ -547,3 +547,25 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   points a second against his track's three star rate and a pace the
   strong driver with a player's hands can beat, with the scripted
   players only as a sanity check.
+- 13 November 2026, the ladder's second attempt
+  (`briefs/RIVALS-LADDER-3.md`, `review/ladder3/REPORT.md`): **still
+  two rivals in the game, nothing a player sees changed.** Tolvo found
+  no plateau in three rounds (best 4 of 38 one per cent moves missing,
+  main's 9), so he is unchanged. The chain stopped at Varsk: his
+  closest driving (20 of 20 disturbed runs, 2 of 38 moves missing) is
+  in the roster behind `?rivals=all`; the strong driver finishes 1.5
+  to 4.5 s behind him and scores up to 14 per cent less. Two things
+  learnt, both about the bars and not the rivals. One: a zero-miss
+  plateau has never been passed by anyone, Kestrow included (13 of
+  38); the look-ahead driver picks another line when a number moves
+  one per cent, so the bar should allow a miss or two or the driver
+  needs changing. Two: "finish first AND outscore him by a quarter"
+  asks for opposite things, because sliding scores and costs time. The
+  strong driver outscores Kestrow by 20 to 46 per cent and is 3.5 to
+  7.9 s behind; the grip player gets home first and scores less.
+  Judge headroom on the total a player can reach (points plus what
+  getting home first is worth), not on both at once. Kept: the ruler
+  (`game/test/ladder3/ruler.js`: multiples of the three star rate
+  1.93, 3.69, 4.37, 2.19, 1.18, 3.09 up the ladder, so Dovane and
+  Halvik are below Kestrow as they stand), `drive.js`, `search.js`,
+  `candidate.js`. Do not start a third search round on the same bars.
