@@ -1,0 +1,3378 @@
+{
+ "steps": [],
+ "real": {
+  "first": {
+   "stars": 1,
+   "score": 895,
+   "offer": {
+    "id": "r1",
+    "name": "Kestrow",
+    "fresh": true
+   },
+   "button": "KESTROW race him, just earned",
+   "besideNext": true
+  },
+  "again": {
+   "id": "r1",
+   "name": "Kestrow",
+   "fresh": false
+  }
+ },
+ "live": {
+  "live": 2,
+  "bad": 0,
+  "steps": 19,
+  "log": [
+   {
+    "step": "empty save",
+    "button": {
+     "head": "RIVALS",
+     "line": "Win a star on First slide to race Kestrow",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "locked",
+      "races": false,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win 🔒 TO EARN HIM ○ Win a star on First slide"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on First slide",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "0/2 beaten · Kestrow is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "open",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win RACE earned, not yet raced"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": true,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Kestrow",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "0/2 beaten · Kestrow is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "open",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win RACE best -120"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": true,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Kestrow",
+    "button": {
+     "head": "RIVALS",
+     "line": "1/2 beaten",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ✓ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Tight city",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "1/2 beaten · Tolvo is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "open",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win RACE earned, not yet raced"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Tolvo",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "1/2 beaten · Tolvo is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "open",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win RACE best -120"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Tolvo",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Upper deck",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Varsk (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Varsk (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Over and under",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Dovane (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Dovane (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Knot yard",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Halvik (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Halvik (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Endless eight",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Sarrow (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Sarrow (not raceable, not saved)",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/2 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "off",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
+     },
+     {
+      "id": "r4",
+      "state": "off",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win SOON not in the game yet"
+     },
+     {
+      "id": "r5",
+      "state": "off",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win SOON not in the game yet"
+     },
+     {
+      "id": "r6",
+      "state": "off",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win SOON not in the game yet"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   }
+  ]
+ },
+ "knownAnswer": {
+  "held": {
+   "acted": false,
+   "state": "rcard locked",
+   "races": false,
+   "needs": [
+    "✓ Win a star on Over and under",
+    "○ Beat Varsk"
+   ]
+  },
+  "broken": {
+   "acted": true,
+   "races": true
+  }
+ },
+ "all": {
+  "bad": 0,
+  "steps": 19,
+  "log": [
+   {
+    "step": "empty save",
+    "button": {
+     "head": "RIVALS",
+     "line": "Win a star on First slide to race Kestrow",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "locked",
+      "races": false,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win 🔒 TO EARN HIM ○ Win a star on First slide"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "locked",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on First slide",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "0/6 beaten · Kestrow is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "open",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win RACE earned, not yet raced"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "locked",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": true,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Kestrow",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "0/6 beaten · Kestrow is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "open",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win RACE best -120"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "locked",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": true,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Kestrow",
+    "button": {
+     "head": "RIVALS",
+     "line": "1/6 beaten",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "locked",
+      "races": false,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ✓ Beat Kestrow"
+     },
+     {
+      "id": "r3",
+      "state": "locked",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Tight city",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "1/6 beaten · Tolvo is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "open",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win RACE earned, not yet raced"
+     },
+     {
+      "id": "r3",
+      "state": "locked",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Upper deck",
+       "Beat Tolvo"
+      ]
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Tolvo",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "1/6 beaten · Tolvo is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "open",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win RACE best -120"
+     },
+     {
+      "id": "r3",
+      "state": "locked",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Upper deck",
+       "Beat Tolvo"
+      ]
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Tolvo",
+    "button": {
+     "head": "RIVALS",
+     "line": "2/6 beaten",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "locked",
+      "races": false,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ✓ Beat Tolvo"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Upper deck",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Upper deck",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "2/6 beaten · Varsk is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "open",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win RACE earned, not yet raced"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Over and under",
+       "Beat Varsk"
+      ]
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Varsk",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "2/6 beaten · Varsk is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "open",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win RACE best -120"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ○ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Over and under",
+       "Beat Varsk"
+      ]
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Varsk",
+    "button": {
+     "head": "RIVALS",
+     "line": "3/6 beaten",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "locked",
+      "races": false,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under ✓ Beat Varsk"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Over and under",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": null
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Over and under",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "3/6 beaten · Dovane is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "open",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win RACE earned, not yet raced"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Knot yard",
+       "Beat Dovane"
+      ]
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Dovane",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "3/6 beaten · Dovane is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "open",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win RACE best -120"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ○ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Knot yard",
+       "Beat Dovane"
+      ]
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Dovane",
+    "button": {
+     "head": "RIVALS",
+     "line": "4/6 beaten",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "beaten",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win BEATEN best +153 race again"
+     },
+     {
+      "id": "r5",
+      "state": "locked",
+      "races": false,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard ✓ Beat Dovane"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Knot yard",
+       "Beat Dovane done"
+      ]
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": null
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Knot yard",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "4/6 beaten · Halvik is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "beaten",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win BEATEN best +153 race again"
+     },
+     {
+      "id": "r5",
+      "state": "open",
+      "races": true,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win RACE earned, not yet raced"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Knot yard done",
+       "Beat Dovane done"
+      ]
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Endless eight",
+       "Beat Halvik"
+      ]
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Halvik",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "4/6 beaten · Halvik is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "beaten",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win BEATEN best +153 race again"
+     },
+     {
+      "id": "r5",
+      "state": "open",
+      "races": true,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win RACE best -120"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ○ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Knot yard done",
+       "Beat Dovane done"
+      ]
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Endless eight",
+       "Beat Halvik"
+      ]
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Halvik",
+    "button": {
+     "head": "RIVALS",
+     "line": "5/6 beaten",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "beaten",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win BEATEN best +153 race again"
+     },
+     {
+      "id": "r5",
+      "state": "beaten",
+      "races": true,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win BEATEN best +154 race again"
+     },
+     {
+      "id": "r6",
+      "state": "locked",
+      "races": false,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight ✓ Beat Halvik"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Knot yard done",
+       "Beat Dovane done"
+      ]
+     },
+     "r6": {
+      "action": false,
+      "offer": false,
+      "next": false,
+      "nextNeeds": [
+       "Win a star on Endless eight",
+       "Beat Halvik done"
+      ]
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "a star on Endless eight",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "5/6 beaten · Sarrow is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "beaten",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win BEATEN best +153 race again"
+     },
+     {
+      "id": "r5",
+      "state": "beaten",
+      "races": true,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win BEATEN best +154 race again"
+     },
+     {
+      "id": "r6",
+      "state": "open",
+      "races": true,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win RACE earned, not yet raced"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Knot yard done",
+       "Beat Dovane done"
+      ]
+     },
+     "r6": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Endless eight done",
+       "Beat Halvik done"
+      ]
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "lost to Sarrow",
+    "button": {
+     "head": "RIVALSRACE",
+     "line": "5/6 beaten · Sarrow is waiting",
+     "mark": true
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "beaten",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win BEATEN best +153 race again"
+     },
+     {
+      "id": "r5",
+      "state": "beaten",
+      "races": true,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win BEATEN best +154 race again"
+     },
+     {
+      "id": "r6",
+      "state": "open",
+      "races": true,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win RACE best -120"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Knot yard done",
+       "Beat Dovane done"
+      ]
+     },
+     "r6": {
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Endless eight done",
+       "Beat Halvik done"
+      ]
+     }
+    },
+    "wrong": []
+   },
+   {
+    "step": "beat Sarrow",
+    "button": {
+     "head": "RIVALS",
+     "line": "6/6 beaten · every one",
+     "mark": false
+    },
+    "cards": [
+     {
+      "id": "r1",
+      "state": "beaten",
+      "races": true,
+      "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win BEATEN best +150 race again"
+     },
+     {
+      "id": "r2",
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+     },
+     {
+      "id": "r3",
+      "state": "beaten",
+      "races": true,
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
+     },
+     {
+      "id": "r4",
+      "state": "beaten",
+      "races": true,
+      "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win BEATEN best +153 race again"
+     },
+     {
+      "id": "r5",
+      "state": "beaten",
+      "races": true,
+      "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win BEATEN best +154 race again"
+     },
+     {
+      "id": "r6",
+      "state": "beaten",
+      "races": true,
+      "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win BEATEN best +155 race again"
+     }
+    ],
+    "routes": {
+     "r1": {
+      "action": true,
+      "offer": false,
+      "next": null
+     },
+     "r2": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
+     },
+     "r3": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Upper deck done",
+       "Beat Tolvo done"
+      ]
+     },
+     "r4": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Over and under done",
+       "Beat Varsk done"
+      ]
+     },
+     "r5": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Knot yard done",
+       "Beat Dovane done"
+      ]
+     },
+     "r6": {
+      "action": true,
+      "offer": false,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Endless eight done",
+       "Beat Halvik done"
+      ]
+     }
+    },
+    "wrong": []
+   }
+  ]
+ }
+}

@@ -298,6 +298,9 @@
   .results .margin { margin: -2px 0 0; font-size: 14px; font-weight: 800; opacity: 0.85; }
   @media (orientation: landscape) and (max-height: 500px) { .results .card.battle .who { font-size: 30px; } .results .duel .n { font-size: 20px; } .results .duel { gap: 3px; } }
   .results .rivalgo { border-color: var(--rival); background: rgba(255,106,60,0.22); }
+  .results .row2 button { min-width: 0; padding-left: 10px; padding-right: 10px; } .results .row2 button b { font-size: 15px; } .results .row2 button small { overflow-wrap: break-word; }
+  .results .unlock.nextr { font-size: 13px; font-weight: 700; display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 10px; }
+  .results .unlock.nextr span { color: #ffd34d; } .results .unlock.nextr span.done { color: var(--cyan); }
   /* the career's rival cards */
   .career .rivalcard { flex: none; display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; min-height: 52px; padding: 6px 12px; border-radius: 12px; border: 2px solid var(--rival); background: linear-gradient(90deg, rgba(255,106,60,0.22), rgba(10,14,30,0.6)); color: #fff; font: inherit; text-align: left; }
   .career .rivalcard.locked { border-color: rgba(255,255,255,0.14); background: rgba(10,14,30,0.45); opacity: 0.7; }
@@ -308,6 +311,54 @@
   .career .rivalcard .state { flex: 0 1 auto; display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-align: right; max-width: 48%; }
   .career .rivalcard .state small { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; opacity: 0.8; white-space: normal; }
   .career .rivalcard .state.go { color: var(--brand-fill); } .career .rivalcard .state.won { color: var(--cyan); }
+  /* the rivals (briefs/RIVALS-LADDER.md): the title's button with its mark, and the rivals screen, a card per rival edged in his paint */
+  /* six buttons on the title: on a portrait phone the career and the rivals, and free drift and the garage, share a row, so the title still fits 390x844 without scrolling */
+  @media (orientation: portrait) {
+    .title .menu { display: grid; grid-template-columns: 1fr 1fr; }
+    .title .menu button[data-action="daily"], .title .menu button[data-action="lab"] { grid-column: 1 / -1; }
+    .title .menu button.big small { white-space: normal; }
+  }
+  .title .rivalsbtn { position: relative; border-color: rgba(255,106,60,0.55); }
+  .title .rivalsbtn.ready { border-color: var(--rival); background: linear-gradient(90deg, rgba(255,106,60,0.28), rgba(10,14,30,0.6)); }
+  .title .rivalsbtn .mark { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 8px; background: var(--rival); color: #fff; font-style: normal; font-size: 11px; font-weight: 900; letter-spacing: 0.1em; vertical-align: 2px; animation: markPulse 1.4s ease-in-out infinite alternate; }
+  @keyframes markPulse { from { opacity: 1; } to { opacity: 0.55; } }
+  .screen.rivals { height: 100%; overflow: hidden; max-width: 620px; gap: 8px; }
+  .rivals .rule { margin: 0; font-size: 12px; opacity: 0.75; text-align: center; max-width: 520px; }
+  .rivals .list { flex: 1 1 auto; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; gap: 8px; padding-bottom: 4px; box-sizing: border-box; }
+  .rcard { flex: none; position: relative; display: grid; grid-template-columns: 124px 1fr auto; grid-template-areas: "pic who st"; align-items: center; gap: 4px 12px; width: 100%; box-sizing: border-box; min-height: 80px; padding: 8px 12px 8px 8px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.16); border-left: 7px solid var(--rp); background: linear-gradient(90deg, color-mix(in srgb, var(--rp) 24%, transparent), rgba(10,14,30,0.62) 55%); color: #fff; font: inherit; text-align: left; }
+  .rcard .rung { position: absolute; left: 4px; top: 3px; z-index: 1; min-width: 20px; height: 20px; border-radius: 10px; background: rgba(0,0,0,0.6); font-size: 12px; font-weight: 900; line-height: 20px; text-align: center; }
+  .rcard .pic { grid-area: pic; display: block; width: 124px; height: 62px; border-radius: 10px; object-fit: cover; background: #111628; }
+  .rcard .pic.sw { background: radial-gradient(ellipse 46% 30% at 50% 60%, var(--p) 0 60%, transparent 62%), #111628; }
+  .rcard .who { grid-area: who; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .rcard .who b { font-size: 17px; font-weight: 900; letter-spacing: 0.1em; color: var(--rp); text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+  .rcard .who small { font-size: 12px; opacity: 0.8; }
+  .rcard .who .style { font-style: italic; opacity: 0.95; }
+  .rcard .who .prize { color: #ffd34d; opacity: 0.9; }
+  .rcard .st { grid-area: st; display: flex; flex-direction: column; align-items: flex-end; text-align: right; gap: 1px; }
+  .rcard .st b { font-size: 15px; font-weight: 900; letter-spacing: 0.1em; }
+  .rcard .st small { font-size: 11px; opacity: 0.85; }
+  .rcard .st.go b { color: var(--brand-fill); } .rcard .st.won b { color: var(--cyan); }
+  .rcard .st.lockd b { font-size: 12px; opacity: 0.8; } .rcard .st.lockd small { color: #ffd34d; opacity: 1; } .rcard .st.lockd small.done { color: var(--cyan); opacity: 0.85; }
+  .rcard.open { border-color: var(--rival); border-left-color: var(--rp); }
+  .rcard.beaten { border-color: rgba(25,216,255,0.5); border-left-color: var(--rp); }
+  .rcard.locked .pic, .rcard.off .pic { filter: saturate(0.75) brightness(0.8); }
+  .rcard.off { opacity: 0.6; }
+  @media (max-width: 560px) {
+    .rcard { grid-template-columns: 104px 1fr; grid-template-areas: "pic who" "pic st"; padding: 8px 10px 8px 6px; gap: 4px 10px; }
+    .rcard .pic { width: 104px; height: 52px; }
+    .rcard .st { align-items: flex-start; text-align: left; flex-direction: row; flex-wrap: wrap; gap: 0 8px; align-items: baseline; }
+    .rcard .st.lockd { flex-direction: column; gap: 0; }
+  }
+  @media (orientation: landscape) and (max-height: 500px) {
+    .screen.rivals { max-width: 980px; }
+    .rivals .list { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: max-content; align-content: start; }
+    .rivals .rule { font-size: 11px; }
+    .rcard { grid-template-columns: 96px 1fr; grid-template-areas: "pic who" "pic st"; min-height: 72px; padding: 6px 10px 6px 6px; gap: 2px 10px; }
+    .rcard .pic { width: 96px; height: 48px; }
+    .rcard .st { align-items: flex-start; text-align: left; flex-direction: row; flex-wrap: wrap; gap: 0 8px; align-items: baseline; }
+    .rcard .st.lockd { flex-direction: column; gap: 0; }
+    .rcard .who b { font-size: 15px; } .rcard .who small { font-size: 11px; }
+  }
   .results .missions .done { color: #ffd34d; } .results .missions .fresh b { color: #ffd34d; margin-left: 4px; }
   .pips.m i { width: 10px; height: 10px; border-radius: 5px; } .pips.m i.on { background: #ffd34d; }
   .row .col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
@@ -322,7 +373,7 @@
     .menu { display: grid; grid-template-columns: 1fr 1fr 1fr; max-width: 640px; }
     .title .menu button.big { min-height: 50px; } .title .menu button.big b { font-size: 16px; }
     .title .menu button.big small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-    .opts { gap: 6px; flex-wrap: nowrap; } .opts .fsbtn { margin-top: 2px; min-height: 36px; padding: 4px 10px; font-size: 11px; gap: 5px; }
+    .opts { gap: 6px; flex-wrap: nowrap; } .opts .fsbtn { margin-top: 2px; min-height: 44px; padding: 4px 10px; font-size: 11px; gap: 5px; }
     .title .hint { display: none; }
     .results .card { margin-top: 1vh; padding: 10px 14px; gap: 6px; }
     .results .score .n { font-size: 44px; }

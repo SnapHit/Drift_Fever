@@ -1,0 +1,52 @@
+{
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 60 Hz synthetic clock",
+ "mainCommit": "2cdccde9fb66584dff5f42ecbb100112e11636c1",
+ "main": [
+  {
+   "name": "career 1, First slide",
+   "score": 895,
+   "replayedScore": 895,
+   "bareSame": true,
+   "knownAnswer": {
+    "entry": 1807,
+    "score": 934,
+    "caught": true
+   }
+  },
+  {
+   "name": "career 23, The vice",
+   "score": 1678,
+   "replayedScore": 1678,
+   "bareSame": true,
+   "knownAnswer": {
+    "entry": 4043,
+    "score": null,
+    "caught": true
+   }
+  }
+ ],
+ "battle": null,
+ "race": {
+  "recorded": {
+   "score": 2114,
+   "rival": 4497,
+   "steps": 9424
+  },
+  "replayed": {
+   "score": 2114,
+   "hash": "-1.0998080644583688,-8.184021027735227,0.09367610807427017,-3.3794046950432324,-28.157970697555797,-0.5541074307723645,-0.09062480697248479,3.3754865247271377,0,0,0,9.867681597865364,-4.801973777977229|9383,5,3",
+   "rival": 4497,
+   "rivalHash": "-1.3369512014889298,-8.12145995196981,0.10127703632114296,-3.9038700374478355,-29.009678204836902,-0.558557563211065,-0.09317010858562311,2.899659126496913,0,0,0,11.450253049335458,-4.717873106137545|9024,0,0|2662,9024"
+  },
+  "playerHashSame": true,
+  "rivalHashSame": true,
+  "knownAnswers": {
+   "input": {
+    "entry": 2173,
+    "caught": true,
+    "rivalUnchanged": true
+   },
+   "entry": true
+  }
+ }
+}

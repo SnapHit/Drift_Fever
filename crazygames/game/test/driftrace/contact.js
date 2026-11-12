@@ -33,7 +33,7 @@
    release was used), and the parked player is held or thrown off; with
    him not solid the overlap check fails.
 
-   node game/test/driftrace/contact.js [r1]   writes review/driftrace/contact.json */
+   node game/test/driftrace/contact.js [r1] [--out FILE]   writes review/driftrace/contact.json, or FILE */
 import path from 'node:path';
 import fs from 'node:fs';
 import { runRace, handsOk } from './race.js';
@@ -191,7 +191,9 @@ verdict(kaCaught, 'known answer: with the pin release off the following case fai
 const ghost = run('TAIL', { solid: false });
 out.knownAnswerSolid = ghost;
 verdict(ghost.maxOverlap > OVERLAP, 'known answer: with him not solid the tail run overlaps ' + ghost.maxOverlap + ' m: ' + (ghost.maxOverlap > OVERLAP ? 'CAUGHT' : 'MISSED'));
-fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(path.join(outDir, 'contact.json'), JSON.stringify(out, null, 1));
+/* --out FILE: the ladder round (briefs/RIVALS-LADDER.md) measures each later rival here and keeps his record in review/ladder/ */
+const outArg = process.argv.indexOf('--out'), outFile = outArg > 0 ? path.resolve(process.argv[outArg + 1]) : path.join(outDir, 'contact.json');
+fs.mkdirSync(path.dirname(outFile), { recursive: true });
+fs.writeFileSync(outFile, JSON.stringify(out, null, 1));
 console.log(failed ? failed + ' failed' : 'all passed');
 process.exit(failed ? 1 : 0);

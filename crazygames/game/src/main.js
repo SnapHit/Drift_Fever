@@ -49,7 +49,8 @@ import { FX_ON } from './fx.js';
 import { createDirector } from './camera/director.js';
 import { TANDEM } from './tune.js';
 import { createRival, gridStart } from './rivals/rival.js';
-import { RIVALS, rivalById, rivalOpen, openRivals, rivalPaint } from './rivals/roster.js';
+import { RIVALS, rivalById, rivalOpen, openRivals, rivalPaint, rivalIndex, rivalOnTrack, rivalState, rivalNeeds, rivalsLive } from './rivals/roster.js';
+import { createPortraits } from './ui/portraits.js';
 import { battleSpec, battleLaps } from './loop/modes.js';
 import { createTandem } from './scoring/tandem.js';
 import { createLead } from './scoring/lead.js';
@@ -214,7 +215,7 @@ function frame(t) {
   if (window.__feel.inject) Object.assign(raw, window.__feel.inject);   // the probes' input
   const world = app.world;
   const S = app.state;
-  const menu = S === 'title' || S === 'career' || S === 'garage' || S === 'lab';
+  const menu = S === 'title' || S === 'career' || S === 'rivals' || S === 'garage' || S === 'lab';
   if (raw.restart && !menu) { if (S === 'dev' || S === 'free') resetRun(); else if (S === 'drive' || S === 'countdown') startRun(app.spec, { onboard: onboard.active }); }
   let rec = quantise(raw);
   let steps = 0;
@@ -318,8 +319,19 @@ function showMenu(name) {
   hud.setVisible(false); hud.setCount('', false); input.touch.setVisible(false);
   if (name === 'title') screens.title(save.state, titleInfo());
   else if (name === 'career') screens.career(save.state);
+  else if (name === 'rivals') showRivals();
   else if (name === 'garage') screens.garage(save.state, app.picked);
   else if (name === 'lab') showLab();
+}
+
+/* THE RIVALS SCREEN (briefs/RIVALS-LADDER.md): each rival's portrait is
+   his car in his paint (the paint he races in against the player's car),
+   drawn by the game's renderer the first time the screen opens. */
+const portraits = createPortraits(THREE, scene.renderer, () => scene.render());
+function showRivals() {
+  const mine = save.state.cars[save.state.car] ? save.state.cars[save.state.car].paint : 'cyan';
+  if (running) portraits.make(RIVALS.map(d => ({ car: d.car, paint: rivalPaint(d, mine) })));
+  screens.rivals(save.state, { portrait: portraits.get });
 }
 
 /* ---- the Track Lab ---- */
@@ -511,7 +523,9 @@ function finishRun() {
     const wasOpen = n < CAREER.length && careerUnlocked(save.state, n), nextChapterWasOpen = c + 1 < CHAPTERS.length && chapterOpen(save.state, c + 1);
     const rivalsBefore = openRivals(save.state);
     improved = save.careerResult(spec.index, stars, score);
-    offer = openRivals(save.state).find(id => !rivalsBefore.includes(id)) || null;
+    /* the offer repeats (briefs/RIVALS-LADDER.md): a result on a rival's track offers his race whenever he is earned and not yet beaten */
+    const here = rivalOnTrack(spec.index), k = here ? rivalIndex(here.id) : -1;
+    if (here && rivalState(save.state, k) === 'open') offer = { id: here.id, name: here.name, fresh: !rivalsBefore.includes(here.id) };
     ({ unlock, note, nextIndex } = careerNews(spec.index, wasOpen, nextChapterWasOpen));
   }
   else if (spec.mode === 'daily') improved = save.dailyResult(spec.date, stars, score);
@@ -523,7 +537,7 @@ function finishRun() {
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
     ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
   }
-  app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer: offer ? { id: offer, name: rivalById(offer).name } : null, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
+  app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();
@@ -558,7 +572,7 @@ function finishBattle() {
     rivalParts: { drift: rs.drift, clean: rs.clean, pace: rs.pace, leads: L.rival.lead, line: L.rival.line, close: 0 },
     gates: L.gates, leadGates: L.player.gates, rivalGates: L.rival.gates, lineTo: L.owner[L.gates - 1] || null, changes: L.changes,
     coins, name: spec.name, label: runHead(spec).label, seconds: app.runTime, laps: app.laps, kind: app.track.kind, steps: tape.reduce((n, e) => n + e.n, 0), hash: app.world.hash(), rivalHash: R.hash(),
-    offer: opened ? { id: opened, name: rivalById(opened).name } : null, nextIndex: null, best2: (save.state.rivals[def.id] || {}).best };
+    offer: opened ? { id: opened, name: rivalById(opened).name } : null, next: nextRival(def), nextIndex: null, best2: (save.state.rivals[def.id] || {}).best };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (FX_ON && won) scene.fireworks(3);
   if (won) for (let i = 0; i < 3; i++) sound.ui('star', i + 1, 0.35 + i * 0.28);
@@ -566,6 +580,15 @@ function finishBattle() {
   hud.setCount('', false); hud.setVisible(false); hud.setMissions(null); input.touch.setVisible(false);
   screens.results(app.results);
   if (FX_ON) countCoins(0.45 + (won ? 3 : 0) * 0.28);
+}
+/* The rival after def on the ladder, for a race's results: his name, and
+   either that he is open (a button) or what still earns him; null after
+   the last rival in the game. */
+function nextRival(def) {
+  const k = rivalIndex(def.id) + 1;
+  if (k >= rivalsLive()) return k < RIVALS.length ? null : { last: true };
+  const d = RIVALS[k], st = rivalState(save.state, k);
+  return { id: d.id, name: d.name, open: st === 'open' || st === 'beaten', beaten: st === 'beaten', needs: rivalNeeds(save.state, k) };
 }
 /* the results' coins count up from nothing, starting with the coin sound */
 let coinTimer = 0;
@@ -604,6 +627,7 @@ function onAction(action, arg) {
     case 'sound': sound.setMuted(!sound.muted); soundButton(); showMenu('title'); break;
     case 'title': menuGround(); showMenu('title'); break;
     case 'career': showMenu('career'); break;
+    case 'rivals': menuGround(); showMenu('rivals'); break;
     case 'garage': app.picked = null; showMenu('garage'); break;
     case 'free': startFree(); break;
     case 'daily': startRun(dailySpec()); break;
@@ -742,6 +766,8 @@ window.__loop = {
   ghostHash: () => app.ghost ? app.ghost.hash() : null,
   ghostState: () => app.ghost ? { steps: app.ghost.state.steps, done: app.ghost.state.done, x: app.ghost.world.car.x, z: app.ghost.world.car.z, yaw: app.ghost.world.car.yaw } : null,
   skipCountdown() { if (app.state === 'countdown') { app.countdown = 0; } },
+  /* the probes: end the run now, as its line would (briefs/RIVALS-LADDER.md measure 4 reads the offers this way) */
+  finishNow() { if (app.state === 'drive' || app.state === 'countdown') finishRun(); return app.results; },
   missions: () => app.missions && { list: app.missions.missions, ...JSON.parse(JSON.stringify(app.missions.state)) },
   /* the probes: judge every mission the current track could carry, not only its three */
   judgeAll() { app.missions = createMissionJudge(allMissionsFor(app.track, app.laps), app.track, app.laps); app.missions.probe = true; app.heardMissions = 0; return app.missions.missions; },

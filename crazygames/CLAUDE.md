@@ -488,4 +488,36 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   steers at depths a gamepad can give and a phone cannot (a phone's
   steering is -1, 0 or +1). `spectacle/night.js` fails one low tier
   moment on Crossover since its new seed.
+- 13 November 2026, the rivals ladder (`briefs/RIVALS-LADDER.md`,
+  `review/ladder/REPORT.md`), after the author could not see when a
+  race was offered (once, then one card in the career list). Rivals
+  have their own screen behind a RIVALS button on the title: all six in
+  ladder order, each with his car in his paint drawn by the game's
+  renderer (`ui/portraits.js`), his style, track, laps and prize, and
+  one of four states: what earns him (ticked as done), RACE, BEATEN
+  with the best margin and still raceable, or SOON for one not in the
+  game. Earning is as it was, a star on his track and a win over the
+  rival before, now a strict chain (a win counts only over a rival who
+  was earned). The title's button shows how many are beaten and a RACE
+  mark when one is earned and unbeaten. A career result on a rival's
+  track offers his race every time he is earned and unbeaten; a race's
+  results name the next rival and offer him or say what earns him.
+  **Two rivals are in the game** (`TANDEM.LIVE` 2): Kestrow, and Tolvo
+  on Tight city in the hatch over three laps (83.5 s, 4,849 of his own;
+  in the starter the scripted grip player beats him 0 times in 20, the
+  slide player 3, the mixed player 8). Tolvo's corner entry speed was
+  set by hand and is on a knife edge (26.2 passes, 26.0 and 26.3 fail),
+  though 20 disturbed runs all pass. The ladder stops at Varsk, who
+  fails: on every Pro circuit the scripted slide player is 14 to 17 s
+  slower over three laps than the other two, so no rival pace gives all
+  three a race. That is a fault of the measuring players, not shown to
+  be one of the rival. Dovane, Halvik and Sarrow were measured and not
+  searched again; Halvik and Sarrow are far too easy (Sarrow scores
+  856). The four wait behind `?rivals=all`. The pin release is proved
+  (`game/test/ladder/pin.js`). The parked player's 1.2 s hold is the
+  game's own stuck recovery (`TUNE.ASSIST.RECOVER_AFTER`), not the
+  rival. No screen is reachable by gamepad. Next for the ladder:
+  scripted players that are a fair measure on Pro and Legend tracks,
+  then rivals three to six. Two rounds are proposed and not started:
+  garage, playground.
 

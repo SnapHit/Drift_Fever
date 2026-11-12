@@ -1,0 +1,41 @@
+game/test/ladder/run-all.sh all, on this branch with TANDEM.LIVE 2 and the final roster, 20:38 to 00:44 UTC, 12 to 13 November 2026.
+The per-probe logs of this run were deleted by mistake when the other rounds' rewritten review files were cleaned up afterwards; the exit codes below and the failing lines were copied from the run's summary before that. Each failure is explained in ../REPORT.md.
+
+game/test/ladder/earning.js exit 0
+game/test/ladder/layout.js exit 0
+game/test/ladder/rivals.js exit 1      (Varsk, Dovane, Halvik, Sarrow fail measures 2 and 3; the ladder does not climb past Varsk; Kestrow and Tolvo pass)
+game/test/ladder/determinism.js exit 0
+game/test/ladder/save.js exit 0
+game/test/ladder/pin.js exit 0
+game/test/driftrace/hands.js exit 0
+game/test/driftrace/racing.js exit 1   (as on main: the place changes in 17 of 20 mixed races; the mixed player wins 6 of 20; with no close bonus 5 of 20)
+game/test/driftrace/contact.js exit 1  (as on main: PARK held 1.2 s; the pin release known answers cannot be judged or are missed on Kestrow)
+game/test/driftrace/determinism.js exit 0
+game/test/driftrace/save.js exit 0
+game/test/driftrace/camera.js exit 0
+game/test/driftrace/layout.js exit 0
+game/test/driftrace/perf.js exit 0
+game/test/loop/quota.js exit 0
+game/test/feel/handling.js exit 0
+game/test/feel/corners.js exit 0
+game/test/feel/probes.js exit 0
+game/test/tracks/probes.js exit 0
+game/test/tracks/tracks2.js exit 1     (as on main: the busyness known answer MISSED for circuits and sprints)
+game/test/visuals/occlusion.js exit 0
+game/test/visuals/occlusion.js --career exit 0
+game/test/visuals/probes.js exit 0
+game/test/cars/measure.js exit 0
+game/test/cars/render.js exit 1        (as on main: lab/cars.html times out, it reads LOOK.SUN_DIR)
+game/test/retention/codes.js exit 0
+game/test/retention/heading.js exit 0
+game/test/chapters/probes.js exit 0
+game/test/stars/ghost.js exit 0
+game/test/spectacle/determinism.js exit 0
+game/test/spectacle/night.js exit 1    (as on main: 7 of 8 moments on the low tier, Crossover at 80 m)
+game/test/spectacle/smoke.js exit 0
+game/test/spectacle/adapt.js exit 0
+game/test/spectacle/layout.js exit 0
+game/test/spectacle/perf.js exit 0
+game/test/retention/probes.js exit 0
+game/test/loop/probes.js exit 0
+ALL DONE (00:44:12)
