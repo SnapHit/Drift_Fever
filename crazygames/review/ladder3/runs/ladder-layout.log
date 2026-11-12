@@ -1,0 +1,46 @@
+PASS 390x844 title, rivals none: no scroll, 10 buttons, no overlaps
+PASS 390x844 title, rivals waiting: no scroll, 10 buttons, no overlaps
+PASS 390x844 title, rivals beaten: no scroll, 10 buttons, no overlaps
+PASS 390x844 rivals screen, none (locked locked locked locked locked locked): 6 cards, the list scrolls, the header stays, no overlaps
+PASS 390x844 rivals screen, some (beaten open locked locked locked locked): 6 cards, the list scrolls, the header stays, no overlaps
+PASS 390x844 rivals screen, beaten (beaten beaten beaten beaten beaten beaten): 6 cards, the list fits, the header stays, no overlaps
+PASS 390x844 career result with the offer ("KESTROW race him" in GO AGAIN DRIFT / BRAKE, Enter or R | NEXT Harbour run | KESTROW race him | MENU): no scroll, no overlaps
+PASS 390x844 race results won-next ( :: REMATCH DRIFT / BRAKE, Enter or R | TOLVO next rival | RIVALS | MENU): no scroll, no overlaps
+PASS 390x844 race results won-toearn (Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 390x844 race results won-last (The whole ladder is yours :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 390x844 race results lost (Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS known answer: the rival cards pulled 30 px up meet: CAUGHT (5)
+PASS 844x390 title, rivals none: no scroll, 10 buttons, no overlaps
+PASS 844x390 title, rivals waiting: no scroll, 10 buttons, no overlaps
+PASS 844x390 title, rivals beaten: no scroll, 10 buttons, no overlaps
+PASS 844x390 rivals screen, none (locked locked locked locked locked locked): 6 cards, the list scrolls, the header stays, no overlaps
+PASS 844x390 rivals screen, some (beaten open locked locked locked locked): 6 cards, the list scrolls, the header stays, no overlaps
+PASS 844x390 rivals screen, beaten (beaten beaten beaten beaten beaten beaten): 6 cards, the list scrolls, the header stays, no overlaps
+PASS 844x390 career result with the offer ("KESTROW race him" in GO AGAIN DRIFT / BRAKE, Enter or R | NEXT Harbour run | KESTROW race him | MENU): no scroll, no overlaps
+PASS 844x390 race results won-next ( :: REMATCH DRIFT / BRAKE, Enter or R | TOLVO next rival | RIVALS | MENU): no scroll, no overlaps
+PASS 844x390 race results won-toearn (Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 844x390 race results won-last (The whole ladder is yours :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 844x390 race results lost (Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 800x450 title, rivals none: no scroll, 10 buttons, no overlaps
+PASS 800x450 title, rivals waiting: no scroll, 10 buttons, no overlaps
+PASS 800x450 title, rivals beaten: no scroll, 10 buttons, no overlaps
+PASS 800x450 rivals screen, none (locked locked locked locked locked locked): 6 cards, the list scrolls, the header stays, no overlaps
+PASS 800x450 rivals screen, some (beaten open locked locked locked locked): 6 cards, the list scrolls, the header stays, no overlaps
+PASS 800x450 rivals screen, beaten (beaten beaten beaten beaten beaten beaten): 6 cards, the list fits, the header stays, no overlaps
+PASS 800x450 career result with the offer ("KESTROW race him" in GO AGAIN DRIFT / BRAKE, Enter or R | NEXT Harbour run | KESTROW race him | MENU): no scroll, no overlaps
+PASS 800x450 race results won-next ( :: REMATCH DRIFT / BRAKE, Enter or R | TOLVO next rival | RIVALS | MENU): no scroll, no overlaps
+PASS 800x450 race results won-toearn (Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 800x450 race results won-last (The whole ladder is yours :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 800x450 race results lost (Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 1280x720 title, rivals none: no scroll, 10 buttons, no overlaps
+PASS 1280x720 title, rivals waiting: no scroll, 10 buttons, no overlaps
+PASS 1280x720 title, rivals beaten: no scroll, 10 buttons, no overlaps
+PASS 1280x720 rivals screen, none (locked locked locked locked locked locked): 6 cards, the list fits, the header stays, no overlaps
+PASS 1280x720 rivals screen, some (beaten open locked locked locked locked): 6 cards, the list fits, the header stays, no overlaps
+PASS 1280x720 rivals screen, beaten (beaten beaten beaten beaten beaten beaten): 6 cards, the list fits, the header stays, no overlaps
+PASS 1280x720 career result with the offer ("KESTROW race him" in GO AGAIN DRIFT / BRAKE, Enter or R | NEXT Harbour run | KESTROW race him | MENU): no scroll, no overlaps
+PASS 1280x720 race results won-next ( :: REMATCH DRIFT / BRAKE, Enter or R | TOLVO next rival | RIVALS | MENU): no scroll, no overlaps
+PASS 1280x720 race results won-toearn (Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 1280x720 race results won-last (The whole ladder is yours :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+PASS 1280x720 race results lost (Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo :: REMATCH DRIFT / BRAKE, Enter or R | RIVALS | MENU): no scroll, no overlaps
+all passed

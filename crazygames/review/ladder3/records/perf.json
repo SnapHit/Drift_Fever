@@ -1,0 +1,427 @@
+{
+ "budgetMs": 16.7,
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, 6x CPU throttle through CDP; the GPU is not measured here",
+ "runs": [
+  {
+   "label": "low, race against r1",
+   "tier": "low",
+   "rival": "r1",
+   "battle": true,
+   "into": 2,
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "near": 270,
+   "preset": "night",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 4.9,
+    "p95": 13.5,
+    "p99": 22.4,
+    "worst": 51.9,
+    "mean": 5.32
+   },
+   "physics": {
+    "n": 270,
+    "p50": 1.8,
+    "p95": 8.8,
+    "p99": 16.8,
+    "worst": 49.9,
+    "mean": 2.78
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 102,
+    "p95": 109,
+    "p99": 109,
+    "worst": 109,
+    "mean": 102.22
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 179171,
+    "p95": 181577,
+    "p99": 181649,
+    "worst": 181665,
+    "mean": 179187.48
+   },
+   "errors": []
+  },
+  {
+   "label": "low, the same track solo (r1's)",
+   "tier": "low",
+   "rival": "r1",
+   "battle": false,
+   "into": 8,
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "near": 0,
+   "preset": "night",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 5.9,
+    "p99": 13.4,
+    "worst": 92,
+    "mean": 2.32
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.5,
+    "p99": 5.5,
+    "worst": 49.1,
+    "mean": 0.61
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.99
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176109,
+    "p95": 177213,
+    "p99": 177313,
+    "worst": 177329,
+    "mean": 176059.67
+   },
+   "errors": []
+  },
+  {
+   "label": "high, race against r1",
+   "tier": "high",
+   "rival": "r1",
+   "battle": true,
+   "into": 2,
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "near": 270,
+   "preset": "night",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 5.9,
+    "p95": 15.1,
+    "p99": 27.8,
+    "worst": 44.2,
+    "mean": 6.45
+   },
+   "physics": {
+    "n": 270,
+    "p50": 2.2,
+    "p95": 10.5,
+    "p99": 22.4,
+    "worst": 36.8,
+    "mean": 3.34
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 104,
+    "p95": 113,
+    "p99": 113,
+    "worst": 113,
+    "mean": 104.89
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 455281,
+    "p95": 457895,
+    "p99": 458011,
+    "worst": 458043,
+    "mean": 455312.22
+   },
+   "errors": []
+  },
+  {
+   "label": "high, the same track solo (r1's)",
+   "tier": "high",
+   "rival": "r1",
+   "battle": false,
+   "into": 8,
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "near": 0,
+   "preset": "night",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.4,
+    "p95": 6.8,
+    "p99": 13.9,
+    "worst": 58.8,
+    "mean": 2.25
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.6,
+    "p99": 5.7,
+    "worst": 57.4,
+    "mean": 0.68
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 78,
+    "p95": 80,
+    "p99": 80,
+    "worst": 80,
+    "mean": 76.84
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 452155,
+    "p95": 453551,
+    "p99": 453675,
+    "worst": 453699,
+    "mean": 452159.73
+   },
+   "errors": []
+  },
+  {
+   "label": "low, race against r2",
+   "tier": "low",
+   "rival": "r2",
+   "battle": true,
+   "into": 2,
+   "index": 4,
+   "frames": 300,
+   "driving": 270,
+   "near": 270,
+   "preset": "dusk",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 4.6,
+    "p95": 10.5,
+    "p99": 25.3,
+    "worst": 159.4,
+    "mean": 5.29
+   },
+   "physics": {
+    "n": 270,
+    "p50": 2.1,
+    "p95": 7.5,
+    "p99": 10.4,
+    "worst": 155.9,
+    "mean": 3.09
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 101,
+    "p95": 106,
+    "p99": 106,
+    "worst": 106,
+    "mean": 100.21
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 181027,
+    "p95": 183245,
+    "p99": 183321,
+    "worst": 183345,
+    "mean": 181275.88
+   },
+   "errors": []
+  },
+  {
+   "label": "low, the same track solo (r2's)",
+   "tier": "low",
+   "rival": "r2",
+   "battle": false,
+   "into": 8,
+   "index": 4,
+   "frames": 300,
+   "driving": 270,
+   "near": 0,
+   "preset": "dusk",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 5.9,
+    "p99": 10.7,
+    "worst": 43.1,
+    "mean": 1.79
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.9,
+    "p99": 6.1,
+    "worst": 6.8,
+    "mean": 0.61
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 67,
+    "p95": 74,
+    "p99": 74,
+    "worst": 74,
+    "mean": 67.63
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 177583,
+    "p95": 178321,
+    "p99": 178357,
+    "worst": 178357,
+    "mean": 177682.44
+   },
+   "errors": []
+  },
+  {
+   "label": "high, race against r2",
+   "tier": "high",
+   "rival": "r2",
+   "battle": true,
+   "into": 2,
+   "index": 4,
+   "frames": 300,
+   "driving": 270,
+   "near": 270,
+   "preset": "dusk",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 5.6,
+    "p95": 12.6,
+    "p99": 22.4,
+    "worst": 108,
+    "mean": 5.87
+   },
+   "physics": {
+    "n": 270,
+    "p50": 2.3,
+    "p95": 7.9,
+    "p99": 14.1,
+    "worst": 106.1,
+    "mean": 3.24
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 104,
+    "p95": 109,
+    "p99": 109,
+    "worst": 109,
+    "mean": 102.46
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 460059,
+    "p95": 462421,
+    "p99": 462481,
+    "worst": 462493,
+    "mean": 460284.86
+   },
+   "errors": []
+  },
+  {
+   "label": "high, the same track solo (r2's)",
+   "tier": "high",
+   "rival": "r2",
+   "battle": false,
+   "into": 8,
+   "index": 4,
+   "frames": 300,
+   "driving": 270,
+   "near": 0,
+   "preset": "dusk",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 5.4,
+    "p99": 10.6,
+    "worst": 13.8,
+    "mean": 1.87
+   },
+   "physics": {
+    "n": 270,
+    "p50": 0.1,
+    "p95": 1.7,
+    "p99": 6.4,
+    "worst": 8.9,
+    "mean": 0.53
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 69,
+    "p95": 76,
+    "p99": 77,
+    "worst": 77,
+    "mean": 70.3
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 456483,
+    "p95": 457229,
+    "p99": 457269,
+    "worst": 457297,
+    "mean": 456587.83
+   },
+   "errors": []
+  },
+  {
+   "label": "low, race against r1, the mixed scripted player playing (a second look ahead)",
+   "tier": "low",
+   "rival": "r1",
+   "battle": true,
+   "driver": {
+    "player": "mixed"
+   },
+   "into": 2,
+   "index": 0,
+   "frames": 300,
+   "driving": 270,
+   "near": 270,
+   "preset": "night",
+   "theme": "docks",
+   "jsWithoutSubmit": {
+    "n": 270,
+    "p50": 4.4,
+    "p95": 12.9,
+    "p99": 20.7,
+    "worst": 77,
+    "mean": 5.18
+   },
+   "physics": {
+    "n": 270,
+    "p50": 1.8,
+    "p95": 8.1,
+    "p99": 16.3,
+    "worst": 74.1,
+    "mean": 3.02
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 104,
+    "p95": 106,
+    "p99": 106,
+    "worst": 107,
+    "mean": 101.41
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 179375,
+    "p95": 180775,
+    "p99": 180833,
+    "worst": 180841,
+    "mean": 179366.93
+   },
+   "errors": []
+  }
+ ],
+ "knownAnswer": {
+  "p95": 30.5,
+  "caught": true
+ }
+}

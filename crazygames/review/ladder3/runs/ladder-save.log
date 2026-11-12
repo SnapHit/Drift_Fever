@@ -1,0 +1,6 @@
+PASS the save from main (2cdccde9fb66, with a rivals entry {"r1":{"won":false,"best":-2383,"when":1794418977289}}) loads with 0 repairs, 0 values changed, 0 fields added; the entry as stored: {"r1":{"won":false,"best":-2383,"when":1794418977289}}
+PASS after a race (2114 against 4497, lost): rivals.r1 = {"won":false,"best":-2383,"when":1794502256024}, coins +211, fields changed: coins, rivals, no ghost kept for it: true
+PASS a rivals entry of the wrong shape loads repaired (3 fixes, rivals {}, 0 other values changed) and the game runs: a race drives (drive), the career shows 2 rival cards, 0 page errors
+PASS known answer: that save fails the rivals invariants raw (fails: CAUGHT) and passes them repaired (true)
+PASS game/test/loop/quota.js: 6 passed, 0 failed
+all passed

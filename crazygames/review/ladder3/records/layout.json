@@ -1,0 +1,753 @@
+{
+ "390x844 title none": {
+  "screen": "screen title",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "390x844 title waiting": {
+  "screen": "screen title",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "390x844 title beaten": {
+  "screen": "screen title",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "390x844 rivals none": {
+  "screen": "screen rivals",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": true,
+  "cards": 6,
+  "states": [
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "390x844 rivals some": {
+  "screen": "screen rivals",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": true,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "open",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "390x844 rivals beaten": {
+  "screen": "screen rivals",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": false,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten"
+  ]
+ },
+ "390x844 career result offer": {
+  "screen": "screen results",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "GO AGAIN DRIFT / BRAKE, Enter or R",
+   "NEXT Harbour run",
+   "KESTROW race him",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "390x844 race won-next": {
+  "screen": "screen results",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "TOLVO next rival",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "390x844 race won-toearn": {
+  "screen": "screen results",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow"
+  ]
+ },
+ "390x844 race won-last": {
+  "screen": "screen results",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "The whole ladder is yours"
+  ]
+ },
+ "390x844 race lost": {
+  "screen": "screen results",
+  "W": 390,
+  "H": 844,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo"
+  ]
+ },
+ "knownAnswer": [
+  "cards: r1/r2",
+  "cards: r2/r3",
+  "cards: r3/r4",
+  "cards: r4/r5",
+  "cards: r5/r6"
+ ],
+ "844x390 title none": {
+  "screen": "screen title",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "844x390 title waiting": {
+  "screen": "screen title",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "844x390 title beaten": {
+  "screen": "screen title",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "844x390 rivals none": {
+  "screen": "screen rivals",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": true,
+  "cards": 6,
+  "states": [
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "844x390 rivals some": {
+  "screen": "screen rivals",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": true,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "open",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "844x390 rivals beaten": {
+  "screen": "screen rivals",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": true,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten"
+  ]
+ },
+ "844x390 career result offer": {
+  "screen": "screen results",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "GO AGAIN DRIFT / BRAKE, Enter or R",
+   "NEXT Harbour run",
+   "KESTROW race him",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "844x390 race won-next": {
+  "screen": "screen results",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "TOLVO next rival",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "844x390 race won-toearn": {
+  "screen": "screen results",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow"
+  ]
+ },
+ "844x390 race won-last": {
+  "screen": "screen results",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "The whole ladder is yours"
+  ]
+ },
+ "844x390 race lost": {
+  "screen": "screen results",
+  "W": 844,
+  "H": 390,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo"
+  ]
+ },
+ "800x450 title none": {
+  "screen": "screen title",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "800x450 title waiting": {
+  "screen": "screen title",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "800x450 title beaten": {
+  "screen": "screen title",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "800x450 rivals none": {
+  "screen": "screen rivals",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": true,
+  "cards": 6,
+  "states": [
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "800x450 rivals some": {
+  "screen": "screen rivals",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": true,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "open",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "800x450 rivals beaten": {
+  "screen": "screen rivals",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": false,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten"
+  ]
+ },
+ "800x450 career result offer": {
+  "screen": "screen results",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "GO AGAIN DRIFT / BRAKE, Enter or R",
+   "NEXT Harbour run",
+   "KESTROW race him",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "800x450 race won-next": {
+  "screen": "screen results",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "TOLVO next rival",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "800x450 race won-toearn": {
+  "screen": "screen results",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow"
+  ]
+ },
+ "800x450 race won-last": {
+  "screen": "screen results",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "The whole ladder is yours"
+  ]
+ },
+ "800x450 race lost": {
+  "screen": "screen results",
+  "W": 800,
+  "H": 450,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo"
+  ]
+ },
+ "1280x720 title none": {
+  "screen": "screen title",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "1280x720 title waiting": {
+  "screen": "screen title",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "1280x720 title beaten": {
+  "screen": "screen title",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 10
+ },
+ "1280x720 rivals none": {
+  "screen": "screen rivals",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": false,
+  "cards": 6,
+  "states": [
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "1280x720 rivals some": {
+  "screen": "screen rivals",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": false,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "open",
+   "locked",
+   "locked",
+   "locked",
+   "locked"
+  ]
+ },
+ "1280x720 rivals beaten": {
+  "screen": "screen rivals",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 7,
+  "headerMoves": false,
+  "listScrolls": false,
+  "cards": 6,
+  "states": [
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten",
+   "beaten"
+  ]
+ },
+ "1280x720 career result offer": {
+  "screen": "screen results",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "GO AGAIN DRIFT / BRAKE, Enter or R",
+   "NEXT Harbour run",
+   "KESTROW race him",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "1280x720 race won-next": {
+  "screen": "screen results",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 4,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "TOLVO next rival",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": []
+ },
+ "1280x720 race won-toearn": {
+  "screen": "screen results",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Tolvo: ○ Win a star on Tight city ✓ Beat Kestrow"
+  ]
+ },
+ "1280x720 race won-last": {
+  "screen": "screen results",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "The whole ladder is yours"
+  ]
+ },
+ "1280x720 race lost": {
+  "screen": "screen results",
+  "W": 1280,
+  "H": 720,
+  "pageScrolls": false,
+  "clash": [],
+  "outside": [],
+  "small": [],
+  "buttons": 3,
+  "cardScrolls": false,
+  "buttonsText": [
+   "REMATCH DRIFT / BRAKE, Enter or R",
+   "RIVALS",
+   "MENU"
+  ],
+  "lines": [
+   "Next, Varsk: ○ Win a star on Upper deck ○ Beat Tolvo"
+  ]
+ }
+}

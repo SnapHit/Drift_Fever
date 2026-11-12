@@ -1,0 +1,45 @@
+ok   all six empty save: button "RIVALS / Win a star on First slide to race Kestrow"; cards locked locked locked locked locked locked
+ok   all six a star on First slide: button "RIVALS +mark / 0/6 beaten · Kestrow is waiting"; cards open locked locked locked locked locked
+ok   all six lost to Kestrow: button "RIVALS +mark / 0/6 beaten · Kestrow is waiting"; cards open locked locked locked locked locked
+ok   all six beat Kestrow: button "RIVALS / 1/6 beaten"; cards beaten locked locked locked locked locked
+ok   all six a star on Tight city: button "RIVALS +mark / 1/6 beaten · Tolvo is waiting"; cards beaten open locked locked locked locked
+ok   all six lost to Tolvo: button "RIVALS +mark / 1/6 beaten · Tolvo is waiting"; cards beaten open locked locked locked locked
+ok   all six beat Tolvo: button "RIVALS / 2/6 beaten"; cards beaten beaten locked locked locked locked
+ok   all six a star on Upper deck: button "RIVALS +mark / 2/6 beaten · Varsk is waiting"; cards beaten beaten open locked locked locked
+ok   all six lost to Varsk: button "RIVALS +mark / 2/6 beaten · Varsk is waiting"; cards beaten beaten open locked locked locked
+ok   all six beat Varsk: button "RIVALS / 3/6 beaten"; cards beaten beaten beaten locked locked locked
+ok   all six a star on Over and under: button "RIVALS +mark / 3/6 beaten · Dovane is waiting"; cards beaten beaten beaten open locked locked
+ok   all six lost to Dovane: button "RIVALS +mark / 3/6 beaten · Dovane is waiting"; cards beaten beaten beaten open locked locked
+ok   all six beat Dovane: button "RIVALS / 4/6 beaten"; cards beaten beaten beaten beaten locked locked
+ok   all six a star on Knot yard: button "RIVALS +mark / 4/6 beaten · Halvik is waiting"; cards beaten beaten beaten beaten open locked
+ok   all six lost to Halvik: button "RIVALS +mark / 4/6 beaten · Halvik is waiting"; cards beaten beaten beaten beaten open locked
+ok   all six beat Halvik: button "RIVALS / 5/6 beaten"; cards beaten beaten beaten beaten beaten locked
+ok   all six a star on Endless eight: button "RIVALS +mark / 5/6 beaten · Sarrow is waiting"; cards beaten beaten beaten beaten beaten open
+ok   all six lost to Sarrow: button "RIVALS +mark / 5/6 beaten · Sarrow is waiting"; cards beaten beaten beaten beaten beaten open
+ok   all six beat Sarrow: button "RIVALS / 6/6 beaten · every one"; cards beaten beaten beaten beaten beaten beaten
+PASS earning all six in order from an empty save (?rivals=all): 19 of 19 steps right: the title's button, every card's state and words, and every route into a race open exactly for an earned rival, after losses and wins
+ok   as shipped empty save: button "RIVALS / Win a star on First slide to race Kestrow"; cards locked locked off off off off
+ok   as shipped a star on First slide: button "RIVALS +mark / 0/2 beaten · Kestrow is waiting"; cards open locked off off off off
+ok   as shipped lost to Kestrow: button "RIVALS +mark / 0/2 beaten · Kestrow is waiting"; cards open locked off off off off
+ok   as shipped beat Kestrow: button "RIVALS / 1/2 beaten"; cards beaten locked off off off off
+ok   as shipped a star on Tight city: button "RIVALS +mark / 1/2 beaten · Tolvo is waiting"; cards beaten open off off off off
+ok   as shipped lost to Tolvo: button "RIVALS +mark / 1/2 beaten · Tolvo is waiting"; cards beaten open off off off off
+ok   as shipped beat Tolvo: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped a star on Upper deck: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped lost to Varsk: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped beat Varsk: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped a star on Over and under: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped lost to Dovane: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped beat Dovane: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped a star on Knot yard: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped lost to Halvik: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped beat Halvik: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped a star on Endless eight: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped lost to Sarrow: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+ok   as shipped beat Sarrow: button "RIVALS / 2/2 beaten · every one"; cards beaten beaten off off off off
+PASS as shipped (TANDEM.LIVE 2): 19 of 19 steps right; a rival past it shows as not in the game yet and is never raceable by any route
+PASS a real career 1 run from an empty save (895, 1 star): the results offer Kestrow as "KESTROW race him, just earned" beside NEXT
+PASS the next career 1 result offers him again, no longer "just earned"
+PASS known answer: a save with a win over the third and none over the second does not open the fourth: held (✓ Win a star on Over and under, ○ Beat Varsk)
+PASS known answer: the same check with the second beaten as well finds the fourth open, so it can fail: CAUGHT
+all passed

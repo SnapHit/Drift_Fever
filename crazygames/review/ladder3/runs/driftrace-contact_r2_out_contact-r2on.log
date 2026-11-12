@@ -1,0 +1,34 @@
+PASS TAIL: only the player's hands
+PASS TAIL: the boxes overlap at most 0 m outside a pin release (bar 0.3); 7 contacts, 3 hard, closest centres 2.913 m, 0 steps let through by the pin release
+PASS TAIL: 0 hard contacts with a chain open, 0 kept it
+PASS TAIL: not thrown off the track: 0 respawns in the 2 s after a contact; at most 0.00 m past the edge line then
+PASS TAIL: held under 1 m/s while asking to drive for at most 0.067 s
+PASS TAIL: no number NaN
+PASS TAIL: his hash with the player there is his hash with no player: same
+PASS SWIPE: only the player's hands
+PASS SWIPE: the boxes overlap at most 0 m outside a pin release (bar 0.3); 14 contacts, 1 hard, closest centres 1.93 m, 0 steps let through by the pin release
+PASS SWIPE: 0 hard contacts with a chain open, 0 kept it
+PASS SWIPE: not thrown off the track: 0 respawns in the 2 s after a contact; at most 2.72 m past the edge line then
+PASS SWIPE: held under 1 m/s while asking to drive for at most 0.067 s
+PASS SWIPE: no number NaN
+PASS SWIPE: his hash with the player there is his hash with no player: same
+PASS PARK: only the player's hands
+PASS PARK: the boxes overlap at most 0 m outside a pin release (bar 0.3); 2 contacts, 1 hard, closest centres 4.226 m, 0 steps let through by the pin release
+PASS PARK: 0 hard contacts with a chain open, 0 kept it
+PASS PARK: not thrown off the track: 0 respawns in the 2 s after a contact; at most 0.00 m past the edge line then
+FAIL PARK: held under 1 m/s while asking to drive for at most 1.158 s
+PASS PARK: no number NaN
+PASS PARK: his hash with the player there is his hash with no player: same
+PASS FOLLOW: only the player's hands
+PASS FOLLOW: the boxes overlap at most 0 m outside a pin release (bar 0.3); 5 contacts, 0 hard, closest centres 2.231 m, 0 steps let through by the pin release
+PASS FOLLOW: 0 hard contacts with a chain open, 0 kept it
+PASS FOLLOW: not thrown off the track: 0 respawns in the 2 s after a contact; at most 0.00 m past the edge line then
+PASS FOLLOW: held under 1 m/s while asking to drive for at most 0.058 s
+PASS FOLLOW: no number NaN
+PASS FOLLOW: his hash with the player there is his hash with no player: same
+FAIL across the four, 0 hard contacts came with a chain open (each lost it), so the rule is tested
+FAIL FOLLOW: behind him from 0 m, 83.3 s behind in all; after a lap behind it gets past him: NO
+FAIL known answer: with the pin release off the parked player is held 1.158 s, respawned 0 times after the contact: CANNOT BE JUDGED (the case itself fails)
+FAIL known answer: with the pin release off the following case fails: CANNOT BE JUDGED (the case itself fails); with it off the follower does not get past, held at most 0.058 s; pin release steps with it on: 0 in FOLLOW, 0 in all four
+PASS known answer: with him not solid the tail run overlaps 2.063 m: CAUGHT
+5 failed

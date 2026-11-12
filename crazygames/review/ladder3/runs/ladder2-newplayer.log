@@ -1,0 +1,39 @@
+
+> drift-fever-crazygames@0.1.0 build
+> node parity/run.js --check && node tools/build-site.js
+
+parity: stamp holds. PASS: 196 roads and 1086 drives (4757947 frames) over 28 days x 6 levels x 6 tapes, plus endless, routes, records across 6 reloads, the real frame and the shipped page (28 jobs, 26100 frames drawn), identical on both sides; 469 finishes, 168 next levels, 1920 off road, 240 hits, 6 ran out, 386 continues, 1558 taps; K1 ok, K2 ok, K3 ok, K4 ok, K5 ok, K6 ok, K7 ok, K8 ok, K9 ok; 2263s
+dist/ assembled: 97 files, 23.85 MB in all
+new game: 78 files, initial download 2.44 MB including three.js
+greybox initial download: 2.05 MB (2145289 bytes) over 7 files: index.html 21974, chrome.css 27676, game.js 11210, chrome.js 415981, world.js 64242, vendor/three.webgpu.min.js 1005970, sim/drift-fever-sim.js 598236
+music: 9.68 MB over 4 tracks, loaded after the first playable frame
+== phone: the rehearsal
+   rehearse step first-visit at frame 2 (16:51:12)
+   rehearse onboarding frame 0: drive, 0 points (16:51:28)
+   rehearse onboarding frame 600: drive, 202 points (16:53:57)
+   rehearse onboarding frame 1200: drive, 250 points (16:55:58)
+   rehearse onboarding frame 1800: drive, 675 points (16:58:04)
+   rehearse onboarding frame 2400: drive, 723 points (17:00:03)
+   rehearse onboarding frame 3000: drive, 1096 points (17:02:06)
+   rehearse onboarding frame 3600: drive, 1144 points (17:04:05)
+   rehearse step onboarding-results at frame 3969 (17:04:24)
+   rehearse step title at frame 3971 (17:04:41)
+   rehearse step career at frame 3973 (17:04:43)
+   rehearse step track1-start at frame 3975 (17:04:45)
+   rehearse track1 frame 0: drive, 0 points (17:05:23)
+   rehearse track1 frame 600: drive, 202 points (17:07:24)
+   rehearse track1 frame 1200: drive, 250 points (17:09:24)
+   rehearse track1 frame 1800: drive, 675 points (17:11:37)
+   rehearse track1 frame 2400: drive, 723 points (17:13:43)
+   rehearse track1 frame 3000: drive, 1096 points (17:15:57)
+   rehearse track1 frame 3600: drive, 1144 points (17:18:05)
+   rehearse step track1-results at frame 7944 (17:18:25)
+   rehearse step race-start at frame 7946 (17:18:42)
+   rehearse race frame 0: drive, 0 points (17:18:53)
+   rehearse race frame 600: drive, 0 points (17:21:22)
+   rehearse race frame 1200: drive, 27 points (17:23:34)
+   rehearse race frame 1800: drive, 33 points (17:25:42)
+   rehearse race frame 2400: drive, 33 points (17:27:50)
+   rehearse race frame 3000: drive, 69 points (17:30:02)
+   rehearse race frame 3600: drive, 93 points (17:32:16)
+   rehearse race frame 4200: drive, 506 points (17:34:41)
