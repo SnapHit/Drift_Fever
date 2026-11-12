@@ -33,7 +33,8 @@ export const LAUNCH = 3;   // s after GO before the place counts
 
 /* opts: { blind (a scripted player that does not see him), car, up, rivalOpts, playerOpts (driving numbers for a scripted player), offset [dx, dz] on the player's start,
    solid (false: the rival not solid), noRival (the rival drives but is not in the player's world),
-   maxSeconds, onStep, trace } */
+   maxSeconds, onStep, trace,
+   at (true: the scripted player uses the numbers searched for this track and car, rivals/players.js PLAYERS.AT; the ladder2 round) } */
 export function runRace(def, who, opts) {
   const o = opts || {};
   const track = trackFor(careerSpec(def.track)), laps = battleLaps(track, def);
@@ -47,7 +48,7 @@ export function runRace(def, who, opts) {
   const ctx = {};
   if (typeof who === 'function') drive = w => who(w, rival, ctx);
   else if (who === 'still') drive = () => ({ steer: 0, throttle: 0, brake: 0, handbrake: 0 });
-  else { const p = createPlayer(track, who, o.playerOpts, o.blind ? null : () => (rival.solid() ? rival.world.car : null)); drive = w => p.input(w); }
+  else { const p = createPlayer(track, who, o.playerOpts, o.blind ? null : () => (rival.solid() ? rival.world.car : null), o.at ? { index: def.track, car: o.car || 'starter', up: o.up } : null); drive = w => p.input(w); }
   let dist = track.start.along || 0, along = world.along, t = 0, handsBroken = 0;
   const L = track.length, limit = Math.round((o.maxSeconds || 300) / STEP);
   let finished = false, i = 0, respawns = 0, minV = Infinity;

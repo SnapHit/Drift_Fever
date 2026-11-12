@@ -1,0 +1,857 @@
+{
+ "bar": {
+  "respawns": 0,
+  "spread": 0.1,
+  "slideCorner": 0.3,
+  "mixedCorner": 0.3,
+  "gripDrift": 0.1
+ },
+ "places": {
+  "0:starter:000:4": {
+   "where": {
+    "index": 0,
+    "laps": 4,
+    "car": "starter",
+    "up": null,
+    "upLevel": 0,
+    "side": 1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      73.83,
+      74.07
+     ],
+     "total": [
+      759,
+      817
+     ],
+     "drift": [
+      0,
+      57
+     ],
+     "hard": 0,
+     "walls": 0,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 0,
+     "gripShare": 0.06976744186046512,
+     "handsBroken": 0,
+     "minKmh": 85.3,
+     "character": true
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      73.73,
+      76.16
+     ],
+     "total": [
+      2801,
+      3858
+     ],
+     "drift": [
+      2073,
+      3105
+     ],
+     "hard": 1,
+     "walls": 2,
+     "withHard": 4,
+     "worstCorner": 0.377,
+     "worstTight": 0.558,
+     "angle": 22,
+     "gripShare": 0.8048211508553654,
+     "handsBroken": 0,
+     "minKmh": 46.2,
+     "character": true
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      76.74,
+      79.75
+     ],
+     "total": [
+      2225,
+      3798
+     ],
+     "drift": [
+      1508,
+      3162
+     ],
+     "hard": 1,
+     "walls": 8,
+     "withHard": 2,
+     "worstCorner": 0,
+     "worstTight": 0.477,
+     "angle": 29,
+     "gripShare": 0.8325434439178515,
+     "handsBroken": 0,
+     "minKmh": 49.2,
+     "character": true
+    }
+   },
+   "spread": 0.0816,
+   "spreadSeconds": 6.02,
+   "finishes": true,
+   "spreadOk": true,
+   "characterOk": true,
+   "pass": true,
+   "measured": "2026-11-12"
+  },
+  "8:starter:111:3": {
+   "where": {
+    "index": 8,
+    "laps": 3,
+    "car": "starter",
+    "up": {
+     "power": 1,
+     "grip": 1,
+     "steer": 1
+    },
+    "upLevel": 1,
+    "side": 1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      89.07,
+      89.46
+     ],
+     "total": [
+      715,
+      719
+     ],
+     "drift": [
+      14,
+      17
+     ],
+     "hard": 0,
+     "walls": 5,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 13.4,
+     "gripShare": 0.02364394993045897,
+     "handsBroken": 0,
+     "minKmh": 85.9,
+     "character": true
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      92.14,
+      94.1
+     ],
+     "total": [
+      6135,
+      7033
+     ],
+     "drift": [
+      5347,
+      6248
+     ],
+     "hard": 0,
+     "walls": 0,
+     "withHard": 0,
+     "worstCorner": 0.103,
+     "worstTight": 0.502,
+     "angle": 23.7,
+     "gripShare": 0.8883833357031139,
+     "handsBroken": 0,
+     "minKmh": 83.5,
+     "character": false
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      91.64,
+      93.46
+     ],
+     "total": [
+      2273,
+      2562
+     ],
+     "drift": [
+      1486,
+      1803
+     ],
+     "hard": 0,
+     "walls": 2,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0.425,
+     "angle": 26.6,
+     "gripShare": 0.7108097327483047,
+     "handsBroken": 0,
+     "minKmh": 82.2,
+     "character": true
+    }
+   },
+   "spread": 0.0565,
+   "spreadSeconds": 5.03,
+   "finishes": true,
+   "spreadOk": true,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  },
+  "4:starter:000:3": {
+   "where": {
+    "index": 4,
+    "laps": 3,
+    "car": "starter",
+    "up": null,
+    "upLevel": 0,
+    "side": -1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      84.62,
+      88.09
+     ],
+     "total": [
+      434,
+      984
+     ],
+     "drift": [
+      5,
+      520
+     ],
+     "hard": 7,
+     "walls": 13,
+     "withHard": 12,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 16.7,
+     "gripShare": 0.5284552845528455,
+     "handsBroken": 0,
+     "minKmh": 31.2,
+     "character": false
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      75.55,
+      80.63
+     ],
+     "total": [
+      7060,
+      8029
+     ],
+     "drift": [
+      6453,
+      7394
+     ],
+     "hard": 2,
+     "walls": 3,
+     "withHard": 16,
+     "worstCorner": 0.123,
+     "worstTight": 0.307,
+     "angle": 31.3,
+     "gripShare": 0.9261496225120109,
+     "handsBroken": 0,
+     "minKmh": 20.2,
+     "character": false
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      80.33,
+      83.33
+     ],
+     "total": [
+      5193,
+      9336
+     ],
+     "drift": [
+      4665,
+      8717
+     ],
+     "hard": 2,
+     "walls": 16,
+     "withHard": 5,
+     "worstCorner": 0,
+     "worstTight": 0.186,
+     "angle": 32.4,
+     "gripShare": 0.9336975149957155,
+     "handsBroken": 0,
+     "minKmh": 41.3,
+     "character": false
+    }
+   },
+   "spread": 0.166,
+   "spreadSeconds": 12.54,
+   "finishes": true,
+   "spreadOk": false,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  },
+  "12:starter:111:3": {
+   "where": {
+    "index": 12,
+    "laps": 3,
+    "car": "starter",
+    "up": {
+     "power": 1,
+     "grip": 1,
+     "steer": 1
+    },
+    "upLevel": 1,
+    "side": -1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      96.92,
+      97.06
+     ],
+     "total": [
+      714,
+      746
+     ],
+     "drift": [
+      0,
+      2
+     ],
+     "hard": 0,
+     "walls": 2,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 0,
+     "gripShare": 0.002797202797202797,
+     "handsBroken": 0,
+     "minKmh": 73.2,
+     "character": true
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      88.94,
+      89.68
+     ],
+     "total": [
+      4033,
+      4560
+     ],
+     "drift": [
+      3290,
+      3784
+     ],
+     "hard": 1,
+     "walls": 2,
+     "withHard": 2,
+     "worstCorner": 0.567,
+     "worstTight": 0.567,
+     "angle": 25.7,
+     "gripShare": 0.8298245614035088,
+     "handsBroken": 0,
+     "minKmh": 62.6,
+     "character": true
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      84.03,
+      90.14
+     ],
+     "total": [
+      2341,
+      3900
+     ],
+     "drift": [
+      1734,
+      3119
+     ],
+     "hard": 5,
+     "walls": 9,
+     "withHard": 13,
+     "worstCorner": 0.078,
+     "worstTight": 0.078,
+     "angle": 26.9,
+     "gripShare": 0.7997435897435897,
+     "handsBroken": 0,
+     "minKmh": 26.4,
+     "character": false
+    }
+   },
+   "spread": 0.1551,
+   "spreadSeconds": 13.03,
+   "finishes": true,
+   "spreadOk": false,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  },
+  "16:starter:222:3": {
+   "where": {
+    "index": 16,
+    "laps": 3,
+    "car": "starter",
+    "up": {
+     "power": 2,
+     "grip": 2,
+     "steer": 2
+    },
+    "upLevel": 2,
+    "side": 1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      100.39,
+      101.2
+     ],
+     "total": [
+      746,
+      1408
+     ],
+     "drift": [
+      36,
+      699
+     ],
+     "hard": 0,
+     "walls": 4,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 20.6,
+     "gripShare": 0.49644886363636365,
+     "handsBroken": 0,
+     "minKmh": 71,
+     "character": false
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      107.94,
+      108.81
+     ],
+     "total": [
+      4816,
+      8131
+     ],
+     "drift": [
+      4129,
+      7444
+     ],
+     "hard": 0,
+     "walls": 2,
+     "withHard": 0,
+     "worstCorner": 0.064,
+     "worstTight": 0.064,
+     "angle": 20.7,
+     "gripShare": 0.9155085475341287,
+     "handsBroken": 0,
+     "minKmh": 66.2,
+     "character": false
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      102.56,
+      107.96
+     ],
+     "total": [
+      2681,
+      8339
+     ],
+     "drift": [
+      2121,
+      7636
+     ],
+     "hard": 6,
+     "walls": 6,
+     "withHard": 11,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 22,
+     "gripShare": 0.9156973258184434,
+     "handsBroken": 0,
+     "minKmh": 33,
+     "character": false
+    }
+   },
+   "spread": 0.0839,
+   "spreadSeconds": 8.42,
+   "finishes": true,
+   "spreadOk": true,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  },
+  "20:starter:222:3": {
+   "where": {
+    "index": 20,
+    "laps": 3,
+    "car": "starter",
+    "up": {
+     "power": 2,
+     "grip": 2,
+     "steer": 2
+    },
+    "upLevel": 2,
+    "side": -1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      98.1,
+      98.83
+     ],
+     "total": [
+      668,
+      992
+     ],
+     "drift": [
+      0,
+      324
+     ],
+     "hard": 0,
+     "walls": 0,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 12,
+     "gripShare": 0.32661290322580644,
+     "handsBroken": 0,
+     "minKmh": 58.4,
+     "character": false
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      106.42,
+      107.19
+     ],
+     "total": [
+      5487,
+      9471
+     ],
+     "drift": [
+      4844,
+      8826
+     ],
+     "hard": 0,
+     "walls": 0,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 24.8,
+     "gripShare": 0.9318973709217612,
+     "handsBroken": 0,
+     "minKmh": 62.1,
+     "character": false
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      102.83,
+      104.97
+     ],
+     "total": [
+      8001,
+      10424
+     ],
+     "drift": [
+      7412,
+      9773
+     ],
+     "hard": 2,
+     "walls": 13,
+     "withHard": 3,
+     "worstCorner": 0,
+     "worstTight": 0.127,
+     "angle": 24.5,
+     "gripShare": 0.9375479662317728,
+     "handsBroken": 0,
+     "minKmh": 39.3,
+     "character": false
+    }
+   },
+   "spread": 0.0927,
+   "spreadSeconds": 9.09,
+   "finishes": true,
+   "spreadOk": true,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  }
+ },
+ "own": {
+  "8:starter:111:3": {
+   "where": {
+    "index": 8,
+    "laps": 3,
+    "car": "starter",
+    "up": {
+     "power": 1,
+     "grip": 1,
+     "steer": 1
+    },
+    "upLevel": 1,
+    "side": 1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      89.51,
+      89.67
+     ],
+     "total": [
+      714,
+      717
+     ],
+     "drift": [
+      14,
+      17
+     ],
+     "hard": 0,
+     "walls": 6,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 13.4,
+     "gripShare": 0.023709902370990237,
+     "handsBroken": 0,
+     "minKmh": 85.2,
+     "character": true
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      105.48,
+      108
+     ],
+     "total": [
+      2991,
+      4838
+     ],
+     "drift": [
+      2392,
+      4134
+     ],
+     "hard": 3,
+     "walls": 8,
+     "withHard": 12,
+     "worstCorner": 0,
+     "worstTight": 0.044,
+     "angle": 19.5,
+     "gripShare": 0.8628509719222462,
+     "handsBroken": 0,
+     "minKmh": 36.7,
+     "character": false
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      89.26,
+      90.71
+     ],
+     "total": [
+      3012,
+      4890
+     ],
+     "drift": [
+      2415,
+      4225
+     ],
+     "hard": 5,
+     "walls": 13,
+     "withHard": 21,
+     "worstCorner": 0,
+     "worstTight": 0.35,
+     "angle": 31.5,
+     "gripShare": 0.8640081799591002,
+     "handsBroken": 0,
+     "minKmh": 62.1,
+     "character": true
+    }
+   },
+   "spread": 0.2099,
+   "spreadSeconds": 18.74,
+   "finishes": true,
+   "spreadOk": false,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  },
+  "0:starter:000:4": {
+   "where": {
+    "index": 0,
+    "laps": 4,
+    "car": "starter",
+    "up": null,
+    "upLevel": 0,
+    "side": 1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      74.87,
+      74.99
+     ],
+     "total": [
+      754,
+      762
+     ],
+     "drift": [
+      0,
+      7
+     ],
+     "hard": 0,
+     "walls": 0,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 0,
+     "gripShare": 0.009186351706036745,
+     "handsBroken": 0,
+     "minKmh": 85,
+     "character": true
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      87.16,
+      89.22
+     ],
+     "total": [
+      4232,
+      6550
+     ],
+     "drift": [
+      3540,
+      5853
+     ],
+     "hard": 2,
+     "walls": 2,
+     "withHard": 3,
+     "worstCorner": 0.132,
+     "worstTight": 0.132,
+     "angle": 18.7,
+     "gripShare": 0.8935877862595419,
+     "handsBroken": 0,
+     "minKmh": 35.9,
+     "character": false
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      74.93,
+      76.77
+     ],
+     "total": [
+      2592,
+      3566
+     ],
+     "drift": [
+      1844,
+      2815
+     ],
+     "hard": 0,
+     "walls": 0,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0.513,
+     "angle": 28.8,
+     "gripShare": 0.7893998878295009,
+     "handsBroken": 0,
+     "minKmh": 82.1,
+     "character": true
+    }
+   },
+   "spread": 0.1917,
+   "spreadSeconds": 14.35,
+   "finishes": true,
+   "spreadOk": false,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  }
+ }
+}

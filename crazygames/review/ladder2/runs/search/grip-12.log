@@ -1,0 +1,10 @@
+searching the grip player on career 13 Over and under, 3 laps, starter {"power":1,"grip":1,"steer":1}
+start -19221 {"seconds":95.22,"total":1029,"drift":376,"walls":3,"hard":3,"respawns":0,"worstCorner":0,"worstTight":0,"angle":18}
+16 -10336 {"seconds":93.33,"total":878,"drift":217,"walls":6,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":18.3} {"EDGE_SAFE":1.2,"ENTRY":20.13,"VMAX":32.64,"AY_MAX":7.61,"OUTSIDE":0.12,"SETUP":59.29,"HB_OVER":2.62,"HB_STEER":0.22}
+22 -8019 {"seconds":92.05,"total":1077,"drift":312,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":15.3} {"EDGE_SAFE":1.36,"ENTRY":17.76,"VMAX":31.4,"AY_MAX":6.82,"OUTSIDE":0.28,"SETUP":44.4,"HB_OVER":4.95,"HB_STEER":0.47}
+35 -7985 {"seconds":92.02,"total":1073,"drift":308,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":15.3} {"EDGE_SAFE":1.36,"ENTRY":17.76,"VMAX":31.4,"AY_MAX":6.82,"OUTSIDE":0.28,"SETUP":44.4,"HB_OVER":4.95,"HB_STEER":0.48}
+50 -7953 {"seconds":92.68,"total":1061,"drift":299,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":15.3} {"EDGE_SAFE":1.36,"ENTRY":17.28,"VMAX":31.4,"AY_MAX":6.82,"OUTSIDE":0.291,"SETUP":44.4,"HB_OVER":4.95,"HB_STEER":0.48}
+61 -7928 {"seconds":92.66,"total":1058,"drift":296,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":15.2} {"EDGE_SAFE":1.36,"ENTRY":17.28,"VMAX":30.21,"AY_MAX":7.12,"OUTSIDE":0.291,"SETUP":44.4,"HB_OVER":4.95,"HB_STEER":0.5}
+80 -7915 {"seconds":92.72,"total":1056,"drift":294,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":15.2} {"EDGE_SAFE":1.51,"ENTRY":17.09,"VMAX":30.21,"AY_MAX":7.38,"OUTSIDE":0.291,"SETUP":44.4,"HB_OVER":5.05,"HB_STEER":0.5}
+best -7915 {"seconds":92.72,"total":1056,"drift":294,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":15.2}
+drive: {"EDGE_SAFE":1.51,"ENTRY":17.09,"VMAX":30.21,"AY_MAX":7.38,"OUTSIDE":0.291,"SETUP":44.4,"HB_OVER":5.05,"HB_STEER":0.5}

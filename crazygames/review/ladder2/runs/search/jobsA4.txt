@@ -1,0 +1,11 @@
+slide-8c game/test/ladder2/players.js search slide --track 8 --laps 3 --up 1 --side 1 --n 150 --seed 5 --from-log review/ladder2/runs/search/slide-8b.log --local --offs 6 --pace 95.5
+mixed-8c game/test/ladder2/players.js search mixed --track 8 --laps 3 --up 1 --side 1 --n 150 --seed 5 --from-log review/ladder2/runs/search/mixed-8.log --local --offs 6
+grip-4d game/test/ladder2/players.js search grip --track 4 --laps 3 --side -1 --n 200 --seed 5 --from-log review/ladder2/runs/search/grip-4b.log --local --offs 4 --range ENTRY=12,29 --range AY_MAX=4,9
+slide-4b game/test/ladder2/players.js search slide --track 4 --laps 3 --side -1 --n 250 --seed 5 --from-log review/ladder2/runs/search/slide-4a.log --local --offs 4 --pace 86.5
+mixed-4e game/test/ladder2/players.js search mixed --track 4 --laps 3 --side -1 --n 120 --seed 5 --from-log review/ladder2/runs/search/mixed-4d.log --local --offs 6
+grip-12c game/test/ladder2/players.js search grip --track 12 --laps 3 --up 1 --side -1 --n 250 --seed 5 --from-log review/ladder2/runs/search/grip-12b.log --local --offs 4 --range ENTRY=12,29 --range AY_MAX=4,9
+mixed-12c game/test/ladder2/players.js search mixed --track 12 --laps 3 --up 1 --side -1 --n 200 --seed 5 --from-log review/ladder2/runs/search/mixed-12b.log --local --offs 4
+grip-16d game/test/ladder2/players.js search grip --track 16 --laps 3 --up 2 --side 1 --n 200 --seed 5 --from-log review/ladder2/runs/search/grip-16b.log --local --offs 4 --range ENTRY=12,29 --range AY_MAX=4,9
+mixed-16c game/test/ladder2/players.js search mixed --track 16 --laps 3 --up 2 --side 1 --n 200 --seed 5 --from-log review/ladder2/runs/search/mixed-16.log --local --offs 4
+grip-20c game/test/ladder2/players.js search grip --track 20 --laps 3 --up 2 --side -1 --n 300 --seed 5 --range ENTRY=12,29 --range AY_MAX=4,9
+mixed-20c game/test/ladder2/players.js search mixed --track 20 --laps 3 --up 2 --side -1 --n 150 --seed 5 --from-log review/ladder2/runs/search/mixed-20.log --local --offs 4

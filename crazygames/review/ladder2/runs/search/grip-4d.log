@@ -1,0 +1,9 @@
+searching the grip player on career 5 Tight city, 3 laps, starter null
+start -31825 {"seconds":88.09,"total":434,"drift":5,"walls":11,"hard":7,"respawns":0,"worstCorner":0,"worstTight":0,"angle":24.1}
+2 -28635 {"seconds":85.65,"total":874,"drift":437,"walls":16,"hard":4,"respawns":0,"worstCorner":0,"worstTight":0,"angle":26} {"EDGE_SAFE":2.47,"ENTRY":12.98,"VMAX":26.02,"AY_MAX":4.17,"OUTSIDE":0.309,"SETUP":44.9,"HB_OVER":2.85,"HB_STEER":0.1}
+7 -20594 {"seconds":84.5,"total":750,"drift":253,"walls":9,"hard":3,"respawns":0,"worstCorner":0,"worstTight":0,"angle":26.7} {"EDGE_SAFE":2.47,"ENTRY":12.98,"VMAX":26.02,"AY_MAX":4.17,"OUTSIDE":0.309,"SETUP":49.9,"HB_OVER":2.85,"HB_STEER":0.11}
+39 -17270 {"seconds":87.03,"total":439,"drift":6,"walls":12,"hard":2,"respawns":0,"worstCorner":0,"worstTight":0,"angle":23.9} {"EDGE_SAFE":2.71,"ENTRY":12.11,"VMAX":26.02,"AY_MAX":4.17,"OUTSIDE":0.309,"SETUP":55.74,"HB_OVER":2.85,"HB_STEER":0.11}
+43 -15804 {"seconds":87.07,"total":555,"drift":10,"walls":3,"hard":3,"respawns":0,"worstCorner":0,"worstTight":0,"angle":22.9} {"EDGE_SAFE":2.71,"ENTRY":12.59,"VMAX":26.02,"AY_MAX":4.17,"OUTSIDE":0.309,"SETUP":48.23,"HB_OVER":2.85,"HB_STEER":0.11}
+135 -14406 {"seconds":84.63,"total":565,"drift":41,"walls":6,"hard":2,"respawns":0,"worstCorner":0,"worstTight":0,"angle":17.3} {"EDGE_SAFE":2.71,"ENTRY":14.21,"VMAX":26.02,"AY_MAX":4.17,"OUTSIDE":0.309,"SETUP":48.23,"HB_OVER":2.85,"HB_STEER":0.11}
+best -14406 {"seconds":84.63,"total":565,"drift":41,"walls":6,"hard":2,"respawns":0,"worstCorner":0,"worstTight":0,"angle":17.3}
+drive: {"EDGE_SAFE":2.71,"ENTRY":14.21,"VMAX":26.02,"AY_MAX":4.17,"OUTSIDE":0.309,"SETUP":48.23,"HB_OVER":2.85,"HB_STEER":0.11}

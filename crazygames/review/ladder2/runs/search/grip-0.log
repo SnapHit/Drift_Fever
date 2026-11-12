@@ -1,0 +1,11 @@
+searching the grip player on career 1 First slide, 4 laps, starter null
+start -4523 {"seconds":74.99,"total":757,"drift":3,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":13.1}
+34 -4491 {"seconds":74.71,"total":757,"drift":1,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":12.1} {"EDGE_SAFE":1.6,"ENTRY":18.43,"VMAX":31.59,"AY_MAX":8.26,"OUTSIDE":0.463,"SETUP":72.23,"HB_OVER":5.45,"HB_STEER":0.35}
+35 -4486 {"seconds":74.63,"total":757,"drift":1,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":12.1} {"EDGE_SAFE":1.6,"ENTRY":18.43,"VMAX":31.59,"AY_MAX":8.26,"OUTSIDE":0.463,"SETUP":72.23,"HB_OVER":5.45,"HB_STEER":0.36}
+36 -4476 {"seconds":74.46,"total":758,"drift":1,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":12.1} {"EDGE_SAFE":1.5,"ENTRY":18.43,"VMAX":32.38,"AY_MAX":8.26,"OUTSIDE":0.463,"SETUP":72.23,"HB_OVER":5.45,"HB_STEER":0.36}
+58 -4468 {"seconds":74.07,"total":762,"drift":3,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":12.2} {"EDGE_SAFE":1.5,"ENTRY":18.43,"VMAX":32.38,"AY_MAX":7.83,"OUTSIDE":0.468,"SETUP":72.52,"HB_OVER":5.92,"HB_STEER":0.36}
+60 -4453 {"seconds":74.09,"total":760,"drift":1,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":12.1} {"EDGE_SAFE":1.5,"ENTRY":18.43,"VMAX":32.38,"AY_MAX":7.83,"OUTSIDE":0.468,"SETUP":72.52,"HB_OVER":5.92,"HB_STEER":0.31}
+83 -4447 {"seconds":74.11,"total":759,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":12} {"EDGE_SAFE":1.5,"ENTRY":18.43,"VMAX":32.38,"AY_MAX":7.83,"OUTSIDE":0.482,"SETUP":77.45,"HB_OVER":5.92,"HB_STEER":0.31}
+94 -4442 {"seconds":74.04,"total":759,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":0} {"EDGE_SAFE":1.5,"ENTRY":18.43,"VMAX":32.38,"AY_MAX":7.62,"OUTSIDE":0.482,"SETUP":77.45,"HB_OVER":5.92,"HB_STEER":0.32}
+best -4442 {"seconds":74.04,"total":759,"drift":0,"walls":0,"hard":0,"respawns":0,"worstCorner":0,"worstTight":0,"angle":0}
+drive: {"EDGE_SAFE":1.5,"ENTRY":18.43,"VMAX":32.38,"AY_MAX":7.62,"OUTSIDE":0.482,"SETUP":77.45,"HB_OVER":5.92,"HB_STEER":0.32}
