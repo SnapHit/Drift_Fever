@@ -102,7 +102,9 @@ async function walk(query, live, label) {
       if (c.state !== e.state) wrong.push(info[k].name + ' card ' + c.state + ', want ' + e.state);
       if (!c.focusable) wrong.push(info[k].name + ' card not reachable by the keyboard');
       if (!!c.action !== e.earned) wrong.push(info[k].name + ' card races: ' + !!c.action);
-      if (e.state === 'locked' && JSON.stringify(c.needs) !== JSON.stringify(e.needs)) wrong.push(info[k].name + ' needs ' + JSON.stringify(c.needs) + ', want ' + JSON.stringify(e.needs));
+      /* since 13 November 2026 a need whose track the career has not opened says where it is; the model here does not know the career's locks, so the note is set aside */
+      const bare = n => (n || []).map(x => ({ ...x, text: x.text.replace(/ \([A-Za-z]+ track \d+, not open yet\)$/, '') }));
+      if (e.state === 'locked' && JSON.stringify(bare(c.needs)) !== JSON.stringify(e.needs)) wrong.push(info[k].name + ' needs ' + JSON.stringify(c.needs) + ', want ' + JSON.stringify(e.needs));
       if (k < live && (!cc || cc.enabled !== e.earned)) wrong.push(info[k].name + ' career card ' + (cc ? (cc.enabled ? 'races' : 'locked') : 'missing'));
       if (k >= live && cc) wrong.push(info[k].name + ' has a career card but is not in the game');
       if (r.action !== e.earned) wrong.push(info[k].name + ' by the action: ' + r.action);

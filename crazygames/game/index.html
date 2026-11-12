@@ -76,17 +76,17 @@
   #readout { position: absolute; right: max(12px, env(safe-area-inset-right)); top: max(10px, env(safe-area-inset-top)); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 14px; opacity: 0.85; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
   #readout .u { font-size: 10px; opacity: 0.6; margin: 0 8px 0 3px; text-transform: uppercase; }
   #toBeat { display: block; font-size: 12px; opacity: 0.7; font-weight: 700; letter-spacing: 0.05em; margin-top: 4px; }
-  #runinfo { position: absolute; left: max(12px, env(safe-area-inset-left)); top: calc(max(10px, env(safe-area-inset-top)) + 44px); font-variant-numeric: tabular-nums; font-weight: 800; font-size: 15px; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+  #runinfo { position: absolute; left: max(12px, env(safe-area-inset-left)); top: calc(max(10px, env(safe-area-inset-top)) + 52px); font-variant-numeric: tabular-nums; font-weight: 800; font-size: 15px; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
   #runinfo span { display: block; }
   #runinfo #clock { font-size: 13px; opacity: 0.75; font-weight: 700; }
-  #fs { position: absolute; left: calc(max(12px, env(safe-area-inset-left)) + 46px); top: max(10px, env(safe-area-inset-top)); width: 36px; height: 36px; border-radius: 18px; border: 0; background: rgba(255,255,255,0.14); color: #fff; padding: 0; pointer-events: auto; display: flex; align-items: center; justify-content: center; }
+  #fs { position: absolute; left: calc(max(12px, env(safe-area-inset-left)) + 52px); top: max(10px, env(safe-area-inset-top)); width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,0.14); color: #fff; padding: 0; pointer-events: auto; display: flex; align-items: center; justify-content: center; }
   #fs[hidden], #snd[hidden] { display: none; }
-  #snd { position: absolute; left: calc(max(12px, env(safe-area-inset-left)) + 92px); top: max(10px, env(safe-area-inset-top)); width: 36px; height: 36px; border-radius: 18px; border: 0; background: rgba(255,255,255,0.14); color: #fff; padding: 0; pointer-events: auto; display: flex; align-items: center; justify-content: center; }
+  #snd { position: absolute; left: calc(max(12px, env(safe-area-inset-left)) + 104px); top: max(10px, env(safe-area-inset-top)); width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,0.14); color: #fff; padding: 0; pointer-events: auto; display: flex; align-items: center; justify-content: center; }
   .opts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .fsbtn { align-self: center; display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 10px 18px; min-height: 44px; border-radius: 22px; border: 2px solid rgba(255,255,255,0.22); background: rgba(10,14,30,0.55); color: #fff; font: inherit; font-weight: 800; font-size: 13px; letter-spacing: 0.08em; }
-  #exit { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); width: 36px; height: 36px; border-radius: 18px; border: 0; background: rgba(255,255,255,0.14); color: #fff; font-size: 16px; line-height: 36px; padding: 0; pointer-events: auto; }
+  #exit { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,0.14); color: #fff; font-size: 18px; line-height: 44px; padding: 0; pointer-events: auto; }
   /* the battle (briefs/RIVALS.md): his total under the player's, the closeness meter under the player's car, his tag, the arrow when he is out of view */
-  #vs { position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 58px); left: 50%; transform: translateX(-50%); display: flex; gap: 7px; align-items: baseline; padding: 3px 12px; border-radius: 12px; background: rgba(10,14,30,0.6); font-weight: 800; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+  #vs { position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 62px); left: 50%; transform: translateX(-50%); display: flex; gap: 7px; align-items: baseline; padding: 3px 12px; border-radius: 12px; background: rgba(10,14,30,0.6); font-weight: 800; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
   #vs[hidden], #meter[hidden], #tag[hidden], #arrow[hidden], #prompt1[hidden] { display: none; }
   #vs .vsl { font-size: 10px; letter-spacing: 0.2em; opacity: 0.7; }
   #vsName { color: var(--rival); font-size: 13px; letter-spacing: 0.08em; }
@@ -97,6 +97,7 @@
   #place { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; font-weight: 900; }
   #placeN { font-size: 20px; letter-spacing: 0.06em; line-height: 1; }
   #gapT { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  #place { flex-wrap: wrap; justify-content: center; } #lineT { flex-basis: 100%; text-align: center; font-size: 10px; letter-spacing: 0.12em; font-weight: 800; color: var(--cyan); opacity: 0.9; } #lineT:empty { display: none; }
   #place.first #placeN, #place.first #gapT { color: var(--cyan); } #place.second #placeN, #place.second #gapT { color: var(--rival); } #place.grid #placeN { color: #c8cbd6; font-size: 14px; letter-spacing: 0.16em; }
   #close { display: grid; grid-template-columns: repeat(5, 15px); gap: 3px; justify-content: center; }
   #close[hidden] { display: none; }
@@ -117,6 +118,7 @@
   #missions.battle { white-space: normal; max-width: min(34vw, 440px); }
   #missions.battle strong { text-align: center; }
   @media (orientation: landscape) and (max-height: 500px) { #missions.battle { top: calc(max(10px, env(safe-area-inset-top)) + 92px); } }
+  @media (orientation: portrait) { #vs { top: calc(max(10px, env(safe-area-inset-top)) + 98px); } #hud.battle #missions.battle, #hud.battle #prompt1 { top: calc(max(10px, env(safe-area-inset-top)) + 134px); } }   /* the pill on its own row under the lap, so a long points gap never meets it */
   @media (orientation: portrait) { #missions.battle { max-width: 88vw; width: max-content; box-sizing: border-box; } }
   #prompt1.in { animation: promptIn 0.3s ease-out; }
   .callout.tandem { color: #5dff9a; }
@@ -166,7 +168,7 @@
   #onboard kbd.round { border-radius: 17px; }
   #onboard .info { position: absolute; left: 50%; top: 33%; transform: translateX(-50%); width: min(86vw, 460px); padding: 10px 16px; border-radius: 14px; background: rgba(10,14,30,0.78); border: 2px solid var(--edge); color: #fff; text-align: center; font-size: clamp(13px, 2vw, 16px); line-height: 1.35; box-shadow: 0 4px 18px rgba(0,0,0,0.45); animation: promptIn 0.3s ease-out; --tx: -50%; }
   #onboard .info b { color: var(--edge); }
-  #skip { position: absolute; right: max(12px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 80px); min-width: 72px; height: 40px; padding: 0 16px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.4); background: rgba(10,14,30,0.6); color: #fff; font: inherit; font-weight: 800; font-size: 13px; letter-spacing: 0.1em; pointer-events: auto; }
+  #skip { position: absolute; right: max(12px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 80px); min-width: 72px; height: 44px; padding: 0 16px; border-radius: 22px; border: 2px solid rgba(255,255,255,0.4); background: rgba(10,14,30,0.6); color: #fff; font: inherit; font-weight: 800; font-size: 13px; letter-spacing: 0.1em; pointer-events: auto; }
   #skip[hidden] { display: none; }
 
   /* the screens */
@@ -184,7 +186,7 @@
   .screen .hint { font-size: 12px; opacity: 0.6; text-align: center; max-width: 360px; margin: auto 0 0; }
   .screen h2 { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: 0.08em; }
   .screen header { display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding-right: 112px; }   /* room for the coin badge at the top right, five digits included, at every width */
-  .screen .back { width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,0.14); color: #fff; font-size: 16px; }
+  .screen .back { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,0.14); color: #fff; font-size: 16px; }
   .coins { position: absolute; top: max(14px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; background: rgba(0,0,0,0.35); padding: 6px 12px; border-radius: 16px; }
   .coin { color: #ffd34d; font-size: 0.85em; }
   .menu { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 420px; }

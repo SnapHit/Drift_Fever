@@ -1,0 +1,347 @@
+{
+ "390x844": {
+  "cards": [
+   {
+    "cls": "rcard locked",
+    "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win 🔒 TO EARN HIM ○ Win a star on First slide"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city (Rookie track 5, not open yet) ○ Beat Kestrow"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck (Pro track 1, not open yet) ○ Beat Tolvo"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under (Pro track 5, not open yet) ○ Beat Varsk"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard (Legend track 1, not open yet) ○ Beat Dovane"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight (Legend track 5, not open yet) ○ Beat Halvik"
+   }
+  ],
+  "grid": {
+   "n": "",
+   "lead": "MOST POINTS WINS",
+   "head": "DRIFT RACE · VARSKMost points wins. Slide to score. Lead him at the gates and get home first for more."
+  },
+  "hud": {
+   "lead": "1,666 PTS BEHIND",
+   "n": "1757",
+   "place": "2ND",
+   "gap": "-2.6 s",
+   "line": "",
+   "t": 18.366666666666266,
+   "gates": 2
+  },
+  "boxes": [
+   {
+    "s": "#exit",
+    "x": 12,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#fs",
+    "x": 64,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#snd",
+    "x": 116,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#runinfo",
+    "x": 12,
+    "y": 62,
+    "w": 59.203125,
+    "h": 35
+   },
+   {
+    "s": "#vs",
+    "x": 58.0703125,
+    "y": 108,
+    "w": 273.859375,
+    "h": 27
+   },
+   {
+    "s": "#restart",
+    "x": 334,
+    "y": 38,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#readout",
+    "x": 280.140625,
+    "y": 10,
+    "w": 97.859375,
+    "h": 17
+   }
+  ],
+  "res": {
+   "score": 91,
+   "them": 6835,
+   "parts": {
+    "drift": 57,
+    "clean": 34,
+    "pace": 0,
+    "leads": 0,
+    "line": 0,
+    "close": 0,
+    "clear": 0,
+    "clearS": 0
+   },
+   "lineTo": null
+  },
+  "margin": {
+   "line": 636,
+   "m0": 0,
+   "m5": 796,
+   "m126": 1909,
+   "m30": 1909
+  }
+ },
+ "844x390": {
+  "cards": [
+   {
+    "cls": "rcard locked",
+    "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win 🔒 TO EARN HIM ○ Win a star on First slide"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city (Rookie track 5, not open yet) ○ Beat Kestrow"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck (Pro track 1, not open yet) ○ Beat Tolvo"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under (Pro track 5, not open yet) ○ Beat Varsk"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard (Legend track 1, not open yet) ○ Beat Dovane"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight (Legend track 5, not open yet) ○ Beat Halvik"
+   }
+  ],
+  "grid": {
+   "n": "",
+   "lead": "MOST POINTS WINS",
+   "head": "DRIFT RACE · VARSKMost points wins. Slide to score. Lead him at the gates and get home first for more."
+  },
+  "hud": {
+   "lead": "1,666 PTS BEHIND",
+   "n": "1757",
+   "place": "2ND",
+   "gap": "-2.6 s",
+   "line": "",
+   "t": 18.366666666666266,
+   "gates": 2
+  },
+  "boxes": [
+   {
+    "s": "#exit",
+    "x": 12,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#fs",
+    "x": 64,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#snd",
+    "x": 116,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#runinfo",
+    "x": 12,
+    "y": 62,
+    "w": 59.203125,
+    "h": 35
+   },
+   {
+    "s": "#vs",
+    "x": 274.7421875,
+    "y": 72,
+    "w": 294.515625,
+    "h": 37
+   },
+   {
+    "s": "#restart",
+    "x": 788,
+    "y": 38,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#readout",
+    "x": 734.140625,
+    "y": 10,
+    "w": 97.859375,
+    "h": 17
+   }
+  ],
+  "res": {
+   "score": 91,
+   "them": 6835,
+   "parts": {
+    "drift": 57,
+    "clean": 34,
+    "pace": 0,
+    "leads": 0,
+    "line": 0,
+    "close": 0,
+    "clear": 0,
+    "clearS": 0
+   },
+   "lineTo": null
+  },
+  "margin": {
+   "line": 636,
+   "m0": 0,
+   "m5": 796,
+   "m126": 1909,
+   "m30": 1909
+  }
+ },
+ "1280x720": {
+  "cards": [
+   {
+    "cls": "rcard locked",
+    "text": "1 KESTROW Smooth and wide First slide · 4 laps · Starter coupe ● 300 first win 🔒 TO EARN HIM ○ Win a star on First slide"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city (Rookie track 5, not open yet) ○ Beat Kestrow"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck (Pro track 1, not open yet) ○ Beat Tolvo"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "4 DOVANE Long, linked slides Over and under · 2 laps · Grand tourer ● 800 first win 🔒 TO EARN HIM ○ Win a star on Over and under (Pro track 5, not open yet) ○ Beat Varsk"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "5 HALVIK The biggest angles Knot yard · 2 laps · Drift build ● 1,000 first win 🔒 TO EARN HIM ○ Win a star on Knot yard (Legend track 1, not open yet) ○ Beat Dovane"
+   },
+   {
+    "cls": "rcard locked",
+    "text": "6 SARROW Fast, deep and linked Endless eight · 2 laps · Fastback ● 1,500 first win 🔒 TO EARN HIM ○ Win a star on Endless eight (Legend track 5, not open yet) ○ Beat Halvik"
+   }
+  ],
+  "grid": {
+   "n": "",
+   "lead": "MOST POINTS WINS",
+   "head": "DRIFT RACE · VARSKMost points wins. Slide to score. Lead him at the gates and get home first for more."
+  },
+  "hud": {
+   "lead": "1,666 PTS BEHIND",
+   "n": "1757",
+   "place": "2ND",
+   "gap": "-2.6 s",
+   "line": "",
+   "t": 18.366666666666266,
+   "gates": 2
+  },
+  "boxes": [
+   {
+    "s": "#exit",
+    "x": 12,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#fs",
+    "x": 64,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#snd",
+    "x": 116,
+    "y": 10,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#runinfo",
+    "x": 12,
+    "y": 62,
+    "w": 59.203125,
+    "h": 35
+   },
+   {
+    "s": "#vs",
+    "x": 492.7421875,
+    "y": 72,
+    "w": 294.515625,
+    "h": 37
+   },
+   {
+    "s": "#restart",
+    "x": 1224,
+    "y": 38,
+    "w": 44,
+    "h": 44
+   },
+   {
+    "s": "#readout",
+    "x": 1170.140625,
+    "y": 10,
+    "w": 97.859375,
+    "h": 17
+   }
+  ],
+  "res": {
+   "score": 91,
+   "them": 6835,
+   "parts": {
+    "drift": 57,
+    "clean": 34,
+    "pace": 0,
+    "leads": 0,
+    "line": 0,
+    "close": 0,
+    "clear": 0,
+    "clearS": 0
+   },
+   "lineTo": null
+  },
+  "margin": {
+   "line": 636,
+   "m0": 0,
+   "m5": 796,
+   "m126": 1909,
+   "m30": 1909
+  }
+ }
+}

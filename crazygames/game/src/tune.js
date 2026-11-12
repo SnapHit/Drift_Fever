@@ -341,13 +341,16 @@ export const LOOP = {
    laps, how each drives) are in rivals/roster.js. First guesses for the
    author to set by play. With no rival, nothing here is read. */
 export const TANDEM = {
-  LIVE:             2,       // how many of the six rivals are in the game, in ladder order; the rest wait behind ?rivals=all until each passes measures 2 and 3 of briefs/RIVALS-LADDER.md (game/test/ladder/rivals.js)
+  LIVE:             6,       // how many of the six rivals are in the game, in ladder order. All six since 13 November 2026, the author's decision after playing them with ?rivals=all; they are tuned by his play from here, not by the machine rulers of the ladder rounds
   LAPS:             2,       // laps of a circuit in a race, for a rival with no laps of his own (rivals/roster.js), so a race stays near 60 to 120 s
   /* the grid: level, side by side, either side of the centre line */
   GRID_SIDE:        2.2,     // m each car starts from the centre line, the rival on his side (roster) and the player on the other
   /* being ahead pays: at each checkpoint and each lap's line the first car there banks a lead bonus, and the first across the finish a larger one */
   LEAD_SHARE:       2.2,     // of the track's first star, shared over the race's lead gates (every checkpoint and lap line before the finish). Was 0.45, at which leading all the way was worth a sixth of his score: with this and LINE_SHARE, a player who leads Kestrow all the way and never slides about ties him, so any sliding wins it
   LINE_SHARE:       1.0,     // of the first star, to the first car across the finish (was 0.3)
+  /* the winning margin pays the player: when he is first home, every second he is clear of the rival at the line is worth points, so a quicker car and a quicker line count (the author, 13 November 2026: he led Varsk all the way by 12 s in the best car and lost by 1,552). The rival is not paid it, so nobody who trails is worse off than before */
+  MARGIN_SHARE:     0.25,    // of the first star, for each second the player is home ahead of the rival
+  MARGIN_CAP:       12,      // s: no more is paid past this margin
   /* close pays, in any position: while both cars slide and are close, the player's drift points count more. Distances are between the two cars' centres */
   NEAR:             4.5,     // m: this close or closer is the full bonus
   FAR:              12,      // m: past this there is no bonus

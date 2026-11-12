@@ -199,7 +199,7 @@ function stepOnce(rec) {
 function driveStep(rec) {
   stepOnce(rec);
   app.runTime += STEP;
-  if (app.progress.state.finished && app.settle === 0) { app.settle = LOOP.FINISH_SETTLE; scoring.bank(); if (app.race) app.race.finish(app.runTime); }
+  if (app.progress.state.finished && app.settle === 0) { app.settle = LOOP.FINISH_SETTLE; scoring.bank(); app.finishT = app.runTime; if (app.race) app.race.finish(app.runTime); }
 }
 
 const STOP = { steer: 0, throttle: 0, brake: 0, handbrake: 1 };   // DRIFT with no steering: the car stops
@@ -288,7 +288,7 @@ function frame(t) {
   if (app.missionsShown > 0 && S === 'drive') { app.missionsShown -= dt; if (app.missionsShown <= 0) hud.setMissions(null); }
   hud.update(scoring, pose, scene.camera, THREE, view, dt, app.lead ? app.lead.state.player.total : 0);
   if (app.rival && (S === 'drive' || S === 'countdown')) {
-    hud.battle(app.tandem.state, app.rival, scoring.state, rv, scene.camera, THREE, view, dt, S === 'countdown', app.lead.state);
+    hud.battle(app.tandem.state, app.rival, scoring.state, rv, scene.camera, THREE, view, dt, S === 'countdown', app.lead.state, app.lead.margin);
     /* the first battle ever: one prompt, as he starts his first slide */
     if (app.battleIntro && app.rival.state.sliding && S === 'drive') { app.battleIntro = false; hud.prompt('Slide close to him for more points, ahead or behind', 3.2); }
     const tc = app.tandem.state;
@@ -421,7 +421,7 @@ function runHead(spec) {
   if (spec.mode === 'career') { const ch = CHAPTERS[chapterOf(spec.index)]; return { label: 'CAREER \u00b7 ' + ch.name.toUpperCase() + ' \u00b7 TRACK ' + (spec.index - ch.from + 1) + ' OF ' + (ch.to - ch.from), name: spec.name }; }
   if (spec.mode === 'daily') return { label: 'DAILY DRIFT', name: 'A new track every day' };
   if (spec.mode === 'lab') return { label: 'TRACK LAB', name: formatCode(spec.code) };
-  if (spec.mode === 'battle') { const d = rivalById(spec.rival); return { label: 'DRIFT RACE \u00b7 ' + d.name.toUpperCase(), name: 'Outscore him. Lead at the gates and the line for a bonus.', battle: true }; }
+  if (spec.mode === 'battle') { const d = rivalById(spec.rival); return { label: 'DRIFT RACE \u00b7 ' + d.name.toUpperCase(), name: 'Most points wins. Slide to score. Lead him at the gates and get home first for more.', battle: true }; }
   return null;
 }
 
@@ -559,7 +559,9 @@ function finishRun() {
 function finishBattle() {
   const spec = app.spec, def = rivalById(spec.rival), R = app.rival, L = app.lead.state;
   if (!R.state.finished) { R.finishRun(); app.rivalRanOn = true; }
-  const score = scoring.state.total + L.player.total, them = R.scoring.state.total + L.rival.total, won = score >= them, margin = score - them;
+  /* first home, the player is also paid for every second he was clear (TANDEM.MARGIN_SHARE) */
+  const clear = L.owner[L.gates - 1] === 'player' ? Math.max(0, R.state.finishTime - (app.finishT || app.runTime)) : 0, clearPts = app.lead.margin(clear);
+  const score = scoring.state.total + L.player.total + clearPts, them = R.scoring.state.total + L.rival.total, won = score >= them, margin = score - them;
   const before = openRivals(save.state);
   const first = save.rivalResult(def.id, won, margin);
   const opened = openRivals(save.state).find(id => !before.includes(id)) || null;
@@ -568,7 +570,7 @@ function finishBattle() {
   save.setOnboarded();
   const s = scoring.state, rs = R.scoring.state;
   app.results = { finished: true, battle: true, mode: 'battle', score, best: s.best, rival: { id: def.id, name: def.name, total: them, seconds: R.state.finishTime }, won, margin, first, prize: first ? def.prize : 0,
-    tandem: s.tandem, parts: { drift: s.drift - s.tandem, clean: s.clean, pace: s.pace, leads: L.player.lead, line: L.player.line, close: s.tandem },
+    tandem: s.tandem, parts: { drift: s.drift - s.tandem, clean: s.clean, pace: s.pace, leads: L.player.lead, line: L.player.line, close: s.tandem, clear: clearPts, clearS: clear },
     rivalParts: { drift: rs.drift, clean: rs.clean, pace: rs.pace, leads: L.rival.lead, line: L.rival.line, close: 0 },
     gates: L.gates, leadGates: L.player.gates, rivalGates: L.rival.gates, lineTo: L.owner[L.gates - 1] || null, changes: L.changes,
     coins, name: spec.name, label: runHead(spec).label, seconds: app.runTime, laps: app.laps, kind: app.track.kind, steps: tape.reduce((n, e) => n + e.n, 0), hash: app.world.hash(), rivalHash: R.hash(),

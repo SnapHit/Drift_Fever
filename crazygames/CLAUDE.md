@@ -569,3 +569,31 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   1.93, 3.69, 4.37, 2.19, 1.18, 3.09 up the ladder, so Dovane and
   Halvik are below Kestrow as they stand), `drive.js`, `search.js`,
   `candidate.js`. Do not start a third search round on the same bars.
+- 13 November 2026, after play with all six (`?rivals=all`, the best
+  car fully upgraded): the author's decisions, and `review/play13/`.
+  (1) **All six rivals are in the game** (`TANDEM.LIVE` 6); they "work
+  well and just need tweaking", and from here they are tuned by his
+  play, not by a machine ruler. Nothing is SOON. Known as they stand:
+  Dovane and Halvik score slower than Kestrow, Sarrow scores 856 when
+  nobody is near him, and those three hit walls in some runs.
+  (2) He led Varsk all the way, was 12 s clear at the line, and lost
+  5,029 to 6,581 while the HUD said "HE LEADS" over "1ST +11.1 s". Two
+  changes. The words: the pill is the points gap ("1,637 PTS BEHIND",
+  "MOST POINTS WINS" on the grid, never "leads"), the place under the
+  car adds what first is worth as things stand ("+1,765 AT THE LINE"),
+  and the grid's heading and the results say most points wins. The
+  rule: **leading counts for more**, his reasons being that it is what
+  a player expects and that it rewards an earned, upgraded car. When
+  the player is first home he is paid for every second he is clear of
+  the rival (`TANDEM.MARGIN_SHARE` 0.25 of the first star a second, up
+  to `MARGIN_CAP` 12 s; `lead.margin`, shown in the First home row).
+  That race would now be won by 357. The rival is not paid it, so a
+  player who trails scores exactly as before and Kestrow's balance for
+  a newcomer is untouched; recorded races replay to the same totals.
+  Both numbers are first guesses for play.
+  (3) Newcomer fixes: HUD buttons 44 px (were 36), SKIP 44 high, the
+  career's back arrow no longer squeezed; a locked rival whose track
+  the career has not opened says so on his card ("Rookie track 5, not
+  open yet"). `game/test/play13/check.js` measures all of it at three
+  sizes. The author plays in a normal browser with a full save, so the
+  true new player run is still to come, by him.

@@ -25,6 +25,9 @@ export function createLead(track, laps) {
   const metres = runMetres(track, laps), rate = starRate(track);
   const perGate = gates > 1 ? Math.round(TANDEM.LEAD_SHARE * rate * metres / (gates - 1)) : 0;
   const line = Math.round(TANDEM.LINE_SHARE * rate * metres);
+  /* the player's winning margin: points for s seconds clear at the line (TANDEM.MARGIN_SHARE of the first star a second, up to MARGIN_CAP) */
+  const perSecond = TANDEM.MARGIN_SHARE * rate * metres;
+  const margin = s => Math.round(Math.min(TANDEM.MARGIN_CAP, Math.max(0, s || 0)) * perSecond);
   const start = track.start ? track.start.along || 0 : 0;
   const passed = p => circuit ? p.lap * (cps + 1) + p.nextCp : p.nextCp + (p.finished ? 1 : 0);
   const mk = () => ({ done: 0, lead: 0, line: 0, gates: 0, total: 0, reach: [] });
@@ -84,5 +87,5 @@ export function createLead(track, laps) {
     L.gap = pFin || rFin ? 0 : place === 1 ? gapOf(L.player, rd) : gapOf(L.rival, pd);
     return L;
   }
-  return { state: L, step, reset, passed };
+  return { state: L, step, reset, passed, margin };
 }

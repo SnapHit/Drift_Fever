@@ -56,7 +56,7 @@ export function createHud(root) {
     <canvas id="streaks"></canvas>
     <div id="boost">BOOST</div>
     <div id="vs" hidden><span class="vsl">VS</span><b id="vsName"></b><span id="vsN">0</span><span id="vsLead"></span></div>
-    <div id="meter" hidden><div id="place"><b id="placeN">1ST</b><span id="gapT"></span></div><div id="close" hidden><i></i><i></i><i></i><i></i><i></i><b id="meterT"></b></div></div>
+    <div id="meter" hidden><div id="place"><b id="placeN">1ST</b><span id="gapT"></span><span id="lineT"></span></div><div id="close" hidden><i></i><i></i><i></i><i></i><i></i><b id="meterT"></b></div></div>
     <div id="tag" hidden><b id="tagName"></b><span id="tagMult"></span></div>
     <div id="arrow" hidden><span class="ar">&#9650;</span><b id="arrowD"></b></div>
     <div id="prompt1" hidden></div>
@@ -75,7 +75,7 @@ export function createHud(root) {
   const totalBox = el.querySelector('#total');
   const vs = el.querySelector('#vs'), vsName = el.querySelector('#vsName'), vsN = el.querySelector('#vsN'), vsLead = el.querySelector('#vsLead');
   const meter = el.querySelector('#meter'), segs = [...meter.querySelectorAll('i')], meterT = el.querySelector('#meterT');
-  const placeBox = el.querySelector('#place'), placeN = el.querySelector('#placeN'), gapT = el.querySelector('#gapT'), closeBox = el.querySelector('#close');
+  const placeBox = el.querySelector('#place'), placeN = el.querySelector('#placeN'), gapT = el.querySelector('#gapT'), lineT = el.querySelector('#lineT'), closeBox = el.querySelector('#close');
   const tag = el.querySelector('#tag'), tagName = el.querySelector('#tagName'), tagMult = el.querySelector('#tagMult');
   const arrow = el.querySelector('#arrow'), arrowD = el.querySelector('#arrowD'), prompt1 = el.querySelector('#prompt1');
   const bat = { rivalX: null, on: false, k: 0, lastN: -1, lastLead: '', lastSeg: -1, lastMode: '', lastT: '', lastTag: null, lastArrow: null, lastMult: '', promptT: 0, lastPlace: '', lastGap: '', heard: 0 };
@@ -225,7 +225,7 @@ export function createHud(root) {
     },
     /* the battle: { name } or null */
     setBattle(b) {
-      bat.on = !!b; bat.rivalX = null; vs.hidden = !b; meter.hidden = true; tag.hidden = true; arrow.hidden = true; prompt1.hidden = true; bat.lastN = -1; bat.lastLead = ''; bat.lastSeg = -1; bat.lastMode = ''; bat.lastT = ''; bat.lastTag = null; bat.lastArrow = null; bat.k = 0; bat.lastPlace = ''; bat.lastGap = ''; bat.heard = 0;
+      bat.on = !!b; bat.rivalX = null; vs.hidden = !b; meter.hidden = true; tag.hidden = true; arrow.hidden = true; prompt1.hidden = true; bat.lastN = -1; bat.lastLead = ''; bat.lastSeg = -1; bat.lastMode = ''; bat.lastT = ''; bat.lastTag = null; bat.lastArrow = null; bat.k = 0; bat.lastPlace = ''; bat.lastGap = ''; bat.lastLine = ''; bat.heard = 0;
       el.classList.toggle('battle', !!b);
       if (b) { vsName.textContent = b.name.toUpperCase(); tagName.textContent = b.name.toUpperCase(); }
     },
@@ -234,13 +234,16 @@ export function createHud(root) {
     /* every frame of a race: t the close bonus's state, rival, the
        player's score state, rv the rival's drawn pose (or null), lead the
        lead gates' state (scoring/lead.js) */
-    battle(t, rival, mine, rv, camera, THREE, view, dt, counting, lead) {
+    battle(t, rival, mine, rv, camera, THREE, view, dt, counting, lead, marginOf) {
       if (!bat.on) return;
       const L = lead || { player: { total: 0 }, rival: { total: 0 }, place: 1, gap: 0, events: [], eventCount: 0 };
       const theirs = rival.scoring.state.total + L.rival.total, ours = mine.total + L.player.total;
-      if (theirs !== bat.lastN) { bat.lastN = theirs; vsN.textContent = String(theirs); }
+      /* the pill is the points, which decide the race: his total and how far ahead or behind on points the player is. "Leads" is never said here: who is ahead on the road is the place under the car */
+      const shown = counting ? '' : String(theirs);
+      if (shown !== bat.lastN) { bat.lastN = shown; vsN.textContent = shown; }
       const ahead = ours > theirs ? 'ahead' : ours < theirs ? 'behind' : 'level';
-      if (ahead !== bat.lastLead) { bat.lastLead = ahead; vs.className = ahead; vsLead.textContent = ahead === 'ahead' ? 'YOU LEAD' : ahead === 'behind' ? 'HE LEADS' : 'LEVEL'; }
+      const leadT = counting ? 'MOST POINTS WINS' : ahead === 'level' ? 'LEVEL ON POINTS' : Math.abs(ours - theirs).toLocaleString('en-AU') + (ahead === 'ahead' ? ' PTS AHEAD' : ' PTS BEHIND');
+      if (leadT !== bat.lastLead) { bat.lastLead = leadT; vs.className = counting ? 'level' : ahead; vsLead.textContent = leadT; }
       if (bat.promptT > 0) { bat.promptT -= dt; if (bat.promptT <= 0) prompt1.hidden = true; }
       /* under the player's car: his place and the gap, and the close bonus while it counts */
       /* over the countdown the sweep swings round the cars, so the place waits for GO */
@@ -250,6 +253,9 @@ export function createHud(root) {
       if (place !== bat.lastPlace) { bat.lastPlace = place; placeN.textContent = place; placeBox.className = counting ? 'grid' : L.place === 1 ? 'first' : 'second'; }
       const gap = counting || !rival.solid() || L.gap < 0.05 ? '' : (L.place === 1 ? '+' : '-') + L.gap.toFixed(1) + ' s';
       if (gap !== bat.lastGap) { bat.lastGap = gap; gapT.textContent = gap; }
+      /* what being first is worth at the line as things stand: the line bonus and the margin so far */
+      const atLine = !counting && L.place === 1 && rival.solid() && L.lineValue ? '+' + (L.lineValue + (marginOf ? marginOf(L.gap) : 0)).toLocaleString('en-AU') + ' AT THE LINE' : '';
+      if (atLine !== bat.lastLine) { bat.lastLine = atLine; lineT.textContent = atLine; }
       const live = rival.solid() && t.together;
       bat.k += ((live ? t.k : 0) - bat.k) * (1 - Math.exp(-dt / HUD_BATTLE.SMOOTH));
       const mode = live && t.mult > 1 ? 'on' : 'off';

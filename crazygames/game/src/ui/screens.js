@@ -104,7 +104,7 @@ export function createScreens(root, onAction) {
       if (st === 'beaten') state = `<span class="st won"><b>BEATEN</b><small>best +${fmt(Math.max(0, e.best))}</small><small>race again</small></span>`;
       else if (st === 'open') state = `<span class="st go"><b>RACE</b><small>${e ? 'best ' + (e.best >= 0 ? '+' : '') + fmt(e.best) : 'earned, not yet raced'}</small></span>`;
       else if (st === 'off') state = `<span class="st off"><b>SOON</b><small>not in the game yet</small></span>`;
-      else state = `<span class="st lockd"><b>&#128274; TO EARN HIM</b>${rivalNeeds(save, k).map(n => `<small class="${n.done ? 'done' : ''}">${n.done ? '&#10003;' : '&#9675;'} ${esc(n.text)}</small>`).join('')}</span>`;
+      else state = `<span class="st lockd"><b>&#128274; TO EARN HIM</b>${rivalNeeds(save, k).map(n => `<small class="${n.done ? 'done' : ''}">${n.done ? '&#10003;' : '&#9675;'} ${esc(n.text + (n.note || ''))}</small>`).join('')}</span>`;
       const go = st === 'open' || st === 'beaten';
       return `<button type="button" class="rcard ${st}" data-rival="${esc(d.id)}" ${go ? `data-action="battle" data-arg="${esc(d.id)}"` : 'aria-disabled="true"'} style="--rp:#${(PAINTS.find(p => p.id === rivalPaint(d, mine)) || PAINTS[0]).hex.toString(16).padStart(6, '0')}">
         <span class="rung">${k + 1}</span>
@@ -253,12 +253,12 @@ export function createScreens(root, onAction) {
     const n = v => fmt(v || 0);
     const table = `<table class="race"><thead><tr><th></th><th class="you">YOU</th><th class="him">${esc(r.rival.name.toUpperCase())}</th></tr></thead><tbody>
       ${row('Drift', n(P.drift), n(Q.drift))}${row('Clean', n(P.clean), n(Q.clean))}${row('Pace', n(P.pace), n(Q.pace))}
-      ${row('Leads', n(P.leads) + ` <small>${r.leadGates || 0}/${gates}</small>`, n(Q.leads) + ` <small>${r.rivalGates || 0}/${gates}</small>`)}
-      ${row('First home', r.lineTo === 'player' ? '+' + n(P.line) : '', r.lineTo === 'rival' ? '+' + n(Q.line) : '')}
+      ${row('Led at gates', n(P.leads) + ` <small>${r.leadGates || 0}/${gates}</small>`, n(Q.leads) + ` <small>${r.rivalGates || 0}/${gates}</small>`)}
+      ${row('First home', r.lineTo === 'player' ? '+' + n((P.line || 0) + (P.clear || 0)) + (P.clear ? ` <small>${(P.clearS || 0).toFixed(1)} s clear</small>` : '') : '', r.lineTo === 'rival' ? '+' + n(Q.line) : '')}
       ${row('Close', n(P.close), '')}</tbody></table>`;
     show('results', `
       <div class="card split battle${r.won ? ' won' : ' lost'}">${a}
-        <p class="runlabel">${esc(r.label)}</p><h2 class="who">${who}</h2><p class="trackname">${esc(r.name)}</p>
+        <p class="runlabel">${esc(r.label)}</p><h2 class="who">${who}</h2><p class="trackname">${esc(r.name)} &middot; most points wins</p>
         <div class="duel">
           <div class="side you"><span class="nm">YOU</span><span class="n">${fmt(r.score)}</span><i style="width:${bar(r.score)}%"></i></div>
           <div class="side him"><span class="nm">${esc(r.rival.name.toUpperCase())}</span><span class="n">${fmt(r.rival.total)}</span><i style="width:${bar(r.rival.total)}%"></i></div>
