@@ -9,7 +9,7 @@
     "name": "Kestrow",
     "fresh": true
    },
-   "button": "RACE KESTROW just earned",
+   "button": "KESTROW race him, just earned",
    "besideNext": true
   },
   "again": {
@@ -19,7 +19,7 @@
   }
  },
  "live": {
-  "live": 1,
+  "live": 2,
   "bad": 0,
   "steps": 19,
   "log": [
@@ -39,15 +39,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
+      "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -106,7 +106,7 @@
     "step": "a star on First slide",
     "button": {
      "head": "RIVALSRACE",
-     "line": "0/1 beaten · Kestrow is waiting",
+     "line": "0/2 beaten · Kestrow is waiting",
      "mark": true
     },
     "cards": [
@@ -118,15 +118,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
+      "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -157,7 +157,10 @@
       "action": false,
       "offer": false,
       "next": false,
-      "nextNeeds": null
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow"
+      ]
      },
      "r3": {
       "action": false,
@@ -186,7 +189,7 @@
     "step": "lost to Kestrow",
     "button": {
      "head": "RIVALSRACE",
-     "line": "0/1 beaten · Kestrow is waiting",
+     "line": "0/2 beaten · Kestrow is waiting",
      "mark": true
     },
     "cards": [
@@ -198,15 +201,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
+      "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -237,7 +240,10 @@
       "action": false,
       "offer": false,
       "next": false,
-      "nextNeeds": null
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow"
+      ]
      },
      "r3": {
       "action": false,
@@ -266,7 +272,7 @@
     "step": "beat Kestrow",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "1/2 beaten",
      "mark": false
     },
     "cards": [
@@ -278,15 +284,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
+      "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ✓ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -317,7 +323,10 @@
       "action": false,
       "offer": false,
       "next": false,
-      "nextNeeds": null
+      "nextNeeds": [
+       "Win a star on Tight city",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
@@ -343,11 +352,11 @@
     "wrong": []
    },
    {
-    "step": "a star on Hairpin heaven",
+    "step": "a star on Tight city",
     "button": {
-     "head": "RIVALS",
-     "line": "1/1 beaten · every one",
-     "mark": false
+     "head": "RIVALSRACE",
+     "line": "1/2 beaten · Tolvo is waiting",
+     "mark": true
     },
     "cards": [
      {
@@ -358,15 +367,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "open",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win RACE earned, not yet raced"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -394,15 +403,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
-      "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -423,11 +436,11 @@
     "wrong": []
    },
    {
-    "step": "lost to Tolvo (not raceable, not saved)",
+    "step": "lost to Tolvo",
     "button": {
-     "head": "RIVALS",
-     "line": "1/1 beaten · every one",
-     "mark": false
+     "head": "RIVALSRACE",
+     "line": "1/2 beaten · Tolvo is waiting",
+     "mark": true
     },
     "cards": [
      {
@@ -438,15 +451,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "open",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win RACE best -120"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -474,15 +487,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
-      "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "action": true,
+      "offer": true,
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -503,10 +520,10 @@
     "wrong": []
    },
    {
-    "step": "beat Tolvo (not raceable, not saved)",
+    "step": "beat Tolvo",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -518,15 +535,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -554,15 +571,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -586,7 +607,7 @@
     "step": "a star on Upper deck",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -598,15 +619,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -634,15 +655,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -666,7 +691,7 @@
     "step": "lost to Varsk (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -678,15 +703,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -714,15 +739,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -746,7 +775,7 @@
     "step": "beat Varsk (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -758,15 +787,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -794,15 +823,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -826,7 +859,7 @@
     "step": "a star on Over and under",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -838,15 +871,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -874,15 +907,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -906,7 +943,7 @@
     "step": "lost to Dovane (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -918,15 +955,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -954,15 +991,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -986,7 +1027,7 @@
     "step": "beat Dovane (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -998,15 +1039,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -1034,15 +1075,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -1066,7 +1111,7 @@
     "step": "a star on Knot yard",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -1078,15 +1123,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -1114,15 +1159,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -1146,7 +1195,7 @@
     "step": "lost to Halvik (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -1158,15 +1207,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -1194,15 +1243,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -1226,7 +1279,7 @@
     "step": "beat Halvik (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -1238,15 +1291,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -1274,15 +1327,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -1306,7 +1363,7 @@
     "step": "a star on Endless eight",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -1318,15 +1375,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -1354,15 +1411,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -1386,7 +1447,7 @@
     "step": "lost to Sarrow (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -1398,15 +1459,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -1434,15 +1495,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -1466,7 +1531,7 @@
     "step": "beat Sarrow (not raceable, not saved)",
     "button": {
      "head": "RIVALS",
-     "line": "1/1 beaten · every one",
+     "line": "2/2 beaten · every one",
      "mark": false
     },
     "cards": [
@@ -1478,15 +1543,15 @@
      },
      {
       "id": "r2",
-      "state": "off",
-      "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win SOON not in the game yet"
+      "state": "beaten",
+      "races": true,
+      "text": "2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "off",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win SOON not in the game yet"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win SOON not in the game yet"
      },
      {
       "id": "r4",
@@ -1514,15 +1579,19 @@
       "next": null
      },
      "r2": {
-      "action": false,
+      "action": true,
       "offer": false,
-      "next": false,
-      "nextNeeds": null
+      "next": true,
+      "nextNeeds": [
+       "Win a star on Tight city done",
+       "Beat Kestrow done"
+      ]
      },
      "r3": {
       "action": false,
       "offer": false,
-      "next": null
+      "next": false,
+      "nextNeeds": null
      },
      "r4": {
       "action": false,
@@ -1581,13 +1650,13 @@
       "id": "r2",
       "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Hairpin heaven ○ Beat Kestrow"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "locked",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
      },
      {
       "id": "r4",
@@ -1660,13 +1729,13 @@
       "id": "r2",
       "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Hairpin heaven ○ Beat Kestrow"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "locked",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
      },
      {
       "id": "r4",
@@ -1698,7 +1767,7 @@
       "offer": false,
       "next": false,
       "nextNeeds": [
-       "Win a star on Hairpin heaven",
+       "Win a star on Tight city",
        "Beat Kestrow"
       ]
      },
@@ -1743,13 +1812,13 @@
       "id": "r2",
       "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Hairpin heaven ○ Beat Kestrow"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ○ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "locked",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
      },
      {
       "id": "r4",
@@ -1781,7 +1850,7 @@
       "offer": false,
       "next": false,
       "nextNeeds": [
-       "Win a star on Hairpin heaven",
+       "Win a star on Tight city",
        "Beat Kestrow"
       ]
      },
@@ -1826,13 +1895,13 @@
       "id": "r2",
       "state": "locked",
       "races": false,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Hairpin heaven ✓ Beat Kestrow"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city ✓ Beat Kestrow"
      },
      {
       "id": "r3",
       "state": "locked",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
      },
      {
       "id": "r4",
@@ -1864,7 +1933,7 @@
       "offer": false,
       "next": false,
       "nextNeeds": [
-       "Win a star on Hairpin heaven",
+       "Win a star on Tight city",
        "Beat Kestrow done"
       ]
      },
@@ -1892,7 +1961,7 @@
     "wrong": []
    },
    {
-    "step": "a star on Hairpin heaven",
+    "step": "a star on Tight city",
     "button": {
      "head": "RIVALSRACE",
      "line": "1/6 beaten · Tolvo is waiting",
@@ -1909,13 +1978,13 @@
       "id": "r2",
       "state": "open",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win RACE earned, not yet raced"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win RACE earned, not yet raced"
      },
      {
       "id": "r3",
       "state": "locked",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
      },
      {
       "id": "r4",
@@ -1947,7 +2016,7 @@
       "offer": true,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -1996,13 +2065,13 @@
       "id": "r2",
       "state": "open",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win RACE best -120"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win RACE best -120"
      },
      {
       "id": "r3",
       "state": "locked",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ○ Beat Tolvo"
      },
      {
       "id": "r4",
@@ -2034,7 +2103,7 @@
       "offer": true,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2083,13 +2152,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "locked",
       "races": false,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ✓ Beat Tolvo"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win 🔒 TO EARN HIM ○ Win a star on Upper deck ✓ Beat Tolvo"
      },
      {
       "id": "r4",
@@ -2121,7 +2190,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2170,13 +2239,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "open",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win RACE earned, not yet raced"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win RACE earned, not yet raced"
      },
      {
       "id": "r4",
@@ -2208,7 +2277,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2261,13 +2330,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "open",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win RACE best -120"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win RACE best -120"
      },
      {
       "id": "r4",
@@ -2299,7 +2368,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2352,13 +2421,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -2390,7 +2459,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2443,13 +2512,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -2481,7 +2550,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2538,13 +2607,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -2576,7 +2645,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2633,13 +2702,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -2671,7 +2740,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2728,13 +2797,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -2766,7 +2835,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2827,13 +2896,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -2865,7 +2934,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -2926,13 +2995,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -2964,7 +3033,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -3025,13 +3094,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -3063,7 +3132,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -3124,13 +3193,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -3162,7 +3231,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },
@@ -3223,13 +3292,13 @@
       "id": "r2",
       "state": "beaten",
       "races": true,
-      "text": "2 TOLVO Fast and shallow Hairpin heaven · 2 laps · Light hatch ● 400 first win BEATEN best +151 race again"
+      "text": "2 TOLVO Fast and shallow Tight city · 3 laps · Light hatch ● 400 first win BEATEN best +151 race again"
      },
      {
       "id": "r3",
       "state": "beaten",
       "races": true,
-      "text": "3 VARSK Late and aggressive Upper deck · 2 laps · Fastback ● 600 first win BEATEN best +152 race again"
+      "text": "3 VARSK Late and aggressive Upper deck · 3 laps · Fastback ● 600 first win BEATEN best +152 race again"
      },
      {
       "id": "r4",
@@ -3261,7 +3330,7 @@
       "offer": false,
       "next": true,
       "nextNeeds": [
-       "Win a star on Hairpin heaven done",
+       "Win a star on Tight city done",
        "Beat Kestrow done"
       ]
      },

@@ -15,7 +15,7 @@ export const RIVALS = [
     drive: { SLIDE_GAIN: 0.35, PROGRESS: 30, KEEP: 397, ANGLE_CAP: 20.41, EDGE_SAFE: 2.47, EDGE_COST: 2670, ENTRY: 26.25, VMAX: 34, CHAIN_KEEP: 273, CHAIN_MARGIN: 0.33, AY_MAX: 7.4, OUTSIDE: 0.427, SETUP: 33.45, WINDOW_PRE: 5.32, WINDOW_POST: -3.75, LINK: 4.31, HB_TIME: 0.108, HB_OVER: 0.65, HB_STEER: 0.3 } },
   /* the rest: Tolvo and Varsk searched again for the ladder (briefs/RIVALS-LADDER.md); Dovane, Halvik and Sarrow as the rivals round chose them (game/test/rivals/search.js, review/rivals/REPORT.md), their driving now planned with a player's hands, measured and not in the game */
   { id: 'r2', name: 'Tolvo', car: 'hatch', paint: 'amber', track: 4, side: -1, prize: 400, laps: 3,
-    style: 'Fast and shallow',
+    style: 'Quick, linking shallow slides',   // measured: 22 degrees on average, as shallow as Kestrow, but his best chain is 1,160 points to Kestrow's 216 and he beats the grip player home
     /* the ladder (briefs/RIVALS-LADDER.md): Tight city, three laps; his driving searched with a player's hands from Kestrow's (game/test/ladder/search.js), then his corner entry speed set by hand to the one value nearby that passes measure 2 */
     drive: { SLIDE_GAIN: 0.35, PROGRESS: 45, KEEP: 325, ANGLE_CAP: 21.56, EDGE_SAFE: 2.37, EDGE_COST: 2875, ENTRY: 26.2, VMAX: 33.14, CHAIN_KEEP: 0, CHAIN_MARGIN: 0.34, AY_MAX: 7.28, OUTSIDE: 0.157, SETUP: 39.95, WINDOW_PRE: 3.98, WINDOW_POST: -5.28, LINK: 4.81, HB_TIME: 0.1, HB_OVER: 0.75, HB_STEER: 0.35 } },
   { id: 'r3', name: 'Varsk', car: 'fastback', paint: 'lime', track: 8, side: 1, prize: 600, laps: 3,
