@@ -1,0 +1,715 @@
+{
+ "rivals": {
+  "mainTolvo": {
+   "id": "r2",
+   "name": "Tolvo (main)",
+   "base": {
+    "seconds": 83.48,
+    "total": 4849,
+    "worstCorner": 0.3400809716599198
+   },
+   "variants": 38,
+   "runs": 180,
+   "missedVariants": 9,
+   "missedRuns": 15,
+   "missed": [
+    {
+     "key": "SLIDE_GAIN",
+     "from": 0.35,
+     "to": 0.3535,
+     "missing": 3,
+     "why": [
+      "2 hard hits, 30.3 km/h, a corner 10% sliding",
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 2,
+     "contacts": 2,
+     "total": [
+      4307,
+      4550
+     ]
+    },
+    {
+     "key": "KEEP",
+     "from": 325,
+     "to": 328.25,
+     "missing": 1,
+     "why": [
+      "total 3353 against 4849"
+     ],
+     "worstCorner": 0.303,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3353,
+      5394
+     ]
+    },
+    {
+     "key": "KEEP",
+     "from": 325,
+     "to": 321.75,
+     "missing": 1,
+     "why": [
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      5200
+     ]
+    },
+    {
+     "key": "ANGLE_CAP",
+     "from": 21.56,
+     "to": 21.7756,
+     "missing": 3,
+     "why": [
+      "2 hard hits, 32.6 km/h, a corner 7% sliding",
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 2,
+     "contacts": 2,
+     "total": [
+      4031,
+      5603
+     ]
+    },
+    {
+     "key": "EDGE_SAFE",
+     "from": 2.37,
+     "to": 2.3937,
+     "missing": 1,
+     "why": [
+      "2 hard hits, 17 contacts, a corner 28% sliding"
+     ],
+     "worstCorner": 0.282,
+     "hard": 2,
+     "contacts": 17,
+     "total": [
+      4179,
+      4739
+     ]
+    },
+    {
+     "key": "ENTRY",
+     "from": 26.2,
+     "to": 26.462,
+     "missing": 1,
+     "why": [
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3945,
+      4920
+     ]
+    },
+    {
+     "key": "ENTRY",
+     "from": 26.2,
+     "to": 25.938,
+     "missing": 1,
+     "why": [
+      "2 hard hits, 35.7 km/h, a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 2,
+     "contacts": 2,
+     "total": [
+      4153,
+      5208
+     ]
+    },
+    {
+     "key": "VMAX",
+     "from": 33.14,
+     "to": 32.8086,
+     "missing": 3,
+     "why": [
+      "3 hard hits, 23 contacts, a corner 2% sliding, total 2838 against 4849",
+      "1 hard hits, 6 contacts, a corner 18% sliding"
+     ],
+     "worstCorner": 0.016,
+     "hard": 4,
+     "contacts": 23,
+     "total": [
+      2838,
+      5450
+     ]
+    },
+    {
+     "key": "HB_STEER",
+     "from": 0.35,
+     "to": 0.3465,
+     "missing": 1,
+     "why": [
+      "1 hard hits, 6 contacts, a corner 24% sliding"
+     ],
+     "worstCorner": 0.24,
+     "hard": 1,
+     "contacts": 6,
+     "total": [
+      3676,
+      5150
+     ]
+    }
+   ],
+   "rows": [
+    {
+     "key": "SLIDE_GAIN",
+     "from": 0.35,
+     "to": 0.3535,
+     "missing": 3,
+     "why": [
+      "2 hard hits, 30.3 km/h, a corner 10% sliding",
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 2,
+     "contacts": 2,
+     "total": [
+      4307,
+      4550
+     ]
+    },
+    {
+     "key": "SLIDE_GAIN",
+     "from": 0.35,
+     "to": 0.3465,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.323,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3882,
+      5817
+     ]
+    },
+    {
+     "key": "PROGRESS",
+     "from": 45,
+     "to": 45.45,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.328,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      5883
+     ]
+    },
+    {
+     "key": "PROGRESS",
+     "from": 45,
+     "to": 44.55,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.326,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4335,
+      5097
+     ]
+    },
+    {
+     "key": "KEEP",
+     "from": 325,
+     "to": 328.25,
+     "missing": 1,
+     "why": [
+      "total 3353 against 4849"
+     ],
+     "worstCorner": 0.303,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3353,
+      5394
+     ]
+    },
+    {
+     "key": "KEEP",
+     "from": 325,
+     "to": 321.75,
+     "missing": 1,
+     "why": [
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      5200
+     ]
+    },
+    {
+     "key": "ANGLE_CAP",
+     "from": 21.56,
+     "to": 21.7756,
+     "missing": 3,
+     "why": [
+      "2 hard hits, 32.6 km/h, a corner 7% sliding",
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 2,
+     "contacts": 2,
+     "total": [
+      4031,
+      5603
+     ]
+    },
+    {
+     "key": "ANGLE_CAP",
+     "from": 21.56,
+     "to": 21.3444,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.323,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4122,
+      4802
+     ]
+    },
+    {
+     "key": "EDGE_SAFE",
+     "from": 2.37,
+     "to": 2.3937,
+     "missing": 1,
+     "why": [
+      "2 hard hits, 17 contacts, a corner 28% sliding"
+     ],
+     "worstCorner": 0.282,
+     "hard": 2,
+     "contacts": 17,
+     "total": [
+      4179,
+      4739
+     ]
+    },
+    {
+     "key": "EDGE_SAFE",
+     "from": 2.37,
+     "to": 2.3463,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4342,
+      5201
+     ]
+    },
+    {
+     "key": "EDGE_COST",
+     "from": 2875,
+     "to": 2903.75,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4570,
+      5205
+     ]
+    },
+    {
+     "key": "EDGE_COST",
+     "from": 2875,
+     "to": 2846.25,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      5201
+     ]
+    },
+    {
+     "key": "ENTRY",
+     "from": 26.2,
+     "to": 26.462,
+     "missing": 1,
+     "why": [
+      "a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3945,
+      4920
+     ]
+    },
+    {
+     "key": "ENTRY",
+     "from": 26.2,
+     "to": 25.938,
+     "missing": 1,
+     "why": [
+      "2 hard hits, 35.7 km/h, a corner 0% sliding"
+     ],
+     "worstCorner": 0,
+     "hard": 2,
+     "contacts": 2,
+     "total": [
+      4153,
+      5208
+     ]
+    },
+    {
+     "key": "VMAX",
+     "from": 33.14,
+     "to": 33.4714,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.326,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3743,
+      5289
+     ]
+    },
+    {
+     "key": "VMAX",
+     "from": 33.14,
+     "to": 32.8086,
+     "missing": 3,
+     "why": [
+      "3 hard hits, 23 contacts, a corner 2% sliding, total 2838 against 4849",
+      "1 hard hits, 6 contacts, a corner 18% sliding"
+     ],
+     "worstCorner": 0.016,
+     "hard": 4,
+     "contacts": 23,
+     "total": [
+      2838,
+      5450
+     ]
+    },
+    {
+     "key": "CHAIN_KEEP",
+     "from": 0,
+     "to": 0,
+     "zero": true,
+     "missing": 0,
+     "why": []
+    },
+    {
+     "key": "CHAIN_KEEP",
+     "from": 0,
+     "to": 0,
+     "zero": true,
+     "missing": 0,
+     "why": []
+    },
+    {
+     "key": "CHAIN_MARGIN",
+     "from": 0.34,
+     "to": 0.3434,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "CHAIN_MARGIN",
+     "from": 0.34,
+     "to": 0.3366,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "AY_MAX",
+     "from": 7.28,
+     "to": 7.3528,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "AY_MAX",
+     "from": 7.28,
+     "to": 7.2072,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "OUTSIDE",
+     "from": 0.157,
+     "to": 0.1586,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.301,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4319,
+      5141
+     ]
+    },
+    {
+     "key": "OUTSIDE",
+     "from": 0.157,
+     "to": 0.1554,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.324,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4085,
+      4863
+     ]
+    },
+    {
+     "key": "SETUP",
+     "from": 39.95,
+     "to": 40.3495,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.323,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4600,
+      5287
+     ]
+    },
+    {
+     "key": "SETUP",
+     "from": 39.95,
+     "to": 39.5505,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3644,
+      4852
+     ]
+    },
+    {
+     "key": "WINDOW_PRE",
+     "from": 3.98,
+     "to": 4.0198,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "WINDOW_PRE",
+     "from": 3.98,
+     "to": 3.9402,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "WINDOW_POST",
+     "from": -5.28,
+     "to": -5.3328,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "WINDOW_POST",
+     "from": -5.28,
+     "to": -5.2272,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "LINK",
+     "from": 4.81,
+     "to": 4.8581,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "LINK",
+     "from": 4.81,
+     "to": 4.7619,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "HB_TIME",
+     "from": 0.1,
+     "to": 0.101,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "HB_TIME",
+     "from": 0.1,
+     "to": 0.099,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4177,
+      4786
+     ]
+    },
+    {
+     "key": "HB_OVER",
+     "from": 0.75,
+     "to": 0.7575,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.325,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3743,
+      5010
+     ]
+    },
+    {
+     "key": "HB_OVER",
+     "from": 0.75,
+     "to": 0.7425,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.325,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      3933,
+      4863
+     ]
+    },
+    {
+     "key": "HB_STEER",
+     "from": 0.35,
+     "to": 0.3535,
+     "missing": 0,
+     "why": [],
+     "worstCorner": 0.308,
+     "hard": 0,
+     "contacts": 0,
+     "total": [
+      4397,
+      4881
+     ]
+    },
+    {
+     "key": "HB_STEER",
+     "from": 0.35,
+     "to": 0.3465,
+     "missing": 1,
+     "why": [
+      "1 hard hits, 6 contacts, a corner 24% sliding"
+     ],
+     "worstCorner": 0.24,
+     "hard": 1,
+     "contacts": 6,
+     "total": [
+      3676,
+      5150
+     ]
+    }
+   ],
+   "pass": false,
+   "measured": "2026-11-12"
+  }
+ },
+ "plateau": {
+  "STEP": 0.01,
+  "RUNS": 5
+ }
+}

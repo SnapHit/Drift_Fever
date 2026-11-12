@@ -1,0 +1,12 @@
+grip-0 game/test/ladder2/players.js search grip --track 0 --laps 4 --side 1 --n 100
+mixed-0 game/test/ladder2/players.js search mixed --track 0 --laps 4 --side 1 --n 100
+grip-4 game/test/ladder2/players.js search grip --track 4 --laps 3 --side -1 --n 100
+mixed-4 game/test/ladder2/players.js search mixed --track 4 --laps 3 --side -1 --n 100
+grip-8 game/test/ladder2/players.js search grip --track 8 --laps 3 --up 1 --side 1 --n 100
+mixed-8 game/test/ladder2/players.js search mixed --track 8 --laps 3 --up 1 --side 1 --n 100
+grip-12 game/test/ladder2/players.js search grip --track 12 --laps 3 --up 1 --side -1 --n 100
+mixed-12 game/test/ladder2/players.js search mixed --track 12 --laps 3 --up 1 --side -1 --n 100
+grip-16 game/test/ladder2/players.js search grip --track 16 --laps 3 --up 2 --side 1 --n 100
+mixed-16 game/test/ladder2/players.js search mixed --track 16 --laps 3 --up 2 --side 1 --n 100
+grip-20 game/test/ladder2/players.js search grip --track 20 --laps 3 --up 2 --side -1 --n 100
+mixed-20 game/test/ladder2/players.js search mixed --track 20 --laps 3 --up 2 --side -1 --n 100

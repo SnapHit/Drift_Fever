@@ -24,13 +24,14 @@
    - each player is what it is called: the slide player slides at least
      30 per cent of every corner in every run (the rival's own bar), the
      mixed player at least 30 per cent of every drift corner (42 m radius
-     or tighter), and the grip player's drift points are at most a tenth
+     or tighter and turning 85 degrees or more, as game/test/stars/slot.js
+     defines one), and the grip player's drift points are at most a tenth
      of its total.
    Known answer: the players' own numbers (chosen on career 1) on Upper
    deck, where the last round found the slide player 14 to 17 s slower,
    fail the spread.
 
-   node game/test/ladder2/players.js search grip|slide|mixed --track 8 [--laps 3] [--car starter] [--up 1] [--n 150] [--seed 1] [--pace 95] [--from own|JSON|r1]
+   node game/test/ladder2/players.js search grip|slide|mixed --track 8 [--laps 3] [--car starter] [--up 1] [--n 150] [--seed 1] [--pace 95] [--from own|JSON|r1] [--from-log file] [--local] [--range KEY=a,b]
    node game/test/ladder2/players.js measure [--place 8:3:starter:1 ...] [--own]   writes review/ladder2/players.json */
 import path from 'node:path';
 import fs from 'node:fs';
@@ -71,6 +72,16 @@ export function judge(where, kind, drive, o) {
   return { value: worst, detail };
 }
 
+/* the best a search's log printed: its drive line, or the last improvement's numbers if it was stopped */
+export function lastDrive(text) {
+  const lines = text.split('\n'), d = lines.filter(l => l.startsWith('drive: '));
+  if (d.length) return d[d.length - 1].slice(7);
+  const imp = lines.filter(l => /^\d+ -?\d+ /.test(l));
+  if (!imp.length) return null;
+  const l = imp[imp.length - 1], k = l.lastIndexOf(' {');
+  return l.slice(k + 1);
+}
+
 let rs = 1;
 const rnd = () => { rs = (rs * 16807) % 2147483647; return rs / 2147483647; };
 const round = (k, v) => /KEEP|COST|PROGRESS/.test(k) ? Math.round(v) : /TIME|GAIN|OUTSIDE/.test(k) ? +v.toFixed(3) : +v.toFixed(2);
@@ -78,13 +89,14 @@ const GRIP_KEYS = /VMAX|ENTRY|AY_MAX|OUTSIDE|SETUP|HB_OVER|HB_STEER|EDGE_SAFE/;
 
 export function searchPlayer(where, kind, from, o) {
   rs = o.seed || 1;
-  const keys = Object.keys(HAND_RANGES).filter(k => kind !== 'grip' || GRIP_KEYS.test(k));
+  const ranges = Object.assign({}, HAND_RANGES, o.ranges || {});
+  const keys = Object.keys(ranges).filter(k => kind !== 'grip' || GRIP_KEYS.test(k));
   let best = { drive: Object.assign({}, from), ...judge(where, kind, from, o) };
   console.log('start ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
   for (let k = 0; k < o.n; k++) {
     const local = k >= o.n * (o.localFrom === undefined ? 0.3 : o.localFrom), drive = Object.assign({}, local ? best.drive : from);
     for (const key of keys) {
-      const [a, b] = HAND_RANGES[key];
+      const [a, b] = ranges[key];
       if (local) { if (rnd() < 0.3) { const cur = drive[key] !== undefined ? drive[key] : RIVAL_DRIVE[key]; drive[key] = round(key, Math.max(a, Math.min(b, cur + (rnd() - 0.5) * (b - a) * 0.25))); } }
       else drive[key] = round(key, a + (b - a) * rnd());
     }
@@ -135,10 +147,14 @@ if (process.argv[1] && process.argv[1].endsWith('ladder2/players.js')) {
   if (args[0] === 'search') {
     const kind = args[1];
     const where = { index: +arg('--track', 0), laps: +arg('--laps', 3), car: arg('--car', 'starter'), up: UP(+arg('--up', 0)), side: +arg('--side', 1) };
-    const f = arg('--from', 'own');
+    /* --range KEY=a,b widens or narrows one number's range */
+    const ranges = {}; for (let i = 0; i < args.length; i++) if (args[i] === '--range') { const [k, v] = args[i + 1].split('='); ranges[k] = v.split(',').map(Number); }
+    let f = arg('--from', 'own');
+    /* --from-log: the best a previous search printed */
+    if (args.includes('--from-log')) { f = lastDrive(fs.readFileSync(arg('--from-log'), 'utf8')) || f; }
     const from = f === 'own' ? PLAYERS[kind].drive : f === 'at' ? (PLAYERS.AT[placeKey(where)] || {})[kind] || PLAYERS[kind].drive : f.startsWith('{') ? JSON.parse(f) : PLAYERS[f] ? PLAYERS[f].drive : rivalById(f).drive;
     console.log('searching the ' + kind + ' player on career ' + (where.index + 1) + ' ' + CAREER[where.index].name + ', ' + where.laps + ' laps, ' + where.car + ' ' + JSON.stringify(where.up) + (arg('--pace') ? ', pace at most ' + arg('--pace') + ' s' : ''));
-    const best = searchPlayer(where, kind, from, { n: +arg('--n', 150), seed: +arg('--seed', 1), pace: arg('--pace') ? +arg('--pace') : 0, localFrom: args.includes('--local') ? 0 : undefined });
+    const best = searchPlayer(where, kind, from, { n: +arg('--n', 150), seed: +arg('--seed', 1), pace: arg('--pace') ? +arg('--pace') : 0, localFrom: args.includes('--local') ? 0 : undefined, ranges });
     console.log('best ' + best.value.toFixed(0) + ' ' + JSON.stringify(best.detail));
     console.log('drive: ' + JSON.stringify(best.drive));
   } else if (args[0] === 'measure') {

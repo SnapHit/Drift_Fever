@@ -16,6 +16,7 @@ import { createPlayer, PLAYERS } from '../../src/rivals/players.js';
 import { carTune } from '../../src/garage/roster.js';
 import { trackFor } from '../../src/ground/source.js';
 import { careerSpec } from '../../src/loop/modes.js';
+const DRIFT = { RADIUS: 42, ANGLE: 85 };   // a drift corner, as game/test/stars/slot.js DRIFT defines one
 
 const q = r => ({ steer: Math.round(r.steer * 1000) / 1000, throttle: Math.round(r.throttle * 100) / 100, brake: Math.round(r.brake * 100) / 100, handbrake: r.handbrake ? 1 : 0 });
 const tracks = new Map();
@@ -33,7 +34,7 @@ export function soloPlayer(where, kind, drive, opts) {
   const scoring = createScoring(), progress = createProgress(track, laps), race = createRace(track, laps, scoring);
   const p = drive ? createPlayer(track, kind, Object.assign({}, PLAYERS[kind].drive, drive), null) : createPlayer(track, kind, null, null, { index: where.index, car: where.car, up: where.up });
   const corners = [];
-  for (let lap = 0; lap < laps; lap++) for (const c of track.corners) corners.push({ name: c.name + (laps > 1 ? ' L' + (lap + 1) : ''), radius: c.radius, from: c.from + lap * track.length, to: c.to + lap * track.length, t: 0, slide: 0, angleSum: 0 });
+  for (let lap = 0; lap < laps; lap++) for (const c of track.corners) corners.push({ name: c.name + (laps > 1 ? ' L' + (lap + 1) : ''), radius: c.radius, angle: Math.abs(c.angle || 0), from: c.from + lap * track.length, to: c.to + lap * track.length, t: 0, slide: 0, angleSum: 0 });
   let dist = track.start.along || 0, along = world.along, t = 0, respawns = 0, minV = Infinity, handsBroken = 0, finished = false;
   const L = track.length, limit = Math.round((o.maxSeconds || 240) / STEP);
   for (let i = 0; i < limit; i++) {
@@ -53,7 +54,8 @@ export function soloPlayer(where, kind, drive, opts) {
     if (progress.state.finished) { scoring.bank(); race.finish(t); finished = true; break; }
   }
   const s = scoring.state, share = c => c.t ? c.slide / c.t : 0;
-  const all = corners.filter(c => c.t > 0), tight = all.filter(c => c.radius <= PLAYERS.MIX_RADIUS);
+  /* the drift corners, as game/test/stars/slot.js defines them */
+  const all = corners.filter(c => c.t > 0), tight = all.filter(c => c.radius <= DRIFT.RADIUS && c.angle >= DRIFT.ANGLE);
   const slid = all.filter(c => c.slide > 0);
   return {
     kind, finished, seconds: +t.toFixed(2), total: s.total, drift: s.drift, clean: s.clean, pace: s.pace, best: s.best,

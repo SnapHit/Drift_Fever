@@ -1,0 +1,119 @@
+{
+ "bar": {
+  "respawns": 0,
+  "spread": 0.1,
+  "slideCorner": 0.3,
+  "mixedCorner": 0.3,
+  "gripDrift": 0.1
+ },
+ "places": {},
+ "own": {
+  "8:starter:111:3": {
+   "where": {
+    "index": 8,
+    "laps": 3,
+    "car": "starter",
+    "up": {
+     "power": 1,
+     "grip": 1,
+     "steer": 1
+    },
+    "upLevel": 1,
+    "side": 1
+   },
+   "players": {
+    "grip": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      89.51,
+      89.67
+     ],
+     "total": [
+      714,
+      717
+     ],
+     "drift": [
+      14,
+      17
+     ],
+     "hard": 0,
+     "walls": 6,
+     "withHard": 0,
+     "worstCorner": 0,
+     "worstTight": 0,
+     "angle": 13.4,
+     "gripShare": 0.023709902370990237,
+     "handsBroken": 0,
+     "minKmh": 85.2,
+     "character": true
+    },
+    "slide": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      105.48,
+      108
+     ],
+     "total": [
+      2991,
+      4838
+     ],
+     "drift": [
+      2392,
+      4134
+     ],
+     "hard": 3,
+     "walls": 8,
+     "withHard": 12,
+     "worstCorner": 0,
+     "worstTight": 0.044,
+     "angle": 19.5,
+     "gripShare": 0.8628509719222462,
+     "handsBroken": 0,
+     "minKmh": 36.7,
+     "character": false
+    },
+    "mixed": {
+     "runs": 21,
+     "unfinished": 0,
+     "respawns": 0,
+     "withRespawn": 0,
+     "seconds": [
+      89.26,
+      90.71
+     ],
+     "total": [
+      3012,
+      4890
+     ],
+     "drift": [
+      2415,
+      4225
+     ],
+     "hard": 5,
+     "walls": 13,
+     "withHard": 21,
+     "worstCorner": 0,
+     "worstTight": 0.35,
+     "angle": 31.5,
+     "gripShare": 0.8640081799591002,
+     "handsBroken": 0,
+     "minKmh": 62.1,
+     "character": true
+    }
+   },
+   "spread": 0.2099,
+   "spreadSeconds": 18.74,
+   "finishes": true,
+   "spreadOk": false,
+   "characterOk": false,
+   "pass": false,
+   "measured": "2026-11-12"
+  }
+ }
+}
