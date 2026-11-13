@@ -1,0 +1,120 @@
+{
+ "runs": [
+  {
+   "tier": "low",
+   "start": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": false,
+    "density": 1
+   },
+   "fast": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": false,
+    "density": 1
+   },
+   "slow": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 4524.5
+     },
+     {
+      "level": 3,
+      "at": 4540.5
+     },
+     {
+      "level": 4,
+      "at": 5324.100000000093
+     }
+    ],
+    "on": true,
+    "done": true,
+    "gaveBack": false,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   },
+   "worn": {
+    "wheels": "blades",
+    "glow": true,
+    "glowTris": 10,
+    "looks": {
+     "wheels": "blades",
+     "glow": "aqua",
+     "smoke": "rose"
+    }
+   }
+  },
+  {
+   "tier": "high",
+   "start": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": true,
+    "density": 1
+   },
+   "fast": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": true,
+    "density": 1
+   },
+   "slow": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 4296
+     },
+     {
+      "level": 2,
+      "at": 4316.100000000093
+     },
+     {
+      "level": 3,
+      "at": 4339.300000000279
+     },
+     {
+      "level": 4,
+      "at": 4506.5
+     }
+    ],
+    "on": true,
+    "done": true,
+    "gaveBack": false,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   },
+   "worn": {
+    "wheels": "blades",
+    "glow": true,
+    "glowTris": 262,
+    "looks": {
+     "wheels": "blades",
+     "glow": "aqua",
+     "smoke": "rose"
+    }
+   }
+  }
+ ]
+}

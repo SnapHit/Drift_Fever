@@ -6,6 +6,7 @@
    and a career run brought mid slide for a shot. */
 import path from 'node:path';
 import fs from 'node:fs';
+import zlib from 'node:zlib';
 import * as R from '../ladder/lib.js';
 
 export * from '../ladder/lib.js';
@@ -80,11 +81,33 @@ export async function pixels(page, png, rect) {
   }, { png: png.toString('base64'), rect });
 }
 
-/* a PNG as raw pixels: { w, h, d } with d the RGBA bytes */
+/* A PNG as raw pixels: { w, h, d } with d the RGBA bytes. Read here
+   with Node's own zlib (a screenshot is an 8 bit RGB or RGBA PNG, not
+   interlaced), so the probes need nothing installed. */
 export async function decode(png) {
-  const sharp = (await import('sharp')).default;
-  const { data, info } = await sharp(png).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  return { w: info.width, h: info.height, d: data };
+  let o = 8, w = 0, h = 0, type = 0;
+  const idat = [];
+  while (o < png.length) {
+    const len = png.readUInt32BE(o), kind = png.toString('ascii', o + 4, o + 8), body = png.subarray(o + 8, o + 8 + len);
+    if (kind === 'IHDR') { w = body.readUInt32BE(0); h = body.readUInt32BE(4); type = body[9]; if (body[8] !== 8 || (type !== 2 && type !== 6) || body[12] !== 0) throw new Error('not an 8 bit RGB or RGBA PNG'); }
+    else if (kind === 'IDAT') idat.push(body);
+    else if (kind === 'IEND') break;
+    o += 12 + len;
+  }
+  const raw = zlib.inflateSync(Buffer.concat(idat)), bpp = type === 6 ? 4 : 3, stride = w * bpp, d = new Uint8Array(w * h * 4), line = new Uint8Array(stride), prev = new Uint8Array(stride);
+  for (let y = 0; y < h; y++) {
+    const f = raw[y * (stride + 1)], src = y * (stride + 1) + 1;
+    for (let x = 0; x < stride; x++) {
+      const a = x >= bpp ? line[x - bpp] : 0, b = prev[x], c = x >= bpp ? prev[x - bpp] : 0, v = raw[src + x];
+      let p = 0;
+      if (f === 1) p = a; else if (f === 2) p = b; else if (f === 3) p = (a + b) >> 1;
+      else if (f === 4) { const q = a + b - c, pa = Math.abs(q - a), pb = Math.abs(q - b), pc = Math.abs(q - c); p = pa <= pb && pa <= pc ? a : pb <= pc ? b : c; }
+      line[x] = (v + p) & 255;
+    }
+    for (let x = 0; x < w; x++) { const t = (y * w + x) * 4, q = x * bpp; d[t] = line[q]; d[t + 1] = line[q + 1]; d[t + 2] = line[q + 2]; d[t + 3] = bpp === 4 ? line[q + 3] : 255; }
+    prev.set(line);
+  }
+  return { w, h, d };
 }
 export const lumOf = (r, g, b) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
 /* how colourful a pixel is: its largest channel less its smallest, 0 to 1 */

@@ -37,6 +37,7 @@ export const SHOWROOM = {
   RING_W:     0.06,          // m
   TICKS:      24,            // marks round the turntable, so its turning reads
   BARS:       { n: 9, colour: 0x9fc0ff, dim: 0.42, r: 12, h: 6.5, w: 0.16, arc: 2.0, y: 0.3 },   // the wall of light behind
+  WALL:       { r: 15, arc: 2.6, rows: [[0, 0x141a36], [1.4, 0x2a3566], [4.2, 0x141a36], [10, 0x090b16]], steps: 24 },   // the curved wall behind the bars: heights (m) and its colour at each, a band of light at the car's height that the car stands out against
   SKY: 0xdfe7ff, GROUND: 0x20243a, HEMI: 0.9,
   KEY: 1.7, KEY_AT: [-5, 7, 6],      // the key light, in front of the car as the camera sees it, left and high
   RIM: 1.5, RIM_AT: [6, 4, -7],      // from behind, for the roof line
@@ -99,6 +100,22 @@ export function createShowroom(THREE, renderer) {
     const a = (i / (B.n - 1) - 0.5) * B.arc, bar = new THREE.Mesh(new THREE.PlaneGeometry(B.w, B.h), barMat);
     bar.position.set(Math.sin(a) * B.r, B.y + B.h / 2, -Math.cos(a) * B.r); bar.rotation.y = -a;
     scene.add(bar);
+  }
+  /* the curved wall behind them, lit in a band at the car's height */
+  {
+    const Wl = S.WALL, pos = [], col = [], c = new THREE.Color();
+    const at = (i, row) => { const a = (i / Wl.steps - 0.5) * Wl.arc; c.setHex(row[1]); return [Math.sin(a) * Wl.r, row[0], -Math.cos(a) * Wl.r, c.r, c.g, c.b]; };
+    const put = v => { pos.push(v[0], v[1], v[2]); col.push(v[3], v[4], v[5]); };
+    for (let i = 0; i < Wl.steps; i++) for (let r = 0; r + 1 < Wl.rows.length; r++) {
+      const a = at(i, Wl.rows[r]), b = at(i + 1, Wl.rows[r]), d = at(i + 1, Wl.rows[r + 1]), e = at(i, Wl.rows[r + 1]);
+      put(a); put(b); put(d); put(a); put(d); put(e);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    const wall = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, side: THREE.DoubleSide }));
+    wall.renderOrder = -2;
+    scene.add(wall);
   }
   /* the soft shadow under the car */
   const soft = softSprite(THREE, 64, false);

@@ -834,6 +834,7 @@ window.__loop = {
   lab: { setLab, labSpec, specFromCode, state: () => app.lab && { settings: app.lab.settings, seed: app.lab.seed, code: app.lab.code, message: app.lab.message, error: app.lab.error, track: app.lab.track && { name: app.lab.track.name, length: app.lab.track.length, kind: app.lab.track.kind, corners: app.lab.track.corners.length, bridges: (app.lab.track.bridges || []).length, fallback: !!app.lab.track.fallback, theme: app.lab.track.theme, preset: app.lab.track.preset } } },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor, battleSpec: id => battleSpec(rivalById(id)), RIVALS, TANDEM,
   showroom, garage: () => ({ picked: app.picked, tab: app.tab, preview: { ...app.preview } }),
+  portraits,
   rival: () => app.rival, tandem: () => app.tandem.state, lead: () => app.lead && app.lead.state,
   /* the probes: the next battle's rival with a start offset, a grip share or a driving number changed (rivals/rival.js opts); null for none */
   setRivalProbe(o) { app.rivalProbe = o || null; },

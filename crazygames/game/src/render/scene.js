@@ -395,7 +395,7 @@ export function createScene(canvas, opts) {
     const t = carTune(id), V = t ? t.VEHICLE : TUNE.VEHICLE;
     let m = makeCar(THREE, id, { paint: paintHex, wheels: look ? look.wheels : null, glowForm: tier === 'high' ? 'soft' : 'cheap' });
     if (ghost) m = makeGhostly(m, LOOP.GHOST_OPACITY, LOOP.GHOST_TINT);
-    else m.group.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
+    else m.group.traverse(o => { if (o.isMesh) { o.castShadow = o !== m.underglow; o.receiveShadow = false; } });   // the glow is light: it throws no shadow
     m.group.position.z = V.WHEELBASE / 2 - V.CG_TO_FRONT;
     root.add(m.group);
     return { model: m, bRear: V.WHEELBASE - V.CG_TO_FRONT, half: V.TRACK / 2 };

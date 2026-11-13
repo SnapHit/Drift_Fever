@@ -1,0 +1,242 @@
+{
+ "390x844": {
+  "pad cars": {
+   "all": 12,
+   "missed": [],
+   "udMissed": 7
+  },
+  "pad paint": {
+   "all": 16,
+   "missed": [],
+   "udMissed": 6
+  },
+  "pad wheels": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 5
+  },
+  "pad glow": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 5
+  },
+  "pad smoke": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 5
+  },
+  "pad upgrades": {
+   "all": 10,
+   "missed": [],
+   "udMissed": 4
+  },
+  "padTrip": {
+   "preview": "violet",
+   "coinsAfterPreview": 3000,
+   "coins": 2600,
+   "worn": "violet",
+   "afterB": "screen title"
+  },
+  "keys": {
+   "want": 13,
+   "tabMiss": [],
+   "kPreview": {
+    "look": "discs",
+    "coins": 3000
+   },
+   "kBought": {
+    "worn": "discs",
+    "coins": 2200
+   }
+  },
+  "touch": {
+   "tPreview": {
+    "look": "lime",
+    "coins": 3000
+   },
+   "tBought": {
+    "worn": "lime",
+    "coins": 2700
+   }
+  },
+  "drag": {
+   "turning": 0.42000000000000703,
+   "byHand": 1.3200000000000007,
+   "expected": 1.3199999999999998,
+   "held": 0,
+   "resumed": 1.5154831645395905,
+   "again": 0.41999314373311947,
+   "touch": -0.9900000000000002,
+   "touchExpected": -0.99,
+   "offStage": {
+    "dragging": false,
+    "moved": 0
+   }
+  },
+  "tip": {
+   "tab": "cars",
+   "on": "CARS",
+   "cards": 5
+  }
+ },
+ "844x390": {
+  "pad cars": {
+   "all": 12,
+   "missed": [],
+   "udMissed": 7
+  },
+  "pad paint": {
+   "all": 16,
+   "missed": [],
+   "udMissed": 13
+  },
+  "pad wheels": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 10
+  },
+  "pad glow": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 10
+  },
+  "pad smoke": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 10
+  },
+  "pad upgrades": {
+   "all": 10,
+   "missed": [],
+   "udMissed": 4
+  },
+  "padTrip": {
+   "preview": "violet",
+   "coinsAfterPreview": 3000,
+   "coins": 2600,
+   "worn": "violet",
+   "afterB": "screen title"
+  },
+  "keys": {
+   "want": 13,
+   "tabMiss": [],
+   "kPreview": {
+    "look": "discs",
+    "coins": 3000
+   },
+   "kBought": {
+    "worn": "discs",
+    "coins": 2200
+   }
+  },
+  "touch": {
+   "tPreview": {
+    "look": "lime",
+    "coins": 3000
+   },
+   "tBought": {
+    "worn": "lime",
+    "coins": 2700
+   }
+  },
+  "drag": {
+   "turning": 0.42000000000000703,
+   "byHand": 1.3200000000000007,
+   "expected": 1.3199999999999998,
+   "held": 0,
+   "resumed": 1.5154831645395905,
+   "again": 0.41999314373311947,
+   "touch": -0.9900000000000002,
+   "touchExpected": -0.99,
+   "offStage": {
+    "dragging": false,
+    "moved": 0
+   }
+  },
+  "tip": {
+   "tab": "cars",
+   "on": "CARS",
+   "cards": 5
+  }
+ },
+ "1280x720": {
+  "pad cars": {
+   "all": 12,
+   "missed": [],
+   "udMissed": 7
+  },
+  "pad paint": {
+   "all": 16,
+   "missed": [],
+   "udMissed": 12
+  },
+  "pad wheels": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 10
+  },
+  "pad glow": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 10
+  },
+  "pad smoke": {
+   "all": 14,
+   "missed": [],
+   "udMissed": 10
+  },
+  "pad upgrades": {
+   "all": 10,
+   "missed": [],
+   "udMissed": 4
+  },
+  "padTrip": {
+   "preview": "violet",
+   "coinsAfterPreview": 3000,
+   "coins": 2600,
+   "worn": "violet",
+   "afterB": "screen title"
+  },
+  "keys": {
+   "want": 13,
+   "tabMiss": [],
+   "kPreview": {
+    "look": "discs",
+    "coins": 3000
+   },
+   "kBought": {
+    "worn": "discs",
+    "coins": 2200
+   }
+  },
+  "touch": {
+   "tPreview": {
+    "look": "lime",
+    "coins": 3000
+   },
+   "tBought": {
+    "worn": "lime",
+    "coins": 2700
+   }
+  },
+  "drag": {
+   "turning": 0.42000000000000703,
+   "byHand": 1.3200000000000007,
+   "expected": 1.3199999999999998,
+   "held": 0,
+   "resumed": 1.5154831645395905,
+   "again": 0.41999314373311947,
+   "touch": -0.9900000000000002,
+   "touchExpected": -0.99,
+   "offStage": {
+    "dragging": false,
+    "moved": 0
+   }
+  },
+  "tip": {
+   "tab": "cars",
+   "on": "CARS",
+   "cards": 5
+  }
+ }
+}
