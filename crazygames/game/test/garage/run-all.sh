@@ -18,7 +18,7 @@ node game/test/garage/controls.js        #    keyboard, touch, gamepad, the drag
 node game/test/garage/wearing.js         #    ghosts and rivals wear their own
 node game/test/garage/adapt.js           # 7  the quality still adapts
 if [ "$1" = "perf" ]; then
-  node game/test/garage/perf.js low      # 7  frame cost, about 30 minutes
-  node game/test/garage/perf.js high     #    about 15 minutes
-  node game/test/garage/perf.js known    #    about 15 minutes
+  node game/test/garage/perf.js low      # 7  frame cost, about 25 minutes
+  node game/test/garage/perf.js high     #    about 8 minutes
+  node game/test/garage/perf.js known    #    about 8 minutes
 fi
