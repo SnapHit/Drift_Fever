@@ -31,6 +31,7 @@ import { createInput } from './input/input.js';
 import { createScoring } from './scoring/drift.js';
 import { createHud } from './ui/hud.js';
 import { createScreens } from './ui/screens.js';
+import { createPadNav } from './ui/padnav.js';
 import { createOnboarding, cornerAhead } from './ui/onboard.js';
 import { createTunePanel, loadSavedTune } from './ui/tune.js';
 import { createDebug } from './ui/debug.js';
@@ -66,6 +67,11 @@ const chase = createChaseCamera();
 const input = createInput(root);
 const hud = createHud(root);
 const screens = createScreens(root, onAction);
+/* the menus by gamepad; in a run its back button leaves for the title, or skips the first run's prompts */
+const padnav = createPadNav(screens.el, {
+  canPress: () => app.state !== 'results' || app.lockout <= 0,
+  onBack: () => { const sk = document.querySelector('#skip'); if (onboard.active && sk && !sk.hidden) sk.click(); else if (app.state === 'drive' || app.state === 'countdown' || app.state === 'free') hud.exit.click(); },
+});
 const onboard = createOnboarding(root, () => { save.setOnboarded(); sound.ui('tap'); });
 const sound = createSound();
 if (query.has('assist')) TUNE.ASSIST.LEVEL = Math.max(0, Math.min(1, +query.get('assist') || 0));
@@ -212,6 +218,7 @@ function frame(t) {
   last = t;
   resize();
   const raw = input.read(t);
+  padnav.update(t);
   if (window.__feel.inject) Object.assign(raw, window.__feel.inject);   // the probes' input
   const world = app.world;
   const S = app.state;
@@ -246,7 +253,7 @@ function frame(t) {
     acc = Math.max(0, acc - steps * STEP);
     physMs = performance.now() - p0; lastSteps = steps;
     if (S === 'drive' && app.settle > 0) { app.settle -= dt * ts; if (app.settle <= 0) finishRun(); }
-    if (S === 'results') { app.lockout -= dt; if (app.lockout <= 0 && raw.action) onAction('again'); }
+    if (S === 'results') { app.lockout -= dt; if (app.lockout <= 0 && raw.action && !padnav.owns()) onAction('again'); }
   }
   const alpha = stepping ? acc / STEP : 0;
   const c = world.car;
@@ -747,7 +754,7 @@ scene.ready.then(() => {
 window.__feel = {
   draw: true,          // the probes turn the GPU submission off on the way to a frame
   inject: null,        // { steer, throttle, brake, handbrake } written over the live input by the probes
-  TUNE, STEP, scoring, chase, scene, input, hud, view, pose, tape, groundName: devGround || null, tunedFromDevice: tuned,
+  TUNE, STEP, scoring, chase, scene, input, padnav, hud, view, pose, tape, groundName: devGround || null, tunedFromDevice: tuned,
   get world() { return app.world; },
   frame, restart: resetRun,
   hash: () => app.world.hash(),

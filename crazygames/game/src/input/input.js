@@ -10,7 +10,7 @@
    steering) and stops the car (without). The physics still takes brake
    and throttle, for the scripted driver.
    Keyboard: left and right (arrows or A, D) steer; space, shift, up,
-   down, W or S drift; R restart. Gamepad: left stick or d-pad steer, A,
+   down, W or S drift (the letters by position, so Q, D, Z, S on AZERTY); R restart. Gamepad: left stick or d-pad steer, A,
    B, X or either trigger drift, Y or start restart.
    Touch: the big buttons touch.js draws; a thumb can slide between the
    two steer buttons without lifting.
@@ -30,7 +30,15 @@ export function createInput(root) {
   let lastKey = 0, lastPad = 0, lastTouch = 0, now = 0;
   const touch = createTouch(root, () => { lastTouch = now; }, () => { restartEdge = true; lastTouch = now; });
 
-  const keyMap = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'hb', ArrowDown: 'hb', a: 'left', A: 'left', d: 'right', D: 'right', w: 'hb', W: 'hb', s: 'hb', S: 'hb', ' ': 'hb', Shift: 'hb' };
+  /* Letters are read by where the key sits (e.code), not by what it
+     prints, so the WASD block is ZQSD on an AZERTY keyboard with no
+     rebinding (CrazyGames' quality guidelines, checked 14 November 2026).
+     Arrows, space and shift are the same key everywhere. A key event with
+     no code (some remote keyboards) falls back to the letter it prints. */
+  const codeMap = { KeyA: 'left', KeyD: 'right', KeyW: 'hb', KeyS: 'hb' };
+  const keyMap = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'hb', ArrowDown: 'hb', ' ': 'hb', Shift: 'hb' };
+  const letterMap = { a: 'left', A: 'left', d: 'right', D: 'right', w: 'hb', W: 'hb', s: 'hb', S: 'hb' };
+  const bound = e => keyMap[e.key] || (e.code ? codeMap[e.code] : letterMap[e.key]);
   /* The car drives itself once the player has pressed anything (DESIGN:
      no brake; DRIFT slows it). Until then it waits on the line. */
   let started = false;
@@ -39,11 +47,11 @@ export function createInput(root) {
     if (typing(e)) return;   // a text field (the Lab's code entry) keeps its keys
     if (e.key === 'r' || e.key === 'R') { if (!e.repeat) { restartEdge = true; actionEdge = true; } lastKey = now; e.preventDefault(); return; }
     if (e.key === 'Enter') { if (!e.repeat) actionEdge = true; lastKey = now; return; }
-    const k = keyMap[e.key];
+    const k = bound(e);
     if (!k) return;
     keys.add(k); lastKey = now; e.preventDefault();
   });
-  window.addEventListener('keyup', e => { const k = keyMap[e.key]; if (k) keys.delete(k); });
+  window.addEventListener('keyup', e => { const k = bound(e); if (k) keys.delete(k); });
   window.addEventListener('blur', () => keys.clear());
 
   let padSeen = false;

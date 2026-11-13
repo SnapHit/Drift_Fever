@@ -10,8 +10,18 @@
    something changes. */
 import { LOOP } from '../tune.js';
 
+/* What the keys at A's and D's positions print on this keyboard (Q and D
+   on AZERTY), where the browser can say (Chromium's keyboard map, a
+   local lookup, no request). Elsewhere the caps read A and D. */
+const LAYOUT = {};
+try {
+  if (navigator.keyboard && navigator.keyboard.getLayoutMap) navigator.keyboard.getLayoutMap().then(m => {
+    for (const c of ['KeyA', 'KeyD']) { const v = m.get(c); if (v && v.length === 1) LAYOUT[c] = v.toUpperCase(); }
+  }).catch(() => {});
+} catch (e) {}
+
 const KEYS = {
-  steer: '<span class="keys"><kbd>&#9664;</kbd><kbd>&#9654;</kbd><i>or</i><kbd>A</kbd><kbd>D</kbd></span>',
+  steer: '<span class="keys"><kbd>&#9664;</kbd><kbd>&#9654;</kbd><i>or</i><kbd data-code="KeyA">A</kbd><kbd data-code="KeyD">D</kbd></span>',
   drift: '<span class="keys"><kbd class="wide">SPACE</kbd><i>+</i><kbd>&#9664;</kbd><kbd>&#9654;</kbd></span>',
   brake: '<span class="keys"><kbd class="wide">SPACE</kbd></span>',
 };
@@ -66,7 +76,7 @@ export function createOnboarding(root, onSkip) {
     st.step = step; st.stepT = 0; st.steerT = 0; st.hbT = 0; st.shown.push(step);
     const touch = st.source === 'touch', pad = st.source === 'pad';
     const text = TEXT[step][touch ? 'touch' : 'keys'];
-    const keys = touch ? '' : pad ? PAD[step] : KEYS[step];
+    const keys = touch ? '' : pad ? PAD[step] : KEYS[step].replace(/data-code="(\w+)">\w</g, (m, c) => 'data-code="' + c + '">' + (LAYOUT[c] || m.slice(-2, -1)) + '<');
     const arrow = touch ? '<span class="arrow">&#9660;</span>' : '';
     setPrompt('<b>' + text + '</b>' + keys + arrow, touch ? (step === 'steer' ? 'at-left' : 'at-right') : 'centre');
   }

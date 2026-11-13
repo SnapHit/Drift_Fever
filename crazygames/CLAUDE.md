@@ -677,3 +677,26 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   raced the new three: whether a player can beat Dovane at 83 points
   a second is for play. Stored best margins over the old three stay
   in a save.
+- 14 November 2026, CrazyGames readiness, first two pieces
+  (`game/test/ready/`, `review/ready/`). Their pages were read the same
+  day: the quality guidelines ask that keys follow the keyboard's
+  layout (their example is ZQSD on AZERTY); nothing on the gameplay,
+  technical or quality pages asks for a gamepad, so pad menus are a
+  nicety, not a requirement. (1) Letters are bound by where the key
+  sits (`e.code` in `input/input.js`), so ZQSD works on AZERTY with no
+  rebinding, and the first run's key caps print what the keys at A and
+  D print where the browser can say (Chromium's keyboard map).
+  (2) Every menu works by gamepad (`ui/padnav.js`, `PADNAV`): d-pad or
+  stick moves a focus ring to the nearest button that way, A presses,
+  B goes back; in a run the back button (select) leaves for the title
+  or skips the first run's prompts. The ring shows only once a pad is
+  used. `ready/pad.js` proves every enabled button on title, career,
+  rivals, garage and lab is reachable at three sizes. Not measured: the
+  results screen by pad, and a real controller (the probe feeds button
+  states). Still to do for readiness: the SDK adapter (their script is
+  an external request and their SDK throws on any other domain, so it
+  must load only when the game is on CrazyGames; the Basic launch needs
+  one "Gameplay start" event), `user-select: none` on the body, frame
+  rate on a real GPU and a 4 GB Chromebook, the ten iframe sizes from
+  800x450 to 1920x1080 at pixel ratio 1.
+

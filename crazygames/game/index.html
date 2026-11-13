@@ -193,6 +193,8 @@
   button.big { width: 100%; min-height: 60px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.22); background: rgba(10,14,30,0.6); color: #fff; font: inherit; padding: 10px 16px; text-align: left; display: flex; flex-direction: column; gap: 2px; -webkit-tap-highlight-color: transparent; }
   button.big b { font-size: 18px; font-weight: 900; letter-spacing: 0.06em; }
   button.big small { font-size: 12px; opacity: 0.75; }
+  /* the gamepad's focus ring (ui/padnav.js), shown only once a pad is used */
+  #screens .padfocus { outline: 3px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 6px rgba(255,255,255,0.22); }
   button.big.primary { background: rgba(239,90,23,0.24); border-color: var(--brand-line); }
   button.big:disabled { opacity: 0.45; }
   button.big:active { background: rgba(25,216,255,0.4); }

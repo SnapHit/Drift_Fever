@@ -1,0 +1,143 @@
+{
+ "390x844 title": {
+  "before": 0,
+  "all": 10,
+  "missed": [],
+  "start": "daily|",
+  "udMissed": 4,
+  "ring": 1
+ },
+ "390x844 career": {
+  "before": 0,
+  "all": 2,
+  "missed": [],
+  "start": "play-career|0",
+  "udMissed": 0,
+  "ring": 1
+ },
+ "390x844 rivals": {
+  "before": 0,
+  "all": 1,
+  "missed": [],
+  "start": "title|",
+  "udMissed": 0,
+  "ring": 1
+ },
+ "390x844 garage": {
+  "before": 0,
+  "all": 17,
+  "missed": [],
+  "start": "pick-car|starter",
+  "udMissed": 5,
+  "ring": 1
+ },
+ "390x844 lab": {
+  "before": 0,
+  "all": 25,
+  "missed": [],
+  "start": "lab-drive|",
+  "udMissed": 7,
+  "ring": 1
+ },
+ "390x844 trip": {
+  "focus": "career|",
+  "afterA": "screen career",
+  "afterB": "screen title",
+  "inRun": true,
+  "afterBack": "screen title"
+ },
+ "844x390 title": {
+  "before": 0,
+  "all": 10,
+  "missed": [],
+  "start": "daily|",
+  "udMissed": 7,
+  "ring": 1
+ },
+ "844x390 career": {
+  "before": 0,
+  "all": 2,
+  "missed": [],
+  "start": "play-career|0",
+  "udMissed": 0,
+  "ring": 1
+ },
+ "844x390 rivals": {
+  "before": 0,
+  "all": 1,
+  "missed": [],
+  "start": "title|",
+  "udMissed": 0,
+  "ring": 1
+ },
+ "844x390 garage": {
+  "before": 0,
+  "all": 17,
+  "missed": [],
+  "start": "pick-car|starter",
+  "udMissed": 9,
+  "ring": 1
+ },
+ "844x390 lab": {
+  "before": 0,
+  "all": 25,
+  "missed": [],
+  "start": "lab-drive|",
+  "udMissed": 13,
+  "ring": 1
+ },
+ "844x390 trip": {
+  "focus": "career|",
+  "afterA": "screen career",
+  "afterB": "screen title",
+  "inRun": true,
+  "afterBack": "screen title"
+ },
+ "1280x720 title": {
+  "before": 0,
+  "all": 10,
+  "missed": [],
+  "start": "daily|",
+  "udMissed": 0,
+  "ring": 1
+ },
+ "1280x720 career": {
+  "before": 0,
+  "all": 2,
+  "missed": [],
+  "start": "play-career|0",
+  "udMissed": 0,
+  "ring": 1
+ },
+ "1280x720 rivals": {
+  "before": 0,
+  "all": 1,
+  "missed": [],
+  "start": "title|",
+  "udMissed": 0,
+  "ring": 1
+ },
+ "1280x720 garage": {
+  "before": 0,
+  "all": 17,
+  "missed": [],
+  "start": "pick-car|starter",
+  "udMissed": 9,
+  "ring": 1
+ },
+ "1280x720 lab": {
+  "before": 0,
+  "all": 25,
+  "missed": [],
+  "start": "lab-drive|",
+  "udMissed": 10,
+  "ring": 1
+ },
+ "1280x720 trip": {
+  "focus": "career|",
+  "afterA": "screen career",
+  "afterB": "screen title",
+  "inRun": true,
+  "afterBack": "screen title"
+ }
+}
