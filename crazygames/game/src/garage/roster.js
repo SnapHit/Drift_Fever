@@ -35,7 +35,7 @@ export const ROSTER = [
   },
   {
     id: 'hatch', name: 'Light hatch', character: 'Small and twitchy. Turns in a flash, slides early.',
-    price: 900, paint: 'amber', rev: 2,
+    price: 2500, paint: 'amber', rev: 2,
     dims: { length: 3.68, width: 1.70, wheelbase: 2.32, track: 1.48, wheelRadius: 0.30 },
     handling: {
       VEHICLE: { MASS: 1020, WHEELBASE: 2.32, CG_TO_FRONT: 1.14, TRACK: 1.48, HALF_LENGTH: 1.84, HALF_WIDTH: 0.85, WHEEL_RADIUS: 0.30, INERTIA_FACTOR: 0.95, ACCEL: 15.5, TOP_SPEED: 66, STEER_RATE: 4.2, STEER_RETURN: 6.0, LOCK: 35 },
@@ -44,7 +44,7 @@ export const ROSTER = [
   },
   {
     id: 'tourer', name: 'Grand tourer', character: 'Long, wide and heavy. Smooth, holds a slide forever.',
-    price: 1800, paint: 'wine', rev: 2,
+    price: 5500, paint: 'wine', rev: 2,
     dims: { length: 4.80, width: 1.90, wheelbase: 2.86, track: 1.66, wheelRadius: 0.35 },
     handling: {
       VEHICLE: { MASS: 1620, WHEELBASE: 2.86, CG_TO_FRONT: 1.40, TRACK: 1.66, HALF_LENGTH: 2.40, HALF_WIDTH: 0.95, WHEEL_RADIUS: 0.35, INERTIA_FACTOR: 1.30, ACCEL: 14, TOP_SPEED: 72, STEER_RATE: 2.6, STEER_RETURN: 4.0, LOCK: 30 },
@@ -53,7 +53,7 @@ export const ROSTER = [
   },
   {
     id: 'fastback', name: 'Fastback', character: 'Raw power. Fast everywhere, wants a firm hand.',
-    price: 3200, paint: 'flame', rev: 2,
+    price: 10000, paint: 'flame', rev: 2,
     dims: { length: 4.70, width: 1.92, wheelbase: 2.76, track: 1.62, wheelRadius: 0.35 },
     handling: {
       VEHICLE: { MASS: 1480, WHEELBASE: 2.76, CG_TO_FRONT: 1.32, TRACK: 1.62, HALF_LENGTH: 2.35, HALF_WIDTH: 0.96, WHEEL_RADIUS: 0.35, INERTIA_FACTOR: 1.15, ACCEL: 16.5, TOP_SPEED: 76, TURN_LIFT: 0.75 },
@@ -62,7 +62,7 @@ export const ROSTER = [
   },
   {
     id: 'driftbuild', name: 'Drift build', character: 'Low, wide and aggressive. The biggest angles.',
-    price: 6000, paint: 'magenta', rev: 2,
+    price: 16000, paint: 'magenta', rev: 2,
     dims: { length: 4.48, width: 2.00, wheelbase: 2.62, track: 1.70, wheelRadius: 0.34 },
     handling: {
       VEHICLE: { MASS: 1280, WHEELBASE: 2.62, CG_TO_FRONT: 1.30, TRACK: 1.70, HALF_LENGTH: 2.24, HALF_WIDTH: 1.00, WHEEL_RADIUS: 0.34, INERTIA_FACTOR: 1.08, ACCEL: 15.5, TOP_SPEED: 72, LOCK: 36, STEER_RATE: 3.6 },

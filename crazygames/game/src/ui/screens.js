@@ -4,7 +4,7 @@
    to the host. Big targets for thumbs: everything is reachable in
    390x844 portrait and in landscape. No images, no fonts, system text. */
 import { ROSTER, PAINTS, carById, upgradeLevels, UPGRADE_STATS, UPGRADE_NAMES } from '../garage/roster.js';
-import { CAREER, CHAPTERS, careerUnlocked, careerStars, chapterStars, chapterOpen, starsToOpen } from '../loop/modes.js';
+import { CAREER, CHAPTERS, careerUnlocked, careerStars, chapterStars, chapterOpen, chapterNeeds } from '../loop/modes.js';
 import { missionTally } from '../loop/missions.js';
 import { LOOP, TANDEM } from '../tune.js';
 import { fullscreenSupported, isFullscreen, fullscreenIcon } from './fullscreen.js';
@@ -152,8 +152,7 @@ export function createScreens(root, onAction) {
         ${playable ? '<span class="col">' + stars(e ? e.stars : 0) + pips(save.missions && save.missions['career:' + i]) + '</span>' : '<span class="lock">&#128274;</span>'}
       </button>` + rivalCard(save, i);
       }).join('');
-      const k = starsToOpen(save, c);
-      const sub = open ? `${chapterStars(save, c)}/${size * 3} &#9733; &middot; ${done}/${size * 3} missions` : `${k} more ${esc(CHAPTERS[c - 1].name)} star${k === 1 ? '' : 's'} to open ${esc(ch.name)}`;
+      const sub = open ? `${chapterStars(save, c)}/${size * 3} &#9733; &middot; ${done}/${size * 3} missions` : esc(chapterNeeds(save, c));
       return `<section class="chapter${open ? '' : ' locked'}" data-chapter="${c}"><div class="chead"><b>${esc(ch.name.toUpperCase())}</b><small>${sub}</small></div>${rows}</section>`;
     }).join('');
     const tally = missionTally(save, CAREER.length);
@@ -248,6 +247,13 @@ export function createScreens(root, onAction) {
     const nextLine = !N ? '' : N.last ? `<p class="unlock done">${r.won ? 'The whole ladder is yours' : 'The last rival on the ladder'}</p>`
       : N.open ? (r.offer ? `<p class="unlock done">&#128275; Next rival earned: ${esc(N.name)}</p>` : '')
       : `<p class="unlock nextr">Next, ${esc(N.name)}: ${N.needs.map(n => `<span class="${n.done ? 'done' : ''}">${n.done ? '&#10003;' : '&#9675;'} ${esc(n.text)}</span>`).join(' ')}</p>`;
+    /* back into the career from a race (the author, 14 November 2026: he had to go by MENU and CAREER). After a win with no new rival to race, the next track is the main button; otherwise it sits in the row under REMATCH */
+    const C = r.career, careerMain = !!(C && r.won && !goNext);
+    const rematch = cls => `<button type="button" class="big${cls}" data-action="again"><b>REMATCH</b>${cls === ' primary' || !C ? '<small>DRIFT / BRAKE, Enter or R</small>' : ''}</button>`;
+    const careerBtn = cls => C ? `<button type="button" class="big${cls}" data-action="play-career" data-arg="${C.index}"><b>${cls ? 'NEXT TRACK' : 'CAREER'}</b><small>${cls ? esc(C.where) + ' &middot; ' : ''}${esc(C.name)}</small></button>` : '';
+    const rivalsBtn = '<button type="button" class="big" data-action="rivals"><b>RIVALS</b></button>', menuBtn = '<button type="button" class="big" data-action="title"><b>MENU</b></button>';
+    const main = careerMain ? careerBtn(' primary') : rematch(r.won && goNext ? '' : ' primary');
+    const row2 = !C ? next + rivalsBtn + menuBtn : careerMain ? rematch('') + rivalsBtn + menuBtn : goNext ? next + careerBtn('') + menuBtn : careerBtn('') + rivalsBtn + menuBtn;
     const P = r.parts || {}, Q = r.rivalParts || {}, gates = Math.max(0, (r.gates || 1) - 1);
     const row = (label, x, y, hint) => `<tr><th>${label}${hint ? ` <small>${hint}</small>` : ''}</th><td>${x}</td><td>${y}</td></tr>`;
     const n = v => fmt(v || 0);
@@ -267,8 +273,8 @@ export function createScreens(root, onAction) {
         ${table}
         <div class="facts"><span>${coinsN}<small>coins${r.prize ? ' &middot; first win +' + fmt(r.prize) : ''}</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>race</small></span><span><b>${r.best2 !== undefined && r.best2 > -1e9 ? (r.best2 >= 0 ? '+' : '') + fmt(r.best2) : ''}</b><small>best margin</small></span></div>
         ${nextLine}
-        <button type="button" class="big${r.won && goNext ? '' : ' primary'}" data-action="again"><b>REMATCH</b><small>DRIFT / BRAKE, Enter or R</small></button>
-        <div class="row2">${next}<button type="button" class="big" data-action="rivals"><b>RIVALS</b></button><button type="button" class="big" data-action="title"><b>MENU</b></button></div>${z}
+        ${main}
+        <div class="row2">${row2}</div>${z}
       </div>`);
   }
 

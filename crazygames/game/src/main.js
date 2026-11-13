@@ -40,7 +40,7 @@ import { createRace } from './scoring/race.js';
 import { fullscreenSupported, toggleFullscreen, onFullscreenChange, fullscreenIcon } from './ui/fullscreen.js';
 import { createSound, soundIcon } from './audio/sound.js';
 import { createGhost, compactTape } from './loop/ghost.js';
-import { CAREER, CHAPTERS, chapterOf, chapterOpen, starsToOpen, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
+import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
@@ -445,7 +445,7 @@ function careerNews(index, wasOpen, nextChapterWasOpen) {
   } else {
     if (n < CAREER.length && careerUnlocked(save.state, n)) nextIndex = n;
     unlock = trackLine();
-    if (up && !chapterOpen(save.state, c + 1)) { const k = starsToOpen(save.state, c + 1); note = { text: k + ' more ' + ch.name + ' star' + (k === 1 ? '' : 's') + ' to open ' + up.name }; }
+    if (up && !chapterOpen(save.state, c + 1)) note = { text: chapterNeeds(save.state, c + 1) };
   }
   return { unlock, note, nextIndex };
 }
@@ -574,7 +574,7 @@ function finishBattle() {
     rivalParts: { drift: rs.drift, clean: rs.clean, pace: rs.pace, leads: L.rival.lead, line: L.rival.line, close: 0 },
     gates: L.gates, leadGates: L.player.gates, rivalGates: L.rival.gates, lineTo: L.owner[L.gates - 1] || null, changes: L.changes,
     coins, name: spec.name, label: runHead(spec).label, seconds: app.runTime, laps: app.laps, kind: app.track.kind, steps: tape.reduce((n, e) => n + e.n, 0), hash: app.world.hash(), rivalHash: R.hash(),
-    offer: opened ? { id: opened, name: rivalById(opened).name } : null, next: nextRival(def), nextIndex: null, best2: (save.state.rivals[def.id] || {}).best };
+    offer: opened ? { id: opened, name: rivalById(opened).name } : null, next: nextRival(def), career: careerNext(), nextIndex: null, best2: (save.state.rivals[def.id] || {}).best };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (FX_ON && won) scene.fireworks(3);
   if (won) for (let i = 0; i < 3; i++) sound.ui('star', i + 1, 0.35 + i * 0.28);
@@ -582,6 +582,15 @@ function finishBattle() {
   hud.setCount('', false); hud.setVisible(false); hud.setMissions(null); input.touch.setVisible(false);
   screens.results(app.results);
   if (FX_ON) countCoins(0.45 + (won ? 3 : 0) * 0.28);
+}
+/* Where the career goes on from here, for a race's results: the first
+   open track never finished, else the first open one short of three
+   stars; null when there is neither. */
+function careerNext() {
+  const S = save.state, at = i => { const ch = CHAPTERS[chapterOf(i)]; return { index: i, name: CAREER[i].name, where: ch.name + ' track ' + (i - ch.from + 1) }; };
+  for (let i = 0; i < CAREER.length; i++) if (careerUnlocked(S, i) && !S.career[String(i)]) return at(i);
+  for (let i = 0; i < CAREER.length; i++) if (careerUnlocked(S, i) && S.career[String(i)].stars < 3) return at(i);
+  return null;
 }
 /* The rival after def on the ladder, for a race's results: his name, and
    either that he is open (a button) or what still earns him; null after

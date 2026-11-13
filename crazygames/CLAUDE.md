@@ -630,3 +630,29 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   on the old game live under the root origin and must keep working at
   its new address, and old links to the root game should still land
   somewhere sensible.
+- 14 November 2026, after the author's own new player run (incognito,
+  from an empty save; he beat all six rivals and calls the game
+  excellent). Four findings.
+  (1) No path from a race's results back into the career: the results
+  now carry it. After a win with no new rival to race, NEXT TRACK (the
+  first open track never finished, else the first short of three
+  stars) is the main button; otherwise CAREER sits under REMATCH
+  (`careerNext` in `main.js`).
+  (2) He never needed tracks 6 to 8 of Rookie or Pro. **A chapter now
+  opens only when every track of the one before has been finished, as
+  well as its stars** (`tracksToOpen`, `chapterNeeds` in
+  `loop/modes.js`); a save with a run already in a chapter keeps it.
+  (3) Too easy: he had the fastback bought and upgraded by the start
+  of Pro and never drove anything twice. First step, the economy: cars
+  2,500, 5,500, 10,000 and 16,000 (were 900, 1,800, 3,200, 6,000) and
+  upgrade steps 400, 900 and 1,800 (were 250, 500, 900); the payout is
+  unchanged, about 7,500 for one clean pass of a chapter, and owned
+  cars stay owned. Second step, quicker later rivals:
+  `briefs/RIVALS-PACE.md`, a background build. Star targets are left
+  alone until both are played. All first guesses for play.
+  (4) His chosen paint sometimes does not show in a race. Not found by
+  reading (every run reads the saved paint); paint is kept per car, so
+  a newly bought car starts in its own colour. Deferred by him.
+  `game/test/play13/career.js` measures 1 to 3. Not rerun: the
+  chapters and garage rounds' own probes, which may now disagree with
+  the new rule and prices.

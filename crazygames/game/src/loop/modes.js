@@ -108,8 +108,29 @@ export function starsToOpen(save, c) {
   if (c <= 0 || c >= CHAPTERS.length) return 0;
   return Math.max(0, LOOP.CHAPTERS.OPEN[c] - chapterStars(save, c - 1));
 }
-/* Is a chapter open: the first always, the rest by the stars of the one before. */
-export function chapterOpen(save, c) { return c === 0 || (c > 0 && c < CHAPTERS.length && starsToOpen(save, c) === 0); }
+/* How many tracks of the chapter before c have never been finished: 0
+   when c is open on that count. Every track must be driven to its line
+   before the next chapter opens (the author, 14 November 2026: by track
+   5 he had the stars and the rival, so tracks 6 to 8 were skipped). A
+   save that already has a run in chapter c keeps it open. */
+export function tracksToOpen(save, c) {
+  if (c <= 0 || c >= CHAPTERS.length) return 0;
+  const ch = CHAPTERS[c], prev = CHAPTERS[c - 1];
+  for (let i = ch.from; i < CAREER.length; i++) if (save.career[String(i)]) return 0;
+  let n = 0;
+  for (let i = prev.from; i < prev.to; i++) if (!save.career[String(i)]) n++;
+  return n;
+}
+/* What still opens chapter c, in the player's words; '' when it is open. */
+export function chapterNeeds(save, c) {
+  if (c <= 0 || c >= CHAPTERS.length) return '';
+  const k = starsToOpen(save, c), t = tracksToOpen(save, c), prev = CHAPTERS[c - 1].name, parts = [];
+  if (k) parts.push(k + ' more ' + prev + ' star' + (k === 1 ? '' : 's'));
+  if (t) parts.push((k ? 'finish ' : 'Finish ') + (t === 1 ? 'the last ' + prev + ' track' : t + ' more ' + prev + ' tracks'));
+  return parts.length ? parts.join(' and ') + ' to open ' + CHAPTERS[c].name : '';
+}
+/* Is a chapter open: the first always, the rest by the stars of the one before and every one of its tracks finished. */
+export function chapterOpen(save, c) { return c === 0 || (c > 0 && c < CHAPTERS.length && starsToOpen(save, c) === 0 && tracksToOpen(save, c) === 0); }
 
 /* Is a career track playable: the first of a chapter when the chapter is
    open, the rest after a star on the one before. */
