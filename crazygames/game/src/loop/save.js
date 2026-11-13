@@ -12,6 +12,7 @@
 import { LOOP } from '../tune.js';
 import { ROSTER, PAINTS, upgradeLevels, UPGRADE_STATS } from '../garage/roster.js';
 import { RIVALS } from '../rivals/roster.js';
+import { carCosmetics, lookOf, isItem, owns, priceOf, STANDARD, KINDS } from '../garage/cosmetics.js';
 
 export const KEY = 'driftfever.cg.save.v' + LOOP.SAVE_VERSION;
 
@@ -29,7 +30,13 @@ export function defaults() {
      over him in any battle (negative while never beaten), and when the
      last battle was. A save from before it has none, which is not a
      fix. */
-  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {}, lab: { codes: {}, last: '' }, rivals: {} };
+  /* cosmetics (added 14 November 2026, briefs/GARAGE.md): each car also
+     carries the wheels, glow and smoke it wears and own, the items
+     bought for it by kind (garage/cosmetics.js). A save from before it
+     has none: every car wears the standard ones, which is not a fix. A
+     ghost carries look, the three it ran with. An older build reading
+     this save ignores all of it. */
+  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels(), ...carCosmetics() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {}, lab: { codes: {}, last: '' }, rivals: {} };
 }
 
 /* Has this save ever finished a run: a career result or a daily result. */
@@ -54,7 +61,7 @@ export function validGhost(g) {
     steps += e[0];
   }
   if (steps !== g.steps) return null;
-  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1, rev: isNum(g.rev) ? g.rev : 1, up: upgradeLevels(g.up), ...(isNum(g.seed) ? { seed: g.seed } : {}) };
+  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1, rev: isNum(g.rev) ? g.rev : 1, up: upgradeLevels(g.up), look: lookOf(g.look), ...(isNum(g.seed) ? { seed: g.seed } : {}) };
 }
 
 /* Repair anything into a valid save. Counts what it had to fix. */
@@ -69,10 +76,10 @@ export function repair(raw) {
     for (const id of Object.keys(raw.cars)) {
       if (!carIds.has(id) || !isObj(raw.cars[id])) { fix(); continue; }
       const paint = raw.cars[id].paint;
-      s.cars[id] = { paint: paintIds.has(paint) ? paint : (fix(), ROSTER.find(c => c.id === id).paint), up: upgradeLevels(raw.cars[id].up) };
+      s.cars[id] = { paint: paintIds.has(paint) ? paint : (fix(), ROSTER.find(c => c.id === id).paint), up: upgradeLevels(raw.cars[id].up), ...carCosmetics(raw.cars[id], fix) };
     }
   } else if (raw.cars !== undefined) fix();
-  if (!s.cars.starter) s.cars.starter = { paint: 'cyan', up: upgradeLevels() };
+  if (!s.cars.starter) s.cars.starter = { paint: 'cyan', up: upgradeLevels(), ...carCosmetics() };
   if (carIds.has(raw.car) && s.cars[raw.car]) s.car = raw.car; else if (raw.car !== undefined) fix();
   if (isObj(raw.career)) {
     for (const k of Object.keys(raw.career)) {
@@ -181,7 +188,24 @@ export function createSave(opts) {
     /* the pieces of the game that change the save */
     addCoins(n) { state.coins = Math.max(0, Math.floor(state.coins + n)); write(); },
     ownsCar(id) { return !!state.cars[id]; },
-    buyCar(id, price) { if (state.cars[id] || state.coins < price || !carIds.has(id)) return false; state.coins -= price; state.cars[id] = { paint: ROSTER.find(c => c.id === id).paint, up: upgradeLevels() }; write(); return true; },
+    buyCar(id, price) { if (state.cars[id] || state.coins < price || !carIds.has(id)) return false; state.coins -= price; state.cars[id] = { paint: ROSTER.find(c => c.id === id).paint, up: upgradeLevels(), ...carCosmetics() }; write(); return true; },
+    /* a cosmetic for an owned car (briefs/GARAGE.md): bought once at its
+       price and worn at once; a second call does nothing and charges
+       nothing, and one the coins do not reach is refused */
+    buyCosmetic(id, kind, item) {
+      const car = state.cars[id];
+      if (!car || !KINDS.includes(kind) || !isItem(kind, item) || owns(car, kind, item)) return false;
+      const price = priceOf(kind, item);
+      if (state.coins < price) return false;
+      state.coins -= price; car.own[kind].push(item); car[kind] = item; write(); return true;
+    },
+    /* wear one already owned, or the standard one */
+    wearCosmetic(id, kind, item) {
+      const car = state.cars[id];
+      if (!car || !KINDS.includes(kind) || !owns(car, kind, item)) return false;
+      if (car[kind] !== item) { car[kind] = item; write(); }
+      return true;
+    },
     /* one step of an upgrade on an owned car, at the price of that step */
     buyUpgrade(id, stat) {
       const car = state.cars[id];

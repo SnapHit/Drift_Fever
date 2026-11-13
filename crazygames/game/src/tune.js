@@ -264,6 +264,17 @@ export const LOOP = {
   NEW_STAR_BONUS:     100,     // and once more for each star newly won on a track or the day's daily
   DAILY_BONUS:        1.5,     // the daily drift pays this much more
   PAINT_PRICE:        60,      // coins for a paint other than the car's own
+  /* THE GARAGE'S COSMETICS (briefs/GARAGE.md, 14 November 2026): wheels,
+     underglow and tyre smoke colour, bought per car and kept per car;
+     none of them is read by the physics or the score. Prices in coins,
+     by item id (garage/cosmetics.js has the items): the fifteen together
+     come to 7,500, about what one clean pass of a chapter pays, and no
+     one item is over 1,500. First guesses for the author's play. */
+  COSMETICS: {
+    WHEELS: { daggers: 500, turbines: 650, discs: 800, fours: 950, blades: 1200 },
+    GLOW:   { aqua: 300, lime: 300, amber: 350, magenta: 350, violet: 400 },
+    SMOKE:  { aqua: 300, lime: 300, tangerine: 350, rose: 350, violet: 400 },
+  },
   GARAGE_TIP_LOSSES: 2,       // races lost to one rival in a visit before the results put GARAGE first (a rival in a dearer car says so from the first)
   UPGRADE_PRICES:     [400, 900, 1800],  // coins for each step of an upgrade, the same for every car (were 250, 500 and 900, and the cars 900, 1,800, 3,200 and 6,000: after play on 14 November the author had the fastback bought and upgraded by the start of Pro and never had to drive anything twice. One clean pass of a chapter pays about 7,500, so the fastback now comes near the end of Pro)
   UPGRADE: {                   // what each step does, as a share of the car's own value

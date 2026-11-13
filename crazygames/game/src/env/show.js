@@ -79,6 +79,32 @@ export const SHOW = {
        of the camera shows, fading in by FAR */
     CLEAR:          { r: 2.4, keep: 0.03, near: 1.2, far: 4 },
   },
+  /* A CHOSEN SMOKE COLOUR (briefs/GARAGE.md 4): the same smoke in a
+     colour bought in the garage. Only its colours change; the amount,
+     the life and the climb with the multiplier above are untouched. The
+     puff leaves the tyre in the colour at full strength and drifts away
+     towards the preset's own lit smoke, keeping KEEP of the colour, and
+     LIGHT dims it by the time of day so a night's smoke is not a day's.
+     The heat warms it towards the colour made paler, not towards orange. */
+  SMOKE_PICK: {
+    KEEP:           0.62,        // share of the chosen colour left as the puff drifts away
+    BIRTH_LIFT:     0.12,        // the colour at the tyre, lifted this far towards white
+    HEAT_LIFT:      0.45,        // the heat's tint: the colour this far towards white
+    LIGHT:          { dusk: 0.95, night: 0.72, dawn: 1.0, rain: 0.8 },
+  },
+  /* THE UNDERGLOW (briefs/GARAGE.md 3): a soft light under the car on
+     the road, in a colour bought in the garage. The light is the glow
+     mesh the car model carries (cars/build.js: a plain quad with a faded
+     border on the low tier, the cheap form; rings with round corners on
+     the high tier), added to the road, drawn before the tyre marks so
+     they lie over it. STRENGTH is its share by the time of day:
+     strongest at night, still there by day. Held under the road edge's
+     brightness and colourfulness in every preset
+     (game/test/garage/readable.js). */
+  UNDERGLOW: {
+    STRENGTH:       { dusk: 0.34, night: 0.42, dawn: 0.3, rain: 0.36 },
+    GHOST:          0.5,         // a ghost's glow, as a share of that
+  },
   /* rain: spray off the tyres whenever the car is quick */
   SPRAY: { FROM: 8, RATE: 34, LIFE: 0.55, SIZE: 0.35, GROW: 1.8, ALPHA: 0.3, COLOUR: 0xd8dee8 },
   /* sparks: brighter, more, longer, on a hit and a scrape */
@@ -86,6 +112,20 @@ export const SHOW = {
 };
 
 const lerp = (a, b, t) => a + (b - a) * t;
+const mixHex = (a, b, t) => { let out = 0; for (const sh of [16, 8, 0]) out |= Math.round(lerp((a >> sh) & 255, (b >> sh) & 255, t)) << sh; return out; };
+const dimHex = (a, k) => mixHex(0x000000, a, k);
+
+/* The smoke's three colours for a preset (by name) and a chosen colour
+   (0xRRGGBB, or null for the standard smoke): as it leaves the tyre, as
+   it drifts away, and what the heat warms it towards. */
+export function smokeColours(presetName, pick) {
+  const S = SHOW.SMOKE, end = S.COLOUR[presetName] || S.COLOUR.dusk;
+  if (pick == null) return { birth: S.BIRTH[presetName] || S.BIRTH.dusk, end, tint: S.HEAT_TINT };
+  const P = SHOW.SMOKE_PICK, light = P.LIGHT[presetName] === undefined ? 1 : P.LIGHT[presetName];
+  return { birth: dimHex(mixHex(pick, 0xffffff, P.BIRTH_LIFT), light), end: mixHex(end, dimHex(pick, light), P.KEEP), tint: dimHex(mixHex(pick, 0xffffff, P.HEAT_LIFT), light) };
+}
+/* the underglow's share of its colour for a preset */
+export const underglowStrength = presetName => { const s = SHOW.UNDERGLOW.STRENGTH[presetName]; return s === undefined ? SHOW.UNDERGLOW.STRENGTH.dusk : s; };
 const pick = (pair, t) => lerp(pair[0], pair[1], t);
 
 export function createShow(THREE, opts) {
