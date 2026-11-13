@@ -723,4 +723,27 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   is as it was. A wall still loses it. The recorded Kestrow race
   replays to the same totals. Halvik and Sarrow are still unplayed
   since the pace round.
+- 14 November 2026, the CrazyGames SDK adapter (`game/src/sdk/`,
+  `game/test/ready/sdk.js`). **The preview and driftfever.com never
+  load their script**: it is an outside request, and their SDK is
+  "disabled" (every call throws) on any domain but theirs and
+  localhost. The build says where it is hosted in one line,
+  `src/sdk/host.js` (`'web'`), and only **`npm run package:crazygames`**
+  (after `npm run build`) writes `'crazygames'`, into
+  `dist-crazygames/`: the new game alone, without the greybox, status
+  and lab pages, 84 files and 12.1 MB with the music. That folder,
+  zipped, is the upload; it is not committed. In their player the
+  adapter loads their v3 script, awaits `init`, and sends
+  `gameplayStart` when a run begins (the countdown included) and
+  `gameplayStop` at its results or a menu, each once; what the game
+  asked for while the script loaded is sent when it is ready. Their
+  optional loading events are not sent (the boot is over before their
+  SDK is ready). No ads, banners, user or data module. A blocked
+  script, a rejected init, a disabled environment or a throwing call
+  each leave the game as it is on the web, measured with a stand-in
+  SDK. Not measured: their real script, which needs their QA tool or a
+  localhost run of the package by the author. Their docs give no list
+  of their domains, so the host is a build line, not a guess at a
+  hostname. Readiness still open: their ten frame sizes, frame rate on
+  a real GPU and a 4 GB Chromebook.
 

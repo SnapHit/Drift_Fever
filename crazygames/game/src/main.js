@@ -32,6 +32,7 @@ import { createScoring } from './scoring/drift.js';
 import { createHud } from './ui/hud.js';
 import { createScreens } from './ui/screens.js';
 import { createPadNav } from './ui/padnav.js';
+import { createSdk } from './sdk/crazygames.js';
 import { createOnboarding, cornerAhead } from './ui/onboard.js';
 import { createTunePanel, loadSavedTune } from './ui/tune.js';
 import { createDebug } from './ui/debug.js';
@@ -66,6 +67,8 @@ const scoring = createScoring();
 const chase = createChaseCamera();
 const input = createInput(root);
 const hud = createHud(root);
+/* CrazyGames' SDK: nothing unless this build is their package (sdk/host.js) */
+const sdk = createSdk();
 const screens = createScreens(root, onAction);
 /* the menus by gamepad; in a run its back button leaves for the title, or skips the first run's prompts */
 const padnav = createPadNav(screens.el, {
@@ -220,6 +223,7 @@ function frame(t) {
   resize();
   const raw = input.read(t);
   padnav.update(t);
+  sdk.playing(app.state === 'countdown' || app.state === 'drive' || app.state === 'free');
   if (window.__feel.inject) Object.assign(raw, window.__feel.inject);   // the probes' input
   const world = app.world;
   const S = app.state;
@@ -773,7 +777,7 @@ scene.ready.then(() => {
 window.__feel = {
   draw: true,          // the probes turn the GPU submission off on the way to a frame
   inject: null,        // { steer, throttle, brake, handbrake } written over the live input by the probes
-  TUNE, STEP, scoring, chase, scene, input, padnav, hud, view, pose, tape, groundName: devGround || null, tunedFromDevice: tuned,
+  TUNE, STEP, scoring, chase, scene, input, padnav, sdk, hud, view, pose, tape, groundName: devGround || null, tunedFromDevice: tuned,
   get world() { return app.world; },
   frame, restart: resetRun,
   hash: () => app.world.hash(),

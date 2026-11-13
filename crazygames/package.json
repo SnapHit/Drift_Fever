@@ -21,7 +21,8 @@
     "probe:perf": "node probes/perf.js",
     "probe:shots": "node probes/review-shots.js",
     "build": "node parity/run.js --check && node tools/build-site.js",
-    "build:site": "node tools/build-site.js"
+    "build:site": "node tools/build-site.js",
+    "package:crazygames": "node tools/package-crazygames.js"
   },
   "devDependencies": {
     "acorn": "^8.19.0",
