@@ -597,3 +597,36 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   open yet"). `game/test/play13/check.js` measures all of it at three
   sizes. The author plays in a normal browser with a full save, so the
   true new player run is still to come, by him.
+- 13 November 2026, **rivals are complete, by the author's word**: he
+  beat all six in the best car fully upgraded. His best margins showed
+  the ladder upside down (Kestrow +1,672, Tolvo +1,276, Varsk +262,
+  Dovane +1,139, Halvik +3,632, Sarrow +3,668), so the last three were
+  reset from a scan, not a search (`game/test/play13/scan.js`: every
+  track of each one's half of his chapter, every car, upgrade step and
+  proven driving; `review/play13/scan.json`, `page.json`). Dovane:
+  Tolvo's driving in the tourer with two upgrade steps, three laps of
+  Over and under, 94.0 s for 4,086, clean, 0 of 20 disturbed runs miss
+  (was 1,897 with 2 hard hits). Halvik: his own driving moved from
+  Knot yard to High wire, three laps, 92.1 s for 4,338 with one scrape
+  (was 1,234 with 5 hard hits); fragile, all 20 disturbed runs miss
+  the bar, mostly by one hard hit, so another browser's arithmetic may
+  put him into a wall. Sarrow: Varsk's driving in the plain starter,
+  three laps of Endless eight, 94.2 s for 5,201, clean, 0 of 20 miss
+  (was the fastback with 9 hard hits); his line is now "Beats you in
+  the starter coupe". Points a second: 35, 58, 70, 43, 47, 55, so
+  Varsk is still the peak and Dovane is still below Tolvo. Halvik now
+  needs a star on High wire. Stored best margins over the old three
+  stay in a save and flatter the new ones. Still unknown: whether a
+  newcomer in the starter can beat Tolvo.
+- 13 November 2026, the author's plan for the end: **when everything
+  else is done this game becomes the one served at driftfever.com and
+  the original moves to a sub URL.** He thinks it far the better game
+  and means to promote it. Not started. It breaks two rules above on
+  purpose (this folder never served from driftfever.com; a crazygames
+  session changes nothing outside `crazygames/`), so it is its own
+  session under the root `CLAUDE.md`, which must be rewritten with it,
+  and needs his go-ahead at the time: the root Worker's assets
+  directory, `.assetsignore` and `publish-check.sh` all change, saves
+  on the old game live under the root origin and must keep working at
+  its new address, and old links to the root game should still land
+  somewhere sensible.

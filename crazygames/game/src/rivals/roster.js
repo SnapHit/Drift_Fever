@@ -22,15 +22,19 @@ export const RIVALS = [
     style: 'Late and aggressive',
     /* the third ladder round (briefs/RIVALS-LADDER-3.md): Upper deck, three laps, searched for the driving bar on a plateau from the ladder round's numbers (game/test/ladder3/search.js, review/ladder3/runs/search/r3-d.log). In the game since 13 November 2026 by the author's decision after play: 20 of 20 disturbed runs pass, but 2 of his 38 one per cent moves miss (one run each), and the strong driver cannot beat him on pace (review/ladder3/REPORT.md); this is the closest found */
     drive: {"SLIDE_GAIN":0.445,"PROGRESS":40,"KEEP":578,"ANGLE_CAP":29.2,"EDGE_SAFE":2.86,"EDGE_COST":2646,"ENTRY":25.85,"VMAX":33.8,"CHAIN_KEEP":0,"CHAIN_MARGIN":0.36,"AY_MAX":7.29,"OUTSIDE":0.49,"SETUP":52.23,"WINDOW_PRE":3,"WINDOW_POST":-7.89,"LINK":3.79,"HB_TIME":0.302,"HB_OVER":1.86,"HB_STEER":0.35} },
-  { id: 'r4', name: 'Dovane', car: 'tourer', paint: 'wine', track: 12, side: -1, prize: 800,
+  /* after play, 13 November 2026: the author beat these three by 1,139, 3,632 and 3,668 in the best car, against 262 over Varsk, so the top of the ladder was its easiest part, and all three hit walls. Each now has the closest clean, quicker scoring setup a scan of his half of his chapter found (every track, car, upgrade step and proven driving; game/test/play13/scan.js, review/play13/scan.json), not a search of his own */
+  { id: 'r4', name: 'Dovane', car: 'tourer', paint: 'wine', track: 12, side: -1, prize: 800, laps: 3, up: { power: 2, grip: 2, steer: 2 },
     style: 'Long, linked slides',
-    drive: { SLIDE_GAIN: 1.353, PROGRESS: 87, KEEP: 974, ANGLE_CAP: 35.87, EDGE_SAFE: 2.63, EDGE_COST: 428, ENTRY: 24.37, VMAX: 30.93, CHAIN_KEEP: 2979, CHAIN_MARGIN: 0.42, AY_MAX: 7.42, OUTSIDE: 0.609, SETUP: 44.06, WINDOW_PRE: 21.02, WINDOW_POST: 1.05, LINK: 26.64, HB_TIME: 0.13 } },
-  { id: 'r5', name: 'Halvik', car: 'driftbuild', paint: 'magenta', track: 16, side: 1, prize: 1000,
+    /* Tolvo's driving in the tourer with two steps of each upgrade: 94.0 s, 4,086, no contact, 0 of 20 disturbed runs miss (was 1,897 with 2 hard hits) */
+    drive: { SLIDE_GAIN: 0.35, PROGRESS: 45, KEEP: 325, ANGLE_CAP: 21.56, EDGE_SAFE: 2.37, EDGE_COST: 2875, ENTRY: 26.2, VMAX: 33.14, CHAIN_KEEP: 0, CHAIN_MARGIN: 0.34, AY_MAX: 7.28, OUTSIDE: 0.157, SETUP: 39.95, WINDOW_PRE: 3.98, WINDOW_POST: -5.28, LINK: 4.81, HB_TIME: 0.1, HB_OVER: 0.75, HB_STEER: 0.35 } },
+  { id: 'r5', name: 'Halvik', car: 'driftbuild', paint: 'magenta', track: 18, side: 1, prize: 1000, laps: 3,
     style: 'The biggest angles',
+    /* his own driving, moved from Knot yard (5 hard hits, 1,234) to High wire over three laps: 92.1 s, 4,338, one scrape. Fragile: every one of the 20 disturbed runs misses the bar, mostly one hard hit, so on another browser's arithmetic he may touch a wall */
     drive: { SLIDE_GAIN: 0.945, PROGRESS: 92, KEEP: 1500, ANGLE_CAP: 50.2, EDGE_SAFE: 1.66, EDGE_COST: 2786, ENTRY: 19.5, VMAX: 32.1, CHAIN_KEEP: 197, CHAIN_MARGIN: 0.24, AY_MAX: 7.38, OUTSIDE: 0.092, SETUP: 70.99, WINDOW_PRE: 13.45, WINDOW_POST: 5.64, LINK: 11.96, HB_TIME: 0.279 } },
-  { id: 'r6', name: 'Sarrow', car: 'fastback', paint: 'white', track: 20, side: -1, prize: 1500,
-    style: 'Fast, deep and linked',
-    drive: { SLIDE_GAIN: 0.714, PROGRESS: 51, KEEP: 405, ANGLE_CAP: 52.72, EDGE_SAFE: 1.03, EDGE_COST: 671, ENTRY: 23.61, VMAX: 24.77, CHAIN_KEEP: 2000, CHAIN_MARGIN: 0.39, AY_MAX: 7.1, OUTSIDE: 0.723, SETUP: 33.14, WINDOW_PRE: 8.88, WINDOW_POST: 1.18, LINK: 59.53, HB_TIME: 0.439 } },
+  { id: 'r6', name: 'Sarrow', car: 'starter', paint: 'white', track: 20, side: -1, prize: 1500, laps: 3,
+    style: 'Beats you in the starter coupe',
+    /* Varsk's driving in the plain starter over three laps of Endless eight: 94.2 s, 5,201, no contact, 0 of 20 disturbed runs miss (was the fastback, 9 hard hits, 3,366 at best). The last rival wins in the first car */
+    drive: {"SLIDE_GAIN":0.445,"PROGRESS":40,"KEEP":578,"ANGLE_CAP":29.2,"EDGE_SAFE":2.86,"EDGE_COST":2646,"ENTRY":25.85,"VMAX":33.8,"CHAIN_KEEP":0,"CHAIN_MARGIN":0.36,"AY_MAX":7.29,"OUTSIDE":0.49,"SETUP":52.23,"WINDOW_PRE":3,"WINDOW_POST":-7.89,"LINK":3.79,"HB_TIME":0.302,"HB_OVER":1.86,"HB_STEER":0.35} },
 ];
 
 export function rivalById(id) { return RIVALS.find(r => r.id === id) || null; }
