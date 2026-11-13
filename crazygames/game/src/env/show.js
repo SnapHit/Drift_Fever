@@ -104,6 +104,7 @@ export const SHOW = {
   UNDERGLOW: {
     STRENGTH:       { dusk: 0.34, night: 0.42, dawn: 0.3, rain: 0.36 },
     GHOST:          0.5,         // a ghost's glow, as a share of that
+    SOFT:           0.72,        // the soft form's share of that (the high tier): its bloom and grade lift it, and measured without this three colours came within 15 per cent of the edge at night
   },
   /* rain: spray off the tyres whenever the car is quick */
   SPRAY: { FROM: 8, RATE: 34, LIFE: 0.55, SIZE: 0.35, GROW: 1.8, ALPHA: 0.3, COLOUR: 0xd8dee8 },
@@ -125,7 +126,7 @@ export function smokeColours(presetName, pick) {
   return { birth: dimHex(mixHex(pick, 0xffffff, P.BIRTH_LIFT), light), end: mixHex(end, dimHex(pick, light), P.KEEP), tint: dimHex(mixHex(pick, 0xffffff, P.HEAT_LIFT), light) };
 }
 /* the underglow's share of its colour for a preset */
-export const underglowStrength = presetName => { const s = SHOW.UNDERGLOW.STRENGTH[presetName]; return s === undefined ? SHOW.UNDERGLOW.STRENGTH.dusk : s; };
+export const underglowStrength = (presetName, soft) => { const s = SHOW.UNDERGLOW.STRENGTH[presetName]; return (s === undefined ? SHOW.UNDERGLOW.STRENGTH.dusk : s) * (soft ? SHOW.UNDERGLOW.SOFT : 1); };
 const pick = (pair, t) => lerp(pair[0], pair[1], t);
 
 export function createShow(THREE, opts) {

@@ -65,31 +65,31 @@
    "where": "showroom",
    "kind": "smoke",
    "item": "aqua",
-   "differs": 30724
+   "differs": 31052
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "item": "lime",
-   "differs": 28831
+   "differs": 28940
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "item": "tangerine",
-   "differs": 27985
+   "differs": 27593
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "item": "rose",
-   "differs": 28877
+   "differs": 28872
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "item": "violet",
-   "differs": 29149
+   "differs": 29353
   }
  ],
  "pairs": [
@@ -258,31 +258,31 @@
    "kind": "smoke",
    "a": "aqua",
    "b": "lime",
-   "pixels": 22966,
-   "mean": 1.63
+   "pixels": 22651,
+   "mean": 1.61
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "a": "aqua",
    "b": "tangerine",
-   "pixels": 24071,
-   "mean": 2.66
+   "pixels": 24125,
+   "mean": 2.64
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "a": "aqua",
    "b": "rose",
-   "pixels": 23927,
-   "mean": 2.43
+   "pixels": 23983,
+   "mean": 2.42
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "a": "aqua",
    "b": "violet",
-   "pixels": 21414,
+   "pixels": 21343,
    "mean": 1.19
   },
   {
@@ -290,7 +290,7 @@
    "kind": "smoke",
    "a": "lime",
    "b": "tangerine",
-   "pixels": 21636,
+   "pixels": 21628,
    "mean": 1.21
   },
   {
@@ -298,40 +298,40 @@
    "kind": "smoke",
    "a": "lime",
    "b": "rose",
-   "pixels": 22839,
-   "mean": 2.03
+   "pixels": 22748,
+   "mean": 2.02
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "a": "lime",
    "b": "violet",
-   "pixels": 22757,
-   "mean": 1.9
+   "pixels": 22458,
+   "mean": 1.88
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "a": "tangerine",
    "b": "rose",
-   "pixels": 19529,
-   "mean": 1.14
+   "pixels": 19288,
+   "mean": 1.13
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "a": "tangerine",
    "b": "violet",
-   "pixels": 23397,
-   "mean": 2.14
+   "pixels": 23088,
+   "mean": 2.12
   },
   {
    "where": "showroom",
    "kind": "smoke",
    "a": "rose",
    "b": "violet",
-   "pixels": 21616,
-   "mean": 1.24
+   "pixels": 21631,
+   "mean": 1.23
   }
  ],
  "known": [

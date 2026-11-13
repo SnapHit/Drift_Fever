@@ -386,7 +386,7 @@ export function createScene(canvas, opts) {
      smoke of its own. */
   const looks = { car: lookOf(null), ghost: lookOf(null), rival: lookOf(null) };
   function applyGlows() {
-    const k = underglowStrength(preset.name);
+    const k = underglowStrength(preset.name, tier === 'high');
     if (model && model.setUnderglow) model.setUnderglow(glowHex(looks.car.glow), k);
     if (ghostModel && ghostModel.setUnderglow) ghostModel.setUnderglow(glowHex(looks.ghost.glow), k * SHOW.UNDERGLOW.GHOST);
     if (rivalModel && rivalModel.setUnderglow) rivalModel.setUnderglow(glowHex(looks.rival.glow), k);
