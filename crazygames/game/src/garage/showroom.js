@@ -51,7 +51,7 @@ export const SHOWROOM = {
   DRAG:       0.011,         // radians per px dragged
   RESUME:     2.2,           // s after a drag before it turns itself again
   EASE:       2.5,           // per second, how the spin comes back
-  GLOW:       0.55,          // the underglow's share in the showroom
+  GLOW:       0.8,           // the underglow's share in the showroom
   SHADOW:     { size: 3.4, opacity: 0.55 },   // the soft shadow under the car
   STEER:      0.32,          // radians the front wheels are turned, so their faces show
   SMOKE:      { pool: 70, rate: 11, life: 1.7, size: 0.32, grow: 0.85, rise: 0.75, alpha: 0.5, spin: 9, preset: 'dusk', drift: 0.5 },   // the smoke section's show
@@ -144,6 +144,7 @@ export function createShowroom(THREE, renderer) {
       model = makeCar(THREE, id, { paint: paintHex, wheels: state.look.wheels, glowForm: 'soft' });
       twin = makeCar(THREE, id, { paint: paintHex, wheels: state.look.wheels, glowForm: 'soft' });
       for (const m of [model, twin]) if (m.lights && m.lights.set) m.lights.set(1, 1);
+      if (model.underglow) model.underglow.renderOrder = 5;   // over the floor and the turntable, which are see through and would dim it; the picture's glow stays under them
       relight();
       upright.add(model.group); under.add(twin.group);
       /* the body's middle over the turntable's, so it turns about itself */

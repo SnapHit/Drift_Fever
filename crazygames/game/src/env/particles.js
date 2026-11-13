@@ -121,7 +121,7 @@ export function createParticles(THREE, opts) {
     if (n) { geo.attributes.position.needsUpdate = true; geo.attributes.alpha.needsUpdate = true; if (tintA) geo.attributes.tint.needsUpdate = true; }
     mesh.visible = n > 0;
   }
-  function clear() { for (const p of P) { p.age = p.life; } geo.setDrawRange(0, 0); mesh.visible = false; live = 0; }
+  function clear() { for (const p of P) { p.age = p.life; } geo.setDrawRange(0, 0); mesh.visible = false; live = 0; head = 0; }   // from the first slot again, so the same run draws its puffs in the same order (the garage probes compare two runs to the pixel)
   return { mesh, spawn, update, clear, setColour: hex => colour.value.setHex(hex), live: () => live, max, dispose: () => { geo.dispose(); mat.dispose(); } };
 }
 
