@@ -121,3 +121,16 @@ export function difference(A, B, mask, tol) {
   return { mean: k ? +(sum / k).toFixed(2) : 0, pixels: k, big };
 }
 export const pct = (list, q) => { if (!list.length) return 0; const s = list.slice().sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.floor(q * s.length))]; };
+
+/* Draw the frame and take the picture. The frame is drawn, then drawn
+   again as it stands (nothing stepped), and the page is given a moment:
+   a canvas drawn once is sometimes photographed a frame late, which
+   showed one item's picture under the next one's name. */
+export async function snap(page, file) {
+  await page.evaluate(() => { window.__feel.draw = true; });
+  await R.runFrames(page, 1);
+  await page.evaluate(() => { const L = window.__loop; if (L.app.state === 'garage') L.showroom.render(); else window.__feel.scene.render(); return new Promise(res => setTimeout(res, 60)); });
+  const png = await page.screenshot({ path: file, timeout: 180000 });
+  await page.evaluate(() => { window.__feel.draw = false; });
+  return png;
+}

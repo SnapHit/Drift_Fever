@@ -37,9 +37,9 @@ export const SHOWROOM = {
   RING_W:     0.06,          // m
   TICKS:      24,            // marks round the turntable, so its turning reads
   BARS:       { n: 9, colour: 0x9fc0ff, dim: 0.42, r: 12, h: 6.5, w: 0.16, arc: 2.0, y: 0.3 },   // the wall of light behind
-  SKY: 0xdfe7ff, GROUND: 0x20243a, HEMI: 1.05,
-  KEY: 2.1, KEY_AT: [-5, 7, 6],      // the key light, in front of the car as the camera sees it, left and high
-  RIM: 1.7, RIM_AT: [6, 4, -7],      // from behind, for the roof line
+  SKY: 0xdfe7ff, GROUND: 0x20243a, HEMI: 0.9,
+  KEY: 1.7, KEY_AT: [-5, 7, 6],      // the key light, in front of the car as the camera sees it, left and high
+  RIM: 1.5, RIM_AT: [6, 4, -7],      // from behind, for the roof line
   FILL: 0.45, FILL_AT: [5, 2, 6],
   EXPOSURE:   1.0,
   DISTANCE:   11.5,          // m the camera stands from the car; the field of view is what fits the car's turning circle into the stage from there
@@ -156,7 +156,7 @@ export function createShowroom(THREE, renderer) {
     }
     dress();
   }
-  function setSection(name) { if (name !== state.section) { state.section = name; if (name !== 'smoke') smoke.clear(); } }
+  function setSection(name) { if (name !== state.section) { state.section = name; if (name !== 'smoke') { smoke.clear(); state.due = 0; for (const m of [model, twin]) if (m) { m.wheels.rl.mesh.rotation.x = 0; m.wheels.rr.mesh.rotation.x = 0; } } } }   // the burnout over: the smoke gone, the rear wheels at rest
 
   /* Stand the camera so the car fits the stage: rect { left, top, width,
      height } in CSS px of a view w by h. */

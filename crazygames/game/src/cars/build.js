@@ -45,6 +45,7 @@ export const FINISH = {
   UNDERGLOW_SPREAD: 0.55,  // m the glow reaches past the body
   UNDERGLOW_SOFT:   { spread: 1.1, rings: 5, corner: 5, round: 0.45 },   // the soft form (the high tier and the showroom): wider, round cornered, fading by a curve
   WHEEL_ROUGH: 0.42, WHEEL_METAL: 0.18,   // the bought wheel designs' finish (the standard wheel keeps the trim's)
+  WHEEL_LIFT: 0.2,         // and how much of its own colour a design gives back unlit, so it is told apart at race distance in shade and at night (the tyre is near black, so it stays so)
   UNDERGLOW_LIFT:   0.025, // m above the ground
   PAINT_ROUGH: 0.42, PAINT_METAL: 0.2,
   GLASS_ROUGH: 0.12, GLASS_METAL: 0.3,
@@ -492,7 +493,9 @@ export function buildCar(THREE, S, options) {
   const wheels = {};
   const W = S.wheel;
   /* a bought design (options.wheels, an id in wheels.js) takes the standard wheel's place, in a finish of its own */
-  const wheelMat = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: FINISH.WHEEL_ROUGH, metalness: FINISH.WHEEL_METAL });
+  const lifted = !!(THREE.TSL && THREE.MeshStandardNodeMaterial);   // a plain three.js (a probe's) has no nodes: the design is then only lit
+  const wheelMat = new (lifted ? THREE.MeshStandardNodeMaterial : THREE.MeshStandardMaterial)({ color: 0xffffff, vertexColors: true, roughness: FINISH.WHEEL_ROUGH, metalness: FINISH.WHEEL_METAL });
+  if (lifted) wheelMat.emissiveNode = THREE.TSL.vertexColor().mul(THREE.TSL.float(FINISH.WHEEL_LIFT));
   let wheelsId = null;
   const WHEEL_AT = [['fl', -1, sh.fa, true], ['fr', 1, sh.fa, true], ['rl', -1, sh.ra, false], ['rr', 1, sh.ra, false]];
   for (const [name, side, z] of WHEEL_AT) {

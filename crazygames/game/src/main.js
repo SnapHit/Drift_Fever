@@ -280,7 +280,7 @@ function frame(t) {
     const rs = app.rival.scoring.state;
     rv = { pose: app.rival.pose(alpha, rivalPose), world: app.rival.world, mult: rs.chain > 0 ? rs.mult : 1, fade: S === 'results' && app.rivalRanOn ? 1 : app.rival.state.fade };
   }
-  scene.update(pose, world, dt * ts, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1, rival: rv });
+  if (S !== 'garage') scene.update(pose, world, dt * ts, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1, rival: rv });   // the garage draws its showroom, not the world: nothing to move there
   sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev', world.touching);
   if (app.frameHit) { sound.hit(app.frameHit.speed, app.frameHit.hard); if (director && app.frameHit.hard) director.hardHit(); app.frameHit = null; }
   /* the score's sounds, from the callouts it queued this frame */

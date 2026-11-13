@@ -96,7 +96,7 @@ for (const preset of PRESETS) {
       await G.wear(page, { glow });
       const m = await G.midSlide(page, index, 2, 16);
       if (boost) await page.evaluate(k => { window.__feel.scene.carModel().underglow.material.color.multiplyScalar(k); }, boost);
-      const png = await G.shot(page, path.join(G.shots, 'readable-' + tier + '-' + preset + '-' + index + '-' + (glow || 'off') + (boost ? '-x' + boost : '') + '.png'));
+      const png = await G.snap(page, path.join(G.shots, 'readable-' + tier + '-' + preset + '-' + index + '-' + (glow || 'off') + (boost ? '-x' + boost : '') + '.png'));
       return { m, img: await G.decode(png), pts: await page.evaluate(EDGE) };
     };
     const off = await frame('off');

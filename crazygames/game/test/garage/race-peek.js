@@ -9,6 +9,6 @@ const pg = await G.page(env, { width: +(process.env.W || 844), height: +(process
 await G.wear(pg.page, look);
 const m = await G.midSlide(pg.page, index, +(process.env.MULT || 2), +(process.env.HELD || 16));
 console.log(JSON.stringify(m));
-await G.shot(pg.page, file);
+await G.snap(pg.page, file);
 if (pg.errors.length) console.log(pg.errors);
 await env.close();
