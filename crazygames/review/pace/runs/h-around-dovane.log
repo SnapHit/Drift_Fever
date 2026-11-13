@@ -1,0 +1,20 @@
+{"car":"driftbuild","up":0,"laps":3,"s":86.11,"total":3837,"mult":3.11,"hard":3,"cont":7,"own":"3 hard hits,7 contacts,a corner 4% sliding","disturbed":20}
+{"car":"driftbuild","up":1,"laps":3,"s":89.58,"total":3001,"mult":2.34,"hard":7,"cont":22,"own":"7 hard hits,22 contacts,36.8 km/h,a corner 0% sliding","disturbed":20}
+{"car":"driftbuild","up":2,"laps":3,"s":91.38,"total":2467,"mult":1.88,"hard":8,"cont":23,"own":"8 hard hits,23 contacts,37.2 km/h,a corner 6% sliding","disturbed":20}
+{"car":"driftbuild","up":3,"laps":3,"s":81.62,"total":2590,"mult":2.21,"hard":10,"cont":13,"own":"10 hard hits,13 contacts,a corner 0% sliding","disturbed":20}
+{"car":"fastback","up":0,"laps":3,"s":90.4,"total":2159,"mult":1.67,"hard":8,"cont":32,"own":"8 hard hits,32 contacts,a corner 0% sliding","disturbed":20}
+{"car":"fastback","up":1,"laps":3,"s":88.6,"total":2148,"mult":1.69,"hard":9,"cont":23,"own":"9 hard hits,23 contacts,36.3 km/h,a corner 0% sliding","disturbed":20}
+{"car":"fastback","up":2,"laps":3,"s":88.72,"total":1452,"mult":1.14,"hard":11,"cont":32,"own":"11 hard hits,32 contacts,a corner 0% sliding","disturbed":20}
+{"car":"fastback","up":3,"laps":3,"s":84.15,"total":2182,"mult":1.81,"hard":12,"cont":19,"own":"12 hard hits,19 contacts,a corner 0% sliding","disturbed":20}
+{"car":"tourer","up":0,"laps":3,"s":89.33,"total":1655,"mult":1.29,"hard":12,"cont":16,"own":"12 hard hits,16 contacts,a corner 0% sliding","disturbed":20}
+{"car":"tourer","up":1,"laps":3,"s":90.06,"total":1898,"mult":1.47,"hard":11,"cont":15,"own":"11 hard hits,15 contacts,a corner 1% sliding","disturbed":20}
+{"car":"tourer","up":2,"laps":3,"s":85.71,"total":1671,"mult":1.36,"hard":11,"cont":16,"own":"11 hard hits,16 contacts,a corner 0% sliding","disturbed":20}
+{"car":"tourer","up":3,"laps":3,"s":83.05,"total":2376,"mult":2,"hard":8,"cont":12,"own":"8 hard hits,12 contacts,a corner 0% sliding","disturbed":20}
+{"car":"hatch","up":0,"laps":3,"s":93.93,"total":4039,"mult":3,"hard":1,"cont":2,"own":"1 hard hits,a corner 8% sliding","disturbed":18}
+{"car":"hatch","up":1,"laps":3,"s":91.86,"total":3657,"mult":2.78,"hard":4,"cont":4,"own":"4 hard hits,4 contacts,a corner 14% sliding","disturbed":20}
+{"car":"hatch","up":2,"laps":3,"s":91.12,"total":3916,"mult":3,"hard":2,"cont":6,"own":"2 hard hits,6 contacts,a corner 10% sliding","disturbed":20}
+{"car":"hatch","up":3,"laps":3,"s":89.78,"total":3958,"mult":3.08,"hard":1,"cont":2,"own":"1 hard hits,a corner 28% sliding","disturbed":20}
+{"car":"starter","up":0,"laps":3,"s":88.63,"total":3172,"mult":2.5,"hard":3,"cont":12,"own":"3 hard hits,12 contacts","disturbed":20}
+{"car":"starter","up":1,"laps":3,"s":85.31,"total":3620,"mult":2.96,"hard":2,"cont":7,"own":"2 hard hits,7 contacts,a corner 15% sliding","disturbed":18}
+{"car":"starter","up":2,"laps":3,"s":86.98,"total":3410,"mult":2.74,"hard":6,"cont":12,"own":"6 hard hits,12 contacts,a corner 0% sliding","disturbed":20}
+{"car":"starter","up":3,"laps":3,"s":83.73,"total":3370,"mult":2.81,"hard":4,"cont":7,"own":"4 hard hits,7 contacts,a corner 6% sliding","disturbed":20}

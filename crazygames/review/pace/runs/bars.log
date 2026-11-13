@@ -1,0 +1,10 @@
+PASS Dovane (Over and under, fastback, 3 laps) in the page: 83.79 s, 6961 points, 83.1 a second, x5.55; respawns 0, hard 0, scrapes 0, lowest 83.2 km/h, least sliding corner 63%, mean angle 33.1 deg, best chain 1109, the guard 0
+PASS Dovane (Over and under, fastback, 3 laps) 20 disturbed: 0 miss (bar 2); worst hard 0, scrapes 0, lowest 83.2 km/h, corner 60%, total 6314 to 7276
+PASS Dovane (Over and under, fastback, 3 laps) plateau: 2 of 38 moves miss (2 of 190 runs; bar 4) :: ANGLE_CAP- 1 (2 hard hits, a corner 1% sliding); HB_OVER+ 1 (1 hard hits, a corner 30% sliding)
+PASS Halvik (High wire, hatch, 2 laps) in the page: 68.63 s, 3509 points, 51.1 a second, x3.57; respawns 0, hard 0, scrapes 0, lowest 53 km/h, least sliding corner 34%, mean angle 29.1 deg, best chain 488, the guard 0
+PASS Halvik (High wire, hatch, 2 laps) 20 disturbed: 1 miss (bar 2); worst hard 0, scrapes 1, lowest 49.9 km/h, corner 27%, total 3462 to 3890 :: a corner 27% sliding
+PASS Halvik (High wire, hatch, 2 laps) plateau: 2 of 38 moves miss (2 of 190 runs; bar 4) :: KEEP+ 1 (a corner 20% sliding); SETUP+ 1 (1 hard hits)
+PASS Sarrow (Endless eight, starter +1/1/1, 3 laps) in the page: 77.87 s, 5914 points, 75.9 a second, x5.4; respawns 0, hard 0, scrapes 0, lowest 86.8 km/h, least sliding corner 58%, mean angle 28.5 deg, best chain 514, the guard 0
+PASS Sarrow (Endless eight, starter +1/1/1, 3 laps) 20 disturbed: 0 miss (bar 2); worst hard 0, scrapes 2, lowest 86.7 km/h, corner 57%, total 5698 to 5929
+PASS Sarrow (Endless eight, starter +1/1/1, 3 laps) plateau: 3 of 38 moves miss (3 of 190 runs; bar 4) :: PROGRESS- 1 (1 hard hits, a corner 0% sliding); HB_OVER+ 1 (2 hard hits, 4 contacts, a corner 4% sliding); HB_OVER- 1 (3 contacts)
+all passed

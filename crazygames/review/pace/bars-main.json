@@ -1,0 +1,455 @@
+{
+ "bars": {
+  "contacts": 2,
+  "disturbed": 2,
+  "plateau": 4,
+  "ceiling": 6
+ },
+ "measured": "2026-11-13",
+ "rivals": {
+  "r5": {
+   "id": "r5",
+   "name": "Halvik",
+   "setup": "High wire, driftbuild, 3 laps",
+   "car": "driftbuild",
+   "up": null,
+   "laps": 3,
+   "track": 18,
+   "drive": {
+    "SLIDE_GAIN": 0.945,
+    "PROGRESS": 92,
+    "KEEP": 1500,
+    "ANGLE_CAP": 50.2,
+    "EDGE_SAFE": 1.66,
+    "EDGE_COST": 2786,
+    "ENTRY": 19.5,
+    "VMAX": 32.1,
+    "CHAIN_KEEP": 197,
+    "CHAIN_MARGIN": 0.24,
+    "AY_MAX": 7.38,
+    "OUTSIDE": 0.092,
+    "SETUP": 70.99,
+    "WINDOW_PRE": 13.45,
+    "WINDOW_POST": 5.64,
+    "LINK": 11.96,
+    "HB_TIME": 0.279
+   },
+   "style": "The biggest angles",
+   "page": {
+    "seconds": 92.08,
+    "total": 4338,
+    "drift": 3688,
+    "clean": 330,
+    "pace": 320,
+    "best": 403,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 1,
+    "minKmh": 75.9,
+    "worstCorner": 0.354,
+    "angle": 33.1,
+    "hands": {
+     "brakeSteps": 0,
+     "liftSteps": 0,
+     "maxBrake": 0,
+     "minThrottle": 1,
+     "overruled": 0
+    },
+    "hash": "97.178575711656,-45.99084198449781,-2.982629498301617,3.512754892495077,24.93156971106977,-0.6031754896821326,-0.023607563278837555,8.152153391416789,0,0,0,9.926280624090559,6.32906635363478|11050,1,0|4338,11050"
+   },
+   "rate": 47.1,
+   "star": 14.328,
+   "multiple": 3.29,
+   "pageBar": {
+    "pass": true,
+    "why": []
+   },
+   "disturbed": {
+    "pass": false,
+    "missing": 20,
+    "of": 20,
+    "why": [
+     "1 hard hits, 32.3 km/h, a corner 8% sliding",
+     "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding",
+     "4 hard hits, 6 contacts, 32 km/h, a corner 5% sliding, total 3043 against 4338",
+     "1 hard hits, 29.5 km/h, a corner 20% sliding",
+     "1 hard hits",
+     "4 hard hits, 8 contacts, 28.2 km/h, a corner 8% sliding, total 3180 against 4338",
+     "3 hard hits, 3 contacts, 24 km/h, a corner 9% sliding",
+     "2 hard hits, 4 contacts, 29.6 km/h, a corner 3% sliding",
+     "1 hard hits",
+     "2 hard hits, 3 contacts, 26.5 km/h, a corner 9% sliding, total 3138 against 4338",
+     "1 hard hits, 32.5 km/h, a corner 18% sliding",
+     "1 hard hits, 32.3 km/h, a corner 8% sliding",
+     "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding",
+     "4 hard hits, 6 contacts, 32 km/h, a corner 5% sliding, total 3043 against 4338",
+     "1 hard hits, 29.5 km/h, a corner 20% sliding",
+     "1 hard hits",
+     "4 hard hits, 8 contacts, 28.2 km/h, a corner 8% sliding, total 3180 against 4338",
+     "3 hard hits, 3 contacts, 24 km/h, a corner 9% sliding",
+     "2 hard hits, 4 contacts, 29.6 km/h, a corner 3% sliding",
+     "1 hard hits"
+    ],
+    "worst": {
+     "hard": 4,
+     "contacts": 8,
+     "minKmh": 24,
+     "worstCorner": 0.027,
+     "total": [
+      3043,
+      4225
+     ]
+    }
+   },
+   "plateau": {
+    "pass": false,
+    "missedVariants": 34,
+    "variants": 34,
+    "missedRuns": 165,
+    "runs": 170,
+    "missed": [
+     {
+      "key": "SLIDE_GAIN",
+      "from": 0.945,
+      "to": 0.9544,
+      "missing": 4,
+      "why": [
+       "2 hard hits, 3 contacts, 29.3 km/h, a corner 2% sliding",
+       "3 hard hits, 3 contacts"
+      ]
+     },
+     {
+      "key": "SLIDE_GAIN",
+      "from": 0.945,
+      "to": 0.9355,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 3 contacts, 33.3 km/h, a corner 10% sliding",
+       "1 hard hits, 4 contacts"
+      ]
+     },
+     {
+      "key": "PROGRESS",
+      "from": 92,
+      "to": 92.92,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "PROGRESS",
+      "from": 92,
+      "to": 91.08,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 3 contacts, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "KEEP",
+      "from": 1500,
+      "to": 1515,
+      "missing": 4,
+      "why": [
+       "1 hard hits, 3 contacts, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts"
+      ]
+     },
+     {
+      "key": "KEEP",
+      "from": 1500,
+      "to": 1485,
+      "missing": 4,
+      "why": [
+       "3 hard hits, 5 contacts, 32.6 km/h, a corner 2% sliding, total 3191 against 4338",
+       "4 hard hits, 5 contacts, 28.4 km/h, a corner 7% sliding"
+      ]
+     },
+     {
+      "key": "ANGLE_CAP",
+      "from": 50.2,
+      "to": 50.702,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 3 contacts, 32.3 km/h, a corner 7% sliding",
+       "a corner 27% sliding"
+      ]
+     },
+     {
+      "key": "ANGLE_CAP",
+      "from": 50.2,
+      "to": 49.698,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "EDGE_SAFE",
+      "from": 1.66,
+      "to": 1.6766,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "a corner 27% sliding"
+      ]
+     },
+     {
+      "key": "EDGE_SAFE",
+      "from": 1.66,
+      "to": 1.6434,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "EDGE_COST",
+      "from": 2786,
+      "to": 2813.86,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "EDGE_COST",
+      "from": 2786,
+      "to": 2758.14,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "ENTRY",
+      "from": 19.5,
+      "to": 19.695,
+      "missing": 4,
+      "why": [
+       "1 hard hits, 4 contacts, a corner 0% sliding",
+       "3 hard hits, 5 contacts"
+      ]
+     },
+     {
+      "key": "ENTRY",
+      "from": 19.5,
+      "to": 19.305,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 4 contacts, a corner 11% sliding",
+       "a corner 20% sliding"
+      ]
+     },
+     {
+      "key": "VMAX",
+      "from": 32.1,
+      "to": 32.421,
+      "missing": 4,
+      "why": [
+       "3 hard hits, 5 contacts, 30.5 km/h, a corner 11% sliding, total 3188 against 4338",
+       "1 hard hits, 29.5 km/h"
+      ]
+     },
+     {
+      "key": "VMAX",
+      "from": 32.1,
+      "to": 31.779,
+      "missing": 5,
+      "why": [
+       "2 hard hits, 4 contacts, 35 km/h, a corner 7% sliding",
+       "1 hard hits, 28.7 km/h, a corner 9% sliding"
+      ]
+     },
+     {
+      "key": "CHAIN_KEEP",
+      "from": 197,
+      "to": 198.97,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "CHAIN_KEEP",
+      "from": 197,
+      "to": 195.03,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "CHAIN_MARGIN",
+      "from": 0.24,
+      "to": 0.2424,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "CHAIN_MARGIN",
+      "from": 0.24,
+      "to": 0.2376,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "AY_MAX",
+      "from": 7.38,
+      "to": 7.4538,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "AY_MAX",
+      "from": 7.38,
+      "to": 7.3062,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "OUTSIDE",
+      "from": 0.092,
+      "to": 0.0929,
+      "missing": 5,
+      "why": [
+       "1 hard hits, a corner 17% sliding",
+       "1 hard hits, 34.4 km/h"
+      ]
+     },
+     {
+      "key": "OUTSIDE",
+      "from": 0.092,
+      "to": 0.0911,
+      "missing": 5,
+      "why": [
+       "2 hard hits, 6 contacts, a corner 0% sliding, total 3008 against 4338",
+       "4 hard hits, 7 contacts, 29.4 km/h, total 3215 against 4338"
+      ]
+     },
+     {
+      "key": "SETUP",
+      "from": 70.99,
+      "to": 71.6999,
+      "missing": 5,
+      "why": [
+       "2 hard hits, 6 contacts, 34.8 km/h",
+       "1 hard hits"
+      ]
+     },
+     {
+      "key": "SETUP",
+      "from": 70.99,
+      "to": 70.2801,
+      "missing": 5,
+      "why": [
+       "2 hard hits, 26.7 km/h, a corner 11% sliding",
+       "1 hard hits, 38.2 km/h, a corner 5% sliding"
+      ]
+     },
+     {
+      "key": "WINDOW_PRE",
+      "from": 13.45,
+      "to": 13.5845,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "WINDOW_PRE",
+      "from": 13.45,
+      "to": 13.3155,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "WINDOW_POST",
+      "from": 5.64,
+      "to": 5.6964,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "WINDOW_POST",
+      "from": 5.64,
+      "to": 5.5836,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "LINK",
+      "from": 11.96,
+      "to": 12.0796,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "LINK",
+      "from": 11.96,
+      "to": 11.8404,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     },
+     {
+      "key": "HB_TIME",
+      "from": 0.279,
+      "to": 0.2818,
+      "missing": 5,
+      "why": [
+       "5 hard hits, 6 contacts, 22.7 km/h, a corner 19% sliding",
+       "2 hard hits, 7 contacts"
+      ]
+     },
+     {
+      "key": "HB_TIME",
+      "from": 0.279,
+      "to": 0.2762,
+      "missing": 5,
+      "why": [
+       "1 hard hits, 32.3 km/h, a corner 8% sliding",
+       "2 hard hits, 5 contacts, 33.5 km/h, a corner 10% sliding"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}
