@@ -1,0 +1,113 @@
+{
+ "part": "known",
+ "budgetMs": 16.7,
+ "slackMs": 1.5,
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, 6x CPU throttle through CDP; the GPU is not measured here",
+ "runs": [
+  {
+   "label": "low, plain",
+   "tier": "low",
+   "look": {},
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 10.2,
+    "p99": 32,
+    "worst": 86.5,
+    "mean": 2.97
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 110,
+   "errors": []
+  },
+  {
+   "label": "known answer: 3 ms of busy work per frame",
+   "tier": "low",
+   "look": {},
+   "busy": 3,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 4.6,
+    "p95": 9,
+    "p99": 13.4,
+    "worst": 25,
+    "mean": 5.15
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 110,
+   "errors": []
+  },
+  {
+   "label": "known answer: 20 ms of busy work per frame",
+   "tier": "low",
+   "look": {},
+   "busy": 20,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 21.9,
+    "p95": 25.5,
+    "p99": 30.2,
+    "worst": 38,
+    "mean": 22.33
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 110,
+   "errors": []
+  }
+ ]
+}

@@ -7,6 +7,11 @@
    on the model, the glow lit (the cheap form on the low tier), the
    smoke in its colour.
    Known answer: 900 frames at 60 fps step nothing down.
+   And what the glow is to the renderer on each tier: the same frame
+   drawn with it and without it, the draw calls and triangles counted
+   (one call; 10 triangles in the cheap form, the low tier's, and 262
+   in the soft form). Known answer: the wheels, which are more
+   triangles and no more calls, do not read as a call.
 
    node game/test/garage/adapt.js   writes review/garage/adapt.json */
 import path from 'node:path';
@@ -33,6 +38,15 @@ for (const tier of ['low', 'high']) {
   G.say(fast.level === 0, tier + ' known answer: 900 frames at 60 fps with the cosmetics on leave the quality alone: level ' + fast.level);
   G.say(slow.level === 4 && slow.density < 1 && slow.pixelRatio < start.pixelRatio && !slow.bloom, tier + ': a slow device is stepped down to the last level with the cosmetics on: level ' + slow.level + ', effects at ' + slow.density + ', pixel ratio ' + start.pixelRatio + ' -> ' + slow.pixelRatio + ', bloom ' + start.bloom + ' -> ' + slow.bloom);
   G.say(worn.wheels === 'blades' && worn.glow && worn.looks.smoke === 'rose' && (tier === 'low' ? worn.glowTris === 10 : worn.glowTris > 100), tier + ': and the cosmetics are still on: wheels ' + worn.wheels + ', the glow lit (' + worn.glowTris + ' triangles), smoke ' + worn.looks.smoke);
+  /* what the renderer is asked for, with and without: the same frame, counted */
+  const pc = await G.page(env, G.PORTRAIT, 'tier=' + tier + '&preset=night&adapt=0'), q = pc.page;
+  const count = async look => { await G.wear(q, look); await G.midSlide(q, 0, 2, 16); await q.evaluate(() => { window.__feel.draw = true; }); await G.runFrames(q, 1); const r = await q.evaluate(() => { const i = window.__feel.scene.info(); return { calls: i.drawCalls, tris: i.triangles }; }); await q.evaluate(() => { window.__feel.draw = false; }); return r; };
+  const none = await count({}), glow = await count({ glow: 'aqua' }), wheels = await count({ wheels: 'blades' });
+  out.runs.push({ tier, counted: { none, glow, wheels } });
+  const want = tier === 'low' ? 10 : 262;
+  G.say(glow.calls - none.calls === 1 && glow.tris - none.tris === want, tier + ': the glow is ' + (glow.calls - none.calls) + ' draw call and ' + (glow.tris - none.tris) + ' triangles more (the ' + (tier === 'low' ? 'cheap' : 'soft') + ' form, ' + want + '), of ' + none.calls + ' calls and ' + none.tris + ' triangles');
+  G.say(wheels.calls === none.calls && wheels.tris > none.tris, tier + ' known answer: a wheel design is ' + (wheels.tris - none.tris) + ' triangles more and ' + (wheels.calls - none.calls) + ' calls more, so the count tells a call from a triangle: ' + (wheels.calls === none.calls && wheels.tris > none.tris ? 'CAUGHT' : 'MISSED'));
+  await pc.close();
   if (pg.errors.length) G.say(false, tier + ' page errors: ' + pg.errors.slice(0, 2).join(' | '));
   await pg.close();
 }

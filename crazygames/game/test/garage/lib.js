@@ -44,8 +44,9 @@ export async function seedRandom(page, seed) {
 /* A career run brought to a frame mid slide, the same frame every time
    (the scripted drifter is deterministic), ready for a shot. Returns
    the moment, or null. */
-export async function midSlide(page, index, mult, held, where) {
+export async function midSlide(page, index, mult, held, where, density) {
   await R.careerRun(page, index);
+  if (density) await page.evaluate(k => { window.__feel.scene.effects().setDensity(k); }, density);   // a known answer's thinned effects
   await seedRandom(page, 7);   // after the run is set up (a track's dressing is built with random numbers the first time only), before its first frame
   if (where !== 'road') return R.slideAt(page, mult || 2, held || 14);
   /* as slideAt (spectacle/lib.js), but with the whole car on the asphalt, clear of the kerbs' paint */

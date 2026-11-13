@@ -320,8 +320,9 @@ function frame(t) {
     hud.setRun(app.track.kind === 'circuit' ? 'LAP ' + Math.min(p.laps, p.lap + 1) + '/' + p.laps : Math.round(p.remaining) + ' m', app.runTime.toFixed(1));
   }
   /* the garage draws its showroom into the game's canvas in the game's place */
-  if (S === 'garage') { const st = screens.el.querySelector('.stage'); if (st) showroom.frame(st.getBoundingClientRect(), view.w, view.h); showroom.update(dt); }
-  if (!window.__feel.draw) scene.camera.updateMatrixWorld(); else if (S === 'garage') showroom.render(); else scene.render();
+  const showroom = S === 'garage' ? showroomNow() : null;
+  if (showroom) { const st = screens.el.querySelector('.stage'); if (st) showroom.frame(st.getBoundingClientRect(), view.w, view.h); showroom.update(dt); }
+  if (!window.__feel.draw) scene.camera.updateMatrixWorld(); else if (showroom) showroom.render(); else scene.render();
   frameMs = performance.now() - t0;
   if (debug) debug.frame(frameMs, physMs, steps, scene.info().submitMs, scene.info(), t);
 }
@@ -347,9 +348,13 @@ function showMenu(name) {
    showroom in its paint and its cosmetics, with any preview over them,
    and the screen is drawn round it. The preview lives in app.preview
    and nowhere else: a run reads the save. */
-const showroom = createShowroom(THREE, scene.renderer);
-showroom.attach(screens.el);
+let theShowroom = null;   // made the first time the garage is opened, so a visit that never opens it pays nothing for it
+function showroomNow() {
+  if (!theShowroom) { theShowroom = createShowroom(THREE, scene.renderer); theShowroom.attach(screens.el); }
+  return theShowroom;
+}
 function showGarage() {
+  const showroom = showroomNow();
   const id = app.picked || save.state.car, mine = save.state.cars[id], P = app.preview;
   const look = lookOf(mine);
   for (const k of KINDS) if (P[k] && isItem(k, P[k])) look[k] = P[k];
@@ -833,7 +838,7 @@ window.__loop = {
   app, save, LOOP, screens, sound, onboard, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
   lab: { setLab, labSpec, specFromCode, state: () => app.lab && { settings: app.lab.settings, seed: app.lab.seed, code: app.lab.code, message: app.lab.message, error: app.lab.error, track: app.lab.track && { name: app.lab.track.name, length: app.lab.track.length, kind: app.lab.track.kind, corners: app.lab.track.corners.length, bridges: (app.lab.track.bridges || []).length, fallback: !!app.lab.track.fallback, theme: app.lab.track.theme, preset: app.lab.track.preset } } },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor, battleSpec: id => battleSpec(rivalById(id)), RIVALS, TANDEM,
-  showroom, garage: () => ({ picked: app.picked, tab: app.tab, preview: { ...app.preview } }),
+  get showroom() { return showroomNow(); }, garage: () => ({ picked: app.picked, tab: app.tab, preview: { ...app.preview } }),
   portraits,
   rival: () => app.rival, tandem: () => app.tandem.state, lead: () => app.lead && app.lead.state,
   /* the probes: the next battle's rival with a start offset, a grip share or a driving number changed (rivals/rival.js opts); null for none */

@@ -1,0 +1,129 @@
+{
+ "part": "high",
+ "budgetMs": 16.7,
+ "slackMs": 1.5,
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, 6x CPU throttle through CDP; the GPU is not measured here",
+ "runs": [
+  {
+   "label": "high, no cosmetics",
+   "tier": "high",
+   "look": {},
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 5.9,
+    "p99": 30.8,
+    "worst": 87.8,
+    "mean": 2.42
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 78,
+    "p95": 80,
+    "p99": 80,
+    "worst": 80,
+    "mean": 76.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 452167,
+    "p95": 453543,
+    "p99": 453687,
+    "worst": 453703,
+    "mean": 452157.61
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 197,
+   "errors": []
+  },
+  {
+   "label": "high, all three",
+   "tier": "high",
+   "look": {
+    "wheels": "blades",
+    "glow": "aqua",
+    "smoke": "rose"
+   },
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 6.3,
+    "p99": 11.7,
+    "worst": 15.5,
+    "mean": 2.02
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 80,
+    "p95": 82,
+    "p99": 82,
+    "worst": 82,
+    "mean": 78.85
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 454023,
+    "p95": 455379,
+    "p99": 455519,
+    "worst": 455539,
+    "mean": 454009.18
+   },
+   "glowTriangles": 262,
+   "smokeAtEnd": 195,
+   "errors": []
+  },
+  {
+   "label": "high, no cosmetics, again",
+   "tier": "high",
+   "look": {},
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 6,
+    "p99": 15.4,
+    "worst": 29.7,
+    "mean": 1.9
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 78,
+    "p95": 80,
+    "p99": 80,
+    "worst": 80,
+    "mean": 76.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 452167,
+    "p95": 453543,
+    "p99": 453687,
+    "worst": 453703,
+    "mean": 452157.61
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 197,
+   "errors": []
+  }
+ ],
+ "cost": {
+  "runToRun": {
+   "p50": -0.2,
+   "p95": 0.1
+  },
+  "all": {
+   "p50": 0,
+   "p95": 0.4,
+   "triangles": 1856,
+   "drawCalls": 2
+  }
+ }
+}

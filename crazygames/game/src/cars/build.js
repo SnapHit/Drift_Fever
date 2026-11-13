@@ -439,7 +439,7 @@ function softGlowMesh(THREE, hw, z0, z1, y) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-  const m = new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const m = new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true });   // one pass: a see through, two sided mesh is otherwise drawn twice
   const mesh = new THREE.Mesh(g, m);
   mesh.renderOrder = -1;
   return mesh;

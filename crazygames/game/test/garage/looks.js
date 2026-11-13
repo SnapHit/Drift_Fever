@@ -13,6 +13,11 @@
        smoke, where hiding the smoke does; for the glow, inside the
        glow's own outline on the road, projected to the screen (each
        grown by GROW pixels);
+     - for a smoke colour, the smoke itself is the standard smoke to the
+       last puff: as many puffs alive, in the same places, the same
+       sizes and the same strengths (the brief: its amount, life and
+       climb stay exactly as they are). Known answer: the same frame
+       with the effects thinned to half is caught;
      - every pair of items of a kind differs from each other in at
        least PAIR pixels by more than 24 levels.
    In the showroom the same three, inside the stage.
@@ -58,12 +63,15 @@ if (part === 'race') {
   for (const preset of ['night', 'dawn']) {
     const pg = await G.page(env, { width: 844, height: 390 }, 'tier=low&preset=' + preset + '&adapt=0'), page = pg.page;
     await G.hud(page, false);
-    const frame = async (look, file, hook) => {
+    const frame = async (look, file, hook, density) => {
       await G.wear(page, look);
-      const m = await G.midSlide(page, 0, 2, 16);
+      const m = await G.midSlide(page, 0, 2, 16, null, density);
       if (hook) await page.evaluate(hook);
       const png = await G.snap(page, file || path.join(G.shots, 'tmp.png'));
-      return G.decode(png);
+      const img = await G.decode(png);
+      /* the smoke as it stands: how many puffs, and their corners and strengths summed */
+      img.smoke = await page.evaluate(() => { const sm = window.__feel.scene.effects().pools.smoke, g = sm.mesh.geometry, n = sm.live(), P = g.attributes.position.array, A = g.attributes.alpha.array; let ps = 0, as = 0; for (let i = 0; i < n * 12; i++) ps += P[i]; for (let i = 0; i < n * 4; i++) as += A[i]; return { n, ps, as, heat: window.__feel.scene.show().state.heat }; });
+      return img;
     };
     const tag = 'race ' + preset;
     const base = await frame({}, path.join(G.shots, 'race-' + preset + '-standard.png')), again = await frame({});
@@ -100,6 +108,18 @@ if (part === 'race') {
         const d = G.diffMask(img, base, 3), off = G.outside(d, regions[kind]);
         out.rows.push({ where: tag, kind, item: id, differs: d.n, outside: off });
         G.say(d.n >= MIN[kind] && off === 0, tag + ' ' + kind + ' ' + id + ': differs from the standard in ' + d.n + ' pixels (bar ' + MIN[kind] + '), ' + off + ' of them outside where ' + kind + ' is drawn');
+        if (kind === 'smoke') {
+          const a = img.smoke, b = base.smoke, sameSmoke = a.n === b.n && a.ps === b.ps && a.as === b.as && a.heat === b.heat;
+          out.rows.push({ where: tag, kind, item: id, smoke: a, standard: b, sameSmoke });
+          G.say(sameSmoke && a.n > 20, tag + ' smoke ' + id + ': the smoke is the standard smoke to the last puff: ' + a.n + ' puffs alive against ' + b.n + ', the same places and sizes (sum ' + a.ps.toFixed(3) + ' against ' + b.ps.toFixed(3) + '), the same strengths (' + a.as.toFixed(3) + ' against ' + b.as.toFixed(3) + '), the same heat');
+        }
+      }
+      if (kind === 'smoke') {
+        const thin = await frame({ smoke: 'rose' }, null, null, 0.5);
+        await page.evaluate(() => { window.__feel.scene.effects().setDensity(1); });
+        const caught = !(thin.smoke.n === base.smoke.n && thin.smoke.ps === base.smoke.ps);
+        out.known.push({ where: tag, kind: 'smoke', what: 'effects at half', puffs: thin.smoke.n, standard: base.smoke.n, caught });
+        G.say(caught, tag + ' smoke known answer: with the effects thinned to half there are ' + thin.smoke.n + ' puffs against ' + base.smoke.n + ': ' + (caught ? 'CAUGHT' : 'MISSED'));
       }
       const worst = pairs(kind, imgs, regions[kind], tag);
       G.say(worst.pixels >= PAIR[kind], tag + ' ' + kind + ': every pair differs; the closest are ' + worst.a + ' and ' + worst.b + ' by ' + worst.pixels + ' pixels (bar ' + PAIR[kind] + ')');

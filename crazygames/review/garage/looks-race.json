@@ -93,9 +93,45 @@
   {
    "where": "race night",
    "kind": "smoke",
+   "item": "aqua",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
    "item": "lime",
    "differs": 27219,
    "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "lime",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
   },
   {
    "where": "race night",
@@ -107,6 +143,24 @@
   {
    "where": "race night",
    "kind": "smoke",
+   "item": "tangerine",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
    "item": "rose",
    "differs": 26350,
    "outside": 0
@@ -114,9 +168,45 @@
   {
    "where": "race night",
    "kind": "smoke",
+   "item": "rose",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
    "item": "violet",
    "differs": 27365,
    "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "violet",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
   },
   {
    "where": "race dawn",
@@ -210,9 +300,45 @@
   {
    "where": "race dawn",
    "kind": "smoke",
+   "item": "aqua",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
    "item": "lime",
    "differs": 27431,
    "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "lime",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
   },
   {
    "where": "race dawn",
@@ -224,6 +350,24 @@
   {
    "where": "race dawn",
    "kind": "smoke",
+   "item": "tangerine",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
    "item": "rose",
    "differs": 27410,
    "outside": 0
@@ -231,9 +375,45 @@
   {
    "where": "race dawn",
    "kind": "smoke",
+   "item": "rose",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
    "item": "violet",
    "differs": 27579,
    "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "violet",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
   }
  ],
  "pairs": [
@@ -738,6 +918,14 @@
   {
    "where": "race night",
    "kind": "smoke",
+   "what": "effects at half",
+   "puffs": 47,
+   "standard": 97,
+   "caught": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
    "a": "aqua",
    "b": "lime",
    "pixels": 0,
@@ -764,6 +952,14 @@
    "a": "aqua",
    "b": "lime",
    "pixels": 0,
+   "caught": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "what": "effects at half",
+   "puffs": 47,
+   "standard": 97,
    "caught": true
   },
   {
