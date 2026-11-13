@@ -1,0 +1,335 @@
+{
+ "bars": {
+  "contacts": 2,
+  "disturbed": 2,
+  "plateau": 4,
+  "ceiling": 6
+ },
+ "measured": "2026-11-13",
+ "rivals": {
+  "r4": {
+   "id": "r4",
+   "name": "Dovane",
+   "setup": "Over and under, fastback, 3 laps",
+   "car": "fastback",
+   "up": null,
+   "laps": 3,
+   "track": 12,
+   "drive": {
+    "SLIDE_GAIN": 1.5,
+    "PROGRESS": 89,
+    "KEEP": 210,
+    "ANGLE_CAP": 38.33,
+    "EDGE_SAFE": 1.45,
+    "EDGE_COST": 2256,
+    "ENTRY": 27.68,
+    "VMAX": 34,
+    "CHAIN_KEEP": 1818,
+    "CHAIN_MARGIN": 0.03,
+    "AY_MAX": 5.24,
+    "OUTSIDE": 0.702,
+    "SETUP": 62.65,
+    "WINDOW_PRE": 8.22,
+    "WINDOW_POST": 16.03,
+    "LINK": 7.88,
+    "HB_TIME": 0.1,
+    "HB_OVER": 4.88,
+    "HB_STEER": 0.35
+   },
+   "style": "Long, linked slides",
+   "page": {
+    "seconds": 83.79,
+    "total": 6961,
+    "drift": 6180,
+    "clean": 396,
+    "pace": 385,
+    "best": 1109,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 83.2,
+    "worstCorner": 0.631,
+    "angle": 33.1,
+    "hands": {
+     "brakeSteps": 0,
+     "liftSteps": 0,
+     "maxBrake": 0,
+     "minThrottle": 1,
+     "overruled": 0
+    },
+    "hash": "116.85859854805942,18.49853949088115,2.3750715857911917,-23.06776385176796,22.163372977921778,0.06761479376151222,-0.007539822368615503,7.275464617296435,0,0,0,-1.412457287315106,8.691979695897942|10055,0,0|6961,10055"
+   },
+   "rate": 83.1,
+   "star": 14.965,
+   "multiple": 5.55,
+   "pageBar": {
+    "pass": true,
+    "why": []
+   },
+   "disturbed": {
+    "pass": true,
+    "missing": 0,
+    "of": 20,
+    "why": [],
+    "worst": {
+     "hard": 0,
+     "contacts": 0,
+     "minKmh": 83.2,
+     "worstCorner": 0.602,
+     "total": [
+      6314,
+      7276
+     ]
+    }
+   },
+   "plateau": {
+    "pass": true,
+    "missedVariants": 2,
+    "variants": 38,
+    "missedRuns": 2,
+    "runs": 190,
+    "missed": [
+     {
+      "key": "ANGLE_CAP",
+      "from": 38.33,
+      "to": 37.9467,
+      "missing": 1,
+      "why": [
+       "2 hard hits, a corner 1% sliding"
+      ]
+     },
+     {
+      "key": "HB_OVER",
+      "from": 4.88,
+      "to": 4.9288,
+      "missing": 1,
+      "why": [
+       "1 hard hits, a corner 30% sliding"
+      ]
+     }
+    ]
+   }
+  },
+  "r5": {
+   "id": "r5",
+   "name": "Halvik",
+   "setup": "High wire, hatch, 2 laps",
+   "car": "hatch",
+   "up": null,
+   "laps": 2,
+   "track": 18,
+   "drive": {
+    "SLIDE_GAIN": 1.5,
+    "PROGRESS": 99,
+    "KEEP": 378,
+    "ANGLE_CAP": 35.79,
+    "EDGE_SAFE": 1.35,
+    "EDGE_COST": 2601,
+    "ENTRY": 28.52,
+    "VMAX": 34,
+    "CHAIN_KEEP": 2044,
+    "CHAIN_MARGIN": 0.16,
+    "AY_MAX": 5.46,
+    "OUTSIDE": 0.676,
+    "SETUP": 45.49,
+    "WINDOW_PRE": 9.84,
+    "WINDOW_POST": 16.2,
+    "LINK": 16.32,
+    "HB_TIME": 0.1,
+    "HB_OVER": 4.53,
+    "HB_STEER": 0.28
+   },
+   "style": "The biggest angles",
+   "page": {
+    "seconds": 68.63,
+    "total": 3509,
+    "drift": 3078,
+    "clean": 240,
+    "pace": 191,
+    "best": 488,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 53,
+    "worstCorner": 0.337,
+    "angle": 29.1,
+    "hands": {
+     "brakeSteps": 0,
+     "liftSteps": 0,
+     "maxBrake": 0,
+     "minThrottle": 1,
+     "overruled": 0
+    },
+    "hash": "102.07933481230025,-45.62685894066635,2.3839048461515344,-9.631211777823719,15.651538665005813,1.0572704574097311,0.36511639444654315,6.1352376849891614,0,0,1.1166666666666651,-8.090399469690599,0.12139386767683563|8236,0,0|3509,8236"
+   },
+   "rate": 51.1,
+   "star": 14.328,
+   "multiple": 3.57,
+   "pageBar": {
+    "pass": true,
+    "why": []
+   },
+   "disturbed": {
+    "pass": true,
+    "missing": 1,
+    "of": 20,
+    "why": [
+     "a corner 27% sliding"
+    ],
+    "worst": {
+     "hard": 0,
+     "contacts": 1,
+     "minKmh": 49.9,
+     "worstCorner": 0.268,
+     "total": [
+      3462,
+      3890
+     ]
+    }
+   },
+   "plateau": {
+    "pass": true,
+    "missedVariants": 2,
+    "variants": 38,
+    "missedRuns": 2,
+    "runs": 190,
+    "missed": [
+     {
+      "key": "KEEP",
+      "from": 378,
+      "to": 381.78,
+      "missing": 1,
+      "why": [
+       "a corner 20% sliding"
+      ]
+     },
+     {
+      "key": "SETUP",
+      "from": 45.49,
+      "to": 45.9449,
+      "missing": 1,
+      "why": [
+       "1 hard hits"
+      ]
+     }
+    ]
+   }
+  },
+  "r6": {
+   "id": "r6",
+   "name": "Sarrow",
+   "setup": "Endless eight, starter +1/1/1, 3 laps",
+   "car": "starter",
+   "up": {
+    "power": 1,
+    "grip": 1,
+    "steer": 1
+   },
+   "laps": 3,
+   "track": 20,
+   "drive": {
+    "SLIDE_GAIN": 0.676,
+    "PROGRESS": 125,
+    "KEEP": 827,
+    "ANGLE_CAP": 50.96,
+    "EDGE_SAFE": 0.8,
+    "EDGE_COST": 713,
+    "ENTRY": 27.79,
+    "VMAX": 30.16,
+    "CHAIN_KEEP": 3030,
+    "CHAIN_MARGIN": 0.56,
+    "AY_MAX": 5.39,
+    "OUTSIDE": 0.148,
+    "SETUP": 78.45,
+    "WINDOW_PRE": 14.24,
+    "WINDOW_POST": 6.96,
+    "LINK": 12.27,
+    "HB_TIME": 0.336,
+    "HB_OVER": 5.04,
+    "HB_STEER": 0.07
+   },
+   "style": "Beats you in the starter coupe",
+   "page": {
+    "seconds": 77.87,
+    "total": 5914,
+    "drift": 5200,
+    "clean": 360,
+    "pace": 354,
+    "best": 514,
+    "respawns": 0,
+    "hard": 0,
+    "contacts": 0,
+    "minKmh": 86.8,
+    "worstCorner": 0.583,
+    "angle": 28.5,
+    "hands": {
+     "brakeSteps": 0,
+     "liftSteps": 0,
+     "maxBrake": 0,
+     "minThrottle": 1,
+     "overruled": 0
+    },
+    "hash": "-46.72897574943754,13.851383865639148,0.6021772511740362,-4.41923553496098,-23.746819785892175,-0.9265333177063768,-0.2967962545073598,7.4234134050740055,0,0,4.216666666666666,-11.59274245596706,-0.45895770175162914|9344,0,0|5914,9344"
+   },
+   "rate": 75.9,
+   "star": 14.053,
+   "multiple": 5.4,
+   "pageBar": {
+    "pass": true,
+    "why": []
+   },
+   "disturbed": {
+    "pass": true,
+    "missing": 0,
+    "of": 20,
+    "why": [],
+    "worst": {
+     "hard": 0,
+     "contacts": 2,
+     "minKmh": 86.7,
+     "worstCorner": 0.574,
+     "total": [
+      5698,
+      5929
+     ]
+    }
+   },
+   "plateau": {
+    "pass": true,
+    "missedVariants": 3,
+    "variants": 38,
+    "missedRuns": 3,
+    "runs": 190,
+    "missed": [
+     {
+      "key": "PROGRESS",
+      "from": 125,
+      "to": 123.75,
+      "missing": 1,
+      "why": [
+       "1 hard hits, a corner 0% sliding"
+      ]
+     },
+     {
+      "key": "HB_OVER",
+      "from": 5.04,
+      "to": 5.0904,
+      "missing": 1,
+      "why": [
+       "2 hard hits, 4 contacts, a corner 4% sliding"
+      ]
+     },
+     {
+      "key": "HB_OVER",
+      "from": 5.04,
+      "to": 4.9896,
+      "missing": 1,
+      "why": [
+       "3 contacts"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

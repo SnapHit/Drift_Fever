@@ -1,0 +1,34 @@
+PASS 390x844 six rival cards, none SOON: rcard locked | rcard locked | rcard locked | rcard locked | rcard locked | rcard locked
+PASS 390x844 Tolvo says where his track is: 2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city (Rookie track 5, not open yet) ○ Beat Kestrow
+PASS 390x844 the grid says most points wins, no "0 LEVEL": {"n":"","lead":"MOST POINTS WINS","head":"DRIFT RACE · VARSKMost points wins. Slide to score. Lead him at the gates and get home first for more."}
+PASS 390x844 the pill is a points gap: {"lead":"1,666 PTS BEHIND","n":"1757","place":"2ND","gap":"-2.6 s","line":"","t":18.366666666666266,"gates":2}
+PASS 390x844 first on the road shows what the line is worth, second does not: 2ND ""
+PASS 390x844 HUD boxes do not overlap: #exit #fs #snd #runinfo #vs #restart #readout
+PASS 390x844 HUD buttons at least 44 px: #exit 44x44, #fs 44x44, #snd 44x44, #restart 44x44
+PASS 390x844 the results say most points wins: DRIFT RACE · VARSK VARSK WINS Upper deck · most points wins YOU 91 VARSK 6,835 6,744 short YOU VARSK Drift 57 5,796 Clean 34 408 Pace 0 377 Led at gates 0 0/11 
+PASS 390x844 a win shows "First home +2,545 12.6 s clear" and the card does not scroll: fits
+PASS 390x844 the margin pays by the second up to the cap: {"line":636,"m0":0,"m5":796,"m126":1909,"m30":1909}
+PASS 390x844 the author's race with Varsk (5,029 to 6,581, 12.6 s clear) is now a win: 5,029 + 1909 = 6938
+PASS 844x390 six rival cards, none SOON: rcard locked | rcard locked | rcard locked | rcard locked | rcard locked | rcard locked
+PASS 844x390 Tolvo says where his track is: 2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city (Rookie track 5, not open yet) ○ Beat Kestrow
+PASS 844x390 the grid says most points wins, no "0 LEVEL": {"n":"","lead":"MOST POINTS WINS","head":"DRIFT RACE · VARSKMost points wins. Slide to score. Lead him at the gates and get home first for more."}
+PASS 844x390 the pill is a points gap: {"lead":"1,666 PTS BEHIND","n":"1757","place":"2ND","gap":"-2.6 s","line":"","t":18.366666666666266,"gates":2}
+PASS 844x390 first on the road shows what the line is worth, second does not: 2ND ""
+PASS 844x390 HUD boxes do not overlap: #exit #fs #snd #runinfo #vs #restart #readout
+PASS 844x390 HUD buttons at least 44 px: #exit 44x44, #fs 44x44, #snd 44x44, #restart 44x44
+PASS 844x390 the results say most points wins: DRIFT RACE · VARSK VARSK WINS Upper deck · most points wins YOU 91 VARSK 6,835 6,744 short YOU VARSK Drift 57 5,796 Clean 34 408 Pace 0 377 Led at gates 0 0/11 
+PASS 844x390 a win shows "First home +2,545 12.6 s clear" and the card does not scroll: fits
+PASS 844x390 the margin pays by the second up to the cap: {"line":636,"m0":0,"m5":796,"m126":1909,"m30":1909}
+PASS 844x390 the author's race with Varsk (5,029 to 6,581, 12.6 s clear) is now a win: 5,029 + 1909 = 6938
+PASS 1280x720 six rival cards, none SOON: rcard locked | rcard locked | rcard locked | rcard locked | rcard locked | rcard locked
+PASS 1280x720 Tolvo says where his track is: 2 TOLVO Quick, linking shallow slides Tight city · 3 laps · Light hatch ● 400 first win 🔒 TO EARN HIM ○ Win a star on Tight city (Rookie track 5, not open yet) ○ Beat Kestrow
+PASS 1280x720 the grid says most points wins, no "0 LEVEL": {"n":"","lead":"MOST POINTS WINS","head":"DRIFT RACE · VARSKMost points wins. Slide to score. Lead him at the gates and get home first for more."}
+PASS 1280x720 the pill is a points gap: {"lead":"1,666 PTS BEHIND","n":"1757","place":"2ND","gap":"-2.6 s","line":"","t":18.366666666666266,"gates":2}
+PASS 1280x720 first on the road shows what the line is worth, second does not: 2ND ""
+PASS 1280x720 HUD boxes do not overlap: #exit #fs #snd #runinfo #vs #restart #readout
+PASS 1280x720 HUD buttons at least 44 px: #exit 44x44, #fs 44x44, #snd 44x44, #restart 44x44
+PASS 1280x720 the results say most points wins: DRIFT RACE · VARSK VARSK WINS Upper deck · most points wins YOU 91 VARSK 6,835 6,744 short YOU VARSK Drift 57 5,796 Clean 34 408 Pace 0 377 Led at gates 0 0/11 
+PASS 1280x720 a win shows "First home +2,545 12.6 s clear" and the card does not scroll: fits
+PASS 1280x720 the margin pays by the second up to the cap: {"line":636,"m0":0,"m5":796,"m126":1909,"m30":1909}
+PASS 1280x720 the author's race with Varsk (5,029 to 6,581, 12.6 s clear) is now a win: 5,029 + 1909 = 6938
+all passed
