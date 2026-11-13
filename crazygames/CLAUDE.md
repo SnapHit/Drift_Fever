@@ -656,3 +656,24 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   `game/test/play13/career.js` measures 1 to 3. Not rerun: the
   chapters and garage rounds' own probes, which may now disagree with
   the new rule and prices.
+- 14 November 2026, the pace round (`briefs/RIVALS-PACE.md`,
+  `review/pace/REPORT.md`): quicker later rivals, two of three. Each
+  was searched on his own for more points a second and passes all
+  three bars (a clean run in the page, at most 2 of 20 disturbed runs
+  and 4 of 38 one per cent moves missing). Dovane: the plain fastback,
+  three laps of Over and under, 83.8 s for 6,961, x5.55 of the three
+  star rate (was x2.90). Sarrow: the starter with one step of each
+  upgrade, three laps of Endless eight, 77.9 s for 5,914, x5.40 (was
+  x3.93). **Halvik missed his target** (x4.9): the best that passes
+  the bars is the plain hatch over two laps of High wire, 68.6 s for
+  3,509, x3.57 (was x3.29 and fragile; he is now robust), and his line
+  is "Short and sharp in the light hatch". So the ladder reads 1.93,
+  3.69, 4.37, 5.55, 3.57, 5.40: it climbs to Dovane, dips at Halvik,
+  and Sarrow sits just under Dovane. High wire and Knot yard were the
+  only circuits open to Halvik (the other two in his half are sprints
+  under 60 s); a harder Halvik needs another track or a longer search.
+  What moved the searches was starting from random drivings
+  (`game/test/pace/explore.js`), not from the old ones. Nobody has
+  raced the new three: whether a player can beat Dovane at 83 points
+  a second is for play. Stored best margins over the old three stay
+  in a save.
