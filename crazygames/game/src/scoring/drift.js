@@ -7,7 +7,7 @@
    or a cone, the points count PROX_BONUS times over. Callouts are
    queued for the HUD. Stepped at the physics rate so a replay scores
    the same; every constant is in TUNE.SCORING. */
-import { TUNE } from '../tune.js';
+import { TUNE, TANDEM } from '../tune.js';
 
 const DEG = 180 / Math.PI;
 
@@ -67,7 +67,11 @@ export function createScoring() {
     const car = world.car;
     const angle = Math.abs(car.slip) * DEG;
     s.angle = angle;
-    if (world.hit && world.hit.hard) { lose(); return; }
+    if (world.hit && world.hit.hard) {
+      /* the other car: the chain is banked, not lost (TANDEM.HIT_BANKS); a wall still loses it */
+      if (world.hit.kind === 'rival' && TANDEM.HIT_BANKS) { s.drifting = false; s.gap = 0; bank(); } else lose();
+      return;
+    }
     if (world.respawned) { lose(); return; }
     const kmh = car.speed * 3.6;
     const scoring = angle >= S.MIN_ANGLE && car.speed >= S.MIN_SPEED && car.vx > 0;

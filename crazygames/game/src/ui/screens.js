@@ -252,8 +252,10 @@ export function createScreens(root, onAction) {
     const rematch = cls => `<button type="button" class="big${cls}" data-action="again"><b>REMATCH</b>${cls === ' primary' || !C ? '<small>DRIFT / BRAKE, Enter or R</small>' : ''}</button>`;
     const careerBtn = cls => C ? `<button type="button" class="big${cls}" data-action="play-career" data-arg="${C.index}"><b>${cls ? 'NEXT TRACK' : 'CAREER'}</b><small>${cls ? esc(C.where) + ' &middot; ' : ''}${esc(C.name)}</small></button>` : '';
     const rivalsBtn = '<button type="button" class="big" data-action="rivals"><b>RIVALS</b></button>', menuBtn = '<button type="button" class="big" data-action="title"><b>MENU</b></button>';
-    const main = careerMain ? careerBtn(' primary') : rematch(r.won && goNext ? '' : ' primary');
-    const row2 = !C ? next + rivalsBtn + menuBtn : careerMain ? rematch('') + rivalsBtn + menuBtn : goNext ? next + careerBtn('') + menuBtn : careerBtn('') + rivalsBtn + menuBtn;
+    /* a lost race points at the garage (main.js garageTip): its line takes the next rival's place, and GARAGE takes RIVALS' button, or the main one once it is pushed */
+    const T = r.tip, garageBtn = cls => `<button type="button" class="big${cls}" data-action="garage"><b>GARAGE</b>${cls ? '<small>a faster car</small>' : ''}</button>`;
+    const main = T && T.push ? garageBtn(' primary') : careerMain ? careerBtn(' primary') : rematch(r.won && goNext ? '' : ' primary');
+    const row2 = T && T.push ? rematch('') + careerBtn('') + menuBtn : T ? (C ? careerBtn('') : rivalsBtn) + garageBtn('') + menuBtn : !C ? next + rivalsBtn + menuBtn : careerMain ? rematch('') + rivalsBtn + menuBtn : goNext ? next + careerBtn('') + menuBtn : careerBtn('') + rivalsBtn + menuBtn;
     const P = r.parts || {}, Q = r.rivalParts || {}, gates = Math.max(0, (r.gates || 1) - 1);
     const row = (label, x, y, hint) => `<tr><th>${label}${hint ? ` <small>${hint}</small>` : ''}</th><td>${x}</td><td>${y}</td></tr>`;
     const n = v => fmt(v || 0);
@@ -272,7 +274,7 @@ export function createScreens(root, onAction) {
         <p class="margin">${r.won ? (r.margin ? 'by ' + fmt(r.margin) : 'a tie is yours') : fmt(-r.margin) + ' short'}</p>${b}
         ${table}
         <div class="facts"><span>${coinsN}<small>coins${r.prize ? ' &middot; first win +' + fmt(r.prize) : ''}</small></span><span><b>${r.seconds.toFixed(1)} s</b><small>race</small></span><span><b>${r.best2 !== undefined && r.best2 > -1e9 ? (r.best2 >= 0 ? '+' : '') + fmt(r.best2) : ''}</b><small>best margin</small></span></div>
-        ${nextLine}
+        ${T ? `<p class="unlock tip">${esc(T.text)}</p>` : nextLine}
         ${main}
         <div class="row2">${row2}</div>${z}
       </div>`);

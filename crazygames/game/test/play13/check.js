@@ -49,7 +49,7 @@ for (const [w, h] of [[390, 844], [844, 390], [1280, 720]]) {
   ok(tag + ' the results say most points wins', /most points wins/i.test(card.text) && /Led at gates/.test(card.text), card.text.slice(0, 160));
   await page.screenshot({ path: path.join(shots, tag + '-results.png') });
   /* a win with the margin row on the card: it shows, and the card still fits without scrolling */
-  await page.evaluate(() => { const L = window.__loop, r = L.results(); L.screens.results({ ...r, won: true, score: r.rival.total + 357, margin: 357, lineTo: 'player', parts: { ...r.parts, line: 636, clear: 1909, clearS: 12.6 } }); });
+  await page.evaluate(() => { const L = window.__loop, r = L.results(); L.screens.results({ ...r, tip: null, won: true, score: r.rival.total + 357, margin: 357, lineTo: 'player', parts: { ...r.parts, line: 636, clear: 1909, clearS: 12.6 } }); });
   await R.runFrames(page, 30);
   const win = await page.evaluate(() => ({ text: document.querySelector('#screens .card').innerText.replace(/\s+/g, ' '), scrolls: [...document.querySelectorAll('#screens, #screens *')].filter(e => e.scrollHeight > e.clientHeight + 1 && /auto|scroll/.test(getComputedStyle(e).overflowY)).map(e => e.className || e.id) }));
   ok(tag + ' a win shows "First home +2,545 12.6 s clear" and the card does not scroll', /First home \+2,545 12\.6 s clear/.test(win.text) && win.scrolls.length === 0, win.scrolls.join(',') || 'fits');

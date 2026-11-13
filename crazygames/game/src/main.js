@@ -45,7 +45,7 @@ import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, ca
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
-import { carTune, carById, carBox, carRev, upgradeLevels } from './garage/roster.js';
+import { carTune, carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS } from './garage/roster.js';
 import { FX_ON } from './fx.js';
 import { createDirector } from './camera/director.js';
 import { TANDEM } from './tune.js';
@@ -90,6 +90,7 @@ const app = {
   ground: null, world: null, progress: null, ghost: null, driver: null,
   spec: null, track: null, laps: 0, targets: null, key: null, missions: null,
   countdown: 0, goShown: 0, runTime: 0, menuT: 0, settle: 0, lockout: 0,
+  lostTo: {},   // races lost to each rival this visit, for the garage tip
   results: null, picked: null,
   lab: null,     // the Track Lab's state: { settings, seed, code, spec, track, message, error }
   rival: null,   // in a drift race (the code says battle): the rival (rivals/rival.js), else null
@@ -575,8 +576,10 @@ function finishBattle() {
   const coins = Math.floor(score * LOOP.COIN_PER_POINT) + (first ? def.prize : 0);
   save.addCoins(coins);
   save.setOnboarded();
+  if (!won) app.lostTo[def.id] = (app.lostTo[def.id] || 0) + 1;
+  const tip = won || (save.state.rivals[def.id] || {}).won ? null : garageTip(def, app.lostTo[def.id]);
   const s = scoring.state, rs = R.scoring.state;
-  app.results = { finished: true, battle: true, mode: 'battle', score, best: s.best, rival: { id: def.id, name: def.name, total: them, seconds: R.state.finishTime }, won, margin, first, prize: first ? def.prize : 0,
+  app.results = { finished: true, battle: true, tip, mode: 'battle', score, best: s.best, rival: { id: def.id, name: def.name, total: them, seconds: R.state.finishTime }, won, margin, first, prize: first ? def.prize : 0,
     tandem: s.tandem, parts: { drift: s.drift - s.tandem, clean: s.clean, pace: s.pace, leads: L.player.lead, line: L.player.line, close: s.tandem, clear: clearPts, clearS: clear },
     rivalParts: { drift: rs.drift, clean: rs.clean, pace: rs.pace, leads: L.rival.lead, line: L.rival.line, close: 0 },
     gates: L.gates, leadGates: L.player.gates, rivalGates: L.rival.gates, lineTo: L.owner[L.gates - 1] || null, changes: L.changes,
@@ -589,6 +592,22 @@ function finishBattle() {
   hud.setCount('', false); hud.setVisible(false); hud.setMissions(null); input.touch.setVisible(false);
   screens.results(app.results);
   if (FX_ON) countCoins(0.45 + (won ? 3 : 0) * 0.28);
+}
+/* After a lost race with a rival not yet beaten: the way to the garage
+   (the author, 14 November 2026: he could not beat Varsk in the starter
+   and nothing told him to buy a car). Shown when his car is dearer than
+   the player's, or from the second loss to him this visit. It names the
+   dearest car the coins will buy, else an upgrade step they will, else
+   says to earn more; push makes GARAGE the results' main button, once
+   there is something to buy and he has been lost to twice. */
+function garageTip(def, losses) {
+  const S = save.state, mine = carById(S.car), his = carById(def.car);
+  if (losses < LOOP.GARAGE_TIP_LOSSES && his.price <= mine.price) return null;
+  const car = ROSTER.filter(c => !S.cars[c.id] && c.price > mine.price && c.price <= S.coins).sort((a, b) => b.price - a.price)[0];
+  const lv = upgradeLevels((S.cars[S.car] || {}).up), step = UPGRADE_STATS.some(k => lv[k] < LOOP.UPGRADE_PRICES.length && LOOP.UPGRADE_PRICES[lv[k]] <= S.coins);
+  const faster = his.price > mine.price ? def.name + ' drives the ' + his.name.toLowerCase() + '. ' : '';
+  const text = car ? faster + 'You can afford the ' + car.name.toLowerCase() + '.' : step ? faster + 'You can afford an upgrade.' : faster + 'Earn coins in the career for a faster car.';
+  return { text, push: !!(car || step) && losses >= LOOP.GARAGE_TIP_LOSSES };
 }
 /* Where the career goes on from here, for a race's results: the first
    open track never finished, else the first open one short of three

@@ -264,6 +264,7 @@ export const LOOP = {
   NEW_STAR_BONUS:     100,     // and once more for each star newly won on a track or the day's daily
   DAILY_BONUS:        1.5,     // the daily drift pays this much more
   PAINT_PRICE:        60,      // coins for a paint other than the car's own
+  GARAGE_TIP_LOSSES: 2,       // races lost to one rival in a visit before the results put GARAGE first (a rival in a dearer car says so from the first)
   UPGRADE_PRICES:     [400, 900, 1800],  // coins for each step of an upgrade, the same for every car (were 250, 500 and 900, and the cars 900, 1,800, 3,200 and 6,000: after play on 14 November the author had the fastback bought and upgraded by the start of Pro and never had to drive anything twice. One clean pass of a chapter pays about 7,500, so the fastback now comes near the end of Pro)
   UPGRADE: {                   // what each step does, as a share of the car's own value
     POWER_ACCEL:      0.06,    // power: drive, per step
@@ -358,7 +359,8 @@ export const TANDEM = {
   LAYER:            2.5,     // m of height apart (a bridge over the other road) that is never close
   RUN_GAP:          40,      // m apart in run distance that is never close (a car a lap down passing the other)
   /* contact: the rival is solid and never moved by the player */
-  HARD_HIT:         5.0,     // m/s into the rival that is a hard contact: the chain is lost, as a wall hit
+  HARD_HIT:         5.0,     // m/s into the rival that is a hard contact
+  HIT_BANKS:        true,    // a hard contact with him banks the chain as it stands; false loses it, as a wall hit does and as it was until 14 November 2026 (the author: he is never slowed or docked by the same touch, so losing everything to it felt unfair)
   HIT_SPEED_KEEP:   0.85,    // share of the player's speed, relative to the rival, kept through a hard contact
   RESTITUTION:      0.1,
   FRICTION:         0.3,

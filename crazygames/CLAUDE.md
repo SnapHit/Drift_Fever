@@ -696,7 +696,31 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   states). Still to do for readiness: the SDK adapter (their script is
   an external request and their SDK throws on any other domain, so it
   must load only when the game is on CrazyGames; the Basic launch needs
-  one "Gameplay start" event), `user-select: none` on the body, frame
+  one "Gameplay start" event), frame
   rate on a real GPU and a 4 GB Chromebook, the ten iframe sizes from
   800x450 to 1920x1080 at pixel ratio 1.
+- 14 November 2026, after the author's second empty save run: Kestrow
+  and Tolvo fell to the starter, Varsk only to a bought and upgraded
+  grand tourer, which he had about enough coins for ("just about
+  perfect"). Dovane could not be beaten in the best car he could
+  afford. Three changes, `game/test/play14/check.js`.
+  (1) Nothing told him to buy a car. A lost race with a rival not yet
+  beaten now points at the garage (`garageTip` in `main.js`): from the
+  first loss when the rival's car is dearer than the player's ("Varsk
+  drives the fastback."), else from the second loss to him in a visit
+  (`LOOP.GARAGE_TIP_LOSSES`). It names the dearest car the coins will
+  buy, else says an upgrade is affordable, else says to earn coins in
+  the career. From the second loss, with something to buy, GARAGE is
+  the results' main button. Losses are counted for the visit, not
+  saved.
+  (2) Dovane "just a little" too fast: his slide gain is 1.3, was 1.5:
+  83.3 s for 6,464, x5.18 (was 6,961, x5.55), 0 of 20 disturbed runs
+  and 0 of 38 moves miss. The ladder reads 1.93, 3.69, 4.37, 5.18,
+  3.57, 5.40.
+  (3) Touching him wiped the player's chain and cost him nothing. **A
+  hard touch with the rival now banks the chain** as it stands
+  (`TANDEM.HIT_BANKS`); the multiplier starts again and the speed loss
+  is as it was. A wall still loses it. The recorded Kestrow race
+  replays to the same totals. Halvik and Sarrow are still unplayed
+  since the pace round.
 

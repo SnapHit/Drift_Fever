@@ -1,0 +1,215 @@
+{
+ "390x844": {
+  "k1": {
+   "won": false,
+   "tip": null,
+   "main": "REMATCH",
+   "buttons": [
+    "REMATCH",
+    "CAREER",
+    "RIVALS",
+    "MENU"
+   ],
+   "next": true,
+   "fits": true
+  },
+  "v1": {
+   "won": false,
+   "tip": "Varsk drives the fastback. Earn coins in the career for a faster car.",
+   "main": "REMATCH",
+   "buttons": [
+    "REMATCH",
+    "CAREER",
+    "GARAGE",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "v2": {
+   "won": false,
+   "tip": "Varsk drives the fastback. You can afford the grand tourer.",
+   "main": "GARAGE",
+   "buttons": [
+    "GARAGE",
+    "REMATCH",
+    "CAREER",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "v3": {
+   "won": false,
+   "tip": "Varsk drives the fastback. You can afford an upgrade.",
+   "main": "GARAGE",
+   "buttons": [
+    "GARAGE",
+    "REMATCH",
+    "CAREER",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "hit": {
+   "rival": {
+    "gained": 1200,
+    "chain": 0,
+    "lost": 0
+   },
+   "wall": {
+    "gained": 0,
+    "chain": 0,
+    "lost": 1200
+   },
+   "off": {
+    "gained": 0,
+    "chain": 0,
+    "lost": 1200
+   }
+  }
+ },
+ "844x390": {
+  "k1": {
+   "won": false,
+   "tip": null,
+   "main": "REMATCH",
+   "buttons": [
+    "REMATCH",
+    "CAREER",
+    "RIVALS",
+    "MENU"
+   ],
+   "next": true,
+   "fits": true
+  },
+  "v1": {
+   "won": false,
+   "tip": "Varsk drives the fastback. Earn coins in the career for a faster car.",
+   "main": "REMATCH",
+   "buttons": [
+    "REMATCH",
+    "CAREER",
+    "GARAGE",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "v2": {
+   "won": false,
+   "tip": "Varsk drives the fastback. You can afford the grand tourer.",
+   "main": "GARAGE",
+   "buttons": [
+    "GARAGE",
+    "REMATCH",
+    "CAREER",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "v3": {
+   "won": false,
+   "tip": "Varsk drives the fastback. You can afford an upgrade.",
+   "main": "GARAGE",
+   "buttons": [
+    "GARAGE",
+    "REMATCH",
+    "CAREER",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "hit": {
+   "rival": {
+    "gained": 1200,
+    "chain": 0,
+    "lost": 0
+   },
+   "wall": {
+    "gained": 0,
+    "chain": 0,
+    "lost": 1200
+   },
+   "off": {
+    "gained": 0,
+    "chain": 0,
+    "lost": 1200
+   }
+  }
+ },
+ "1280x720": {
+  "k1": {
+   "won": false,
+   "tip": null,
+   "main": "REMATCH",
+   "buttons": [
+    "REMATCH",
+    "CAREER",
+    "RIVALS",
+    "MENU"
+   ],
+   "next": true,
+   "fits": true
+  },
+  "v1": {
+   "won": false,
+   "tip": "Varsk drives the fastback. Earn coins in the career for a faster car.",
+   "main": "REMATCH",
+   "buttons": [
+    "REMATCH",
+    "CAREER",
+    "GARAGE",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "v2": {
+   "won": false,
+   "tip": "Varsk drives the fastback. You can afford the grand tourer.",
+   "main": "GARAGE",
+   "buttons": [
+    "GARAGE",
+    "REMATCH",
+    "CAREER",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "v3": {
+   "won": false,
+   "tip": "Varsk drives the fastback. You can afford an upgrade.",
+   "main": "GARAGE",
+   "buttons": [
+    "GARAGE",
+    "REMATCH",
+    "CAREER",
+    "MENU"
+   ],
+   "next": false,
+   "fits": true
+  },
+  "hit": {
+   "rival": {
+    "gained": 1200,
+    "chain": 0,
+    "lost": 0
+   },
+   "wall": {
+    "gained": 0,
+    "chain": 0,
+    "lost": 1200
+   },
+   "off": {
+    "gained": 0,
+    "chain": 0,
+    "lost": 1200
+   }
+  }
+ }
+}

@@ -226,8 +226,8 @@ export function createWorld(ground, opts) {
      the deepest corner, worked in the other car's frame (its velocity
      at that point taken away and given back), so a car standing still
      on his line is pushed on by him, not driven through. A contact
-     harder than TANDEM.HARD_HIT along the normal is a hard one: as a
-     wall hit, the chain is lost (the scoring reads world.hit) and the
+     harder than TANDEM.HARD_HIT along the normal is a hard one: the
+     chain is banked (TANDEM.HIT_BANKS; the scoring reads world.hit) and the
      player keeps only HIT_SPEED_KEEP of his speed relative to the other
      car. Returns the hit, or null. */
   const bodyPts = new Float64Array(8), axes = new Float64Array(8);
