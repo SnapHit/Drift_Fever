@@ -1,0 +1,55 @@
+{
+ "main": "ffdd9d0",
+ "old": {
+  "chars": 2432,
+  "same": true,
+  "repaired": 0,
+  "standard": true,
+  "ghosts": true,
+  "key": true,
+  "known": true
+ },
+ "reload": {
+  "kept": true,
+  "repaired": 0
+ },
+ "inMain": {
+  "threw": null,
+  "repaired": 0,
+  "ok": true,
+  "known": true
+ },
+ "roundTrip": {
+  "coins": 43101,
+  "fastback": {
+   "wheels": "standard",
+   "glow": "off",
+   "smoke": "standard",
+   "own": {
+    "wheels": [],
+    "glow": [],
+    "smoke": []
+   }
+  },
+  "repaired": 0
+ },
+ "unknown": {
+  "threw": null,
+  "fixes": 3,
+  "ok": true
+ },
+ "full": {
+  "cap": 12303,
+  "dropped": 4,
+  "failed": 0,
+  "kept": [
+   "career:4",
+   "career:5",
+   "career:6"
+  ],
+  "ok": true,
+  "known": true,
+  "quota": "all passed"
+ },
+ "fullSet": 7500
+}

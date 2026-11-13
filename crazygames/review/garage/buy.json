@@ -1,0 +1,78 @@
+{
+ "390x844": {
+  "bad": [],
+  "known": {
+   "b: charges twice": [
+    "b wheels: coins fell by 1900, the price is 950",
+    "b glow: coins fell by 800, the price is 400",
+    "b smoke: coins fell by 700, the price is 350"
+   ],
+   "c: charges again for what is owned": [
+    "c wheels: a second press took 950 more",
+    "c glow: a second press took 400 more",
+    "c smoke: a second press took 350 more"
+   ],
+   "d: sells with too few coins": [
+    "d wheels: bought out of reach (coins 1199)",
+    "d glow: bought out of reach (coins 299)",
+    "d smoke: bought out of reach (coins 299)"
+   ],
+   "e: the preview written into the save": [
+    "a wheels: the preview changed the save",
+    "b wheels: no buy button",
+    "a glow: the preview changed the save",
+    "b glow: no buy button",
+    "a smoke: the preview changed the save",
+    "b smoke: no buy button",
+    "d wheels: the buy button is not disabled one coin short",
+    "d wheels: the button does not say how many more (none)",
+    "d wheels: the tile does not say how many more (Tri-blades✓ WORN)",
+    "d glow: the buy button is not disabled one coin short",
+    "d glow: the button does not say how many more (none)",
+    "d glow: the tile does not say how many more (Aqua✓ WORN)",
+    "d smoke: the buy button is not disabled one coin short",
+    "d smoke: the button does not say how many more (none)",
+    "d smoke: the tile does not say how many more (Lime✓ WORN)",
+    "e: a preview was saved on leaving the garage"
+   ]
+  }
+ },
+ "1280x720": {
+  "bad": [],
+  "known": {
+   "b: charges twice": [
+    "b wheels: coins fell by 1900, the price is 950",
+    "b glow: coins fell by 800, the price is 400",
+    "b smoke: coins fell by 700, the price is 350"
+   ],
+   "c: charges again for what is owned": [
+    "c wheels: a second press took 950 more",
+    "c glow: a second press took 400 more",
+    "c smoke: a second press took 350 more"
+   ],
+   "d: sells with too few coins": [
+    "d wheels: bought out of reach (coins 1199)",
+    "d glow: bought out of reach (coins 299)",
+    "d smoke: bought out of reach (coins 299)"
+   ],
+   "e: the preview written into the save": [
+    "a wheels: the preview changed the save",
+    "b wheels: no buy button",
+    "a glow: the preview changed the save",
+    "b glow: no buy button",
+    "a smoke: the preview changed the save",
+    "b smoke: no buy button",
+    "d wheels: the buy button is not disabled one coin short",
+    "d wheels: the button does not say how many more (none)",
+    "d wheels: the tile does not say how many more (Tri-blades✓ WORN)",
+    "d glow: the buy button is not disabled one coin short",
+    "d glow: the button does not say how many more (none)",
+    "d glow: the tile does not say how many more (Aqua✓ WORN)",
+    "d smoke: the buy button is not disabled one coin short",
+    "d smoke: the button does not say how many more (none)",
+    "d smoke: the tile does not say how many more (Lime✓ WORN)",
+    "e: a preview was saved on leaving the garage"
+   ]
+  }
+ }
+}

@@ -193,6 +193,7 @@ export function createScreens(root, onAction) {
   const TABS = [['cars', 'CARS'], ['paint', 'PAINT'], ['wheels', 'WHEELS'], ['glow', 'GLOW'], ['smoke', 'SMOKE'], ['upgrades', 'UPGRADES']];
   const hexOf = n => '#' + n.toString(16).padStart(6, '0');
   const coin = n => '<span class="coin">&#9679;</span> ' + fmt(n);
+  const needed = n => fmt(n) + ' more coin' + (n === 1 ? '' : 's') + ' needed';
   /* an item's picture: the wheel drawn from its own numbers, the glow as a lit pad, the smoke as a puff */
   function itemPic(kind, item, carId) {
     if (kind === 'wheels') { const d = wheelDesign(item.id); return d ? wheelIcon(d, 44) : standardIcon(carSpec(carId).wheel, 44); }
@@ -205,7 +206,6 @@ export function createScreens(root, onAction) {
     const car = carById(sel), mine = save.cars[sel], owned = !!mine, chosen = save.car === sel;
     const worn = lookOf(mine);
     const tabs = TABS.map(([id, label]) => `<button type="button" class="tab${id === tab ? ' on' : ''}" data-action="garage-tab" data-arg="${id}">${label}</button>`).join('');
-    const short = price => `<small class="need">${fmt(price - save.coins)} more coins needed</small>`;
     let pane = '', action = '';
     if (tab === 'cars') {
       pane = '<div class="cards">' + ROSTER.map(c => {
@@ -214,7 +214,7 @@ export function createScreens(root, onAction) {
         <span class="swatch" style="background:#${(PAINTS.find(p => p.id === (own ? save.cars[c.id].paint : c.paint)) || PAINTS[0]).hex.toString(16).padStart(6, '0')}"></span>
         <b>${esc(c.name)}</b><small>${own ? (save.car === c.id ? 'chosen' : 'owned') : coin(c.price)}</small>${!own && save.coins < c.price ? `<small class="need">${fmt(c.price - save.coins)} more</small>` : ''}</button>`;
       }).join('') + '</div>';
-      if (!owned) action = `<button type="button" class="big primary" data-action="buy-car" data-arg="${sel}" ${save.coins >= car.price ? '' : 'disabled'}><b>BUY</b><small>${coin(car.price)}${save.coins >= car.price ? '' : ' &middot; ' + fmt(car.price - save.coins) + ' more coins needed'}</small></button>`;
+      if (!owned) action = `<button type="button" class="big primary" data-action="buy-car" data-arg="${sel}" ${save.coins >= car.price ? '' : 'disabled'}><b>BUY</b><small>${coin(car.price)}${save.coins >= car.price ? '' : ' &middot; ' + needed(car.price - save.coins)}</small></button>`;
       else if (!chosen) action = `<button type="button" class="big primary" data-action="choose-car" data-arg="${sel}"><b>DRIVE THIS</b></button>`;
       else action = `<button type="button" class="big" data-action="title"><b>CHOSEN</b><small>back to the title</small></button>`;
     } else if (tab === 'paint') {
@@ -226,7 +226,7 @@ export function createScreens(root, onAction) {
       const p = PAINTS.find(q => q.id === shown) || PAINTS[0];
       if (!owned) action = notYours(car);
       else if (shown === myPaint) action = `<div class="note"><b>${esc(p.name.toUpperCase())}</b><small>on the car</small></div>`;
-      else action = `<button type="button" class="big primary" data-action="buy-paint" data-arg="${p.id}" ${save.coins >= LOOP.PAINT_PRICE ? '' : 'disabled'}><b>PAINT IT ${esc(p.name.toUpperCase())}</b><small>${coin(LOOP.PAINT_PRICE)}${save.coins >= LOOP.PAINT_PRICE ? '' : ' &middot; ' + fmt(LOOP.PAINT_PRICE - save.coins) + ' more coins needed'}</small></button>`;
+      else action = `<button type="button" class="big primary" data-action="buy-paint" data-arg="${p.id}" ${save.coins >= LOOP.PAINT_PRICE ? '' : 'disabled'}><b>PAINT IT ${esc(p.name.toUpperCase())}</b><small>${coin(LOOP.PAINT_PRICE)}${save.coins >= LOOP.PAINT_PRICE ? '' : ' &middot; ' + needed(LOOP.PAINT_PRICE - save.coins)}</small></button>`;
     } else if (KINDS.includes(tab)) {
       const shown = pre[tab] || worn[tab];
       pane = `<div class="items ${tab}">` + ITEMS[tab].map(it => {
@@ -237,7 +237,7 @@ export function createScreens(root, onAction) {
       const it = ITEMS[tab].find(i => i.id === shown) || ITEMS[tab][0], price = priceOf(tab, it.id);
       if (!owned) action = notYours(car);
       else if (shown === worn[tab]) action = `<div class="note"><b>${esc(it.name.toUpperCase())}</b><small>on the car</small></div>`;
-      else action = `<button type="button" class="big primary" data-action="buy-look" data-arg="${tab}:${it.id}" ${save.coins >= price ? '' : 'disabled'}><b>BUY ${esc(it.name.toUpperCase())}</b><small>${coin(price)}${save.coins >= price ? '' : ' &middot; ' + fmt(price - save.coins) + ' more coins needed'}</small></button>`;
+      else action = `<button type="button" class="big primary" data-action="buy-look" data-arg="${tab}:${it.id}" ${save.coins >= price ? '' : 'disabled'}><b>BUY ${esc(it.name.toUpperCase())}</b><small>${coin(price)}${save.coins >= price ? '' : ' &middot; ' + needed(price - save.coins)}</small></button>`;
     } else {
       pane = owned ? upgrades(save, sel) : '<p class="hintline">Upgrades are bought for a car you own.</p>';
       action = owned ? '' : notYours(car);
