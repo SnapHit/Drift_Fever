@@ -747,3 +747,35 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   hostname. Readiness still open: their ten frame sizes, frame rate on
   a real GPU and a 4 GB Chromebook.
 
+- 14 November 2026, the garage round (`briefs/GARAGE.md`,
+  `review/garage/REPORT.md`), the author's scope: cosmetics and a
+  showroom, **nothing that changes how a car drives**. The garage is
+  now the picked car on a turntable in a studio of its own
+  (`garage/showroom.js`), dragged to turn, with six sections beside or
+  under it: Cars, Paint, Wheels, Glow, Smoke, Upgrades. A press
+  previews, BUY buys; previews never reach a save or a race. Five
+  wheel designs (`cars/wheels.js`), five underglow colours and five
+  smoke colours (`SHOW.UNDERGLOW`, `smokeColours` in `env/show.js`),
+  bought and kept per car (`wheels`, `glow`, `smoke`, `own` on each
+  car in the save; `garage/cosmetics.js`), prices in `LOOP.COSMETICS`:
+  all fifteen on one car are 7,500, the dearest 1,200, first guesses
+  for play. Ghosts record their look; Varsk, Dovane, Halvik and Sarrow
+  wear wheels (`look` in `rivals/roster.js`), drawn only. Recorded
+  runs and the Kestrow race replay to the bit; an old save loads
+  unchanged; a save from this build loads in the build before it, but
+  that build writes the cosmetics away and the coins do not come back
+  (a rollback only). Paint now previews first and needs PAINT IT, and
+  is still not kept once changed (60 again), which sits oddly beside
+  OWNED wheels. **The readability rule's "most saturated" half was
+  never true**: the road edge measures 0.08 to 0.19 of full
+  colourfulness and kerbs, walls and tail-lights 0.55 to 0.81 with no
+  glow at all, so the glow is held to brightness (edge at least x1.11
+  brighter) and to adding 15 per cent less to the road than the edge
+  stands over it (`game/test/garage/readable.js`); margins at night
+  are thin. Probes in `game/test/garage/` (`run-all.sh`). Open for
+  play, all drawn in software here: whether the showroom makes him
+  want the next wheel, wheels at race distance on a phone (about 12
+  pixels across, told apart by colour), glow strength, Rose smoke
+  against the standard red at night, the prices, frame rate (no
+  JavaScript cost the probe can see; GPU cost unmeasured). Next: the
+  playground round (a stunt park with challenges), approved.

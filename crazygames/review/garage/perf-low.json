@@ -1,0 +1,258 @@
+{
+ "part": "low",
+ "budgetMs": 16.7,
+ "slackMs": 1.5,
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, 6x CPU throttle through CDP; the GPU is not measured here",
+ "runs": [
+  {
+   "label": "low, no cosmetics",
+   "tier": "low",
+   "look": {},
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.2,
+    "p95": 5.8,
+    "p99": 12.1,
+    "worst": 71.3,
+    "mean": 1.8
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 110,
+   "errors": []
+  },
+  {
+   "label": "low, wheels (tri-blades)",
+   "tier": "low",
+   "look": {
+    "wheels": "blades"
+   },
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 5.6,
+    "p99": 10.3,
+    "worst": 19.1,
+    "mean": 1.73
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 177445,
+    "p95": 178553,
+    "p99": 178653,
+    "worst": 178661,
+    "mean": 177388.47
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 110,
+   "errors": []
+  },
+  {
+   "label": "low, glow (aqua)",
+   "tier": "low",
+   "look": {
+    "glow": "aqua"
+   },
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 5.5,
+    "p99": 14.7,
+    "worst": 42.4,
+    "mean": 1.73
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 78,
+    "p95": 80,
+    "p99": 80,
+    "worst": 80,
+    "mean": 76.87
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176137,
+    "p95": 177233,
+    "p99": 177333,
+    "worst": 177341,
+    "mean": 176079.25
+   },
+   "glowTriangles": 10,
+   "smokeAtEnd": 110,
+   "errors": []
+  },
+  {
+   "label": "low, smoke (rose)",
+   "tier": "low",
+   "look": {
+    "smoke": "rose"
+   },
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1,
+    "p95": 4.2,
+    "p99": 17.1,
+    "worst": 73.1,
+    "mean": 1.64
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 110,
+   "errors": []
+  },
+  {
+   "label": "low, all three",
+   "tier": "low",
+   "look": {
+    "wheels": "blades",
+    "glow": "aqua",
+    "smoke": "rose"
+   },
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1.1,
+    "p95": 5.5,
+    "p99": 10,
+    "worst": 14.1,
+    "mean": 1.48
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 78,
+    "p95": 80,
+    "p99": 80,
+    "worst": 80,
+    "mean": 76.87
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 177465,
+    "p95": 178561,
+    "p99": 178661,
+    "worst": 178669,
+    "mean": 177407.25
+   },
+   "glowTriangles": 10,
+   "smokeAtEnd": 110,
+   "errors": []
+  },
+  {
+   "label": "low, no cosmetics, again",
+   "tier": "low",
+   "look": {},
+   "busy": 0,
+   "driving": 270,
+   "preset": "night",
+   "js": {
+    "n": 270,
+    "p50": 1,
+    "p95": 4.9,
+    "p99": 11.6,
+    "worst": 48.9,
+    "mean": 1.67
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "glowTriangles": 0,
+   "smokeAtEnd": 110,
+   "errors": []
+  }
+ ],
+ "cost": {
+  "runToRun": {
+   "p50": -0.2,
+   "p95": -0.9
+  },
+  "wheels": {
+   "p50": 0.1,
+   "p95": -0.2,
+   "triangles": 1328,
+   "drawCalls": 0
+  },
+  "glow": {
+   "p50": 0.1,
+   "p95": -0.3,
+   "triangles": 20,
+   "drawCalls": 2
+  },
+  "smoke": {
+   "p50": -0.2,
+   "p95": -1.6,
+   "triangles": 0,
+   "drawCalls": 0
+  },
+  "all": {
+   "p50": -0.1,
+   "p95": -0.3,
+   "triangles": 1348,
+   "drawCalls": 2
+  }
+ }
+}

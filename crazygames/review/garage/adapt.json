@@ -1,0 +1,154 @@
+{
+ "runs": [
+  {
+   "tier": "low",
+   "start": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": false,
+    "density": 1
+   },
+   "fast": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": false,
+    "density": 1
+   },
+   "slow": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 4604.4000000003725
+     },
+     {
+      "level": 3,
+      "at": 4621.100000000559
+     },
+     {
+      "level": 4,
+      "at": 5292.299999999814
+     }
+    ],
+    "on": true,
+    "done": true,
+    "gaveBack": false,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   },
+   "worn": {
+    "wheels": "blades",
+    "glow": true,
+    "glowTris": 10,
+    "looks": {
+     "wheels": "blades",
+     "glow": "aqua",
+     "smoke": "rose"
+    }
+   }
+  },
+  {
+   "tier": "low",
+   "counted": {
+    "none": {
+     "calls": 74,
+     "tris": 176957
+    },
+    "glow": {
+     "calls": 75,
+     "tris": 176967
+    },
+    "wheels": {
+     "calls": 74,
+     "tris": 178285
+    }
+   }
+  },
+  {
+   "tier": "high",
+   "start": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": true,
+    "density": 1
+   },
+   "fast": {
+    "level": 0,
+    "steps": [],
+    "on": true,
+    "done": false,
+    "gaveBack": false,
+    "pixelRatio": 1,
+    "bloom": true,
+    "density": 1
+   },
+   "slow": {
+    "level": 4,
+    "steps": [
+     {
+      "level": 1,
+      "at": 4146.200000000186
+     },
+     {
+      "level": 2,
+      "at": 4164.200000000186
+     },
+     {
+      "level": 3,
+      "at": 4181.200000000186
+     },
+     {
+      "level": 4,
+      "at": 4349.700000000186
+     }
+    ],
+    "on": true,
+    "done": true,
+    "gaveBack": false,
+    "pixelRatio": 0.65,
+    "bloom": false,
+    "density": 0.55
+   },
+   "worn": {
+    "wheels": "blades",
+    "glow": true,
+    "glowTris": 262,
+    "looks": {
+     "wheels": "blades",
+     "glow": "aqua",
+     "smoke": "rose"
+    }
+   }
+  },
+  {
+   "tier": "high",
+   "counted": {
+    "none": {
+     "calls": 76,
+     "tris": 452983
+    },
+    "glow": {
+     "calls": 77,
+     "tris": 453245
+    },
+    "wheels": {
+     "calls": 76,
+     "tris": 454311
+    }
+   }
+  }
+ ]
+}

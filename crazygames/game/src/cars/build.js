@@ -23,6 +23,8 @@
    Units metres, Y up, the car faces -Z, the origin on the ground at the
    middle of the wheelbase. */
 
+import { wheelDesign, wheelDesignGeometry } from './wheels.js';
+
 /* Colours that are not the paint, in one place. */
 export const FINISH = {
   UNDER:     0x101114,   // floor, wheel wells
@@ -41,6 +43,9 @@ export const FINISH = {
   HEAD_ON:   1.6,        // emissive intensity with the lights on
   TAIL_ON:   1.4,
   UNDERGLOW_SPREAD: 0.55,  // m the glow reaches past the body
+  UNDERGLOW_SOFT:   { spread: 1.1, rings: 5, corner: 5, round: 0.45 },   // the soft form (the high tier and the showroom): wider, round cornered, fading by a curve
+  WHEEL_ROUGH: 0.42, WHEEL_METAL: 0.18,   // the bought wheel designs' finish (the standard wheel keeps the trim's)
+  WHEEL_LIFT: 0.2,         // and how much of its own colour a design gives back unlit, so it is told apart at race distance in shade and at night (the tyre is near black, so it stays so)
   UNDERGLOW_LIFT:   0.025, // m above the ground
   PAINT_ROUGH: 0.42, PAINT_METAL: 0.2,
   GLASS_ROUGH: 0.12, GLASS_METAL: 0.3,
@@ -377,8 +382,8 @@ function wheelGeometry(THREE, R, w, W) {
   return { pos, col };
 }
 
-function wheelMesh(THREE, R, w, W, side, material) {
-  const { pos, col } = wheelGeometry(THREE, R, w, W);
+function wheelMesh(THREE, R, w, W, side, material, design) {
+  const { pos, col } = design ? wheelDesignGeometry(THREE, R, w, design) : wheelGeometry(THREE, R, w, W);
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
@@ -388,9 +393,10 @@ function wheelMesh(THREE, R, w, W, side, material) {
 }
 
 /* ---- the glow under the car ---- */
-function underglowMesh(THREE, sh, S) {
+function underglowMesh(THREE, sh, S, soft) {
   const s = FINISH.UNDERGLOW_SPREAD, y = FINISH.UNDERGLOW_LIFT;
   const hw = S.halfWidth * 0.8, z0 = sh.fa - 0.2, z1 = sh.ra + 0.2;
+  if (soft) return softGlowMesh(THREE, hw, z0, z1, y);
   const inner = [[-hw, z0], [hw, z0], [hw, z1], [-hw, z1]];
   const outer = [[-hw - s, z0 - s], [hw + s, z0 - s], [hw + s, z1 + s], [-hw - s, z1 + s]];
   const pos = [], col = [];
@@ -404,6 +410,36 @@ function underglowMesh(THREE, sh, S) {
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   g.computeVertexNormals();
   const m = new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  const mesh = new THREE.Mesh(g, m);
+  mesh.renderOrder = -1;
+  return mesh;
+}
+
+/* The soft form: rings of a round cornered outline from the body's
+   footprint outwards, the light falling away by a curve, so its edge is
+   never a line on the road. About 200 triangles, one draw call. */
+function softGlowMesh(THREE, hw, z0, z1, y) {
+  const G = FINISH.UNDERGLOW_SOFT, pos = [], col = [];
+  const outline = grow => {
+    const r = G.round + grow, pts = [];
+    for (const [cx, cz, a0] of [[hw - G.round, z0 + G.round, -Math.PI / 2], [hw - G.round, z1 - G.round, 0], [-hw + G.round, z1 - G.round, Math.PI / 2], [-hw + G.round, z0 + G.round, Math.PI]]) {
+      for (let i = 0; i <= G.corner; i++) { const a = a0 + (Math.PI / 2) * i / G.corner; pts.push([cx + Math.cos(a) * r, cz + Math.sin(a) * r]); }
+    }
+    return pts;
+  };
+  const rings = [];
+  for (let k = 0; k <= G.rings; k++) { const t = k / G.rings; rings.push({ pts: outline(G.spread * t), k: (1 - t) * (1 - t) }); }
+  const v = (p, k) => { pos.push(p[0], y, p[1]); col.push(k, k, k); };
+  const n = rings[0].pts.length;
+  for (let i = 1; i + 1 < n; i++) { v(rings[0].pts[0], 1); v(rings[0].pts[i + 1], 1); v(rings[0].pts[i], 1); }
+  for (let r = 0; r + 1 < rings.length; r++) {
+    const A = rings[r], B = rings[r + 1];
+    for (let i = 0; i < n; i++) { const j = (i + 1) % n; v(A.pts[i], A.k); v(A.pts[j], A.k); v(B.pts[j], B.k); v(A.pts[i], A.k); v(B.pts[j], B.k); v(B.pts[i], B.k); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  const m = new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true });   // one pass: a see through, two sided mesh is otherwise drawn twice
   const mesh = new THREE.Mesh(g, m);
   mesh.renderOrder = -1;
   return mesh;
@@ -456,21 +492,43 @@ export function buildCar(THREE, S, options) {
      (rotation.x), as the feel prototype's scene does. */
   const wheels = {};
   const W = S.wheel;
-  for (const [name, side, z, front] of [['fl', -1, sh.fa, true], ['fr', 1, sh.fa, true], ['rl', -1, sh.ra, false], ['rr', 1, sh.ra, false]]) {
+  /* a bought design (options.wheels, an id in wheels.js) takes the standard wheel's place, in a finish of its own */
+  const lifted = !!(THREE.TSL && THREE.MeshStandardNodeMaterial);   // a plain three.js (a probe's) has no nodes: the design is then only lit
+  const wheelMat = new (lifted ? THREE.MeshStandardNodeMaterial : THREE.MeshStandardMaterial)({ color: 0xffffff, vertexColors: true, roughness: FINISH.WHEEL_ROUGH, metalness: FINISH.WHEEL_METAL });
+  if (lifted) wheelMat.emissiveNode = THREE.TSL.vertexColor().mul(THREE.TSL.float(FINISH.WHEEL_LIFT));
+  let wheelsId = null;
+  const WHEEL_AT = [['fl', -1, sh.fa, true], ['fr', 1, sh.fa, true], ['rl', -1, sh.ra, false], ['rr', 1, sh.ra, false]];
+  for (const [name, side, z] of WHEEL_AT) {
     const pivot = new THREE.Group();
     pivot.name = 'wheel:' + name;
     pivot.position.set(side * D.track / 2, D.wheelRadius, z);
-    const mesh = wheelMesh(THREE, D.wheelRadius, front ? D.tyre[0] : D.tyre[1], W, side, trim);
-    pivot.add(mesh);
     group.add(pivot);
-    wheels[name] = { pivot, mesh };
+    wheels[name] = { pivot, mesh: null };
   }
+  /* Fit a wheel design by id, or the car's standard wheel for anything
+     else. The new meshes take the old ones' spin and shadow settings. */
+  function setWheels(id) {
+    const design = wheelDesign(id);
+    for (const [name, side, , front] of WHEEL_AT) {
+      const wh = wheels[name], old = wh.mesh;
+      const mesh = wheelMesh(THREE, D.wheelRadius, front ? D.tyre[0] : D.tyre[1], W, side, design ? wheelMat : trim, design);
+      if (old) {
+        mesh.rotation.copy(old.rotation); mesh.castShadow = old.castShadow; mesh.receiveShadow = old.receiveShadow; mesh.renderOrder = old.renderOrder;
+        wh.pivot.remove(old); old.geometry.dispose();
+      }
+      wh.pivot.add(mesh);
+      wh.mesh = mesh;
+    }
+    wheelsId = design ? id : null;
+  }
+  setWheels(opts.wheels);
 
-  const glow = underglowMesh(THREE, sh, S);
+  const glow = underglowMesh(THREE, sh, S, opts.glowForm === 'soft');
   glow.name = 'underglow';
   group.add(glow);
-  const setUnderglow = colour => { if (colour == null) glow.visible = false; else { glow.material.color.setHex(colour); glow.visible = true; } };
-  setUnderglow(opts.underglow != null ? opts.underglow : null);
+  /* colour: 0xRRGGBB or null for off; strength: the light's share, 1 if not given (the scene sets it by the time of day) */
+  const setUnderglow = (colour, strength) => { if (colour == null) glow.visible = false; else { glow.material.color.setHex(colour).multiplyScalar(strength === undefined ? 1 : strength); glow.visible = true; } };
+  setUnderglow(opts.underglow != null ? opts.underglow : null, opts.underglowStrength);
 
   const lights = {
     head, tail,
@@ -494,8 +552,9 @@ export function buildCar(THREE, S, options) {
   const car = {
     id: S.id, group, body, wheels, lights, dims, underglow: glow,
     setPaint(colour) { paint.color.setHex(colour); },
-    setUnderglow,
-    dispose() { group.traverse(o => { if (o.geometry) o.geometry.dispose(); }); for (const m of [paint, glass, trim, headMat, tailMat, glow.material]) m.dispose(); },
+    setUnderglow, setWheels,
+    get wheelsId() { return wheelsId; },
+    dispose() { group.traverse(o => { if (o.geometry) o.geometry.dispose(); }); for (const m of [paint, glass, trim, wheelMat, headMat, tailMat, glow.material]) m.dispose(); },
   };
   if (opts.debug) car.parts = sink.parts;
   return car;

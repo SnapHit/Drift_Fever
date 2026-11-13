@@ -27,7 +27,8 @@ import { buildEnvironment } from '../env/world.js';
 import { styleTrack, racingLine, TRACK_STYLE } from '../env/trackstyle.js';
 import { createEffects } from '../env/effects.js';
 import { bannerTexture, concreteTexture, SPONSORS_SHOW } from '../env/textures.js';
-import { createShow, SHOW } from '../env/show.js';
+import { createShow, SHOW, underglowStrength } from '../env/show.js';
+import { lookOf, glowHex, smokeHex } from '../garage/cosmetics.js';
 import { FX_ON, FX_PARTICLES } from '../fx.js';
 
 export const LOOK = {
@@ -202,6 +203,7 @@ export function createScene(canvas, opts) {
     if (rivalFx) rivalFx.setPreset(p);
     if (rivalShow) rivalShow.setPreset(p);
     if (FX_ON) setGrade(p);
+    applyGlows();
   }
 
   /* ---- the ground and the world around it ---- */
@@ -359,6 +361,7 @@ export function createScene(canvas, opts) {
   ghostRoot.visible = false;
   scene.add(ghostRoot);
   let model = null, ghostModel = null;
+  let effects = null, show = null;   // the player's particles and show, made further down (rebuildEffects)
   /* the rival (briefs/RIVALS.md): a second car with his own marks, smoke
      and show, at their own density (SHOW.RIVAL); he fades out after his
      finish */
@@ -376,19 +379,34 @@ export function createScene(canvas, opts) {
      of the wheelbase, the physics origin the centre of mass, CG_TO_FRONT
      behind the front axle, so the model sits WHEELBASE / 2 - CG_TO_FRONT
      back along +Z. */
-  function mount(root, id, paintHex, ghost) {
+  /* The cosmetics each car on the road wears (briefs/GARAGE.md): the
+     wheels are built into the model, the glow is the model's own light
+     at the preset's strength, and the smoke colour goes to that car's
+     effects. A ghost shows its wheels and a fainter glow; it has no
+     smoke of its own. */
+  const looks = { car: lookOf(null), ghost: lookOf(null), rival: lookOf(null) };
+  function applyGlows() {
+    const k = underglowStrength(preset.name, tier === 'high');
+    if (model && model.setUnderglow) model.setUnderglow(glowHex(looks.car.glow), k);
+    if (ghostModel && ghostModel.setUnderglow) ghostModel.setUnderglow(glowHex(looks.ghost.glow), k * SHOW.UNDERGLOW.GHOST);
+    if (rivalModel && rivalModel.setUnderglow) rivalModel.setUnderglow(glowHex(looks.rival.glow), k);
+  }
+  function mount(root, id, paintHex, ghost, look) {
     const t = carTune(id), V = t ? t.VEHICLE : TUNE.VEHICLE;
-    let m = makeCar(THREE, id, { paint: paintHex });
+    let m = makeCar(THREE, id, { paint: paintHex, wheels: look ? look.wheels : null, glowForm: tier === 'high' ? 'soft' : 'cheap' });
     if (ghost) m = makeGhostly(m, LOOP.GHOST_OPACITY, LOOP.GHOST_TINT);
-    else m.group.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
+    else m.group.traverse(o => { if (o.isMesh) { o.castShadow = o !== m.underglow; o.receiveShadow = false; } });   // the glow is light: it throws no shadow
     m.group.position.z = V.WHEELBASE / 2 - V.CG_TO_FRONT;
     root.add(m.group);
     return { model: m, bRear: V.WHEELBASE - V.CG_TO_FRONT, half: V.TRACK / 2 };
   }
-  function setCar(id, paintId) {
+  function setCar(id, paintId, look) {
     if (model) { car.remove(model.group); model.dispose(); }
-    const r = mount(car, id, paintById(paintId || carById(id).paint).hex, false);
+    looks.car = lookOf(look);
+    const r = mount(car, id, paintById(paintId || carById(id).paint).hex, false, looks.car);
     model = r.model; rig.bRear = r.bRear; rig.half = r.half;
+    applyGlows();
+    if (effects) effects.setSmoke(smokeHex(looks.car.smoke));
     if (model.lights && model.lights.set) model.lights.set(preset.headlights ? 1 : 0.35, 1);
     lamps = carLamps(model);
   }
@@ -408,16 +426,19 @@ export function createScene(canvas, opts) {
     out.exhaust = [d.halfWidth * 0.45, 0.32, (d.centreZ || 0) + d.halfLength + oz + 0.05];
     return out;
   }
-  function setGhost(id, paintId) {
+  function setGhost(id, paintId, look) {
     if (ghostModel) { ghostRoot.remove(ghostModel.group); ghostModel.dispose(); ghostModel = null; }
     if (!id) { ghostRoot.visible = false; return; }
-    ghostModel = mount(ghostRoot, id, paintById(paintId || carById(id).paint).hex, true).model;
+    looks.ghost = lookOf(look);
+    ghostModel = mount(ghostRoot, id, paintById(paintId || carById(id).paint).hex, true, looks.ghost).model;
+    applyGlows();
   }
-  function setRival(id, paintId) {
+  function setRival(id, paintId, look) {
     if (rivalModel) { rivalRoot.remove(rivalModel.group); rivalModel.dispose(); rivalModel = null; }
     rivalFaded = 1;
     if (!id) { rivalRoot.visible = false; return; }
-    const r = mount(rivalRoot, id, paintById(paintId || carById(id).paint).hex, false);
+    looks.rival = lookOf(look);
+    const r = mount(rivalRoot, id, paintById(paintId || carById(id).paint).hex, false, looks.rival);
     rivalModel = r.model; rivalRig.bRear = r.bRear; rivalRig.half = r.half; rivalRoot.visible = true;
     /* the player's headlights never light him: a few metres behind him
        in a tandem they washed his paint to white. The sky and the sun
@@ -426,6 +447,7 @@ export function createScene(canvas, opts) {
     rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
     if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
     rivalLamps = carLamps(rivalModel);
+    applyGlows();
     rebuildRivalFx();
   }
   /* see through as he fades: 1 is solid, 0 gone */
@@ -487,10 +509,9 @@ export function createScene(canvas, opts) {
   }
 
   /* ---- effects ---- */
-  let effects = null, show = null;
   function rebuildEffects() {
     if (effects) { scene.remove(effects.group); effects.dispose(); }
-    effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON });
+    effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, smoke: smokeHex(looks.car.smoke) });
     if (FX_ON) effects.setDensity(density());
     scene.add(effects.group);
     if (FX_ON) {
@@ -504,7 +525,7 @@ export function createScene(canvas, opts) {
     if (rivalFx) { scene.remove(rivalFx.group); rivalFx.dispose(); rivalFx = null; }
     if (rivalShow) { scene.remove(rivalShow.group); rivalShow.dispose(); rivalShow = null; }
     if (!rivalModel) return;
-    rivalFx = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, share: FX_ON ? SHOW.RIVAL.SHARE[tier] || SHOW.RIVAL.SHARE.low : 0.5, noRain: true });
+    rivalFx = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, share: FX_ON ? SHOW.RIVAL.SHARE[tier] || SHOW.RIVAL.SHARE.low : 0.5, noRain: true, smoke: smokeHex(looks.rival.smoke) });
     if (FX_ON) rivalFx.setDensity(density());
     scene.add(rivalFx.group);
     if (FX_ON) { rivalShow = createShow(THREE, { tier: T(), tierName: tier, preset, glows: SHOW.RIVAL.GLOWS[tier] || SHOW.RIVAL.GLOWS.low }); scene.add(rivalShow.group); }
@@ -674,7 +695,7 @@ export function createScene(canvas, opts) {
   }
   return {
     THREE, renderer, scene, camera, car, ready, show: () => show, effects: () => effects, setGround, setCar, setGhost, setRival, rivalRoot, rivalShow: () => rivalShow, rivalEffects: () => rivalFx, update, resize, render, clearMarks, setLook,
-    carModel: () => model,
+    carModel: () => model, ghostModel: () => ghostModel, rivalModel: () => rivalModel, looks,
     frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, done: adapt.done, gaveBack: adapt.gaveBack, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
     info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
     environment: () => env, dressing: () => dressing,

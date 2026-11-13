@@ -15,7 +15,7 @@
    everything is exactly as before. */
 import { createParticles } from './particles.js';
 import { softSprite, sparkSprite, rainSprite, puffSprite } from './textures.js';
-import { SHOW } from './show.js';
+import { SHOW, smokeColours } from './show.js';
 
 export const FX = {
   SMOKE_LIFE:     1.4,     // s
@@ -78,14 +78,17 @@ export function createEffects(THREE, opts) {
   /* the show's smoke colours for the preset, linear, and the heat's tint */
   const col = { birth: [1, 1, 1], end: [1, 1, 1], tint: [1, 1, 1], spray: [1, 1, 1] };
   const lin = (hex, out) => { const c = new THREE.Color().setHex(hex); out[0] = c.r; out[1] = c.g; out[2] = c.b; return out; };
-  lin(SHOW.SMOKE.HEAT_TINT, col.tint); lin(SHOW.SPRAY.COLOUR, col.spray);
+  lin(SHOW.SPRAY.COLOUR, col.spray);
+  /* the smoke colour bought in the garage (briefs/GARAGE.md 4), 0xRRGGBB, or null for the standard smoke */
+  let pick = o.smoke == null ? null : o.smoke;
   function setPreset(p) {
     preset = p; wind.x = p.windX || 0; wind.z = p.windZ || 0;
-    if (show) { smoke.setColour(0xffffff); lin(SHOW.SMOKE.BIRTH[p.name] || SHOW.SMOKE.BIRTH.dusk, col.birth); lin(SHOW.SMOKE.COLOUR[p.name] || SHOW.SMOKE.COLOUR.dusk, col.end); }
-    else smoke.setColour(p.smoke || 0xd0c8c0);
+    if (show) { smoke.setColour(0xffffff); const c = smokeColours(p.name, pick); lin(c.birth, col.birth); lin(c.end, col.end); lin(c.tint, col.tint); }
+    else smoke.setColour(pick == null ? p.smoke || 0xd0c8c0 : smokeColours(p.name, pick).end);
     if (!p.rain) rain.clear();
   }
   setPreset(preset);
+  function setSmoke(hex) { pick = hex == null ? null : hex; setPreset(preset); }
   let density = 1;   // the adaptation's share of the spawn rates, 0 to 1
   const c0 = [0, 0, 0], c1 = [0, 0, 0];
 
@@ -163,5 +166,5 @@ export function createEffects(THREE, opts) {
     if (preset.rain || rain.live()) rain.update(dt, camera, null);
   }
   function clear() { for (const p of [smoke, dust, sparks, flame, rain]) p.clear(); for (const k of Object.keys(due)) due[k] = 0; }
-  return { group, update, setPreset, clear, setDensity: k => { density = Math.max(0, Math.min(1, k)); }, pools: { smoke, dust, sparks, flame, rain }, dispose() { for (const p of [smoke, dust, sparks, flame, rain]) p.dispose(); soft.dispose(); spark.dispose(); drop.dispose(); if (puff) puff.dispose(); } };
+  return { group, update, setPreset, setSmoke, clear, setDensity: k => { density = Math.max(0, Math.min(1, k)); }, pools: { smoke, dust, sparks, flame, rain }, dispose() { for (const p of [smoke, dust, sparks, flame, rain]) p.dispose(); soft.dispose(); spark.dispose(); drop.dispose(); if (puff) puff.dispose(); } };
 }

@@ -1,0 +1,981 @@
+{
+ "part": "race",
+ "rows": [
+  {
+   "where": "race night",
+   "item": "standard twice",
+   "differs": 0
+  },
+  {
+   "where": "race night",
+   "item": "regions",
+   "wheels": 532,
+   "smoke": 31510,
+   "glow": 3736
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "item": "daggers",
+   "differs": 178,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "item": "turbines",
+   "differs": 200,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "item": "discs",
+   "differs": 198,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "item": "fours",
+   "differs": 201,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "item": "blades",
+   "differs": 170,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "item": "aqua",
+   "differs": 1020,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "item": "lime",
+   "differs": 1017,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "item": "amber",
+   "differs": 1002,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "item": "magenta",
+   "differs": 1007,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "item": "violet",
+   "differs": 1020,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "aqua",
+   "differs": 27525,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "aqua",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "lime",
+   "differs": 27219,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "lime",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "tangerine",
+   "differs": 26292,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "tangerine",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "rose",
+   "differs": 26350,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "rose",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "violet",
+   "differs": 27365,
+   "outside": 0
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "item": "violet",
+   "smoke": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 31017.312251054216,
+    "as": 20.47501025022939,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "item": "standard twice",
+   "differs": 0
+  },
+  {
+   "where": "race dawn",
+   "item": "regions",
+   "wheels": 771,
+   "smoke": 31748,
+   "glow": 3736
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "item": "daggers",
+   "differs": 195,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "item": "turbines",
+   "differs": 219,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "item": "discs",
+   "differs": 216,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "item": "fours",
+   "differs": 219,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "item": "blades",
+   "differs": 184,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "item": "aqua",
+   "differs": 1015,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "item": "lime",
+   "differs": 1018,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "item": "amber",
+   "differs": 1013,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "item": "magenta",
+   "differs": 1013,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "item": "violet",
+   "differs": 1014,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "aqua",
+   "differs": 27990,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "aqua",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "lime",
+   "differs": 27431,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "lime",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "tangerine",
+   "differs": 26674,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "tangerine",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "rose",
+   "differs": 27410,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "rose",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "violet",
+   "differs": 27579,
+   "outside": 0
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "item": "violet",
+   "smoke": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "standard": {
+    "n": 97,
+    "ps": 30841.867037736345,
+    "as": 20.220988316927105,
+    "heat": 0.5152975066128377
+   },
+   "sameSmoke": true
+  }
+ ],
+ "pairs": [
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "turbines",
+   "pixels": 125,
+   "mean": 26.83
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "discs",
+   "pixels": 111,
+   "mean": 22.86
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "fours",
+   "pixels": 147,
+   "mean": 30.23
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "blades",
+   "pixels": 115,
+   "mean": 29.03
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "turbines",
+   "b": "discs",
+   "pixels": 116,
+   "mean": 19.95
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "turbines",
+   "b": "fours",
+   "pixels": 128,
+   "mean": 18.44
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "turbines",
+   "b": "blades",
+   "pixels": 136,
+   "mean": 21.68
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "discs",
+   "b": "fours",
+   "pixels": 128,
+   "mean": 15.69
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "discs",
+   "b": "blades",
+   "pixels": 126,
+   "mean": 28.02
+  },
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "fours",
+   "b": "blades",
+   "pixels": 118,
+   "mean": 20.43
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 842,
+   "mean": 10.36
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "amber",
+   "pixels": 854,
+   "mean": 16.65
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "magenta",
+   "pixels": 805,
+   "mean": 16.41
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "violet",
+   "pixels": 757,
+   "mean": 7.46
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "lime",
+   "b": "amber",
+   "pixels": 787,
+   "mean": 9.38
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "lime",
+   "b": "magenta",
+   "pixels": 849,
+   "mean": 13.76
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "lime",
+   "b": "violet",
+   "pixels": 849,
+   "mean": 13.2
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "amber",
+   "b": "magenta",
+   "pixels": 578,
+   "mean": 5.8
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "amber",
+   "b": "violet",
+   "pixels": 844,
+   "mean": 13.36
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "magenta",
+   "b": "violet",
+   "pixels": 751,
+   "mean": 8.95
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 19904,
+   "mean": 22.58
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "tangerine",
+   "pixels": 20535,
+   "mean": 36.74
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "rose",
+   "pixels": 19313,
+   "mean": 34.02
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "violet",
+   "pixels": 17033,
+   "mean": 16.14
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "lime",
+   "b": "tangerine",
+   "pixels": 16215,
+   "mean": 17.2
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "lime",
+   "b": "rose",
+   "pixels": 18659,
+   "mean": 27.73
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "lime",
+   "b": "violet",
+   "pixels": 19774,
+   "mean": 26.56
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "tangerine",
+   "b": "rose",
+   "pixels": 14856,
+   "mean": 13.8
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "tangerine",
+   "b": "violet",
+   "pixels": 20042,
+   "mean": 28.98
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "rose",
+   "b": "violet",
+   "pixels": 16816,
+   "mean": 17.88
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "turbines",
+   "pixels": 124,
+   "mean": 20.61
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "discs",
+   "pixels": 111,
+   "mean": 17.57
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "fours",
+   "pixels": 147,
+   "mean": 22.97
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "blades",
+   "pixels": 113,
+   "mean": 21.81
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "turbines",
+   "b": "discs",
+   "pixels": 101,
+   "mean": 14.68
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "turbines",
+   "b": "fours",
+   "pixels": 139,
+   "mean": 13.01
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "turbines",
+   "b": "blades",
+   "pixels": 136,
+   "mean": 16.82
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "discs",
+   "b": "fours",
+   "pixels": 128,
+   "mean": 12.35
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "discs",
+   "b": "blades",
+   "pixels": 125,
+   "mean": 21.79
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "fours",
+   "b": "blades",
+   "pixels": 119,
+   "mean": 15.35
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 807,
+   "mean": 9.86
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "amber",
+   "pixels": 840,
+   "mean": 15.96
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "magenta",
+   "pixels": 823,
+   "mean": 16.15
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "violet",
+   "pixels": 746,
+   "mean": 7.5
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "lime",
+   "b": "amber",
+   "pixels": 773,
+   "mean": 9.2
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "lime",
+   "b": "magenta",
+   "pixels": 845,
+   "mean": 13.35
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "lime",
+   "b": "violet",
+   "pixels": 827,
+   "mean": 11.77
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "amber",
+   "b": "magenta",
+   "pixels": 533,
+   "mean": 5.2
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "amber",
+   "b": "violet",
+   "pixels": 808,
+   "mean": 11.93
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "magenta",
+   "b": "violet",
+   "pixels": 752,
+   "mean": 8.65
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 23213,
+   "mean": 30.62
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "tangerine",
+   "pixels": 23841,
+   "mean": 50.16
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "rose",
+   "pixels": 23689,
+   "mean": 46.07
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "violet",
+   "pixels": 21650,
+   "mean": 22.66
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "lime",
+   "b": "tangerine",
+   "pixels": 21566,
+   "mean": 23.11
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "lime",
+   "b": "rose",
+   "pixels": 22955,
+   "mean": 38.22
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "lime",
+   "b": "violet",
+   "pixels": 23106,
+   "mean": 35.85
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "tangerine",
+   "b": "rose",
+   "pixels": 19024,
+   "mean": 20.86
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "tangerine",
+   "b": "violet",
+   "pixels": 23284,
+   "mean": 40.01
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "rose",
+   "b": "violet",
+   "pixels": 21464,
+   "mean": 23.41
+  }
+ ],
+ "known": [
+  {
+   "where": "race night",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "turbines",
+   "pixels": 0,
+   "caught": true
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 0,
+   "caught": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "what": "effects at half",
+   "puffs": 47,
+   "standard": 97,
+   "caught": true
+  },
+  {
+   "where": "race night",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 0,
+   "caught": true
+  },
+  {
+   "where": "race night",
+   "kind": "glow",
+   "what": "three times as wide",
+   "outside": 36938,
+   "caught": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "wheels",
+   "a": "daggers",
+   "b": "turbines",
+   "pixels": 0,
+   "caught": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 0,
+   "caught": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "what": "effects at half",
+   "puffs": 47,
+   "standard": 97,
+   "caught": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "smoke",
+   "a": "aqua",
+   "b": "lime",
+   "pixels": 0,
+   "caught": true
+  },
+  {
+   "where": "race dawn",
+   "kind": "glow",
+   "what": "three times as wide",
+   "outside": 34951,
+   "caught": true
+  }
+ ]
+}

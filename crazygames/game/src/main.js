@@ -46,7 +46,9 @@ import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, ca
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
-import { carTune, carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS } from './garage/roster.js';
+import { carTune, carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById } from './garage/roster.js';
+import { createShowroom } from './garage/showroom.js';
+import { lookOf, owns, isItem, KINDS } from './garage/cosmetics.js';
 import { FX_ON } from './fx.js';
 import { createDirector } from './camera/director.js';
 import { TANDEM } from './tune.js';
@@ -95,6 +97,7 @@ const app = {
   countdown: 0, goShown: 0, runTime: 0, menuT: 0, settle: 0, lockout: 0,
   lostTo: {},   // races lost to each rival this visit, for the garage tip
   results: null, picked: null,
+  tab: 'cars', preview: {},   // the garage: its section, and what is shown on the car but not bought ({ paint, wheels, glow, smoke }); never saved, never raced
   lab: null,     // the Track Lab's state: { settings, seed, code, spec, track, message, error }
   rival: null,   // in a drift race (the code says battle): the rival (rivals/rival.js), else null
   tandem: createTandem(),   // the close bonus, stepped only in a race (scoring/tandem.js)
@@ -124,7 +127,8 @@ function setGround(ground, carId, paintId, start) {
   app.world = createWorld(start ? Object.assign({}, ground, { start }) : ground, { tune: carTune(carId, save.state.cars[carId] && save.state.cars[carId].up) });
   box = carBox(carId);
   scene.setGround(ground);
-  scene.setCar(carId, paintId);
+  /* the car as it races: the cosmetics the save says it wears, never a garage preview (the dev drive has none) */
+  scene.setCar(carId, paintId, app.state === 'dev' ? null : lookOf(save.state.cars[carId]));
   chase.setCeiling(deckCeiling(ground));
 }
 
@@ -276,7 +280,7 @@ function frame(t) {
     const rs = app.rival.scoring.state;
     rv = { pose: app.rival.pose(alpha, rivalPose), world: app.rival.world, mult: rs.chain > 0 ? rs.mult : 1, fade: S === 'results' && app.rivalRanOn ? 1 : app.rival.state.fade };
   }
-  scene.update(pose, world, dt * ts, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1, rival: rv });
+  if (S !== 'garage') scene.update(pose, world, dt * ts, g, { mult: scoring.state.chain > 0 ? scoring.state.mult : 1, rival: rv });   // the garage draws its showroom, not the world: nothing to move there
   sound.update(world.car, S === 'drive' || S === 'countdown' || S === 'free' || S === 'dev', world.touching);
   if (app.frameHit) { sound.hit(app.frameHit.speed, app.frameHit.hard); if (director && app.frameHit.hard) director.hardHit(); app.frameHit = null; }
   /* the score's sounds, from the callouts it queued this frame */
@@ -315,7 +319,10 @@ function frame(t) {
     const p = app.progress.state;
     hud.setRun(app.track.kind === 'circuit' ? 'LAP ' + Math.min(p.laps, p.lap + 1) + '/' + p.laps : Math.round(p.remaining) + ' m', app.runTime.toFixed(1));
   }
-  if (window.__feel.draw) scene.render(); else scene.camera.updateMatrixWorld();
+  /* the garage draws its showroom into the game's canvas in the game's place */
+  const showroom = S === 'garage' ? showroomNow() : null;
+  if (showroom) { const st = screens.el.querySelector('.stage'); if (st) showroom.frame(st.getBoundingClientRect(), view.w, view.h); showroom.update(dt); }
+  if (!window.__feel.draw) scene.camera.updateMatrixWorld(); else if (showroom) showroom.render(); else scene.render();
   frameMs = performance.now() - t0;
   if (debug) debug.frame(frameMs, physMs, steps, scene.info().submitMs, scene.info(), t);
 }
@@ -327,13 +334,33 @@ function titleInfo() {
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
+  if (name !== 'garage') app.preview = {};   // a preview does not leave the garage
   if (onboard.active) onboard.stop(false);
   hud.setVisible(false); hud.setCount('', false); input.touch.setVisible(false);
   if (name === 'title') screens.title(save.state, titleInfo());
   else if (name === 'career') screens.career(save.state);
   else if (name === 'rivals') showRivals();
-  else if (name === 'garage') screens.garage(save.state, app.picked);
+  else if (name === 'garage') showGarage();
   else if (name === 'lab') showLab();
+}
+
+/* THE GARAGE (briefs/GARAGE.md): the car looked at stands in the
+   showroom in its paint and its cosmetics, with any preview over them,
+   and the screen is drawn round it. The preview lives in app.preview
+   and nowhere else: a run reads the save. */
+let theShowroom = null;   // made the first time the garage is opened, so a visit that never opens it pays nothing for it
+function showroomNow() {
+  if (!theShowroom) { theShowroom = createShowroom(THREE, scene.renderer); theShowroom.attach(screens.el); }
+  return theShowroom;
+}
+function showGarage() {
+  const showroom = showroomNow();
+  const id = app.picked || save.state.car, mine = save.state.cars[id], P = app.preview;
+  const look = lookOf(mine);
+  for (const k of KINDS) if (P[k] && isItem(k, P[k])) look[k] = P[k];
+  showroom.show(id, paintById(P.paint || (mine ? mine.paint : carById(id).paint)).hex, look);
+  showroom.setSection(app.tab);
+  screens.garage(save.state, { picked: app.picked, tab: app.tab, preview: P });
 }
 
 /* THE RIVALS SCREEN (briefs/RIVALS-LADDER.md): each rival's portrait is
@@ -342,7 +369,7 @@ function showMenu(name) {
 const portraits = createPortraits(THREE, scene.renderer, () => scene.render());
 function showRivals() {
   const mine = save.state.cars[save.state.car] ? save.state.cars[save.state.car].paint : 'cyan';
-  if (running) portraits.make(RIVALS.map(d => ({ car: d.car, paint: rivalPaint(d, mine) })));
+  if (running) portraits.make(RIVALS.map(d => ({ car: d.car, paint: rivalPaint(d, mine), look: d.look })));
   screens.rivals(save.state, { portrait: portraits.get });
 }
 
@@ -484,7 +511,7 @@ function startRun(spec, opts) {
   app.missionsShown = listed || head ? LOOP.MISSIONS.SHOWN : 0;
   const rec = spec.mode === 'battle' ? null : ghostFor(spec.key, app.track);   // no ghost is kept for a battle
   app.ghost = rec ? createGhost(app.track, rec) : null;
-  scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null);
+  scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null, rec ? rec.look : null);   // a ghost wears what it ran in; one from before the garage round, the standard ones
   hud.setToBeat(rec ? 'best ' + rec.score : spec.mode === 'lab' ? (save.labBest(spec.code) ? 'best ' + save.labBest(spec.code).best : '') : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
   /* a race: the rival beside the player on the grid, solid, and the lead gates */
   if (spec.mode === 'battle') {
@@ -492,7 +519,7 @@ function startRun(spec, opts) {
     app.rival = createRival(app.track, def, app.laps, app.rivalProbe || undefined);   // rivalProbe: the measurements' disturbances and known answers only
     app.lead = createLead(app.track, app.laps);
     app.world.obstacle = () => app.rival.body();
-    scene.setRival(def.car, rivalPaint(def, paint));
+    scene.setRival(def.car, rivalPaint(def, paint), def.look);
     app.battleIntro = Object.keys(save.state.rivals).length === 0;
     hud.setBattle({ name: def.name });
     hud.setToBeat('');
@@ -547,7 +574,7 @@ function finishRun() {
   const prevGhost = ghostFor(spec.key, app.track);
   let ghostSaved = false;
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
-    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up) });
+    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up), look: lookOf(save.state.cars[save.state.car]) });
   }
   app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
@@ -669,7 +696,8 @@ function onAction(action, arg) {
     case 'title': menuGround(); showMenu('title'); break;
     case 'career': showMenu('career'); break;
     case 'rivals': menuGround(); showMenu('rivals'); break;
-    case 'garage': app.picked = null; showMenu('garage'); break;
+    case 'garage': app.picked = null; app.tab = 'cars'; app.preview = {}; showMenu('garage'); break;
+    case 'garage-tab': app.tab = arg; showGarage(); break;
     case 'free': startFree(); break;
     case 'daily': startRun(dailySpec()); break;
     case 'onboard': startRun(careerSpec(0), { onboard: true }); break;
@@ -697,25 +725,36 @@ function onAction(action, arg) {
     case 'play-career': { const i = +arg; if (careerUnlocked(save.state, i)) startRun(careerSpec(i)); break; }
     case 'battle': { const d = rivalById(arg); if (d && rivalOpen(save.state, d.id)) startRun(battleSpec(d)); break; }
     case 'again': if (app.spec && app.spec.mode !== 'free') startRun(app.spec); break;
-    case 'pick-car': app.picked = arg; previewCar(); screens.garage(save.state, app.picked); break;
-    case 'buy-car': if (save.buyCar(arg, carById(arg).price)) { save.chooseCar(arg); app.picked = arg; menuGround(); } screens.garage(save.state, app.picked); break;
-    case 'choose-car': if (save.chooseCar(arg)) menuGround(); screens.garage(save.state, app.picked); break;
-    case 'upgrade': { const id = app.picked || save.state.car; if (save.buyUpgrade(id, arg) && id === save.state.car) menuGround(); screens.garage(save.state, app.picked); break; }
+    case 'pick-car': app.picked = arg; app.preview = {}; showGarage(); break;
+    case 'buy-car': if (save.buyCar(arg, carById(arg).price)) { save.chooseCar(arg); app.picked = arg; app.preview = {}; menuGround(); } showGarage(); break;
+    case 'choose-car': if (save.chooseCar(arg)) menuGround(); showGarage(); break;
+    case 'upgrade': { const id = app.picked || save.state.car; if (save.buyUpgrade(id, arg) && id === save.state.car) menuGround(); showGarage(); break; }
+    /* a paint: the car's own and the one it wears are free and go on at once; any other is shown on the car, and PAINT IT buys it */
     case 'paint': {
-      const id = app.picked || save.state.car, car = carById(id);
-      if (save.state.cars[id]) {
-        const free = arg === car.paint || arg === save.state.cars[id].paint;
-        if (free || save.state.coins >= LOOP.PAINT_PRICE) { if (!free) save.addCoins(-LOOP.PAINT_PRICE); save.setPaint(id, arg); if (id === save.state.car) menuGround(); }
-      }
-      previewCar();
-      screens.garage(save.state, app.picked); break;
+      const id = app.picked || save.state.car, car = carById(id), mine = save.state.cars[id];
+      if (mine && (arg === car.paint || arg === mine.paint)) { save.setPaint(id, arg); delete app.preview.paint; }
+      else app.preview.paint = arg;
+      showGarage(); break;
+    }
+    case 'buy-paint': {
+      const id = app.picked || save.state.car, mine = save.state.cars[id];
+      if (mine && arg !== mine.paint && save.state.coins >= LOOP.PAINT_PRICE && save.setPaint(id, arg)) { save.addCoins(-LOOP.PAINT_PRICE); delete app.preview.paint; }
+      showGarage(); break;
+    }
+    /* a cosmetic, as kind:id: one already owned goes on at once; any other is shown on the car, and BUY buys it */
+    case 'look': {
+      const [kind, item] = String(arg || '').split(':'), id = app.picked || save.state.car, mine = save.state.cars[id];
+      if (!KINDS.includes(kind) || !isItem(kind, item)) break;
+      if (mine && owns(mine, kind, item)) { save.wearCosmetic(id, kind, item); delete app.preview[kind]; }
+      else app.preview[kind] = item;
+      showGarage(); break;
+    }
+    case 'buy-look': {
+      const [kind, item] = String(arg || '').split(':'), id = app.picked || save.state.car;
+      if (save.buyCosmetic(id, kind, item)) delete app.preview[kind];
+      showGarage(); break;
     }
   }
-}
-/* The garage's backdrop shows the car being looked at, in its paint. */
-function previewCar() {
-  const id = app.picked || save.state.car;
-  scene.setCar(id, save.state.cars[id] ? save.state.cars[id].paint : carById(id).paint);
 }
 hud.exit.addEventListener('click', () => { if (app.state !== 'dev') { menuGround(); showMenu('title'); } });
 /* full screen: a button in the HUD beside the exit, and one on the title */
@@ -799,6 +838,8 @@ window.__loop = {
   app, save, LOOP, screens, sound, onboard, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
   lab: { setLab, labSpec, specFromCode, state: () => app.lab && { settings: app.lab.settings, seed: app.lab.seed, code: app.lab.code, message: app.lab.message, error: app.lab.error, track: app.lab.track && { name: app.lab.track.name, length: app.lab.track.length, kind: app.lab.track.kind, corners: app.lab.track.corners.length, bridges: (app.lab.track.bridges || []).length, fallback: !!app.lab.track.fallback, theme: app.lab.track.theme, preset: app.lab.track.preset } } },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor, battleSpec: id => battleSpec(rivalById(id)), RIVALS, TANDEM,
+  get showroom() { return showroomNow(); }, garage: () => ({ picked: app.picked, tab: app.tab, preview: { ...app.preview } }),
+  portraits,
   rival: () => app.rival, tandem: () => app.tandem.state, lead: () => app.lead && app.lead.state,
   /* the probes: the next battle's rival with a start offset, a grip share or a driving number changed (rivals/rival.js opts); null for none */
   setRivalProbe(o) { app.rivalProbe = o || null; },

@@ -12,6 +12,9 @@ import { soundIcon } from '../audio/sound.js';
 import { FIELDS } from '../lab/code.js';
 import { crossoverOffered, format as formatCode } from '../lab/lab.js';
 import { FX_ON } from '../fx.js';
+import { ITEMS, STANDARD, KINDS, lookOf, priceOf, owns } from '../garage/cosmetics.js';
+import { wheelDesign, wheelIcon, standardIcon } from '../cars/wheels.js';
+import { carSpec } from '../cars/index.js';
 import { RIVALS, rivalOpen, rivalsLive, rivalNeeds, rivalState, ladderSummary, rivalPaint } from '../rivals/roster.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -38,8 +41,9 @@ export function createScreens(root, onAction) {
     current = name;
     el.innerHTML = '<div class="screen ' + name + '">' + html + '</div>';
     el.classList.add('on');
+    el.classList.toggle('bare', name === 'garage');   // the garage shows the showroom through, not the menus' backdrop
   }
-  function hide() { current = null; el.classList.remove('on'); el.innerHTML = ''; }
+  function hide() { current = null; el.classList.remove('on', 'bare'); el.innerHTML = ''; }
 
   function coins(save) { return '<div class="coins"><span class="coin">&#9679;</span> ' + fmt(save.coins) + '</div>'; }
 
@@ -84,7 +88,7 @@ export function createScreens(root, onAction) {
 
   /* A rival's portrait (his car in his paint) or, until it is drawn, a swatch of his paint */
   function portraitOf(d, playerPaint, info) {
-    const paint = rivalPaint(d, playerPaint), url = info && info.portrait ? info.portrait(d.car, paint) : '';
+    const paint = rivalPaint(d, playerPaint), url = info && info.portrait ? info.portrait(d.car, paint, d.look) : '';
     const hex = (PAINTS.find(p => p.id === paint) || PAINTS[0]).hex.toString(16).padStart(6, '0');
     return url ? `<img class="pic" src="${url}" alt="${esc(carById(d.car).name)} in ${esc(paint)}">` : `<span class="pic sw" style="--p:#${hex}"></span>`;
   }
@@ -175,25 +179,80 @@ export function createScreens(root, onAction) {
     }).join('') + '</div>';
   }
 
-  function garage(save, picked) {
-    const sel = picked || save.car;
-    const car = carById(sel), owned = !!save.cars[sel], chosen = save.car === sel;
-    const cards = ROSTER.map(c => {
-      const own = !!save.cars[c.id];
-      return `<button type="button" class="card${c.id === sel ? ' sel' : ''}${own ? ' owned' : ''}" data-action="pick-car" data-arg="${c.id}">
-        <span class="swatch" style="background:#${(PAINTS.find(p => p.id === (own ? save.cars[c.id].paint : c.paint)) || PAINTS[0]).hex.toString(16).padStart(6, '0')}"></span>
-        <b>${esc(c.name)}</b><small>${own ? (save.car === c.id ? 'chosen' : 'owned') : '<span class="coin">&#9679;</span> ' + fmt(c.price)}</small></button>`;
-    }).join('');
-    const myPaint = owned ? save.cars[sel].paint : car.paint;
-    const paints = PAINTS.map(p => `<button type="button" class="paint${p.id === myPaint ? ' sel' : ''}" data-action="paint" data-arg="${p.id}" style="background:#${p.hex.toString(16).padStart(6, '0')}" aria-label="${p.name}" ${owned ? '' : 'disabled'}>${p.id === car.paint || p.id === myPaint ? '' : '<small>' + LOOP.PAINT_PRICE + '</small>'}</button>`).join('');
-    let action;
-    if (!owned) action = `<button type="button" class="big primary" data-action="buy-car" data-arg="${sel}" ${save.coins >= car.price ? '' : 'disabled'}><b>BUY</b><small><span class="coin">&#9679;</span> ${fmt(car.price)}${save.coins >= car.price ? '' : ' &middot; you have ' + fmt(save.coins)}</small></button>`;
-    else if (!chosen) action = `<button type="button" class="big primary" data-action="choose-car" data-arg="${sel}"><b>DRIVE THIS</b></button>`;
-    else action = `<button type="button" class="big" data-action="title"><b>CHOSEN</b><small>back to the title</small></button>`;
-    show('garage', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>GARAGE</h2></header>
-      <div class="cards">${cards}</div>
-      <div class="detail"><h3>${esc(car.name)}</h3><p>${esc(car.character)}</p><div class="paints">${paints}</div>${owned ? upgrades(save, sel) : ''}${action}</div>`);
+  /* THE GARAGE (briefs/GARAGE.md): one screen with the car on show. The
+     stage is an empty rectangle the showroom draws the car into
+     (garage/showroom.js), and the controls sit beside it or under it:
+     six sections (cars, paint, wheels, glow, smoke, upgrades), the
+     section's items, and one action. A press on an item not owned shows
+     it on the car, a preview; the action then buys it. A press on one
+     already owned fits it. Every item says what it is: worn, owned, or
+     its price, and how many coins short the player is of one out of
+     reach.
+     G: { picked (the car looked at, or null for the chosen one), tab,
+     preview: { paint, wheels, glow, smoke } (ids shown but not bought) } */
+  const TABS = [['cars', 'CARS'], ['paint', 'PAINT'], ['wheels', 'WHEELS'], ['glow', 'GLOW'], ['smoke', 'SMOKE'], ['upgrades', 'UPGRADES']];
+  const hexOf = n => '#' + n.toString(16).padStart(6, '0');
+  const coin = n => '<span class="coin">&#9679;</span> ' + fmt(n);
+  const needed = n => fmt(n) + ' more coin' + (n === 1 ? '' : 's') + ' needed';
+  /* an item's picture: the wheel drawn from its own numbers, the glow as a lit pad, the smoke as a puff */
+  function itemPic(kind, item, carId) {
+    if (kind === 'wheels') { const d = wheelDesign(item.id); return d ? wheelIcon(d, 44) : standardIcon(carSpec(carId).wheel, 44); }
+    if (kind === 'glow') return item.hex === null ? '<span class="gpic off"></span>' : `<span class="gpic" style="--c:${hexOf(item.hex)}"></span>`;
+    return item.hex === null ? '<span class="spic"></span>' : `<span class="spic" style="--c:${hexOf(item.hex)}"></span>`;
   }
+  function garage(save, G) {
+    const g = G && typeof G === 'object' ? G : { picked: G || null };
+    const sel = g.picked || save.car, tab = TABS.some(t => t[0] === g.tab) ? g.tab : 'cars', pre = g.preview || {};
+    const car = carById(sel), mine = save.cars[sel], owned = !!mine, chosen = save.car === sel;
+    const worn = lookOf(mine);
+    const tabs = TABS.map(([id, label]) => `<button type="button" class="tab${id === tab ? ' on' : ''}" data-action="garage-tab" data-arg="${id}">${label}</button>`).join('');
+    let pane = '', action = '';
+    if (tab === 'cars') {
+      pane = '<div class="cards">' + ROSTER.map(c => {
+        const own = !!save.cars[c.id];
+        return `<button type="button" class="card${c.id === sel ? ' sel' : ''}${own ? ' owned' : ''}" data-action="pick-car" data-arg="${c.id}">
+        <span class="swatch" style="background:#${(PAINTS.find(p => p.id === (own ? save.cars[c.id].paint : c.paint)) || PAINTS[0]).hex.toString(16).padStart(6, '0')}"></span>
+        <b>${esc(c.name)}</b><small>${own ? (save.car === c.id ? 'chosen' : 'owned') : coin(c.price)}</small>${!own && save.coins < c.price ? `<small class="need">${fmt(c.price - save.coins)} more</small>` : ''}</button>`;
+      }).join('') + '</div>';
+      if (!owned) action = `<button type="button" class="big primary" data-action="buy-car" data-arg="${sel}" ${save.coins >= car.price ? '' : 'disabled'}><b>BUY</b><small>${coin(car.price)}${save.coins >= car.price ? '' : ' &middot; ' + needed(car.price - save.coins)}</small></button>`;
+      else if (!chosen) action = `<button type="button" class="big primary" data-action="choose-car" data-arg="${sel}"><b>DRIVE THIS</b></button>`;
+      else action = `<button type="button" class="big" data-action="title"><b>CHOSEN</b><small>back to the title</small></button>`;
+    } else if (tab === 'paint') {
+      const myPaint = owned ? mine.paint : car.paint, shown = pre.paint || myPaint;
+      pane = '<div class="paints">' + PAINTS.map(p => {
+        const free = p.id === car.paint || p.id === myPaint;
+        return `<button type="button" class="paint${p.id === shown ? ' sel' : ''}${p.id === myPaint ? ' worn' : ''}" data-action="paint" data-arg="${p.id}" style="background:${hexOf(p.hex)}" aria-label="${p.name}">${p.id === myPaint ? '<small>&#10003;</small>' : free ? '' : '<small>' + LOOP.PAINT_PRICE + '</small>'}</button>`;
+      }).join('') + '</div>';
+      const p = PAINTS.find(q => q.id === shown) || PAINTS[0];
+      if (!owned) action = notYours(car);
+      else if (shown === myPaint) action = `<div class="note"><b>${esc(p.name.toUpperCase())}</b><small>on the car</small></div>`;
+      else action = `<button type="button" class="big primary" data-action="buy-paint" data-arg="${p.id}" ${save.coins >= LOOP.PAINT_PRICE ? '' : 'disabled'}><b>PAINT IT ${esc(p.name.toUpperCase())}</b><small>${coin(LOOP.PAINT_PRICE)}${save.coins >= LOOP.PAINT_PRICE ? '' : ' &middot; ' + needed(LOOP.PAINT_PRICE - save.coins)}</small></button>`;
+    } else if (KINDS.includes(tab)) {
+      const shown = pre[tab] || worn[tab];
+      pane = `<div class="items ${tab}">` + ITEMS[tab].map(it => {
+        const have = owned && owns(mine, tab, it.id), on = worn[tab] === it.id && (owned || it.id === STANDARD[tab]), price = priceOf(tab, it.id);
+        const state = on ? '<small class="st on">&#10003; WORN</small>' : have ? '<small class="st">OWNED</small>' : it.id === STANDARD[tab] ? '<small class="st">STANDARD</small>' : `<small class="st price">${coin(price)}</small>${save.coins < price ? `<small class="need">${fmt(price - save.coins)} more</small>` : ''}`;
+        return `<button type="button" class="item${it.id === shown ? ' sel' : ''}${on ? ' worn' : ''}${have ? ' owned' : ''}" data-action="look" data-arg="${tab}:${it.id}">${itemPic(tab, it, sel)}<b>${esc(it.name)}</b>${state}</button>`;
+      }).join('') + '</div>';
+      const it = ITEMS[tab].find(i => i.id === shown) || ITEMS[tab][0], price = priceOf(tab, it.id);
+      if (!owned) action = notYours(car);
+      else if (shown === worn[tab]) action = `<div class="note"><b>${esc(it.name.toUpperCase())}</b><small>on the car</small></div>`;
+      else action = `<button type="button" class="big primary" data-action="buy-look" data-arg="${tab}:${it.id}" ${save.coins >= price ? '' : 'disabled'}><b>BUY ${esc(it.name.toUpperCase())}</b><small>${coin(price)}${save.coins >= price ? '' : ' &middot; ' + needed(price - save.coins)}</small></button>`;
+    } else {
+      pane = owned ? upgrades(save, sel) : '<p class="hintline">Upgrades are bought for a car you own.</p>';
+      action = owned ? '' : notYours(car);
+    }
+    const keep = el.querySelector('.garage .pane'), keepTab = keep ? keep.dataset.tab : null, keepTop = keep ? keep.scrollTop : 0;
+    show('garage', `${coins(save)}<header><button type="button" class="back" data-action="title">&#9664;</button><h2>GARAGE</h2></header>
+      <div class="stage"><small class="draghint">drag to turn</small></div>
+      <div class="tabs">${tabs}</div>
+      <div class="who"><b>${esc(car.name)}</b><small>${esc(car.character)}</small></div>
+      <div class="pane" data-tab="${tab}">${pane}</div>
+      <div class="act">${action}</div>`);
+    if (keepTab === tab) { const now = el.querySelector('.garage .pane'); if (now) now.scrollTop = keepTop; }
+  }
+  /* a car not owned can be dressed to look at, and bought on the cars section */
+  function notYours(car) { return `<button type="button" class="big" data-action="garage-tab" data-arg="cars"><b>NOT YOURS YET</b><small>buy the ${esc(car.name.toLowerCase())} to fit this</small></button>`; }
 
   /* THE TRACK LAB. L: { settings, seed, code, track, best, ghost, message,
      error, link }. The plan canvas is drawn by the host after show(),

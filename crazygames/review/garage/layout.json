@@ -1,0 +1,1542 @@
+{
+ "rows": [
+  {
+   "size": "390x844",
+   "car": [
+    48,
+    133,
+    342,
+    266
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    48,
+    133,
+    342,
+    266
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    48,
+    133,
+    342,
+    266
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    48,
+    133,
+    342,
+    266
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    48,
+    133,
+    342,
+    266
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    48,
+    133,
+    342,
+    266
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 10,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    52,
+    144,
+    338,
+    263
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    52,
+    144,
+    338,
+    263
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    52,
+    144,
+    338,
+    263
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    52,
+    144,
+    338,
+    263
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    52,
+    144,
+    338,
+    263
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    52,
+    144,
+    338,
+    263
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    49,
+    129,
+    341,
+    264
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    49,
+    129,
+    341,
+    264
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    49,
+    129,
+    341,
+    264
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    49,
+    129,
+    341,
+    264
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    49,
+    129,
+    341,
+    264
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "car": [
+    49,
+    129,
+    341,
+    264
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    64,
+    390,
+    326
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "390x844",
+   "picture": {
+    "x0": 56,
+    "y0": 131,
+    "x1": 325,
+    "y1": 248
+   },
+   "box": {
+    "left": 49.357360984253454,
+    "top": 130.71120358852784,
+    "right": 327.60729699626995,
+    "bottom": 257.4706181763786,
+    "width": 278.2499360120165,
+    "height": 126.75941458785076
+   },
+   "fills": 0.9667567362473102
+  },
+  {
+   "size": "844x390",
+   "car": [
+    57,
+    122,
+    403,
+    279
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    57,
+    122,
+    403,
+    279
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "844x390",
+   "car": [
+    57,
+    122,
+    403,
+    279
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    57,
+    122,
+    403,
+    279
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    57,
+    122,
+    403,
+    279
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    57,
+    122,
+    403,
+    279
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 10,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "844x390",
+   "car": [
+    61,
+    135,
+    399,
+    275
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    61,
+    135,
+    399,
+    275
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "844x390",
+   "car": [
+    61,
+    135,
+    399,
+    275
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    61,
+    135,
+    399,
+    275
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    61,
+    135,
+    399,
+    275
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    61,
+    135,
+    399,
+    275
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "844x390",
+   "car": [
+    58,
+    118,
+    402,
+    277
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    58,
+    118,
+    402,
+    277
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "844x390",
+   "car": [
+    58,
+    118,
+    402,
+    277
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    58,
+    118,
+    402,
+    277
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    58,
+    118,
+    402,
+    277
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": true
+  },
+  {
+   "size": "844x390",
+   "car": [
+    58,
+    118,
+    402,
+    277
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    460,
+    390
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "844x390",
+   "picture": {
+    "x0": 66,
+    "y0": 120,
+    "x1": 384,
+    "y1": 258
+   },
+   "box": {
+    "left": 58.21637449424776,
+    "top": 119.39334269416106,
+    "right": 386.40860671354915,
+    "bottom": 268.90444707983113,
+    "width": 328.1922322193014,
+    "height": 149.51110438567008
+   },
+   "fills": 0.9689443222029374
+  },
+  {
+   "size": "800x450",
+   "car": [
+    51,
+    159,
+    365,
+    301
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    51,
+    159,
+    365,
+    301
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    51,
+    159,
+    365,
+    301
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    51,
+    159,
+    365,
+    301
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    51,
+    159,
+    365,
+    301
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    51,
+    159,
+    365,
+    301
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 10,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    55,
+    171,
+    361,
+    297
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    55,
+    171,
+    361,
+    297
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    55,
+    171,
+    361,
+    297
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    55,
+    171,
+    361,
+    297
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    55,
+    171,
+    361,
+    297
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    55,
+    171,
+    361,
+    297
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    53,
+    155,
+    363,
+    299
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    53,
+    155,
+    363,
+    299
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    53,
+    155,
+    363,
+    299
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    53,
+    155,
+    363,
+    299
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    53,
+    155,
+    363,
+    299
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "car": [
+    53,
+    155,
+    363,
+    299
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    416,
+    450
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "800x450",
+   "picture": {
+    "x0": 60,
+    "y0": 157,
+    "x1": 347,
+    "y1": 282
+   },
+   "box": {
+    "left": 52.64785171653714,
+    "top": 156.62528382776304,
+    "right": 349.4477834626879,
+    "bottom": 291.83532605480383,
+    "width": 296.7999317461507,
+    "height": 135.2100422270408
+   },
+   "fills": 0.966981354448112
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    100,
+    232,
+    710,
+    508
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    100,
+    232,
+    710,
+    508
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    100,
+    232,
+    710,
+    508
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    100,
+    232,
+    710,
+    508
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    100,
+    232,
+    710,
+    508
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    100,
+    232,
+    710,
+    508
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 10,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    108,
+    255,
+    702,
+    501
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    108,
+    255,
+    702,
+    501
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    108,
+    255,
+    702,
+    501
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    108,
+    255,
+    702,
+    501
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    108,
+    255,
+    702,
+    501
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    108,
+    255,
+    702,
+    501
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    103,
+    224,
+    707,
+    504
+   ],
+   "section": "cars",
+   "bad": [],
+   "buttons": 13,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    103,
+    224,
+    707,
+    504
+   ],
+   "section": "paint",
+   "bad": [],
+   "buttons": 16,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    103,
+    224,
+    707,
+    504
+   ],
+   "section": "wheels",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    103,
+    224,
+    707,
+    504
+   ],
+   "section": "glow",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    103,
+    224,
+    707,
+    504
+   ],
+   "section": "smoke",
+   "bad": [],
+   "buttons": 14,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "car": [
+    103,
+    224,
+    707,
+    504
+   ],
+   "section": "upgrades",
+   "bad": [],
+   "buttons": 8,
+   "smallest": 44,
+   "stage": [
+    0,
+    0,
+    810,
+    720
+   ],
+   "scrolls": false
+  },
+  {
+   "size": "1280x720",
+   "picture": {
+    "x0": 116,
+    "y0": 227,
+    "x1": 677,
+    "y1": 471
+   },
+   "box": {
+    "left": 102.51144204421884,
+    "top": 226.8665382223271,
+    "right": 680.4151552999451,
+    "bottom": 490.1360915970939,
+    "width": 577.9037132557263,
+    "height": 263.2695533747668
+   },
+   "fills": 0.9707499487059944
+  }
+ ],
+ "known": [
+  {
+   "size": "390x844",
+   "over": 1,
+   "small": 1,
+   "wide": 1
+  },
+  {
+   "size": "844x390",
+   "over": 1,
+   "small": 1,
+   "wide": 1
+  },
+  {
+   "size": "800x450",
+   "over": 1,
+   "small": 1,
+   "wide": 1
+  },
+  {
+   "size": "1280x720",
+   "over": 1,
+   "small": 1,
+   "wide": 1
+  }
+ ]
+}

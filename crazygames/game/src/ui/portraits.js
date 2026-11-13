@@ -23,6 +23,9 @@ export const PORTRAIT = {
   FILL: 0.96,               // share of the portrait's width the car fills
 };
 
+/* a portrait is kept by its car, its paint and the wheels it wears (briefs/GARAGE.md 2) */
+const keyOf = (car, paint, look) => car + ':' + paint + ':' + ((look && look.wheels) || 'standard');
+
 export function createPortraits(THREE, renderer, redraw) {
   const cache = new Map();
   let studio = null;
@@ -37,7 +40,7 @@ export function createPortraits(THREE, renderer, redraw) {
   }
   /* draw every portrait not yet made, in one task; returns how many were made */
   function make(list) {
-    const todo = list.filter(p => !cache.has(p.car + ':' + p.paint));
+    const todo = list.filter(p => !cache.has(keyOf(p.car, p.paint, p.look)));
     if (!todo.length || !renderer || !renderer.domElement) return 0;
     if (!studio) studio = build();
     const canvas = renderer.domElement, cw = canvas.width, ch = canvas.height;
@@ -50,7 +53,7 @@ export function createPortraits(THREE, renderer, redraw) {
     for (const p of todo) {
       let model = null;
       try {
-        model = makeCar(THREE, p.car, { paint: paintById(p.paint).hex });
+        model = makeCar(THREE, p.car, { paint: paintById(p.paint).hex, wheels: p.look ? p.look.wheels : null });   // in the wheels he races on (briefs/GARAGE.md 2)
         if (model.lights && model.lights.set) model.lights.set(1, 1);
         studio.scene.add(model.group);
         /* frame the car: the camera along AT at the distance that makes it FILL the portrait's width */
@@ -66,10 +69,10 @@ export function createPortraits(THREE, renderer, redraw) {
         renderer.render(studio.scene, cam);
         g.clearRect(0, 0, PORTRAIT.W, PORTRAIT.H);
         g.drawImage(canvas, (cw - cropW) / 2, (ch - cropH) / 2, cropW, cropH, 0, 0, PORTRAIT.W, PORTRAIT.H);
-        cache.set(p.car + ':' + p.paint, out.toDataURL('image/png'));
+        cache.set(keyOf(p.car, p.paint, p.look), out.toDataURL('image/png'));
         made++;
       } catch (e) {
-        cache.set(p.car + ':' + p.paint, '');   // a swatch stands in
+        cache.set(keyOf(p.car, p.paint, p.look), '');   // a swatch stands in
       } finally {
         if (model) { studio.scene.remove(model.group); if (model.dispose) model.dispose(); }
       }
@@ -78,5 +81,5 @@ export function createPortraits(THREE, renderer, redraw) {
     if (redraw) redraw();   // the game's own frame back, in this same task
     return made;
   }
-  return { make, get: (car, paint) => cache.get(car + ':' + paint) || '', has: (car, paint) => cache.has(car + ':' + paint) };
+  return { make, get: (car, paint, look) => cache.get(keyOf(car, paint, look)) || '', has: (car, paint, look) => cache.has(keyOf(car, paint, look)) };
 }

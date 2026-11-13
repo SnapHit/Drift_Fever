@@ -1,0 +1,162 @@
+{
+ "recorded": {
+  "finished": true,
+  "ghostSaved": true,
+  "rec": {
+   "look": {
+    "wheels": "discs",
+    "glow": "aqua",
+    "smoke": "rose"
+   },
+   "steps": 8396
+  }
+ },
+ "ghost": {
+  "g1": {
+   "look": {
+    "wheels": "discs",
+    "glow": "aqua",
+    "smoke": "rose"
+   },
+   "wheels": "discs",
+   "glow": true,
+   "car": {
+    "look": {
+     "wheels": "discs",
+     "glow": "aqua",
+     "smoke": "rose"
+    },
+    "wheels": "discs",
+    "glow": true
+   }
+  },
+  "g2": {
+   "look": {
+    "wheels": "discs",
+    "glow": "aqua",
+    "smoke": "rose"
+   },
+   "wheels": "discs",
+   "glow": true,
+   "car": {
+    "look": {
+     "wheels": "standard",
+     "glow": "off",
+     "smoke": "standard"
+    },
+    "wheels": "standard",
+    "glow": false
+   }
+  },
+  "g3": {
+   "look": {
+    "wheels": "standard",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "wheels": "standard",
+   "glow": false,
+   "car": {
+    "look": {
+     "wheels": "standard",
+     "glow": "off",
+     "smoke": "standard"
+    },
+    "wheels": "standard",
+    "glow": false
+   }
+  },
+  "g4": {
+   "look": {
+    "wheels": "fours",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "wheels": "fours",
+   "glow": false,
+   "car": {
+    "look": {
+     "wheels": "standard",
+     "glow": "off",
+     "smoke": "standard"
+    },
+    "wheels": "standard",
+    "glow": false
+   }
+  }
+ },
+ "rivals": {
+  "r1": {
+   "name": "Kestrow",
+   "wheels": "standard",
+   "glow": false,
+   "look": {
+    "wheels": "standard",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "player": "standard"
+  },
+  "r2": {
+   "name": "Tolvo",
+   "wheels": "standard",
+   "glow": false,
+   "look": {
+    "wheels": "standard",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "player": "standard"
+  },
+  "r3": {
+   "name": "Varsk",
+   "wheels": "turbines",
+   "glow": false,
+   "look": {
+    "wheels": "turbines",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "player": "standard"
+  },
+  "r4": {
+   "name": "Dovane",
+   "wheels": "fours",
+   "glow": false,
+   "look": {
+    "wheels": "fours",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "player": "standard"
+  },
+  "r5": {
+   "name": "Halvik",
+   "wheels": "daggers",
+   "glow": false,
+   "look": {
+    "wheels": "daggers",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "player": "standard"
+  },
+  "r6": {
+   "name": "Sarrow",
+   "wheels": "discs",
+   "glow": false,
+   "look": {
+    "wheels": "discs",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "player": "standard"
+  }
+ },
+ "portraits": {
+  "shown": 6,
+  "differs": true,
+  "same": true,
+  "len": 23202
+ }
+}
