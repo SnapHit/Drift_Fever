@@ -9,7 +9,7 @@
    with elevation 0 until the car follows the road's height. A track is
    generated once per run (the worst case measured by the track session
    is about half a second). */
-import { testTrack, carPark } from './track.js';
+import { testTrack, stuntPark } from './track.js';
 import { LOOP } from '../tune.js';
 import * as generator from '../tracks/generate.js';
 
@@ -71,4 +71,5 @@ export function trackFor(spec) {
   return t;
 }
 
-export function freeGround() { return carPark(); }
+/* free drift's ground: the stunt park (briefs/PLAYGROUND.md), under the time of day it is asked for */
+export function freeGround(preset) { const g = stuntPark(); if (preset) g.preset = preset; return g; }

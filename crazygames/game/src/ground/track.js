@@ -7,6 +7,8 @@
    Units metres, Y up, flat. Headings follow the vehicle: yaw zero faces
    -Z, positive yaw turns left. */
 
+import { stuntPark } from '../park/layout.js';
+
 const SAMPLE = 2;
 
 function catmullRom(p0, p1, p2, p3, t) {
@@ -122,3 +124,8 @@ function boundsOf(centre, pad) {
 }
 
 export function groundByName(name) { return name === 'park' ? carPark() : testTrack(); }
+
+/* Free drift's ground since 14 November 2026: the stunt park
+   (park/layout.js, briefs/PLAYGROUND.md). The small car park above stays
+   for ?ground=park, which the feel probes drive. */
+export { stuntPark };

@@ -307,6 +307,54 @@ export const LOOP = {
     MULT:             [2, 3],  // the multiplier to reach, easy and hard tracks (x4 was never reached by a scripted driver)
     SHOWN:            2.5,     // s the mission list stays after GO
   },
+  /* THE STUNT PARK (briefs/PLAYGROUND.md, 14 November 2026): free
+     drift's ground, with eight challenges that each have three levels
+     (bronze, silver, gold), each level paid once and never again. No
+     timer and nothing else is paid there. TARGETS are what each level
+     asks, in the challenge's own unit; COINS what each pays: all 24
+     together come to 7,500, about one clean pass of a chapter. The
+     park's shape is PARK in park/layout.js. First guesses for the
+     author's play; review/park/REPORT.md says which levels a scripted
+     driver with a player's hands reached, and in which car. */
+  PARK: {
+    TARGETS: {
+      donut:  [1, 4, 10],         // full turns round the donut pillar in one slide
+      eight:  [2, 4, 8],          // links of the figure eight in one chain (two links are one whole eight)
+      slalom: [3, 5, 7],          // cones passed on alternate sides in one chain, none knocked
+      wall:   [20, 60, 140],      // m slid close beside the long wall without a touch (round the inside of its curve is about 65 m a lap)
+      gate:   [55, 85, 110],      // km/h through a gate, sideways
+      slide:  [100, 400, 1200],   // m in one unbroken slide
+      chain:  [400, 2500, 10000], // points of one banked chain
+      tour:   [2, 4, 6],          // places visited in one chain
+    },
+    COINS: {
+      donut:  [100, 250, 500],
+      eight:  [120, 300, 600],
+      slalom: [120, 300, 600],
+      wall:   [100, 280, 570],
+      gate:   [80, 220, 500],
+      slide:  [80, 200, 450],
+      chain:  [80, 220, 450],
+      tour:   [150, 380, 850],
+    },
+    GRACE:          0.35,    // s a slide may drop under the scoring angle and still be the same slide, for the donut and the wall ride (a flicker, not a break)
+    DONUT_SHOWN:    0.25,    // turns round the pillar before the readout says DONUTS
+    WALL_NEAR:      2.5,     // m between the car's body and the long wall that counts as beside it
+    WALL_SHOWN:     3,       // m of wall ride before the readout says so
+    GATE_ANGLE:     25,      // degrees of slide through a gate for it to count as sideways
+    GATE_CLEAN:     0.25,    // s since the last wall contact for a gate to count
+    GATE_SHOWN:     2.2,     // s a gate's speed stays in the readout
+    SLALOM_REACH:   12,      // m to the side of a cone within which it is passed
+    SLALOM_CLEAR:   3,       // m past a cone before it is counted, still standing
+    SLIDE_SHOWN:    25,      // m of slide before the readout says SLIDE (nothing else being counted)
+    TOUR_SHOWN:     2.2,     // s the tour's count stays in the readout when a place is added
+    TOUR_SLALOM:    8,       // m from the cone line that visits the slalom
+    TOUR_WALL:      6,       // m from the long wall that visits it
+    RESTAND:        45,      // m the car must be from a knocked cone, and the cone at rest, before it stands up again
+    PRESETS:        ['dusk', 'night', 'dawn'],   // the park's time of day, the next one each visit
+    WON_SHOWN:      2.6,     // s a level just won stays in the readout
+    TIP_SHOWN:      6,       // s the first visit's one line stays
+  },
   /* TRACK LAB (briefs/RETENTION.md 3): a player's own tracks by code.
      What the length words mean to the generator, the feature weights of
      each style (TRACKS.WEIGHTS is 'mixed'), how many codes are kept, and
