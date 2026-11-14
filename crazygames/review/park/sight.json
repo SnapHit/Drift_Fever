@@ -1,0 +1,132 @@
+{
+ "limit": 0.3333333333333333,
+ "runs": [
+  {
+   "view": "1280x720",
+   "name": "the grand tour",
+   "frames": 2560,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "1280x720",
+   "name": "six turns of the donut",
+   "frames": 3600,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "1280x720",
+   "name": "six loops of the eight",
+   "frames": 3178,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "1280x720",
+   "name": "the gate at speed",
+   "frames": 979,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "1280x720",
+   "name": "the wall ride",
+   "frames": 2400,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "1280x720",
+   "name": "worst cases",
+   "cases": 28,
+   "longest": 0.117,
+   "by": "donut",
+   "fadedCases": 28,
+   "known": {
+    "longest": 1.567,
+    "by": "gate-a-0",
+    "over": 28
+   }
+  },
+  {
+   "view": "390x844",
+   "name": "the grand tour",
+   "frames": 2560,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "390x844",
+   "name": "six turns of the donut",
+   "frames": 3600,
+   "hiddenFrames": 7,
+   "partly": 7,
+   "longest": 0.117,
+   "by": "donut",
+   "faded": 0
+  },
+  {
+   "view": "390x844",
+   "name": "six loops of the eight",
+   "frames": 3178,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "390x844",
+   "name": "the gate at speed",
+   "frames": 979,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "390x844",
+   "name": "the wall ride",
+   "frames": 2400,
+   "hiddenFrames": 0,
+   "partly": 0,
+   "longest": 0,
+   "by": null,
+   "faded": 0
+  },
+  {
+   "view": "390x844",
+   "name": "worst cases",
+   "cases": 28,
+   "longest": 0.117,
+   "by": "donut",
+   "fadedCases": 28,
+   "known": {
+    "longest": 1.567,
+    "by": "gate-a-0",
+    "over": 28
+   }
+  }
+ ],
+ "clearAt": 0.35
+}

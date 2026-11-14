@@ -1,0 +1,476 @@
+{
+ "size": {
+  "w": 300,
+  "h": 200,
+  "area": 60000,
+  "times": 3.64
+ },
+ "flood": {
+  "places": 44,
+  "missed": [],
+  "free": 224021,
+  "seen": 224021,
+  "need": 2.63
+ },
+ "driven": [
+  {
+   "name": "donut",
+   "done": true,
+   "hits": 0,
+   "cones": 0,
+   "seconds": 4.7
+  },
+  {
+   "name": "eight",
+   "done": true,
+   "hits": 0,
+   "cones": 0,
+   "seconds": 5
+  },
+  {
+   "name": "slalom",
+   "done": true,
+   "hits": 0,
+   "cones": 0,
+   "seconds": 7.8
+  },
+  {
+   "name": "wall",
+   "done": true,
+   "hits": 0,
+   "cones": 0,
+   "seconds": 6.7
+  },
+  {
+   "name": "gate-a",
+   "done": true,
+   "hits": 0,
+   "cones": 0,
+   "seconds": 3.7
+  },
+  {
+   "name": "gate-b",
+   "done": true,
+   "hits": 0,
+   "cones": 0,
+   "seconds": 5.8
+  }
+ ],
+ "leave": {
+  "runs": 504,
+  "aims": 84,
+  "worst": {
+   "out": 0,
+   "deep": 0,
+   "vhit": 52.836335868611016,
+   "vmax": 58.11890302310505
+  },
+  "known": {
+   "out": 14.004426004011279,
+   "deep": 0,
+   "vmax": 31.143428062076506,
+   "vhit": 31.143428062076506
+  },
+  "whole": {
+   "out": 0,
+   "deep": 0,
+   "vmax": 31.143428062076506,
+   "vhit": 31.143428062076506
+  }
+ },
+ "stuck": {
+  "cases": [
+   {
+    "name": "the north wall",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 40.01,
+    "z": -96.54,
+    "inside": false,
+    "clear": 1.26,
+    "t": 2.9
+   },
+   {
+    "name": "the south wall",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -40.01,
+    "z": 96.54,
+    "inside": false,
+    "clear": 1.26,
+    "t": 2.9
+   },
+   {
+    "name": "the east wall",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 146.54,
+    "z": 30.01,
+    "inside": false,
+    "clear": 1.26,
+    "t": 2.9
+   },
+   {
+    "name": "the west wall",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -146.55,
+    "z": 60,
+    "inside": false,
+    "clear": 1.25,
+    "t": 2.6
+   },
+   {
+    "name": "the north west corner",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -147.51,
+    "z": -96.58,
+    "inside": false,
+    "clear": 1.22,
+    "t": 3.3
+   },
+   {
+    "name": "the north east corner",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 146.51,
+    "z": -97.59,
+    "inside": false,
+    "clear": 1.29,
+    "t": 3.3
+   },
+   {
+    "name": "the south east corner",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 147.58,
+    "z": 96.51,
+    "inside": false,
+    "clear": 1.29,
+    "t": 3.3
+   },
+   {
+    "name": "the south west corner",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -146.58,
+    "z": 97.51,
+    "inside": false,
+    "clear": 1.22,
+    "t": 3.3
+   },
+   {
+    "name": "donut from the south",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -31.84,
+    "z": -12.79,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "donut from the east",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -26.79,
+    "z": -18.16,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "donut from the north west",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -35.93,
+    "z": -21.22,
+    "inside": false,
+    "clear": 0.76,
+    "t": 2.5
+   },
+   {
+    "name": "eight-a from the south",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 36.16,
+    "z": -8.79,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "eight-a from the east",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 41.21,
+    "z": -14.16,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "eight-a from the north west",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 32.07,
+    "z": -17.22,
+    "inside": false,
+    "clear": 0.76,
+    "t": 2.5
+   },
+   {
+    "name": "eight-b from the south",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 82.16,
+    "z": -8.79,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "eight-b from the east",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 87.21,
+    "z": -14.16,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "eight-b from the north west",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 78.07,
+    "z": -17.22,
+    "inside": false,
+    "clear": 0.76,
+    "t": 2.5
+   },
+   {
+    "name": "gate-a-0 from the south",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -6.34,
+    "z": 40.21,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "gate-a-0 from the east",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -1.35,
+    "z": 36.6,
+    "inside": false,
+    "clear": 1.27,
+    "t": 2.7
+   },
+   {
+    "name": "gate-a-0 from the north west",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -10.43,
+    "z": 31.78,
+    "inside": false,
+    "clear": 0.76,
+    "t": 2.5
+   },
+   {
+    "name": "gate-a-1 from the south",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 6.66,
+    "z": 40.21,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "gate-a-1 from the east",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 11.71,
+    "z": 34.84,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "gate-a-1 from the north west",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": 2.57,
+    "z": 31.78,
+    "inside": false,
+    "clear": 0.76,
+    "t": 2.5
+   },
+   {
+    "name": "gate-b-0 from the south",
+    "recovered": true,
+    "drivesOff": 48.5,
+    "x": -102.07,
+    "z": 50.61,
+    "inside": false,
+    "clear": 1.34,
+    "t": 1.6
+   },
+   {
+    "name": "gate-b-0 from the east",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -94.79,
+    "z": 34.34,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "gate-b-0 from the north west",
+    "recovered": true,
+    "drivesOff": 45.2,
+    "x": -103.93,
+    "z": 31.28,
+    "inside": false,
+    "clear": 0.76,
+    "t": 2.5
+   },
+   {
+    "name": "gate-b-1 from the south",
+    "recovered": true,
+    "drivesOff": 48.4,
+    "x": -99.84,
+    "z": 50.71,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "gate-b-1 from the east",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -94.79,
+    "z": 45.34,
+    "inside": false,
+    "clear": 0.95,
+    "t": 2.5
+   },
+   {
+    "name": "gate-b-1 from the north west",
+    "recovered": true,
+    "drivesOff": 45.2,
+    "x": -103.93,
+    "z": 42.28,
+    "inside": false,
+    "clear": 0.76,
+    "t": 2.5
+   },
+   {
+    "name": "the long wall from inside",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -118.71,
+    "z": 0.9,
+    "inside": false,
+    "clear": 1.27,
+    "t": 2.6
+   },
+   {
+    "name": "the long wall from behind",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -123.74,
+    "z": 10.6,
+    "inside": false,
+    "clear": 1.27,
+    "t": 2
+   },
+   {
+    "name": "the long wall from inside",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -131.49,
+    "z": -19.94,
+    "inside": false,
+    "clear": 1.2,
+    "t": 2.6
+   },
+   {
+    "name": "the long wall from behind",
+    "recovered": true,
+    "drivesOff": 5.1,
+    "x": -142.39,
+    "z": -19.94,
+    "inside": false,
+    "clear": 1.19,
+    "t": 2
+   },
+   {
+    "name": "the long wall from inside",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -118.71,
+    "z": -40.9,
+    "inside": false,
+    "clear": 1.26,
+    "t": 2.6
+   },
+   {
+    "name": "the long wall from behind",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -123.74,
+    "z": -50.6,
+    "inside": false,
+    "clear": 1.27,
+    "t": 2
+   },
+   {
+    "name": "a tip of the long wall",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -107.74,
+    "z": 8.45,
+    "inside": false,
+    "clear": 1.16,
+    "t": 2.5
+   },
+   {
+    "name": "a tip of the long wall",
+    "recovered": true,
+    "drivesOff": 49.8,
+    "x": -107.74,
+    "z": -48.45,
+    "inside": false,
+    "clear": 1.16,
+    "t": 2.5
+   },
+   {
+    "name": "the west wall, behind the long wall",
+    "recovered": true,
+    "drivesOff": 5.2,
+    "x": -146.55,
+    "z": -20,
+    "inside": false,
+    "clear": 1.25,
+    "t": 2
+   }
+  ],
+  "known": {
+   "name": "known answer",
+   "recovered": true,
+   "drivesOff": 48.5,
+   "x": -31,
+   "z": -18,
+   "inside": true,
+   "clear": 0.08,
+   "t": 2.9
+  }
+ },
+ "errors": []
+}
