@@ -89,7 +89,7 @@
   #vs { position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 62px); left: 50%; transform: translateX(-50%); display: flex; gap: 7px; align-items: baseline; padding: 3px 12px; border-radius: 12px; background: rgba(10,14,30,0.6); font-weight: 800; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
   #vs[hidden], #meter[hidden], #tag[hidden], #arrow[hidden], #prompt1[hidden] { display: none; }
   /* the stunt park (briefs/PLAYGROUND.md): the readout under the total, the list button under the restart, the one line of welcome */
-  #park { position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 62px); left: 50%; transform: translateX(-50%); display: flex; gap: 9px; align-items: center; padding: 4px 14px; border-radius: 14px; background: rgba(10,14,30,0.66); border: 2px solid rgba(255,255,255,0.16); font-weight: 900; letter-spacing: 0.06em; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: clamp(15px, 2.4vw, 20px); text-shadow: 0 1px 4px rgba(0,0,0,0.7); pointer-events: none; }
+  #park { position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 62px); left: 50%; transform: translateX(var(--ptx, -50%)); display: flex; gap: 9px; align-items: center; padding: 4px 14px; border-radius: 14px; background: rgba(10,14,30,0.66); border: 2px solid rgba(255,255,255,0.16); font-weight: 900; letter-spacing: 0.06em; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: clamp(15px, 2.4vw, 20px); text-shadow: 0 1px 4px rgba(0,0,0,0.7); pointer-events: none; }
   #park[hidden], #parktip[hidden], #plist[hidden] { display: none; }
   #park #parkP { display: flex; gap: 4px; }
   #park #parkP i { width: 10px; height: 10px; transform: rotate(45deg); border: 2px solid rgba(255,255,255,0.45); box-sizing: border-box; }
@@ -101,7 +101,9 @@
   #park.won.bronze { border-color: #e0915a; } #park.won.bronze em { color: #f0a36c; }
   #park.won.silver { border-color: #d5dbea; } #park.won.silver em { color: #e6ebf7; }
   #park.pop { animation: parkPop 0.45s ease-out; }
-  @keyframes parkPop { 0% { transform: translateX(-50%) scale(1.14); } 100% { transform: translateX(-50%) scale(1); } }
+  @keyframes parkPop { 0% { transform: translateX(var(--ptx, -50%)) scale(1.14); } 100% { transform: translateX(var(--ptx, -50%)) scale(1); } }
+  /* a phone on its side: the game's own chain number rides just under the total there, so the readout goes to the left under the buttons (where a run's lap and clock sit; the park has neither) */
+  @media (orientation: landscape) and (max-height: 500px) { #park { left: max(12px, env(safe-area-inset-left)); --ptx: 0px; transform-origin: left center; } }
   @media (orientation: portrait) { #park { top: calc(max(10px, env(safe-area-inset-top)) + 98px); letter-spacing: 0.03em; gap: 7px; padding: 4px 11px; } }
   #parktip { position: absolute; left: 50%; top: calc(max(10px, env(safe-area-inset-top)) + 84px); transform: translateX(-50%); width: max-content; max-width: min(86vw, 520px); box-sizing: border-box; padding: 9px 16px; border-radius: 14px; background: rgba(10,14,30,0.8); border: 2px solid var(--cyan); font-weight: 800; font-size: clamp(14px, 2.2vw, 17px); text-align: center; pointer-events: none; }
   @media (orientation: portrait) { #parktip { top: calc(max(10px, env(safe-area-inset-top)) + 136px); } }

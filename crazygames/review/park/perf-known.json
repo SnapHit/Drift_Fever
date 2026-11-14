@@ -1,0 +1,155 @@
+{
+ "part": "known",
+ "budgetMs": 16.7,
+ "slackMs": 1.5,
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, low tier, night, 6x CPU throttle through CDP; the GPU is not measured here",
+ "runs": [
+  {
+   "label": "the park, plain",
+   "busy": 0,
+   "state": "free",
+   "sliding": 270,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 1.4,
+    "p95": 3.5,
+    "p99": 7.5,
+    "worst": 11.6,
+    "mean": 1.44
+   },
+   "over": 0,
+   "frame": {
+    "n": 270,
+    "p50": 21.4,
+    "p95": 45.7,
+    "p99": 78.4,
+    "worst": 206.1,
+    "mean": 21.67
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 75,
+    "p95": 81,
+    "p99": 88,
+    "worst": 89,
+    "mean": 73.84
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 131429,
+    "p95": 132587,
+    "p99": 132671,
+    "worst": 132683,
+    "mean": 131387.1
+   },
+   "errors": [],
+   "judge": {
+    "donut": 2,
+    "slide": 366,
+    "live": "donut",
+    "hits": 0
+   }
+  },
+  {
+   "label": "known answer: 3 ms of busy work per frame",
+   "busy": 3,
+   "state": "free",
+   "sliding": 270,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 4.4,
+    "p95": 8.1,
+    "p99": 11,
+    "worst": 24.7,
+    "mean": 4.88
+   },
+   "over": 1,
+   "frame": {
+    "n": 270,
+    "p50": 19,
+    "p95": 39.3,
+    "p99": 59.8,
+    "worst": 159.6,
+    "mean": 22.18
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 75,
+    "p95": 81,
+    "p99": 88,
+    "worst": 89,
+    "mean": 73.84
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 131429,
+    "p95": 132587,
+    "p99": 132671,
+    "worst": 132683,
+    "mean": 131387.1
+   },
+   "errors": [],
+   "judge": {
+    "donut": 2,
+    "slide": 366,
+    "live": "donut",
+    "hits": 0
+   }
+  },
+  {
+   "label": "known answer: 20 ms of busy work per frame",
+   "busy": 20,
+   "state": "free",
+   "sliding": 270,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 22.8,
+    "p95": 29.1,
+    "p99": 39.8,
+    "worst": 72.7,
+    "mean": 23.85
+   },
+   "over": 270,
+   "frame": {
+    "n": 270,
+    "p50": 45.4,
+    "p95": 82.7,
+    "p99": 127.3,
+    "worst": 230.4,
+    "mean": 48.51
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 75,
+    "p95": 81,
+    "p99": 88,
+    "worst": 89,
+    "mean": 73.84
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 131429,
+    "p95": 132587,
+    "p99": 132671,
+    "worst": 132683,
+    "mean": 131387.1
+   },
+   "errors": [],
+   "judge": {
+    "donut": 2,
+    "slide": 366,
+    "live": "donut",
+    "hits": 0
+   }
+  }
+ ]
+}
