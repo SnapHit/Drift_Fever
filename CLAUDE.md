@@ -52,6 +52,8 @@ The Worker builds from this repo automatically on every push to `main`, and the 
 
 **What the build changes, and nothing else.** The original's head gains a `<base href="/">` (so its music, touch icon and links resolve from `/classic/`) and its canonical and `og:url` say `/classic/`: 32 bytes, checked by the build and by `publish-check.sh`. The 3D game's `noindex` line, which the preview keeps, becomes the canonical, share and touch icon tags. Both games carry the same inline favicon, the orange D, by the author's word.
 
+**The share card, `og-card.png`, is the 3D game's cover** since 15 November 2026: the drift build mid slide under the wordmark, made in `crazygames/brand/` (`covers/hero-share.png`, from key art the author generated from pictures of the game's own car; `crazygames/CLAUDE.md` has the rule and its one exception). Every page of the site shares it, the original and the seven pages included. `brand/make-og-card.js` still draws the original game's card and would overwrite it: do not run it without the author's word; the old card is in the history.
+
 **The seven pages' cabinet frames `/classic/`**, not the front page: the 3D game's controls do not fit a frame that small. Its two ways out go to `/`.
 
 To see exactly what a deploy would publish, without deploying:

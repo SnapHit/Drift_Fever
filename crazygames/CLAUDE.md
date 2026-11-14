@@ -910,3 +910,11 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   1376x768, scaled up 1.4 times for the 1920x1080 cover. Nothing is in
   use yet: the site's `og-card.png` is unchanged until he says which,
   and until he has checked the model's terms.
+- 15 November 2026: **the hero set is the cover art**, the author's
+  choice, and he has checked the image model's terms of commercial
+  use. The site's share card (`/og-card.png`, the root file) is now
+  `brand/covers/hero-share.png`. For CrazyGames: `hero-landscape.png`,
+  `hero-portrait.png` and `hero-square.png`. The battle set is not
+  used. Still to make: their preview video, from the author's own
+  recording of a rival race in the drift build.
+
