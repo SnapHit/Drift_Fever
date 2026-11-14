@@ -918,3 +918,18 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   used. Still to make: their preview video, from the author's own
   recording of a rival race in the drift build.
 
+- 15 November 2026, the preview video, first cut, from the author's
+  phone recording of the start of his race with Sarrow (2424x1080, 60
+  frames a second, 20.7 s). CrazyGames asks for 15 to 20 s, no sound,
+  1080p in 16:9 and in 2:3, no black bars. Landscape is the left
+  1,920 px of the frame, which keeps the two steer buttons whole and
+  leaves the DRIFT button and the speed readout out, so the car and the
+  score sit right of centre; portrait is the middle 720 px scaled up
+  1.5 times to 1080x1620, clear of every touch button. Both 20.0 s, 60
+  frames a second, silent. Not committed (`brand/video/`, 51 MB); the
+  commands are two ffmpeg lines: `crop=1920:1080:0:0` and
+  `crop=720:1080:852:0,scale=1080:1620`. Weak points: touch buttons in
+  a clip desktop players will see, the first five seconds carry the
+  race's instructions, the portrait is soft, and it does not open on
+  the cover. A cleaner source would be a keyboard recording at
+  1920x1080, or frames drawn here by the game itself in both shapes.
