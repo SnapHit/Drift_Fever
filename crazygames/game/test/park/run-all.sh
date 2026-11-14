@@ -9,7 +9,8 @@
 fail=0
 check() { echo "== $*"; out=$(node "$@" 2>&1); code=$?; echo "$out" | grep -E "^FAIL|failed|all passed" | tail -n 6; [ $code -eq 0 ] || fail=$((fail + 1)); }
 if [ "${1:-}" = others ]; then
-  check game/test/ladder2/determinism.js
+  check game/test/ladder2/determinism.js   # compares with answers stored from another build of Chromium: see game/test/park/same.js
+  check game/test/park/same.js
   check game/test/play13/check.js
   check game/test/play13/career.js
   check game/test/play14/check.js
