@@ -154,7 +154,11 @@ grit at the screen in the same body) is replaced, never cut.
 - The car is an original design, fixed cyan. Never a recognisable real car.
   Never name anything after a competitor's game.
 - Assets: commercial use licences only, CC0 preferred, every one recorded
-  in `ASSETS.md` with source and licence. No AI generated images as assets.
+  in `ASSETS.md` with source and licence. No AI generated images as assets
+  in the game. One exception, by the author's word on 15 November 2026:
+  cover art and share cards may be built on images he generates, from
+  pictures of the game's own cars, never a recognisable real car, with
+  the title set from the wordmark and not by the model.
 - Zero external requests and no ads, except through the CrazyGames SDK
   adapter, which is a no-op until Full Launch.
 - Signs stay metric, matching the run card.
@@ -884,3 +888,14 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   Their preview video (15 to 20 s, 1080p landscape and 2:3 portrait, no
   sound) is not made. Also fixed: a race's points pill followed the
   player into the stunt park (`hud.setBattle(null)` in `startFree`).
+- 15 November 2026: the author found the first covers "not
+  impressive" and chose another route: the top car a player can earn
+  (the drift build, amber, tri-blades, violet glow) as the hero, and
+  key art he generates with an image model from pictures of that car,
+  which this folder then sets under the wordmark and cuts to the four
+  shapes. The hard constraint above was amended for it. Reference
+  pictures in `brand/reference/` (`game/test/brand/reference.js` for
+  the five studio angles, `capture.js --shots
+  game/test/brand/reference-shots.json` for the two mid slide) and the
+  prompts in `brand/PROMPTS.md`. The model's terms of commercial use
+  were not verified here: his to check before anything is published.

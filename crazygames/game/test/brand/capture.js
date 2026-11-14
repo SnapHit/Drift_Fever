@@ -11,7 +11,7 @@
    the share card is 1200x630. Each is drawn at twice its size and
    scaled down by compose.js.
 
-   node game/test/brand/capture.js [--preview] [--only chase,duel] [--out dir]
+   node game/test/brand/capture.js [--preview] [--only chase,duel] [--out dir] [--shots file.json]
    writes brand/bg/<concept>-<shape>.png (--preview: half the pixels, jpg) */
 import path from 'node:path'; import fs from 'node:fs';
 import * as R from '../garage/lib.js';
@@ -22,7 +22,7 @@ fs.mkdirSync(out, { recursive: true });
 
 export const SHAPES = { landscape: [1920, 1080], portrait: [800, 1200], square: [800, 800], share: [1200, 630] };
 /* a camera: metres from the car, metres up, bearing round the car in degrees, field of view, the height it looks at, and metres it looks to one side of the car */
-const SHOTS = JSON.parse(fs.readFileSync(new URL('./shots.json', import.meta.url), 'utf8'));
+const SHOTS = JSON.parse(fs.readFileSync(args.includes('--shots') ? args[args.indexOf('--shots') + 1] : new URL('./shots.json', import.meta.url), 'utf8'));
 
 const env = await R.start();
 for (const [name, shot] of Object.entries(SHOTS)) {
