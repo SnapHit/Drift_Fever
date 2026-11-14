@@ -1003,3 +1003,12 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   pass) and `?renderer=webgl2&tier=high` (the bloom pass without
   WebGPU) tell the backend from the tier, since `?renderer=webgl2`
   alone changes both.
+- 15 November 2026: **the trails draw on the author's phone**, by his
+  word, in the smoke's form. So on his Pixel 9 (WebGPU) the old form
+  was the fault: a ribbon with one four part `glow` attribute and no
+  texture drew nothing, and software WebGPU here drew it. Which part
+  (the four part attribute, or no texture) is not known. The glows
+  (`createGlows` in `env/particles.js`: brake lights, lamps' glints)
+  still carry a four part `glow` attribute, with a texture: whether
+  they draw on his phone has not been asked. For new drawing: build
+  it as the particles are, and have it seen on a real phone.
