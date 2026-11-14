@@ -975,3 +975,31 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   track): it should be drawn again on a track that is night in the
   game. Seen on the way: the title still says "CrazyGames edition"
   under the wordmark, on driftfever.com too.
+- 15 November 2026, the trails again: the author's phone still drew
+  none on driftfever.com and drew them with `?renderer=webgl2`, so the
+  fixed index was not it. Two things came of it.
+  (1) **The WebGPU backend can now be run in the sandbox**
+  (`game/test/webgpu/lib.js`), which the entry above says it cannot.
+  Chromium gives a software WebGPU device and draws with it; what
+  fails is showing it: the first `getCurrentTexture()` on a canvas
+  destroys the device. The probe swaps the canvas' WebGPU context,
+  before the page runs, for one that hands the renderer a texture of
+  the device's own, and reads the picture back from it. The game and
+  three.js are untouched. `W.open` and `W.grab` there; `smoke.js`
+  draws the title on both tiers. Every round's probes have only ever
+  run the WebGL 2 fallback: the high tier on WebGPU is what a modern
+  phone gets (`backend === 'webgl2'` or four cores or fewer is the low
+  tier), so new drawing should be looked at here too.
+  (2) On that WebGPU, in software, **the trails drew in both forms**
+  (`trails-gpu.js`: 5,151 pixels on the high tier, 2,438 on the low,
+  as on WebGL 2), so the fault is his phone's GPU or driver and was
+  not reproduced. The ribbon is now built as the smoke is, attribute
+  for attribute (a soft texture, `alpha`, `tint`, `uv`; it carried one
+  four part `glow` colour and no texture), because the smoke has
+  always drawn on his phone: the form known to work there, not a
+  fault found. The glows (`createGlows`) still use the four part
+  `glow` attribute; whether they draw on his phone is not known. If
+  the trails still do not show: `?tier=low` (WebGPU without the bloom
+  pass) and `?renderer=webgl2&tier=high` (the bloom pass without
+  WebGPU) tell the backend from the tier, since `?renderer=webgl2`
+  alone changes both.

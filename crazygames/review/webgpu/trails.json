@@ -3,7 +3,7 @@
   "k": 863,
   "preset": "dawn",
   "quads": 60,
-  "px": 2438,
+  "px": 2339,
   "known": 0
  },
  "low dusk": {
@@ -31,28 +31,28 @@
   "k": 863,
   "preset": "dawn",
   "quads": 60,
-  "px": 2500,
+  "px": 2389,
   "known": 0
  },
  "high dusk": {
   "k": 863,
   "preset": "dusk",
   "quads": 60,
-  "px": 4230,
+  "px": 2978,
   "known": 0
  },
  "high night": {
   "k": 863,
   "preset": "night",
   "quads": 60,
-  "px": 5151,
+  "px": 3809,
   "known": 0
  },
  "high rain": {
   "k": 863,
   "preset": "rain",
   "quads": 60,
-  "px": 4390,
+  "px": 3328,
   "known": 0
  }
 }

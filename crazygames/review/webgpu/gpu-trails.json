@@ -1,0 +1,22 @@
+{
+ "high": {
+  "k": 863,
+  "backend": "webgpu",
+  "tier": "high",
+  "bloom": true,
+  "quads": 60,
+  "px": 3807,
+  "known": 0,
+  "errors": []
+ },
+ "low": {
+  "k": 863,
+  "backend": "webgpu",
+  "tier": "low",
+  "bloom": false,
+  "quads": 60,
+  "px": 2438,
+  "known": 0,
+  "errors": []
+ }
+}

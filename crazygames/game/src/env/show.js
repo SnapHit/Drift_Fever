@@ -29,6 +29,7 @@ export const SHOW = {
   TRAIL_WIDTH:      [0.065, 0.11],    // m half width at the light, at heat 0 and 1 (were 0.045 and 0.085: a pixel or two on a phone with no bloom to spread them)
   TRAIL_COLOUR:     [1.0, 0.09, 0.07],   // linear, additive
   TRAIL_GAIN:       [1.6, 3.2],   // brightness at heat 0 and 1 (over 1 feeds the bloom)
+  TRAIL_SOFT:       0.22,    // how far in from the soft sprite's edge the ribbon's own edges sit, 0 to 0.5 (0: fully soft edges, a thinner looking trail)
   TRAIL_MIN_SPEED:  6,       // m/s
   TRAIL_SPACING:    0.12,    // m the car moves before a new point is laid
   TRAIL_PRESETS:    { dusk: 0.8, night: 1, dawn: 0.5, rain: 0.9 },   // how strongly each preset shows them. Dawn was 0 (daylight hides a tail-light) and dusk 0.55 until 15 November 2026: the author wants them on every track, and had never seen one
@@ -143,10 +144,22 @@ export function createShow(THREE, opts) {
   const N = SHOW.TRAIL_POINTS;
   const trail = [0, 1].map(() => ({ pts: new Array(N).fill(null).map(() => ({ x: 0, y: 0, z: 0, age: 1e9, link: false })), head: 0, on: false, lx: 0, lz: 0 }));
   const tgeo = new THREE.BufferGeometry();
-  const tpos = new Float32Array(2 * N * 4 * 3), tcol = new Float32Array(2 * N * 4 * 4);
+  const tpos = new Float32Array(2 * N * 4 * 3), talpha = new Float32Array(2 * N * 4), ttint = new Float32Array(2 * N * 4 * 3), tuv = new Float32Array(2 * N * 4 * 2);
   const tidx = new Uint16Array(2 * (N - 1) * 6);
   tgeo.setAttribute('position', new THREE.BufferAttribute(tpos, 3));
-  tgeo.setAttribute('glow', new THREE.BufferAttribute(tcol, 4));
+  /* The ribbon is built as the smoke is, attribute for attribute: a
+     soft texture, an alpha and a tint (particles.js). It used to carry
+     one four part colour of its own and no texture, and on the author's
+     phone (WebGPU on a Mali GPU) it never drew, while the smoke always
+     has; with ?renderer=webgl2 it drew. The sandbox's WebGPU, in
+     software, drew both forms (game/test/webgpu/trails-gpu.js), so this
+     is the form known to work on his phone, not a fault found. Across
+     the ribbon the texture runs from TRAIL_SOFT to 1 - TRAIL_SOFT of
+     the sprite's width, so its edges are soft. */
+  for (let n = 0; n < 2 * N; n++) { const u0 = SHOW.TRAIL_SOFT, u1 = 1 - SHOW.TRAIL_SOFT; tuv.set([u0, 0.5, u1, 0.5, u1, 0.5, u0, 0.5], n * 8); }
+  tgeo.setAttribute('alpha', new THREE.BufferAttribute(talpha, 1));
+  tgeo.setAttribute('tint', new THREE.BufferAttribute(ttint, 3));
+  tgeo.setAttribute('uv', new THREE.BufferAttribute(tuv, 2));
   /* The index never changes: quad n is always vertices 4n to 4n + 3, so
      it is written once here. It used to be rewritten every frame, the
      only geometry in the game that did so, and the author never once saw
@@ -158,8 +171,9 @@ export function createShow(THREE, opts) {
   tgeo.setDrawRange(0, 0);
   const T = THREE.TSL;
   const tmat = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: true });
-  const tg = T.attribute('glow', 'vec4');
-  tmat.colorNode = tg.xyz; tmat.opacityNode = tg.w;
+  const ttex = T.texture(soft, T.uv());
+  tmat.colorNode = T.uniform(new THREE.Color(0xffffff)).mul(ttex.rgb).mul(T.attribute('tint', 'vec3'));
+  tmat.opacityNode = ttex.a.mul(T.attribute('alpha', 'float')).mul(T.float(1));
   const trails = new THREE.Mesh(tgeo, tmat);
   trails.frustumCulled = false; trails.renderOrder = 5; trails.name = 'trails';
   group.add(trails);
@@ -170,7 +184,7 @@ export function createShow(THREE, opts) {
 
   function setPreset(p) { preset = p; }
   /* one ribbon vertex: where, and its alpha from its age */
-  function put(i, x, y, z, f, gain) { tpos[i * 3] = x; tpos[i * 3 + 1] = y; tpos[i * 3 + 2] = z; tcol[i * 4] = SHOW.TRAIL_COLOUR[0] * gain; tcol[i * 4 + 1] = SHOW.TRAIL_COLOUR[1] * gain; tcol[i * 4 + 2] = SHOW.TRAIL_COLOUR[2] * gain; tcol[i * 4 + 3] = f * f; }
+  function put(i, x, y, z, f, gain) { tpos[i * 3] = x; tpos[i * 3 + 1] = y; tpos[i * 3 + 2] = z; ttint[i * 3] = SHOW.TRAIL_COLOUR[0] * gain; ttint[i * 3 + 1] = SHOW.TRAIL_COLOUR[1] * gain; ttint[i * 3 + 2] = SHOW.TRAIL_COLOUR[2] * gain; talpha[i] = f * f; }
 
   /* ctx: { mult, car (the three.js group at the physics origin), tails
      ([[x, y, z], [x, y, z]] in the car's frame), exhaust ([x, y, z] in
@@ -234,7 +248,7 @@ export function createShow(THREE, opts) {
       }
     }
     tgeo.setDrawRange(0, quads * 6);
-    if (quads) { tgeo.attributes.position.needsUpdate = true; tgeo.attributes.glow.needsUpdate = true; }
+    if (quads) { tgeo.attributes.position.needsUpdate = true; tgeo.attributes.alpha.needsUpdate = true; tgeo.attributes.tint.needsUpdate = true; }
     trails.visible = quads > 0;
 
     /* the pop on the lift: a slide held long enough, then let go */
