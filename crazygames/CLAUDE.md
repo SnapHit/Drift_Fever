@@ -933,3 +933,22 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   race's instructions, the portrait is soft, and it does not open on
   the cover. A cleaner source would be a keyboard recording at
   1920x1080, or frames drawn here by the game itself in both shapes.
+- 15 November 2026, the preview video, drawn by the game
+  (`game/test/brand/video.js`), which replaces the cut from the phone
+  recording by the author's word. The drift build in amber on
+  tri-blades with the violet glow and every upgrade, against Varsk on
+  Upper deck at night, the player's car driven by the look-ahead driver
+  with Dovane's numbers (`RIVAL=r3 HANDS=r4`, the pair a scan of eleven
+  found with the closest race and no wall touched), nothing forced:
+  the game's own camera, score and HUD at a desktop's size, no touch
+  buttons. 1,080 frames a sixtieth of a second apart from step 151 in
+  each shape, 1920x1080 and 1080x1620, about 2.3 s a frame in software
+  with both running. The first 30 frames carry the race's instructions
+  and are left out; the cover (`brand/covers/hero-*`) holds for 0.8 s
+  and fades over 0.4 s into the race. Both 18.3 s, 60 frames a second,
+  silent, 26 and 22 MB, not committed. Joined by ffmpeg: the cover
+  looped for 1.2 s, the frames from `-start_number 30`, `xfade` at 0.8
+  s. Open for the author's eye: the car is small in a window that
+  size, the night is dark, the smoke is the night preset's pink and not
+  the cover's white, and Varsk is behind the camera after the first
+  few seconds.
