@@ -60,6 +60,9 @@ export function createHud(root) {
     <div id="tag" hidden><b id="tagName"></b><span id="tagMult"></span></div>
     <div id="arrow" hidden><span class="ar">&#9650;</span><b id="arrowD"></b></div>
     <div id="prompt1" hidden></div>
+    <div id="park" hidden><b id="parkT"></b><span id="parkP"><i></i><i></i><i></i></span><em id="parkW"></em></div>
+    <div id="parktip" hidden></div>
+    <button type="button" id="plist" aria-label="the park's challenges" title="Challenges (L)" hidden><span>&#9776;</span><b id="plistN"></b></button>
     <button type="button" id="exit" aria-label="back to the title">&#10005;</button>
     <button type="button" id="fs" aria-label="full screen" hidden></button>
     <button type="button" id="snd" aria-label="sound" hidden></button>`;
@@ -142,8 +145,42 @@ export function createHud(root) {
       sx.beginPath(); sx.moveTo(cx + ca * r0, cy + sa * r0); sx.lineTo(cx + ca * (r0 + len), cy + sa * (r0 + len)); sx.stroke();
     }
   }
+  /* THE PARK'S READOUT (briefs/PLAYGROUND.md 2): what is being counted,
+     as it is counted ("DONUTS 3"), three pips for the levels (lit for
+     those this count has reached, gold for those already won and paid),
+     and for a moment the level just won and what it paid. It sits under
+     the total at the top, never over the car. */
+  const parkBox = el.querySelector('#park'), parkT = el.querySelector('#parkT'), parkW = el.querySelector('#parkW'), parkPips = [...el.querySelectorAll('#parkP i')], parkTip = el.querySelector('#parktip'), plist = el.querySelector('#plist'), plistN = el.querySelector('#plistN');
+  const pk = { on: false, text: '', pips: '', won: '', wonT: 0, wonId: null, tipT: 0, tally: '', shown: false };
   return {
-    el, exit, fs, snd,
+    el, exit, fs, snd, plist,
+    /* the park's HUD on or off: the list button with its tally ("7/24") and the readout */
+    setPark(on, tally) {
+      pk.on = !!on; plist.hidden = !on; el.classList.toggle('inpark', !!on);
+      if (!on) { parkBox.hidden = true; parkTip.hidden = true; pk.shown = false; pk.text = ''; pk.pips = ''; pk.won = ''; pk.wonT = 0; pk.tipT = 0; }
+      if (on && tally !== undefined && tally !== pk.tally) { pk.tally = tally; plistN.textContent = tally; }
+    },
+    /* one line on what the park is, for a while */
+    parkTip(text, seconds) { parkTip.textContent = text; parkTip.hidden = false; pk.tipT = seconds || 5; },
+    /* a level just won: { id, label, level (bronze, silver or gold), coins, seconds } */
+    parkWon(w) { pk.wonT = w.seconds || 2.6; pk.wonLabel = w.label; pk.wonLevel = w.level; pk.wonCoins = w.coins; pk.wonId = w.id; },
+    /* every frame in the park: live { id, value, level } from the judge, label and said its words, won the saved level of that challenge */
+    park(live, label, said, won, dt) {
+      if (!pk.on) return;
+      if (pk.tipT > 0) { pk.tipT -= dt; if (pk.tipT <= 0) parkTip.hidden = true; }
+      if (pk.wonT > 0) pk.wonT -= dt;
+      const winning = pk.wonT > 0;
+      const show = winning || !!live.id;
+      if (show !== pk.shown) { pk.shown = show; parkBox.hidden = !show; }
+      if (!show) return;
+      /* while a level just won is up, the line is that challenge's (with its count, if it is the one still being counted) */
+      const text = winning ? pk.wonLabel + (live.id === pk.wonId ? ' ' + said : '') : label + ' ' + said;
+      if (text !== pk.text) { pk.text = text; parkT.textContent = text; }
+      const wonText = winning ? pk.wonLevel.toUpperCase() + (pk.wonCoins ? ' +' + pk.wonCoins : '') : '';
+      if (wonText !== pk.won) { pk.won = wonText; parkW.textContent = wonText; parkBox.className = winning ? 'won ' + pk.wonLevel : ''; if (winning) { parkBox.classList.remove('pop'); void parkBox.offsetWidth; parkBox.classList.add('pop'); } }
+      const lv = live.id && (!winning || live.id === pk.wonId) ? live.level : 0, had = live.id && (!winning || live.id === pk.wonId) ? won : 0, pips = lv + ':' + had;
+      if (pips !== pk.pips) { pk.pips = pips; parkPips.forEach((p, i) => { p.className = i < had ? 'paid' : i < lv ? 'on' : ''; }); }
+    },
     setVisible(on) { el.classList.toggle('hidden', !on); },
     /* text for the lap or distance slot and the clock; '' hides */
     setRun(lap, clock) {

@@ -1,15 +1,15 @@
 /* THE HOST. Makes the scene, the camera, the input, the scoring, the HUD
    and the screens, and runs the game loop: a title, then a run (a
    countdown, the drive, a finish or a lap count, the results), with the
-   daily drift, the career ladder, free drift in the car park and the
+   daily drift, the career ladder, free drift in the stunt park and the
    garage. The physics steps at a fixed 120 Hz from the input record,
    interpolated for drawing at whatever rate the display runs. Every
    step's input is recorded, so a run can be replayed exactly: the ghost
    is the best run's tape driven through a second world in lockstep.
 
    States: title, career, garage (the screens, the menu camera orbiting
-   the car on the line); countdown, drive, results (a run); free (the car
-   park); dev (?ground=track or park: the feel prototype's endless drive,
+   the car on the line); countdown, drive, results (a run); free (the stunt
+   park) and park (its list of challenges); dev (?ground=track or park: the feel prototype's endless drive,
    which the feel probes use through window.__feel).
 
    Query: ?renderer=webgl2 forces the fallback; ?ground=park or track the
@@ -59,6 +59,7 @@ import { battleSpec, battleLaps } from './loop/modes.js';
 import { createTandem } from './scoring/tandem.js';
 import { createLead } from './scoring/lead.js';
 import { createPlayer } from './rivals/players.js';
+import { createParkJudge, restandCones, challengeById, parkTally, sayValue, LEVELS } from './park/challenges.js';
 
 const query = new URLSearchParams(location.search);
 const MAX_STEPS = 8;              // steps per frame before time is dropped
@@ -103,6 +104,8 @@ const app = {
   tandem: createTandem(),   // the close bonus, stepped only in a race (scoring/tandem.js)
   lead: null,               // in a race: the lead gates, the place and the gap (scoring/lead.js)
   dist: 0, distAlong: 0,    // in a race: the player's metres into the run, unwrapped
+  park: null,               // in the stunt park (free drift): the challenges' judge (park/challenges.js), else null
+  parkVisits: 0, parkPaid: 0, inPark: false,   // visits this session (the park's time of day moves on with each), the judge's events already paid, and whether the list was opened from inside the park
 };
 const rivalPose = { x: 0, y: 0, z: 0, yaw: 0, car: null };
 let box = carBox('starter');
@@ -124,6 +127,7 @@ function quantise(rec) {
 function setGround(ground, carId, paintId, start) {
   app.ground = ground;
   app.rival = null; app.lead = null; scene.setRival(null);
+  app.park = null; hud.setPark(false);
   app.world = createWorld(start ? Object.assign({}, ground, { start }) : ground, { tune: carTune(carId, save.state.cars[carId] && save.state.cars[carId].up) });
   box = carBox(carId);
   scene.setGround(ground);
@@ -175,6 +179,7 @@ function resetRun() {
   if (app.missions) app.missions.reset();
   if (app.ghost) app.ghost.reset();
   if (app.rival) app.rival.reset();
+  if (app.park) { app.park.reset(); app.parkPaid = 0; }
   app.tandem.reset(); if (app.lead) app.lead.reset(); app.dist = app.ground.start ? app.ground.start.along || 0 : 0; app.distAlong = app.world.along;
   tape.length = 0; acc = 0; last = -1; app.runTime = 0;
   prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
@@ -199,6 +204,7 @@ function stepOnce(rec) {
     app.tandem.step(world, app.rival, app.dist, ang >= S.MIN_ANGLE && c.speed >= S.MIN_SPEED && c.vx > 0);
     scoring.step(world, STEP, app.tandem.state);
   } else scoring.step(world, STEP);
+  if (app.park) app.park.step(world, scoring.state);   // the park's challenges read the world and the score, and change neither
   if (app.progress) app.progress.step(world);
   if (app.race) app.race.step(world, app.progress.state);
   if (app.lead) app.lead.step(app.progress.state, app.rival.progress.state, app.dist, app.rival.runDistance());
@@ -231,7 +237,7 @@ function frame(t) {
   if (window.__feel.inject) Object.assign(raw, window.__feel.inject);   // the probes' input
   const world = app.world;
   const S = app.state;
-  const menu = S === 'title' || S === 'career' || S === 'rivals' || S === 'garage' || S === 'lab';
+  const menu = S === 'title' || S === 'career' || S === 'rivals' || S === 'garage' || S === 'lab' || S === 'park';
   if (raw.restart && !menu) { if (S === 'dev' || S === 'free') resetRun(); else if (S === 'drive' || S === 'countdown') startRun(app.spec, { onboard: onboard.active }); }
   let rec = quantise(raw);
   let steps = 0;
@@ -314,6 +320,7 @@ function frame(t) {
       app.heardTandem = tc.calloutCount;
     }
   }
+  if (S === 'free' && app.park) parkFrame(dt);
   if (onboard.active) onboard.update(dt, { driving: S === 'drive', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity });
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;
@@ -340,6 +347,7 @@ function showMenu(name) {
   if (name === 'title') screens.title(save.state, titleInfo());
   else if (name === 'career') screens.career(save.state);
   else if (name === 'rivals') showRivals();
+  else if (name === 'park') screens.park(save.state, { inPark: app.inPark });
   else if (name === 'garage') showGarage();
   else if (name === 'lab') showLab();
 }
@@ -675,16 +683,66 @@ function countCoins(delay) {
   }, 33);
 }
 
+/* FREE DRIFT IS THE STUNT PARK (briefs/PLAYGROUND.md): no timer, no
+   results, nothing paid but the challenges' levels, once each. The
+   park's time of day moves on with each visit. */
 function startFree() {
   if (onboard.active) onboard.stop(false);
-  app.spec = { mode: 'free', key: 'free', name: 'Free drift' };
-  app.track = freeGround();
+  app.spec = { mode: 'free', key: 'free', name: 'Stunt park' };
+  app.track = freeGround(LOOP.PARK.PRESETS[app.parkVisits % LOOP.PARK.PRESETS.length]);
+  app.parkVisits++;
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
   app.progress = null; app.race = null; app.ghost = null; app.missions = null; hud.setMissions(null); scene.setGhost(null);
+  app.park = createParkJudge(app.track); app.parkPaid = 0; app.inPark = false;
   app.state = 'free';
   input.setStarted(false);
   screens.hide(); hud.setVisible(true); hud.setRun('', ''); hud.setToBeat(''); input.touch.setVisible(true);
+  hud.setPark(true, parkTallyText());
+  if (scene.park()) scene.park().setWon(save.state.park.won);
   resetRun();
+  /* the first visit: one line on what the park is, once */
+  if (!save.state.park.seen) { hud.parkTip('The stunt park. No timer: drive to a place and try it. Each level of each challenge pays coins once.', LOOP.PARK.TIP_SHOWN); save.setParkSeen(); }
+}
+function parkTallyText() { const t = parkTally(save.state.park.won); return t.won + '/' + t.of; }
+/* Every frame in the park: the levels the judge says were reached since
+   the last frame are paid (the save pays each level once, and the lower
+   ones with a higher one) and celebrated with the game's own spectacle;
+   knocked cones stand up again once the car is away; the readout says
+   what is being counted. */
+let padY = true;
+function parkFrame(dt) {
+  const J = app.park.state;
+  if (J.eventCount < app.parkPaid) app.parkPaid = 0;
+  if (J.eventCount !== app.parkPaid) {
+    for (const ev of J.events.slice(-Math.min(J.events.length, J.eventCount - app.parkPaid))) {
+      const paid = save.parkWin(ev.id, ev.level);
+      if (!paid.levels.length) continue;
+      const top = paid.levels[paid.levels.length - 1], c = challengeById(ev.id);
+      hud.parkWon({ id: ev.id, label: c.label, level: LEVELS[top - 1], coins: paid.coins, seconds: LOOP.PARK.WON_SHOWN });
+      hud.notice(c.name.toUpperCase() + ' ' + LEVELS[top - 1].toUpperCase() + '  +' + paid.coins, 'mission');
+      if (FX_ON) scene.fireworks(top);
+      for (let i = 0; i < top; i++) sound.ui('star', i + 1, i * 0.22);
+      sound.ui('coin', 0, top * 0.22);
+      hud.setPark(true, parkTallyText());
+      if (scene.park()) scene.park().setWon(save.state.park.won);
+    }
+    app.parkPaid = J.eventCount;
+  }
+  restandCones(app.world);
+  const L = J.live, c = L.id ? challengeById(L.id) : null;
+  hud.park(L, c ? c.label : '', c ? sayValue(L.id, L.value) : '', L.id ? (save.state.park.won[L.id] || 0) : 0, dt);
+  /* the list by gamepad: Y (the top face button) opens it */
+  let y = false;
+  try { for (const p of navigator.getGamepads ? navigator.getGamepads() : []) if (p && p.buttons[3] && p.buttons[3].pressed) y = true; } catch (e) { y = false; }
+  if (y && !padY) { openParkList(); padnav.focus(null); }   // the pad opened it, so the pad's ring is up at once and B goes straight back
+  padY = y;
+}
+/* the list from inside the park: the park waits as it is */
+function openParkList() { if (app.state !== 'free' || !app.park) return; app.inPark = true; showMenu('park'); }
+function closeParkList() {
+  if (!app.inPark || !app.park) { menuGround(); showMenu('title'); return; }
+  app.inPark = false; app.state = 'free'; last = -1; acc = 0;
+  screens.hide(); hud.setVisible(true); input.touch.setVisible(true);
 }
 
 function onAction(action, arg) {
@@ -699,6 +757,9 @@ function onAction(action, arg) {
     case 'garage': app.picked = null; app.tab = 'cars'; app.preview = {}; showMenu('garage'); break;
     case 'garage-tab': app.tab = arg; showGarage(); break;
     case 'free': startFree(); break;
+    case 'park': app.inPark = false; showMenu('park'); break;   // the list from the title: DRIVE starts the park
+    case 'park-back': closeParkList(); break;
+    case 'park-info': break;   // a card: nothing to do, it is a button so a gamepad can walk the list
     case 'daily': startRun(dailySpec()); break;
     case 'onboard': startRun(careerSpec(0), { onboard: true }); break;
     case 'lab': if (app.state !== 'lab' && app.lab && app.lab.spec) setLab(app.lab.settings, app.lab.seed); showMenu('lab'); break;   // back from a run: the car to the line, the backdrop as the Lab left it
@@ -757,6 +818,13 @@ function onAction(action, arg) {
   }
 }
 hud.exit.addEventListener('click', () => { if (app.state !== 'dev') { menuGround(); showMenu('title'); } });
+/* the park's list: its button in the HUD, or L or Tab on a keyboard (Escape or the same key comes back) */
+hud.plist.addEventListener('click', e => { e.stopPropagation(); sound.ui('tap'); openParkList(); });
+window.addEventListener('keydown', e => {
+  if (e.code !== 'KeyL' && e.code !== 'Tab' && e.code !== 'Escape') return;
+  if (app.state === 'free' && app.park && e.code !== 'Escape') { e.preventDefault(); openParkList(); }
+  else if (app.state === 'park' && app.inPark) { e.preventDefault(); closeParkList(); }
+});
 /* full screen: a button in the HUD beside the exit, and one on the title */
 if (fullscreenSupported()) { hud.fs.hidden = false; hud.fs.innerHTML = fullscreenIcon(false); }
 hud.fs.addEventListener('click', e => { e.stopPropagation(); toggleFullscreen(); });
@@ -840,6 +908,7 @@ window.__loop = {
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor, battleSpec: id => battleSpec(rivalById(id)), RIVALS, TANDEM,
   get showroom() { return showroomNow(); }, garage: () => ({ picked: app.picked, tab: app.tab, preview: { ...app.preview } }),
   portraits,
+  park: () => app.park, parkList: { open: openParkList, close: closeParkList },
   rival: () => app.rival, tandem: () => app.tandem.state, lead: () => app.lead && app.lead.state,
   /* the probes: the next battle's rival with a start offset, a grip share or a driving number changed (rivals/rival.js opts); null for none */
   setRivalProbe(o) { app.rivalProbe = o || null; },

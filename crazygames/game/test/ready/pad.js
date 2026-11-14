@@ -25,7 +25,7 @@ const PAD = `
     while (q.length) { const k = q.shift(); for (const d of dirs) { N.focus(k); tap(DIR[d]); if (!seen.has(N.key)) { seen.add(N.key); q.push(N.key); } } }
     N.focus(start); return { start, seen: [...seen] }; };
 `;
-const SCREENS = ['title', 'career', 'rivals', 'garage', 'lab'];
+const SCREENS = ['title', 'career', 'rivals', 'garage', 'lab', 'park'];   // park: the stunt park's list of challenges (briefs/PLAYGROUND.md), as the title opens it
 for (const vp of [{ width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 720 }]) {
   const tag = vp.width + 'x' + vp.height, pg = await R.emptyPage(env, vp, '');
   await pg.page.evaluate(() => { const S = window.__loop.save; S.state.coins = 99999; });
