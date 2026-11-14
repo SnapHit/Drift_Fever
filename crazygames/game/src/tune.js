@@ -321,7 +321,7 @@ export const LOOP = {
       donut:  [1, 4, 10],         // full turns round the donut pillar in one slide
       eight:  [2, 4, 8],          // links of the figure eight in one chain (two links are one whole eight)
       slalom: [3, 5, 7],          // cones passed on alternate sides in one chain, none knocked
-      wall:   [20, 60, 140],      // m slid close beside the long wall without a touch (round the inside of its curve is about 65 m a lap)
+      wall:   [15, 40, 90],       // m slid close beside the long wall without a touch (round the inside of its curve is about 65 m a lap). Were 20, 60 and 140 with a 2.5 m lane: after play on 15 November the author, in the best car fully upgraded, never passed 20 m in many tries
       gate:   [55, 85, 110],      // km/h through a gate, sideways
       slide:  [100, 400, 1200],   // m in one unbroken slide
       chain:  [400, 2500, 10000], // points of one banked chain
@@ -339,7 +339,7 @@ export const LOOP = {
     },
     GRACE:          0.35,    // s a slide may drop under the scoring angle and still be the same slide, for the donut and the wall ride (a flicker, not a break)
     DONUT_SHOWN:    0.25,    // turns round the pillar before the readout says DONUTS
-    WALL_NEAR:      2.5,     // m between the car's body and the long wall that counts as beside it
+    WALL_NEAR:      6,       // m between the car's body and the long wall that counts as beside it (was 2.5, a lane too thin for thumbs)
     WALL_SHOWN:     3,       // m of wall ride before the readout says so
     GATE_ANGLE:     25,      // degrees of slide through a gate for it to count as sideways
     GATE_CLEAN:     0.25,    // s since the last wall contact for a gate to count
@@ -376,6 +376,7 @@ export const LOOP = {
      First guesses, out of 24 in each chapter. */
   CHAPTERS: {
     OPEN:             [0, 12, 14],
+    STAR_SCALE:       [1, 1.5, 1.5],   // a chapter's star targets as a multiple of the plain ones (modes.js starScale). After play on 15 November 2026: in the fastback the author won three stars on every Pro track, with double the points on some. Only the targets move: what a clean sector, the pace and a lead pay still come from the plain first star, and stars already won are kept
   },
   /* FIRST-RUN ONBOARDING (briefs/RETENTION.md 1): the first visit skips
      the title and lands in career track 1, with short prompts at the
@@ -405,6 +406,8 @@ export const TANDEM = {
   LAPS:             2,       // laps of a circuit in a race, for a rival with no laps of his own (rivals/roster.js), so a race stays near 60 to 120 s
   /* the grid: level, side by side, either side of the centre line */
   GRID_SIDE:        2.2,     // m each car starts from the centre line, the rival on his side (roster) and the player on the other
+  /* what a rival's drift is worth: his drift points count this share in the race's total, unless his own entry in rivals/roster.js says another (driftShare). His driving and pace are untouched; only what his slides pay moves. After play on 15 November 2026: the author, in the fastback, found Varsk's and Dovane's pace right and their drift points about double anything he could make */
+  RIVAL_DRIFT:      1,
   /* being ahead pays: at each checkpoint and each lap's line the first car there banks a lead bonus, and the first across the finish a larger one */
   LEAD_SHARE:       2.2,     // of the track's first star, shared over the race's lead gates (every checkpoint and lap line before the finish). Was 0.45, at which leading all the way was worth a sixth of his score: with this and LINE_SHARE, a player who leads Kestrow all the way and never slides about ties him, so any sliding wins it
   LINE_SHARE:       1.0,     // of the first star, to the first car across the finish (was 0.3)

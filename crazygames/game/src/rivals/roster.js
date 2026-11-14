@@ -6,6 +6,15 @@
    (rivals/driver.js RIVAL_DRIVE). First guesses for the author to set
    by play; the measurements in game/test/rivals/ say how each drives.
 
+   driftShare (15 November 2026, after play): the share of his drift
+   points the race counts (TANDEM.RIVAL_DRIFT when he has none). The
+   author found Varsk's and Dovane's pace right in the fastback and
+   their drift points about double his own: he beat Varsk only just,
+   after many tries, and Dovane never. So Varsk counts 0.9 (6,001 of
+   his own, was 6,581), Dovane 0.75 (5,043, was 6,464) and Sarrow, not
+   yet raced at his new pace, 0.8 (4,874, was 5,914). Their driving is
+   untouched. First guesses for play.
+
    look (briefs/GARAGE.md 2): the wheels a rival wears, in his race and
    on his portrait: gunmetal turbines for Varsk, gold deep fours on
    Dovane's wine, thin daggers on Halvik's hatch, white discs on
@@ -25,12 +34,12 @@ export const RIVALS = [
     style: 'Quick, linking shallow slides',   // measured: 22 degrees on average, as shallow as Kestrow, but his best chain is 1,160 points to Kestrow's 216 and he beats the grip player home
     /* the ladder (briefs/RIVALS-LADDER.md): Tight city, three laps; his driving searched with a player's hands from Kestrow's (game/test/ladder/search.js), then his corner entry speed set by hand to the one value nearby that passes measure 2 */
     drive: { SLIDE_GAIN: 0.35, PROGRESS: 45, KEEP: 325, ANGLE_CAP: 21.56, EDGE_SAFE: 2.37, EDGE_COST: 2875, ENTRY: 26.2, VMAX: 33.14, CHAIN_KEEP: 0, CHAIN_MARGIN: 0.34, AY_MAX: 7.28, OUTSIDE: 0.157, SETUP: 39.95, WINDOW_PRE: 3.98, WINDOW_POST: -5.28, LINK: 4.81, HB_TIME: 0.1, HB_OVER: 0.75, HB_STEER: 0.35 } },
-  { id: 'r3', name: 'Varsk', car: 'fastback', paint: 'lime', track: 8, side: 1, prize: 600, laps: 3, look: { wheels: 'turbines' },
+  { id: 'r3', name: 'Varsk', car: 'fastback', paint: 'lime', track: 8, side: 1, prize: 600, laps: 3, driftShare: 0.9, look: { wheels: 'turbines' },
     style: 'Late and aggressive',
     /* the third ladder round (briefs/RIVALS-LADDER-3.md): Upper deck, three laps, searched for the driving bar on a plateau from the ladder round's numbers (game/test/ladder3/search.js, review/ladder3/runs/search/r3-d.log). In the game since 13 November 2026 by the author's decision after play: 20 of 20 disturbed runs pass, but 2 of his 38 one per cent moves miss (one run each), and the strong driver cannot beat him on pace (review/ladder3/REPORT.md); this is the closest found */
     drive: {"SLIDE_GAIN":0.445,"PROGRESS":40,"KEEP":578,"ANGLE_CAP":29.2,"EDGE_SAFE":2.86,"EDGE_COST":2646,"ENTRY":25.85,"VMAX":33.8,"CHAIN_KEEP":0,"CHAIN_MARGIN":0.36,"AY_MAX":7.29,"OUTSIDE":0.49,"SETUP":52.23,"WINDOW_PRE":3,"WINDOW_POST":-7.89,"LINK":3.79,"HB_TIME":0.302,"HB_OVER":1.86,"HB_STEER":0.35} },
   /* the pace round (briefs/RIVALS-PACE.md, review/pace/REPORT.md), 14 November 2026: the author beat all six first time from an empty save, so these three were searched again, each on his own, for more points a second (his multiple of his track's three star rate, ladder3/ruler.js), each passing the driving bar in the page, at most 2 of 20 disturbed runs missing it and at most 4 of his 38 one per cent moves. Before it they were the closest setups a scan found (game/test/play13/scan.js): Dovane x2.90, Halvik x3.29 (every disturbed run missing the bar), Sarrow x3.93 */
-  { id: 'r4', name: 'Dovane', car: 'fastback', paint: 'wine', track: 12, side: -1, prize: 800, laps: 3, look: { wheels: 'fours' },
+  { id: 'r4', name: 'Dovane', car: 'fastback', paint: 'wine', track: 12, side: -1, prize: 800, laps: 3, driftShare: 0.75, look: { wheels: 'fours' },
     style: 'Long, linked slides',
     /* after play, 14 November 2026: the author could not beat him in the best car he could afford ("just a little" too fast), so his slide gain is 1.3, not the search's 1.5: 83.3 s for 6,464, x5.18 of the three star rate (was 6,961, x5.55), 0 of 20 disturbed runs and 0 of 38 one per cent moves miss */
     /* a driving found at random and searched in the fastback (review/pace/runs/d-explore2.log, d3-a.log, its best at 102), in the plain fastback over three laps of Over and under (was Tolvo's driving in the tourer with two steps, 94.0 s for 4,086) */
@@ -39,7 +48,7 @@ export const RIVALS = [
     style: 'Short and sharp in the light hatch',   // the shortest race of the six (68.6 s); his angles (29 degrees on average) are no longer the biggest, Dovane's are (33)
     /* Dovane's family of driving found again on High wire (review/pace/runs/h-explore2.log) and searched in the plain hatch (h2-a.log, then h3-a.log at two laps, its best at 31): short of his target, the highest setup found that passes all three bars (was his own driving in the drift build, 92.1 s for 4,338, every disturbed run missing) */
     drive: {"SLIDE_GAIN":1.5,"PROGRESS":99,"KEEP":378,"ANGLE_CAP":35.79,"EDGE_SAFE":1.35,"EDGE_COST":2601,"ENTRY":28.52,"VMAX":34,"CHAIN_KEEP":2044,"CHAIN_MARGIN":0.16,"AY_MAX":5.46,"OUTSIDE":0.676,"SETUP":45.49,"WINDOW_PRE":9.84,"WINDOW_POST":16.2,"LINK":16.32,"HB_TIME":0.1,"HB_OVER":4.53,"HB_STEER":0.28} },
-  { id: 'r6', name: 'Sarrow', car: 'starter', paint: 'white', track: 20, side: -1, prize: 1500, laps: 3, up: { power: 1, grip: 1, steer: 1 }, look: { wheels: 'discs' },
+  { id: 'r6', name: 'Sarrow', car: 'starter', paint: 'white', track: 20, side: -1, prize: 1500, laps: 3, up: { power: 1, grip: 1, steer: 1 }, driftShare: 0.8, look: { wheels: 'discs' },
     style: 'Beats you in the starter coupe',
     /* no clean setup at his target in a fast car (review/pace/runs/s1-a.log, s2-a.log), so the starter with one step of each upgrade, a driving found at random (s-explore3.log) and searched (s3-a.log), three laps of Endless eight (was Varsk's driving in the plain starter, 94.2 s for 5,201) */
     drive: {"SLIDE_GAIN":0.676,"PROGRESS":125,"KEEP":827,"ANGLE_CAP":50.96,"EDGE_SAFE":0.8,"EDGE_COST":713,"ENTRY":27.79,"VMAX":30.16,"CHAIN_KEEP":3030,"CHAIN_MARGIN":0.56,"AY_MAX":5.39,"OUTSIDE":0.148,"SETUP":78.45,"WINDOW_PRE":14.24,"WINDOW_POST":6.96,"LINK":12.27,"HB_TIME":0.336,"HB_OVER":5.04,"HB_STEER":0.07} },

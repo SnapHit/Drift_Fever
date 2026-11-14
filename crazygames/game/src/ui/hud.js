@@ -274,7 +274,7 @@ export function createHud(root) {
     battle(t, rival, mine, rv, camera, THREE, view, dt, counting, lead, marginOf) {
       if (!bat.on) return;
       const L = lead || { player: { total: 0 }, rival: { total: 0 }, place: 1, gap: 0, events: [], eventCount: 0 };
-      const theirs = rival.scoring.state.total + L.rival.total, ours = mine.total + L.player.total;
+      const theirs = rival.points() + L.rival.total, ours = mine.total + L.player.total;
       /* the pill is the points, which decide the race: his total and how far ahead or behind on points the player is. "Leads" is never said here: who is ahead on the road is the place under the car */
       const shown = counting ? '' : String(theirs);
       if (shown !== bat.lastN) { bat.lastN = shown; vsN.textContent = shown; }

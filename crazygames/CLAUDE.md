@@ -818,3 +818,31 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   targets and coins, the curved wall's 2.5 m lane on a phone, the
   pillar fade, list first then DRIVE. Not measured: a real GPU, a
   phone, thumbs, the high tier's frame cost.
+- 15 November 2026, after the author's third empty save run and his
+  first of the stunt park ("brilliant" in the drift build fully
+  upgraded). Three changes, `game/test/play15/check.js`.
+  (1) **A rival's drift counts at a share** (`TANDEM.RIVAL_DRIFT` 1,
+  `driftShare` in `rivals/roster.js`, `points()` in `rivals/rival.js`).
+  In the fastback he found Varsk's and Dovane's pace "more or less
+  perfect" and their drift points about double his own: Varsk beaten
+  only just after many tries, Dovane never. Their driving is untouched;
+  the race counts Varsk's drift at 0.9 (6,001 of his own, was 6,581),
+  Dovane's at 0.75 (5,043, was 6,464) and Sarrow's, unplayed at his new
+  pace, at 0.8 (4,874, was 5,914). Kestrow, Tolvo and Halvik count in
+  full. His own scoring and hash never know of it. The lesson: a
+  machine with a player's hands links slides a thumb cannot, so a
+  rival's points a second say nothing about what a player can match.
+  (2) **Pro and Legend ask 1.5 times the star targets**
+  (`LOOP.CHAPTERS.STAR_SCALE`, `starScale` in `loop/modes.js`): in the
+  fastback he won three stars on every Pro track, with double the
+  points on some. Only a career run's targets move; clean sectors, the
+  pace, leads and missions still come from the plain first star, races
+  and the daily are not scaled, and stars already won are kept. Legend
+  has not been played at either scale.
+  (3) The wall ride: he never passed 20 m. Its lane is 6 m (was 2.5)
+  and its levels 15, 40 and 90 m (were 20, 60, 140).
+  All first guesses for play. Open: `.github/workflows/
+  crazygames-parity.yml` has failed since GitHub's runner moved to
+  Ubuntu 26.04 (the pinned Playwright cannot install there); it is
+  outside this folder and waits for the author's word. Deploys are
+  not affected.

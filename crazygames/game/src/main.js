@@ -42,7 +42,7 @@ import { createRace } from './scoring/race.js';
 import { fullscreenSupported, toggleFullscreen, onFullscreenChange, fullscreenIcon } from './ui/fullscreen.js';
 import { createSound, soundIcon } from './audio/sound.js';
 import { createGhost, compactTape } from './loop/ghost.js';
-import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, careerSpec, dailySpec, careerUnlocked, starTargets, starsFor, coinsFor, lapsFor } from './loop/modes.js';
+import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, careerSpec, dailySpec, careerUnlocked, starTargets, starScale, starsFor, coinsFor, lapsFor } from './loop/modes.js';
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
@@ -505,7 +505,7 @@ function startRun(spec, opts) {
   /* a race starts level: the rival on his side of the grid, the player on the other */
   setGround(app.track, carId, paint, raceDef ? gridStart(app.track, -(raceDef.side || 1)) : null);
   app.laps = raceDef ? battleLaps(app.track, raceDef) : lapsFor(app.track);
-  app.targets = starTargets(app.track, app.laps);
+  app.targets = starTargets(app.track, app.laps, starScale(spec));
   app.progress = createProgress(app.track, app.laps);
   app.race = createRace(app.track, app.laps, scoring);
   /* the career tracks and the daily carry missions; the Lab does not */
@@ -608,7 +608,7 @@ function finishBattle() {
   if (!R.state.finished) { R.finishRun(); app.rivalRanOn = true; }
   /* first home, the player is also paid for every second he was clear (TANDEM.MARGIN_SHARE) */
   const clear = L.owner[L.gates - 1] === 'player' ? Math.max(0, R.state.finishTime - (app.finishT || app.runTime)) : 0, clearPts = app.lead.margin(clear);
-  const score = scoring.state.total + L.player.total + clearPts, them = R.scoring.state.total + L.rival.total, won = score >= them, margin = score - them;
+  const score = scoring.state.total + L.player.total + clearPts, them = R.points() + L.rival.total, won = score >= them, margin = score - them;
   const before = openRivals(save.state);
   const first = save.rivalResult(def.id, won, margin);
   const opened = openRivals(save.state).find(id => !before.includes(id)) || null;
@@ -620,7 +620,7 @@ function finishBattle() {
   const s = scoring.state, rs = R.scoring.state;
   app.results = { finished: true, battle: true, tip, mode: 'battle', score, best: s.best, rival: { id: def.id, name: def.name, total: them, seconds: R.state.finishTime }, won, margin, first, prize: first ? def.prize : 0,
     tandem: s.tandem, parts: { drift: s.drift - s.tandem, clean: s.clean, pace: s.pace, leads: L.player.lead, line: L.player.line, close: s.tandem, clear: clearPts, clearS: clear },
-    rivalParts: { drift: rs.drift, clean: rs.clean, pace: rs.pace, leads: L.rival.lead, line: L.rival.line, close: 0 },
+    rivalParts: { drift: R.driftPoints(), clean: rs.clean, pace: rs.pace, leads: L.rival.lead, line: L.rival.line, close: 0 },
     gates: L.gates, leadGates: L.player.gates, rivalGates: L.rival.gates, lineTo: L.owner[L.gates - 1] || null, changes: L.changes,
     coins, name: spec.name, label: runHead(spec).label, seconds: app.runTime, laps: app.laps, kind: app.track.kind, steps: tape.reduce((n, e) => n + e.n, 0), hash: app.world.hash(), rivalHash: R.hash(),
     offer: opened ? { id: opened, name: rivalById(opened).name } : null, next: nextRival(def), career: careerNext(), nextIndex: null, best2: (save.state.rivals[def.id] || {}).best };

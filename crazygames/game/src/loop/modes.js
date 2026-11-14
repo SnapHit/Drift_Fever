@@ -154,9 +154,15 @@ export function starRate(track) {
   const d = track.requested && track.requested.difficulty !== undefined ? track.requested.difficulty : 0.5;
   return LOOP.STAR_RATE * (1 - d * LOOP.STAR_HARD_EASE);
 }
-export function starTargets(track, laps) {
-  const base = runMetres(track, laps) * starRate(track);
+export function starTargets(track, laps, scale) {
+  const base = runMetres(track, laps) * starRate(track) * (scale || 1);
   return LOOP.STAR_LEVELS.map(k => Math.round(base * k / 10) * 10);
+}
+
+/* how much more a run's star targets ask than the plain ones: a career run's chapter (LOOP.CHAPTERS.STAR_SCALE), 1 for anything else */
+export function starScale(spec) {
+  const k = spec && spec.mode === 'career' ? LOOP.CHAPTERS.STAR_SCALE[chapterOf(spec.index)] : 1;
+  return k > 0 ? k : 1;
 }
 
 export function starsFor(score, targets) { let n = 0; for (const t of targets) if (score >= t) n++; return n; }

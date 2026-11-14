@@ -112,8 +112,12 @@ export function createRival(track, def, laps, opts) {
     return bodyOut;
   }
   /* his run's hash: the world at his finish, and his total (before it, the world now) */
+  /* what the race counts for him: his own score with his drift points at his share (TANDEM.RIVAL_DRIFT, or driftShare in his roster entry). His own scoring, and so his hash, never knows of it */
+  const share = def.driftShare === undefined ? TANDEM.RIVAL_DRIFT : def.driftShare;
+  const driftPoints = () => Math.round(scoring.state.drift * share);
+  const points = () => scoring.state.total - scoring.state.drift + driftPoints();
   const hash = () => st.finishHash || world.hash() + '|' + scoring.state.total + ',' + st.finishStep;
-  return { def, world, scoring, progress, race, driver, driverMode: () => driver.mode, state: st, box, reset, step, finishRun, pose, runDistance, solid, body, hash };
+  return { def, world, scoring, points, driftPoints, progress, race, driver, driverMode: () => driver.mode, state: st, box, reset, step, finishRun, pose, runDistance, solid, body, hash };
 }
 
 /* the measurements' grip disturbance: the rival's car with both axles'
