@@ -31,12 +31,15 @@
 
    THREE SITE SPECIFIC CHANGES, and only three.
 
-   1. THE FRAME IS "/", the game at the repo root serving double duty,
-      rather than a play/ path. No copy in a play/ folder: one file, one
-      source of truth, and every future game update reaches all seven
-      pages with no action here.
+   1. THE FRAME IS "/classic/", the original one file game. Until 15
+      November 2026 it was "/", where that game then lived; the 3D game
+      is at "/" now and its controls do not fit a frame this small (its
+      buttons sit under the bezel's notch and the cabinet's own expand
+      button), so the machine keeps the game it was built round. Still
+      one file and one source of truth: build-site.js publishes the
+      repository's index.html there.
 
-   2. BOTH WAYS OUT POINT AT "/" IN A NEW TAB. On snap-hit the marquee
+   2. BOTH WAYS OUT POINT AT "/" IN A NEW TAB, which is now the 3D game. On snap-hit the marquee
       and the button leave for the game's own domain; here that domain
       is the one the reader is already on, so both go to the front page,
       which is the game. They are kept rather than dropped because the
@@ -73,8 +76,8 @@
 (function () {
   'use strict';
 
-  var SRC = '/';                 // the game, at the root of this site
-  var OUT = '/';                 // where both ways out go, in a new tab
+  var SRC = '/classic/';         // the original game, which fits the machine (see 1 above)
+  var OUT = '/';                 // where both ways out go, in a new tab: the front page, the 3D game
   var NAME = 'Drift Fever';
   var HOLD_MS = 20000;           // the loading card's last resort
   var MARGIN = 120;              // px of slack around the viewport, both ways

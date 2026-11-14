@@ -11,16 +11,23 @@
 # publish out of a repository, and Jekyll never ran.
 #
 # THE SITE IS A CLOUDFLARE WORKER. wrangler.jsonc points the assets
-# directory at the repository root, driftfever.com and www are custom
-# domains on it, and `npx wrangler deploy` is the deploy. What reaches
-# the web is decided by .assetsignore, which is an allowlist.
+# directory at site/, which build-site.js assembles before every deploy;
+# driftfever.com and www are custom domains on it, and `npx wrangler
+# deploy` is the deploy. What reaches the web is decided by
+# build-site.js, which is an allowlist: it copies what is published and
+# nothing else.
 #
-# THE FIRST CHECK IS THE ONE THAT MATTERS. It compares the live
-# index.html against the one in this working tree, by byte count. Two
-# numbers. If they differ the deploy has not landed, and that single
-# line would have caught the frozen site, the failed builds and the
+# SINCE 15 NOVEMBER 2026 THE FRONT PAGE IS THE 3D GAME from crazygames/
+# and the original one file game is at /classic/.
+#
+# THE FIRST CHECKS ARE THE ONES THAT MATTER. They compare the live games
+# against this working tree, by byte count: the original at /classic/
+# against index.html (plus the 32 bytes build-site.js adds to its head,
+# CLASSIC_DELTA there), and the 3D game's main module against
+# crazygames/game/src/main.js. If they differ the deploy has not landed,
+# and that would have caught the frozen site, the failed builds and the
 # stale content together. Everything after it assumes the site is
-# current; if the first check fails, fix that before reading the rest.
+# current; if the first checks fail, fix that before reading the rest.
 #
 # Two optional arguments, both for testing this script rather than the
 # site: where to fetch from, and what the canonical tags should say.
@@ -41,6 +48,7 @@ ok()  { pass=$((pass+1)); printf '  ok    %s\n' "$1"; }
 bad() { fail=$((fail+1)); printf '  FAIL  %s\n' "$1"; }
 
 PATHS="/
+/classic/
 /car-games-online/
 /where-to-play-drift-hunters/
 /browser-games-official-sites/
@@ -51,19 +59,33 @@ PATHS="/
 
 # ------------------------------------------------------------------
 printf '\n== IS THE LIVE SITE THIS BUILD\n\n'
-LOCAL=$(wc -c < "$HERE/index.html" | tr -d ' ')
+CLASSIC_DELTA=32   # the bytes build-site.js adds to the original game's head
+LOCAL=$(( $(wc -c < "$HERE/index.html" | tr -d ' ') + CLASSIC_DELTA ))
 # --compressed, so the number is the decoded size whatever the Worker
 # chose to do on the wire, which is what makes it comparable to a file
 # on disk at all.
-LIVE=$(curl -sS --compressed "$BASE/" | wc -c | tr -d ' ')
-printf '  repo index.html %s bytes\n  live index.html %s bytes\n' "$LOCAL" "$LIVE"
+LIVE=$(curl -sS --compressed "$BASE/classic/" | wc -c | tr -d ' ')
+printf '  repo index.html as published %s bytes\n  live /classic/ %s bytes\n' "$LOCAL" "$LIVE"
 if [ "$LOCAL" = "$LIVE" ]; then
-  ok "the live game is this build"
+  ok "the live original game is this build"
 else
   bad "THE DEPLOY HAS NOT LANDED. live $LIVE, repo $LOCAL, difference $((LIVE - LOCAL))"
   printf '        run: npx wrangler deploy\n'
   printf '        everything below is measured against a stale site.\n'
 fi
+
+LOCAL3=$(wc -c < "$HERE/crazygames/game/src/main.js" | tr -d ' ')
+LIVE3=$(curl -sS --compressed "$BASE/src/main.js" | wc -c | tr -d ' ')
+printf '  repo 3D game main.js %s bytes\n  live /src/main.js %s bytes\n' "$LOCAL3" "$LIVE3"
+if [ "$LOCAL3" = "$LIVE3" ]; then
+  ok "the live 3D game is this build"
+else
+  bad "THE 3D GAME IS NOT THIS BUILD. live $LIVE3, repo $LOCAL3"
+fi
+# the front page is the 3D game and may be indexed (the preview's noindex line is replaced at build)
+FRONT=$(curl -sS --compressed "$BASE/")
+case "$FRONT" in *'src="src/main.js"'*) ok "the front page is the 3D game" ;; *) bad "the front page is not the 3D game" ;; esac
+case "$FRONT" in *noindex*) bad "the front page says noindex" ;; *) ok "the front page may be indexed" ;; esac
 
 # WHO IS ANSWERING, printed rather than asserted. The whole of this
 # session was caused by nobody knowing which host was serving the
@@ -111,7 +133,7 @@ else
 fi
 
 # ------------------------------------------------------------------
-printf '\n== THE EIGHT PAGES, DIRECT, NO REDIRECT FOLLOWED\n\n'
+printf '\n== THE NINE PAGES, DIRECT, NO REDIRECT FOLLOWED\n\n'
 for p in $PATHS; do
   code=$(curl -sS -o /dev/null -w '%{http_code}' "$BASE$p")
   if [ "$code" = "200" ]; then
@@ -171,8 +193,9 @@ done
 
 # ------------------------------------------------------------------
 printf '\n== THE REST OF WHAT MUST NOT BE PUBLISHED\n\n'
-for p in /brand/ /brand/make-og-card.js /build-pages.js /publish-check.sh \
-         /wrangler.jsonc /_config.yml /CNAME /package.json /node_modules/; do
+for p in /brand/ /brand/make-og-card.js /build-pages.js /build-site.js /publish-check.sh \
+         /wrangler.jsonc /_config.yml /CNAME /package.json /node_modules/ \
+         /crazygames/ /crazygames/CLAUDE.md /site/ /greybox/ /status/ /lab/; do
   code=$(curl -sSL -o /dev/null -w '%{http_code}' "$BASE$p")
   [ "$code" = "404" ] && ok "404   $p" || bad "$code, NOT 404   $p"
 done
@@ -181,8 +204,8 @@ done
 printf '\n== THE SITEMAP AND ROBOTS\n\n'
 sm=$(curl -sS "$BASE/sitemap.xml" | tr '<' '\n' | grep '^loc>' | sed 's/^loc>//')
 n=$(printf '%s\n' "$sm" | grep -c 'http')
-[ "$n" = "8" ] && ok "the sitemap lists exactly 8 URLs" \
-                || bad "the sitemap lists $n URLs, expected 8"
+[ "$n" = "9" ] && ok "the sitemap lists exactly 9 URLs" \
+                || bad "the sitemap lists $n URLs, expected 9"
 for u in $sm; do
   case "$u" in
     "$CANON"/*) ;;
@@ -190,12 +213,12 @@ for u in $sm; do
   esac
   case "$u" in */) ;; *) bad "sitemap entry has no trailing slash: $u"; continue ;; esac
   want=$(printf '%s\n' "$PATHS" | grep -c "^${u#$CANON}\$")
-  [ "$want" = "1" ] && ok "in the sitemap and in the eight   ${u#$CANON}" \
-                    || bad "sitemap lists a URL that is not one of the eight: $u"
+  [ "$want" = "1" ] && ok "in the sitemap and in the nine   ${u#$CANON}" \
+                    || bad "sitemap lists a URL that is not one of the nine: $u"
 done
 for p in $PATHS; do
   printf '%s\n' "$sm" | grep -q "^$CANON$p\$" \
-    || bad "one of the eight is missing from the sitemap: $p"
+    || bad "one of the nine is missing from the sitemap: $p"
 done
 
 # ------------------------------------------------------------------

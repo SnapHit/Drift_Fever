@@ -187,9 +187,19 @@ session. The preview URL is https://drift-fever-crazygames.novlrgames.workers.de
 unlisted, by the author's decision on 16 October 2026: no Cloudflare Access.
 `SETUP.md` has the exact steps, for the parts only the author can do.
 
-The live site never serves this folder: the root `.assetsignore` is an
-allowlist and `crazygames/` is not on it. `/crazygames/` on driftfever.com
-is a 404 and that is checked after a deploy.
+**Since 15 November 2026 the new game is also the front page of
+driftfever.com**, by the author's decision, with the original at
+`/classic/`. The root's `build-site.js` runs this folder's
+`tools/build-site.js` and publishes `dist/` without the greybox, status
+and lab pages; it replaces `game/index.html`'s `noindex` line, which the
+preview keeps, with the canonical and share tags, so that line must stay
+exactly one line. So every push to `main` that changes `game/` changes
+the live site: after a deploy check the preview's files AND
+driftfever.com's (`../publish-check.sh`; `/src/main.js` there matches
+`game/src/main.js`, `/classic/` is the root `index.html` plus 32 bytes).
+The folder itself is still never served: `/crazygames/` on driftfever.com
+is a 404. A save on the preview does not follow a player to
+driftfever.com: storage belongs to the origin.
 
 The deploy build checks the parity stamp rather than running the browser
 test, because the Workers build image is not guaranteed to have Chromium: a
@@ -847,3 +857,11 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   day its runner is pinned to `ubuntu-24.04` (the live workflow and
   the copy in `ci/parity.yml`). Unpin it when Playwright is next
   raised.
+- 15 November 2026, **the swap**: this game is the front page of
+  driftfever.com and the original is at `/classic/` (the root
+  `build-site.js`, `wrangler.jsonc`, `publish-check.sh` and `CLAUDE.md`,
+  in their own session). The page's icon is the original's orange D and
+  its description no longer says CrazyGames edition. The rule "a
+  crazygames session changes nothing outside `crazygames/`" stands; the
+  earlier lines here that say driftfever.com is unchanged at 1,594,540
+  bytes describe the site before the swap.
