@@ -107,7 +107,8 @@ export function buildDressing(THREE, ground, o) {
   const lights = [];   // { kind, x, y, z, foot: { x, y, z } }: every lamp head and tower lamp, for the flares and the reflections
   const stands = [];   // the grandstands' crowd boxes, for the flashes
   const info = { drawCalls: 0, triangles: 0, lamps: 0, pools: 0 };
-  if (!n) return { group, update() {}, clear() {}, dispose() {}, info, lights, fireworks: () => {} };
+  /* a ground with no road (the stunt park, the old car park): nothing of the road's is built, only the fireworks, which a level won in the park lets off (briefs/PLAYGROUND.md); the park's own lamps and paint are env/park.js */
+  const road = n > 0;
   const closed = ground.kind === 'circuit';
   const left = ground.walls && ground.walls[0], right = ground.walls && ground.walls[1];
   const wallOff = (i, sgn) => { const w = sgn > 0 ? left : right, c = C[i]; if (!w || !w.points[i]) return c.width / 2; const p = w.points[i]; return Math.abs((p.x - c.x) * -Math.cos(c.heading) + (p.z - c.z) * Math.sin(c.heading)); };
@@ -115,7 +116,7 @@ export function buildDressing(THREE, ground, o) {
   /* ---- the lamp row ---- */
   const placed = (env && env.placed) || {};
   const have = (placed.lamp || []).map(l => [l.x, l.z]);
-  if (dark) {
+  if (dark && road) {
     const props = buildProps(THREE, theme, (ground.seed >>> 0) || 1);
     const list = [];
     const length = ground.length || n * 2;
@@ -185,7 +186,7 @@ export function buildDressing(THREE, ground, o) {
 
   /* ---- reflective tape along the barriers ---- */
   const carPos = T.uniform(new THREE.Vector3());
-  if ((DRESS.TAPE_CATCH[preset.name] || 0) > 0 && left && right) {
+  if (road && (DRESS.TAPE_CATCH[preset.name] || 0) > 0 && left && right) {
     const pos = [], idx = [];
     for (const [w, sgn] of [[left, 1], [right, -1]]) {
       const segs = closed ? n : n - 1;
@@ -217,7 +218,7 @@ export function buildDressing(THREE, ground, o) {
 
   /* ---- the start grid and the chequered line ---- */
   const start = ground.startLine === undefined ? 8 : ground.startLine;
-  {
+  if (road) {
     const quads = [], cols = [];
     const paint = new THREE.Color().setHex(DRESS.GRID_COLOUR), black = new THREE.Color(0.02, 0.02, 0.025);
     const put = (s, u0, u1, a0, a1, colour) => {
