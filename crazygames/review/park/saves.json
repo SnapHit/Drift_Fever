@@ -1,0 +1,66 @@
+{
+ "main": "0533f2b",
+ "old": {
+  "chars": 2846,
+  "same": true,
+  "repaired": 0,
+  "nothing": true,
+  "key": true,
+  "hadPark": false,
+  "known": true
+ },
+ "pay": {
+  "paid": 2530,
+  "want": 2530,
+  "again": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "reload": {
+   "repaired": 0,
+   "again": [
+    0,
+    0,
+    0
+   ],
+   "next": 500
+  },
+  "known": 850
+ },
+ "inMain": {
+  "threw": null,
+  "repaired": 0,
+  "ok": true,
+  "known": true
+ },
+ "roundTrip": {
+  "coins": 49251,
+  "park": {
+   "won": {},
+   "seen": false
+  },
+  "repaired": 0
+ },
+ "unknown": {
+  "threw": null,
+  "fixes": 3,
+  "ok": true
+ },
+ "full": {
+  "cap": 12356,
+  "dropped": 4,
+  "failed": 0,
+  "kept": [
+   "career:4",
+   "career:5",
+   "career:6"
+  ],
+  "ok": true,
+  "known": true,
+  "quota": "all passed"
+ },
+ "allCoins": 7500,
+ "levels": 24
+}

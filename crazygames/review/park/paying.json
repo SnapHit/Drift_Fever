@@ -1,0 +1,236 @@
+{
+ "first": {
+  "coins": 480,
+  "events": [
+   {
+    "id": "slide",
+    "level": 1,
+    "value": 100.2
+   },
+   {
+    "id": "donut",
+    "level": 1,
+    "value": 1
+   },
+   {
+    "id": "chain",
+    "level": 2,
+    "value": 3704
+   }
+  ],
+  "won": {
+   "slide": 1,
+   "donut": 1,
+   "chain": 2
+  },
+  "celebrated": 373,
+  "shown": {
+   "text": "SLIDE BRONZE +80",
+   "notice": "LONG SLIDE BRONZE  +80",
+   "tally": "1/24"
+  },
+  "best": {
+   "donut": 2,
+   "gate": 0
+  }
+ },
+ "afterTitle": {
+  "coins": 0,
+  "events": [
+   {
+    "id": "slide",
+    "level": 1,
+    "value": 100.2
+   },
+   {
+    "id": "donut",
+    "level": 1,
+    "value": 1
+   },
+   {
+    "id": "chain",
+    "level": 2,
+    "value": 3704
+   }
+  ],
+  "won": {
+   "slide": 1,
+   "donut": 1,
+   "chain": 2
+  },
+  "celebrated": 597,
+  "shown": {
+   "text": "SLIDE 25 m SILVER +300",
+   "notice": "",
+   "tally": "4/24"
+  },
+  "best": {
+   "donut": 2,
+   "gate": 0
+  },
+  "title": {
+   "state": "title",
+   "line": "free drift · 4 of 24"
+  }
+ },
+ "afterReload": {
+  "coins": 0,
+  "events": [
+   {
+    "id": "slide",
+    "level": 1,
+    "value": 100.2
+   },
+   {
+    "id": "donut",
+    "level": 1,
+    "value": 1
+   },
+   {
+    "id": "chain",
+    "level": 2,
+    "value": 3704
+   }
+  ],
+  "won": {
+   "slide": 1,
+   "donut": 1,
+   "chain": 2
+  },
+  "celebrated": 0,
+  "shown": null,
+  "best": {
+   "donut": 2,
+   "gate": 0
+  },
+  "loaded": {
+   "coins": 480,
+   "won": {
+    "slide": 1,
+    "donut": 1,
+    "chain": 2
+   },
+   "seen": true
+  }
+ },
+ "knownOnce": {
+  "coins": 480,
+  "events": [
+   {
+    "id": "slide",
+    "level": 1,
+    "value": 100.2
+   },
+   {
+    "id": "donut",
+    "level": 1,
+    "value": 1
+   },
+   {
+    "id": "chain",
+    "level": 2,
+    "value": 3704
+   }
+  ],
+  "won": {
+   "slide": 1,
+   "donut": 1,
+   "chain": 2
+  },
+  "celebrated": 373,
+  "shown": {
+   "text": "SLIDE BRONZE +80",
+   "notice": "LONG SLIDE BRONZE  +80",
+   "tally": "1/24"
+  },
+  "best": {
+   "donut": 2,
+   "gate": 0
+  }
+ },
+ "silverFirst": {
+  "coins": 300,
+  "events": [
+   {
+    "id": "gate",
+    "level": 2,
+    "value": 92.7
+   }
+  ],
+  "won": {
+   "slide": 1,
+   "donut": 1,
+   "chain": 2,
+   "gate": 2
+  },
+  "celebrated": 0,
+  "shown": null,
+  "best": {
+   "donut": 0,
+   "gate": 92.7
+  }
+ },
+ "bronzeAfter": {
+  "coins": 0,
+  "events": [
+   {
+    "id": "gate",
+    "level": 1,
+    "value": 70.9
+   }
+  ],
+  "won": {
+   "slide": 1,
+   "donut": 1,
+   "chain": 2,
+   "gate": 2
+  },
+  "celebrated": 0,
+  "shown": null,
+  "best": {
+   "donut": 0,
+   "gate": 70.9
+  }
+ },
+ "knownOrder": {
+  "bronze": {
+   "coins": 80,
+   "events": [
+    {
+     "id": "gate",
+     "level": 1,
+     "value": 70.9
+    }
+   ],
+   "won": {
+    "gate": 1
+   },
+   "celebrated": 0,
+   "shown": null,
+   "best": {
+    "donut": 0,
+    "gate": 70.9
+   }
+  },
+  "silver": {
+   "coins": 220,
+   "events": [
+    {
+     "id": "gate",
+     "level": 2,
+     "value": 92.7
+    }
+   ],
+   "won": {
+    "gate": 2
+   },
+   "celebrated": 0,
+   "shown": null,
+   "best": {
+    "donut": 0,
+    "gate": 92.7
+   }
+  }
+ },
+ "errors": []
+}
