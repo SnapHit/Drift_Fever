@@ -1,0 +1,70 @@
+{
+ "part": "tour",
+ "drives": [
+  {
+   "id": "tour",
+   "label": "one chain: the narrow gate, the wall, the donut pad, the first gate, the eight, the cones",
+   "car": "starter",
+   "up": null,
+   "line": "tour",
+   "args": [],
+   "seconds": 42.6,
+   "judge": 6,
+   "again": 6,
+   "agree": true,
+   "level": 3,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 1840,
+   "steps": 5117,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 1,
+    "wall": 104.1,
+    "gate": 0,
+    "slide": 143.2,
+    "chain": 0,
+    "tour": 6
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 1,
+    "slalom": 1,
+    "wall": 104.1,
+    "gate": 0,
+    "slide": 143,
+    "chain": 0,
+    "tour": 6
+   }
+  }
+ ],
+ "reach": {
+  "tour": {
+   "bronze": {
+    "reached": true,
+    "target": 2,
+    "car": "starter",
+    "by": "one chain: the narrow gate, the wall, the donut pad, the first gate, the eight, the cones",
+    "value": 6
+   },
+   "silver": {
+    "reached": true,
+    "target": 4,
+    "car": "starter",
+    "by": "one chain: the narrow gate, the wall, the donut pad, the first gate, the eight, the cones",
+    "value": 6
+   },
+   "gold": {
+    "reached": true,
+    "target": 6,
+    "car": "starter",
+    "by": "one chain: the narrow gate, the wall, the donut pad, the first gate, the eight, the cones",
+    "value": 6
+   }
+  }
+ },
+ "errors": []
+}

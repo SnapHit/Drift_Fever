@@ -1,0 +1,136 @@
+{
+ "part": "open",
+ "drives": [
+  {
+   "id": "slide",
+   "label": "eleven turns of a circle on the open floor, then straight on",
+   "car": "starter",
+   "up": null,
+   "line": "open",
+   "args": [
+    11
+   ],
+   "seconds": 69.5,
+   "judge": 1399.4,
+   "again": 1399.2,
+   "agree": true,
+   "level": 3,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 1480,
+   "steps": 8343,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 1399.4,
+    "chain": 20843,
+    "tour": 1
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 1399.2,
+    "chain": 20843,
+    "tour": 1
+   }
+  },
+  {
+   "id": "chain",
+   "label": "eleven turns of a circle on the open floor, then straight on",
+   "car": "starter",
+   "up": null,
+   "line": "open",
+   "args": [
+    11
+   ],
+   "seconds": 69.5,
+   "judge": 20843,
+   "again": 20843,
+   "agree": true,
+   "level": 3,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 1480,
+   "steps": 8343,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 1399.4,
+    "chain": 20843,
+    "tour": 1
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 1399.2,
+    "chain": 20843,
+    "tour": 1
+   }
+  }
+ ],
+ "reach": {
+  "slide": {
+   "bronze": {
+    "reached": true,
+    "target": 100,
+    "car": "starter",
+    "by": "eleven turns of a circle on the open floor, then straight on",
+    "value": 1399.4
+   },
+   "silver": {
+    "reached": true,
+    "target": 400,
+    "car": "starter",
+    "by": "eleven turns of a circle on the open floor, then straight on",
+    "value": 1399.4
+   },
+   "gold": {
+    "reached": true,
+    "target": 1200,
+    "car": "starter",
+    "by": "eleven turns of a circle on the open floor, then straight on",
+    "value": 1399.4
+   }
+  },
+  "chain": {
+   "bronze": {
+    "reached": true,
+    "target": 400,
+    "car": "starter",
+    "by": "eleven turns of a circle on the open floor, then straight on",
+    "value": 20843
+   },
+   "silver": {
+    "reached": true,
+    "target": 2500,
+    "car": "starter",
+    "by": "eleven turns of a circle on the open floor, then straight on",
+    "value": 20843
+   },
+   "gold": {
+    "reached": true,
+    "target": 10000,
+    "car": "starter",
+    "by": "eleven turns of a circle on the open floor, then straight on",
+    "value": 20843
+   }
+  }
+ },
+ "errors": []
+}
