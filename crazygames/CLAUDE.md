@@ -841,8 +841,9 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   has not been played at either scale.
   (3) The wall ride: he never passed 20 m. Its lane is 6 m (was 2.5)
   and its levels 15, 40 and 90 m (were 20, 60, 140).
-  All first guesses for play. Open: `.github/workflows/
-  crazygames-parity.yml` has failed since GitHub's runner moved to
-  Ubuntu 26.04 (the pinned Playwright cannot install there); it is
-  outside this folder and waits for the author's word. Deploys are
-  not affected.
+  All first guesses for play. The parity workflow had failed since
+  GitHub's `ubuntu-latest` moved to Ubuntu 26.04, where the pinned
+  Playwright cannot install Chromium; by the author's word the same
+  day its runner is pinned to `ubuntu-24.04` (the live workflow and
+  the copy in `ci/parity.yml`). Unpin it when Playwright is next
+  raised.

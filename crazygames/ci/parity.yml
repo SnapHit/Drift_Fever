@@ -10,7 +10,7 @@ on:
     paths: ['crazygames/**', '.github/workflows/crazygames-parity.yml']
 jobs:
   parity:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # pinned 15 November 2026: ubuntu-latest moved to 26.04, where the pinned Playwright cannot install Chromium
     timeout-minutes: 60
     defaults:
       run:
