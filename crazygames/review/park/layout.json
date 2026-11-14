@@ -1,0 +1,342 @@
+{
+ "390x844": {
+  "title": {
+   "name": "STUNT PARK",
+   "line": "free drift · 0 of 24",
+   "oneLine": true,
+   "w": 175,
+   "h": 58,
+   "fits": true,
+   "dailyOneLine": true
+  },
+  "list": {
+   "vw": 390,
+   "vh": 844,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "drive": {
+   "frames": 2400,
+   "shown": 1071,
+   "over": 0,
+   "what": [],
+   "offscreen": 0,
+   "won": 218,
+   "carTop": 441
+  },
+  "hud": {
+   "w": 84,
+   "h": 44,
+   "on": true,
+   "clash": false
+  },
+  "known": [
+   1,
+   {
+    "park": 4757
+   },
+   0,
+   0,
+   444
+  ],
+  "longest": {
+   "w": 307,
+   "left": 41,
+   "right": 349,
+   "vw": 390,
+   "popped": 350
+  },
+  "listIn": {
+   "vw": 390,
+   "vh": 844,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "back": {
+   "txt": "BACK TO THE PARK",
+   "got": 2,
+   "state": "free",
+   "open": false
+  },
+  "errors": []
+ },
+ "844x390": {
+  "title": {
+   "name": "STUNT PARK",
+   "line": "free drift · 0 of 24",
+   "oneLine": false,
+   "w": 132,
+   "h": 77,
+   "fits": true,
+   "dailyOneLine": false
+  },
+  "list": {
+   "vw": 844,
+   "vh": 390,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "drive": {
+   "frames": 2400,
+   "shown": 1071,
+   "over": 0,
+   "what": [],
+   "offscreen": 0,
+   "won": 218,
+   "carTop": 197
+  },
+  "hud": {
+   "w": 84,
+   "h": 44,
+   "on": true,
+   "clash": false
+  },
+  "known": [
+   1,
+   {
+    "park": 4205
+   },
+   0,
+   0,
+   198
+  ],
+  "longest": {
+   "w": 408,
+   "left": 218,
+   "right": 626,
+   "vw": 844,
+   "popped": 465
+  },
+  "listIn": {
+   "vw": 844,
+   "vh": 390,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "back": {
+   "txt": "BACK TO THE PARK",
+   "got": 2,
+   "state": "free",
+   "open": false
+  },
+  "errors": []
+ },
+ "800x450": {
+  "title": {
+   "name": "STUNT PARK",
+   "line": "free drift · 0 of 24",
+   "oneLine": false,
+   "w": 132,
+   "h": 77,
+   "fits": true,
+   "dailyOneLine": false
+  },
+  "list": {
+   "vw": 800,
+   "vh": 450,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "drive": {
+   "frames": 2400,
+   "shown": 1071,
+   "over": 0,
+   "what": [],
+   "offscreen": 0,
+   "won": 218,
+   "carTop": 228
+  },
+  "hud": {
+   "w": 84,
+   "h": 44,
+   "on": true,
+   "clash": false
+  },
+  "known": [
+   1,
+   {
+    "park": 4852
+   },
+   0,
+   0,
+   229
+  ],
+  "longest": {
+   "w": 395,
+   "left": 202,
+   "right": 598,
+   "vw": 800,
+   "popped": 450
+  },
+  "listIn": {
+   "vw": 800,
+   "vh": 450,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "back": {
+   "txt": "BACK TO THE PARK",
+   "got": 2,
+   "state": "free",
+   "open": false
+  },
+  "errors": []
+ },
+ "1280x720": {
+  "title": {
+   "name": "STUNT PARK",
+   "line": "free drift · 0 of 24",
+   "oneLine": true,
+   "w": 260,
+   "h": 58,
+   "fits": true,
+   "dailyOneLine": true
+  },
+  "list": {
+   "vw": 1280,
+   "vh": 720,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "drive": {
+   "frames": 2400,
+   "shown": 1071,
+   "over": 0,
+   "what": [],
+   "offscreen": 0,
+   "won": 218,
+   "carTop": 364
+  },
+  "hud": {
+   "w": 84,
+   "h": 44,
+   "on": true,
+   "clash": false
+  },
+  "known": [
+   1,
+   {
+    "park": 6973
+   },
+   0,
+   0,
+   366
+  ],
+  "longest": {
+   "w": 408,
+   "left": 436,
+   "right": 844,
+   "vw": 1280,
+   "popped": 465
+  },
+  "listIn": {
+   "vw": 1280,
+   "vh": 720,
+   "buttons": 10,
+   "small": [],
+   "off": 0,
+   "sideways": {
+    "doc": 0,
+    "screens": 0,
+    "list": 0
+   },
+   "cards": 8,
+   "allSeen": true,
+   "cut": [],
+   "goOn": true,
+   "pageScrolls": 0,
+   "headH": 44
+  },
+  "back": {
+   "txt": "BACK TO THE PARK",
+   "got": 2,
+   "state": "free",
+   "open": false
+  },
+  "errors": []
+ }
+}
