@@ -952,3 +952,26 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   size, the night is dark, the smoke is the night preset's pink and not
   the cover's white, and Varsk is behind the camera after the first
   few seconds.
+- 15 November 2026, the tail-light trails, after the author compared
+  the rendered preview with his own recording: he has never seen a
+  trail on his phone (a Pixel 9, which draws on WebGPU), and wants
+  them. Two causes were possible and both are changed in
+  `env/show.js`. (1) By design: dawn tracks drew none and dusk ones at
+  0.55; now dawn 0.5 and dusk 0.8 (`SHOW.TRAIL_PRESETS`), and the
+  ribbon is wider (`TRAIL_WIDTH` 0.065 to 0.11 m, was 0.045 to 0.085)
+  so it reads on a phone with no bloom. His recording was Sarrow's
+  race, a dawn track. (2) Perhaps a fault: the ribbon's index buffer
+  was rewritten every frame, the only geometry in the game that did
+  so; everything with a fixed index shows on his phone. The index is
+  fixed now, written once. **Unproven**: the sandbox's Chromium does
+  give a WebGPU device (`--enable-unsafe-webgpu
+  --use-webgpu-adapter=swiftshader`), the game picks the WebGPU
+  backend on it, and the canvas stays blank, so nothing can be told
+  apart there. Only his phone can say; `?renderer=webgl2` on the
+  address forces the fallback for a comparison, and `?preset=night`
+  any time of day. `game/test/webgpu/trails.js` measures (1) on WebGL
+  2, both tiers, four times of day. The preview video was drawn with
+  Upper deck forced to night, which the game never does (it is a dusk
+  track): it should be drawn again on a track that is night in the
+  game. Seen on the way: the title still says "CrazyGames edition"
+  under the wordmark, on driftfever.com too.

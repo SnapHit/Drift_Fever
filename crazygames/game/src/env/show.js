@@ -26,12 +26,12 @@ export const SHOW = {
   /* tail-light trails */
   TRAIL_POINTS:     36,      // points per light
   TRAIL_LIFE:       [0.32, 0.75],   // s a trail point lasts, at heat 0 and 1
-  TRAIL_WIDTH:      [0.045, 0.085],   // m half width at the light, at heat 0 and 1
+  TRAIL_WIDTH:      [0.065, 0.11],    // m half width at the light, at heat 0 and 1 (were 0.045 and 0.085: a pixel or two on a phone with no bloom to spread them)
   TRAIL_COLOUR:     [1.0, 0.09, 0.07],   // linear, additive
   TRAIL_GAIN:       [1.6, 3.2],   // brightness at heat 0 and 1 (over 1 feeds the bloom)
   TRAIL_MIN_SPEED:  6,       // m/s
   TRAIL_SPACING:    0.12,    // m the car moves before a new point is laid
-  TRAIL_PRESETS:    { dusk: 0.55, night: 1, dawn: 0, rain: 0.9 },   // how strongly each preset shows them (daylight hides a tail-light)
+  TRAIL_PRESETS:    { dusk: 0.8, night: 1, dawn: 0.5, rain: 0.9 },   // how strongly each preset shows them. Dawn was 0 (daylight hides a tail-light) and dusk 0.55 until 15 November 2026: the author wants them on every track, and had never seen one
   /* the tail-lights */
   TAIL_BASE:        { dusk: 0.6, night: 1, dawn: 0.35, rain: 1 },   // the tail-lights' glow with no brake
   TAIL_BRAKE:       2.4,     // and under the brake or the handbrake
@@ -147,6 +147,13 @@ export function createShow(THREE, opts) {
   const tidx = new Uint16Array(2 * (N - 1) * 6);
   tgeo.setAttribute('position', new THREE.BufferAttribute(tpos, 3));
   tgeo.setAttribute('glow', new THREE.BufferAttribute(tcol, 4));
+  /* The index never changes: quad n is always vertices 4n to 4n + 3, so
+     it is written once here. It used to be rewritten every frame, the
+     only geometry in the game that did so, and the author never once saw
+     a trail on his phone, which draws on WebGPU, where everything with a
+     fixed index (smoke, glows, marks) shows. Unproven: the sandbox's
+     WebGPU draws nothing at all, so only his phone can say. */
+  for (let n = 0; n < 2 * (N - 1); n++) { const q = n * 4, o6 = n * 6; tidx[o6] = q; tidx[o6 + 1] = q + 1; tidx[o6 + 2] = q + 2; tidx[o6 + 3] = q; tidx[o6 + 4] = q + 2; tidx[o6 + 5] = q + 3; }
   tgeo.setIndex(new THREE.BufferAttribute(tidx, 1));
   tgeo.setDrawRange(0, 0);
   const T = THREE.TSL;
@@ -223,12 +230,11 @@ export function createShow(THREE, opts) {
         const q = quads * 4;
         put(q, a.x + nx * wa, a.y + ny * wa, a.z + nz * wa, fa, gain); put(q + 1, a.x - nx * wa, a.y - ny * wa, a.z - nz * wa, fa, gain);
         put(q + 2, b.x - nx * wb, b.y - ny * wb, b.z - nz * wb, fb, gain); put(q + 3, b.x + nx * wb, b.y + ny * wb, b.z + nz * wb, fb, gain);
-        const o6 = quads * 6; tidx[o6] = q; tidx[o6 + 1] = q + 1; tidx[o6 + 2] = q + 2; tidx[o6 + 3] = q; tidx[o6 + 4] = q + 2; tidx[o6 + 5] = q + 3;
         quads++;
       }
     }
     tgeo.setDrawRange(0, quads * 6);
-    if (quads) { tgeo.attributes.position.needsUpdate = true; tgeo.attributes.glow.needsUpdate = true; tgeo.index.needsUpdate = true; }
+    if (quads) { tgeo.attributes.position.needsUpdate = true; tgeo.attributes.glow.needsUpdate = true; }
     trails.visible = quads > 0;
 
     /* the pop on the lift: a slide held long enough, then let go */

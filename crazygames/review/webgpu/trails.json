@@ -1,0 +1,58 @@
+{
+ "low dawn": {
+  "k": 863,
+  "preset": "dawn",
+  "quads": 60,
+  "px": 2438,
+  "known": 0
+ },
+ "low dusk": {
+  "k": 863,
+  "preset": "dusk",
+  "quads": 60,
+  "px": 2438,
+  "known": 0
+ },
+ "low night": {
+  "k": 863,
+  "preset": "night",
+  "quads": 60,
+  "px": 2438,
+  "known": 0
+ },
+ "low rain": {
+  "k": 863,
+  "preset": "rain",
+  "quads": 60,
+  "px": 2438,
+  "known": 0
+ },
+ "high dawn": {
+  "k": 863,
+  "preset": "dawn",
+  "quads": 60,
+  "px": 2500,
+  "known": 0
+ },
+ "high dusk": {
+  "k": 863,
+  "preset": "dusk",
+  "quads": 60,
+  "px": 4230,
+  "known": 0
+ },
+ "high night": {
+  "k": 863,
+  "preset": "night",
+  "quads": 60,
+  "px": 5151,
+  "known": 0
+ },
+ "high rain": {
+  "k": 863,
+  "preset": "rain",
+  "quads": 60,
+  "px": 4390,
+  "known": 0
+ }
+}
