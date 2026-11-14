@@ -1,0 +1,40 @@
+{
+ "part": "known",
+ "drives": [],
+ "reach": {},
+ "known": {
+  "donut": {
+   "whole": 4,
+   "broken": 2,
+   "again": 2,
+   "wholeAgain": 4,
+   "before": 1,
+   "dropsTo": 0
+  },
+  "wall": {
+   "best": 108.8,
+   "touchAt": 2056,
+   "before": 108.8,
+   "after": 0,
+   "again": 109,
+   "hits": 9
+  },
+  "slalom": {
+   "cones": 2,
+   "judge": 3,
+   "again": 3,
+   "knocks": 2,
+   "zeroAfter": true,
+   "neverUp": true
+  },
+  "guard": {
+   "clean": 0,
+   "fed": 12
+  },
+  "cut": {
+   "judge": 4,
+   "again": 3
+  }
+ },
+ "errors": []
+}

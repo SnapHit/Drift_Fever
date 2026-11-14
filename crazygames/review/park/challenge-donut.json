@@ -1,0 +1,72 @@
+{
+ "part": "donut",
+ "drives": [
+  {
+   "id": "donut",
+   "label": "round the pillar eleven times",
+   "car": "starter",
+   "up": null,
+   "line": "donut",
+   "args": [
+    11
+   ],
+   "seconds": 100,
+   "judge": 11,
+   "again": 11,
+   "agree": true,
+   "level": 3,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 1580,
+   "steps": 11997,
+   "all": {
+    "donut": 11,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 1470.2,
+    "chain": 0,
+    "tour": 1
+   },
+   "allAgain": {
+    "donut": 11,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 1470,
+    "chain": 0,
+    "tour": 1
+   }
+  }
+ ],
+ "reach": {
+  "donut": {
+   "bronze": {
+    "reached": true,
+    "target": 1,
+    "car": "starter",
+    "by": "round the pillar eleven times",
+    "value": 11
+   },
+   "silver": {
+    "reached": true,
+    "target": 4,
+    "car": "starter",
+    "by": "round the pillar eleven times",
+    "value": 11
+   },
+   "gold": {
+    "reached": true,
+    "target": 10,
+    "car": "starter",
+    "by": "round the pillar eleven times",
+    "value": 11
+   }
+  }
+ },
+ "errors": []
+}

@@ -1,0 +1,72 @@
+{
+ "part": "eight",
+ "drives": [
+  {
+   "id": "eight",
+   "label": "nine loops of the eight",
+   "car": "starter",
+   "up": null,
+   "line": "eight",
+   "args": [
+    9
+   ],
+   "seconds": 71.3,
+   "judge": 10,
+   "again": 10,
+   "agree": true,
+   "level": 3,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 1850,
+   "steps": 8559,
+   "all": {
+    "donut": 0,
+    "eight": 10,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 147.9,
+    "chain": 15995,
+    "tour": 1
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 10,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 0,
+    "slide": 147.7,
+    "chain": 15995,
+    "tour": 1
+   }
+  }
+ ],
+ "reach": {
+  "eight": {
+   "bronze": {
+    "reached": true,
+    "target": 2,
+    "car": "starter",
+    "by": "nine loops of the eight",
+    "value": 10
+   },
+   "silver": {
+    "reached": true,
+    "target": 4,
+    "car": "starter",
+    "by": "nine loops of the eight",
+    "value": 10
+   },
+   "gold": {
+    "reached": true,
+    "target": 8,
+    "car": "starter",
+    "by": "nine loops of the eight",
+    "value": 10
+   }
+  }
+ },
+ "errors": []
+}

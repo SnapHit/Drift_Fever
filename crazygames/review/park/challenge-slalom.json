@@ -1,0 +1,119 @@
+{
+ "part": "slalom",
+ "drives": [
+  {
+   "id": "slalom",
+   "label": "the weave 5.5 m wide, drawn 4 m early",
+   "car": "starter",
+   "up": null,
+   "line": "slalom",
+   "args": [
+    5.5,
+    4
+   ],
+   "seconds": 21.8,
+   "judge": 6,
+   "again": 6,
+   "agree": true,
+   "level": 2,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 650,
+   "steps": 2617,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 6,
+    "wall": 0,
+    "gate": 0,
+    "slide": 83.5,
+    "chain": 1355,
+    "tour": 2
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 6,
+    "wall": 0,
+    "gate": 0,
+    "slide": 83.2,
+    "chain": 1355,
+    "tour": 2
+   }
+  },
+  {
+   "id": "slalom",
+   "label": "the weave 6.5 m wide, drawn 12 m early",
+   "car": "hatch",
+   "up": {
+    "power": 3,
+    "grip": 3,
+    "steer": 3
+   },
+   "line": "slalom",
+   "args": [
+    6.5,
+    12
+   ],
+   "seconds": 21.3,
+   "judge": 7,
+   "again": 7,
+   "agree": true,
+   "level": 3,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 600,
+   "steps": 2557,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 7,
+    "wall": 6.3,
+    "gate": 0,
+    "slide": 94.7,
+    "chain": 0,
+    "tour": 2
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 7,
+    "wall": 6.1,
+    "gate": 0,
+    "slide": 94.4,
+    "chain": 0,
+    "tour": 2
+   }
+  }
+ ],
+ "reach": {
+  "slalom": {
+   "bronze": {
+    "reached": true,
+    "target": 3,
+    "car": "starter",
+    "by": "the weave 5.5 m wide, drawn 4 m early",
+    "value": 6
+   },
+   "silver": {
+    "reached": true,
+    "target": 5,
+    "car": "starter",
+    "by": "the weave 5.5 m wide, drawn 4 m early",
+    "value": 6
+   },
+   "gold": {
+    "reached": true,
+    "target": 7,
+    "car": "hatch fully upgraded",
+    "by": "the weave 6.5 m wide, drawn 12 m early",
+    "value": 7
+   }
+  }
+ },
+ "errors": []
+}

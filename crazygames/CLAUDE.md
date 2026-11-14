@@ -779,3 +779,42 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   against the standard red at night, the prices, frame rate (no
   JavaScript cost the probe can see; GPU cost unmeasured). Next: the
   playground round (a stunt park with challenges), approved.
+- 14 November 2026, the playground round (`briefs/PLAYGROUND.md`,
+  `review/park/REPORT.md`), the author's scope: a stunt park with
+  challenges, no timer. Free drift's ground is now a 300 by 200 m
+  walled park (`park/layout.js`, drawn by `env/park.js`): a gate ahead
+  of the start, a donut pad, twin pillars for a figure eight, seven
+  cones, a long curved orange wall, a second gate. Eight challenges
+  (`park/challenges.js`, numbers and coins in `LOOP.PARK`): donuts,
+  figure eight, slalom, wall ride, gate crasher, long slide, big
+  chain, grand tour, each with bronze, silver and gold, 24 levels
+  paying 7,500 in all, each once (`park` in the save; a higher level
+  first pays the lower with it). A level is won the moment its count
+  is reached, with a live readout under the total. The title's button
+  is STUNT PARK and opens the list, where DRIVE starts the park (one
+  press more than before); a HUD button, L or Tab, or a pad's top face
+  button opens the list in the park. The physics, cars, rivals and
+  score rules are untouched. Scripted hands with a phone's inputs
+  reached all 24 levels, gold in the plain starter on six of eight
+  (slalom gold needed the upgraded hatch, gate gold the upgraded
+  fastback), so gold is patience more than car for a machine. Brief
+  deviations forced by the physics: every solid is round and 4 m
+  through (thin walls cannot be built: the physics pushes back points
+  up to 2.5 m behind a face), the long wall is curved, the cones are
+  30 m apart. **`ladder2/determinism.js` fails on a newer Chromium, on
+  main too**: its stored hashes in `review/ladder2/main.json` were
+  recorded in another Chromium build, and the physics is the same to
+  the bit only within one browser build. `game/test/park/same.js` is
+  the measure now: main (from git) and the working copy side by side
+  in one browser. It also means a rival's race can differ a little
+  between browsers, as the 13 November entry feared for Halvik. The
+  sandbox's browsers moved the same day: point
+  `PLAYWRIGHT_BROWSERS_PATH` at a folder holding
+  `chromium-<n>/chrome-linux/chrome` (the probes' `findChromium` does
+  not know `chrome-linux64`). The first writing of this round was lost
+  with the machine before any push: **brief sessions push after every
+  working step.** Open for play: whether three things to try are seen
+  within five seconds (the park is sparse at night at speed), the
+  targets and coins, the curved wall's 2.5 m lane on a phone, the
+  pillar fade, list first then DRIVE. Not measured: a real GPU, a
+  phone, thumbs, the high tier's frame cost.

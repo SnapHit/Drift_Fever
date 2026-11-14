@@ -36,7 +36,12 @@ export function defaults() {
      has none: every car wears the standard ones, which is not a fix. A
      ghost carries look, the three it ran with. An older build reading
      this save ignores all of it. */
-  return { v: LOOP.SAVE_VERSION, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels(), ...carCosmetics() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {}, lab: { codes: {}, last: '' }, rivals: {} };
+  /* park (added 14 November 2026, briefs/PLAYGROUND.md): the stunt
+     park's challenges. won: per challenge id, the highest level paid
+     (1 bronze, 2 silver, 3 gold); seen: the park's one line of welcome
+     has been shown. A save from before it has neither, which is not a
+     fix: nothing won. An older build reading this save ignores it. */
+  return { v: LOOP.SAVE_VERSION, park: { won: {}, seen: false }, coins: 0, car: 'starter', cars: { starter: { paint: 'cyan', up: upgradeLevels(), ...carCosmetics() } }, career: {}, daily: {}, ghosts: {}, starPay: true, onboarded: false, missions: {}, lab: { codes: {}, last: '' }, rivals: {} };
 }
 
 /* Has this save ever finished a run: a career result or a daily result. */
@@ -47,6 +52,7 @@ const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
 const carIds = new Set(ROSTER.map(c => c.id));
 const paintIds = new Set(PAINTS.map(p => p.id));
 const rivalIds = new Set(RIVALS.map(r => r.id));
+const parkIds = new Set(Object.keys(LOOP.PARK.COINS));
 
 /* A ghost record, or null if it is not one. */
 export function validGhost(g) {
@@ -119,6 +125,16 @@ export function repair(raw) {
       s.rivals[k] = { won: e.won, best: Math.round(e.best), when: e.when };
     }
   } else if (raw.rivals !== undefined) fix();
+  if (isObj(raw.park)) {
+    if (isObj(raw.park.won)) {
+      for (const k of Object.keys(raw.park.won)) {
+        const v = raw.park.won[k];
+        if (!parkIds.has(k) || !isNum(v) || v < 1 || v > 3 || v !== Math.floor(v)) { fix(); continue; }
+        s.park.won[k] = v;
+      }
+    } else if (raw.park.won !== undefined) fix();
+    s.park.seen = raw.park.seen === true;
+  } else if (raw.park !== undefined) fix();
   return { state: s, fixes };
 }
 
@@ -261,6 +277,19 @@ export function createSave(opts) {
       state.rivals[id] = e; write();
       return first;
     },
+    /* a level of a park challenge reached (briefs/PLAYGROUND.md): every
+       level up to it not yet paid is paid now, once, lower ones first, and
+       never again. Returns { levels: [those newly paid], coins }. */
+    parkWin(id, level) {
+      const out = { levels: [], coins: 0 };
+      if (!parkIds.has(id)) return out;
+      const had = state.park.won[id] || 0, to = Math.max(0, Math.min(3, Math.floor(level)));
+      for (let lv = had + 1; lv <= to; lv++) { out.levels.push(lv); out.coins += LOOP.PARK.COINS[id][lv - 1]; }
+      if (!out.levels.length) return out;
+      state.park.won[id] = to; state.coins = Math.max(0, Math.floor(state.coins + out.coins)); write();
+      return out;
+    },
+    setParkSeen() { if (!state.park.seen) { state.park.seen = true; write(); } },
     setLabLast(code) { if (state.lab.last !== code) { state.lab.last = code; write(); } },
     ghost(key) { return state.ghosts[key] || null; },
     setGhost(key, record) {

@@ -1,0 +1,344 @@
+{
+ "part": "cost",
+ "budgetMs": 16.7,
+ "slackMs": 1.5,
+ "note": "headless Chromium, forced WebGL 2 on SwiftShader, 390x844, low tier, night, 6x CPU throttle through CDP; the GPU is not measured here",
+ "runs": [
+  {
+   "label": "a career run (track 1), the scripted drifter, 1",
+   "busy": 0,
+   "state": "drive",
+   "sliding": 114,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 1.5,
+    "p95": 7.5,
+    "p99": 14.5,
+    "worst": 21.1,
+    "mean": 2.27
+   },
+   "over": 1,
+   "frame": {
+    "n": 270,
+    "p50": 22.5,
+    "p95": 49.7,
+    "p99": 106.6,
+    "worst": 178.9,
+    "mean": 24.04
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "errors": []
+  },
+  {
+   "label": "the park, a held slide round the donut pillar, 1",
+   "busy": 0,
+   "state": "free",
+   "sliding": 270,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 1.6,
+    "p95": 5.7,
+    "p99": 7.7,
+    "worst": 10.6,
+    "mean": 1.94
+   },
+   "over": 0,
+   "frame": {
+    "n": 270,
+    "p50": 19.4,
+    "p95": 54.7,
+    "p99": 76.4,
+    "worst": 168,
+    "mean": 23.16
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 75,
+    "p95": 81,
+    "p99": 88,
+    "worst": 89,
+    "mean": 73.84
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 131429,
+    "p95": 132587,
+    "p99": 132671,
+    "worst": 132683,
+    "mean": 131387.1
+   },
+   "errors": [],
+   "judge": {
+    "donut": 2,
+    "slide": 366,
+    "live": "donut",
+    "hits": 0
+   }
+  },
+  {
+   "label": "a career run (track 1), the scripted drifter, 2",
+   "busy": 0,
+   "state": "drive",
+   "sliding": 114,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 1.8,
+    "p95": 8,
+    "p99": 14.1,
+    "worst": 17.7,
+    "mean": 2.42
+   },
+   "over": 1,
+   "frame": {
+    "n": 270,
+    "p50": 21.6,
+    "p95": 53.5,
+    "p99": 86.4,
+    "worst": 127.4,
+    "mean": 23.56
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "errors": []
+  },
+  {
+   "label": "the park, a held slide round the donut pillar, 2",
+   "busy": 0,
+   "state": "free",
+   "sliding": 270,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 5.4,
+    "p99": 9.8,
+    "worst": 20.1,
+    "mean": 1.65
+   },
+   "over": 1,
+   "frame": {
+    "n": 270,
+    "p50": 17.6,
+    "p95": 40,
+    "p99": 66.4,
+    "worst": 153.8,
+    "mean": 19.2
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 75,
+    "p95": 81,
+    "p99": 88,
+    "worst": 89,
+    "mean": 73.84
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 131429,
+    "p95": 132587,
+    "p99": 132671,
+    "worst": 132683,
+    "mean": 131387.1
+   },
+   "errors": [],
+   "judge": {
+    "donut": 2,
+    "slide": 366,
+    "live": "donut",
+    "hits": 0
+   }
+  },
+  {
+   "label": "a career run (track 1), the scripted drifter, 3",
+   "busy": 0,
+   "state": "drive",
+   "sliding": 114,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 1.3,
+    "p95": 5.3,
+    "p99": 9.2,
+    "worst": 14.2,
+    "mean": 1.57
+   },
+   "over": 0,
+   "frame": {
+    "n": 270,
+    "p50": 17.2,
+    "p95": 43.8,
+    "p99": 61.3,
+    "worst": 99.4,
+    "mean": 18.78
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 76,
+    "p95": 78,
+    "p99": 78,
+    "worst": 78,
+    "mean": 74.9
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 176117,
+    "p95": 177225,
+    "p99": 177325,
+    "worst": 177333,
+    "mean": 176060.47
+   },
+   "errors": []
+  },
+  {
+   "label": "the park, a held slide round the donut pillar, 3",
+   "busy": 0,
+   "state": "free",
+   "sliding": 270,
+   "of": 270,
+   "preset": "night",
+   "tier": "low",
+   "js": {
+    "n": 270,
+    "p50": 1.4,
+    "p95": 5.5,
+    "p99": 11.4,
+    "worst": 18.2,
+    "mean": 1.74
+   },
+   "over": 1,
+   "frame": {
+    "n": 270,
+    "p50": 17.4,
+    "p95": 48,
+    "p99": 100.1,
+    "worst": 124.5,
+    "mean": 19.46
+   },
+   "drawCalls": {
+    "n": 270,
+    "p50": 75,
+    "p95": 81,
+    "p99": 88,
+    "worst": 89,
+    "mean": 73.84
+   },
+   "triangles": {
+    "n": 270,
+    "p50": 131429,
+    "p95": 132587,
+    "p99": 132671,
+    "worst": 132683,
+    "mean": 131387.1
+   },
+   "errors": [],
+   "judge": {
+    "donut": 2,
+    "slide": 366,
+    "live": "donut",
+    "hits": 0
+   }
+  }
+ ],
+ "all": {
+  "career": [
+   {
+    "p50": 1.5,
+    "p95": 7.5,
+    "worst": 21.1,
+    "over": 1
+   },
+   {
+    "p50": 1.8,
+    "p95": 8,
+    "worst": 17.7,
+    "over": 1
+   },
+   {
+    "p50": 1.3,
+    "p95": 5.3,
+    "worst": 14.2,
+    "over": 0
+   }
+  ],
+  "park": [
+   {
+    "p50": 1.6,
+    "p95": 5.7,
+    "worst": 10.6,
+    "over": 0
+   },
+   {
+    "p50": 1.3,
+    "p95": 5.4,
+    "worst": 20.1,
+    "over": 1
+   },
+   {
+    "p50": 1.4,
+    "p95": 5.5,
+    "worst": 18.2,
+    "over": 1
+   }
+  ],
+  "middle": {
+   "career": {
+    "p95": 7.5,
+    "p50": 1.5
+   },
+   "park": {
+    "p95": 5.5,
+    "p50": 1.4
+   }
+  },
+  "drawCalls": {
+   "career": 76,
+   "park": 75
+  },
+  "triangles": {
+   "career": 176117,
+   "park": 131429
+  }
+ }
+}

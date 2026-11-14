@@ -24,6 +24,7 @@ import { PRESETS, presetFor, sunDirection, presetShow } from '../env/presets.js'
 import { buildDressing } from '../env/dressing.js';
 import { THEMES, themeFor } from '../env/themes.js';
 import { buildEnvironment } from '../env/world.js';
+import { buildPark } from '../env/park.js';
 import { styleTrack, racingLine, TRACK_STYLE } from '../env/trackstyle.js';
 import { createEffects } from '../env/effects.js';
 import { bannerTexture, concreteTexture, SPONSORS_SHOW } from '../env/textures.js';
@@ -208,6 +209,7 @@ export function createScene(canvas, opts) {
 
   /* ---- the ground and the world around it ---- */
   let groundGroup = null, cones = null, env = null, envKey = null, track = null, currentGround = null, dressing = null;
+  let park = null;   // the stunt park's own drawing (env/park.js), while free drift's ground is the one shown
   const concrete = concreteTexture(THREE, 128);
   function setGround(ground) {
     currentGround = ground;
@@ -219,6 +221,7 @@ export function createScene(canvas, opts) {
     applyPreset(p);
     theme = th;
     if (groundGroup) { scene.remove(groundGroup); groundGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+    if (park) { park.dispose(); park = null; }
     groundGroup = new THREE.Group();
     const b = ground.bounds;
     if (ground.centre.length) {
@@ -233,6 +236,11 @@ export function createScene(canvas, opts) {
       const at = m => C[Math.max(0, Math.min(n - 1, Math.round(m / 2)))];
       groundGroup.add(gantry(at(ground.startLine === undefined ? 8 : ground.startLine), LOOK.GANTRY_BEAM, true));
       if (ground.finish) groundGroup.add(gantry(at(ground.finish.along), LOOK.FINISH_BEAM, false));
+    } else if (ground.park) {
+      /* the stunt park (briefs/PLAYGROUND.md): its slab, walls, pillars, paint, names and lamps */
+      track = null;
+      park = buildPark(THREE, ground, { preset: p, theme: th, tierName: tier, wallNear: LOOP.PARK.WALL_NEAR });
+      groundGroup.add(park.group);
     } else {
       // the car park: a lighter slab inside the walls, and its walls
       track = null;
@@ -468,7 +476,7 @@ export function createScene(canvas, opts) {
   const clearOf = { x: 0, y: 0, z: 0, r: 1.8, keep: 0.1, near: 2.5, far: 7 };
   const dressArgs = { dt: 0, pose: null, sliding: false };
   const showCtx = { mult: 1, car: null, tails: null, exhaust: null, lights: null, pools: null, density: 1,
-    extraGlows: g => { if (dressing) dressing.update(dressArgs.dt, camera, dressArgs.pose, show.state.heat, dressArgs.sliding, g); } };
+    extraGlows: g => { if (dressing) dressing.update(dressArgs.dt, camera, dressArgs.pose, show.state.heat, dressArgs.sliding, g); if (park) park.flares(g, camera); } };
 
   /* ---- tyre marks: a ring of quads under the rear wheels ---- */
   const markLimit = () => FX_ON ? LOOK.MARK_SHOW[tier] || LOOK.MARK_SHOW.low : T().marks;
@@ -655,6 +663,7 @@ export function createScene(canvas, opts) {
       rivalBeam.updateMatrixWorld(); rivalBeam.target.updateMatrixWorld();
     }
     followSun(pose);
+    if (park) park.update(dt, camera, pose);   // a pillar between the camera and the car fades
     if (cones) {
       for (let i = 0; i < world.cones.length; i++) {
         const k = world.cones[i];
@@ -698,7 +707,7 @@ export function createScene(canvas, opts) {
     carModel: () => model, ghostModel: () => ghostModel, rivalModel: () => rivalModel, looks,
     frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, done: adapt.done, gaveBack: adapt.gaveBack, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
     info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
-    environment: () => env, dressing: () => dressing,
+    environment: () => env, dressing: () => dressing, park: () => park,
     fireworks: stars => { if (dressing) dressing.fireworks(stars); },
     setTier: t => { if (LOOK.TIERS[t]) { tier = t; applyTier(); if (currentGround) setGround(currentGround); } },
   };

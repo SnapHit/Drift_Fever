@@ -1,0 +1,173 @@
+{
+ "part": "gate",
+ "drives": [
+  {
+   "id": "gate",
+   "label": "north through the first gate from the start, a flick 10 m before it",
+   "car": "starter",
+   "up": null,
+   "line": "gate",
+   "args": [
+    false,
+    {
+     "off": -2,
+     "lead": 10,
+     "dir": 1
+    }
+   ],
+   "seconds": 7.3,
+   "judge": 70.9,
+   "again": 70.9,
+   "agree": true,
+   "level": 1,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 80,
+   "steps": 871,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 70.9,
+    "slide": 32.9,
+    "chain": 106,
+    "tour": 1
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 70.9,
+    "slide": 32.8,
+    "chain": 106,
+    "tour": 1
+   }
+  },
+  {
+   "id": "gate",
+   "label": "round and back south through it, a flick 16 m before, -3 m off its centre",
+   "car": "starter",
+   "up": null,
+   "line": "gate",
+   "args": [
+    true,
+    {
+     "off": -3,
+     "lead": 16,
+     "dir": -1
+    }
+   ],
+   "seconds": 16.3,
+   "judge": 92.7,
+   "again": 92.7,
+   "agree": true,
+   "level": 2,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 0,
+   "paid": 220,
+   "steps": 1955,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 92.7,
+    "slide": 45,
+    "chain": 136,
+    "tour": 1
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 0,
+    "wall": 0,
+    "gate": 92.7,
+    "slide": 44.8,
+    "chain": 136,
+    "tour": 1
+   }
+  },
+  {
+   "id": "gate",
+   "label": "round and back south through it, a flick 16 m before, 0 m off its centre",
+   "car": "fastback",
+   "up": {
+    "power": 3,
+    "grip": 3,
+    "steer": 3
+   },
+   "line": "gate",
+   "args": [
+    true,
+    {
+     "off": 0,
+     "lead": 16,
+     "dir": -1
+    }
+   ],
+   "seconds": 26,
+   "judge": 126.5,
+   "again": 126.5,
+   "agree": true,
+   "level": 3,
+   "guard": 0,
+   "hits": 0,
+   "hardHits": 0,
+   "cones": 1,
+   "paid": 500,
+   "steps": 3117,
+   "all": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 1,
+    "wall": 0,
+    "gate": 126.5,
+    "slide": 38.9,
+    "chain": 7,
+    "tour": 1
+   },
+   "allAgain": {
+    "donut": 0,
+    "eight": 0,
+    "slalom": 1,
+    "wall": 0,
+    "gate": 126.5,
+    "slide": 38.6,
+    "chain": 7,
+    "tour": 1
+   }
+  }
+ ],
+ "reach": {
+  "gate": {
+   "bronze": {
+    "reached": true,
+    "target": 55,
+    "car": "starter",
+    "by": "north through the first gate from the start, a flick 10 m before it",
+    "value": 70.9
+   },
+   "silver": {
+    "reached": true,
+    "target": 85,
+    "car": "starter",
+    "by": "round and back south through it, a flick 16 m before, -3 m off its centre",
+    "value": 92.7
+   },
+   "gold": {
+    "reached": true,
+    "target": 110,
+    "car": "fastback fully upgraded",
+    "by": "round and back south through it, a flick 16 m before, 0 m off its centre",
+    "value": 126.5
+   }
+  }
+ },
+ "errors": []
+}

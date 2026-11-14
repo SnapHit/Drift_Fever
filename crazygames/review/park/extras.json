@@ -1,0 +1,101 @@
+{
+ "welcome": {
+  "first": "The stunt park. No timer: drive to a place and try it. Each level of each challenge pays coins once.",
+  "after7s": null,
+  "second": null,
+  "afterReload": null
+ },
+ "ways": {
+  "touch": {
+   "opened": true,
+   "still": true,
+   "back": true,
+   "chain": 2.6
+  },
+  "L": {
+   "opened": true,
+   "still": true,
+   "back": true
+  },
+  "Tab": {
+   "opened": true,
+   "still": true,
+   "back": true
+  },
+  "known": true,
+  "pad": {
+   "opened": true,
+   "ring": 1,
+   "back": true
+  }
+ },
+ "bands": {
+  "fresh": {
+   "donut": 0.95,
+   "eight": 0.95,
+   "gate-a": 0.95,
+   "gate-b": 0.95,
+   "wall": 0.95,
+   "slalom": 0.95
+  },
+  "silver": {
+   "donut": 0.95,
+   "eight": 0.95,
+   "gate-a": 0.95,
+   "gate-b": 0.95,
+   "wall": 0.95,
+   "slalom": 0.95
+  },
+  "gold": {
+   "donut": 0.28,
+   "eight": 0.95,
+   "gate-a": 0.95,
+   "gate-b": 0.95,
+   "wall": 0.95,
+   "slalom": 0.95
+  }
+ },
+ "cosmetics": {
+  "plain": {
+   "looks": {
+    "wheels": "standard",
+    "glow": "off",
+    "smoke": "standard"
+   },
+   "glow": false,
+   "wheels": null
+  },
+  "dressed": {
+   "looks": {
+    "wheels": "blades",
+    "glow": "aqua",
+    "smoke": "rose"
+   },
+   "glow": true,
+   "wheels": "blades"
+  }
+ },
+ "sdk": {
+  "title": false,
+  "park": true,
+  "list": false,
+  "back": true
+ },
+ "cones": {
+  "near": 1,
+  "away": 0,
+  "home": true,
+  "rolling": 1
+ },
+ "nothingElse": {
+  "chain": 3953,
+  "won": {
+   "slide": 1,
+   "chain": 2
+  },
+  "coins": 380,
+  "due": 380,
+  "same": true
+ },
+ "errors": []
+}

@@ -15,6 +15,7 @@ import { FX_ON } from '../fx.js';
 import { ITEMS, STANDARD, KINDS, lookOf, priceOf, owns } from '../garage/cosmetics.js';
 import { wheelDesign, wheelIcon, standardIcon } from '../cars/wheels.js';
 import { carSpec } from '../cars/index.js';
+import { CHALLENGES, LEVELS, parkTally, coinsOf } from '../park/challenges.js';
 import { RIVALS, rivalOpen, rivalsLive, rivalNeeds, rivalState, ladderSummary, rivalPaint } from '../rivals/roster.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -60,7 +61,7 @@ export function createScreens(root, onAction) {
         <button type="button" class="big primary" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
         <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total}/${CAREER.length * 3} stars &middot; ${info.missions}/${info.missionsOf} missions</small></button>
         ${rivalsButton(save)}
-        <button type="button" class="big" data-action="free"><b>FREE DRIFT</b><small>the car park, no timer</small></button>
+        <button type="button" class="big parkbtn" data-action="park"><b>STUNT PARK</b><small>free drift &middot; ${parkTally(save.park && save.park.won).won} of ${parkTally(save.park && save.park.won).of}</small></button>
         <button type="button" class="big" data-action="garage"><b>GARAGE</b><small>${esc(carById(save.car).name)}</small></button>
         <button type="button" class="big" data-action="lab"><b>TRACK LAB</b><small>${info.labCodes ? info.labCodes + ' of your tracks saved' : 'make and share tracks'}</small></button>
       </div>
@@ -143,6 +144,25 @@ export function createScreens(root, onAction) {
      missions, or how many more stars open it) over its tracks. The list
      scrolls in its own box under the screen's header, and opens scrolled
      to the player's current chapter: the furthest one open. */
+  /* THE STUNT PARK'S LIST (briefs/PLAYGROUND.md 3): every challenge with
+     its place, one line of what to do, its three targets, which are won
+     and what each pays. Each card is a button that does nothing, so a
+     gamepad's focus can walk the list and scroll it. info.inPark: opened
+     from the park's HUD, so the way out is back to the park; otherwise
+     from the title, and DRIVE starts the park. The way on sits above
+     the list, not under it: a gamepad's focus then walks the cards
+     straight down, with nothing between a card and the next one below
+     the fold. */
+  function park(save, info) {
+    const won = (save.park && save.park.won) || {}, T = parkTally(won), inPark = !!(info && info.inPark);
+    const unit = (c, v) => c.unit === 'm' ? fmt(v) + ' m' : c.unit === 'km/h' ? v + ' km/h' : c.unit === 'points' ? fmt(v) + ' pts' : c.unit === 'places' ? v + ' places' : v + ' ' + (v === 1 ? c.unit.replace(/s$/, '') : c.unit);
+    const cards = CHALLENGES.map(c => {
+      const had = won[c.id] || 0;
+      const levels = LEVELS.map((name, i) => `<span class="lv ${name}${i < had ? ' got' : ''}"><i>${i < had ? '&#10003;' : '&#9670;'}</i><b>${unit(c, LOOP.PARK.TARGETS[c.id][i])}</b><small><span class="coin">&#9679;</span> ${i < had ? 'won' : fmt(coinsOf(c.id, i + 1))}</small></span>`).join('');
+      return `<button type="button" class="pcard${had >= 3 ? ' gold' : ''}" data-action="park-info" data-arg="${c.id}"><span class="who"><b>${esc(c.name.toUpperCase())}</b><small class="place">${esc(c.place)}</small><small class="what">${esc(c.what)}</small></span><span class="lvs">${levels}</span></button>`;
+    }).join('');
+    show('park', `${coins(save)}<header><button type="button" class="back" data-action="${inPark ? 'park-back' : 'title'}">&#9664;</button><h2>STUNT PARK</h2><span class="tally">${T.won}/${T.of} won</span></header><div class="drive"><button type="button" class="big primary" data-action="${inPark ? 'park-back' : 'free'}"><b>${inPark ? 'BACK TO THE PARK' : 'DRIVE'}</b></button></div><p class="rule">No timer. Drive to a place and try it: the game counts as you go. Each level pays once.</p><div class="list">${cards}</div>`);
+  }
   function career(save) {
     const chapters = CHAPTERS.map((ch, c) => {
       const open = chapterOpen(save, c), size = ch.to - ch.from;
@@ -372,7 +392,7 @@ export function createScreens(root, onAction) {
       </div>`);
   }
 
-  return { el, show, hide, title, career, rivals, garage, lab, results, get current() { return current; } };
+  return { el, show, hide, title, career, rivals, park, garage, lab, results, get current() { return current; } };
 }
 
 export { fmt };
