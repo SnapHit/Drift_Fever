@@ -899,3 +899,14 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   game/test/brand/reference-shots.json` for the two mid slide) and the
   prompts in `brand/PROMPTS.md`. The model's terms of commercial use
   were not verified here: his to check before anything is published.
+- 15 November 2026: the author's generated key art came back and he
+  thinks it "worked brilliantly". The pictures are in `brand/art/`
+  (hero: the drift build alone, in three shapes; battle: with a lime
+  car, in two) and the covers made from them in `brand/covers/hero-*`
+  and `battle-*` (`compose.js --bg brand/art`). The hero set is the one
+  that keeps the game's car; in the battle pictures the lime car reads
+  as a real coupe and the amber car lost its tri-blades, so they break
+  the exception's own terms as they stand. The landscape art is
+  1376x768, scaled up 1.4 times for the 1920x1080 cover. Nothing is in
+  use yet: the site's `og-card.png` is unchanged until he says which,
+  and until he has checked the model's terms.
