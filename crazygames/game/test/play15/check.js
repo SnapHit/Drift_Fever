@@ -48,6 +48,12 @@ const wall = await page.evaluate(async () => { const { LOOP } = await import('/s
 out.wall = wall;
 ok('the wall ride counts within 6 m of the wall and asks 15, 40 and 90 m', wall.near === 6 && wall.t.join() === '15,40,90', JSON.stringify(wall));
 
+/* a race's points pill does not follow the player into the stunt park (the author's screenshot, 15 November) */
+const pill = await page.evaluate(async () => { const L = window.__loop, vs = document.querySelector('#vs');
+  L.startRun(L.battleSpec('r1')); const inRace = !vs.hidden; L.action('title'); L.action('free'); return { inRace, inPark: !vs.hidden }; });
+out.pill = pill;
+ok('the rival pill shows in a race (known answer) and not in the stunt park after it', pill.inRace && !pill.inPark, JSON.stringify(pill));
+
 fs.writeFileSync(path.join(dir, 'check.json'), JSON.stringify(out, null, 1));
 await env.close();
 console.log(fails ? fails + ' failed' : 'all passed');

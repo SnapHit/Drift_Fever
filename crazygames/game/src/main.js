@@ -697,6 +697,7 @@ function startFree() {
   app.state = 'free';
   input.setStarted(false);
   screens.hide(); hud.setVisible(true); hud.setRun('', ''); hud.setToBeat(''); input.touch.setVisible(true);
+  hud.setBattle(null);   // a race's points pill must not follow the player into the park (it did until 15 November 2026)
   hud.setPark(true, parkTallyText());
   if (scene.park()) scene.park().setWon(save.state.park.won);
   resetRun();
