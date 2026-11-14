@@ -77,7 +77,7 @@ for (const vp of P.SIZES) {
   const known = await page.evaluate(new Function(`
     const F = window.__feel, Lp = window.__loop, e = document.getElementById('park'), was = e.getAttribute('style') || '';
     const each = new Function('F', 'Lp', ${JSON.stringify(EACH)});
-    window.__clock += 1000 / 60; F.frame(window.__clock); e.hidden = false; e.style.top = '58%';
+    window.__clock += 1000 / 60; F.frame(window.__clock); e.hidden = false; e.style.top = '58%'; e.style.left = '50%'; e.style.setProperty('--ptx', '-50%');
     const r = each(F, Lp); e.setAttribute('style', was);
     return r;
   `));

@@ -66,15 +66,30 @@ drive knocked one cone on its way round (not at the gate).
 
 | # | Measure | Result | Known answer |
 |---|---|---|---|
-| 1 | The park (`park.js`) | PASS. 3.64 times the old area. A flood over every spot the car fits (2.63 m clear) reaches all 44 places asked and all 224,021 cells: nothing walled off. Driven on grip to six places, 0 contacts. 504 flat out drives at 84 points of the outer wall, two cars, three starts: 0.00 m outside, 0.00 m into a solid (top 209 km/h). Stuck recovery in 38 places: always on open ground, at least 0.76 m clear, and drives off. | A 14 m gap cut in the wall: the driver gets 14 m outside, CAUGHT. The flood does not enter a pillar. A recovery put inside a pillar, CAUGHT. |
+| 1 | The park (`park.js`) | PASS. 3.64 times the old area. A flood over every spot the car fits (2.63 m clear) reaches all 44 places asked and all 224,021 cells: nothing walled off. Driven on grip to six places, 0 contacts. 504 flat out drives at 84 points of the outer wall, two cars, three starts: 0.00 m outside, 0.00 m into a solid (top 209 km/h). Stuck recovery in 38 places: always on open ground, at least 0.76 m clear, and drives off. | A 14 m gap cut in the wall: the driver gets 14 m outside in 8 s, CAUGHT. The flood does not enter a pillar. A recovery put inside a pillar, CAUGHT. |
 | 2 | Sight (`sight.js`) | PASS. Tour, donuts, eight, gate, wall ride, landscape and portrait: the car hidden for 0 s in nine of ten laps, 0.117 s in one. Worst case made for each of 7 solids, 4 ways: 0.117 s (limit 0.333). | Fade off: up to 1.57 s, 28 of 28 over, CAUGHT. |
 | 3 | Each challenge, each level (`challenges.js`) | PASS. Table above; judge and second count agree in all 11 drives. | A slide broken mid donut: the count falls 1 to 0, best 2 not 4. A wall touched: the ride's count is 0 on the next step. Cones knocked: the count is 0 after each knock. The guard counts 12 of 12 half steer inputs. A recording with a quarter cut out: 3 turns against 4, CAUGHT. |
 | 4 | Paying (`paying.js`) | PASS. Bronze paid once (and only the levels won: 480 coins for donut bronze, slide bronze, chain bronze and silver); again after the title: 0; after a reload: 0. Gate at 93 km/h with bronze never won pays bronze and silver together (300); a bronze pass after: 0. | Storage cleared: the same drive pays 480 again. Bronze first then silver pays 80 then 220, not 300. |
 | 5 | Saves (`saves.js`, Node, against `origin/main`'s `save.js`) | PASS. An old save loads unchanged, 0 repairs, nothing won. This build's save loads in main without throwing. Pay once at the save, lower levels with a higher. Unknown ids and levels repaired. Full storage: ghosts go, park levels and coins stay. `loop/quota.js` passes. | One coin taken, CAUGHT. A loader made to throw, CAUGHT. Wiped levels pay again. |
 | 6 | Layout (`layout.js`) at 390x844, 844x390, 800x450, 1280x720 | PASS. List: no button under 44 px, nothing scrolls sideways, all 8 cards reachable, nothing cut off, DRIVE on screen. In the park: list button 84 by 44; over a donut drive the readout, welcome, button and notice are over the car on 0 of 2,400 frames at every size. | The readout moved over the car, CAUGHT at every size. |
-| 7 | Nothing else changed | PASS, all ten: `ladder2/determinism.js`, `play13/check.js`, `play13/career.js`, `play14/check.js`, `ready/pad.js` (now with the park's list), `ready/keys.js`, `ready/sdk.js` after `npm run build`, `ladder/earning.js`, `garage/buy.js`, `garage/layout.js`. | their own |
+| 7 | Nothing else changed | Nine of ten PASS: `play13/check.js`, `play13/career.js`, `play14/check.js`, `ready/pad.js` (now with the park's list), `ready/keys.js`, `ready/sdk.js` after `npm run build`, `ladder/earning.js`, `garage/buy.js`, `garage/layout.js`. **`ladder2/determinism.js` FAILS on this machine, and fails the same way on main's own code**: see below. In its place `park/same.js`: main and this branch side by side in one browser agree to the bit on both recorded tapes, the recorded Kestrow race tape, and two runs driven live (career 1: 895 in 8,396 steps; the Kestrow race: 2,433 against 4,497 in 9,290 steps). | A tape entry turned: another hash. ACCEL moved one per cent on this branch: 7 of 7 disagree, CAUGHT. |
 | 8 | Frame cost (`perf.js`), low tier, night, 6x throttle, JS without submit | PASS. Park, mid slide round the donut pillar (sliding 270 of 270 frames): p95 5.7, 5.4, 5.5 ms; median 1.6, 1.3, 1.4. Career track 1: p95 7.5, 8.0, 5.3; median 1.5, 1.8, 1.3. Worst frames 10.6 to 20.1 (park) and 14.2 to 21.1 (career); frames over 16.7 ms: 0, 1, 1 and 1, 1, 0 of 270. 75 draw calls against 76, 131,429 triangles against 176,117. Quality still steps down to level 4 on both tiers. | 3 ms of busy work: median 1.4 to 4.4. 20 ms: p95 29.1, fails the budget. 900 frames at 60 fps step nothing. |
 |   | The rest (`extras.js`) | PASS. Welcome once. List by touch, L, Tab, gamepad. Gold dims its place only. Cosmetics show. The adapter sees the park as play and the list as not. Cones stand up again. A drive changes only the save's park field and coins. | one each |
+
+## The determinism probe, which the brief names and which does not pass
+
+`game/test/ladder2/determinism.js` compares with hashes stored in
+`review/ladder2/main.json`. On this machine's Chromium (build 1243)
+it fails 4 checks, **and main's own code, out of git, fails the same 4
+in the same browser**: scores match (895, 1,678) and the world hashes
+do not, and the recorded race tape no longer reaches its line. The
+stored answers were recorded in another build of Chromium; the last
+bit of its arithmetic differs. Earlier in this round, on the machine's
+previous browser, the probe passed on this same code (that machine was
+recycled and the result is not on disk, so take it as said, not shown).
+What is shown is `game/test/park/same.js` (measure 7 above). The stored
+answers in `review/ladder2/` are untouched; re-recording them is the
+reviewer's call.
 
 ## Deviations from the brief, and decisions
 
@@ -108,8 +123,13 @@ drive knocked one cone on its way round (not at the gate).
     feel probes drive.
 11. The gate drives use a flick thrown at a set point (button and
     steering held 0.3 s, steering 1.2 s more): still a phone's inputs.
-12. Headline on the title at 844x390 and 800x450 takes two lines, as
+12. STUNT PARK on the title takes two lines at 844x390 and 800x450, as
     DAILY DRIFT does there; one line at 390 and 1280.
+13. The readout is under the total, except on a phone on its side,
+    where the game's own chain number rides there: it goes to the left
+    under the buttons.
+14. The work was written twice: the machine was recycled before the
+    first push. Every number here is from the second writing.
 
 ## What failed or was cut
 
