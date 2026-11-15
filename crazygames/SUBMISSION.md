@@ -83,7 +83,10 @@ purchases, no accounts.
   driftfever.com does not.
 - Hides its own full screen button inside their frame (they forbid a
   custom one and provide theirs).
-- A new player lands in a run of the first track with no click.
+- A new player lands on the title, where the main button (CAREER,
+  start here) is one click from a run of the first track. Their
+  gameplay page asks for gameplay at once or one click at most. The
+  controls are prompted during that first run and can be skipped.
 
 ## Checked against their requirements
 

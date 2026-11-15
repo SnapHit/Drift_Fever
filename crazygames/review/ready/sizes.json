@@ -87,7 +87,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "907x510 career": {
@@ -171,7 +171,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1024x576 career": {
@@ -255,7 +255,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1152x648 career": {
@@ -339,7 +339,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1280x720 career": {
@@ -423,7 +423,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1366x768 career": {
@@ -507,7 +507,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1536x864 career": {
@@ -591,7 +591,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1600x900 career": {
@@ -675,7 +675,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1760x990 career": {
@@ -759,7 +759,7 @@
   "buttons": 10,
   "minBtn": 44,
   "minText": 12,
-  "minTextOf": "2026-11-15 3 laps",
+  "minTextOf": "start here · track 1 of ",
   "bad": []
  },
  "1920x1080 career": {

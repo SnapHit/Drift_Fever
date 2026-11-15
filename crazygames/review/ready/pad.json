@@ -3,8 +3,8 @@
   "before": 0,
   "all": 10,
   "missed": [],
-  "start": "daily|",
-  "udMissed": 4,
+  "start": "first|",
+  "udMissed": 5,
   "ring": 1
  },
  "390x844 career": {
@@ -48,8 +48,8 @@
   "ring": 1
  },
  "390x844 trip": {
-  "focus": "career|",
-  "afterA": "screen career",
+  "focus": "rivals|",
+  "afterA": "screen rivals",
   "afterB": "screen title",
   "inRun": true,
   "afterBack": "screen title"
@@ -87,7 +87,7 @@
   "before": 0,
   "all": 10,
   "missed": [],
-  "start": "daily|",
+  "start": "first|",
   "udMissed": 7,
   "ring": 1
  },
@@ -132,8 +132,8 @@
   "ring": 1
  },
  "844x390 trip": {
-  "focus": "career|",
-  "afterA": "screen career",
+  "focus": "rivals|",
+  "afterA": "screen rivals",
   "afterB": "screen title",
   "inRun": true,
   "afterBack": "screen title"
@@ -171,7 +171,7 @@
   "before": 0,
   "all": 10,
   "missed": [],
-  "start": "daily|",
+  "start": "first|",
   "udMissed": 0,
   "ring": 1
  },
@@ -216,8 +216,8 @@
   "ring": 1
  },
  "1280x720 trip": {
-  "focus": "career|",
-  "afterA": "screen career",
+  "focus": "rivals|",
+  "afterA": "screen rivals",
   "afterB": "screen title",
   "inRun": true,
   "afterBack": "screen title"

@@ -192,6 +192,7 @@
   #onboard .info b { color: var(--edge); }
   #skip { position: absolute; right: max(12px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 80px); min-width: 72px; height: 44px; padding: 0 16px; border-radius: 22px; border: 2px solid rgba(255,255,255,0.4); background: rgba(10,14,30,0.6); color: #fff; font: inherit; font-weight: 800; font-size: 13px; letter-spacing: 0.1em; pointer-events: auto; }
   #skip[hidden] { display: none; }
+  #onboard.park #skip { top: calc(max(10px, env(safe-area-inset-top)) + 134px); }   /* the stunt park's list button has the usual place */
 
   /* the screens */
   #screens { position: absolute; inset: 0; display: none; overflow: auto; -webkit-overflow-scrolling: touch; background: linear-gradient(180deg, rgba(14,16,30,0.72), rgba(14,16,30,0.86)); }

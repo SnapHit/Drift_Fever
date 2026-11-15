@@ -1,0 +1,394 @@
+{
+ "phone": {
+  "state": "title",
+  "onboard": false,
+  "buttons": [
+   {
+    "action": "first",
+    "primary": true,
+    "text": "CAREER start here · track 1 of 24",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "daily",
+    "primary": false,
+    "text": "DAILY DRIFT 2026-11-15 3 laps",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "rivals",
+    "primary": false,
+    "text": "RIVALS Win a star on First slide to race Kestrow",
+    "h": 73,
+    "inside": true
+   },
+   {
+    "action": "park",
+    "primary": false,
+    "text": "STUNT PARK free drift · 0 of 24",
+    "h": 73,
+    "inside": true
+   },
+   {
+    "action": "garage",
+    "primary": false,
+    "text": "GARAGE Starter coupe",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "lab",
+    "primary": false,
+    "text": "TRACK LAB make and share tracks",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "fullscreen",
+    "primary": false,
+    "text": "FULL SCREEN",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "sound",
+    "primary": false,
+    "text": "SOUND ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "music",
+    "primary": false,
+    "text": "♫ MUSIC ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "onboard",
+    "primary": false,
+    "text": "? HOW TO PLAY",
+    "h": 44,
+    "inside": true
+   }
+  ]
+ },
+ "phone-wide": {
+  "state": "title",
+  "onboard": false,
+  "buttons": [
+   {
+    "action": "first",
+    "primary": true,
+    "text": "CAREER start here · track 1 of 24",
+    "h": 77,
+    "inside": true
+   },
+   {
+    "action": "daily",
+    "primary": false,
+    "text": "DAILY DRIFT 2026-11-15 3 laps",
+    "h": 77,
+    "inside": true
+   },
+   {
+    "action": "rivals",
+    "primary": false,
+    "text": "RIVALS Win a star on First slide to race Kestrow",
+    "h": 77,
+    "inside": true
+   },
+   {
+    "action": "park",
+    "primary": false,
+    "text": "STUNT PARK free drift · 0 of 24",
+    "h": 57,
+    "inside": true
+   },
+   {
+    "action": "garage",
+    "primary": false,
+    "text": "GARAGE Starter coupe",
+    "h": 57,
+    "inside": true
+   },
+   {
+    "action": "lab",
+    "primary": false,
+    "text": "TRACK LAB make and share tracks",
+    "h": 57,
+    "inside": true
+   },
+   {
+    "action": "fullscreen",
+    "primary": false,
+    "text": "FULL SCREEN",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "sound",
+    "primary": false,
+    "text": "SOUND ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "music",
+    "primary": false,
+    "text": "♫ MUSIC ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "onboard",
+    "primary": false,
+    "text": "? HOW TO PLAY",
+    "h": 44,
+    "inside": true
+   }
+  ]
+ },
+ "desktop": {
+  "state": "title",
+  "onboard": false,
+  "buttons": [
+   {
+    "action": "first",
+    "primary": true,
+    "text": "CAREER start here · track 1 of 24",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "daily",
+    "primary": false,
+    "text": "DAILY DRIFT 2026-11-15 3 laps",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "rivals",
+    "primary": false,
+    "text": "RIVALS Win a star on First slide to race Kestrow",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "park",
+    "primary": false,
+    "text": "STUNT PARK free drift · 0 of 24",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "garage",
+    "primary": false,
+    "text": "GARAGE Starter coupe",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "lab",
+    "primary": false,
+    "text": "TRACK LAB make and share tracks",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "fullscreen",
+    "primary": false,
+    "text": "FULL SCREEN",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "sound",
+    "primary": false,
+    "text": "SOUND ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "music",
+    "primary": false,
+    "text": "♫ MUSIC ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "onboard",
+    "primary": false,
+    "text": "? HOW TO PLAY",
+    "h": 44,
+    "inside": true
+   }
+  ]
+ },
+ "taught": {
+  "shown": [
+   "steer",
+   "clean",
+   "drift",
+   "chain",
+   "brake"
+  ],
+  "saved": true,
+  "again": false,
+  "first": true
+ },
+ "old": {
+  "state": "title",
+  "onboard": false,
+  "buttons": [
+   {
+    "action": "daily",
+    "primary": true,
+    "text": "DAILY DRIFT 2026-11-15 3 laps",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "career",
+    "primary": false,
+    "text": "CAREER 0/72 stars · 1/72 missions",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "rivals",
+    "primary": false,
+    "text": "RIVALS Win a star on First slide to race Kestrow",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "park",
+    "primary": false,
+    "text": "STUNT PARK free drift · 0 of 24",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "garage",
+    "primary": false,
+    "text": "GARAGE Starter coupe",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "lab",
+    "primary": false,
+    "text": "TRACK LAB make and share tracks",
+    "h": 58,
+    "inside": true
+   },
+   {
+    "action": "fullscreen",
+    "primary": false,
+    "text": "FULL SCREEN",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "sound",
+    "primary": false,
+    "text": "SOUND ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "music",
+    "primary": false,
+    "text": "♫ MUSIC ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "onboard",
+    "primary": false,
+    "text": "? HOW TO PLAY",
+    "h": 44,
+    "inside": true
+   }
+  ]
+ },
+ "frame": {
+  "state": "title",
+  "onboard": false,
+  "buttons": [
+   {
+    "action": "first",
+    "primary": true,
+    "text": "CAREER start here · track 1 of 24",
+    "h": 77,
+    "inside": true
+   },
+   {
+    "action": "daily",
+    "primary": false,
+    "text": "DAILY DRIFT 2026-11-15 3 laps",
+    "h": 77,
+    "inside": true
+   },
+   {
+    "action": "rivals",
+    "primary": false,
+    "text": "RIVALS Win a star on First slide to race Kestrow",
+    "h": 77,
+    "inside": true
+   },
+   {
+    "action": "park",
+    "primary": false,
+    "text": "STUNT PARK free drift · 0 of 24",
+    "h": 57,
+    "inside": true
+   },
+   {
+    "action": "garage",
+    "primary": false,
+    "text": "GARAGE Starter coupe",
+    "h": 57,
+    "inside": true
+   },
+   {
+    "action": "lab",
+    "primary": false,
+    "text": "TRACK LAB make and share tracks",
+    "h": 57,
+    "inside": true
+   },
+   {
+    "action": "fullscreen",
+    "primary": false,
+    "text": "FULL SCREEN",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "sound",
+    "primary": false,
+    "text": "SOUND ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "music",
+    "primary": false,
+    "text": "♫ MUSIC ON",
+    "h": 44,
+    "inside": true
+   },
+   {
+    "action": "onboard",
+    "primary": false,
+    "text": "? HOW TO PLAY",
+    "h": 44,
+    "inside": true
+   }
+  ]
+ }
+}

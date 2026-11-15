@@ -1,6 +1,6 @@
-/* FIRST-RUN ONBOARDING. On the first visit the game lands in a run of
-   career track 1 with no title and no click, and this shows short
-   prompts at the moments they apply: steer, DRIFT / BRAKE with steering
+/* FIRST-RUN ONBOARDING. The game opens on the title; on a new player's
+   first run of anything (a career track, the daily, the stunt park) this
+   shows short prompts at the moments they apply: steer, DRIFT / BRAKE with steering
    to slide, DRIFT / BRAKE alone to brake, then what a banked chain and a
    clean sector are the first time each happens. Every prompt is shown
    once and goes when it is done (or after LOOP.ONBOARD.PROMPT_MAX
@@ -112,7 +112,7 @@ export function createOnboarding(root, onSkip) {
 
   /* for the probes: is a prompt or an explanation on screen */
   function visible() { return !el.hidden && (!prompt.hidden || !info.hidden); }
-  return { el, state: st, start, stop, update, visible, get active() { return st.active; } };
+  return { el, state: st, start, stop, update, visible, get active() { return st.active; }, get taught() { return st.done.steer && st.done.drift && st.done.brake; } };
 }
 
 /* How far along the track to the next corner's start, the short way on

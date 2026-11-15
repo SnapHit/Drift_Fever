@@ -1035,3 +1035,23 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   sound, by his word: there is enough going on. Not checked, his
   alone: frame rate on a desktop GPU, a 4 GB Chromebook, Safari, and
   their portal's own preview with the zip.
+- 15 November 2026, **the game opens on the title, the first visit
+  too**, by the author's decision after a friend's play (one track,
+  one rival, then gone, never having seen the park, the garage or the
+  Lab). This reverses the 9 November landing in a run with no click.
+  On a save with no career run the title's first and main button is
+  CAREER, "start here", and it starts track 1 in one click (`first` in
+  `main.js`; CrazyGames allows one click at most); once a career run
+  is finished the title is as it was, the daily as the main button.
+  **The prompts stay, by the reviewer's advice, and follow the player:**
+  they come on a new player's first run of anything, the stunt park
+  included (`save.needsOnboarding()` in `startRun` and `startFree`),
+  and never again once steer, slide and brake are each done or SKIP is
+  pressed (`onboard.taught`), whatever was being driven. Their quality
+  page asks for the controls to be shown in play. The author doubted
+  the prompts were needed at all, with the park to practise in: his
+  call still, and taking them out is one line (`teach`). HOW TO PLAY
+  is unchanged. `game/test/start/check.js` measures it at four sizes
+  from a truly empty profile. `ladder2/newplayer.js` replays presses
+  rehearsed for the old landing and is out of date; `ready/pad.js` and
+  `retention/heading.js` were moved to the new start.

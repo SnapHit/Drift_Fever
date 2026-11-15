@@ -378,9 +378,9 @@ export const LOOP = {
     OPEN:             [0, 12, 14],
     STAR_SCALE:       [1, 1.5, 1.5],   // a chapter's star targets as a multiple of the plain ones (modes.js starScale). After play on 15 November 2026: in the fastback the author won three stars on every Pro track, with double the points on some. Only the targets move: what a clean sector, the pace and a lead pay still come from the plain first star, and stars already won are kept
   },
-  /* FIRST-RUN ONBOARDING (briefs/RETENTION.md 1): the first visit skips
-     the title and lands in career track 1, with short prompts at the
-     moments they apply. The car is never paused to explain. */
+  /* FIRST-RUN ONBOARDING (briefs/RETENTION.md 1): a new player's first
+     run of anything carries short prompts at the moments they apply (the
+     game opens on the title since 15 November 2026). The car is never paused to explain. */
   ONBOARD: {
     STEER_HOLD:       0.5,     // s of steering held before the steer prompt counts as done
     DRIFT_LEAD:       45,      // m before the next corner the drift prompt comes up (once steering is done)

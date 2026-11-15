@@ -61,8 +61,9 @@ export function createScreens(root, onAction) {
       ${sub ? `<p class="sub">${sub}</p>` : ''}
       ${info.backPay ? `<p class="sub pay">+${fmt(info.backPay)} coins for the stars you have already won</p>` : ''}
       <div class="menu">
-        <button type="button" class="big primary" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
-        <button type="button" class="big" data-action="career"><b>CAREER</b><small>${total}/${CAREER.length * 3} stars &middot; ${info.missions}/${info.missionsOf} missions</small></button>
+        ${info.fresh ? `<button type="button" class="big primary" data-action="first"><b>CAREER</b><small>start here &middot; track 1 of ${CAREER.length}</small></button>` : ''}
+        <button type="button" class="big${info.fresh ? '' : ' primary'}" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
+        ${info.fresh ? '' : `<button type="button" class="big" data-action="career"><b>CAREER</b><small>${total}/${CAREER.length * 3} stars &middot; ${info.missions}/${info.missionsOf} missions</small></button>`}
         ${rivalsButton(save)}
         <button type="button" class="big parkbtn" data-action="park"><b>STUNT PARK</b><small>free drift &middot; ${parkTally(save.park && save.park.won).won} of ${parkTally(save.park && save.park.won).of}</small></button>
         <button type="button" class="big" data-action="garage"><b>GARAGE</b><small>${esc(carById(save.car).name)}</small></button>

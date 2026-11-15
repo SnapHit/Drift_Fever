@@ -39,6 +39,8 @@ for (const vp of SIZES) {
     const { page } = pg;
     const box = sel => page.evaluate(s => { const e = document.querySelector(s); if (!e || e.hidden || !e.offsetParent && getComputedStyle(e).position !== 'fixed') return null; const r = e.getBoundingClientRect(); return r.width && r.height ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null; }, sel);
     /* the targets are set as a run starts, so the known answer restarts the first visit's run; the levels, not the rate, since the clean and pace pay scales with the rate */
+    /* since 15 November 2026 a first visit opens on the title: its main button starts the run */
+    await page.evaluate(() => window.__loop.action('first'));
     if (known) await page.evaluate(() => { const Lp = window.__loop; Lp.LOOP.STAR_LEVELS = Lp.LOOP.STAR_LEVELS.map(k => k * 100); Lp.startRun(Lp.careerSpec(0), { onboard: true }); });
     await R.runFrames(page, 90, 'return 0;');
     const head = await page.evaluate(() => { const m = document.getElementById('missions'); return { shown: !m.hidden, label: (m.querySelector('i') || {}).textContent || '', name: (m.querySelector('strong') || {}).textContent || '', state: window.__loop.app.state }; });

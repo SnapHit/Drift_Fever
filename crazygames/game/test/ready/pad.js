@@ -47,14 +47,14 @@ for (const vp of [{ width: 390, height: 844 }, { width: 844, height: 390 }, { wi
   /* a trip by pad: title, A on CAREER, B back; then into a run and out by the back button; results reached */
   const trip = await pg.page.evaluate(new Function(PAD + `
     const L = window.__loop, o = {};
-    L.action('title'); tap(99); N.focus('career|'); o.focus = N.key; tap(0); o.afterA = document.querySelector('#screens .screen').className;
+    L.action('title'); tap(99); N.focus('rivals|'); o.focus = N.key; tap(0); o.afterA = document.querySelector('#screens .screen').className;
     tap(1); o.afterB = document.querySelector('#screens .screen').className;
     L.action('career'); tap(99); N.focus('play-career|0'); tap(0); o.inRun = !document.querySelector('#screens').classList.contains('on');
     tap(8); o.afterBack = document.querySelector('#screens').classList.contains('on') ? document.querySelector('#screens .screen').className : 'still in the run';
     return o;
   `));
   out[tag + ' trip'] = trip;
-  say(/career/.test(trip.afterA) && /title/.test(trip.afterB) && trip.inRun && /title/.test(trip.afterBack), tag + ' a trip by pad: A on CAREER opens it, B goes back, A starts track 1, the back button leaves the run: ' + JSON.stringify(trip));
+  say(/rivals/.test(trip.afterA) && /title/.test(trip.afterB) && trip.inRun && /title/.test(trip.afterBack), tag + ' a trip by pad: A on RIVALS opens it (CAREER on a new save starts track 1), B goes back, A starts track 1, the back button leaves the run: ' + JSON.stringify(trip));
   /* the results by pad (15 November 2026): a career run's and a lost race's. Every button is reached, A presses the one in the ring, B goes to the title */
   for (const [kind, make] of [['career results', 'L.careerSpec(0)'], ['race results', 'L.battleSpec("r1")']]) {
     await pg.page.evaluate(new Function(`const L = window.__loop; window.__feel.draw = false; L.startRun(${make}); L.skipCountdown();`));

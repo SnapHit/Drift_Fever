@@ -321,7 +321,8 @@ function frame(t) {
     }
   }
   if (S === 'free' && app.park) parkFrame(dt);
-  if (onboard.active) onboard.update(dt, { driving: S === 'drive', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity });
+  if (onboard.active) onboard.update(dt, { driving: S === 'drive' || S === 'free', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity });
+  if (onboard.active && onboard.taught) save.setOnboarded();   // the three prompts are done: never again, whatever was being driven
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;
     hud.setRun(app.track.kind === 'circuit' ? 'LAP ' + Math.min(p.laps, p.lap + 1) + '/' + p.laps : Math.round(p.remaining) + ' m', app.runTime.toFixed(1));
@@ -337,7 +338,7 @@ function frame(t) {
 /* ---- the states ---- */
 function titleInfo() {
   const d = dailySpec();
-  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, labCodes: Object.keys(save.state.lab.codes).length, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
+  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, fresh: Object.keys(save.state.career).length === 0, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, labCodes: Object.keys(save.state.lab.codes).length, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -513,7 +514,8 @@ function startRun(spec, opts) {
   app.missions = missions ? createMissionJudge(missions, app.track, app.laps) : null;
   app.heardMissions = 0;
   /* the list over the countdown; not on the onboarding run, which teaches the core and nothing else (the missions are still judged and paid) */
-  const listed = missions && !(opts && opts.onboard);
+  const teach = !!(opts && opts.onboard) || save.needsOnboarding();   // the prompts: the first run of anything, or HOW TO PLAY
+  const listed = missions && !teach;
   const head = runHead(spec);
   hud.setMissions(listed ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null, head);
   app.missionsShown = listed || head ? LOOP.MISSIONS.SHOWN : 0;
@@ -540,7 +542,8 @@ function startRun(spec, opts) {
   resetRun();
   hud.setRun(app.track.kind === 'circuit' ? 'LAP 1/' + app.laps : Math.round(app.progress.total()) + ' m', '0.0');
   hud.setCount(String(Math.ceil(LOOP.COUNTDOWN)), false);
-  if (opts && opts.onboard) onboard.start(inputSource()); else if (onboard.active) onboard.stop(false);
+  onboard.el.classList.remove('park');
+  if (teach) onboard.start(inputSource()); else if (onboard.active) onboard.stop(false);
 }
 
 function finishRun() {
@@ -687,7 +690,8 @@ function countCoins(delay) {
    results, nothing paid but the challenges' levels, once each. The
    park's time of day moves on with each visit. */
 function startFree() {
-  if (onboard.active) onboard.stop(false);
+  onboard.el.classList.add('park');   // SKIP sits under the park's list button
+  if (save.needsOnboarding()) onboard.start(inputSource()); else if (onboard.active) onboard.stop(false);   // a new player who picks the park first is shown the controls there
   app.spec = { mode: 'free', key: 'free', name: 'Stunt park' };
   app.track = freeGround(LOOP.PARK.PRESETS[app.parkVisits % LOOP.PARK.PRESETS.length]);
   app.parkVisits++;
@@ -763,6 +767,7 @@ function onAction(action, arg) {
     case 'park-info': break;   // a card: nothing to do, it is a button so a gamepad can walk the list
     case 'daily': startRun(dailySpec()); break;
     case 'onboard': startRun(careerSpec(0), { onboard: true }); break;
+    case 'first': startRun(careerSpec(0)); break;   // a new player's main button: career track 1 in one click
     case 'lab': if (app.state !== 'lab' && app.lab && app.lab.spec) setLab(app.lab.settings, app.lab.seed); showMenu('lab'); break;   // back from a run: the car to the line, the backdrop as the Lab left it
     case 'lab-set': labSet(arg); break;
     case 'lab-new': setLab(app.lab.settings, randomSeed()); showMenu('lab'); break;
@@ -860,12 +865,12 @@ scene.ready.then(() => {
     if (r.error) { openLab(); app.lab.message = 'That link is not a track code: ' + r.error + '.'; app.lab.error = true; }
     else setLab(r.spec.settings, r.spec.seed, 'A shared track: ' + r.spec.code.slice(0, 4) + '-' + r.spec.code.slice(4, 8) + '-' + r.spec.code.slice(8));
     showMenu('lab');
-  } else if (save.needsOnboarding() && query.get('title') !== '1') {
-    /* the first visit: no title, no click, straight into career track 1
-       with the prompts (RETENTION.md 1; CrazyGames asks for gameplay at
-       once). The title comes after that run's results. */
-    startRun(careerSpec(0), { onboard: true });
   } else {
+    /* every visit opens on the title, the first one too (the author's
+       decision, 15 November 2026, after a friend played one track and one
+       rival and left without seeing the rest). A new player's main
+       button is one click from career track 1, and the prompts come on
+       the first run of whatever is picked. */
     menuGround();
     showMenu('title');
   }
