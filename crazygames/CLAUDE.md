@@ -1055,3 +1055,6 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   from a truly empty profile. `ladder2/newplayer.js` replays presses
   rehearsed for the old landing and is out of date; `ready/pad.js` and
   `retention/heading.js` were moved to the new start.
+  After the author's eye the same day: on a phone the new player's
+  menu is start here across the top, two pairs, then the Lab across
+  (`.menu.fresh`); every row runs edge to edge, measured.

@@ -394,6 +394,9 @@
   @media (orientation: portrait) {
     .title .menu { display: grid; grid-template-columns: 1fr 1fr; }
     .title .menu button[data-action="daily"], .title .menu button[data-action="lab"] { grid-column: 1 / -1; }
+    /* a new player's menu: start here across the top, then two pairs, then the Lab across */
+    .title .menu button[data-action="first"] { grid-column: 1 / -1; }
+    .title .menu.fresh button[data-action="daily"] { grid-column: auto; }
     .title .menu button.big small { white-space: normal; }
   }
   .title .rivalsbtn { position: relative; border-color: rgba(255,106,60,0.55); }

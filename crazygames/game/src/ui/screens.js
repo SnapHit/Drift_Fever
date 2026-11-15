@@ -60,7 +60,7 @@ export function createScreens(root, onAction) {
       <h1><img class="wordmark" src="assets/brand/drift-fever-wordmark.svg" alt="Drift Fever"></h1>
       ${sub ? `<p class="sub">${sub}</p>` : ''}
       ${info.backPay ? `<p class="sub pay">+${fmt(info.backPay)} coins for the stars you have already won</p>` : ''}
-      <div class="menu">
+      <div class="menu${info.fresh ? ' fresh' : ''}">
         ${info.fresh ? `<button type="button" class="big primary" data-action="first"><b>CAREER</b><small>start here &middot; track 1 of ${CAREER.length}</small></button>` : ''}
         <button type="button" class="big${info.fresh ? '' : ' primary'}" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
         ${info.fresh ? '' : `<button type="button" class="big" data-action="career"><b>CAREER</b><small>${total}/${CAREER.length * 3} stars &middot; ${info.missions}/${info.missionsOf} missions</small></button>`}

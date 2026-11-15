@@ -30,6 +30,11 @@ for (const [name, vp] of [['phone', { width: 390, height: 844 }], ['phone-wide',
   ok(name + ': an empty save boots on the title, no run started', t.state !== 'countdown' && t.state !== 'drive' && !t.onboard && menu.length >= 6, 'state ' + t.state + ', ' + menu.map(b => b.action).join(' '));
   ok(name + ': the main button is start here, first in the list, and the only main one', menu[0].action === 'first' && menu[0].primary && menu.filter(b => b.primary).length === 1 && !menu.some(b => b.action === 'career'), menu[0].text);
   ok(name + ': every title button is inside the frame and at least 36 px high', t.buttons.every(b => b.inside && b.h >= 36), t.buttons.filter(b => !b.inside || b.h < 36).map(b => b.action + ' ' + b.h + (b.inside ? '' : ' outside')).join(', ') || 'all ' + t.buttons.length);
+  /* the menu is balanced: every row of it is filled edge to edge (the author's eye, 15 November) */
+  const rows = await page.evaluate(() => { const m = document.querySelector('.title .menu').getBoundingClientRect(), by = {};
+    for (const b of document.querySelectorAll('.title .menu button')) { const r = b.getBoundingClientRect(), k = Math.round(r.top); (by[k] = by[k] || []).push([r.left - m.left, m.right - r.right]); }
+    return Object.values(by).map(a => ({ n: a.length, left: Math.round(Math.min(...a.map(x => x[0]))), right: Math.round(Math.min(...a.map(x => x[1]))) })); });
+  ok(name + ': every row of the menu runs from edge to edge', rows.every(r => r.left <= 1 && r.right <= 1), rows.map(r => r.n).join(' '));
   await page.screenshot({ path: path.join(dir, 'title-' + name + '.png') });
 
   /* one click to gameplay, with the prompts */
