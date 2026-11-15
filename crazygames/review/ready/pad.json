@@ -25,10 +25,10 @@
  },
  "390x844 garage": {
   "before": 0,
-  "all": 17,
+  "all": 12,
   "missed": [],
-  "start": "pick-car|starter",
-  "udMissed": 5,
+  "start": "garage-tab|cars",
+  "udMissed": 7,
   "ring": 1
  },
  "390x844 lab": {
@@ -39,12 +39,49 @@
   "udMissed": 7,
   "ring": 1
  },
+ "390x844 park": {
+  "before": 0,
+  "all": 10,
+  "missed": [],
+  "start": "free|",
+  "udMissed": 1,
+  "ring": 1
+ },
  "390x844 trip": {
   "focus": "career|",
   "afterA": "screen career",
   "afterB": "screen title",
   "inRun": true,
   "afterBack": "screen title"
+ },
+ "390x844 career results": {
+  "all": 2,
+  "missed": [],
+  "start": "again|",
+  "list": [
+   "again|",
+   "title|"
+  ],
+  "owns": true,
+  "afterB": "screen title"
+ },
+ "390x844 race results": {
+  "all": 4,
+  "missed": [],
+  "start": "again|",
+  "list": [
+   "again|",
+   "play-career|0",
+   "rivals|",
+   "title|"
+  ],
+  "owns": true,
+  "afterB": "screen title"
+ },
+ "390x844 again": {
+  "k": "again|",
+  "state": "countdown",
+  "open": false
  },
  "844x390 title": {
   "before": 0,
@@ -72,10 +109,10 @@
  },
  "844x390 garage": {
   "before": 0,
-  "all": 17,
+  "all": 12,
   "missed": [],
-  "start": "pick-car|starter",
-  "udMissed": 9,
+  "start": "garage-tab|cars",
+  "udMissed": 7,
   "ring": 1
  },
  "844x390 lab": {
@@ -83,7 +120,15 @@
   "all": 25,
   "missed": [],
   "start": "lab-drive|",
-  "udMissed": 13,
+  "udMissed": 12,
+  "ring": 1
+ },
+ "844x390 park": {
+  "before": 0,
+  "all": 10,
+  "missed": [],
+  "start": "free|",
+  "udMissed": 4,
   "ring": 1
  },
  "844x390 trip": {
@@ -92,6 +137,35 @@
   "afterB": "screen title",
   "inRun": true,
   "afterBack": "screen title"
+ },
+ "844x390 career results": {
+  "all": 2,
+  "missed": [],
+  "start": "again|",
+  "list": [
+   "again|",
+   "title|"
+  ],
+  "owns": true,
+  "afterB": "screen title"
+ },
+ "844x390 race results": {
+  "all": 4,
+  "missed": [],
+  "start": "again|",
+  "list": [
+   "again|",
+   "play-career|0",
+   "rivals|",
+   "title|"
+  ],
+  "owns": true,
+  "afterB": "screen title"
+ },
+ "844x390 again": {
+  "k": "again|",
+  "state": "countdown",
+  "open": false
  },
  "1280x720 title": {
   "before": 0,
@@ -119,10 +193,10 @@
  },
  "1280x720 garage": {
   "before": 0,
-  "all": 17,
+  "all": 12,
   "missed": [],
-  "start": "pick-car|starter",
-  "udMissed": 9,
+  "start": "garage-tab|cars",
+  "udMissed": 7,
   "ring": 1
  },
  "1280x720 lab": {
@@ -133,11 +207,48 @@
   "udMissed": 10,
   "ring": 1
  },
+ "1280x720 park": {
+  "before": 0,
+  "all": 10,
+  "missed": [],
+  "start": "free|",
+  "udMissed": 5,
+  "ring": 1
+ },
  "1280x720 trip": {
   "focus": "career|",
   "afterA": "screen career",
   "afterB": "screen title",
   "inRun": true,
   "afterBack": "screen title"
+ },
+ "1280x720 career results": {
+  "all": 2,
+  "missed": [],
+  "start": "again|",
+  "list": [
+   "again|",
+   "title|"
+  ],
+  "owns": true,
+  "afterB": "screen title"
+ },
+ "1280x720 race results": {
+  "all": 4,
+  "missed": [],
+  "start": "again|",
+  "list": [
+   "again|",
+   "play-career|0",
+   "rivals|",
+   "title|"
+  ],
+  "owns": true,
+  "afterB": "screen title"
+ },
+ "1280x720 again": {
+  "k": "again|",
+  "state": "countdown",
+  "open": false
  }
 }

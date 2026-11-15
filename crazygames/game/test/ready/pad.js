@@ -55,6 +55,28 @@ for (const vp of [{ width: 390, height: 844 }, { width: 844, height: 390 }, { wi
   `));
   out[tag + ' trip'] = trip;
   say(/career/.test(trip.afterA) && /title/.test(trip.afterB) && trip.inRun && /title/.test(trip.afterBack), tag + ' a trip by pad: A on CAREER opens it, B goes back, A starts track 1, the back button leaves the run: ' + JSON.stringify(trip));
+  /* the results by pad (15 November 2026): a career run's and a lost race's. Every button is reached, A presses the one in the ring, B goes to the title */
+  for (const [kind, make] of [['career results', 'L.careerSpec(0)'], ['race results', 'L.battleSpec("r1")']]) {
+    await pg.page.evaluate(new Function(`const L = window.__loop; window.__feel.draw = false; L.startRun(${make}); L.skipCountdown();`));
+    await R.runFrames(pg.page, 40);
+    await pg.page.evaluate(() => window.__loop.finishNow());
+    await R.runFrames(pg.page, 40);
+    const r = await pg.page.evaluate(new Function(PAD + `
+      const all = [...new Set(keys())], full = reach(['up', 'down', 'left', 'right']), o = { all: all.length, missed: all.filter(k => !full.seen.includes(k)), start: full.start, list: all };
+      o.owns = N.owns();
+      tap(1); o.afterB = document.querySelector('#screens').classList.contains('on') ? document.querySelector('#screens .screen').className : 'in a run';
+      return o;
+    `));
+    out[tag + ' ' + kind] = r;
+    say(r.all >= 2 && r.missed.length === 0 && r.owns && /title/.test(r.afterB), tag + ' ' + kind + ': all ' + r.all + ' buttons reached from ' + r.start + (r.missed.length ? ', MISSED ' + r.missed.join(' ') : '') + '; B goes to ' + r.afterB);
+  }
+  /* and A on the ring starts the run again and nothing else does */
+  const again = await pg.page.evaluate(new Function(PAD + `const L = window.__loop; L.startRun(L.careerSpec(0)); L.skipCountdown(); return true;`));
+  await R.runFrames(pg.page, 40); await pg.page.evaluate(() => window.__loop.finishNow()); await R.runFrames(pg.page, 60);   // past LOOP.RESULTS_LOCKOUT, before which a press is ignored
+  const pressed = await pg.page.evaluate(new Function(PAD + `N.focus('again|'); const k = N.key; tap(0); return { k, state: window.__loop.app.state, open: document.querySelector('#screens').classList.contains('on') };`));
+  out[tag + ' again'] = pressed;
+  say(pressed.k === 'again|' && !pressed.open && (pressed.state === 'countdown' || pressed.state === 'drive'), tag + ' A on AGAIN starts the run again: ' + JSON.stringify(pressed));
+  await pg.page.evaluate(() => window.__loop.action('title'));
   await pg.page.evaluate(new Function(PAD + `window.__loop.action('garage'); tap(99); tap(13);`));
   await pg.page.screenshot({ path: path.join(dir, 'shots', tag + '-pad-garage.png') });
   await pg.page.close();

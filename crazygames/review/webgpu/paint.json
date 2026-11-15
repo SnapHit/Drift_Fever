@@ -1,0 +1,86 @@
+[
+ {
+  "label": "1-own",
+  "car": "starter",
+  "paint": "cyan",
+  "rgb": [
+   25,
+   216,
+   255
+  ],
+  "model": "#19d8ff",
+  "seenHue": 205,
+  "wantHue": 190.17391304347828,
+  "dist": 14.82608695652172
+ },
+ {
+  "label": "2-magenta",
+  "car": "starter",
+  "paint": "magenta",
+  "rgb": [
+   255,
+   45,
+   138
+  ],
+  "model": "#ff2d8a",
+  "seenHue": 325,
+  "wantHue": 333.42857142857144,
+  "dist": 8.428571428571445
+ },
+ {
+  "label": "3-lime",
+  "car": "starter",
+  "paint": "lime",
+  "rgb": [
+   155,
+   227,
+   28
+  ],
+  "model": "#9be31c",
+  "seenHue": 75,
+  "wantHue": 81.70854271356784,
+  "dist": 6.708542713567837
+ },
+ {
+  "label": "4-hatch-own",
+  "car": "hatch",
+  "paint": "amber",
+  "rgb": [
+   255,
+   184,
+   28
+  ],
+  "model": "#ffb81c",
+  "seenHue": 35,
+  "wantHue": 41.23348017621146,
+  "dist": 6.233480176211458
+ },
+ {
+  "label": "5-hatch-flame",
+  "car": "hatch",
+  "paint": "flame",
+  "rgb": [
+   232,
+   69,
+   44
+  ],
+  "model": "#e8452c",
+  "seenHue": 355,
+  "wantHue": 7.9787234042553195,
+  "dist": 12.978723404255334
+ },
+ {
+  "label": "6-back-to-starter",
+  "car": "starter",
+  "paint": "lime",
+  "rgb": [
+   155,
+   227,
+   28
+  ],
+  "model": "#9be31c",
+  "seenHue": 75,
+  "wantHue": 81.70854271356784,
+  "dist": 6.708542713567837
+ }
+]

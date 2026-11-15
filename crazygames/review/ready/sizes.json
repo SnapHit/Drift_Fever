@@ -1,0 +1,842 @@
+{
+ "800x450 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "FULL SCREEN",
+  "bad": []
+ },
+ "800x450 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "800x450 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "Earn each one with a sta",
+  "bad": []
+ },
+ "800x450 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "800x450 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "800x450 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "800x450 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "800x450 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "800x450 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "800x450 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "800x450 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "800x450 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "907x510 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "907x510 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "907x510 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "907x510 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "907x510 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "907x510 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "907x510 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "907x510 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "907x510 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "907x510 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "907x510 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "907x510 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1024x576 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1024x576 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1024x576 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1024x576 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1024x576 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1024x576 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1024x576 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1024x576 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1024x576 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1024x576 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1024x576 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1024x576 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1152x648 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1152x648 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1152x648 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1152x648 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1152x648 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1152x648 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1152x648 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1152x648 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1152x648 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1152x648 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1152x648 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1152x648 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1280x720 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1280x720 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1280x720 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1280x720 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1280x720 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1280x720 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1280x720 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1280x720 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1280x720 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1280x720 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1280x720 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1280x720 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1366x768 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1366x768 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1366x768 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1366x768 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1366x768 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1366x768 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1366x768 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1366x768 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1366x768 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1366x768 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1366x768 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1366x768 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1536x864 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1536x864 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1536x864 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1536x864 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1536x864 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1536x864 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1536x864 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1536x864 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1536x864 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1536x864 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1536x864 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1536x864 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1600x900 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1600x900 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1600x900 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1600x900 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1600x900 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1600x900 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1600x900 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1600x900 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1600x900 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1600x900 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1600x900 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1600x900 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1760x990 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1760x990 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1760x990 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1760x990 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1760x990 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1760x990 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1760x990 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1760x990 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1760x990 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1760x990 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1760x990 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1760x990 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1920x1080 title": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 12,
+  "minTextOf": "2026-11-15 3 laps",
+  "bad": []
+ },
+ "1920x1080 career": {
+  "buttons": 2,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "Win a star on First slid",
+  "bad": []
+ },
+ "1920x1080 rivals": {
+  "buttons": 7,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "○ Win a star on First sl",
+  "bad": []
+ },
+ "1920x1080 garage": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1920x1080 garage wheels": {
+  "buttons": 13,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "drag to turn",
+  "bad": []
+ },
+ "1920x1080 lab": {
+  "buttons": 25,
+  "minBtn": 36,
+  "minText": 10,
+  "minTextOf": "CODE",
+  "bad": []
+ },
+ "1920x1080 park list": {
+  "buttons": 10,
+  "minBtn": 44,
+  "minText": 11,
+  "minTextOf": "The donut pad",
+  "bad": []
+ },
+ "1920x1080 a run": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1920x1080 career results": {
+  "buttons": 2,
+  "minBtn": 52,
+  "minText": 11,
+  "minTextOf": "CAREER · ROOKIE · TRACK ",
+  "bad": []
+ },
+ "1920x1080 a race": {
+  "buttons": 3,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ },
+ "1920x1080 race results": {
+  "buttons": 4,
+  "minBtn": 60,
+  "minText": 10,
+  "minTextOf": "YOU",
+  "bad": []
+ },
+ "1920x1080 stunt park": {
+  "buttons": 4,
+  "minBtn": 44,
+  "minText": 10,
+  "minTextOf": "km/h",
+  "bad": []
+ }
+}

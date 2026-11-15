@@ -1012,3 +1012,26 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   still carry a four part `glow` attribute, with a texture: whether
   they draw on his phone has not been asked. For new drawing: build
   it as the particles are, and have it seen on a real phone.
+- 15 November 2026, getting ready to submit, by the author's word
+  (**`SUBMISSION.md`** is the pack: files, the description and
+  controls to paste, their rules against where the build stands, and
+  the order to do it in). Their pages were read again the same day.
+  (1) The title says "CrazyGames edition" only in their package
+  (`HOST` in `sdk/host.js`); on the web nothing sits under the
+  wordmark. (2) **Their real SDK works with the package**: served from
+  localhost, where it runs in its "local" mode, v3.8.0 initialised and
+  logged a gameplay start at a run and a stop at the menu. (3) Ten
+  16:9 sizes at pixel ratio 1, twelve views each
+  (`game/test/ready/sizes.js`): their pages give no list, so the ten
+  are ours. It found the Lab's option buttons 34 px high and a 9 px
+  line at 800x450; both raised. (4) The results by gamepad
+  (`ready/pad.js`): every button reached, A on AGAIN starts again once
+  the 0.7 s lockout is over, B goes to the title. (5) The paint that
+  "sometimes does not show" (14 November): six garage journeys on
+  WebGPU, each read off the screen, all right
+  (`game/test/webgpu/paint.js`). Not reproduced. What remains likely
+  is a paint shown in the garage and not bought (it needs PAINT IT
+  since the garage round), or a new car in its own colour. No rival
+  sound, by his word: there is enough going on. Not checked, his
+  alone: frame rate on a desktop GPU, a 4 GB Chromebook, Safari, and
+  their portal's own preview with the zip.

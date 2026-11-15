@@ -12,6 +12,7 @@ import { soundIcon } from '../audio/sound.js';
 import { FIELDS } from '../lab/code.js';
 import { crossoverOffered, format as formatCode } from '../lab/lab.js';
 import { FX_ON } from '../fx.js';
+import { HOST } from '../sdk/host.js';
 import { ITEMS, STANDARD, KINDS, lookOf, priceOf, owns } from '../garage/cosmetics.js';
 import { wheelDesign, wheelIcon, standardIcon } from '../cars/wheels.js';
 import { carSpec } from '../cars/index.js';
@@ -51,11 +52,13 @@ export function createScreens(root, onAction) {
   function title(save, info) {
     const daily = save.daily && save.daily.date === info.dailyDate ? save.daily : null;
     const total = careerStars(save);
+    /* under the wordmark: which edition, only in the package made for CrazyGames (on the web it is simply the game: the author, 15 November 2026), and a warning when nothing can be saved */
+    const sub = (info.standIn ? 'test track build' : HOST === 'crazygames' ? 'CrazyGames edition' : '') + (info.storage ? '' : ' <em>(no memory on this device)</em>');
     show('title', `
       ${coins(save)}
       <img class="lockup" src="assets/brand/snaphit-lockup.svg" alt="SnapHit Studios. Instant. Play.">
       <h1><img class="wordmark" src="assets/brand/drift-fever-wordmark.svg" alt="Drift Fever"></h1>
-      <p class="sub">${info.standIn ? 'test track build' : 'CrazyGames edition'}${info.storage ? '' : ' <em>(no memory on this device)</em>'}</p>
+      ${sub ? `<p class="sub">${sub}</p>` : ''}
       ${info.backPay ? `<p class="sub pay">+${fmt(info.backPay)} coins for the stars you have already won</p>` : ''}
       <div class="menu">
         <button type="button" class="big primary" data-action="daily"><b>DAILY DRIFT</b><small>${esc(info.dailyName)} ${info.dailyKind}${daily ? ' &middot; best ' + fmt(daily.best) + ' ' + stars(daily.stars, true) : ''}</small></button>
