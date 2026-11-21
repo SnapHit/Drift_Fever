@@ -1065,3 +1065,14 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   art with the title moved clear (`compose.js --safe`; zone sizes
   measured in the portal are in the script). The `hero-*` covers and
   the site's share card are unchanged.
+- 21 November 2026: **submitted to CrazyGames for a Basic Launch**, by
+  the author, and listed in the portal as "Awaiting review". The build
+  is the package of commit 43eeb66's tree (main at cd535a3 plus the
+  covers). Their QA player ran it from the uploaded folder: Gameplay
+  Start and Stop detected, no warnings, load size 0.5 MB, total 12.2 MB.
+  Progress save declared as LocalStorage (their Automatic Progress
+  Save; no size limit in their docs, the Data module's is 1 MB, and a
+  save with many ghosts passes 2 MB). Their "load time" counts the
+  seconds on the title before the first run, since the game opens on
+  the menu. Not tried before submitting: an iPhone, Edge. Their Basic
+  Launch scoring adds click-through rate from 23 November 2026.

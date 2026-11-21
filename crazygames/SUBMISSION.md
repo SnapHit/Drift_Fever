@@ -1,5 +1,7 @@
 # Submitting Drift Fever to CrazyGames
 
+**Submitted on 21 November 2026 for a Basic Launch; awaiting review.**
+
 Everything their Developer Portal asks for, in one place, made on 15
 November 2026 from their own pages read that day
 (docs.crazygames.com/requirements: intro, technical, gameplay, quality,
