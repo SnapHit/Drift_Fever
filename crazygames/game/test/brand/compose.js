@@ -16,6 +16,14 @@ fs.mkdirSync(out, { recursive: true });
 const SHAPES = { landscape: [1920, 1080], portrait: [800, 1200], square: [800, 800], share: [1200, 630] };
 /* the title: its width as a share of the cover's, and how far down its top sits as a share of the height */
 const TITLE = { landscape: { w: 0.36, top: 0.04 }, portrait: { w: 0.86, top: 0.06 }, square: { w: 0.74, top: 0.045 }, share: { w: 0.36, top: 0.04 } };
+/* --safe: CrazyGames' portal shows the top-left corner its "New" and
+   "Updated" labels cover (measured in the portal on 21 November 2026:
+   landscape 40.6 by 20.5 per cent, portrait 41.0 by 10.2, square 35.9
+   by 30.7). These place the title clear of it: landscape and square move
+   right, portrait moves down. left is the title box's left edge, as a
+   share of the width; the wordmark's own margin is 5.7 per cent of it. */
+const SAFE = { landscape: { w: 0.36, top: 0.04, left: 0.42 }, portrait: { w: 0.86, top: 0.08 }, square: { w: 0.58, top: 0.045, left: 0.37 } };
+if (args.includes('--safe')) Object.assign(TITLE, SAFE);
 const mark = fs.readFileSync(path.join(R.root, 'game', 'assets', 'brand', 'drift-fever-wordmark.svg'), 'utf8');
 const exe = process.env.PLAYWRIGHT_BROWSERS_PATH ? fs.readdirSync(process.env.PLAYWRIGHT_BROWSERS_PATH).map(d => path.join(process.env.PLAYWRIGHT_BROWSERS_PATH, d, 'chrome-linux', 'chrome')).find(p => fs.existsSync(p)) : undefined;
 const browser = await chromium.launch({ executablePath: exe });
@@ -27,8 +35,8 @@ for (const f of fs.readdirSync(bg).sort()) {
   await page.setContent(`<!doctype html><style>
     html, body { margin: 0; width: ${w}px; height: ${h}px; overflow: hidden; background: #000; }
     .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }   /* a picture of another shape keeps its foot, where the car is, and gives up sky */
-    .shade { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 42% at 50% ${Math.round((T.top + 0.13) * 100)}%, rgba(8, 4, 22, 0.55), rgba(8, 4, 22, 0) 72%), linear-gradient(to bottom, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.28)); }
-    .title { position: absolute; left: ${(1 - T.w) / 2 * 100}%; top: ${T.top * 100}%; width: ${T.w * 100}%; filter: drop-shadow(0 ${Math.round(w * 0.006)}px ${Math.round(w * 0.012)}px rgba(10, 2, 20, 0.7)) drop-shadow(0 0 ${Math.round(w * 0.03)}px rgba(255, 110, 30, 0.35)); }
+    .shade { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 42% at ${Math.round(((T.left === undefined ? (1 - T.w) / 2 : T.left) + T.w / 2) * 100)}% ${Math.round((T.top + 0.13) * 100)}%, rgba(8, 4, 22, 0.55), rgba(8, 4, 22, 0) 72%), linear-gradient(to bottom, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.28)); }
+    .title { position: absolute; left: ${(T.left === undefined ? (1 - T.w) / 2 : T.left) * 100}%; top: ${T.top * 100}%; width: ${T.w * 100}%; filter: drop-shadow(0 ${Math.round(w * 0.006)}px ${Math.round(w * 0.012)}px rgba(10, 2, 20, 0.7)) drop-shadow(0 0 ${Math.round(w * 0.03)}px rgba(255, 110, 30, 0.35)); }
     .title svg { display: block; width: 100%; height: auto; }
   </style><img class="bg" src="${data}"><div class="shade"></div><div class="title">${mark}</div>`);
   await page.waitForTimeout(200);

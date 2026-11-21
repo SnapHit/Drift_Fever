@@ -1058,3 +1058,10 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   After the author's eye the same day: on a phone the new player's
   menu is start here across the top, two pairs, then the Lab across
   (`.menu.fresh`); every row runs edge to edge, measured.
+- 21 November 2026, submitting: their portal shows the top-left corner
+  its "New" and "Updated" labels cover, and it sat over the D of the
+  title on the square cover (and nicked the other two). The covers
+  uploaded to CrazyGames are `brand/covers/crazygames-*.png`, the hero
+  art with the title moved clear (`compose.js --safe`; zone sizes
+  measured in the portal are in the script). The `hero-*` covers and
+  the site's share card are unchanged.

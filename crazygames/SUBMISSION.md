@@ -10,9 +10,9 @@ game-covers). Their portal is https://developer.crazygames.com/.
 | What | File | Notes |
 |---|---|---|
 | The game | `drift-fever-crazygames.zip` | Made by `npm run build` then `npm run package:crazygames`, then the contents of `dist-crazygames/` zipped with `index.html` at the top. 90 files, 12.2 MB unzipped (their limits: 1,500 files, 250 MB). Not committed: make it again before uploading so it is the latest build. |
-| Landscape cover, 1920x1080 | `brand/covers/hero-landscape.png` | |
-| Portrait cover, 800x1200 | `brand/covers/hero-portrait.png` | |
-| Square cover, 800x800 | `brand/covers/hero-square.png` | |
+| Landscape cover, 1920x1080 | `brand/covers/crazygames-landscape.png` | The hero art with the title clear of their label zone (`compose.js --safe`). |
+| Portrait cover, 800x1200 | `brand/covers/crazygames-portrait.png` | The hero art with the title clear of their label zone (`compose.js --safe`). |
+| Square cover, 800x800 | `brand/covers/crazygames-square.png` | The hero art with the title clear of their label zone (`compose.js --safe`). |
 | Landscape video, 1080p 16:9 | `brand/video/drift-fever-preview-landscape-1920x1080.mp4` | 18.3 s, silent, 26 MB (their limits: 15 to 20 s, 50 MB). Not committed. |
 | Portrait video, 1080p 2:3 | `brand/video/drift-fever-preview-portrait-1080x1620.mp4` | 18.3 s, silent, 22 MB. Not committed. |
 
