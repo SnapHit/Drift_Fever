@@ -49,9 +49,17 @@ async function picture(backend, page) {
   if (backend === 'webgpu') return W.grab(page);
   return L.decode(await page.screenshot({ timeout: 180000 }));
 }
-async function open(backend, env, tier, query) {
+/* in software a WebGPU page now and then never gets its device and never becomes ready: such a page is
+   given up after a minute and the browser started again, three times at most */
+let env = null;
+async function open(backend, _env, tier, query) {
   const q = 'tier=' + tier + '&adapt=0&title=1&look=2' + (query || '');
-  const pg = backend === 'webgpu' ? await W.open(env, VP, q) : await L.openPage(env, VP, q.replace(/^/, ''));
+  let pg = null;
+  if (backend !== 'webgpu') pg = await L.openPage(env, VP, q);
+  else for (let attempt = 0; !pg; attempt++) {
+    try { pg = await W.open(env, VP, q, { timeout: 60000 }); }
+    catch (e) { if (attempt >= 3) throw e; console.log('(again after: ' + String(e.message || e).split('\n')[0] + ')'); await env.close().catch(() => {}); env = await W.start(); }
+  }
   await pg.page.evaluate(() => { try { localStorage.clear(); } catch (e) {} const S = window.__loop.save; S.reset(); S.setOnboarded(); for (let i = 0; i < 24; i++) S.careerResult(i, 3, 100000); });
   return pg;
 }
@@ -64,7 +72,7 @@ const changed = (A, B) => L.diffMask(A, B, TOL).n;
 
 const out = {};
 for (const backend of backends) {
-  const env = backend === 'webgpu' ? await W.start() : await L.start();
+  env = backend === 'webgpu' ? await W.start() : await L.start();
   for (const tier of tiers) {
     const key = backend + ' ' + tier, rows = {};
     const pg = await open(backend, env, tier);

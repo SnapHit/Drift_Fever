@@ -6,7 +6,8 @@
    from GO for FRAMES frames. The look must stay within 10 per cent of
    main on each, race by race (medians over the frames). The high tier
    is reported. Each race is its own browser, and one that fails to
-   load is run again once.
+   load is run again, three times at most (in software a WebGPU page
+   now and then never gets its device, and never becomes ready).
    The sandbox's GPU is software on the same two cores as the page, so
    a frame timed while the GPU is still drawing the one before is timed
    against it: the first runs, all frames in one go at 640x360, read 3.1
@@ -48,11 +49,11 @@ async function run(race, tier, query, extra) {
   for (let attempt = 0; ; attempt++) {
     const env = backend === 'webgpu' ? await W.start() : await L.start();
     try { const r = await once(env, race, tier, query, extra); await env.close(); return r; }
-    catch (e) { await env.close().catch(() => {}); if (attempt >= 1) throw e; console.log('(run again after: ' + String(e.message || e).split('\n')[0] + ')'); }
+    catch (e) { await env.close().catch(() => {}); if (attempt >= 3) throw e; console.log('(run again after: ' + String(e.message || e).split('\n')[0] + ')'); }
   }
 }
 async function once(env, race, tier, query, extra) {
-  const pg = backend === 'webgpu' ? await W.open(env, VP, 'tier=' + tier + query + '&title=1&adapt=0') : await L.page(env, VP, 'tier=' + tier + query);
+  const pg = backend === 'webgpu' ? await W.open(env, VP, 'tier=' + tier + query + '&title=1&adapt=0', { timeout: 60000 }) : await L.page(env, VP, 'tier=' + tier + query);
   if (backend === 'webgpu') await pg.page.evaluate(() => { try { localStorage.clear(); } catch (e) {} const S = window.__loop.save; S.reset(); S.setOnboarded(); for (let i = 0; i < 24; i++) S.careerResult(i, 3, 100000); });
   await L.dress(pg.page, L.STARTER);
   await L.raceTo(pg.page, { rival: L.RACES[race].rival, to: 0 });
