@@ -13,7 +13,8 @@
    None of these is balanced; they are characters for the author to play.
    The dimensions follow the car models' specs (length, wheelbase, track,
    wheel radius) so the physics box matches what is drawn. */
-import { TUNE, LOOP } from '../tune.js';
+import { TUNE, LOOP, FIRST } from '../tune.js';
+import { FIRST_ON } from '../first.js';
 
 export const PAINTS = [
   { id: 'cyan',    hex: 0x19d8ff, name: 'cyan' },
@@ -78,7 +79,7 @@ export function paintById(id) { return PAINTS.find(p => p.id === id) || PAINTS[0
    recorded on the old handling is not replayed on the new (8 November
    2026: the four paid cars made at least as quick as the starter, which
    had been made faster on 5 November and left them behind). */
-export function carRev(id) { return carById(id).rev || 1; }
+export function carRev(id, profile) { return id === 'starter' && FIRST_ON && !(profile && profile.controls === 'pro') ? FIRST.rev : carById(id).rev || 1; }   // the first minute's starter has its own on Easy (briefs/FIRST-MINUTE.md; physics/profile.js firstStarter): neither handling replays the other's ghosts
 
 export const UPGRADE_STATS = ['power', 'grip', 'steer'];
 export const UPGRADE_NAMES = { power: 'Power', grip: 'Grip', steer: 'Steering' };

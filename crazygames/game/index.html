@@ -355,6 +355,12 @@
   .results .unlock { margin: 0; font-size: 14px; font-weight: 800; text-align: center; opacity: 0.85; }
   .results .unlock.done { color: var(--brand-fill); opacity: 1; font-size: 15px; }
   .results .unlock.tip { color: #ffb81c; opacity: 1; }
+  /* the first minute's way to the garage (briefs/FIRST-MINUTE.md, ?first=2): what the coins buy, one press away */
+  .results .shopgo { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 6px 12px; border-radius: 14px; border: 2px solid rgba(255,211,77,0.75); background: linear-gradient(90deg, rgba(255,211,77,0.2), rgba(10,14,30,0.55)); color: #fff; font: inherit; text-align: left; cursor: pointer; }
+  .results .shopgo .sw { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 0 12px var(--c); }
+  .results .shopgo .what { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+  .results .shopgo .what b { font-size: 14px; font-weight: 900; letter-spacing: 0.04em; } .results .shopgo .what small { font-size: 12px; opacity: 0.8; }
+  .results .shopgo .go { flex: none; font-size: 13px; font-weight: 900; letter-spacing: 0.08em; color: #ffd34d; }
   .results .chapnote { margin: -4px 0 0; font-size: 13px; font-weight: 700; text-align: center; opacity: 0.75; }
   /* a battle's results (briefs/RIVALS.md 3) */
   .results .card.battle .who { margin: 0; font-size: clamp(30px, 8vw, 44px); font-weight: 900; letter-spacing: 0.04em; line-height: 1; text-align: center; }

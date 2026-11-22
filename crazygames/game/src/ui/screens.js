@@ -380,7 +380,15 @@ export function createScreens(root, onAction) {
       </div>`);
   }
 
-  /* r: { score, best, stars, targets, coins, improved, mode, name, label, seconds, nextIndex, unlock, note, laps, kind, missions, code } */
+  /* THE WAY TO THE GARAGE (briefs/FIRST-MINUTE.md priority 2, ?first=2):
+     what the coins already buy, shown with its colour and price, one
+     press from the garage where it is on the car and BUY is the button.
+     s: { kind, item, name, price, hex } (main.js shopPick) */
+  function shopLine(s) {
+    const sw = s.hex === null || s.hex === undefined ? '' : `<span class="sw" style="--c:${hexOf(s.hex)}"></span>`;
+    return `<button type="button" class="shopgo" data-action="shop" data-arg="${esc(s.kind)}:${esc(s.item)}">${sw}<span class="what"><b>${esc(s.name.toUpperCase())}</b><small>your coins buy it now &middot; ${coin(s.price)}</small></span><span class="go">GARAGE &#9654;</span></button>`;
+  }
+  /* r: { score, best, stars, targets, coins, improved, mode, name, label, seconds, nextIndex, unlock, note, laps, kind, missions, code, shop } */
   function results(r) {
     if (r.battle) return battleResults(r);
     const targets = r.targets.map((t, i) => `<span class="${r.score >= t ? 'on' : 'off'}">&#9733; ${fmt(t)}</span>`).join('');
@@ -403,6 +411,7 @@ export function createScreens(root, onAction) {
         ${r.code ? `<div class="coderow"><span class="codelabel">CODE</span><span class="code">${formatCode(r.code)}</span><button type="button" class="mini" data-action="lab-copy">COPY</button><button type="button" class="mini" data-action="lab-link">LINK</button></div>${r.message ? `<p class="status">${esc(r.message)}</p>` : ''}` : ''}
         ${r.unlock ? `<p class="unlock${r.unlock.done ? ' done' : ''}">${r.unlock.done ? '&#128275; ' : ''}${esc(r.unlock.text)}</p>` : ''}
         ${r.note ? `<p class="chapnote">${esc(r.note.text)}</p>` : ''}
+        ${r.shop ? shopLine(r.shop) : ''}
         <button type="button" class="big${r.unlock && r.unlock.done ? '' : ' primary'}" data-action="again"><b>GO AGAIN</b><small>DRIFT / BRAKE, Enter or R</small></button>
         <div class="row2">
           ${r.nextIndex !== null && r.nextIndex !== undefined ? `<button type="button" class="big${r.unlock && r.unlock.done ? ' primary' : ''}" data-action="play-career" data-arg="${r.nextIndex}"><b>NEXT</b><small>${esc(CAREER[r.nextIndex].name)}</small></button>` : ''}

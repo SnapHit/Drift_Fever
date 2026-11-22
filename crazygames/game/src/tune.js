@@ -67,6 +67,17 @@ export const TUNE = {
     BOOST_ACCEL:        9,       // m/s^2 of extra drive while boosting
     BOOST_TOP:          14,      // m/s added to the top speed while boosting
     WALL_SPIN:          0.35,    // share of a wall hit's turning that reaches the car: walls slide you along instead of spinning you round
+    /* THE FIRST MINUTE (briefs/FIRST-MINUTE.md): the held button, its
+       scrub and the kind wall (physics/vehicle.js, physics/world.js).
+       Every one is 0 here, so no car's handling changes: only the
+       starter's FIRST handling below sets them, behind ?first=2. */
+    HOLD_GRIP:          0,       // share of the front axle's grip a full steer asks for at speed, as a lateral acceleration (0: full lock, as always)
+    HOLD_SLIP:          0,       // degrees added to that angle for the tyres' own slip
+    HOLD_CRUISE:        0,       // m/s a held steer on grip bleeds the car down towards
+    HOLD_SCRUB:         0,       // m/s^2 it bleeds at, at full steer (0: none)
+    WALL_KIND:          0,       // share of the speed it met a wall with that the car keeps along the wall (0: the wall as always)
+    WALL_NOSE:          0,       // degrees the nose must point into a wall before it is turned along it
+    WALL_TURN:          0,       // rad/s of yaw per radian the nose is off the wall's line, while it touches
   },
   ASSIST: {
     LEVEL:              1.0,     // the hidden level: 0 is raw, 1 is the phone setting
@@ -279,6 +290,44 @@ export const PROFILES = {
         ANGLE_LIMIT: 95, ANGLE_PULL: 0, SPIN_GAIN: 0, THROTTLE_EASE: 0, YAW_SOFT: 9, COUNTERSTEER: 0.15, YAW_DAMP: 0.05, DRIFT_ENTER: 10 },
       SCALE: { MU_REAR: 0.9, DRIFT_EASE_IN: 1.5 },
     },
+  },
+};
+
+/* THE FIRST MINUTE'S STARTER (briefs/FIRST-MINUTE.md, 23 November 2026,
+   behind ?first=2): the starter coupe as the player drives it, layered
+   on the car as the garage tunes it (its upgrades count) the way a Pro
+   variant is (physics/profile.js), never on TUNE, so a rival in the
+   starter (Kestrow, Sarrow) drives exactly as he did. Measured with
+   scripted strangers on track 1 (game/test/first/newcomer.js,
+   review/first/REPORT.md): a thumb's steering is all or nothing, and on
+   the old starter a held button settled at 46 km/h on an 11 m circle
+   whatever the speed (full lock at the front's limit, with TURN_LIFT
+   taking 85 per cent of the drive), so strangers crawled round at 13
+   m/s, dived nose first into the inside wall, stopped dead and sat
+   there until they were put back. VEHICLE sets a number, SCALE
+   multiplies the car's own. rev: the starter's handling revision with
+   the switch (garage/roster.js carRev), so neither handling replays
+   the other's ghosts; the switch's ghosts are kept under their own key
+   as well (first:career:0), so nothing in a save is replaced. */
+export const FIRST = {
+  rev: 2,
+  VEHICLE: {
+    HOLD_GRIP:      0.9,     // a held button at speed asks for nine tenths of the front's grip: a circle of about 25 m at the cruise, tighter than every corner of track 1 (34 m and up), so holding it always makes the corner and the thumb only has to let go
+    HOLD_SLIP:      2,       // degrees for the tyres' own slip, so the circle is about the one asked for
+    HOLD_CRUISE:    19,      // m/s a held turn bleeds down towards (68 km/h; par pace is 18), instead of TURN_LIFT's 13
+    HOLD_SCRUB:     14,      // m/s^2: from 30 m/s on the first straight to the cruise in under a second, so a held button into the first corner turns instead of running wide
+    TURN_LIFT_FROM: 15,      // m/s the held turn's drive cut starts at (was 10, which held every held turn to 46 km/h)
+    WALL_KIND:      0.75,    // a wall met keeps three quarters of the speed, along the wall
+    WALL_NOSE:      10,      // degrees into a wall before the nose is turned along it
+    WALL_TURN:      3,       // rad/s per radian: the nose comes round in about a third of a second (6 swung it at 200 degrees a second; 2 left more scrapes)
+  },
+  ASSIST: {},
+  /* career track 1's star targets with the switch (main.js firstTargets; everything else's are as they were). Main's are 450, 900 and 1,580 */
+  STARS:            [450, 900, 1580],
+  SHOP_PAINT:       'amber',   // the paint the results offer when the coins buy nothing dearer: the cover car's colour
+  SCALE: {
+    STEER_RATE:     2.8125,  // 3.2 to 9 shares of the held angle a second: a tap of 100 ms turns about 2 degrees at track 1's speeds and 200 ms about 5 (were 3.4 and 10)
+    STEER_RETURN:   2.4,     // 5 to 12: and lets go as quickly
   },
 };
 

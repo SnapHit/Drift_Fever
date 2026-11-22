@@ -103,7 +103,18 @@ export function stepVehicle(s, input, dt) {
 
   /* ---- steering: the driver's slewed angle, then the assist ---- */
   const lockFull = V.LOCK * DEG;
-  const lockDrive = (V.LOCK + (V.LOCK_AT_SPEED - V.LOCK) * Math.min(1, speed / V.LOCK_SPEED)) * DEG;
+  let lockDrive = (V.LOCK + (V.LOCK_AT_SPEED - V.LOCK) * Math.min(1, speed / V.LOCK_SPEED)) * DEG;
+  /* THE HELD BUTTON (briefs/FIRST-MINUTE.md, the starter on ?first=2): a
+     thumb's steering is all or nothing, and at speed full lock asked for
+     an 11 m circle at the front tyres' limit whatever the speed. With
+     HOLD_GRIP set, a full steer at speed asks for no more than the turn
+     that takes HOLD_GRIP of the front's grip (as a lateral acceleration,
+     more with a steering upgrade), plus HOLD_SLIP for the tyres' own
+     slip, and the slew is a share of that angle, so a tap is a small
+     correction and a hold is a corner at every speed. 0 in TUNE: this
+     never runs for a car without it. */
+  const holding = V.HOLD_GRIP > 0 && speed > 1;
+  if (holding) lockDrive = Math.min(lockDrive, Math.atan(L * V.HOLD_GRIP * V.MU_FRONT * g * (V.LOCK / TUNE.VEHICLE.LOCK) / (speed * speed)) + V.HOLD_SLIP * DEG);
   const beta = speed > 0.01 ? Math.atan2(vy, absVx) : 0;
   s.slip = beta;
   let steerIn = input.steer;
@@ -138,7 +149,7 @@ export function stepVehicle(s, input, dt) {
   }
   const target = -steerIn * lockDrive;
   const turningIn = Math.abs(target) > Math.abs(s.steerDriver) && target * s.steerDriver >= 0;
-  s.steerDriver = moveToward(s.steerDriver, target, (turningIn ? V.STEER_RATE : V.STEER_RETURN) * lockFull * dt);
+  s.steerDriver = moveToward(s.steerDriver, target, (turningIn ? V.STEER_RATE : V.STEER_RETURN) * (holding ? lockDrive : lockFull) * dt);
   const lockAssist = A.COUNTERSTEER_LOCK * DEG;
   let delta = s.steerDriver + assist;
   if (delta > lockAssist) delta = lockAssist; else if (delta < -lockAssist) delta = -lockAssist;
@@ -344,6 +355,17 @@ export function stepVehicle(s, input, dt) {
       if (sp > cruise) sp2 = Math.max(cruise, sp - A.DRIFT_SCRUB * Math.min(1.5, absB / (45 * DEG)) * dt * A.LEVEL);
       s.wvx = -Math.sin(psi) * sp2; s.wvz = -Math.cos(psi) * sp2;
     }
+  }
+
+  /* THE HELD TURN'S SCRUB (briefs/FIRST-MINUTE.md, with HOLD_GRIP): on
+     grip, a steer held at speed bleeds the car down towards HOLD_CRUISE
+     at HOLD_SCRUB m/s^2 (in proportion to the steer), so a held button
+     into a corner slows to the speed its circle holds instead of running
+     wide, as a drift's scrub slows a slide to DRIFT_CRUISE. 0 in TUNE:
+     this never runs for a car without it. */
+  if (V.HOLD_SCRUB > 0 && !s.drifting && input.steer !== 0) {
+    const sp = Math.hypot(s.wvx, s.wvz);
+    if (sp > V.HOLD_CRUISE) { const k = Math.max(V.HOLD_CRUISE, sp - V.HOLD_SCRUB * Math.abs(input.steer) * dt) / sp; s.wvx *= k; s.wvz *= k; }
   }
 
   /* ---- the low speed blend: below LOW_SPEED the car turns as a

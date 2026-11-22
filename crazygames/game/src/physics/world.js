@@ -181,6 +181,7 @@ export function createWorld(ground, opts) {
     const S = TUNE.SCORING;
     const layerH = TUNE.BANK.LAYER_HEIGHT;
     let worst = null, contact = false;
+    const sp0 = Math.hypot(car.wvx, car.wvz);   // the speed the car met the wall with, for the kind wall below
     for (let pass = 0; pass < 2; pass++) {
       bodyPoints(car, pts);
       let any = false;
@@ -207,6 +208,7 @@ export function createWorld(ground, opts) {
       }
       if (!any) break;
     }
+    if (contact) kindWall(sp0);
     /* A hit is a new contact, or a hard one at any time; a scrape along
        a wall is one contact however many steps it lasts. */
     if (worst && worst.speed >= HIT_MIN && (!world.touching || worst.hard)) {
@@ -218,6 +220,40 @@ export function createWorld(ground, opts) {
       world.hit = worst;
     }
     world.touching = contact;
+  }
+
+  /* THE KIND WALL (briefs/FIRST-MINUTE.md, the starter on ?first=2). A
+     wall met nose first stopped the car dead (restitution 0.12), and with
+     no reverse on Easy and no steering at a standstill it sat there until
+     it was put back on the track 1.2 s later, the camera swinging after
+     it. With WALL_KIND set, while the car touches a wall and its nose
+     points into it by more than WALL_NOSE degrees, the nose is turned
+     along the wall, the way down the road, at WALL_TURN (rad/s of yaw per
+     radian off), and the car keeps at least WALL_KIND of the speed it met
+     the wall with, along the wall. A hard hit is still a hard hit (the
+     score reads the impulse, which comes before this) and still costs
+     HIT_SPEED_KEEP after it. 0 in TUNE: this never runs for a car
+     without it. */
+  function kindWall(sp0) {
+    const V = tune ? tune.VEHICLE : TUNE.VEHICLE;
+    if (!(V.WALL_KIND > 0)) return;
+    const nx = world.wallNx, nz = world.wallNz;
+    let tx = -nz, tz = nx, dx, dz;
+    /* the way down the road: the centre's heading there, or the car's travel in the car park */
+    if (ground.centre.length) { const c = ground.centre[world.centreIndex]; dx = -Math.sin(c.heading); dz = -Math.cos(c.heading); }
+    else { dx = car.wvx; dz = car.wvz; if (Math.hypot(dx, dz) < 0.1) { dx = -Math.sin(car.yaw); dz = -Math.cos(car.yaw); } }
+    if (tx * dx + tz * dz < 0) { tx = -tx; tz = -tz; }
+    /* the nose: how far it points into the wall, and the yaw that lies along it */
+    const fx = -Math.sin(car.yaw), fz = -Math.cos(car.yaw);
+    const into = -(fx * nx + fz * nz);
+    if (into > Math.sin(V.WALL_NOSE * Math.PI / 180)) {
+      let e = Math.atan2(-tx, -tz) - car.yaw;
+      while (e > Math.PI) e -= 2 * Math.PI; while (e < -Math.PI) e += 2 * Math.PI;
+      car.r = e * V.WALL_TURN;
+    }
+    /* the speed: at least WALL_KIND of what it came in with, along the wall */
+    const vt = car.wvx * tx + car.wvz * tz, want = V.WALL_KIND * sp0;
+    if (vt < want) { car.wvx += tx * (want - vt); car.wvz += tz * (want - vt); }
   }
 
   /* THE OTHER CAR. Two boxes on the road's plane, separated along the

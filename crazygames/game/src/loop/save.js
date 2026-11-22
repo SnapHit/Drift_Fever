@@ -77,8 +77,8 @@ export function validGhost(g) {
     ...(g.controls === 'pro' && PROFILES.PRO_VARIANTS.includes(g.variant) ? { controls: 'pro', variant: g.variant, prorev: isNum(g.prorev) ? g.prorev : 1 } : {}) };
 }
 
-/* a ghost key without Pro's prefix: the track it belongs to */
-const trackKey = k => k.startsWith('pro:') ? k.slice(4) : k;
+/* a ghost key without Pro's prefix, or the first minute's (briefs/FIRST-MINUTE.md: first:, and first:pro:): the track it belongs to */
+const trackKey = k => { if (k.startsWith('first:')) k = k.slice(6); return k.startsWith('pro:') ? k.slice(4) : k; };
 
 /* Repair anything into a valid save. Counts what it had to fix. */
 export function repair(raw) {
@@ -177,7 +177,7 @@ export function createSave(opts) {
      their ghosts are dropped, so the save stays small */
   function trimLab() {
     const codes = Object.keys(state.lab.codes).sort((a, b) => state.lab.codes[b].when - state.lab.codes[a].when);
-    for (const k of codes.slice(LOOP.LAB.KEEP)) { delete state.lab.codes[k]; delete state.ghosts['lab:' + k]; delete state.ghosts['pro:lab:' + k]; }
+    for (const k of codes.slice(LOOP.LAB.KEEP)) { delete state.lab.codes[k]; delete state.ghosts['lab:' + k]; delete state.ghosts['pro:lab:' + k]; delete state.ghosts['first:lab:' + k]; delete state.ghosts['first:pro:lab:' + k]; }
     for (const k of Object.keys(state.ghosts)) { const t = trackKey(k); if (t.startsWith('lab:') && !state.lab.codes[t.slice(4)]) delete state.ghosts[k]; }
   }
   /* Storage that is full refuses the whole save, and then nothing after

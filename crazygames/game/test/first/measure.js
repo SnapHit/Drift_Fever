@@ -26,6 +26,7 @@ export const CLUNK = {
   START_WIN: 0.6,      // s after a DRIFT press with steering inside which a scoring slide counts as started by it
   END_WIN: 0.6,        // s after the thumbs let go inside which a slide's end counts as going with them
   SNAP_WIN: 0.4,       // s after a slide ends over which its angle's fall is looked at
+  WALL_END: 0.25,      // s before a slide's end a wall contact makes it a slide that ended in the wall
   SPIN: 80,            // degrees of slide past which it is a spin
   LOSS_WIN: 0.5,       // s after a wall contact over which the speed it took is looked at
   KICK_WIN: 0.1,       // s after a contact over which the yaw rate's jump is looked at
@@ -100,11 +101,18 @@ export function clunk(run, cols) {
   out.slideSecondsTotal = r2(slides.reduce((n, s) => n + (s.end - s.start + 1) * dt, 0));
   out.slidesOverOneSecond = slides.filter(s => (s.end - s.start + 1) * dt >= 1).length;
   out.slideAngleMean = r2(mean(slides.map(s => mean(drive.slice(s.start, s.end + 1).map(ang)))));
-  const falls = slides.map(s => { let m = 0; for (let k = s.end; k < Math.min(drive.length - 1, s.end + C.SNAP_WIN * 60); k++) m = Math.max(m, (ang(drive[k]) - ang(drive[k + 1])) * 60); return m; });
-  out.endFallMean = r2(mean(falls));   // degrees a second the angle falls by, at most, as a slide ends: a snap back reads high
+  /* how each slide ended: in a wall (a contact from WALL_END before its end to SNAP_WIN after), put back on the track, or by itself */
+  const touchNear = (a, b) => { for (let k = Math.max(0, a); k <= Math.min(drive.length - 1, b); k++) if (g(drive[k], 'touch') || g(drive[k], 'hit') > 0.8) return true; return false; };
+  const putNear = (a, b) => { for (let k = Math.max(0, a); k <= Math.min(drive.length - 1, b); k++) if (g(drive[k], 'resp')) return true; return false; };
+  for (const sl of slides) sl.how = putNear(sl.end - 6, sl.end + C.SNAP_WIN * 60) ? 'put back' : touchNear(sl.end - C.WALL_END * 60, sl.end + C.SNAP_WIN * 60) ? 'wall' : 'own';
+  out.slidesIntoWall = slides.filter(s => s.how === 'wall' || s.how === 'put back').length;
+  const own = slides.filter(s => s.how === 'own');
+  const falls = own.map(s => { let m = 0; for (let k = s.end; k < Math.min(drive.length - 1, s.end + C.SNAP_WIN * 60); k++) m = Math.max(m, (ang(drive[k]) - ang(drive[k + 1])) * 60); return m; });
+  out.endFallMean = r2(mean(falls));   // degrees a second the angle falls by, at most, as a slide ends by itself (not in a wall): a snap back reads high
   out.endFallMax = r2(falls.length ? Math.max(...falls) : 0);
-  out.spins = 0;
-  for (let i = 1; i < drive.length; i++) if (ang(drive[i]) > C.SPIN && ang(drive[i - 1]) <= C.SPIN) out.spins++;
+  /* spins: the slide past SPIN degrees, and whether a wall did it (a contact in the SNAP_WIN before) */
+  out.spins = 0; out.spinsFromWall = 0;
+  for (let i = 1; i < drive.length; i++) if (ang(drive[i]) > C.SPIN && ang(drive[i - 1]) <= C.SPIN) { out.spins++; if (touchNear(i - C.SNAP_WIN * 60, i)) out.spinsFromWall++; }
   /* a DRIFT press with steering, and what it did */
   const driftPresses = [], alone = [];
   for (let i = 1; i < drive.length; i++) {
@@ -127,13 +135,18 @@ export function clunk(run, cols) {
   out.infoS = r2(rows.filter(r => g(r, 'prompt') === 6).length * dt);
   const fin = rows.findIndex(r => g(r, 'fin') === 1), res = rows.findIndex(r => g(r, 'st') === 2);
   out.lineToResultsS = fin >= 0 && res >= 0 ? r2((res - fin) * dt) : null;
-  let cut = 0, cuts = 0, fovStep = 0;
+  /* the camera: its biggest turn in one frame, and the frames past CUT, by when they came (the countdown's sweep, a put back, the finish, else the drive) */
+  let cut = 0, fovStep = 0;
+  const cuts = { countdown: 0, putBack: 0, finish: 0, drive: 0 };
+  let lastPut = -1e9;
   for (let i = 1; i < rows.length; i++) {
+    if (g(rows[i], 'resp')) lastPut = i;
     let d = Math.abs(g(rows[i], 'cyaw') - g(rows[i - 1], 'cyaw')); if (d > 180) d = 360 - d;
-    if (d > cut) cut = d; if (d > C.CUT) cuts++;
+    if (d > cut) cut = d;
+    if (d > C.CUT) { const st = g(rows[i], 'st'); if (st === 0) cuts.countdown++; else if (i - lastPut < 60) cuts.putBack++; else if (g(rows[i], 'fin') || st === 2) cuts.finish++; else cuts.drive++; }
     fovStep = Math.max(fovStep, Math.abs(g(rows[i], 'fov') - g(rows[i - 1], 'fov')));
   }
-  out.cameraTurnMax = r2(cut); out.cameraCuts = cuts; out.fovStepMax = r2(fovStep);
+  out.cameraTurnMax = r2(cut); out.cameraCuts = cuts.countdown + cuts.putBack + cuts.finish + cuts.drive; out.cameraCutsInDrive = cuts.drive; out.cameraCutsAtPutBack = cuts.putBack; out.cameraCutsAtFinish = cuts.finish; out.cameraCutsInCountdown = cuts.countdown; out.fovStepMax = r2(fovStep);
   return out;
 }
 

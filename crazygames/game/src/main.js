@@ -20,7 +20,7 @@
    that track, one click from driving it; ?controls=pro drives a keyboard
    or a gamepad with throttle, brake and handbrake, and ?pro=a, b or c
    picks the handling (briefs/PRO-CONTROLS.md, input/mode.js). */
-import { TUNE, LOOP } from './tune.js';
+import { TUNE, LOOP, FIRST } from './tune.js';
 import { createWorld, STEP } from './physics/world.js';
 import { createDriver } from './physics/driver.js';
 import { groundByName } from './ground/track.js';
@@ -31,7 +31,7 @@ import { createChaseCamera, carOnScreen } from './camera/chase.js';
 import { LOOK as TRACK_LOOK } from './tracks/mesh.js';
 import { createInput } from './input/input.js';
 import { controls } from './input/mode.js';
-import { EASY, handlingFor, ghostFields, proVariant } from './physics/profile.js';
+import { EASY, handlingFor, ghostFields, proVariant, firstStarter, profileOf } from './physics/profile.js';
 import { createScoring } from './scoring/drift.js';
 import { createHud } from './ui/hud.js';
 import { createScreens } from './ui/screens.js';
@@ -50,9 +50,10 @@ import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, ca
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
-import { carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById } from './garage/roster.js';
+import { carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById, PAINTS } from './garage/roster.js';
 import { createShowroom } from './garage/showroom.js';
-import { lookOf, owns, isItem, KINDS } from './garage/cosmetics.js';
+import { lookOf, owns, isItem, KINDS, ITEMS, priceOf } from './garage/cosmetics.js';
+import { FIRST_ON } from './first.js';
 import { FX_ON } from './fx.js';
 import { createDirector } from './camera/director.js';
 import { TANDEM } from './tune.js';
@@ -424,7 +425,7 @@ function showLab() {
   openLab();
   const L = app.lab;
   const best = L.code ? save.labBest(L.code) : null;
-  const ghost = L.code && L.track ? !!(ghostFor('lab:' + L.code, L.track) || (controls.profileFor(inputSource()).controls === 'pro' && ghostFor('pro:lab:' + L.code, L.track))) : false;
+  const ghost = L.code && L.track ? !!(ghostFor(firstKey('lab:' + L.code, EASY), L.track) || ghostFor('lab:' + L.code, L.track) || (controls.profileFor(inputSource()).controls === 'pro' && ghostFor('pro:lab:' + L.code, L.track))) : false;
   screens.lab(save.state, { ...L, best, ghost, link: L.code ? linkFor(L.code) : '' });
   const canvas = document.getElementById('plan');
   if (canvas && L.track) drawPlan(canvas, L.track, { labels: Math.min(view.w, view.h) >= 600 });
@@ -464,19 +465,26 @@ function menuGround() {
    replaced by the next ghost worth keeping. */
 function ghostFor(key, track) {
   const rec = save.ghost(key);
-  if (!rec || rec.gen !== (track.version || 1) || rec.rev !== carRev(rec.car)) return null;
+  if (!rec || rec.gen !== (track.version || 1) || rec.rev !== carRev(rec.car, profileOf(rec.controls, rec.variant))) return null;
   /* a career slot whose seed was replaced: a ghost recorded on another seed, or with none on a slot that has had two, drove another layout */
-  const m = /^(?:pro:)?career:(\d+)$/.exec(key), c = m ? CAREER[+m[1]] : null;
+  const m = /^(?:first:)?(?:pro:)?career:(\d+)$/.exec(key), c = m ? CAREER[+m[1]] : null;
   if (c && (rec.seed !== undefined ? rec.seed !== c.seed : c.was !== undefined)) return null;
   /* a Pro slot (briefs/PRO-CONTROLS.md) holds only a Pro run on a variant as it now is: one from before its numbers changed drove another car */
-  if (key.startsWith('pro:') && (rec.controls !== 'pro' || !proVariant(rec.variant) || rec.prorev !== proVariant(rec.variant).rev)) return null;
+  if (/^(?:first:)?pro:/.test(key) && (rec.controls !== 'pro' || !proVariant(rec.variant) || rec.prorev !== proVariant(rec.variant).rev)) return null;
   return rec;
 }
+/* The first minute's starter (briefs/FIRST-MINUTE.md, ?first=2) keeps
+   its ghosts under first: in front of the track's key, so a run with the
+   switch never replaces a ghost from before it; without the switch the
+   keys are as they always were. */
+const firstKey = (key, profile) => firstStarter(save.state.car, profile) ? 'first:' + key : key;
 /* The ghost a run races: on Pro its own best, else the Easy one (which
    replays as Easy, the way it was driven); on Easy only the Easy one, as
-   always. */
-function ghostKey(key) { return app.profile.controls === 'pro' ? 'pro:' + key : key; }
-function raceGhost(key, track) { return (app.profile.controls === 'pro' ? ghostFor(ghostKey(key), track) : null) || ghostFor(key, track); }
+   always. The first minute's starter races its own, else a ghost of
+   another car on the plain key (a starter ghost there is of the old
+   handling, and carRev turns it away). */
+function ghostKey(key) { return firstKey(app.profile.controls === 'pro' ? 'pro:' + key : key, app.profile); }
+function raceGhost(key, track) { return (app.profile.controls === 'pro' ? ghostFor(ghostKey(key), track) : null) || ghostFor(firstKey(key, EASY), track) || ghostFor(key, track); }
 
 /* Which controls the prompts should draw: the source that moved last,
    or, before anything has, the touch pad if it is showing. */
@@ -530,6 +538,35 @@ function chooseProfile(opts) {
   input.setMode(app.profile.controls);
 }
 
+/* THE FIRST MINUTE (briefs/FIRST-MINUTE.md, ?first=2): career track
+   1's own star targets (FIRST.STARS in tune.js), so a newcomer's first
+   run earns a star more often than not; every other run's are as they
+   were. */
+function firstTargets(spec) { return FIRST_ON && spec.mode === 'career' && spec.index === 0 ? FIRST.STARS.slice() : null; }
+/* What the coins already buy (briefs/FIRST-MINUTE.md priority 2), for the
+   results' way to the garage: while nothing has been bought, the dearest
+   cosmetic the coins buy for the chosen car, else a new paint (FIRST.SHOP_PAINT,
+   the cover car's), or null when the coins buy nothing yet. */
+function shopPick() {
+  const S = save.state, id = S.car, mine = S.cars[id];
+  if (!FIRST_ON || !mine || !freshGarage(S)) return null;
+  let best = null;
+  for (const kind of KINDS) for (const it of ITEMS[kind]) {
+    const p = priceOf(kind, it.id);
+    if (p > 0 && p <= S.coins && !owns(mine, kind, it.id) && (!best || p > best.price)) best = { kind, item: it.id, name: it.name + ' ' + (kind === 'glow' ? 'underglow' : kind === 'smoke' ? 'smoke' : 'wheels'), price: p, hex: it.hex === undefined ? null : it.hex };
+  }
+  if (!best && S.coins >= LOOP.PAINT_PRICE) {
+    const p = [paintById(FIRST.SHOP_PAINT), ...PAINTS].find(q => q.id !== mine.paint && q.id !== carById(id).paint);
+    if (p) best = { kind: 'paint', item: p.id, name: p.name + ' paint', price: LOOP.PAINT_PRICE, hex: p.hex };
+  }
+  return best;
+}
+/* nothing bought yet: the starter alone, in its own paint, no upgrade and no cosmetic */
+function freshGarage(S) {
+  const c = S.cars.starter;
+  return Object.keys(S.cars).length === 1 && !!c && c.paint === carById('starter').paint && UPGRADE_STATS.every(k => !(c.up && c.up[k])) && KINDS.every(k => !(c.own && c.own[k] && c.own[k].length));
+}
+
 function startRun(spec, opts) {
   app.spec = spec; app.key = spec.key;
   chooseProfile(opts);
@@ -539,7 +576,7 @@ function startRun(spec, opts) {
   /* a race starts level: the rival on his side of the grid, the player on the other */
   setGround(app.track, carId, paint, raceDef ? gridStart(app.track, -(raceDef.side || 1)) : null);
   app.laps = raceDef ? battleLaps(app.track, raceDef) : lapsFor(app.track);
-  app.targets = starTargets(app.track, app.laps, starScale(spec));
+  app.targets = firstTargets(spec) || starTargets(app.track, app.laps, starScale(spec));
   app.progress = createProgress(app.track, app.laps);
   app.race = createRace(app.track, app.laps, scoring);
   /* the career tracks and the daily carry missions; the Lab does not */
@@ -620,9 +657,9 @@ function finishRun() {
   const prevGhost = ghostFor(gkey, app.track);
   let ghostSaved = false;
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
-    ghostSaved = save.setGhost(gkey, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up), look: lookOf(save.state.cars[save.state.car]), ...ghostFields(app.profile) });
+    ghostSaved = save.setGhost(gkey, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car, app.profile), up: upgradeLevels(save.state.cars[save.state.car].up), look: lookOf(save.state.cars[save.state.car]), ...ghostFields(app.profile) });
   }
-  app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
+  app.results = { ...(FIRST_ON ? { shop: shopPick() } : {}), finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
   if (onboard.active) onboard.stop(false);
   save.setOnboarded();
@@ -800,6 +837,8 @@ function onAction(action, arg) {
     case 'rivals': menuGround(); showMenu('rivals'); break;
     case 'garage': app.picked = null; app.tab = 'cars'; app.preview = {}; showMenu('garage'); break;
     case 'garage-tab': app.tab = arg; showGarage(); break;
+    /* the results' way to the garage (briefs/FIRST-MINUTE.md): the garage on the item the coins buy, shown on the car, its BUY one press away */
+    case 'shop': { const [kind, item] = String(arg || '').split(':'); app.picked = null; app.tab = kind === 'paint' || KINDS.includes(kind) ? kind : 'cars'; app.preview = {}; if (kind === 'paint' ? !!PAINTS.find(p => p.id === item) : KINDS.includes(kind) && isItem(kind, item)) app.preview[kind] = item; showMenu('garage'); break; }
     case 'free': startFree(); break;
     case 'park': app.inPark = false; showMenu('park'); break;   // the list from the title: DRIVE starts the park
     case 'park-back': closeParkList(); break;

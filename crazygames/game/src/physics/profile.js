@@ -12,10 +12,32 @@
    A profile is { controls: 'easy' } or { controls: 'pro', variant }, and
    a ghost records one of those, so it replays with the handling it was
    driven with (loop/ghost.js). */
-import { TUNE, PROFILES } from '../tune.js';
+import { TUNE, PROFILES, FIRST } from '../tune.js';
 import { carTune } from '../garage/roster.js';
+import { FIRST_ON } from '../first.js';
 
 export const EASY = Object.freeze({ controls: 'easy' });
+
+/* A set of numbers layered over a handling pair (or TUNE itself for
+   null): VEHICLE and ASSIST set a number, SCALE multiplies the pair's
+   own. A Pro variant is layered so, and the first minute's starter. */
+function layer(base, X) {
+  const bv = base ? base.VEHICLE : TUNE.VEHICLE, ba = base ? base.ASSIST : TUNE.ASSIST;
+  const V = Object.assign(Object.create(bv), X.VEHICLE || {}), A = Object.assign(Object.create(ba), X.ASSIST || {});
+  for (const k of Object.keys(X.SCALE || {})) {
+    if (k in TUNE.VEHICLE) V[k] = bv[k] * X.SCALE[k];
+    else if (k in TUNE.ASSIST) A[k] = ba[k] * X.SCALE[k];
+  }
+  return { VEHICLE: V, ASSIST: A };
+}
+
+/* Is this the first minute's starter (briefs/FIRST-MINUTE.md): the
+   player's starter coupe with ?first=2, driven on Easy (every touch run,
+   and a keyboard or a pad on Easy). Pro keeps the starter as it was:
+   under Pro's throttle the kind wall turned into riding the walls
+   (review/first/REPORT.md), and Pro's variants wait for the author's
+   pick by play. Rivals never come here. */
+export const firstStarter = (carId, profile) => FIRST_ON && carId === 'starter' && !(profile && profile.controls === 'pro');
 
 /* The variant named, or null when it is not one. */
 export function proVariant(v) { return PROFILES.PRO_VARIANTS.includes(v) ? PROFILES.PRO[v] : null; }
@@ -30,16 +52,12 @@ export function profileOf(controls, variant) {
    profile. Easy returns exactly carTune's answer, the same object shape
    the game always built, so nothing about an Easy run changes. */
 export function handlingFor(carId, up, profile) {
-  const base = carTune(carId, up);
+  let base = carTune(carId, up);
+  /* the first minute's starter, on Easy (briefs/FIRST-MINUTE.md) */
+  if (firstStarter(carId, profile)) base = layer(base, FIRST);
   const P = profile && profile.controls === 'pro' ? proVariant(profile.variant) : null;
   if (!P) return base;
-  const bv = base ? base.VEHICLE : TUNE.VEHICLE, ba = base ? base.ASSIST : TUNE.ASSIST;
-  const V = Object.assign(Object.create(bv), P.VEHICLE || {}), A = Object.assign(Object.create(ba), P.ASSIST || {});
-  for (const k of Object.keys(P.SCALE || {})) {
-    if (k in TUNE.VEHICLE) V[k] = bv[k] * P.SCALE[k];
-    else if (k in TUNE.ASSIST) A[k] = ba[k] * P.SCALE[k];
-  }
-  return { VEHICLE: V, ASSIST: A };
+  return layer(base, P);
 }
 
 /* What a ghost keeps of a profile: nothing on Easy (a ghost with no
