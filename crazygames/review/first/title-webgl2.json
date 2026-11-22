@@ -1,0 +1,4844 @@
+{
+ "probe": {
+  "FRAMES": 60,
+  "STRIDE": 10,
+  "WARM": 60,
+  "MOVED": 6,
+  "MOVING": 0.005,
+  "PCT": 0.05,
+  "FLOOR": 4.5,
+  "COST_FRAMES": 150,
+  "COST_SKIP": 10,
+  "LIMIT": 0.1,
+  "SHOTS": [
+   12,
+   48
+  ]
+ },
+ "main": "2fc25d4",
+ "pages": {
+  "webgl2 low 390x844": {
+   "main": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.0214,
+    "movedMedian": 0.0379,
+    "samplesStill": 0,
+    "driven": 0,
+    "slid": 0,
+    "framesOut": 0,
+    "framesUnder": 600,
+    "worstUnder": {
+     "px": 6750,
+     "of": "park",
+     "car": {
+      "x0": 74.62290784557094,
+      "y0": 375.4037008836261,
+      "x1": 305.9326469002258,
+      "y1": 503.9091425648081,
+      "behind": false,
+      "inside": true
+     }
+    },
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.71
+    },
+    "errors": []
+   },
+   "branch": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.0165,
+    "movedMedian": 0.1121,
+    "samplesStill": 0,
+    "driven": 256.1,
+    "slid": 51,
+    "framesOut": 0,
+    "framesUnder": 0,
+    "worstUnder": null,
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.48
+    },
+    "errors": []
+   },
+   "rows": [
+    {
+     "i": 0,
+     "moved": 0.06111921254101349,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 110.79334740753512,
+      "y0": 702.0762624910435,
+      "x1": 274.4921495542424,
+      "y1": 780.3484813101154,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 13.9,
+     "slip": 0
+    },
+    {
+     "i": 1,
+     "moved": 0.054177299793413534,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 110.9864548699902,
+      "y0": 702.2865011679124,
+      "x1": 274.4252823918444,
+      "y1": 780.0738701821604,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 15.7,
+     "slip": 0
+    },
+    {
+     "i": 2,
+     "moved": 0.017085915664114715,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 111.21651290883881,
+      "y0": 702.5242613305975,
+      "x1": 274.3353606264952,
+      "y1": 779.7641304853647,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.3,
+     "slip": 0
+    },
+    {
+     "i": 3,
+     "moved": 0.12129055778344879,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.84
+     },
+     "car": {
+      "x0": 111.48673815427026,
+      "y0": 702.7890465695568,
+      "x1": 274.21793057760146,
+      "y1": 779.4202038033958,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.9,
+     "slip": 0
+    },
+    {
+     "i": 4,
+     "moved": 0.19815591201847127,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.82
+     },
+     "car": {
+      "x0": 111.80023563348516,
+      "y0": 703.0802178287902,
+      "x1": 274.06849728054743,
+      "y1": 779.0432392697963,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.4,
+     "slip": 0
+    },
+    {
+     "i": 5,
+     "moved": 0.037738485842751246,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.84
+     },
+     "car": {
+      "x0": 112.1580965155827,
+      "y0": 703.3954546062306,
+      "x1": 273.88361377080383,
+      "y1": 778.6365689093832,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.9,
+     "slip": 0
+    },
+    {
+     "i": 6,
+     "moved": 0.016529955037064042,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.88
+     },
+     "car": {
+      "x0": 112.50752448693741,
+      "y0": 703.6887505526906,
+      "x1": 273.6908100153652,
+      "y1": 778.2595504655586,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.2,
+     "slip": 0
+    },
+    {
+     "i": 7,
+     "moved": 0.020731559120184713,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.91
+     },
+     "car": {
+      "x0": 112.77151274273916,
+      "y0": 703.9022723739756,
+      "x1": 273.53824348488223,
+      "y1": 777.9858909072639,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.5,
+     "slip": 0
+    },
+    {
+     "i": 8,
+     "moved": 0.028970713330902904,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.09
+     },
+     "car": {
+      "x0": 113.01473268963804,
+      "y0": 704.0936145064485,
+      "x1": 273.3930167705657,
+      "y1": 777.7412374368506,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.6,
+     "slip": -0.1
+    },
+    {
+     "i": 9,
+     "moved": 0.04046360432616357,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 113.2483800364624,
+      "y0": 704.2730479335187,
+      "x1": 273.24967690271546,
+      "y1": 777.5123066840384,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.7,
+     "slip": -0.2
+    },
+    {
+     "i": 10,
+     "moved": 0.04326771175112407,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 113.58293949322167,
+      "y0": 704.5232596220295,
+      "x1": 273.03849275834915,
+      "y1": 777.1938718659201,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.7,
+     "slip": -0.3
+    },
+    {
+     "i": 11,
+     "moved": 0.05082634585004253,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 115.02126101777252,
+      "y0": 705.5268209324908,
+      "x1": 272.0653753777102,
+      "y1": 775.9259476410574,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": -0.2
+    },
+    {
+     "i": 12,
+     "moved": 0.04747235387045814,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 114.14863293540833,
+      "y0": 707.1007071000092,
+      "x1": 270.1661306395591,
+      "y1": 773.9668621436292,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 0.9
+    },
+    {
+     "i": 13,
+     "moved": 0.06023210596670312,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 112.87428553335315,
+      "y0": 706.3501815848256,
+      "x1": 268.7422295671992,
+      "y1": 774.8966427116478,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.6,
+     "slip": 1.2
+    },
+    {
+     "i": 14,
+     "moved": 0.07592356300887107,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 110.84416597700748,
+      "y0": 704.3861453553013,
+      "x1": 270.601642786591,
+      "y1": 777.3682569282291,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 4.4
+    },
+    {
+     "i": 15,
+     "moved": 0.0647253615263094,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 109.46022142126489,
+      "y0": 701.8958513799806,
+      "x1": 273.3643588125013,
+      "y1": 780.5846763908058,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 8.3
+    },
+    {
+     "i": 16,
+     "moved": 0.20337222019686474,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.12
+     },
+     "car": {
+      "x0": 109.36590548137441,
+      "y0": 701.0099553802808,
+      "x1": 274.0228235186994,
+      "y1": 781.7518470623104,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 7.8
+    },
+    {
+     "i": 17,
+     "moved": 0.22918641390205371,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.04
+     },
+     "car": {
+      "x0": 109.38023138329726,
+      "y0": 701.4251248104621,
+      "x1": 273.7392039317078,
+      "y1": 781.2033333025885,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.4,
+     "slip": 3.7
+    },
+    {
+     "i": 18,
+     "moved": 0.15857941426661806,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.84
+     },
+     "car": {
+      "x0": 109.51118663588107,
+      "y0": 702.0877345955547,
+      "x1": 273.19637138383746,
+      "y1": 780.3334789986989,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 0.9
+    },
+    {
+     "i": 19,
+     "moved": 0.08171709806780897,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 109.45064533139391,
+      "y0": 701.8546976044748,
+      "x1": 273.39927143740977,
+      "y1": 780.6386257146498,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": 1.3
+    },
+    {
+     "i": 20,
+     "moved": 0.07793778101834974,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 109.36925227407613,
+      "y0": 701.2840191616273,
+      "x1": 273.84073366440475,
+      "y1": 781.3894561206997,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.1
+    },
+    {
+     "i": 21,
+     "moved": 0.09018714303074493,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 109.37590770037454,
+      "y0": 700.842833652779,
+      "x1": 274.1236848775657,
+      "y1": 781.9734100403438,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.6,
+     "slip": 2.4
+    },
+    {
+     "i": 22,
+     "moved": 0.10051646615627659,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.73
+     },
+     "car": {
+      "x0": 109.41624333102253,
+      "y0": 700.5508940246693,
+      "x1": 274.2804258459415,
+      "y1": 782.3615104013994,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.8,
+     "slip": 2.2
+    },
+    {
+     "i": 23,
+     "moved": 0.12546785757686232,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.66
+     },
+     "car": {
+      "x0": 109.54010324356322,
+      "y0": 700.0970520300491,
+      "x1": 274.47161270611275,
+      "y1": 782.9675306927033,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.6
+    },
+    {
+     "i": 24,
+     "moved": 0.14166970470288007,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.62
+     },
+     "car": {
+      "x0": 109.91910087174492,
+      "y0": 699.3565613374548,
+      "x1": 274.6295762592091,
+      "y1": 783.9634057088072,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.8,
+     "slip": 3.8
+    },
+    {
+     "i": 25,
+     "moved": 0.1365141572487544,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.61
+     },
+     "car": {
+      "x0": 110.53248381916465,
+      "y0": 698.6353210629944,
+      "x1": 274.56695611372675,
+      "y1": 784.9419399400383,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.3,
+     "slip": 5.2
+    },
+    {
+     "i": 26,
+     "moved": 0.13844027220804472,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.61
+     },
+     "car": {
+      "x0": 111.15286014389683,
+      "y0": 698.1149734728901,
+      "x1": 274.3612459566507,
+      "y1": 785.653216971028,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.7,
+     "slip": 6
+    },
+    {
+     "i": 27,
+     "moved": 0.1268562401263823,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.52
+     },
+     "car": {
+      "x0": 111.55984516637785,
+      "y0": 697.8340434841247,
+      "x1": 274.1842564837834,
+      "y1": 786.0390919277966,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 6
+    },
+    {
+     "i": 28,
+     "moved": 0.12112042775549885,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.52
+     },
+     "car": {
+      "x0": 111.64030995118962,
+      "y0": 697.7826438825768,
+      "x1": 274.1463409793865,
+      "y1": 786.1098347004133,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 5.1
+    },
+    {
+     "i": 29,
+     "moved": 0.10096913355207195,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.52
+     },
+     "car": {
+      "x0": 111.50280025417959,
+      "y0": 697.8712437227362,
+      "x1": 274.2105972331392,
+      "y1": 785.987919630715,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.1,
+     "slip": 3.9
+    },
+    {
+     "i": 30,
+     "moved": 0.14581358609794629,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.52
+     },
+     "car": {
+      "x0": 111.79427873628049,
+      "y0": 697.6875775049247,
+      "x1": 274.0714533734387,
+      "y1": 786.2407935434533,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.4,
+     "slip": -2.1
+    },
+    {
+     "i": 31,
+     "moved": 0.15392818082391543,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.48
+     },
+     "car": {
+      "x0": 113.87498616272867,
+      "y0": 696.6924005799846,
+      "x1": 272.848943144995,
+      "y1": 787.6208196189729,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18,
+     "slip": 2.3
+    },
+    {
+     "i": 32,
+     "moved": 0.15144002916514765,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.52
+     },
+     "car": {
+      "x0": 114.26396613106859,
+      "y0": 696.5474332390398,
+      "x1": 272.5896845152618,
+      "y1": 787.8232474667028,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.2,
+     "slip": 0.7
+    },
+    {
+     "i": 33,
+     "moved": 0.15494592295540163,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.57
+     },
+     "car": {
+      "x0": 114.30624826040948,
+      "y0": 696.5322422386314,
+      "x1": 272.56106641176456,
+      "y1": 787.8444804500054,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.9,
+     "slip": 0.9
+    },
+    {
+     "i": 34,
+     "moved": 0.15337222019686475,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.62
+     },
+     "car": {
+      "x0": 114.31761093166686,
+      "y0": 696.5281780121973,
+      "x1": 272.55336171695046,
+      "y1": 787.8501618269592,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.5,
+     "slip": 0.9
+    },
+    {
+     "i": 35,
+     "moved": 0.13772025762547088,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.69
+     },
+     "car": {
+      "x0": 114.2709003975419,
+      "y0": 696.5449345956414,
+      "x1": 272.58499680920994,
+      "y1": 787.8267396357668,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.6,
+     "slip": 0.6
+    },
+    {
+     "i": 36,
+     "moved": 0.1836371369546725,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.8
+     },
+     "car": {
+      "x0": 113.4705557308775,
+      "y0": 696.8540296209325,
+      "x1": 273.1101731332598,
+      "y1": 787.3955476406098,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.8,
+     "slip": 1.5
+    },
+    {
+     "i": 37,
+     "moved": 0.2015402843601896,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.95
+     },
+     "car": {
+      "x0": 111.02868849342677,
+      "y0": 698.2088110893932,
+      "x1": 274.40955397300127,
+      "y1": 785.5246171177415,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 19.2,
+     "slip": 0.8
+    },
+    {
+     "i": 38,
+     "moved": 0.13212723295661685,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.04
+     },
+     "car": {
+      "x0": 109.51473895976096,
+      "y0": 700.170640873021,
+      "x1": 274.4451723668307,
+      "y1": 782.8690434646415,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20,
+     "slip": 0.5
+    },
+    {
+     "i": 39,
+     "moved": 0.07615141572487544,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.07
+     },
+     "car": {
+      "x0": 109.51844436880793,
+      "y0": 702.1122716862212,
+      "x1": 273.174281211921,
+      "y1": 780.3013981547859,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.8,
+     "slip": -0.1
+    },
+    {
+     "i": 40,
+     "moved": 0.045300157977883095,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.04
+     },
+     "car": {
+      "x0": 110.28766466257632,
+      "y0": 703.6574268964105,
+      "x1": 271.53053050621105,
+      "y1": 778.2997538535458,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.4,
+     "slip": -0.6
+    },
+    {
+     "i": 41,
+     "moved": 0.05181978369182161,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6
+     },
+     "car": {
+      "x0": 111.1582592367449,
+      "y0": 704.7437322404569,
+      "x1": 270.11405292291727,
+      "y1": 776.9140528251,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.1,
+     "slip": -0.8
+    },
+    {
+     "i": 42,
+     "moved": 0.05998298699720501,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.91
+     },
+     "car": {
+      "x0": 111.81987817806099,
+      "y0": 705.4181677016005,
+      "x1": 269.1415776879499,
+      "y1": 776.0625112243125,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.8,
+     "slip": -0.9
+    },
+    {
+     "i": 43,
+     "moved": 0.05749483533843723,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.8
+     },
+     "car": {
+      "x0": 112.16797044617338,
+      "y0": 705.741656090361,
+      "x1": 268.6519160934783,
+      "y1": 775.6564316166201,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.6,
+     "slip": -0.9
+    },
+    {
+     "i": 44,
+     "moved": 0.05554441608943979,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 112.11999847064271,
+      "y0": 705.6981228086048,
+      "x1": 268.71865700600534,
+      "y1": 775.7109910929256,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.6,
+     "slip": -1
+    },
+    {
+     "i": 45,
+     "moved": 0.057531291772997935,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 110.93810405212122,
+      "y0": 704.496271436456,
+      "x1": 270.4536283426429,
+      "y1": 777.228174044831,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.7,
+     "slip": -0.3
+    },
+    {
+     "i": 46,
+     "moved": 0.1216794264187629,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 110.21143441386455,
+      "y0": 703.5437833569717,
+      "x1": 271.66712745036017,
+      "y1": 778.4457372582024,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.8,
+     "slip": 0.5
+    },
+    {
+     "i": 47,
+     "moved": 0.11950115445376108,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 110.13616476694712,
+      "y0": 703.4269841461253,
+      "x1": 271.80508868334834,
+      "y1": 778.5959769649799,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.9,
+     "slip": 0.3
+    },
+    {
+     "i": 48,
+     "moved": 0.10751610159193098,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 110.11230169641253,
+      "y0": 703.3888970584895,
+      "x1": 271.8495372722635,
+      "y1": 778.6450131504984,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": 0.8
+    },
+    {
+     "i": 49,
+     "moved": 0.11195771053590958,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 109.62260745320343,
+      "y0": 702.4180070099009,
+      "x1": 272.8878013200429,
+      "y1": 779.9024449418972,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 3.8
+    },
+    {
+     "i": 50,
+     "moved": 0.07502126625349374,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 109.98081499846548,
+      "y0": 703.1683570715323,
+      "x1": 272.10160276206506,
+      "y1": 778.929383927754,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 1.1
+    },
+    {
+     "i": 51,
+     "moved": 0.1664357759144489,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.82
+     },
+     "car": {
+      "x0": 110.65738668501665,
+      "y0": 704.1576952934813,
+      "x1": 270.90243644877904,
+      "y1": 777.6594247144727,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": -0.3
+    },
+    {
+     "i": 52,
+     "moved": 0.20963665086887837,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.88
+     },
+     "car": {
+      "x0": 110.51389171424186,
+      "y0": 703.9721781445927,
+      "x1": 271.1403479201021,
+      "y1": 777.8964447348426,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 0.9
+    },
+    {
+     "i": 53,
+     "moved": 0.1727761574917973,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.96
+     },
+     "car": {
+      "x0": 109.537313389749,
+      "y0": 702.1736142307211,
+      "x1": 273.11846170366096,
+      "y1": 780.2212369444023,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 6.4
+    },
+    {
+     "i": 54,
+     "moved": 0.09176084578928181,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.04
+     },
+     "car": {
+      "x0": 109.71371835618524,
+      "y0": 699.7012165051842,
+      "x1": 274.5814740112012,
+      "y1": 783.4987848562249,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 14.7
+    },
+    {
+     "i": 55,
+     "moved": 0.11207619394823186,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.17
+     },
+     "car": {
+      "x0": 111.79285969456183,
+      "y0": 697.6884349190492,
+      "x1": 274.0721569421154,
+      "y1": 786.2396117364698,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 22.4
+    },
+    {
+     "i": 56,
+     "moved": 0.15212966338558756,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.41
+     },
+     "car": {
+      "x0": 113.71749830195795,
+      "y0": 696.7539389562198,
+      "x1": 272.9517319787537,
+      "y1": 787.5349975803466,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30,
+     "slip": 26.5
+    },
+    {
+     "i": 57,
+     "moved": 0.15885891359825008,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.56
+     },
+     "car": {
+      "x0": 114.15664438019965,
+      "y0": 696.5864764707629,
+      "x1": 272.6619492017344,
+      "y1": 787.7686934682529,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 27.1
+    },
+    {
+     "i": 58,
+     "moved": 0.17746992344148743,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.72
+     },
+     "car": {
+      "x0": 111.37034356407372,
+      "y0": 697.9602122708892,
+      "x1": 274.2699297330032,
+      "y1": 785.8656288165043,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 20.4
+    },
+    {
+     "i": 59,
+     "moved": 0.12690181066958317,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.72
+     },
+     "car": {
+      "x0": 109.36453224655605,
+      "y0": 701.144209307542,
+      "x1": 273.93616257412907,
+      "y1": 781.5741774404465,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.7,
+     "slip": 10.1
+    }
+   ]
+  },
+  "webgl2 low 1280x720": {
+   "main": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.0351,
+    "movedMedian": 0.0481,
+    "samplesStill": 0,
+    "driven": 0,
+    "slid": 0,
+    "framesOut": 0,
+    "framesUnder": 600,
+    "worstUnder": {
+     "px": 10341,
+     "of": "park",
+     "car": {
+      "x0": 466.0053756211686,
+      "y0": 305.287135846044,
+      "x1": 822.2954599598171,
+      "y1": 455.467225666905,
+      "behind": false,
+      "inside": true
+     }
+    },
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.57
+    },
+    "errors": []
+   },
+   "branch": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.0512,
+    "movedMedian": 0.1692,
+    "samplesStill": 0,
+    "driven": 256.1,
+    "slid": 51,
+    "framesOut": 0,
+    "framesUnder": 0,
+    "worstUnder": null,
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.28
+    },
+    "errors": []
+   },
+   "rows": [
+    {
+     "i": 0,
+     "moved": 0.21756401909722223,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 99.0633509305917,
+      "y0": 19.8665838660958,
+      "x1": 410.38548491467424,
+      "y1": 167.5784172458664,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 13.9,
+     "slip": 0
+    },
+    {
+     "i": 1,
+     "moved": 0.1602419704861111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 99.57027738536823,
+      "y0": 20.19701907573889,
+      "x1": 410.4139606285322,
+      "y1": 166.9781356081392,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 15.7,
+     "slip": 0
+    },
+    {
+     "i": 2,
+     "moved": 0.13685980902777778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 100.16199086659341,
+      "y0": 20.571250494836146,
+      "x1": 410.4166885076519,
+      "y1": 166.30227107179357,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.3,
+     "slip": 0
+    },
+    {
+     "i": 3,
+     "moved": 0.17096028645833333,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 100.84298384405017,
+      "y0": 20.98869554736627,
+      "x1": 410.38397411876974,
+      "y1": 165.5533026427449,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.9,
+     "slip": 0
+    },
+    {
+     "i": 4,
+     "moved": 0.1521017795138889,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8
+     },
+     "car": {
+      "x0": 101.61737640076886,
+      "y0": 21.44856437483485,
+      "x1": 410.30585320751595,
+      "y1": 164.73418739938285,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.4,
+     "slip": 0
+    },
+    {
+     "i": 5,
+     "moved": 0.051219618055555555,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 102.48443675997372,
+      "y0": 21.947418811272236,
+      "x1": 410.17311828227065,
+      "y1": 163.8526268696517,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.9,
+     "slip": 0
+    },
+    {
+     "i": 6,
+     "moved": 0.09350043402777777,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 103.31658706853432,
+      "y0": 22.412467372036375,
+      "x1": 410.0060947686775,
+      "y1": 163.03728747341486,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.2,
+     "slip": 0
+    },
+    {
+     "i": 7,
+     "moved": 0.09164822048611111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 103.93714554412796,
+      "y0": 22.751582718733793,
+      "x1": 409.8588465139185,
+      "y1": 162.44663910148685,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.5,
+     "slip": 0
+    },
+    {
+     "i": 8,
+     "moved": 0.07248155381944445,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 104.50341560057986,
+      "y0": 23.055871369114502,
+      "x1": 409.70894889738844,
+      "y1": 161.91942453790105,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.6,
+     "slip": -0.1
+    },
+    {
+     "i": 9,
+     "moved": 0.09920789930555556,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 105.04291856729175,
+      "y0": 23.341565161799632,
+      "x1": 409.55325445846,
+      "y1": 161.42679874841576,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.7,
+     "slip": -0.2
+    },
+    {
+     "i": 10,
+     "moved": 0.11535698784722222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.31
+     },
+     "car": {
+      "x0": 105.80850519998904,
+      "y0": 23.740508040680496,
+      "x1": 409.3121685395595,
+      "y1": 160.74270740064512,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.7,
+     "slip": -0.3
+    },
+    {
+     "i": 11,
+     "moved": 0.15947482638888888,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.26
+     },
+     "car": {
+      "x0": 103.12847643208102,
+      "y0": 25.34714547140263,
+      "x1": 408.07595521302187,
+      "y1": 158.03185141754304,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": -0.2
+    },
+    {
+     "i": 12,
+     "moved": 0.17918402777777778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.35
+     },
+     "car": {
+      "x0": 99.15130218093189,
+      "y0": 27.88810975252915,
+      "x1": 405.33021494083783,
+      "y1": 153.8837534250148,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 0.9
+    },
+    {
+     "i": 13,
+     "moved": 0.20532118055555557,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.34
+     },
+     "car": {
+      "x0": 97.24286132142872,
+      "y0": 26.67316209013667,
+      "x1": 403.10978720830207,
+      "y1": 155.84635223132926,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.6,
+     "slip": 1.2
+    },
+    {
+     "i": 14,
+     "moved": 0.2654763454861111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.38
+     },
+     "car": {
+      "x0": 94.55228995422289,
+      "y0": 23.521809838166263,
+      "x1": 398.6129180411242,
+      "y1": 161.1171743622904,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 4.4
+    },
+    {
+     "i": 15,
+     "moved": 0.2799880642361111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.3
+     },
+     "car": {
+      "x0": 93.65898801543977,
+      "y0": 19.583385841454263,
+      "x1": 405.358962775618,
+      "y1": 168.095529756654,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 8.3
+    },
+    {
+     "i": 16,
+     "moved": 0.28200846354166664,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.7
+     },
+     "car": {
+      "x0": 94.16236016328632,
+      "y0": 18.1975241930167,
+      "x1": 407.2471378172186,
+      "y1": 170.66186489693493,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 7.8
+    },
+    {
+     "i": 17,
+     "moved": 0.17428602430555556,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.34
+     },
+     "car": {
+      "x0": 93.86564063963334,
+      "y0": 18.846016121757533,
+      "x1": 406.4023981497137,
+      "y1": 169.453527503305,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.4,
+     "slip": 3.7
+    },
+    {
+     "i": 18,
+     "moved": 0.104755859375,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.35
+     },
+     "car": {
+      "x0": 93.61231841244766,
+      "y0": 19.884603190849397,
+      "x1": 404.9093931405489,
+      "y1": 167.54559720009823,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 0.9
+    },
+    {
+     "i": 19,
+     "moved": 0.08570203993055556,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.08
+     },
+     "car": {
+      "x0": 93.67177516894422,
+      "y0": 19.518831323861,
+      "x1": 405.4536081738387,
+      "y1": 168.2137481611741,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": 1.3
+    },
+    {
+     "i": 20,
+     "moved": 0.07613172743055556,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.04
+     },
+     "car": {
+      "x0": 93.95408513170295,
+      "y0": 18.62541585627397,
+      "x1": 406.69779518777557,
+      "y1": 169.86308793507152,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.1
+    },
+    {
+     "i": 21,
+     "moved": 0.13753363715277778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8
+     },
+     "car": {
+      "x0": 94.31374327711019,
+      "y0": 17.936969056705156,
+      "x1": 407.56562118720194,
+      "y1": 171.15110590913318,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.6,
+     "slip": 2.4
+    },
+    {
+     "i": 22,
+     "moved": 0.1800922309027778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.89
+     },
+     "car": {
+      "x0": 94.6243109729263,
+      "y0": 17.482483631167053,
+      "x1": 408.0902580211533,
+      "y1": 172.00968901317276,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.8,
+     "slip": 2.2
+    },
+    {
+     "i": 23,
+     "moved": 0.1879861111111111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.85
+     },
+     "car": {
+      "x0": 95.2299470056385,
+      "y0": 16.777639321201416,
+      "x1": 408.819701239336,
+      "y1": 173.354472042875,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.6
+    },
+    {
+     "i": 24,
+     "moved": 0.16919921875,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.91
+     },
+     "car": {
+      "x0": 96.5709671127081,
+      "y0": 15.631999933879701,
+      "x1": 409.75424391887725,
+      "y1": 175.5752869041542,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.8,
+     "slip": 3.8
+    },
+    {
+     "i": 25,
+     "moved": 0.11951063368055556,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.96
+     },
+     "car": {
+      "x0": 98.36005220718384,
+      "y0": 14.521342238021608,
+      "x1": 410.29983406811454,
+      "y1": 177.77077297818005,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.3,
+     "slip": 5.2
+    },
+    {
+     "i": 26,
+     "moved": 0.19153862847222222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.96
+     },
+     "car": {
+      "x0": 99.99947071940426,
+      "y0": 13.723210399606351,
+      "x1": 410.41899221398626,
+      "y1": 179.37499698004245,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.7,
+     "slip": 6
+    },
+    {
+     "i": 27,
+     "moved": 0.17029622395833333,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.27
+     },
+     "car": {
+      "x0": 101.02496080562027,
+      "y0": 13.293405396388373,
+      "x1": 410.3693285459329,
+      "y1": 180.2482715349364,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 6
+    },
+    {
+     "i": 28,
+     "moved": 0.18569010416666668,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.49
+     },
+     "car": {
+      "x0": 101.22424254453833,
+      "y0": 13.214850346775231,
+      "x1": 410.3506147646,
+      "y1": 180.4085968680979,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 5.1
+    },
+    {
+     "i": 29,
+     "moved": 0.22443359375,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.5
+     },
+     "car": {
+      "x0": 100.88304255469609,
+      "y0": 13.350275288736334,
+      "x1": 410.38095445373995,
+      "y1": 180.13234296769696,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.1,
+     "slip": 3.9
+    },
+    {
+     "i": 30,
+     "moved": 0.19628472222222224,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.73
+     },
+     "car": {
+      "x0": 101.6027999373523,
+      "y0": 13.06962610262827,
+      "x1": 410.30769275455623,
+      "y1": 180.70557684320863,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.4,
+     "slip": -2.1
+    },
+    {
+     "i": 31,
+     "moved": 0.19996419270833332,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.39
+     },
+     "car": {
+      "x0": 106.47075544135667,
+      "y0": 11.554635142192954,
+      "x1": 409.08580356483327,
+      "y1": 183.84987567700367,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18,
+     "slip": 2.3
+    },
+    {
+     "i": 32,
+     "moved": 0.19963324652777778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.49
+     },
+     "car": {
+      "x0": 107.3449312801673,
+      "y0": 11.33474320102863,
+      "x1": 408.76348929466087,
+      "y1": 184.31337464008124,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.2,
+     "slip": 0.7
+    },
+    {
+     "i": 33,
+     "moved": 0.19560980902777778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.28
+     },
+     "car": {
+      "x0": 107.43944893617197,
+      "y0": 11.3117126015335,
+      "x1": 408.72711496512073,
+      "y1": 184.36202577027052,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.9,
+     "slip": 0.9
+    },
+    {
+     "i": 34,
+     "moved": 0.1548556857638889,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.54
+     },
+     "car": {
+      "x0": 107.46483290331568,
+      "y0": 11.305551330873197,
+      "x1": 408.7172969202552,
+      "y1": 184.37504460287929,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.5,
+     "slip": 0.9
+    },
+    {
+     "i": 35,
+     "moved": 0.1716623263888889,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.4
+     },
+     "car": {
+      "x0": 107.36043871097387,
+      "y0": 11.330954933872661,
+      "x1": 408.75754127021037,
+      "y1": 184.3213758027897,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.6,
+     "slip": 0.6
+    },
+    {
+     "i": 36,
+     "moved": 0.12057400173611112,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.58
+     },
+     "car": {
+      "x0": 105.55219531596407,
+      "y0": 11.800038403195149,
+      "x1": 409.395417426462,
+      "y1": 183.33475888030023,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.8,
+     "slip": 1.5
+    },
+    {
+     "i": 37,
+     "moved": 0.12097005208333333,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.07
+     },
+     "car": {
+      "x0": 99.67983000568616,
+      "y0": 13.866947234481364,
+      "x1": 410.4168311507492,
+      "y1": 179.08442682594483,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 19.2,
+     "slip": 0.8
+    },
+    {
+     "i": 38,
+     "moved": 0.08611762152777777,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.02
+     },
+     "car": {
+      "x0": 95.1211710800294,
+      "y0": 16.89178809016647,
+      "x1": 408.70894660055524,
+      "y1": 173.13558370262575,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20,
+     "slip": 0.5
+    },
+    {
+     "i": 39,
+     "moved": 0.08013888888888888,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.2
+     },
+     "car": {
+      "x0": 93.60787103761915,
+      "y0": 19.923148264982117,
+      "x1": 404.8509379332926,
+      "y1": 167.47542511775364,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.8,
+     "slip": -0.1
+    },
+    {
+     "i": 40,
+     "moved": 0.12772786458333332,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.1
+     },
+     "car": {
+      "x0": 93.9741059963486,
+      "y0": 22.3627585969908,
+      "x1": 400.7734184727876,
+      "y1": 163.12414239435012,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.4,
+     "slip": -0.6
+    },
+    {
+     "i": 41,
+     "moved": 0.098466796875,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.37
+     },
+     "car": {
+      "x0": 94.92296267237833,
+      "y0": 24.092572137794058,
+      "x1": 398.394276205274,
+      "y1": 160.1426606718884,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.1,
+     "slip": -0.8
+    },
+    {
+     "i": 42,
+     "moved": 0.13674913194444444,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.1
+     },
+     "car": {
+      "x0": 95.77004489200782,
+      "y0": 25.172691489340707,
+      "x1": 400.5487942326231,
+      "y1": 158.32283250007686,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.8,
+     "slip": -0.9
+    },
+    {
+     "i": 43,
+     "moved": 0.131767578125,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.07
+     },
+     "car": {
+      "x0": 96.24249590362908,
+      "y0": 25.692449391830834,
+      "x1": 401.49045950506826,
+      "y1": 157.45828557865508,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.6,
+     "slip": -0.9
+    },
+    {
+     "i": 44,
+     "moved": 0.19927191840277778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.35
+     },
+     "car": {
+      "x0": 96.1764794398799,
+      "y0": 25.622439392676274,
+      "x1": 401.3670786538708,
+      "y1": 157.57432024090974,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.6,
+     "slip": -1
+    },
+    {
+     "i": 45,
+     "moved": 0.19912760416666667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.93
+     },
+     "car": {
+      "x0": 94.66050018538347,
+      "y0": 23.6974463013538,
+      "x1": 398.2748012106798,
+      "y1": 160.81633521406346,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.7,
+     "slip": -0.3
+    },
+    {
+     "i": 46,
+     "moved": 0.24039713541666666,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.4
+     },
+     "car": {
+      "x0": 93.9061912232463,
+      "y0": 22.182497727926467,
+      "x1": 401.09770623943837,
+      "y1": 163.43970144852418,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.8,
+     "slip": 0.5
+    },
+    {
+     "i": 47,
+     "moved": 0.13284613715277777,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.98
+     },
+     "car": {
+      "x0": 93.84284855700379,
+      "y0": 21.997369532305658,
+      "x1": 401.42726024578064,
+      "y1": 163.7647531168524,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.9,
+     "slip": 0.3
+    },
+    {
+     "i": 48,
+     "moved": 0.1539333767361111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.02
+     },
+     "car": {
+      "x0": 93.82362171377778,
+      "y0": 21.937031286928516,
+      "x1": 401.53389309986505,
+      "y1": 163.8709097502706,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": 0.8
+    },
+    {
+     "i": 49,
+     "moved": 0.22041015625,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.34
+     },
+     "car": {
+      "x0": 93.58071927881703,
+      "y0": 20.4039366148638,
+      "x1": 404.1048097879375,
+      "y1": 166.60392105891182,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 3.8
+    },
+    {
+     "i": 50,
+     "moved": 0.20771050347222222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.37
+     },
+     "car": {
+      "x0": 93.72628690722507,
+      "y0": 21.58794011866249,
+      "x1": 402.1431325399118,
+      "y1": 164.48715754429847,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 1.1
+    },
+    {
+     "i": 51,
+     "moved": 0.18115776909722223,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.67
+     },
+     "car": {
+      "x0": 94.34498684202161,
+      "y0": 23.15786257484302,
+      "x1": 399.3048420735944,
+      "y1": 161.74329698821464,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": -0.3
+    },
+    {
+     "i": 52,
+     "moved": 0.2218695746527778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.16
+     },
+     "car": {
+      "x0": 94.19396926903524,
+      "y0": 22.86270909070153,
+      "x1": 399.85706919093553,
+      "y1": 162.25379693557065,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 0.9
+    },
+    {
+     "i": 53,
+     "moved": 0.16738172743055554,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.29
+     },
+     "car": {
+      "x0": 93.59824268349783,
+      "y0": 20.019537341416576,
+      "x1": 404.7038588096,
+      "y1": 167.30014443757366,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 6.4
+    },
+    {
+     "i": 54,
+     "moved": 0.15123480902777778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.38
+     },
+     "car": {
+      "x0": 95.88921190850478,
+      "y0": 16.164553124459253,
+      "x1": 409.3617297133787,
+      "y1": 174.53747918297995,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 14.7
+    },
+    {
+     "i": 55,
+     "moved": 0.14951280381944446,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.37
+     },
+     "car": {
+      "x0": 101.59932681631297,
+      "y0": 13.070935503965986,
+      "x1": 410.30812905999454,
+      "y1": 180.7028957365902,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 22.4
+    },
+    {
+     "i": 56,
+     "moved": 0.19280707465277777,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.8
+     },
+     "car": {
+      "x0": 106.11429906848329,
+      "y0": 11.64803994836998,
+      "x1": 409.20962673183635,
+      "y1": 183.6535458078181,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30,
+     "slip": 26.5
+    },
+    {
+     "i": 57,
+     "moved": 0.15387369791666666,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.4
+     },
+     "car": {
+      "x0": 107.10459072003701,
+      "y0": 11.393945586188327,
+      "x1": 408.85466680431693,
+      "y1": 184.18840466875935,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 27.1
+    },
+    {
+     "i": 58,
+     "moved": 0.21567057291666666,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.67
+     },
+     "car": {
+      "x0": 100.55134214384928,
+      "y0": 13.486340599657897,
+      "x1": 410.40238046429744,
+      "y1": 179.85544779581915,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 20.4
+    },
+    {
+     "i": 59,
+     "moved": 0.1933984375,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.36
+     },
+     "car": {
+      "x0": 94.05422632368506,
+      "y0": 18.407038675311757,
+      "x1": 406.98214182918775,
+      "y1": 170.27002634835316,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.7,
+     "slip": 10.1
+    }
+   ]
+  },
+  "webgl2 high 390x844": {
+   "main": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.0366,
+    "movedMedian": 0.0535,
+    "samplesStill": 0,
+    "driven": 0,
+    "slid": 0,
+    "framesOut": 0,
+    "framesUnder": 600,
+    "worstUnder": {
+     "px": 6750,
+     "of": "park",
+     "car": {
+      "x0": 74.62290784557094,
+      "y0": 375.4037008836261,
+      "x1": 305.9326469002258,
+      "y1": 503.9091425648081,
+      "behind": false,
+      "inside": true
+     }
+    },
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.67
+    },
+    "errors": []
+   },
+   "branch": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.0345,
+    "movedMedian": 0.1476,
+    "samplesStill": 0,
+    "driven": 256.1,
+    "slid": 51,
+    "framesOut": 0,
+    "framesUnder": 0,
+    "worstUnder": null,
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.48
+    },
+    "errors": []
+   },
+   "rows": [
+    {
+     "i": 0,
+     "moved": 0.08281079110462997,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 110.79334740753512,
+      "y0": 702.0762624910435,
+      "x1": 274.4921495542424,
+      "y1": 780.3484813101154,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 13.9,
+     "slip": 0
+    },
+    {
+     "i": 1,
+     "moved": 0.07607546481954065,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 110.9864548699902,
+      "y0": 702.2865011679124,
+      "x1": 274.4252823918444,
+      "y1": 780.0738701821604,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 15.7,
+     "slip": 0
+    },
+    {
+     "i": 2,
+     "moved": 0.03603718556325192,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.79
+     },
+     "car": {
+      "x0": 111.21651290883881,
+      "y0": 702.5242613305975,
+      "x1": 274.3353606264952,
+      "y1": 779.7641304853647,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.3,
+     "slip": 0
+    },
+    {
+     "i": 3,
+     "moved": 0.14099526066350712,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.84
+     },
+     "car": {
+      "x0": 111.48673815427026,
+      "y0": 702.7890465695568,
+      "x1": 274.21793057760146,
+      "y1": 779.4202038033958,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.9,
+     "slip": 0
+    },
+    {
+     "i": 4,
+     "moved": 0.2053165633734354,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.84
+     },
+     "car": {
+      "x0": 111.80023563348516,
+      "y0": 703.0802178287902,
+      "x1": 274.06849728054743,
+      "y1": 779.0432392697963,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.4,
+     "slip": 0
+    },
+    {
+     "i": 5,
+     "moved": 0.05836371369546725,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.88
+     },
+     "car": {
+      "x0": 112.1580965155827,
+      "y0": 703.3954546062306,
+      "x1": 273.88361377080383,
+      "y1": 778.6365689093832,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.9,
+     "slip": 0
+    },
+    {
+     "i": 6,
+     "moved": 0.03452728156519626,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.88
+     },
+     "car": {
+      "x0": 112.50752448693741,
+      "y0": 703.6887505526906,
+      "x1": 273.6908100153652,
+      "y1": 778.2595504655586,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.2,
+     "slip": 0
+    },
+    {
+     "i": 7,
+     "moved": 0.034903998055656825,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.89
+     },
+     "car": {
+      "x0": 112.77151274273916,
+      "y0": 703.9022723739756,
+      "x1": 273.53824348488223,
+      "y1": 777.9858909072639,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.5,
+     "slip": 0
+    },
+    {
+     "i": 8,
+     "moved": 0.04410924778223357,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.09
+     },
+     "car": {
+      "x0": 113.01473268963804,
+      "y0": 704.0936145064485,
+      "x1": 273.3930167705657,
+      "y1": 777.7412374368506,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.6,
+     "slip": -0.1
+    },
+    {
+     "i": 9,
+     "moved": 0.061899987847855144,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 113.2483800364624,
+      "y0": 704.2730479335187,
+      "x1": 273.24967690271546,
+      "y1": 777.5123066840384,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.7,
+     "slip": -0.2
+    },
+    {
+     "i": 10,
+     "moved": 0.06527524608093328,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 113.58293949322167,
+      "y0": 704.5232596220295,
+      "x1": 273.03849275834915,
+      "y1": 777.1938718659201,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.7,
+     "slip": -0.3
+    },
+    {
+     "i": 11,
+     "moved": 0.08122797423745291,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 115.02126101777252,
+      "y0": 705.5268209324908,
+      "x1": 272.0653753777102,
+      "y1": 775.9259476410574,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": -0.2
+    },
+    {
+     "i": 12,
+     "moved": 0.09060031595576619,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.13
+     },
+     "car": {
+      "x0": 114.14863293540833,
+      "y0": 707.1007071000092,
+      "x1": 270.1661306395591,
+      "y1": 773.9668621436292,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 0.9
+    },
+    {
+     "i": 13,
+     "moved": 0.1182950540770446,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.16
+     },
+     "car": {
+      "x0": 112.87428553335315,
+      "y0": 706.3501815848256,
+      "x1": 268.7422295671992,
+      "y1": 774.8966427116478,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.6,
+     "slip": 1.2
+    },
+    {
+     "i": 14,
+     "moved": 0.14764855997083484,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.16
+     },
+     "car": {
+      "x0": 110.84416597700748,
+      "y0": 704.3861453553013,
+      "x1": 270.601642786591,
+      "y1": 777.3682569282291,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 4.4
+    },
+    {
+     "i": 15,
+     "moved": 0.1991979584396646,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.16
+     },
+     "car": {
+      "x0": 109.46022142126489,
+      "y0": 701.8958513799806,
+      "x1": 273.3643588125013,
+      "y1": 780.5846763908058,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 8.3
+    },
+    {
+     "i": 16,
+     "moved": 0.27555899866326405,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.16
+     },
+     "car": {
+      "x0": 109.36590548137441,
+      "y0": 701.0099553802808,
+      "x1": 274.0228235186994,
+      "y1": 781.7518470623104,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 7.8
+    },
+    {
+     "i": 17,
+     "moved": 0.31354660347551344,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.07
+     },
+     "car": {
+      "x0": 109.38023138329726,
+      "y0": 701.4251248104621,
+      "x1": 273.7392039317078,
+      "y1": 781.2033333025885,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.4,
+     "slip": 3.7
+    },
+    {
+     "i": 18,
+     "moved": 0.24134159679183376,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.88
+     },
+     "car": {
+      "x0": 109.51118663588107,
+      "y0": 702.0877345955547,
+      "x1": 273.19637138383746,
+      "y1": 780.3334789986989,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 0.9
+    },
+    {
+     "i": 19,
+     "moved": 0.1587465062583546,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.84
+     },
+     "car": {
+      "x0": 109.45064533139391,
+      "y0": 701.8546976044748,
+      "x1": 273.39927143740977,
+      "y1": 780.6386257146498,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": 1.3
+    },
+    {
+     "i": 20,
+     "moved": 0.1397618179608701,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 109.36925227407613,
+      "y0": 701.2840191616273,
+      "x1": 273.84073366440475,
+      "y1": 781.3894561206997,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.1
+    },
+    {
+     "i": 21,
+     "moved": 0.14929213756227974,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.71
+     },
+     "car": {
+      "x0": 109.37590770037454,
+      "y0": 700.842833652779,
+      "x1": 274.1236848775657,
+      "y1": 781.9734100403438,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.6,
+     "slip": 2.4
+    },
+    {
+     "i": 22,
+     "moved": 0.1451512942034269,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.71
+     },
+     "car": {
+      "x0": 109.41624333102253,
+      "y0": 700.5508940246693,
+      "x1": 274.2804258459415,
+      "y1": 782.3615104013994,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.8,
+     "slip": 2.2
+    },
+    {
+     "i": 23,
+     "moved": 0.14676449143273787,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.66
+     },
+     "car": {
+      "x0": 109.54010324356322,
+      "y0": 700.0970520300491,
+      "x1": 274.47161270611275,
+      "y1": 782.9675306927033,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.6
+    },
+    {
+     "i": 24,
+     "moved": 0.1603809697411593,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.62
+     },
+     "car": {
+      "x0": 109.91910087174492,
+      "y0": 699.3565613374548,
+      "x1": 274.6295762592091,
+      "y1": 783.9634057088072,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.8,
+     "slip": 3.8
+    },
+    {
+     "i": 25,
+     "moved": 0.1752855754040588,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.57
+     },
+     "car": {
+      "x0": 110.53248381916465,
+      "y0": 698.6353210629944,
+      "x1": 274.56695611372675,
+      "y1": 784.9419399400383,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.3,
+     "slip": 5.2
+    },
+    {
+     "i": 26,
+     "moved": 0.18183558148013124,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.57
+     },
+     "car": {
+      "x0": 111.15286014389683,
+      "y0": 698.1149734728901,
+      "x1": 274.3612459566507,
+      "y1": 785.653216971028,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.7,
+     "slip": 6
+    },
+    {
+     "i": 27,
+     "moved": 0.1680398590351197,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.55
+     },
+     "car": {
+      "x0": 111.55984516637785,
+      "y0": 697.8340434841247,
+      "x1": 274.1842564837834,
+      "y1": 786.0390919277966,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 6
+    },
+    {
+     "i": 28,
+     "moved": 0.16642362376959532,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.48
+     },
+     "car": {
+      "x0": 111.64030995118962,
+      "y0": 697.7826438825768,
+      "x1": 274.1463409793865,
+      "y1": 786.1098347004133,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 5.1
+    },
+    {
+     "i": 29,
+     "moved": 0.16088832178879572,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.48
+     },
+     "car": {
+      "x0": 111.50280025417959,
+      "y0": 697.8712437227362,
+      "x1": 274.2105972331392,
+      "y1": 785.987919630715,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.1,
+     "slip": 3.9
+    },
+    {
+     "i": 30,
+     "moved": 0.21160226029894277,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.52
+     },
+     "car": {
+      "x0": 111.79427873628049,
+      "y0": 697.6875775049247,
+      "x1": 274.0714533734387,
+      "y1": 786.2407935434533,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.4,
+     "slip": -2.1
+    },
+    {
+     "i": 31,
+     "moved": 0.20635253372220197,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.48
+     },
+     "car": {
+      "x0": 113.87498616272867,
+      "y0": 696.6924005799846,
+      "x1": 272.848943144995,
+      "y1": 787.6208196189729,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18,
+     "slip": 2.3
+    },
+    {
+     "i": 32,
+     "moved": 0.18285332361161746,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.48
+     },
+     "car": {
+      "x0": 114.26396613106859,
+      "y0": 696.5474332390398,
+      "x1": 272.5896845152618,
+      "y1": 787.8232474667028,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.2,
+     "slip": 0.7
+    },
+    {
+     "i": 33,
+     "moved": 0.20319905213270142,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.52
+     },
+     "car": {
+      "x0": 114.30624826040948,
+      "y0": 696.5322422386314,
+      "x1": 272.56106641176456,
+      "y1": 787.8444804500054,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.9,
+     "slip": 0.9
+    },
+    {
+     "i": 34,
+     "moved": 0.18794811034147527,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.62
+     },
+     "car": {
+      "x0": 114.31761093166686,
+      "y0": 696.5281780121973,
+      "x1": 272.55336171695046,
+      "y1": 787.8501618269592,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.5,
+     "slip": 0.9
+    },
+    {
+     "i": 35,
+     "moved": 0.18165026127111436,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.69
+     },
+     "car": {
+      "x0": 114.2709003975419,
+      "y0": 696.5449345956414,
+      "x1": 272.58499680920994,
+      "y1": 787.8267396357668,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.6,
+     "slip": 0.6
+    },
+    {
+     "i": 36,
+     "moved": 0.1743437841779074,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.82
+     },
+     "car": {
+      "x0": 113.4705557308775,
+      "y0": 696.8540296209325,
+      "x1": 273.1101731332598,
+      "y1": 787.3955476406098,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.8,
+     "slip": 1.5
+    },
+    {
+     "i": 37,
+     "moved": 0.15370944221655122,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.96
+     },
+     "car": {
+      "x0": 111.02868849342677,
+      "y0": 698.2088110893932,
+      "x1": 274.40955397300127,
+      "y1": 785.5246171177415,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 19.2,
+     "slip": 0.8
+    },
+    {
+     "i": 38,
+     "moved": 0.11041438813950662,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.04
+     },
+     "car": {
+      "x0": 109.51473895976096,
+      "y0": 700.170640873021,
+      "x1": 274.4451723668307,
+      "y1": 782.8690434646415,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20,
+     "slip": 0.5
+    },
+    {
+     "i": 39,
+     "moved": 0.07520354842629724,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.05
+     },
+     "car": {
+      "x0": 109.51844436880793,
+      "y0": 702.1122716862212,
+      "x1": 273.174281211921,
+      "y1": 780.3013981547859,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.8,
+     "slip": -0.1
+    },
+    {
+     "i": 40,
+     "moved": 0.06414813464576498,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.04
+     },
+     "car": {
+      "x0": 110.28766466257632,
+      "y0": 703.6574268964105,
+      "x1": 271.53053050621105,
+      "y1": 778.2997538535458,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.4,
+     "slip": -0.6
+    },
+    {
+     "i": 41,
+     "moved": 0.06149896706768745,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.96
+     },
+     "car": {
+      "x0": 111.1582592367449,
+      "y0": 704.7437322404569,
+      "x1": 270.11405292291727,
+      "y1": 776.9140528251,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.1,
+     "slip": -0.8
+    },
+    {
+     "i": 42,
+     "moved": 0.07770992830234537,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.88
+     },
+     "car": {
+      "x0": 111.81987817806099,
+      "y0": 705.4181677016005,
+      "x1": 269.1415776879499,
+      "y1": 776.0625112243125,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.8,
+     "slip": -0.9
+    },
+    {
+     "i": 43,
+     "moved": 0.08179608700935716,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.83
+     },
+     "car": {
+      "x0": 112.16797044617338,
+      "y0": 705.741656090361,
+      "x1": 268.6519160934783,
+      "y1": 775.6564316166201,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.6,
+     "slip": -0.9
+    },
+    {
+     "i": 44,
+     "moved": 0.09156033539919796,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 112.11999847064271,
+      "y0": 705.6981228086048,
+      "x1": 268.71865700600534,
+      "y1": 775.7109910929256,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.6,
+     "slip": -1
+    },
+    {
+     "i": 45,
+     "moved": 0.08707923198444525,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.78
+     },
+     "car": {
+      "x0": 110.93810405212122,
+      "y0": 704.496271436456,
+      "x1": 270.4536283426429,
+      "y1": 777.228174044831,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.7,
+     "slip": -0.3
+    },
+    {
+     "i": 46,
+     "moved": 0.12437112650382792,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 110.21143441386455,
+      "y0": 703.5437833569717,
+      "x1": 271.66712745036017,
+      "y1": 778.4457372582024,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.8,
+     "slip": 0.5
+    },
+    {
+     "i": 47,
+     "moved": 0.13090594239883338,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 110.13616476694712,
+      "y0": 703.4269841461253,
+      "x1": 271.80508868334834,
+      "y1": 778.5959769649799,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.9,
+     "slip": 0.3
+    },
+    {
+     "i": 48,
+     "moved": 0.13044416089439786,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 110.11230169641253,
+      "y0": 703.3888970584895,
+      "x1": 271.8495372722635,
+      "y1": 778.6450131504984,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": 0.8
+    },
+    {
+     "i": 49,
+     "moved": 0.13593693036821,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.75
+     },
+     "car": {
+      "x0": 109.62260745320343,
+      "y0": 702.4180070099009,
+      "x1": 272.8878013200429,
+      "y1": 779.9024449418972,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 3.8
+    },
+    {
+     "i": 50,
+     "moved": 0.1133734354113501,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.79
+     },
+     "car": {
+      "x0": 109.98081499846548,
+      "y0": 703.1683570715323,
+      "x1": 272.10160276206506,
+      "y1": 778.929383927754,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 1.1
+    },
+    {
+     "i": 51,
+     "moved": 0.19969315834244744,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.84
+     },
+     "car": {
+      "x0": 110.65738668501665,
+      "y0": 704.1576952934813,
+      "x1": 270.90243644877904,
+      "y1": 777.6594247144727,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": -0.3
+    },
+    {
+     "i": 52,
+     "moved": 0.2453639567383643,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.88
+     },
+     "car": {
+      "x0": 110.51389171424186,
+      "y0": 703.9721781445927,
+      "x1": 271.1403479201021,
+      "y1": 777.8964447348426,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 0.9
+    },
+    {
+     "i": 53,
+     "moved": 0.1995594847490582,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.96
+     },
+     "car": {
+      "x0": 109.537313389749,
+      "y0": 702.1736142307211,
+      "x1": 273.11846170366096,
+      "y1": 780.2212369444023,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 6.4
+    },
+    {
+     "i": 54,
+     "moved": 0.1215761331875076,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.04
+     },
+     "car": {
+      "x0": 109.71371835618524,
+      "y0": 699.7012165051842,
+      "x1": 274.5814740112012,
+      "y1": 783.4987848562249,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 14.7
+    },
+    {
+     "i": 55,
+     "moved": 0.1857151537246324,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.21
+     },
+     "car": {
+      "x0": 111.79285969456183,
+      "y0": 697.6884349190492,
+      "x1": 274.0721569421154,
+      "y1": 786.2396117364698,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 22.4
+    },
+    {
+     "i": 56,
+     "moved": 0.2234627536760238,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.44
+     },
+     "car": {
+      "x0": 113.71749830195795,
+      "y0": 696.7539389562198,
+      "x1": 272.9517319787537,
+      "y1": 787.5349975803466,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30,
+     "slip": 26.5
+    },
+    {
+     "i": 57,
+     "moved": 0.1891694008992587,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.6
+     },
+     "car": {
+      "x0": 114.15664438019965,
+      "y0": 696.5864764707629,
+      "x1": 272.6619492017344,
+      "y1": 787.7686934682529,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 27.1
+    },
+    {
+     "i": 58,
+     "moved": 0.18322092599343784,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.72
+     },
+     "car": {
+      "x0": 111.37034356407372,
+      "y0": 697.9602122708892,
+      "x1": 274.2699297330032,
+      "y1": 785.8656288165043,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 20.4
+    },
+    {
+     "i": 59,
+     "moved": 0.17469619637866082,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.72
+     },
+     "car": {
+      "x0": 109.36453224655605,
+      "y0": 701.144209307542,
+      "x1": 273.93616257412907,
+      "y1": 781.5741774404465,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.7,
+     "slip": 10.1
+    }
+   ]
+  },
+  "webgl2 high 1280x720": {
+   "main": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.0622,
+    "movedMedian": 0.0779,
+    "samplesStill": 0,
+    "driven": 0,
+    "slid": 0,
+    "framesOut": 0,
+    "framesUnder": 600,
+    "worstUnder": {
+     "px": 10341,
+     "of": "park",
+     "car": {
+      "x0": 466.0053756211686,
+      "y0": 305.287135846044,
+      "x1": 822.2954599598171,
+      "y1": 455.467225666905,
+      "behind": false,
+      "inside": true
+     }
+    },
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.54
+    },
+    "errors": []
+   },
+   "branch": {
+    "samples": 60,
+    "frames": 600,
+    "movedMin": 0.1072,
+    "movedMedian": 0.3007,
+    "samplesStill": 0,
+    "driven": 256.1,
+    "slid": 51,
+    "framesOut": 0,
+    "framesUnder": 0,
+    "worstUnder": null,
+    "lowest": {
+     "button": "first",
+     "line": "start here · track 1 of ",
+     "contrast": 5.28
+    },
+    "errors": []
+   },
+   "rows": [
+    {
+     "i": 0,
+     "moved": 0.2622189670138889,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 99.0633509305917,
+      "y0": 19.8665838660958,
+      "x1": 410.38548491467424,
+      "y1": 167.5784172458664,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 13.9,
+     "slip": 0
+    },
+    {
+     "i": 1,
+     "moved": 0.2101030815972222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 99.57027738536823,
+      "y0": 20.19701907573889,
+      "x1": 410.4139606285322,
+      "y1": 166.9781356081392,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 15.7,
+     "slip": 0
+    },
+    {
+     "i": 2,
+     "moved": 0.191611328125,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 100.16199086659341,
+      "y0": 20.571250494836146,
+      "x1": 410.4166885076519,
+      "y1": 166.30227107179357,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.3,
+     "slip": 0
+    },
+    {
+     "i": 3,
+     "moved": 0.22378255208333334,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 100.84298384405017,
+      "y0": 20.98869554736627,
+      "x1": 410.38397411876974,
+      "y1": 165.5533026427449,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.9,
+     "slip": 0
+    },
+    {
+     "i": 4,
+     "moved": 0.19995876736111112,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8
+     },
+     "car": {
+      "x0": 101.61737640076886,
+      "y0": 21.44856437483485,
+      "x1": 410.30585320751595,
+      "y1": 164.73418739938285,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.4,
+     "slip": 0
+    },
+    {
+     "i": 5,
+     "moved": 0.10721462673611111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 102.48443675997372,
+      "y0": 21.947418811272236,
+      "x1": 410.17311828227065,
+      "y1": 163.8526268696517,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.9,
+     "slip": 0
+    },
+    {
+     "i": 6,
+     "moved": 0.14126410590277777,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 103.31658706853432,
+      "y0": 22.412467372036375,
+      "x1": 410.0060947686775,
+      "y1": 163.03728747341486,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.2,
+     "slip": 0
+    },
+    {
+     "i": 7,
+     "moved": 0.12531792534722222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 103.93714554412796,
+      "y0": 22.751582718733793,
+      "x1": 409.8588465139185,
+      "y1": 162.44663910148685,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.5,
+     "slip": 0
+    },
+    {
+     "i": 8,
+     "moved": 0.1285015190972222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 104.50341560057986,
+      "y0": 23.055871369114502,
+      "x1": 409.70894889738844,
+      "y1": 161.91942453790105,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.6,
+     "slip": -0.1
+    },
+    {
+     "i": 9,
+     "moved": 0.16545138888888888,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.58
+     },
+     "car": {
+      "x0": 105.04291856729175,
+      "y0": 23.341565161799632,
+      "x1": 409.55325445846,
+      "y1": 161.42679874841576,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.7,
+     "slip": -0.2
+    },
+    {
+     "i": 10,
+     "moved": 0.1992361111111111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.31
+     },
+     "car": {
+      "x0": 105.80850519998904,
+      "y0": 23.740508040680496,
+      "x1": 409.3121685395595,
+      "y1": 160.74270740064512,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.7,
+     "slip": -0.3
+    },
+    {
+     "i": 11,
+     "moved": 0.2865668402777778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.13
+     },
+     "car": {
+      "x0": 103.12847643208102,
+      "y0": 25.34714547140263,
+      "x1": 408.07595521302187,
+      "y1": 158.03185141754304,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": -0.2
+    },
+    {
+     "i": 12,
+     "moved": 0.3574077690972222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.35
+     },
+     "car": {
+      "x0": 99.15130218093189,
+      "y0": 27.88810975252915,
+      "x1": 405.33021494083783,
+      "y1": 153.8837534250148,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 0.9
+    },
+    {
+     "i": 13,
+     "moved": 0.3968413628472222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.52
+     },
+     "car": {
+      "x0": 97.24286132142872,
+      "y0": 26.67316209013667,
+      "x1": 403.10978720830207,
+      "y1": 155.84635223132926,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.6,
+     "slip": 1.2
+    },
+    {
+     "i": 14,
+     "moved": 0.44496636284722224,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.25
+     },
+     "car": {
+      "x0": 94.55228995422289,
+      "y0": 23.521809838166263,
+      "x1": 398.6129180411242,
+      "y1": 161.1171743622904,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 4.4
+    },
+    {
+     "i": 15,
+     "moved": 0.4726117621527778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.17
+     },
+     "car": {
+      "x0": 93.65898801543977,
+      "y0": 19.583385841454263,
+      "x1": 405.358962775618,
+      "y1": 168.095529756654,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 8.3
+    },
+    {
+     "i": 16,
+     "moved": 0.4559233940972222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.7
+     },
+     "car": {
+      "x0": 94.16236016328632,
+      "y0": 18.1975241930167,
+      "x1": 407.2471378172186,
+      "y1": 170.66186489693493,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.2,
+     "slip": 7.8
+    },
+    {
+     "i": 17,
+     "moved": 0.4008279079861111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.22
+     },
+     "car": {
+      "x0": 93.86564063963334,
+      "y0": 18.846016121757533,
+      "x1": 406.4023981497137,
+      "y1": 169.453527503305,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.4,
+     "slip": 3.7
+    },
+    {
+     "i": 18,
+     "moved": 0.3560611979166667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.13
+     },
+     "car": {
+      "x0": 93.61231841244766,
+      "y0": 19.884603190849397,
+      "x1": 404.9093931405489,
+      "y1": 167.54559720009823,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 0.9
+    },
+    {
+     "i": 19,
+     "moved": 0.3669835069444444,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.92
+     },
+     "car": {
+      "x0": 93.67177516894422,
+      "y0": 19.518831323861,
+      "x1": 405.4536081738387,
+      "y1": 168.2137481611741,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": 1.3
+    },
+    {
+     "i": 20,
+     "moved": 0.34679578993055554,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.65
+     },
+     "car": {
+      "x0": 93.95408513170295,
+      "y0": 18.62541585627397,
+      "x1": 406.69779518777557,
+      "y1": 169.86308793507152,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.1
+    },
+    {
+     "i": 21,
+     "moved": 0.282900390625,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.53
+     },
+     "car": {
+      "x0": 94.31374327711019,
+      "y0": 17.936969056705156,
+      "x1": 407.56562118720194,
+      "y1": 171.15110590913318,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.6,
+     "slip": 2.4
+    },
+    {
+     "i": 22,
+     "moved": 0.2648697916666667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.39
+     },
+     "car": {
+      "x0": 94.6243109729263,
+      "y0": 17.482483631167053,
+      "x1": 408.0902580211533,
+      "y1": 172.00968901317276,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.8,
+     "slip": 2.2
+    },
+    {
+     "i": 23,
+     "moved": 0.2654253472222222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.67
+     },
+     "car": {
+      "x0": 95.2299470056385,
+      "y0": 16.777639321201416,
+      "x1": 408.819701239336,
+      "y1": 173.354472042875,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 2.6
+    },
+    {
+     "i": 24,
+     "moved": 0.3249283854166667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.17
+     },
+     "car": {
+      "x0": 96.5709671127081,
+      "y0": 15.631999933879701,
+      "x1": 409.75424391887725,
+      "y1": 175.5752869041542,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.8,
+     "slip": 3.8
+    },
+    {
+     "i": 25,
+     "moved": 0.3155653211805556,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.31
+     },
+     "car": {
+      "x0": 98.36005220718384,
+      "y0": 14.521342238021608,
+      "x1": 410.29983406811454,
+      "y1": 177.77077297818005,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.3,
+     "slip": 5.2
+    },
+    {
+     "i": 26,
+     "moved": 0.36385308159722224,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.61
+     },
+     "car": {
+      "x0": 99.99947071940426,
+      "y0": 13.723210399606351,
+      "x1": 410.41899221398626,
+      "y1": 179.37499698004245,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.7,
+     "slip": 6
+    },
+    {
+     "i": 27,
+     "moved": 0.33338541666666666,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.24
+     },
+     "car": {
+      "x0": 101.02496080562027,
+      "y0": 13.293405396388373,
+      "x1": 410.3693285459329,
+      "y1": 180.2482715349364,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 6
+    },
+    {
+     "i": 28,
+     "moved": 0.34990885416666667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.43
+     },
+     "car": {
+      "x0": 101.22424254453833,
+      "y0": 13.214850346775231,
+      "x1": 410.3506147646,
+      "y1": 180.4085968680979,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 5.1
+    },
+    {
+     "i": 29,
+     "moved": 0.35938585069444445,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.47
+     },
+     "car": {
+      "x0": 100.88304255469609,
+      "y0": 13.350275288736334,
+      "x1": 410.38095445373995,
+      "y1": 180.13234296769696,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.1,
+     "slip": 3.9
+    },
+    {
+     "i": 30,
+     "moved": 0.2945421006944444,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.73
+     },
+     "car": {
+      "x0": 101.6027999373523,
+      "y0": 13.06962610262827,
+      "x1": 410.30769275455623,
+      "y1": 180.70557684320863,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18.4,
+     "slip": -2.1
+    },
+    {
+     "i": 31,
+     "moved": 0.27868055555555554,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.39
+     },
+     "car": {
+      "x0": 106.47075544135667,
+      "y0": 11.554635142192954,
+      "x1": 409.08580356483327,
+      "y1": 183.84987567700367,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 18,
+     "slip": 2.3
+    },
+    {
+     "i": 32,
+     "moved": 0.24452256944444445,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.49
+     },
+     "car": {
+      "x0": 107.3449312801673,
+      "y0": 11.33474320102863,
+      "x1": 408.76348929466087,
+      "y1": 184.31337464008124,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.2,
+     "slip": 0.7
+    },
+    {
+     "i": 33,
+     "moved": 0.23509223090277778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 5.28
+     },
+     "car": {
+      "x0": 107.43944893617197,
+      "y0": 11.3117126015335,
+      "x1": 408.72711496512073,
+      "y1": 184.36202577027052,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.9,
+     "slip": 0.9
+    },
+    {
+     "i": 34,
+     "moved": 0.21888563368055555,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.31
+     },
+     "car": {
+      "x0": 107.46483290331568,
+      "y0": 11.305551330873197,
+      "x1": 408.7172969202552,
+      "y1": 184.37504460287929,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.5,
+     "slip": 0.9
+    },
+    {
+     "i": 35,
+     "moved": 0.2871213107638889,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.23
+     },
+     "car": {
+      "x0": 107.36043871097387,
+      "y0": 11.330954933872661,
+      "x1": 408.75754127021037,
+      "y1": 184.3213758027897,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 16.6,
+     "slip": 0.6
+    },
+    {
+     "i": 36,
+     "moved": 0.3807779947916667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.4
+     },
+     "car": {
+      "x0": 105.55219531596407,
+      "y0": 11.800038403195149,
+      "x1": 409.395417426462,
+      "y1": 183.33475888030023,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 17.8,
+     "slip": 1.5
+    },
+    {
+     "i": 37,
+     "moved": 0.36390190972222225,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.98
+     },
+     "car": {
+      "x0": 99.67983000568616,
+      "y0": 13.866947234481364,
+      "x1": 410.4168311507492,
+      "y1": 179.08442682594483,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 19.2,
+     "slip": 0.8
+    },
+    {
+     "i": 38,
+     "moved": 0.3300151909722222,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.93
+     },
+     "car": {
+      "x0": 95.1211710800294,
+      "y0": 16.89178809016647,
+      "x1": 408.70894660055524,
+      "y1": 173.13558370262575,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20,
+     "slip": 0.5
+    },
+    {
+     "i": 39,
+     "moved": 0.33357421875,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.18
+     },
+     "car": {
+      "x0": 93.60787103761915,
+      "y0": 19.923148264982117,
+      "x1": 404.8509379332926,
+      "y1": 167.47542511775364,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 20.8,
+     "slip": -0.1
+    },
+    {
+     "i": 40,
+     "moved": 0.306123046875,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.72
+     },
+     "car": {
+      "x0": 93.9741059963486,
+      "y0": 22.3627585969908,
+      "x1": 400.7734184727876,
+      "y1": 163.12414239435012,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 21.4,
+     "slip": -0.6
+    },
+    {
+     "i": 41,
+     "moved": 0.224072265625,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.81
+     },
+     "car": {
+      "x0": 94.92296267237833,
+      "y0": 24.092572137794058,
+      "x1": 398.394276205274,
+      "y1": 160.1426606718884,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.1,
+     "slip": -0.8
+    },
+    {
+     "i": 42,
+     "moved": 0.22475911458333334,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.05
+     },
+     "car": {
+      "x0": 95.77004489200782,
+      "y0": 25.172691489340707,
+      "x1": 400.5487942326231,
+      "y1": 158.32283250007686,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 22.8,
+     "slip": -0.9
+    },
+    {
+     "i": 43,
+     "moved": 0.21738606770833332,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.01
+     },
+     "car": {
+      "x0": 96.24249590362908,
+      "y0": 25.692449391830834,
+      "x1": 401.49045950506826,
+      "y1": 157.45828557865508,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 23.6,
+     "slip": -0.9
+    },
+    {
+     "i": 44,
+     "moved": 0.2476291232638889,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.35
+     },
+     "car": {
+      "x0": 96.1764794398799,
+      "y0": 25.622439392676274,
+      "x1": 401.3670786538708,
+      "y1": 157.57432024090974,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 24.6,
+     "slip": -1
+    },
+    {
+     "i": 45,
+     "moved": 0.26976453993055555,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.75
+     },
+     "car": {
+      "x0": 94.66050018538347,
+      "y0": 23.6974463013538,
+      "x1": 398.2748012106798,
+      "y1": 160.81633521406346,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 25.7,
+     "slip": -0.3
+    },
+    {
+     "i": 46,
+     "moved": 0.3404861111111111,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.76
+     },
+     "car": {
+      "x0": 93.9061912232463,
+      "y0": 22.182497727926467,
+      "x1": 401.09770623943837,
+      "y1": 163.43970144852418,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 26.8,
+     "slip": 0.5
+    },
+    {
+     "i": 47,
+     "moved": 0.24147786458333334,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.84
+     },
+     "car": {
+      "x0": 93.84284855700379,
+      "y0": 21.997369532305658,
+      "x1": 401.42726024578064,
+      "y1": 163.7647531168524,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 27.9,
+     "slip": 0.3
+    },
+    {
+     "i": 48,
+     "moved": 0.28979709201388887,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.78
+     },
+     "car": {
+      "x0": 93.82362171377778,
+      "y0": 21.937031286928516,
+      "x1": 401.53389309986505,
+      "y1": 163.8709097502706,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.4,
+     "slip": 0.8
+    },
+    {
+     "i": 49,
+     "moved": 0.3034537760416667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.2
+     },
+     "car": {
+      "x0": 93.58071927881703,
+      "y0": 20.4039366148638,
+      "x1": 404.1048097879375,
+      "y1": 166.60392105891182,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.1,
+     "slip": 3.8
+    },
+    {
+     "i": 50,
+     "moved": 0.3078146701388889,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.09
+     },
+     "car": {
+      "x0": 93.72628690722507,
+      "y0": 21.58794011866249,
+      "x1": 402.1431325399118,
+      "y1": 164.48715754429847,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.1,
+     "slip": 1.1
+    },
+    {
+     "i": 51,
+     "moved": 0.28313259548611114,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.59
+     },
+     "car": {
+      "x0": 94.34498684202161,
+      "y0": 23.15786257484302,
+      "x1": 399.3048420735944,
+      "y1": 161.74329698821464,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31,
+     "slip": -0.3
+    },
+    {
+     "i": 52,
+     "moved": 0.34219618055555556,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.02
+     },
+     "car": {
+      "x0": 94.19396926903524,
+      "y0": 22.86270909070153,
+      "x1": 399.85706919093553,
+      "y1": 162.25379693557065,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 0.9
+    },
+    {
+     "i": 53,
+     "moved": 0.3038422309027778,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.14
+     },
+     "car": {
+      "x0": 93.59824268349783,
+      "y0": 20.019537341416576,
+      "x1": 404.7038588096,
+      "y1": 167.30014443757366,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.4,
+     "slip": 6.4
+    },
+    {
+     "i": 54,
+     "moved": 0.3006901041666667,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.33
+     },
+     "car": {
+      "x0": 95.88921190850478,
+      "y0": 16.164553124459253,
+      "x1": 409.3617297133787,
+      "y1": 174.53747918297995,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 31.3,
+     "slip": 14.7
+    },
+    {
+     "i": 55,
+     "moved": 0.31550021701388886,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 8.28
+     },
+     "car": {
+      "x0": 101.59932681631297,
+      "y0": 13.070935503965986,
+      "x1": 410.30812905999454,
+      "y1": 180.7028957365902,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30.7,
+     "slip": 22.4
+    },
+    {
+     "i": 56,
+     "moved": 0.34076497395833333,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.67
+     },
+     "car": {
+      "x0": 106.11429906848329,
+      "y0": 11.64803994836998,
+      "x1": 409.20962673183635,
+      "y1": 183.6535458078181,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 30,
+     "slip": 26.5
+    },
+    {
+     "i": 57,
+     "moved": 0.31647677951388886,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.46
+     },
+     "car": {
+      "x0": 107.10459072003701,
+      "y0": 11.393945586188327,
+      "x1": 408.85466680431693,
+      "y1": 184.18840466875935,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 29.2,
+     "slip": 27.1
+    },
+    {
+     "i": 58,
+     "moved": 0.3443684895833333,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 6.67
+     },
+     "car": {
+      "x0": 100.55134214384928,
+      "y0": 13.486340599657897,
+      "x1": 410.40238046429744,
+      "y1": 179.85544779581915,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.6,
+     "slip": 20.4
+    },
+    {
+     "i": 59,
+     "moved": 0.26483289930555554,
+     "low": {
+      "button": "first",
+      "line": "start here · track 1 of ",
+      "contrast": 7.36
+     },
+     "car": {
+      "x0": 94.05422632368506,
+      "y0": 18.407038675311757,
+      "x1": 406.98214182918775,
+      "y1": 170.27002634835316,
+      "behind": false,
+      "inside": true
+     },
+     "speed": 28.7,
+     "slip": 10.1
+    }
+   ]
+  }
+ },
+ "cost": {},
+ "knownAnswers": {
+  "underMenu": {
+   "samples": 60,
+   "frames": 600,
+   "movedMin": 0.0625,
+   "movedMedian": 0.1914,
+   "samplesStill": 0,
+   "driven": 256.1,
+   "slid": 51,
+   "framesOut": 0,
+   "framesUnder": 600,
+   "worstUnder": {
+    "px": 6924,
+    "of": "daily",
+    "car": {
+     "x0": 85.81136738631442,
+     "y0": 360.1269802408432,
+     "x1": 299.31667656776443,
+     "y1": 481.8723434458357,
+     "behind": false,
+     "inside": true
+    }
+   },
+   "lowest": {
+    "button": "first",
+    "line": "start here · track 1 of ",
+    "contrast": 1.7
+   }
+  },
+  "still": {
+   "samples": 60,
+   "frames": 600,
+   "movedMin": 0,
+   "movedMedian": 0,
+   "samplesStill": 60,
+   "driven": 0,
+   "slid": 600,
+   "framesOut": 0,
+   "framesUnder": 600,
+   "worstUnder": {
+    "px": 4575,
+    "of": "rivals",
+    "car": {
+     "x0": 133.66226015075404,
+     "y0": 357.1234956427471,
+     "x1": 265.4676531505676,
+     "y1": 486.660114371915,
+     "behind": false,
+     "inside": true
+    }
+   },
+   "lowest": {
+    "button": "first",
+    "line": "start here · track 1 of ",
+    "contrast": 4.16
+   }
+  }
+ }
+}
