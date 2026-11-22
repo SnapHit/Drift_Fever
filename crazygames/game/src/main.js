@@ -50,12 +50,13 @@ import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, ca
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
-import { carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById, PAINTS } from './garage/roster.js';
+import { carById, carBox, carRev, carTune, upgradeLevels, ROSTER, UPGRADE_STATS, paintById, PAINTS } from './garage/roster.js';
 import { createShowroom } from './garage/showroom.js';
 import { lookOf, owns, isItem, KINDS, ITEMS, priceOf } from './garage/cosmetics.js';
 import { FIRST_ON } from './first.js';
 import { FX_ON } from './fx.js';
 import { createDirector } from './camera/director.js';
+import { createTitleCamera, createTitleGuard, freeLand, TITLE } from './camera/title.js';
 import { TANDEM } from './tune.js';
 import { createRival, gridStart } from './rivals/rival.js';
 import { RIVALS, rivalById, rivalOpen, openRivals, rivalPaint, rivalIndex, rivalOnTrack, rivalState, rivalNeeds, rivalsLive } from './rivals/roster.js';
@@ -97,6 +98,8 @@ const debug = query.get('debug') === '1' ? createDebug(root) : null;
 const scene = createScene(canvas, { renderer: query.get('renderer') === 'webgl2' ? 'webgl2' : undefined, tier: query.get('tier') || undefined });
 const THREE = scene.THREE;
 const director = FX_ON ? createDirector(THREE) : null;   // the spectacle round's camera moments, over the chase camera
+const titleCam = FIRST_ON ? createTitleCamera() : null;   // the live title's camera (briefs/FIRST-MINUTE.md, ?first=2)
+const titleGuard = FIRST_ON ? createTitleGuard() : null;   // and whether the device can afford its car
 const autoDrive = query.get('auto') === '1';
 const devGround = query.get('ground');
 
@@ -116,6 +119,7 @@ const app = {
   dist: 0, distAlong: 0,    // in a race: the player's metres into the run, unwrapped
   park: null,               // in the stunt park (free drift): the challenges' judge (park/challenges.js), else null
   parkVisits: 0, parkPaid: 0, inPark: false,   // visits this session (the park's time of day moves on with each), the judge's events already paid, and whether the list was opened from inside the park
+  titleDriver: null, titleLand: null, titleLook: 0, titleStill: false,   // the live title (briefs/FIRST-MINUTE.md, ?first=2): its driver, the clear place for its car, frames since the title's layout was looked at, and whether its car has stopped for the visit
   profile: EASY,            // how the player's car is driven this run (briefs/PRO-CONTROLS.md): Easy, or Pro and its variant, chosen as the run starts (input/mode.js)
 };
 const rivalPose = { x: 0, y: 0, z: 0, yaw: 0, car: null };
@@ -234,11 +238,13 @@ function driveStep(rec) {
 }
 
 const STOP = { steer: 0, throttle: 0, brake: 0, handbrake: 1 };   // DRIFT with no steering: the car stops
-let physMs = 0, lastSteps = 0, frameMs = 0;
+let physMs = 0, lastSteps = 0, frameMs = 0, framesRun = 0, prebuilding = FIRST_ON;
 function frame(t) {
   const t0 = performance.now();
+  if (prebuilding && ++framesRun >= 2) prebuilding = scene.prebuild();   // the first minute (briefs/FIRST-MINUTE.md): the effects built ahead, one a frame, once the first frame is up (render/scene.js)
   if (last < 0) last = t;
-  if (FX_ON) scene.frameTime(t - last);   // the adaptation reads the browser's frame clock
+  const gap = t - last;
+  if (FX_ON) scene.frameTime(gap);   // the adaptation reads the browser's frame clock
   const dt = Math.min(0.1, Math.max(0, (t - last) / 1000));
   last = t;
   resize();
@@ -284,12 +290,34 @@ function frame(t) {
     if (S === 'drive' && app.settle > 0) { app.settle -= dt * ts; if (app.settle <= 0) finishRun(); }
     if (S === 'results') { app.lockout -= dt; if (app.lockout <= 0 && raw.action && !padnav.owns()) onAction('again'); }
   }
-  const alpha = stepping ? acc / STEP : 0;
+  /* THE LIVE TITLE (briefs/FIRST-MINUTE.md priority 4, ?first=2): the
+     title's car drives track 1 by the look-ahead driver, in steps as a
+     run does, framed in the title's clear place; when the device cannot
+     afford it (its frames slow, or the quality stepped down) the car goes
+     back to the line and stands, framed the same, for the rest of the
+     visit; with no clear place the title is as it was */
+  const framed = titleFramed(S);
+  if (framed && ++app.titleLook >= 30) { app.titleLook = 0; app.titleLand = titleLand(); }   // the title's layout, looked at again now and then (a logo loads, the screen turns)
+  if (titleCam) titleShade(framed ? app.titleLand : null);
+  const live = framed && !app.titleStill && titleGuard.frame(gap) && scene.adaptState().level === 0;
+  if (framed && !live && !app.titleStill) { app.titleStill = true; app.world.reset(); const c0 = app.world.car; prev.x = c0.x; prev.y = c0.y || 0; prev.z = c0.z; prev.yaw = c0.yaw; acc = 0; }   // it cannot: the car back on the line, standing, for the rest of the visit, as the title always was
+  if (live) {
+    acc += dt;
+    let n = Math.floor(acc / STEP + 1e-6);
+    if (n > MAX_STEPS) { n = MAX_STEPS; acc = n * STEP; }
+    const p0 = performance.now();
+    for (let i = 0; i < n; i++) titleStep();
+    acc = Math.max(0, acc - n * STEP);
+    physMs = performance.now() - p0; lastSteps = n;
+  }
+  const alpha = stepping || live ? acc / STEP : 0;
   const c = world.car;
   let dy = c.yaw - prev.yaw; if (dy > Math.PI) dy -= 2 * Math.PI; else if (dy < -Math.PI) dy += 2 * Math.PI;
   pose.x = prev.x + (c.x - prev.x) * alpha; pose.y = prev.y + ((c.y || 0) - prev.y) * alpha; pose.z = prev.z + (c.z - prev.z) * alpha; pose.yaw = prev.yaw + dy * alpha;
   pose.slip = c.slip; pose.speed = c.speed; pose.boost = c.boost; pose.layer = c.layer || 0;
-  if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
+  if (titleCam && !framed && titleCam.state.init) titleCam.release(scene.camera);
+  if (framed) titleCam.update(pose, dt, scene.camera, view, app.titleLand);
+  else if (menu) { app.menuT += dt; chase.orbit(pose, app.menuT, scene.camera, view.w / view.h); }
   else {
     chase.update(pose, dt, scene.camera, view.w / view.h);
     if (director) director.apply(S === 'countdown' ? 'countdown' : finishing ? 'finish' : 'drive', pose, scene.camera, dt, S === 'countdown' ? 1 - Math.max(0, app.countdown) / LOOP.COUNTDOWN : 0, chase.state, app.rival && (S === 'countdown' || S === 'drive') ? app.rival.world.car : null);
@@ -361,7 +389,7 @@ function showMenu(name) {
   if (name !== 'garage') app.preview = {};   // a preview does not leave the garage
   if (onboard.active) onboard.stop(false);
   hud.setVisible(false); hud.setCount('', false); input.touch.setVisible(false);
-  if (name === 'title') screens.title(save.state, titleInfo());
+  if (name === 'title') { screens.title(save.state, titleInfo()); if (titleCam) { app.titleLand = titleLand(); app.titleLook = 0; } }
   else if (name === 'career') screens.career(save.state);
   else if (name === 'rivals') showRivals();
   else if (name === 'park') screens.park(save.state, { inPark: app.inPark });
@@ -450,12 +478,39 @@ async function copyText(text, what) {
 }
 /* The title's backdrop: the chosen car on the daily track's line. */
 function menuGround() {
-  const spec = dailySpec();
+  const spec = FIRST_ON ? careerSpec(0) : dailySpec();   // the live title drives track 1, the newcomer's first (briefs/FIRST-MINUTE.md)
   app.spec = spec; app.track = trackFor(spec);
   scene.setTitle();   // ?look=2 draws the title's backdrop at floodlit dusk (render/scene.js); without it nothing changes
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
   app.progress = null; app.race = null; app.ghost = null; app.missions = null; scene.setGhost(null);
+  /* the live title's car is the chosen car as the garage tunes it, under no profile, driven by the scripted slide player (rivals/players.js) with a player's hands */
+  if (FIRST_ON) { const mine = save.state.cars[save.state.car]; app.world = createWorld(app.track, { tune: carTune(save.state.car, mine && mine.up) }); app.titleDriver = createPlayer(app.track, 'slide', null, null, { index: 0, car: save.state.car }); app.titleLook = 30; }
   resetRun(); app.driver = null;
+}
+/* the live title (briefs/FIRST-MINUTE.md priority 4): on the title, with a clear place for the car */
+function titleFramed(S) { return !!titleCam && S === 'title' && running && !!app.titleDriver && !!app.titleLand; }
+function titleStep() {
+  const world = app.world, c = world.car;
+  prev.x = c.x; prev.y = c.y || 0; prev.z = c.z; prev.yaw = c.yaw;
+  world.stepWorld(quantise(app.titleDriver.input(world)));
+}
+/* the title's shade over the backdrop, opened round the car's clear place (index.html, #screens.liveland), so the car reads and the buttons keep the shade behind them */
+let shadeKey = '';
+function titleShade(land) {
+  const key = land ? [land.x, land.y, land.w, land.h].join() : '';
+  if (key === shadeKey) return;
+  shadeKey = key;
+  const el = screens.el;
+  el.classList.toggle('liveland', !!land);
+  if (land) for (const [k, v] of [['--land-x', land.x + land.w / 2], ['--land-y', land.y + land.h / 2], ['--land-rx', land.w * TITLE.SHADE[0]], ['--land-ry', land.h * TITLE.SHADE[1]]]) el.style.setProperty(k, Math.round(v) + 'px');
+}
+/* the clear place on the title for the car (camera/title.js freeLand): every button, text and logo of it kept clear; a logo not loaded yet keeps its whole row */
+function titleLand() {
+  const el = screens.el.querySelector('.screen.title');
+  if (!el || !screens.el.classList.contains('on')) return null;
+  const rects = [];
+  for (const e of el.querySelectorAll('button, img, h1, p, .coins')) { const r = e.getBoundingClientRect(); if (r.height <= 0) continue; rects.push(r.width > 0 ? r : { left: 0, right: view.w, top: r.top, bottom: r.bottom }); }
+  return freeLand(rects, view.w, view.h);
 }
 
 /* A saved ghost only drives the track it was recorded on. A ghost from an

@@ -12,6 +12,13 @@
    thins any particle standing between the camera and the car, so the
    car's own smoke never hides it. */
 
+/* THE FIRST MINUTE (briefs/FIRST-MINUTE.md, ?first=2): a pool render/
+   scene.js prebuild has kept (userData.kept, one pool a frame on the title
+   after its first frame) stays visible when empty, drawing nothing (its
+   range is empty), so it is built then and not at the first slide's smoke
+   or the first wall's sparks, mid run (game/test/first/hitches.js).
+   Without the switch nothing is kept, and an empty pool is hidden as it
+   always was. */
 const WHITE = [1, 1, 1];
 
 export function createParticles(THREE, opts) {
@@ -38,7 +45,7 @@ export function createParticles(THREE, opts) {
   mat.colorNode = tintA ? colour.mul(tex.rgb).mul(T.attribute('tint', 'vec3')) : colour.mul(tex.rgb);
   mat.opacityNode = tex.a.mul(T.attribute('alpha', 'float')).mul(T.float(o.opacity === undefined ? 1 : o.opacity));
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.frustumCulled = false;
+  mesh.frustumCulled = false; mesh.userData.keepBuilt = true; mesh.userData.kept = false;
   mesh.renderOrder = o.renderOrder === undefined ? 3 : o.renderOrder;
   mesh.name = o.name || 'particles';
   const P = new Array(max).fill(null).map(() => ({ life: 0, age: 0, x: 0, y: 0, z: 0, y0: 0, vx: 0, vy: 0, vz: 0, size: 0, grow: 0, a: 1, g: 0, drag: 0, rot: 0, spin: 0, stretch: 0, gd: 0, c0: [1, 1, 1], c1: [1, 1, 1] }));
@@ -121,9 +128,9 @@ export function createParticles(THREE, opts) {
     if (!n) awake = false;
     geo.setDrawRange(0, n * 6);
     if (n) { geo.attributes.position.needsUpdate = true; geo.attributes.alpha.needsUpdate = true; if (tintA) geo.attributes.tint.needsUpdate = true; }
-    mesh.visible = n > 0;
+    mesh.visible = n > 0 || mesh.userData.kept;
   }
-  function clear() { for (const p of P) { p.age = p.life; } geo.setDrawRange(0, 0); mesh.visible = false; live = 0; head = 0; }   // from the first slot again, so the same run draws its puffs in the same order (the garage probes compare two runs to the pixel)
+  function clear() { for (const p of P) { p.age = p.life; } geo.setDrawRange(0, 0); mesh.visible = mesh.userData.kept; live = 0; head = 0; }   // from the first slot again, so the same run draws its puffs in the same order (the garage probes compare two runs to the pixel)
   return { mesh, spawn, update, clear, setColour: hex => colour.value.setHex(hex), live: () => live, max, dispose: () => { geo.dispose(); mat.dispose(); } };
 }
 
@@ -152,7 +159,7 @@ export function createGlows(THREE, opts) {
   mat.colorNode = tex.rgb.mul(g.xyz);
   mat.opacityNode = tex.a.mul(g.w);
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.frustumCulled = false;
+  mesh.frustumCulled = false; mesh.userData.keepBuilt = true; mesh.userData.kept = false;
   mesh.renderOrder = o.renderOrder === undefined ? 5 : o.renderOrder;
   mesh.name = o.name || 'glows';
   if (o.depthTest === false) mat.depthTest = false;
@@ -183,7 +190,7 @@ export function createGlows(THREE, opts) {
   function end() {
     geo.setDrawRange(0, n * 6);
     if (n) { geo.attributes.position.needsUpdate = true; geo.attributes.glow.needsUpdate = true; }
-    mesh.visible = n > 0;
+    mesh.visible = n > 0 || mesh.userData.kept;
   }
   return { mesh, begin, add, end, count: () => n, max, dispose: () => { geo.dispose(); mat.dispose(); } };
 }

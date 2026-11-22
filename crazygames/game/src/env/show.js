@@ -202,7 +202,7 @@ export function createShow(THREE, opts) {
   tmat.colorNode = T.uniform(new THREE.Color(0xffffff)).mul(ttex.rgb).mul(T.attribute('tint', 'vec3'));
   tmat.opacityNode = ttex.a.mul(T.attribute('alpha', 'float')).mul(T.float(1));
   const trails = new THREE.Mesh(tgeo, tmat);
-  trails.frustumCulled = false; trails.renderOrder = 5; trails.name = 'trails';
+  trails.frustumCulled = false; trails.renderOrder = 5; trails.name = 'trails'; trails.userData.keepBuilt = true; trails.userData.kept = false;
   group.add(trails);
 
   const state = { heat: 0, tail: 0, slideT: 0, pops: 0, popDue: 0, popHeat: 0, flash: 0, flashSize: 0, flashX: 0, flashY: 0, flashZ: 0 };
@@ -276,7 +276,7 @@ export function createShow(THREE, opts) {
     }
     tgeo.setDrawRange(0, quads * 6);
     if (quads) { tgeo.attributes.position.needsUpdate = true; tgeo.attributes.alpha.needsUpdate = true; tgeo.attributes.tint.needsUpdate = true; }
-    trails.visible = quads > 0;
+    trails.visible = quads > 0 || trails.userData.kept;   // the first minute (briefs/FIRST-MINUTE.md, env/particles.js): kept visible empty once built ahead, so not built at the first slide
 
     /* the pop on the lift: a slide held long enough, then let go */
     if (sliding) state.slideT += dt;
@@ -324,6 +324,6 @@ export function createShow(THREE, opts) {
     if (ctx.extraGlows) ctx.extraGlows(glows);
     glows.end();
   }
-  function clear() { for (const tr of trail) { for (const p of tr.pts) { p.age = 1e9; p.link = false; } tr.on = false; } state.heat = 0; state.pops = 0; state.flash = 0; state.slideT = 0; tgeo.setDrawRange(0, 0); trails.visible = false; }
+  function clear() { for (const tr of trail) { for (const p of tr.pts) { p.age = 1e9; p.link = false; } tr.on = false; } state.heat = 0; state.pops = 0; state.flash = 0; state.slideT = 0; tgeo.setDrawRange(0, 0); trails.visible = trails.userData.kept; }
   return { group, update, setPreset, clear, state, glows, dispose() { tgeo.dispose(); tmat.dispose(); glows.dispose(); soft.dispose(); } };
 }

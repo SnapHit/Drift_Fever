@@ -338,6 +338,7 @@ export const FIRST = {
   /* the first run's prompts with the switch (ui/onboard.js): measured with strangers' thumbs, the slide prompt 45 m before track 1's first corner (reached at about 28 m/s) and the brake prompt wherever it fell put them in the walls three times a lap, against once in three laps with the prompts skipped */
   ONBOARD: {
     DRIFT_AFTER:    1,       // corners driven before the slide prompt may come (then LOOP.ONBOARD.DRIFT_LEAD before the next, as always)
+    DRIFT_WAIT:     34,      // s after steering is done the slide prompt comes anyway, wherever the car is (main's LOOP.ONBOARD.DRIFT_WAIT is 4: it came on the first straight)
     BRAKE_LEAD:     40,      // m before a corner the brake prompt comes, once the slide is done
     BRAKE_SPEED:    21,      // m/s the car must be doing there (76 km/h): the brake is shown where it helps
     BRAKE_WAIT:     12,      // s after the slide it comes anyway

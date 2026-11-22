@@ -179,8 +179,9 @@ export function createOnboarding(root, onSkip) {
      and the prompts are as they were. */
   function firstDrift(ctx) {
     if (!FIRST_ON || ctx.cornerAhead === Infinity) return null;   // the stunt park has no corners: its prompts are as they were
-    if (st.corners < FIRST.ONBOARD.DRIFT_AFTER) return st.waitT >= O.DRIFT_WAIT + 30 ? 'now' : 'wait';
-    return ctx.cornerAhead <= O.DRIFT_LEAD || st.waitT >= O.DRIFT_WAIT + 30 ? 'now' : 'wait';
+    const late = st.waitT >= FIRST.ONBOARD.DRIFT_WAIT;
+    if (st.corners < FIRST.ONBOARD.DRIFT_AFTER) return late ? 'now' : 'wait';
+    return ctx.cornerAhead <= O.DRIFT_LEAD || late ? 'now' : 'wait';
   }
   function firstBrake(ctx) {
     const F = FIRST.ONBOARD;

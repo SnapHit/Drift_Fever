@@ -10,7 +10,8 @@
    Known answer: one pixel of this branch's frame changed by one level
    is caught.
 
-   node game/test/look/switch.js   writes review/look/switch.json (ONLY=garage,title for those cases, KEEP=dir to keep the frames) */
+   node game/test/look/switch.js   writes review/look/switch.json (ONLY=garage,title for those cases, KEEP=dir to keep the frames,
+   LOOK= to draw both sides as they ship, the look on, instead of ?look=1: then it writes review/look/switch-shipped.json) */
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -29,12 +30,13 @@ for (const tier of ['low', 'high']) for (const [preset, rival] of [['dawn', 'r6'
 CASES.push({ kind: 'title', tier: 'high' }, { kind: 'garage', tier: 'high' });
 if (process.env.ONLY) CASES.splice(0, CASES.length, ...CASES.filter(c => process.env.ONLY.split(',').includes(c.kind)));   // ONLY=garage,title: those cases alone
 const KEEP = process.env.KEEP || null;   // a folder: each side's frames kept there as PNG
+const LOOK = process.env.LOOK === undefined ? '&look=1' : process.env.LOOK ? '&look=' + process.env.LOOK : '';   // briefs/FIRST-MINUTE.md rule 1: LOOK= compares the game as it ships
 
 async function frames(dir) {
   const R = await import(pathToFileURL(path.join(dir, 'game/test/garage/lib.js')).href + '?' + path.basename(dir));
   const env = await R.start(), out = {};
   for (const c of CASES) {
-    const pg = await R.openPage(env, { width: 640, height: 360 }, 'tier=' + c.tier + '&adapt=0&title=1&look=1');   // the look is the default since 22 November: ?look=1 must still be the game before it
+    const pg = await R.openPage(env, { width: 640, height: 360 }, 'tier=' + c.tier + '&adapt=0&title=1' + LOOK);   // the look is the default since 22 November: ?look=1 must still be the game before it
     const png = await pg.page.evaluate(async c => {
       const L = window.__loop, F = window.__feel;
       try { localStorage.clear(); } catch (e) {}
@@ -66,7 +68,7 @@ for (const k of Object.keys(main.out)) {
   const lum = []; for (let i = 0; i < B.d.length; i += 4 * 97) lum.push(R.lumOf(B.d[i], B.d[i + 1], B.d[i + 2]));
   const spread = R.pct(lum, 0.95) - R.pct(lum, 0.05);
   report[k] = { pixels: A.w * A.h, differ: d.n, spread: +spread.toFixed(3) };
-  say(d.n === 0 && spread > 0.1, k + ': main (' + commit + ') and this branch without ?look=2, ' + A.w + 'x' + A.h + ': ' + d.n + ' pixels differ (the frame is a picture, not blank: brightness 5th to 95th centile spans ' + spread.toFixed(2) + ')');
+  say(d.n === 0 && spread > 0.1, k + ': main (' + commit + ') and this branch' + (LOOK ? ' with ?' + LOOK.slice(1) : ' as it ships, without ?first=2') + ', ' + A.w + 'x' + A.h + ': ' + d.n + ' pixels differ (the frame is a picture, not blank: brightness 5th to 95th centile spans ' + spread.toFixed(2) + ')');
 }
 /* the known answer: one pixel of one frame moved by one level */
 const k0 = Object.keys(mine.out)[0], A = await R.decode(main.out[k0]), B = await R.decode(mine.out[k0]);
@@ -74,7 +76,7 @@ B.d[(B.w * 100 + 200) * 4] = (B.d[(B.w * 100 + 200) * 4] + 1) % 256;
 const kd = R.diffMask(A, B, 0);
 say(kd.n === 1, 'known answer: one pixel of "' + k0 + '" changed by one level: ' + kd.n + ' pixel caught');
 fs.mkdirSync(path.join(root, 'review', 'look'), { recursive: true });
-fs.writeFileSync(path.join(root, 'review', 'look', 'switch.json'), JSON.stringify({ main: commit, step: STEP, size: '640x360', cases: report }, null, 1));
+fs.writeFileSync(path.join(root, 'review', 'look', process.env.LOOK === undefined ? 'switch.json' : 'switch-shipped.json'), JSON.stringify({ main: commit, step: STEP, size: '640x360', query: LOOK, cases: report }, null, 1));
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(failed ? failed + ' failed' : 'all passed');
 process.exit(failed ? 1 : 0);
