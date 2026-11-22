@@ -14,7 +14,7 @@
 
    Also the worn racing line: a soft dark ribbon that leans to the
    inside through corners, laid once per track. */
-import { asphaltTexture, concreteTexture } from './textures.js';
+import { asphaltTexture, concreteTexture, asphaltDetail, puddleTexture } from './textures.js';
 
 export const TRACK_STYLE = {
   ASPHALT_TILE:  7,        // m per repeat of the grain
@@ -31,10 +31,54 @@ export const TRACK_STYLE = {
   RACING_LINE_RADIUS: 80,  // m: corners this tight or tighter get the full lean
 };
 
+/* THE COVER LOOK'S ROAD (briefs/COVER-LOOK.md 3, ?look=2): the asphalt
+   as a standard material that reflects the world's environment, with
+   the stones and grain of env/textures.js asphaltDetail as its relief
+   and its roughness, so the surface catches the light. On a wet preset
+   the asphalt darkens and goes smooth, and patches of standing water
+   lie in it as mirrors (puddleTexture), each its own scale so the two
+   tiles never line up. The edge line, the kerbs and the lines stay as
+   they are: paint, not water, and the readability rule's brightness
+   half is held on them. */
+export const TRACK_LOOK = {
+  ROUGH:         [0.8, 0.96],   // dry: the roughness over the stones and the binder
+  NORMAL:        { dry: 0.16, wet: 0.12 },  // the relief's strength (the low tier has none: its cost is the high tier's alone)
+  WET_ROUGH:     [0.34, 0.55],  // wet: the asphalt between the puddles
+  PUDDLE_ROUGH:  0.06,          // the standing water: a mirror, just blurred
+  PUDDLE_TILE:   41,            // m per repeat of the water's patches
+  PUDDLE_SHARE:  0.3,           // about this much of a wet road is under water
+  WET_ALBEDO:    0.5,           // wet asphalt is darker: its colour times this
+  DETAIL_SIZE:   256,           // px, the relief's and roughness's tile
+};
+
 let cache = null;
 function textures(THREE) {
   if (!cache) cache = { asphalt: asphaltTexture(THREE, 256), concrete: concreteTexture(THREE, 128) };
   return cache;
+}
+let lookCache = null;
+function lookTextures(THREE) {
+  if (!lookCache) { const d = asphaltDetail(THREE, TRACK_LOOK.DETAIL_SIZE); lookCache = { normal: d.normal, rough: d.rough, puddle: puddleTexture(THREE, 256, TRACK_LOOK.PUDDLE_SHARE) }; }
+  return lookCache;
+}
+
+/* The cover look's asphalt for a preset: a node material, the night's
+   baked moonlight (roadGlow) as its emission, as edgeGlow gives the
+   road without the look. detail: the relief (the high tier). */
+function lookAsphalt(THREE, preset, detail) {
+  const T = THREE.TSL, X = lookTextures(THREE), L = TRACK_LOOK, wet = !!preset.wet;
+  const k = TRACK_STYLE.ROAD_LIFT * (wet ? L.WET_ALBEDO : 1);
+  const m = new THREE.MeshStandardNodeMaterial({ vertexColors: true, map: textures(THREE).asphalt, color: new THREE.Color(k, k, k), metalness: 0 });
+  const uv = T.uv(), grain = T.texture(X.rough, uv).r;
+  const puddle = wet ? T.texture(X.puddle, uv.mul(TRACK_STYLE.ASPHALT_TILE / L.PUDDLE_TILE)).r : null;
+  m.roughnessNode = wet ? T.mix(T.mix(T.float(L.WET_ROUGH[0]), T.float(L.WET_ROUGH[1]), grain), T.float(L.PUDDLE_ROUGH), puddle) : T.mix(T.float(L.ROUGH[0]), T.float(L.ROUGH[1]), grain);
+  if (detail) {
+    const s = wet ? L.NORMAL.wet : L.NORMAL.dry;
+    m.normalNode = T.normalMap(T.texture(X.normal, uv), wet ? T.vec2(s, s).mul(T.float(1).sub(puddle)) : T.vec2(s, s));
+  }
+  if (preset.roadGlow) m.emissiveNode = T.vertexColor().mul(T.float(preset.roadGlow));
+  m.userData.look = true;   // render/scene.js's edge glow leaves it alone: its emission is here
+  return m;
 }
 
 /* UVs from positions: per triangle, a planar map for faces that face
@@ -74,7 +118,7 @@ export function styleTrack(THREE, group, preset, options) {
     ? new THREE.MeshStandardMaterial({ vertexColors: vc(geo), map: T.asphalt, color: lift, roughness: TRACK_STYLE.ROUGH_WET, metalness: TRACK_STYLE.METAL_WET })
     : lam(geo, { map: T.asphalt, color: lift });
   const table = {
-    road:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return asphalt(geo); },
+    road:     geo => { projectUVs(THREE, geo, TRACK_STYLE.ASPHALT_TILE); return o.look ? lookAsphalt(THREE, preset, o.tierName === 'high') : asphalt(geo); },
     edge:     geo => lam(geo, { emissive: TRACK_STYLE.EDGE_PAINT, emissiveIntensity: preset.edgeGlow || 0 }),
     kerb:     geo => lam(geo, {}),
     runoff:   geo => lam(geo, {}),

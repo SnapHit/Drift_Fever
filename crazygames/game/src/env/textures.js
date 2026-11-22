@@ -65,6 +65,79 @@ export function asphaltTexture(THREE, size) {
   return t;
 }
 
+/* THE COVER LOOK'S ROAD (briefs/COVER-LOOK.md 3, ?look=2): the asphalt's
+   surface as maps made here, nothing downloaded. A height field of
+   stones and grain (the same value noise as the colour, at finer
+   scales, with sharp little stones scattered over it) becomes a normal
+   map, so the surface catches the light in specks; a roughness map
+   where the stones are a little smoother than the binder between them;
+   and, apart, a mask of standing water in broad soft patches, for a wet
+   track, tiled at another scale so the two never line up. */
+export function asphaltDetail(THREE, size) {
+  const s = size || 256, rng = makeRng(13);
+  const h = new Float32Array(s * s);
+  const layer = (cell, amp, seed) => {
+    const g = makeRng(seed), n = Math.ceil(s / cell), a = new Float32Array(n * n);
+    for (let i = 0; i < a.length; i++) a[i] = g.next() * 2 - 1;
+    for (let y = 0; y < s; y++) for (let x = 0; x < s; x++) {
+      const fx = x / cell, fy = y / cell, ix = Math.floor(fx), iy = Math.floor(fy), tx = fx - ix, ty = fy - iy;
+      const q = (i, j) => a[((j % n) + n) % n * n + ((i % n) + n) % n];
+      const sx = tx * tx * (3 - 2 * tx), sy = ty * ty * (3 - 2 * ty);
+      h[y * s + x] += amp * ((q(ix, iy) * (1 - sx) + q(ix + 1, iy) * sx) * (1 - sy) + (q(ix, iy + 1) * (1 - sx) + q(ix + 1, iy + 1) * sx) * sy);
+    }
+  };
+  layer(2, 0.35, 61); layer(4, 0.45, 62); layer(16, 0.4, 63);   // cells that divide the tile, so it wraps without a seam
+  /* stones: little domes proud of the binder, wrapping round the tile's edges */
+  const stones = new Float32Array(s * s);
+  for (let k = 0; k < s * s / 18; k++) {
+    const cx = rng.range(0, s), cy = rng.range(0, s), r = rng.range(0.8, 2.4), top = rng.range(0.5, 1);
+    for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
+      const x = Math.floor(cx + dx), y = Math.floor(cy + dy), d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / r;
+      if (d < 1) { const i = ((y % s) + s) % s * s + ((x % s) + s) % s; stones[i] = Math.max(stones[i], top * Math.sqrt(1 - d * d)); }
+    }
+  }
+  for (let i = 0; i < h.length; i++) h[i] = h[i] * 0.5 + stones[i];
+  const nc = canvas(s, s), rc = canvas(s, s), nctx = nc.getContext('2d'), rctx = rc.getContext('2d');
+  const ni = nctx.createImageData(s, s), ri = rctx.createImageData(s, s);
+  const at = (x, y) => h[((y % s) + s) % s * s + ((x % s) + s) % s];
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++) {
+    const dx = (at(x + 1, y) - at(x - 1, y)) * 1.4, dy = (at(x, y + 1) - at(x, y - 1)) * 1.4, l = Math.hypot(dx, dy, 1);
+    const k = (y * s + x) * 4;
+    ni.data[k] = Math.round((-dx / l * 0.5 + 0.5) * 255); ni.data[k + 1] = Math.round((dy / l * 0.5 + 0.5) * 255); ni.data[k + 2] = Math.round((1 / l * 0.5 + 0.5) * 255); ni.data[k + 3] = 255;
+    const r = Math.max(0, Math.min(1, 0.62 - stones[y * s + x] * 0.35 + h[y * s + x] * 0.08));   // stones smoother than the binder
+    ri.data[k] = ri.data[k + 1] = ri.data[k + 2] = Math.round(r * 255); ri.data[k + 3] = 255;
+  }
+  nctx.putImageData(ni, 0, 0); rctx.putImageData(ri, 0, 0);
+  const mk = c => { const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; t.anisotropy = 4; return t; };
+  return { normal: mk(nc), rough: mk(rc) };
+}
+
+/* Standing water: broad soft patches, 1 where the water lies. share is
+   about how much of the road is under it. */
+export function puddleTexture(THREE, size, share) {
+  const s = size || 256, c = canvas(s, s), ctx = c.getContext('2d'), img = ctx.createImageData(s, s), g = makeRng(71);
+  const octave = (n, amp) => { const a = new Float32Array(n * n); for (let i = 0; i < a.length; i++) a[i] = g.next(); return { n, a, amp }; };
+  const O = [octave(4, 0.6), octave(9, 0.3), octave(23, 0.1)];
+  const val = (x, y) => {
+    let v = 0;
+    for (const o of O) {
+      const fx = x / s * o.n, fy = y / s * o.n, ix = Math.floor(fx), iy = Math.floor(fy), tx = fx - ix, ty = fy - iy, sx = tx * tx * (3 - 2 * tx), sy = ty * ty * (3 - 2 * ty);
+      const q = (i, j) => o.a[(j % o.n) * o.n + (i % o.n)];
+      v += o.amp * ((q(ix, iy) * (1 - sx) + q(ix + 1, iy) * sx) * (1 - sy) + (q(ix, iy + 1) * (1 - sx) + q(ix + 1, iy + 1) * sx) * sy);
+    }
+    return v;
+  };
+  const cut = 1 - (share === undefined ? 0.4 : share) * 0.62 - 0.19;   // the noise's level above which water lies
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++) {
+    const v = val(x, y), m = Math.max(0, Math.min(1, (v - cut) / 0.07)), k = (y * s + x) * 4;
+    img.data[k] = img.data[k + 1] = img.data[k + 2] = Math.round(m * m * (3 - 2 * m) * 255); img.data[k + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace;
+  return t;
+}
+
 export function concreteTexture(THREE, size) {
   const s = size || 128, c = canvas(s, s), ctx = c.getContext('2d');
   grain(ctx, s, s, 21, 0.3, [3, 9, 31]);

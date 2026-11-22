@@ -33,6 +33,10 @@ export function makeSky(THREE, preset) {
   const group = new THREE.Group();
   group.name = 'sky';
   const sunDir = sunDirection(preset);
+  /* the glow's own direction, where a preset gives one (the cover look's
+     twilight: the sun is down behind the glow while the key light is
+     the floodlights'); otherwise the sun's */
+  const glowDir = preset.glowElev !== undefined ? sunDirection({ sunElev: preset.glowElev, sunAzim: preset.glowAzim }) : sunDir;
   /* the dome */
   const geo = new THREE.SphereGeometry(SKY.RADIUS, SKY.SEGMENTS[0], SKY.SEGMENTS[1]);
   const pos = geo.attributes.position, n = pos.count;
@@ -45,7 +49,7 @@ export function makeSky(THREE, preset) {
     // horizon to band over the first slice of elevation, band to zenith above
     mix3(horizon, band, smooth(0.0, 0.12, up), tmp);
     mix3(tmp, zenith, smooth(0.08, 0.55, up), tmp2);
-    const d = Math.max(0, x * sunDir[0] + y * sunDir[1] + z * sunDir[2]);
+    const d = Math.max(0, x * glowDir[0] + y * glowDir[1] + z * glowDir[2]);
     const g = Math.pow(d, preset.glowPower || SKY.GLOW_POWER) * (preset.glowGain || SKY.GLOW) * (1 - smooth(0.3, 0.9, up) * 0.7);
     // below the horizon the dome is the horizon colour, darkened, so a hill's gap never shows sky
     const below = y < 0 ? smooth(0, -0.25, y) : 0;
@@ -112,7 +116,7 @@ export function makeSky(THREE, preset) {
       const centre = [Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)];
       const along = [Math.cos(az), 0, -Math.sin(az)];
       const upv = [-Math.sin(el) * Math.sin(az), Math.cos(el), -Math.sin(el) * Math.cos(az)];
-      const d = Math.max(0, centre[0] * sunDir[0] + centre[1] * sunDir[1] + centre[2] * sunDir[2]);
+      const d = Math.max(0, centre[0] * glowDir[0] + centre[1] * glowDir[1] + centre[2] * glowDir[2]);
       const k = 0.35 + 0.65 * Math.pow(d, 2);
       const colour = mix3(shade, lit, k, [0, 0, 0]);
       const corner = (a, b) => [(centre[0] + along[0] * a * len + upv[0] * b * th) * R, (centre[1] + along[1] * a * len + upv[1] * b * th) * R, (centre[2] + along[2] * a * len + upv[2] * b * th) * R];
