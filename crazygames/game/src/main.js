@@ -50,7 +50,7 @@ import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, ca
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
-import { carTune, carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById } from './garage/roster.js';
+import { carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById } from './garage/roster.js';
 import { createShowroom } from './garage/showroom.js';
 import { lookOf, owns, isItem, KINDS } from './garage/cosmetics.js';
 import { FX_ON } from './fx.js';
