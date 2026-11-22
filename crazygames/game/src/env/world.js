@@ -18,6 +18,7 @@ export const WORLD = {
   WATER_SIZE:      2400,     // m, the water plane
   WATER_NEAR:      20,       // m inland of the cliff the water's near edge sits, under the ground
   LIT_INTENSITY:   { on: 2.4, off: 0.0 },
+  FLOOD_LIT:       { on: 6.0, off: 0.0 },   // the cover look's floodlight banks: hot enough to bloom hard (?look=2 only)
   BOARD_W:         6.0, BOARD_H: 1.8, BOARD_Y: 2.3,
   FLAG_SWAY:       0,        // flags are still (no per frame work on the low tier)
 };
@@ -69,11 +70,13 @@ export function buildEnvironment(THREE, track, options) {
   const back = makeBackdrop(THREE, theme, preset, seed);
 
   /* props */
-  const placed = placeScenery(track, theme, terrain, { share: tier.sceneryShare === undefined ? 1 : tier.sceneryShare });
-  const props = buildProps(THREE, theme, seed);
+  const placed = placeScenery(track, theme, terrain, { share: tier.sceneryShare === undefined ? 1 : tier.sceneryShare, look: !!o.look, tierName: o.tierName });
+  const props = buildProps(THREE, theme, seed, { look: !!o.look });
   const bodyMat = new THREE.MeshLambertMaterial({ vertexColors: true });
   const litMat = new THREE.MeshLambertMaterial({ vertexColors: true, emissive: 0xffffff, emissiveIntensity: preset.lamps ? WORLD.LIT_INTENSITY.on : WORLD.LIT_INTENSITY.off });
   disposables.push(bodyMat, litMat);
+  const floodMat = o.look ? new THREE.MeshLambertMaterial({ vertexColors: true, emissive: 0xffffff, emissiveIntensity: preset.lamps ? WORLD.FLOOD_LIT.on : WORLD.FLOOD_LIT.off }) : null;
+  if (floodMat) disposables.push(floodMat);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), s3 = new THREE.Vector3(), col = new THREE.Color();
   const meshes = {};
   for (const kind of Object.keys(placed)) {
@@ -84,7 +87,7 @@ export function buildEnvironment(THREE, track, options) {
     body.castShadow = tier.propShadows !== false && PROP_DIMS[kind].h >= (tier.shadowMinHeight || 0);
     body.receiveShadow = true;
     body.frustumCulled = false;
-    const lit = def.lit ? new THREE.InstancedMesh(def.lit, litMat, list.length) : null;
+    const lit = def.lit ? new THREE.InstancedMesh(def.lit, kind === 'flood' && floodMat ? floodMat : litMat, list.length) : null;
     if (lit) { lit.name = 'lit:' + kind; lit.frustumCulled = false; }
     let anyColour = false;
     list.forEach((it, i) => {

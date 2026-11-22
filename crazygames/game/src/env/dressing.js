@@ -22,6 +22,7 @@
 import { buildProps } from './props.js';
 import { createParticles } from './particles.js';
 import { sparkSprite } from './textures.js';
+import { VENUE } from './scenery.js';
 
 export const DRESS = {
   /* the lamp row, at night and in the rain */
@@ -29,12 +30,12 @@ export const DRESS = {
   LAMP_BACK:      4.5,      // m behind the barrier, as the docks' lamps (env/scenery.js LAMP_BACK)
   LAMP_HEAD:      [0, 7.95, -1.2],   // the head, in the lamp's own frame (env/props.js)
   LAMP_SKIP:      14,       // m: no new lamp this close to a lamp the theme already placed
-  LAMP_PRESETS:   { night: 1, rain: 1 },
+  LAMP_PRESETS:   { night: 1, rain: 1, twilight: 1 },   // twilight: the cover look's floodlit dusk (env/presets.js), ?look=2 only
   /* the pools of light on the road */
-  POOL_RADIUS:    { lamp: 12, tower: 18 },   // m
+  POOL_RADIUS:    { lamp: 12, tower: 18, flood: 15 },   // m (flood: the cover look's floodlight towers, env/props.js)
   POOL_IN:        0.3,      // share of the road's width inside its edge the pool is centred, on the lamp's side (away from the edge line, which must stay the brightest thing)
-  POOL_COLOUR:    { night: [1.0, 0.78, 0.5], rain: [0.9, 0.82, 0.7] },   // linear, additive
-  POOL_GAIN:      { night: 0.035, rain: 0.022 },   // linear light added at the pool's heart (dusk's sunlit asphalt is about 0.005)
+  POOL_COLOUR:    { night: [1.0, 0.78, 0.5], rain: [0.9, 0.82, 0.7], twilight: [1.0, 0.88, 0.72] },   // linear, additive
+  POOL_GAIN:      { night: 0.035, rain: 0.022, twilight: 0.03 },   // linear light added at the pool's heart (dusk's sunlit asphalt is about 0.005)
   POOL_GRID:      6,        // vertices a side, so a pool follows a banked road
   POOL_LIFT:      0.045,    // m over the road
   /* reflective tape on the barriers' faces */
@@ -42,19 +43,24 @@ export const DRESS = {
   TAPE_WIDTH:     0.09,     // m tall
   TAPE_INSET:     0.27,     // m in from the barrier's line, its road side face
   TAPE_COLOUR:    [1.0, 0.72, 0.42],   // amber, so the edge line stays the brightest thing
-  TAPE_BASE:      { night: 0.22, rain: 0.18, dusk: 0, dawn: 0 },   // glow with nothing near
-  TAPE_CATCH:     { night: 0.9, rain: 0.6, dusk: 0, dawn: 0 },     // more glow where the headlights reach
+  TAPE_BASE:      { night: 0.22, rain: 0.18, dusk: 0, dawn: 0, twilight: 0.16 },   // glow with nothing near
+  TAPE_CATCH:     { night: 0.9, rain: 0.6, dusk: 0, dawn: 0, twilight: 0.7 },     // more glow where the headlights reach
   TAPE_REACH:     [8, 55],  // m: full catch within the first, none past the second
   /* the flares on the lamp heads, and the towers' */
-  FLARE_SIZE:     { lamp: 0.75, tower: 1.9, stand: 1.4 },   // m half width
+  FLARE_SIZE:     { lamp: 0.75, tower: 1.9, stand: 1.4, flood: 4.6 },   // m half width
   FLARE_COLOUR:   [1.0, 0.78, 0.5],
-  FLARE_ALPHA:    { night: 0.9, rain: 0.6 },
+  FLARE_ALPHA:    { night: 0.9, rain: 0.6, twilight: 0.85 },
   FLARE_RANGE:    260,      // m, the farthest flare drawn
   /* the wet road's reflections of the lights */
-  WET_LENGTH:     { lamp: 9, tower: 14, car: 3 },   // m half length, towards the camera (seen at a grazing angle, so long)
-  WET_WIDTH:      { lamp: 0.42, tower: 0.9, car: 0.22 },
+  WET_LENGTH:     { lamp: 9, tower: 14, car: 3, flood: 20 },   // m half length, towards the camera (seen at a grazing angle, so long)
+  WET_WIDTH:      { lamp: 0.42, tower: 0.9, car: 0.22, flood: 1.8 },
   WET_ALPHA:      0.55,
   WET_RANGE:      120,      // m
+  /* the cover look (?look=2): a wet road is dark between the lights, so
+     its pools are fainter and its streaks narrower than the rain's, and
+     night and twilight are wet as well (env/presets.js) */
+  LOOK_POOL_GAIN: { night: 0.014, rain: 0.012, twilight: 0.011 },
+  LOOK_WET:       { width: { lamp: 0.3, tower: 0.6, flood: 0.85 }, length: { lamp: 8, tower: 12, flood: 15 }, alpha: 0.5, near: [9, 16] },   // near: m from the camera over which a streak fades in (one under the camera is a smear across the picture)
   /* the start grid */
   GRID_SLOTS:     6,        // boxes behind the line, two abreast
   GRID_GAP:       8,        // m between rows
@@ -98,6 +104,7 @@ function nearestSample(C, x, z, hint) {
 
 export function buildDressing(THREE, ground, o) {
   const preset = o.preset, theme = o.theme, tierName = o.tierName || 'low', env = o.env;
+  const wetLook = o.look ? DRESS.LOOK_WET : null;   // the cover look's streaks
   const group = new THREE.Group();
   group.name = 'dressing';
   const disposables = [];
@@ -151,6 +158,7 @@ export function buildDressing(THREE, ground, o) {
     /* the theme's own lamps and the towers light the road too */
     for (const l of placed.lamp || []) { const hx = Math.sin(l.ry) * DRESS.LAMP_HEAD[2], hz = Math.cos(l.ry) * DRESS.LAMP_HEAD[2]; const i = nearestSample(C, l.x, l.z); lights.push({ kind: 'lamp', x: l.x + hx, y: l.y + DRESS.LAMP_HEAD[1], z: l.z + hz, i, sgn: side(C[i], l.x, l.z) }); }
     for (const t of placed.tower || []) { const i = nearestSample(C, t.x, t.z); lights.push({ kind: 'tower', x: t.x, y: t.y + 14.8, z: t.z, i, sgn: side(C[i], t.x, t.z) }); }
+    for (const f of placed.flood || []) { const i = nearestSample(C, f.x, f.z); lights.push({ kind: 'flood', x: f.x, y: f.y + VENUE.FLOOD_HEAD, z: f.z, i, sgn: side(C[i], f.x, f.z) }); }   // the cover look's floodlight towers
   }
   function side(c, x, z) { return ((x - c.x) * -Math.cos(c.heading) + (z - c.z) * Math.sin(c.heading)) >= 0 ? 1 : -1; }
   for (const l of lights) { const c = C[l.i]; const u = l.sgn * (c.width / 2 - c.width * DRESS.POOL_IN), lx = -Math.cos(c.heading), lz = Math.sin(c.heading); l.foot = { x: c.x + lx * u, z: c.z + lz * u }; l.foot.y = roadY(c, l.foot.x, l.foot.z); }
@@ -173,7 +181,7 @@ export function buildDressing(THREE, ground, o) {
     geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
     geo.setIndex(idx);
     const mat = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true, side: THREE.DoubleSide });
-    const col = DRESS.POOL_COLOUR[preset.name] || DRESS.POOL_COLOUR.night, gain = DRESS.POOL_GAIN[preset.name] || 0.3;
+    const col = DRESS.POOL_COLOUR[preset.name] || DRESS.POOL_COLOUR.night, gain = (o.look ? DRESS.LOOK_POOL_GAIN[preset.name] : DRESS.POOL_GAIN[preset.name]) || 0.3;
     const d = T.uv().sub(0.5).length().mul(2);
     const fall = T.float(1).sub(d).max(0);
     mat.colorNode = T.vec3(col[0] * gain, col[1] * gain, col[2] * gain).mul(fall.mul(fall));
@@ -291,7 +299,8 @@ export function buildDressing(THREE, ground, o) {
         const d = Math.hypot(l.x - cp.x, l.z - cp.z);
         if (d > DRESS.FLARE_RANGE) continue;
         glows.add(l.x, l.y, l.z, DRESS.FLARE_SIZE[l.kind] || 1, fc[0] * 1.5, fc[1] * 1.5, fc[2] * 1.5, fa * (1 - d / DRESS.FLARE_RANGE * 0.5));
-        if (preset.wet && d < DRESS.WET_RANGE) glows.add(l.foot.x, l.foot.y + 0.05, l.foot.z, DRESS.WET_WIDTH[l.kind] || 0.5, fc[0], fc[1] * 0.95, fc[2] * 0.9, DRESS.WET_ALPHA * (1 - d / DRESS.WET_RANGE), DRESS.WET_LENGTH[l.kind] || 3);
+        const near = wetLook ? Math.max(0, Math.min(1, (Math.hypot(l.foot.x - cp.x, l.foot.z - cp.z) - wetLook.near[0]) / (wetLook.near[1] - wetLook.near[0]))) : 1;
+        if (preset.wet && d < DRESS.WET_RANGE) glows.add(l.foot.x, l.foot.y + 0.05, l.foot.z, (wetLook ? wetLook.width : DRESS.WET_WIDTH)[l.kind] || 0.5, fc[0], fc[1] * 0.95, fc[2] * 0.9, (wetLook ? wetLook.alpha : DRESS.WET_ALPHA) * (1 - d / DRESS.WET_RANGE) * near, (wetLook ? wetLook.length : DRESS.WET_LENGTH)[l.kind] || 3);
       }
     }
     /* the crowd's flashes as the car passes, more while it slides */

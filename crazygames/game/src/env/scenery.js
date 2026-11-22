@@ -41,6 +41,21 @@ export const PROP_DIMS = {
   tower:      { r: 1.4,  h: 15.5 },
   flag:       { r: 0.8,  h: 5.2 },
   board:      { r: 3.2,  h: 3.2,  box: [6.4, 0.5] },
+  flood:      { r: 3.4,  h: 23.5, box: [6.8, 1.4] },   // the cover look's floodlight tower: a mast and a bank of lamps (props.js)
+};
+
+/* THE COVER LOOK'S VENUE (briefs/COVER-LOOK.md 4, ?look=2): with the
+   look on, the trackside is denser (the theme's counts times these) and
+   floodlight towers stand along the road as well as at the corners, as
+   many as a track needs to read at night, every FLOOD_EVERY metres on
+   alternate sides, set back FLOOD_BACK past the barrier, facing it. */
+export const VENUE = {
+  /* the theme's trackside counts times these, by tier (towers: the floods replace them). The low tier keeps the theme's stands: a stand's crowd is thousands of triangles, and the low tier keeps its cost */
+  MORE:          { low: { grandstands: 1, boards: 1.8, tyres: 1.4, flags: 1.2, towers: 0 }, high: { grandstands: 2, boards: 2.2, tyres: 1.6, flags: 1.3, towers: 0 } },
+  FLOOD_EVERY:   62,       // m along the road between floodlight towers
+  FLOOD_BACK:    11,       // m past the barrier to the tower's foot
+  FLOOD_MAX:     18,
+  FLOOD_HEAD:    21.6,     // m, the middle of its bank of lamps (props.js)
 };
 
 export const SCENERY = {
@@ -146,7 +161,9 @@ export function placeScenery(track, theme, terrain, options) {
   /* trackside furniture, only where there is a road */
   const C = track.centre, n = C.length;
   if (n) {
-    const side = theme.trackside;
+    /* the cover look: a denser trackside, the floods in place of the towers */
+    const more = o.look ? VENUE.MORE[o.tierName === 'low' ? 'low' : 'high'] : null;
+    const side = more ? Object.fromEntries(Object.entries(theme.trackside).map(([k, v]) => [k, more[k] === undefined ? v : Math.round(v * more[k])])) : theme.trackside;
     const corners = cornersOf(track).filter(c => c.angle >= SCENERY.MIN_CORNER_ANGLE).sort((a, b) => b.angle - a.angle);
     const closed = track.kind === 'circuit';
     const length = track.length;
@@ -221,6 +238,19 @@ export function placeScenery(track, theme, terrain, options) {
         const p = beside(track, terrain, s, sgn * (w + SCENERY.TYRE_BACK + rng.range(0, 1.5)));
         add('tyrestack', { x: p.x, y: p.y, z: p.z, ry: rng.range(0, Math.PI), s: 1 });
         tyres++;
+      }
+    }
+    /* the cover look's floodlight towers: along the road on alternate sides, facing it, nudged clear of the furniture already standing */
+    if (o.look) {
+      let floods = 0;
+      for (let s = 16, k = 0; s < length - (closed ? 0 : 30) && floods < VENUE.FLOOD_MAX; s += VENUE.FLOOD_EVERY, k++) {
+        const at = [s, s + 9, s - 9].find(q => q > 0 && q < length && free(q, 4));
+        if (at === undefined) continue;
+        const sgn = k % 2 ? 1 : -1;
+        const w = wallOffset(track, at, sgn > 0 ? 'left' : 'right');
+        const p = beside(track, terrain, at, sgn * (w + VENUE.FLOOD_BACK));
+        add('flood', { x: p.x, y: p.y, z: p.z, ry: Math.atan2(-(p.lx * sgn), -(p.lz * sgn)), s: 1 });
+        used.push([at, 4]); floods++;
       }
     }
   }

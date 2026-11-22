@@ -1,0 +1,130 @@
+{
+ "frames": 120,
+ "size": "320x180",
+ "backend": "webgl2",
+ "stepped": "one frame at a time, the GPU idle before each",
+ "races": {
+  "low day": {
+   "main": {
+    "frames": 330,
+    "drawCalls": 102,
+    "drawCallsMax": 102,
+    "triangles": 338347,
+    "workMs": 3.6,
+    "workP90": 6.7,
+    "physMs": 0.2,
+    "submitMs": 2.8,
+    "workByBrowser": [
+     3.1,
+     4,
+     3.5
+    ]
+   },
+   "look": {
+    "frames": 330,
+    "drawCalls": 103,
+    "drawCallsMax": 104,
+    "triangles": 344871,
+    "workMs": 4.3,
+    "workP90": 8.7,
+    "physMs": 0.2,
+    "submitMs": 3.4,
+    "workByBrowser": [
+     4.5,
+     4.2,
+     4.1
+    ]
+   },
+   "ratio": {
+    "drawCalls": 1.01,
+    "triangles": 1.019,
+    "work": 1.194
+   }
+  },
+  "low dusk": {
+   "main": {
+    "frames": 330,
+    "drawCalls": 99,
+    "drawCallsMax": 99,
+    "triangles": 352343,
+    "workMs": 3.2,
+    "workP90": 5.8,
+    "physMs": 0.2,
+    "submitMs": 2.5,
+    "workByBrowser": [
+     3.5,
+     3.1,
+     2.8
+    ]
+   },
+   "look": {
+    "frames": 330,
+    "drawCalls": 100,
+    "drawCallsMax": 101,
+    "triangles": 357287,
+    "workMs": 3.9,
+    "workP90": 7.7,
+    "physMs": 0.2,
+    "submitMs": 3.3,
+    "workByBrowser": [
+     4.5,
+     3.5,
+     3.7
+    ]
+   },
+   "ratio": {
+    "drawCalls": 1.01,
+    "triangles": 1.014,
+    "work": 1.219
+   }
+  },
+  "low night": {
+   "main": {
+    "frames": 330,
+    "drawCalls": 110,
+    "drawCallsMax": 110,
+    "triangles": 180683,
+    "workMs": 3.5,
+    "workP90": 6.6,
+    "physMs": 0.2,
+    "submitMs": 2.7,
+    "workByBrowser": [
+     3.6,
+     4,
+     2.9
+    ]
+   },
+   "look": {
+    "frames": 330,
+    "drawCalls": 111,
+    "drawCallsMax": 112,
+    "triangles": 185909,
+    "workMs": 5,
+    "workP90": 9.2,
+    "physMs": 0.2,
+    "submitMs": 4,
+    "workByBrowser": [
+     5,
+     5.4,
+     4.8
+    ]
+   },
+   "ratio": {
+    "drawCalls": 1.009,
+    "triangles": 1.029,
+    "work": 1.429
+   }
+  }
+ },
+ "knownAnswer": {
+  "frames": 110,
+  "drawCalls": 600,
+  "drawCallsMax": 601,
+  "triangles": 363287,
+  "workMs": 7.5,
+  "workP90": 13.9,
+  "physMs": 0.2,
+  "submitMs": 6.5
+ },
+ "cores": "pinned"
+}

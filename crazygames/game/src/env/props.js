@@ -84,7 +84,20 @@ function prism(THREE, w, h, d) {
   return g;
 }
 
-export function buildProps(THREE, theme, seed) {
+/* THE COVER LOOK'S FLOODLIGHT TOWER (briefs/COVER-LOOK.md 4, ?look=2):
+   a mast and, at the top, a bank of lamps tilted down at the road, as
+   the cover's. The lamps are the lit part (bright, so they bloom). Built
+   to PROP_DIMS.flood; its front, the lamps, faces -Z. */
+export const FLOOD = {
+  MAST:   { w: 0.55, h: 20.2 },
+  BANK:   { y: 21.6, w: 6.6, h: 3.2, d: 0.45, tilt: 0.34, cols: 4, rows: 3, gap: 0.16 },   // tilt: radians the bank looks down
+  BRACE:  3.4,               // m between the mast's cross braces
+  STEEL:  0x3a3d46,
+  FRAME:  0x24262d,
+  LAMP:   0xfff3d6,
+};
+
+export function buildProps(THREE, theme, seed, options) {
   const rng = makeRng((seed >>> 0) + 303);
   const out = {};
   const make = (kind, fn) => { const A = assembler(THREE), L = assembler(THREE); fn(A, L); out[kind] = { body: A.build(), lit: L.count() ? L.build() : null }; };
@@ -234,6 +247,21 @@ export function buildProps(THREE, theme, seed) {
     // posts and a plain back; the printed face is a separate mesh with the atlas
     for (const x of [-2.6, 2.6]) A.push(new THREE.BoxGeometry(0.16, 3.3, 0.16), COL.BOARD_POST, x, 1.65, 0.1);
     A.push(new THREE.BoxGeometry(6.2, 1.9, 0.12), COL.BOARD_POST, 0, 2.3, 0.1);
+  });
+  /* the cover look's floods, last, and only with the look: nothing above draws a different number from the generator */
+  if (options && options.look) make('flood', (A, L) => {
+    const M = FLOOD.MAST, B = FLOOD.BANK, t = B.tilt;
+    A.push(new THREE.BoxGeometry(M.w, M.h, M.w), FLOOD.STEEL, 0, M.h / 2, 0);
+    for (let y = FLOOD.BRACE; y < M.h - 1; y += FLOOD.BRACE) A.push(new THREE.BoxGeometry(M.w * 2.2, 0.12, M.w * 2.2), FLOOD.STEEL, 0, y, 0);
+    /* a point on the bank: u across, v up its face, w out of it towards the road (-Z, tilted down) */
+    const at = (u, v, w) => [u, B.y + v * Math.cos(t) - w * Math.sin(t), -v * Math.sin(t) - w * Math.cos(t)];
+    const c = at(0, 0, 0);
+    A.push(new THREE.BoxGeometry(B.w, B.h, B.d), FLOOD.FRAME, c[0], c[1], c[2], -t, 0, 0);
+    const cw = B.w / B.cols, rh = B.h / B.rows;
+    for (let i = 0; i < B.cols; i++) for (let j = 0; j < B.rows; j++) {
+      const p = at(-B.w / 2 + (i + 0.5) * cw, -B.h / 2 + (j + 0.5) * rh, B.d / 2 + 0.04);
+      L.push(new THREE.BoxGeometry(cw * (1 - B.gap * 2), rh * (1 - B.gap * 2), 0.1), FLOOD.LAMP, p[0], p[1], p[2], -t, 0, 0);
+    }
   });
   return out;
 }

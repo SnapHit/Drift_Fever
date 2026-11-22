@@ -8,6 +8,7 @@
    angles here are written in degrees for the author and converted where
    they are read. Y is up. The car faces -Z at yaw zero, and +yaw is a
    left turn, as three.js rotates about Y. */
+import { LOOK_ON } from './fx.js';
 
 export const TUNE = {
   VEHICLE: {
@@ -174,6 +175,25 @@ export const TUNE = {
     SHAKE_HZ:           23,      // cycles per second
     NEAR:               0.5,
     FAR:                900,
+    /* THE COVER LOOK'S CAMERA (briefs/COVER-LOOK.md 7): with ?look=2
+       these take the place of the numbers above of the same name, before
+       anything reads them (the ?tune=1 panel then edits these), so the
+       car is the subject: closer and lower, a narrower view that widens
+       less with speed. Without the switch they are never read. */
+    LOOK: {
+      DISTANCE:         6.6,     // m behind the car (8.5 without the look)
+      DISTANCE_SPEED:   0.04,    // extra metres per m/s, so it still pulls back at speed (0.045)
+      HEIGHT:           2.35,    // m above the ground: low, the road ahead still over the roof (3.8)
+      LOOK_AHEAD:       5.0,     // m ahead of the car the camera looks at (6.0)
+      LOOK_UP:          0.95,    // m above the ground it looks at: the car sits lower in the picture, more road above it (0.7)
+      FOV:              56,      // degrees, vertical, in landscape (62)
+      FOV_SPEED:        0.32,    // degrees per m/s: the sense of speed, with less of the car lost to it (0.5)
+      FOV_PORTRAIT:     74,      // and in portrait (78)
+      PORTRAIT_DISTANCE: 1.6,    // in portrait the view is narrow, so the camera stands further back: the car keeps about the share of the width it had (a quarter; 1.05)
+      ASPECT_MAX:       1.7778,  // a screen wider than 16:9 (a phone on its side) narrows the vertical view so it sees no more across than 16:9 would: the car keeps its share
+      PORTRAIT_HEIGHT:  1.45,    // and higher, for the road ahead (1.25)
+      PORTRAIT_LOOK:    1.4,     // and looks further ahead (1.30)
+    },
   },
   SCORING: {
     MIN_ANGLE:          12,      // degrees of drift before points start
@@ -321,6 +341,8 @@ export const PANEL = [
 export function tuneGet(path) { const [g, k] = path.split('.'); return TUNE[g][k]; }
 export function tuneSet(path, v) { const [g, k] = path.split('.'); TUNE[g][k] = v; }
 export function tuneDefaults() { return JSON.parse(JSON.stringify(DEFAULTS)); }
+/* the cover look's camera (CAMERA.LOOK) in place, before the defaults are taken, so the panel's reset keeps it */
+if (LOOK_ON) Object.assign(TUNE.CAMERA, TUNE.CAMERA.LOOK);
 const DEFAULTS = JSON.parse(JSON.stringify(TUNE));
 
 /* THE GAME LOOP BLOCK: everything tunable about a run that is not the

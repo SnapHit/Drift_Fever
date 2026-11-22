@@ -10,7 +10,7 @@
    and three.js are untouched and do not know.
 
    start()            a browser that has WebGPU
-   open(env, vp, q)   a page of the game on the WebGPU backend, the frame loop stubbed as in the other probes
+   open(env, vp, q, { timeout })   a page of the game on the WebGPU backend, the frame loop stubbed as in the other probes
    grab(page, file)   the last frame drawn, as { w, h, d } (RGBA), written as a PNG if a file is given */
 import fs from 'node:fs';
 import * as R from '../garage/lib.js';
@@ -44,7 +44,8 @@ const FAKE = `(function () {
   };
 })();`;
 
-export async function open(env, viewport, query) {
+export async function open(env, viewport, query, opts) {
+  const wait = (opts && opts.timeout) || 120000;   // a page whose WebGPU device never comes stays unready for good: a probe that retries can give up sooner
   const context = await env.browser.newContext({ viewport, deviceScaleFactor: 1 });
   const page = await context.newPage();
   const errors = [];
@@ -52,7 +53,7 @@ export async function open(env, viewport, query) {
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text().slice(0, 300)); });
   await page.addInitScript(FAKE);
   await page.goto(env.url + '?' + (query || ''), { waitUntil: 'load', timeout: 120000 });
-  await page.waitForFunction(() => window.__ready === true || (document.getElementById('fail') && !document.getElementById('fail').hidden), null, { timeout: 120000 });
+  await page.waitForFunction(() => window.__ready === true || (document.getElementById('fail') && !document.getElementById('fail').hidden), null, { timeout: wait });
   const failed = await page.evaluate(() => { const f = document.getElementById('fail'); return f && !f.hidden ? f.textContent : null; });
   if (failed) throw new Error('page failed: ' + failed);
   return { page, context, errors, close: () => context.close() };

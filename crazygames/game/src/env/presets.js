@@ -161,3 +161,68 @@ export const PRESET_SHOW = {
   rain:  { hemi: 2.8, edgeGlow: 0.75, grade: { lift: [0.0, 0.005, 0.015], gain: [0.97, 1.0, 1.04], saturation: 0.95, vignette: 0.34 } },
 };
 export function presetShow(p) { const o = PRESET_SHOW[p.name]; return o ? { ...p, ...o } : p; }
+
+/* THE COVER LOOK'S PRESETS (briefs/COVER-LOOK.md 3 and 5, ?look=2):
+   what each preset becomes with the switch on, laid over the spectacle
+   round's, plus one more. Night is wet, as the brief asks (a wet track
+   with the lights mirrored in it); dusk and dawn stay dry.
+
+   TWILIGHT is the cover's floodlit dusk: the sun just down behind a
+   red and orange band, the sky deep violet overhead, the floodlights
+   on and the track wet. The key light is the floodlights' (high and
+   cool white, so the shadows stay short), not the sun's, so the sky's
+   glow has its own direction (glowElev, glowAzim, read by env/sky.js)
+   and there is no disc. Career track 1 (seed FIRST_SEED) and the
+   title's backdrop are drawn in it on both tiers; ?preset=twilight
+   asks for it anywhere. Every other track keeps its own preset. */
+export const TWILIGHT = {
+  ...PRESETS.dusk,
+  name:         'twilight',
+  zenith:       0x0f0c26,     // deep violet overhead
+  band:         0x4c2152,     // a purple band between
+  horizon:      0xd9582e,     // a red and orange horizon, the sun just gone
+  glow:         0xff9a48,     // brightest where it went down
+  fog:          0x4a2740,     // the haze over the far ground: dusky, so the land does not glow orange
+  sunDisc:      null,         // no disc: the sun is down
+  glowElev:     -1,           // degrees, where the glow sits
+  glowAzim:     205,
+  glowPower:    2.2,
+  glowGain:     1.7,
+  sunElev:      62,           // the key light: the floodlights, high
+  sunAzim:      150,
+  sun:          1.35,
+  sunColour:    0xe6ecff,     // cool white, as floodlights are
+  hemiSky:      0x5a4a9a,     // the violet sky's fill
+  hemiGround:   0x2a1a26,
+  hemi:         1.05,
+  fogNear:      80,
+  fogFar:       560,
+  exposure:     1.05,
+  stars:        0.35,
+  lamps:        true,
+  headlights:   true,
+  wet:          true,
+  rain:         false,
+  edgeGlow:     0.9,
+  roadGlow:     0.06,         // the asphalt's own baked light between the pools (as night's)
+  smoke:        0xb8b0c8,
+  cloud:        0.7,
+  windX:        1.0, windZ: 0.35,
+  grade:        { lift: [0.02, 0.0, 0.04], gain: [1.06, 0.99, 1.0], saturation: 1.14, vignette: 0.34 },
+};
+export const PRESET_LOOK = {
+  night: { wet: true },
+  rain:  {},
+  dusk:  {},
+  dawn:  {},
+};
+export const FIRST_SEED = 1101;   // career track 1, First slide (loop/modes.js CAREER[0])
+/* The preset a track is drawn in with the switch on: twilight for career
+   track 1 and the title's backdrop (title: true) unless something names
+   another, else the track's own with the look's changes. forced: the
+   preset a track or the address names, which always wins. */
+export function presetLook(p, seed, forced, title) {
+  if (forced === 'twilight' || (!forced && (title || (seed >>> 0) === FIRST_SEED))) return TWILIGHT;
+  const o = PRESET_LOOK[p.name];
+  return o ? { ...p, ...o } : p;
+}

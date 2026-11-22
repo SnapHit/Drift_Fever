@@ -24,6 +24,7 @@
    middle of the wheelbase. */
 
 import { wheelDesign, wheelDesignGeometry } from './wheels.js';
+import { LOOK_ON } from '../fx.js';
 
 /* Colours that are not the paint, in one place. */
 export const FINISH = {
@@ -53,7 +54,62 @@ export const FINISH = {
   LAMP_ROUGH:  0.3,
 };
 
+/* THE COVER LOOK'S FINISH (briefs/COVER-LOOK.md 2, ?look=2): the same
+   shapes and colours in materials that reflect the world's environment
+   (render/envmap.js). The paint is a clear coat: a sharp, glossy top
+   coat over the colour, as the cover's amber. The glass is dark and
+   mirror smooth. The trim is told apart by its colour, triangle by
+   triangle: the tyres rubber, the rims and design wheels metal, the
+   exhaust tips and grille surrounds dark chrome, the plate a semi
+   gloss, the rest satin black. The lamps glow hard enough to bloom.
+   Without the switch FINISH above is the whole story. */
+export const FINISH_LOOK = {
+  PAINT:   { roughness: 0.34, metalness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.07, specularIntensity: 0.35 },   // specularIntensity: the colour coat's own sheen, low, so the sharp top coat does the reflecting and a facet facing a low sun keeps its colour
+  GLASS:   { colour: 0x0a1018, roughness: 0.04, metalness: 0.4 },
+  /* [roughness, metalness] by kind of trim */
+  RUBBER:  [0.88, 0.0],    // the tyres
+  DARK:    [0.7, 0.0],     // the floor, the wheel wells, between the spokes
+  SATIN:   [0.42, 0.25],   // bumpers, grilles, wings, sills, roofs in black
+  CHROME:  [0.14, 1.0],    // exhaust tips and grille surrounds (FINISH.METAL)
+  PLATE:   [0.38, 0.0],
+  RIM:     [0.26, 0.85],   // a wheel's face, any colour
+  DARK_MAX: 0x40,          // a trim colour whose brightest channel is at most this is black trim
+  HEAD_ON: 4.2,            // the lamps' emissive intensity with the lights on: over the bloom's threshold
+  TAIL_ON: 3.4,
+};
+
 const SINKS = ['paint', 'glass', 'trim', 'head', 'tail'];
+
+/* The cover look's [roughness, metalness] for a trim triangle of linear
+   colour (r, g, b), as the sink and the wheel builders write it. */
+let finishTable = null;
+function finishOf(THREE, r, g, b) {
+  if (!finishTable) {
+    const c = new THREE.Color(), L = FINISH_LOOK, k = hex => { c.setHex(hex); return [c.r, c.g, c.b]; };
+    finishTable = [[k(FINISH.TYRE), L.RUBBER], [k(FINISH.TYRE_WALL), L.RUBBER], [k(FINISH.UNDER), L.DARK], [k(FINISH.GAP), L.DARK], [k(FINISH.METAL), L.CHROME], [k(FINISH.PLATE), L.PLATE]];
+    c.setHex((L.DARK_MAX << 16) | (L.DARK_MAX << 8) | L.DARK_MAX); finishTable.darkMax = c.r;
+  }
+  for (const [ref, f] of finishTable) if (Math.abs(ref[0] - r) + Math.abs(ref[1] - g) + Math.abs(ref[2] - b) < 1e-4) return f;
+  return Math.max(r, g, b) <= finishTable.darkMax ? FINISH_LOOK.SATIN : FINISH_LOOK.RIM;
+}
+/* rough and metal attributes from a geometry's colours, every vertex */
+function addFinish(THREE, geo, wheel) {
+  const col = geo.attributes.color, n = col.count, rough = new Float32Array(n), metal = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let f = finishOf(THREE, col.getX(i), col.getY(i), col.getZ(i));
+    if (!wheel && f === FINISH_LOOK.RIM) f = FINISH_LOOK.SATIN;   // a bright trim colour on the body that is no known one: satin, not metal
+    rough[i] = f[0]; metal[i] = f[1];
+  }
+  geo.setAttribute('rough', new THREE.BufferAttribute(rough, 1));
+  geo.setAttribute('metal', new THREE.BufferAttribute(metal, 1));
+}
+/* a standard node material reading those attributes */
+function finishMaterial(THREE, extra) {
+  const T = THREE.TSL, m = new THREE.MeshStandardNodeMaterial(Object.assign({ color: 0xffffff, vertexColors: true }, extra || {}));
+  m.roughnessNode = T.attribute('rough', 'float');
+  m.metalnessNode = T.attribute('metal', 'float');
+  return m;
+}
 
 /* Piecewise linear through [z, value] keys in order of z, flat beyond. */
 function curve(keys) {
@@ -382,13 +438,14 @@ function wheelGeometry(THREE, R, w, W) {
   return { pos, col };
 }
 
-function wheelMesh(THREE, R, w, W, side, material, design) {
+function wheelMesh(THREE, R, w, W, side, material, design, look) {
   const { pos, col } = design ? wheelDesignGeometry(THREE, R, w, design) : wheelGeometry(THREE, R, w, W);
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   if (side < 0) g.rotateY(Math.PI);           // the left wheels: outer face to -x, winding kept
   g.computeVertexNormals();
+  if (look) addFinish(THREE, g, true);        // the cover look: rubber tyres, metal faces
   return new THREE.Mesh(g, material);
 }
 
@@ -472,15 +529,24 @@ export function buildCar(THREE, S, options) {
   endFaces(S, sh, sink);
   extras(S, sh, sink);
 
-  const paint = new THREE.MeshStandardMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: FINISH.PAINT_ROUGH, metalness: FINISH.PAINT_METAL });
-  const glass = new THREE.MeshStandardMaterial({ color: FINISH.GLASS, roughness: FINISH.GLASS_ROUGH, metalness: FINISH.GLASS_METAL });
-  const trim = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: FINISH.TRIM_ROUGH, metalness: FINISH.TRIM_METAL });
-  const headMat = new THREE.MeshStandardMaterial({ color: FINISH.HEAD_LENS, emissive: FINISH.HEAD_GLOW, emissiveIntensity: FINISH.HEAD_ON, roughness: FINISH.LAMP_ROUGH });
-  const tailMat = new THREE.MeshStandardMaterial({ color: FINISH.TAIL_LENS, emissive: FINISH.TAIL_GLOW, emissiveIntensity: FINISH.TAIL_ON, roughness: FINISH.LAMP_ROUGH });
+  /* the cover look (?look=2) needs the node materials, which a plain three.js (a probe's) has not */
+  const look = LOOK_ON && !!(THREE.TSL && THREE.MeshStandardNodeMaterial);
+  const L = FINISH_LOOK, HEAD_ON = look ? L.HEAD_ON : FINISH.HEAD_ON, TAIL_ON = look ? L.TAIL_ON : FINISH.TAIL_ON;
+  const paint = look
+    ? new THREE.MeshPhysicalMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: L.PAINT.roughness, metalness: L.PAINT.metalness, clearcoat: L.PAINT.clearcoat, clearcoatRoughness: L.PAINT.clearcoatRoughness, specularIntensity: L.PAINT.specularIntensity })
+    : new THREE.MeshStandardMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: FINISH.PAINT_ROUGH, metalness: FINISH.PAINT_METAL });
+  const glass = look
+    ? new THREE.MeshStandardMaterial({ color: L.GLASS.colour, roughness: L.GLASS.roughness, metalness: L.GLASS.metalness })
+    : new THREE.MeshStandardMaterial({ color: FINISH.GLASS, roughness: FINISH.GLASS_ROUGH, metalness: FINISH.GLASS_METAL });
+  const trim = look ? finishMaterial(THREE) : new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: FINISH.TRIM_ROUGH, metalness: FINISH.TRIM_METAL });
+  const headMat = new THREE.MeshStandardMaterial({ color: FINISH.HEAD_LENS, emissive: FINISH.HEAD_GLOW, emissiveIntensity: HEAD_ON, roughness: FINISH.LAMP_ROUGH });
+  const tailMat = new THREE.MeshStandardMaterial({ color: FINISH.TAIL_LENS, emissive: FINISH.TAIL_GLOW, emissiveIntensity: TAIL_ON, roughness: FINISH.LAMP_ROUGH });
 
   const group = new THREE.Group();
   group.name = 'car:' + S.id;
-  const body = new THREE.Mesh(geometryFrom(THREE, sink.lists, ['paint', 'glass', 'trim']), [paint, glass, trim]);
+  const bodyGeo = geometryFrom(THREE, sink.lists, ['paint', 'glass', 'trim']);
+  if (look) addFinish(THREE, bodyGeo, false);
+  const body = new THREE.Mesh(bodyGeo, [paint, glass, trim]);
   body.name = 'body';
   group.add(body);
   const head = new THREE.Mesh(geometryFrom(THREE, sink.lists, ['head']), headMat);
@@ -494,7 +560,7 @@ export function buildCar(THREE, S, options) {
   const W = S.wheel;
   /* a bought design (options.wheels, an id in wheels.js) takes the standard wheel's place, in a finish of its own */
   const lifted = !!(THREE.TSL && THREE.MeshStandardNodeMaterial);   // a plain three.js (a probe's) has no nodes: the design is then only lit
-  const wheelMat = new (lifted ? THREE.MeshStandardNodeMaterial : THREE.MeshStandardMaterial)({ color: 0xffffff, vertexColors: true, roughness: FINISH.WHEEL_ROUGH, metalness: FINISH.WHEEL_METAL });
+  const wheelMat = look ? finishMaterial(THREE) : new (lifted ? THREE.MeshStandardNodeMaterial : THREE.MeshStandardMaterial)({ color: 0xffffff, vertexColors: true, roughness: FINISH.WHEEL_ROUGH, metalness: FINISH.WHEEL_METAL });
   if (lifted) wheelMat.emissiveNode = THREE.TSL.vertexColor().mul(THREE.TSL.float(FINISH.WHEEL_LIFT));
   let wheelsId = null;
   const WHEEL_AT = [['fl', -1, sh.fa, true], ['fr', 1, sh.fa, true], ['rl', -1, sh.ra, false], ['rr', 1, sh.ra, false]];
@@ -511,7 +577,7 @@ export function buildCar(THREE, S, options) {
     const design = wheelDesign(id);
     for (const [name, side, , front] of WHEEL_AT) {
       const wh = wheels[name], old = wh.mesh;
-      const mesh = wheelMesh(THREE, D.wheelRadius, front ? D.tyre[0] : D.tyre[1], W, side, design ? wheelMat : trim, design);
+      const mesh = wheelMesh(THREE, D.wheelRadius, front ? D.tyre[0] : D.tyre[1], W, side, design ? wheelMat : trim, design, look);
       if (old) {
         mesh.rotation.copy(old.rotation); mesh.castShadow = old.castShadow; mesh.receiveShadow = old.receiveShadow; mesh.renderOrder = old.renderOrder;
         wh.pivot.remove(old); old.geometry.dispose();
@@ -533,7 +599,7 @@ export function buildCar(THREE, S, options) {
   const lights = {
     head, tail,
     /* 0 is off, 1 is on; anything between dims them. */
-    set(h, t) { if (h != null) headMat.emissiveIntensity = FINISH.HEAD_ON * h; if (t != null) tailMat.emissiveIntensity = FINISH.TAIL_ON * t; },
+    set(h, t) { if (h != null) headMat.emissiveIntensity = HEAD_ON * h; if (t != null) tailMat.emissiveIntensity = TAIL_ON * t; },
   };
 
   /* The measured box of everything but the glow, so dims say what is drawn. */

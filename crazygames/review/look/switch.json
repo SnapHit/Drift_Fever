@@ -1,0 +1,47 @@
+{
+ "main": "4d7c372",
+ "step": 300,
+ "size": "640x360",
+ "cases": {
+  "race low dawn": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.824
+  },
+  "race low dusk": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.757
+  },
+  "race low night": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.592
+  },
+  "race high dawn": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.724
+  },
+  "race high dusk": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.685
+  },
+  "race high night": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.559
+  },
+  "title high": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.799
+  },
+  "garage high": {
+   "pixels": 230400,
+   "differ": 0,
+   "spread": 0.793
+  }
+ }
+}

@@ -447,6 +447,7 @@ async function copyText(text, what) {
 function menuGround() {
   const spec = dailySpec();
   app.spec = spec; app.track = trackFor(spec);
+  scene.setTitle();   // ?look=2 draws the title's backdrop at floodlit dusk (render/scene.js); without it nothing changes
   setGround(app.track, save.state.car, save.state.cars[save.state.car].paint);
   app.progress = null; app.race = null; app.ghost = null; app.missions = null; scene.setGhost(null);
   resetRun(); app.driver = null;

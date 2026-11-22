@@ -30,7 +30,11 @@ import { createEffects } from '../env/effects.js';
 import { bannerTexture, concreteTexture, SPONSORS_SHOW } from '../env/textures.js';
 import { createShow, SHOW, underglowStrength } from '../env/show.js';
 import { lookOf, glowHex, smokeHex } from '../garage/cosmetics.js';
-import { FX_ON, FX_PARTICLES } from '../fx.js';
+import { FX_ON, FX_PARTICLES, LOOK_ON } from '../fx.js';
+import { buildEnvMap, ENVMAP } from './envmap.js';
+import { presetLook } from '../env/presets.js';
+import { buildVenue } from '../env/venue.js';
+import { fxaa } from './fxaa.js';
 
 export const LOOK = {
   EDGE:         0xf6e7a1,     // the brightest, most saturated thing on screen (the mesh builder paints it)
@@ -98,6 +102,17 @@ export const LOOK = {
     low:  { pixelRatio: 1.0, shadow: 1024, shadowRange: 36, terrainCell: 8, sceneryShare: 0.4, shadowMinHeight: 2.5, smoke: 48, dust: 32, sparks: 60, rain: 140, marks: 1400, bloom: false, headlight: true },
     high: { pixelRatio: 2.0, shadow: 2048, shadowRange: 52, terrainCell: 5, sceneryShare: 1.0, shadowMinHeight: 0,   smoke: 120, dust: 80, sparks: 160, rain: 400, marks: 4000, bloom: true,  headlight: true },
   },
+  /* THE COVER LOOK (briefs/COVER-LOOK.md, ?look=2): what the scene does
+     differently with the switch on. Without it none of this is read. */
+  COVER: {
+    ANTIALIAS:  true,     // antialiasing on both tiers (?aa=0 turns it off, the clean edges probe's known answer): the look draws through its own post pass on both tiers
+    MSAA:       { low: 0, high: 4 },   // samples on the scene pass: the high tier's (a phone's tiled GPU resolves them cheaply); the low tier's edges are the FXAA's alone, which costs one pass and not four times the memory
+    FXAA:       true,     // render/fxaa.js, after the tone mapping, so a bright glowing edge is smoothed too (MSAA resolves before the tone curve)
+    BLOOM:      { threshold: 0.9, strength: 0.7, radius: 0.014, taps: 12 },   // the high tier's bloom with the look: the floods and the lamps glow harder
+    ENVIRONMENT: true,    // the world's environment (render/envmap.js; ?env=0 leaves it out, the reflections probe's known answer)
+    UNDERGLOW:  0.7,      // the underglow's strength with the look: the wet, darker road under it shows its pool more, and at full strength lime, amber and magenta stood within 15 per cent of the edge line at night, dusk and floodlit dusk (garage/readable.js --look: 14 of 50 failed)
+    CAR_HEMI:   true,     // the cars' materials keep the flat sky fill with the environment over it (false: the sun and the environment only, which left a car's shaded side too dark to read its colour at dusk)
+  },
 };
 
 const query = typeof location !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams('');
@@ -105,14 +120,15 @@ const query = typeof location !== 'undefined' ? new URLSearchParams(location.sea
 export function createScene(canvas, opts) {
   const options = opts || {};
   const forceWebGL = options.renderer === 'webgl2';
-  const renderer = new THREE.WebGPURenderer({ canvas, antialias: false, forceWebGL, alpha: false, powerPreference: 'high-performance' });
+  const antialias = LOOK_ON && LOOK.COVER.ANTIALIAS && query.get('aa') !== '0';
+  const renderer = new THREE.WebGPURenderer({ canvas, antialias: false, forceWebGL, alpha: false, powerPreference: 'high-performance' });   // the cover look's antialiasing is in its post pass (setPost)
   renderer.toneMapping = LOOK.TONE_MAPPING === 'aces' ? THREE.ACESFilmicToneMapping : THREE.NeutralToneMapping;
   renderer.shadowMap.enabled = query.get('shadows') !== '0';
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   let backend = 'pending', tier = options.tier || 'low';
   const view = { w: 1, h: 1 };
   const overrides = { preset: options.preset || query.get('preset') || null, theme: options.theme || query.get('theme') || null };
-  let post = null;
+  let post = null, postBloom = false;
   const ready = renderer.init().then(() => {
     backend = renderer.backend && renderer.backend.isWebGPUBackend ? 'webgpu' : 'webgl2';
     const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 0;
@@ -156,12 +172,12 @@ export function createScene(canvas, opts) {
   function stepDown() {
     adapt.level++;
     /* the bloom is only there to lose on the high tier: a low tier goes straight on to the pixels */
-    if (adapt.level === 2 && !post) adapt.level = 3;
+    if (adapt.level === 2 && !postBloom) adapt.level = 3;
     adapt.steps.push({ level: adapt.level, at: performance.now() });
     clearWindow();
     if (effects && effects.setDensity) effects.setDensity(density());
     if (rivalFx && rivalFx.setDensity) rivalFx.setDensity(density());
-    if (adapt.level === 2) post = null;
+    if (adapt.level === 2) setPost(false);
     if (adapt.level >= 3) applyPixels();
   }
   /* nothing that was taken away made the frames shorter: put it all back, for good */
@@ -195,7 +211,7 @@ export function createScene(canvas, opts) {
     hemi.color.setHex(p.hemiSky); hemi.groundColor.setHex(p.hemiGround); hemi.intensity = p.hemi;
     sun.color.setHex(p.sunColour); sun.intensity = p.sun;
     const d = sunDirection(p); sunDir.set(d[0], d[1], d[2]);
-    scene.fog.color.setHex(p.horizon); scene.fog.near = p.fogNear; scene.fog.far = p.fogFar;
+    scene.fog.color.setHex(p.fog !== undefined ? p.fog : p.horizon); scene.fog.near = p.fogNear; scene.fog.far = p.fogFar;   // fog: only a cover look preset gives its own
     scene.background = new THREE.Color(p.horizon);
     renderer.toneMappingExposure = p.exposure;
     headlight.visible = !!(T().headlight && p.headlights);
@@ -211,16 +227,22 @@ export function createScene(canvas, opts) {
   let groundGroup = null, cones = null, env = null, envKey = null, track = null, currentGround = null, dressing = null;
   let park = null;   // the stunt park's own drawing (env/park.js), while free drift's ground is the one shown
   const concrete = concreteTexture(THREE, 128);
+  /* the cover look's environment (render/envmap.js): the map, the key it was made for, and one generator kept for every track */
+  let envMap = null, envMapKey = null, pmrem = null, titleNext = false, venue = null;
   function setGround(ground) {
     currentGround = ground;
     const seed = (ground.seed >>> 0) || (ground.centre.length ? 7 : 3);
     /* a track may name its own preset and theme (the Lab's); the query's override wins over the seed's pick */
     let p = presetFor(seed, overrides.preset || ground.preset);
     if (FX_ON) p = presetShow(p);
+    /* the cover look: career track 1 and the title's backdrop at floodlit dusk, night wet (env/presets.js) */
+    if (LOOK_ON && ground.centre.length) p = presetLook(p, seed, overrides.preset || ground.preset, titleNext);
+    titleNext = false;
     const th = ground.centre.length ? themeFor(seed, overrides.theme || ground.theme) : (overrides.theme && THEMES[overrides.theme] ? THEMES[overrides.theme] : THEMES.docks);
     applyPreset(p);
     theme = th;
     if (groundGroup) { scene.remove(groundGroup); groundGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+    if (venue) { venue.dispose(); venue = null; }
     if (park) { park.dispose(); park = null; }
     groundGroup = new THREE.Group();
     const b = ground.bounds;
@@ -228,7 +250,7 @@ export function createScene(canvas, opts) {
       /* the road, edges, kerbs, run-off, lines, barriers and clip posts
          come from the track generator's mesh builder; the look is ours */
       track = buildTrackMesh(ground, THREE);
-      styleTrack(THREE, track, p, { edgeGlowNode: edgeGlow });
+      styleTrack(THREE, track, p, { edgeGlowNode: edgeGlow, look: LOOK_ON, tierName: tier });
       groundGroup.add(track);
       const line = racingLine(THREE, ground, markMaterial);
       if (line) groundGroup.add(line);
@@ -236,6 +258,7 @@ export function createScene(canvas, opts) {
       const at = m => C[Math.max(0, Math.min(n - 1, Math.round(m / 2)))];
       groundGroup.add(gantry(at(ground.startLine === undefined ? 8 : ground.startLine), LOOK.GANTRY_BEAM, true));
       if (ground.finish) groundGroup.add(gantry(at(ground.finish.along), LOOK.FINISH_BEAM, false));
+      if (LOOK_ON) { venue = buildVenue(THREE, ground); groundGroup.add(venue.group); }   // the cover look's catch fencing (env/venue.js)
     } else if (ground.park) {
       /* the stunt park (briefs/PLAYGROUND.md): its slab, walls, pillars, paint, names and lamps */
       track = null;
@@ -256,11 +279,12 @@ export function createScene(canvas, opts) {
     const key = [seed, ground.name, p.name, th.name, tier].join('|');
     if (env && envKey !== key) { scene.remove(env.group); scene.remove(env.sky); env.dispose(); env = null; }
     if (!env) {
-      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), sponsors: FX_ON ? SPONSORS_SHOW : null });
+      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), tierName: tier, sponsors: FX_ON ? SPONSORS_SHOW : null, look: LOOK_ON });
       scene.add(env.group); scene.add(env.sky);
       envKey = key;
       if (dressing) { scene.remove(dressing.group); dressing.dispose(); dressing = null; }
-      if (FX_ON) { dressing = buildDressing(THREE, ground, { preset: p, theme: th, tierName: tier, env }); scene.add(dressing.group); }
+      if (FX_ON) { dressing = buildDressing(THREE, ground, { preset: p, theme: th, tierName: tier, env, look: LOOK_ON }); scene.add(dressing.group); }
+      if (LOOK_ON) setEnvironment(key, p, th, seed);
     }
     // cones
     if (cones) { scene.remove(cones); cones.geometry.dispose(); cones = null; }
@@ -276,6 +300,34 @@ export function createScene(canvas, opts) {
     if (rivalShow) rivalShow.clear();
     if (dressing) dressing.clear();
   }
+  /* THE COVER LOOK'S ENVIRONMENT (briefs/COVER-LOOK.md 1): made from
+     this track's own sky and its preset's lights when the world is
+     rebuilt, never per frame, and given to the scene, so every standard
+     material (the cars, the wet road, the water) reflects it. */
+  function setEnvironment(key, p, th, seed) {
+    if (!envOn) return;
+    if (envMap && envMapKey === key) return;
+    if (!pmrem) pmrem = new THREE.PMREMGenerator(renderer);
+    const old = envMap;
+    envMap = buildEnvMap(THREE, renderer, { sky: env && env.sky, preset: p, theme: th, seed, tierName: tier, generator: pmrem });
+    envMapKey = key;
+    scene.environment = envMap.texture;
+    scene.environmentIntensity = ENVMAP.INTENSITY;
+    if (old) old.dispose();
+  }
+  /* With LOOK.COVER.CAR_HEMI false, the lights a car's materials see
+     with the look on: the key light and the environment, not the sky's
+     flat fill (the environment is the sky). With it true (as set) the
+     cars keep the fill and this does nothing. */
+  const envOn = LOOK_ON && LOOK.COVER.ENVIRONMENT && query.get('env') !== '0';
+  function carLights(m, extra) {
+    if (!envOn || LOOK.COVER.CAR_HEMI || !m) return;
+    const lit = THREE.TSL.lights([sun, ...(extra || [])]);
+    m.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const mt of Array.isArray(o.material) ? o.material : [o.material]) if (mt.isMeshStandardMaterial) mt.lightsNode = lit; });
+  }
+  /* the next ground set is the title's backdrop (?look=2 draws it at floodlit dusk) */
+  function setTitle() { titleNext = true; }
+
   /* The car park's walls: a track's come with its mesh. */
   function parkWalls(ground) {
     const wallGeo = { plain: [], tyres: [], clip: [] };
@@ -309,7 +361,7 @@ export function createScene(canvas, opts) {
   function edgeGlow(group, k) {
     const TSL = THREE.TSL;
     group.traverse(m => {
-      if (!m.isMesh || m.name !== 'road' || !m.geometry.attributes.color) return;
+      if (!m.isMesh || m.name !== 'road' || !m.geometry.attributes.color || m.material.userData.look) return;   // the cover look's road carries its own (env/trackstyle.js)
       const old = m.material;
       const nm = old.isMeshStandardMaterial
         ? new THREE.MeshStandardNodeMaterial({ vertexColors: true, map: old.map, color: old.color, roughness: old.roughness, metalness: old.metalness })
@@ -394,10 +446,12 @@ export function createScene(canvas, opts) {
      smoke of its own. */
   const looks = { car: lookOf(null), ghost: lookOf(null), rival: lookOf(null) };
   function applyGlows() {
-    const k = underglowStrength(preset.name, tier === 'high');
+    const k = underglowStrength(preset.name, tier === 'high') * (LOOK_ON ? LOOK.COVER.UNDERGLOW : 1);
     if (model && model.setUnderglow) model.setUnderglow(glowHex(looks.car.glow), k);
     if (ghostModel && ghostModel.setUnderglow) ghostModel.setUnderglow(glowHex(looks.ghost.glow), k * SHOW.UNDERGLOW.GHOST);
     if (rivalModel && rivalModel.setUnderglow) rivalModel.setUnderglow(glowHex(looks.rival.glow), k);
+    /* the cover look: each car's smoke is born a little in its underglow's colour (env/effects.js) */
+    if (LOOK_ON) { if (effects && effects.setGlow) effects.setGlow(glowHex(looks.car.glow), k); if (rivalFx && rivalFx.setGlow) rivalFx.setGlow(glowHex(looks.rival.glow), k); }
   }
   function mount(root, id, paintHex, ghost, look) {
     const t = carTune(id), V = t ? t.VEHICLE : TUNE.VEHICLE;
@@ -413,6 +467,7 @@ export function createScene(canvas, opts) {
     looks.car = lookOf(look);
     const r = mount(car, id, paintById(paintId || carById(id).paint).hex, false, looks.car);
     model = r.model; rig.bRear = r.bRear; rig.half = r.half;
+    carLights(model, [headlight]);
     applyGlows();
     if (effects) effects.setSmoke(smokeHex(looks.car.smoke));
     if (model.lights && model.lights.set) model.lights.set(preset.headlights ? 1 : 0.35, 1);
@@ -439,6 +494,7 @@ export function createScene(canvas, opts) {
     if (!id) { ghostRoot.visible = false; return; }
     looks.ghost = lookOf(look);
     ghostModel = mount(ghostRoot, id, paintById(paintId || carById(id).paint).hex, true, looks.ghost).model;
+    carLights(ghostModel);
     applyGlows();
   }
   function setRival(id, paintId, look) {
@@ -451,7 +507,7 @@ export function createScene(canvas, opts) {
     /* the player's headlights never light him: a few metres behind him
        in a tandem they washed his paint to white. The sky and the sun
        still do, so he reads as his colour, lit as the scene is */
-    const lit = THREE.TSL.lights([hemi, sun, rivalBeam]);
+    const lit = THREE.TSL.lights(envOn && !LOOK.COVER.CAR_HEMI ? [sun, rivalBeam] : [hemi, sun, rivalBeam]);   // the cover look: the environment is his sky fill, as it is the player's
     rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
     if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
     rivalLamps = carLamps(rivalModel);
@@ -519,24 +575,26 @@ export function createScene(canvas, opts) {
   /* ---- effects ---- */
   function rebuildEffects() {
     if (effects) { scene.remove(effects.group); effects.dispose(); }
-    effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, smoke: smokeHex(looks.car.smoke) });
+    effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, smoke: smokeHex(looks.car.smoke), look: LOOK_ON });
     if (FX_ON) effects.setDensity(density());
     scene.add(effects.group);
     if (FX_ON) {
       if (show) { scene.remove(show.group); show.dispose(); }
-      show = createShow(THREE, { tier: T(), tierName: tier, preset });
+      show = createShow(THREE, { tier: T(), tierName: tier, preset, look: LOOK_ON });
       scene.add(show.group);
     }
     if (rivalModel) rebuildRivalFx();
+    else if (LOOK_ON) applyGlows();   // the new pools take the underglow's colour (the cover look)
   }
   function rebuildRivalFx() {
     if (rivalFx) { scene.remove(rivalFx.group); rivalFx.dispose(); rivalFx = null; }
     if (rivalShow) { scene.remove(rivalShow.group); rivalShow.dispose(); rivalShow = null; }
     if (!rivalModel) return;
-    rivalFx = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, share: FX_ON ? SHOW.RIVAL.SHARE[tier] || SHOW.RIVAL.SHARE.low : 0.5, noRain: true, smoke: smokeHex(looks.rival.smoke) });
+    rivalFx = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, share: FX_ON ? SHOW.RIVAL.SHARE[tier] || SHOW.RIVAL.SHARE.low : 0.5, noRain: true, smoke: smokeHex(looks.rival.smoke), look: LOOK_ON });
     if (FX_ON) rivalFx.setDensity(density());
     scene.add(rivalFx.group);
-    if (FX_ON) { rivalShow = createShow(THREE, { tier: T(), tierName: tier, preset, glows: SHOW.RIVAL.GLOWS[tier] || SHOW.RIVAL.GLOWS.low }); scene.add(rivalShow.group); }
+    if (FX_ON) { rivalShow = createShow(THREE, { tier: T(), tierName: tier, preset, glows: SHOW.RIVAL.GLOWS[tier] || SHOW.RIVAL.GLOWS.low, look: LOOK_ON }); scene.add(rivalShow.group); }
+    if (LOOK_ON) applyGlows();   // the new pools take the underglow's colour (the cover look)
   }
   rebuildEffects();
 
@@ -549,6 +607,8 @@ export function createScene(canvas, opts) {
   /* ---- bloom on the high tier: the scene pass plus a soft ring of
      samples of its bright parts, through the renderer's post pipeline ---- */
   function setPost(on) {
+    postBloom = !!on;
+    if (LOOK_ON) { setPostLook(on); return; }
     if (!on) { post = null; return; }
     try {
       const TSL = THREE.TSL;
@@ -578,6 +638,41 @@ export function createScene(canvas, opts) {
       pipeline.outputNode = out;
       post = pipeline;
     } catch (e) { console.warn('bloom off: ' + (e && e.message)); post = null; }
+  }
+  /* THE COVER LOOK'S POST PASS, on both tiers: the scene (with MSAA on
+     the high tier), the bloom where the tier has it, the colour grade
+     per preset, then the tone mapping into a picture of its own and the
+     FXAA over that (render/fxaa.js). */
+  function setPostLook(bloom) {
+    try {
+      const TSL = THREE.TSL, C = LOOK.COVER;
+      const pipeline = new THREE.PostProcessing(renderer);
+      const scenePass = TSL.pass(scene, camera, { samples: antialias ? (C.MSAA[tier] || 0) : 0 });
+      let out = scenePass.getTextureNode('output');
+      if (bloom) {
+        const B = C.BLOOM;
+        let glow = TSL.vec3(0);
+        for (let i = 0; i < B.taps; i++) {
+          const a = i / B.taps * Math.PI * 2, r = (i % 2 ? 1 : 0.5) * B.radius;
+          glow = glow.add(scenePass.getTextureNode('output').sample(TSL.uv().add(TSL.vec2(Math.cos(a) * r, Math.sin(a) * r))).rgb.sub(B.threshold).max(0));
+        }
+        out = out.add(TSL.vec4(glow.mul(B.strength / B.taps), 0));
+      }
+      /* the grade: lift, gain and saturation per preset, and on the high tier the vignette (the low tier's is the page's own, main.js, over the canvas) */
+      const G = grade, graded = c => {
+        let rgb = c.rgb.mul(G.gain).add(G.lift);
+        rgb = TSL.mix(TSL.vec3(rgb.dot(TSL.vec3(0.2126, 0.7152, 0.0722))), rgb, G.saturation);
+        if (tier === 'high') rgb = rgb.mul(TSL.float(1).sub(G.vignette.mul(TSL.smoothstep(0.35, 1.0, TSL.uv().sub(0.5).length().mul(1.414)))));
+        return TSL.vec4(rgb, c.a);
+      };
+      if (antialias && C.FXAA) {
+        pipeline.outputColorTransform = false;
+        const display = c => TSL.renderOutput(graded(c), renderer.toneMapping, renderer.outputColorSpace);
+        if (tier === 'high') pipeline.outputNode = fxaa(THREE, TSL.rtt(display(out), null, null, { type: THREE.UnsignedByteType }));   // the bloom's picture, tone mapped once into its own, then smoothed
+        else pipeline.outputNode = fxaa(THREE, scenePass.getTextureNode('output'), display);   // the low tier: no picture between, each read tone mapped as it is taken
+      } else pipeline.outputNode = graded(out);
+      post = pipeline;
+    } catch (e) { console.warn('post off: ' + (e && e.message)); post = null; }
   }
 
   /* ---- per frame ---- */
@@ -708,6 +803,7 @@ export function createScene(canvas, opts) {
     frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, done: adapt.done, gaveBack: adapt.gaveBack, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
     info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
     environment: () => env, dressing: () => dressing, park: () => park,
+    envMap: () => envMap, setTitle,
     fireworks: stars => { if (dressing) dressing.fireworks(stars); },
     setTier: t => { if (LOOK.TIERS[t]) { tier = t; applyTier(); if (currentGround) setGround(currentGround); } },
   };

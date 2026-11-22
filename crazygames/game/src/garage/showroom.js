@@ -24,6 +24,8 @@ import { createParticles } from '../env/particles.js';
 import { puffSprite, softSprite } from '../env/textures.js';
 import { smokeColours, SHOW } from '../env/show.js';
 import { lookOf, glowHex, smokeHex } from './cosmetics.js';
+import { LOOK_ON } from '../fx.js';
+import { studioEnvironment, ENVMAP } from '../render/envmap.js';
 
 export const SHOWROOM = {
   BACK:       0x090b16,      // the dark the floor fades into
@@ -66,12 +68,20 @@ export function createShowroom(THREE, renderer) {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.3, 90);
   const hemi = new THREE.HemisphereLight(S.SKY, S.GROUND, S.HEMI);
   scene.add(hemi);
+  /* the cover look (briefs/COVER-LOOK.md 2, ?look=2): a studio for the
+     car's clear coat to reflect (render/envmap.js), which is its fill
+     light too, so the car does not also take the flat sky fill.
+     ?env=0 leaves it out (the reflections probe's known answer). */
+  const studio = LOOK_ON && !/[?&]env=0/.test(typeof location !== 'undefined' ? location.search : '');
+  const studioMap = studio ? studioEnvironment(THREE, renderer) : null;
+  if (studio) scene.environment = studioMap.texture;
   /* each light, and its twin under the floor, which lights the car's
      picture in it. The car itself is given the lights above by name (as
      the rival is given his beam in render/scene.js), so the twins under
      the floor never light it from below. */
-  const above = [hemi];
-  for (const [k, at] of [[S.KEY, S.KEY_AT], [S.RIM, S.RIM_AT], [S.FILL, S.FILL_AT]]) {
+  const above = studio ? [] : [hemi];
+  for (const [k0, at] of [[S.KEY, S.KEY_AT], [S.RIM, S.RIM_AT], [S.FILL, S.FILL_AT]]) {
+    const k = k0 * (studio ? ENVMAP.STUDIO.LIGHTS : 1);   // the studio's strips light the car too: the lamps step back
     const l = new THREE.DirectionalLight(0xffffff, k); l.position.set(at[0], at[1], at[2]); scene.add(l); above.push(l);
     const u = new THREE.DirectionalLight(0xffffff, k); u.position.set(at[0], -at[1], at[2]); scene.add(u);
   }
@@ -88,6 +98,8 @@ export function createShowroom(THREE, renderer) {
   const ring = new THREE.Mesh(new THREE.RingGeometry(S.TABLE_R - S.RING_W, S.TABLE_R, 64), new THREE.MeshBasicMaterial({ color: S.RING, transparent: true, depthWrite: false }));
   ring.rotation.x = -Math.PI / 2; ring.position.y = 0.008; ring.renderOrder = 3;
   table.add(disc, ring);
+  /* the floor and the turntable take the studio's lights only softly: a dark floor, not a mirror of the strips */
+  if (studio) for (const m of [floor.material, disc.material]) { m.envMap = studioMap.texture; m.envMapIntensity = ENVMAP.STUDIO.FLOOR_ENV; }
   const tickGeo = new THREE.PlaneGeometry(0.05, 0.3), tickMat = new THREE.MeshBasicMaterial({ color: 0x5a6590, transparent: true, depthWrite: false });
   for (let i = 0; i < S.TICKS; i++) {
     const a = 2 * Math.PI * i / S.TICKS, t = new THREE.Mesh(tickGeo, tickMat);

@@ -64,7 +64,10 @@ export function createEffects(THREE, opts) {
   const share = o.share || 1, size = n => Math.max(8, Math.round(n * share));
   const soft = softSprite(THREE, 128, true), spark = sparkSprite(THREE, 32), drop = rainSprite(THREE);
   const puff = show ? puffSprite(THREE, 128) : null;
-  const smoke = createParticles(THREE, show ? { max: size(SHOW.SMOKE.POOL[tierName] || SHOW.SMOKE.POOL.low), texture: puff, colour: 0xffffff, tint: true, name: 'smoke', renderOrder: 4 } : { max: tier.smoke || 60, texture: soft, colour: 0xd0c8c0, name: 'smoke', renderOrder: 4 });
+  /* the cover look (?look=2): SHOW.SMOKE_LOOK over the show's smoke */
+  const look = show && !!o.look, keep = tierName === 'low' ? Object.fromEntries(SHOW.SMOKE_LOOK.LOW_KEEPS.map(k => [k, SHOW.SMOKE[k]])) : {};
+  const SM = look ? { ...SHOW.SMOKE, ...SHOW.SMOKE_LOOK, ...keep } : SHOW.SMOKE;
+  const smoke = createParticles(THREE, show ? { max: size(SM.POOL[tierName] || SM.POOL.low), texture: puff, colour: 0xffffff, tint: true, name: 'smoke', renderOrder: 4, lift: look ? SM.LIFT : null } : { max: tier.smoke || 60, texture: soft, colour: 0xd0c8c0, name: 'smoke', renderOrder: 4 });
   const dust = createParticles(THREE, { max: tier.dust || 40, texture: soft, colour: FX.DUST_COLOUR, name: 'dust', renderOrder: 4 });
   const sparks = createParticles(THREE, show ? { max: size(SHOW.SPARKS.POOL[tierName] || SHOW.SPARKS.POOL.low), texture: spark, colour: SHOW.SPARKS.COLOUR, additive: true, name: 'sparks', renderOrder: 5 } : { max: tier.sparks || 60, texture: spark, colour: 0xffd090, additive: true, name: 'sparks', renderOrder: 5 });
   const flame = createParticles(THREE, { max: show ? 72 : 24, texture: spark, colour: FX.FLAME_COLOUR, additive: true, name: 'flame', renderOrder: 5 });
@@ -77,18 +80,22 @@ export function createEffects(THREE, opts) {
 
   /* the show's smoke colours for the preset, linear, and the heat's tint */
   const col = { birth: [1, 1, 1], end: [1, 1, 1], tint: [1, 1, 1], spray: [1, 1, 1] };
+  /* the cover look: the underglow's colour (linear, times its strength) in the smoke as it is born */
+  const glowCol = [0, 0, 0], birthGlow = [1, 1, 1];
+  function tintBirth() { const k = look && glowCol[0] + glowCol[1] + glowCol[2] > 0 ? SM.GLOW : 0; for (let i = 0; i < 3; i++) birthGlow[i] = col.birth[i] * (1 - k) + glowCol[i] * k; }
   const lin = (hex, out) => { const c = new THREE.Color().setHex(hex); out[0] = c.r; out[1] = c.g; out[2] = c.b; return out; };
   lin(SHOW.SPRAY.COLOUR, col.spray);
   /* the smoke colour bought in the garage (briefs/GARAGE.md 4), 0xRRGGBB, or null for the standard smoke */
   let pick = o.smoke == null ? null : o.smoke;
   function setPreset(p) {
     preset = p; wind.x = p.windX || 0; wind.z = p.windZ || 0;
-    if (show) { smoke.setColour(0xffffff); const c = smokeColours(p.name, pick); lin(c.birth, col.birth); lin(c.end, col.end); lin(c.tint, col.tint); }
+    if (show) { smoke.setColour(0xffffff); const c = smokeColours(p.name, pick, look); lin(c.birth, col.birth); lin(c.end, col.end); lin(c.tint, col.tint); tintBirth(); }
     else smoke.setColour(pick == null ? p.smoke || 0xd0c8c0 : smokeColours(p.name, pick).end);
     if (!p.rain) rain.clear();
   }
   setPreset(preset);
   function setSmoke(hex) { pick = hex == null ? null : hex; setPreset(preset); }
+  function setGlow(hex, strength) { if (hex == null) glowCol.fill(0); else { lin(hex, glowCol); for (let i = 0; i < 3; i++) glowCol[i] = Math.min(1, glowCol[i] * (strength === undefined ? 1 : strength) * 2.2); } tintBirth(); }
   let density = 1;   // the adaptation's share of the spawn rates, 0 to 1
   const c0 = [0, 0, 0], c1 = [0, 0, 0];
 
@@ -97,7 +104,7 @@ export function createEffects(THREE, opts) {
      and the billboards. */
   function update(dt, camera, pose, world, rig, heat, clear) {
     const c = world.car, by = pose.y || 0;   // the road's height under the car
-    const h = heat || 0, S = SHOW.SMOKE, lp = (pair) => pair[0] + (pair[1] - pair[0]) * h;
+    const h = heat || 0, S = SM, lp = (pair) => pair[0] + (pair[1] - pair[0]) * h;
     const fx = -Math.sin(pose.yaw), fz = -Math.cos(pose.yaw), lx = -Math.cos(pose.yaw), lz = Math.sin(pose.yaw);
     const sliding = c.rearSlide >= 0.9 || c.hb > 0.5 || c.spinning;
     const off = world.halfWidth !== undefined && world.ground.centre.length > 0 && Math.abs(world.lateral) > world.halfWidth;
@@ -110,7 +117,8 @@ export function createEffects(THREE, opts) {
         const strength = Math.min(1, Math.max(c.rearSlide / 2, c.hb, c.spinning ? 0.6 : 0, c.drifting ? 0.7 : 0));
         due[key] += dt * lp(S.RATE) * strength * density;
         const tk = S.HEAT_TINT_MAX * h;
-        for (let k = 0; k < 3; k++) { c0[k] = col.birth[k] + (col.tint[k] - col.birth[k]) * tk; c1[k] = col.end[k] + (col.tint[k] - col.end[k]) * tk; }
+        const B = look ? birthGlow : col.birth;
+        for (let k = 0; k < 3; k++) { c0[k] = B[k] + (col.tint[k] - B[k]) * tk; c1[k] = col.end[k] + (col.tint[k] - col.end[k]) * tk; }
         /* the way the tyres slide: the car's sideways velocity, along its lateral axis */
         const vlat = c.wvx * lx + c.wvz * lz, th = Math.sign(vlat) * Math.min(1, Math.abs(vlat) / 6) * lp(S.THROW);
         while (due[key] >= 1) {
@@ -166,5 +174,5 @@ export function createEffects(THREE, opts) {
     if (preset.rain || rain.live()) rain.update(dt, camera, null);
   }
   function clear() { for (const p of [smoke, dust, sparks, flame, rain]) p.clear(); for (const k of Object.keys(due)) due[k] = 0; }
-  return { group, update, setPreset, setSmoke, clear, setDensity: k => { density = Math.max(0, Math.min(1, k)); }, pools: { smoke, dust, sparks, flame, rain }, dispose() { for (const p of [smoke, dust, sparks, flame, rain]) p.dispose(); soft.dispose(); spark.dispose(); drop.dispose(); if (puff) puff.dispose(); } };
+  return { group, update, setPreset, setSmoke, setGlow, clear, setDensity: k => { density = Math.max(0, Math.min(1, k)); }, pools: { smoke, dust, sparks, flame, rain }, dispose() { for (const p of [smoke, dust, sparks, flame, rain]) p.dispose(); soft.dispose(); spark.dispose(); drop.dispose(); if (puff) puff.dispose(); } };
 }
