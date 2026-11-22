@@ -22,8 +22,12 @@ fixed: it works instantly in a browser, and it is called Drift Fever.
 Everything else, the hard constraints below included, is now a default
 that a brief may change when it says why.** `ROADMAP.md` is the plan:
 what the evidence says, the rounds, and what must be true before
-resubmitting. Round 1 is two briefs run in parallel on their own
-branches: `briefs/COVER-LOOK.md` and `briefs/PRO-CONTROLS.md`.
+resubmitting. Round 1 was two briefs run in parallel on their own
+branches, `briefs/COVER-LOOK.md` and `briefs/PRO-CONTROLS.md`, both
+merged and the default since 22 November. Round 2 is
+`briefs/FIRST-MINUTE.md` (the first minute, and the starter car a
+friend of the author's found "clunky" on track 1), started 23 November
+on `crazygames-first-minute`.
 
 ## New direction, 29 October 2026: read DESIGN.md first
 

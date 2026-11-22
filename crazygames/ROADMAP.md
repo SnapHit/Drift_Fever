@@ -121,11 +121,28 @@ that small changes get the same answer.
 4. No known bug in the first ten minutes.
 5. Covers and video drawn from the game.
 
+## Where it stands (23 November 2026)
+
+- **Round 1 is in and is the default** on driftfever.com since the
+  evening of 22 November, by the author's word after playing the look
+  on his phone: the look (`?look=1` for the old one) and Pro controls on
+  a keyboard or gamepad (variant a until he picks; `?controls=easy` for
+  the old ones). Since then: the paint fix, and the boot no longer
+  flashes the race HUD before the title.
+- **Round 2 is running**: `briefs/FIRST-MINUTE.md`, on its own branch,
+  by the author's go-ahead of 23 November. New evidence went into it:
+  a friend of his played it and called the initial experience of the
+  first race track "clunky", and his reading is that the first car
+  needs to be more enjoyable to play with.
+- He cannot play on a desktop for a while, so the Pro variant and the
+  bench wait, and round 2 is judged on his phone first.
+- He has emailed CrazyGames' developer support asking what fell short.
+
 ## Decisions waiting on the author
 
-- Start 1A and 1B as background sessions (his standing rule: ask first).
+- Pick a Pro variant on a keyboard (`?pro=b`, `?pro=c`), when he has a
+  desktop.
 - Run `?bench=1&adapt=0` on his desktop and phone and send the result.
-- Ask CrazyGames what fell short (a draft is in the reply of 22
-  November); one concrete reason beats any amount of our guessing.
+- CrazyGames' answer, when it comes, goes into the next brief.
 - Later: first party counts (round 2), paid sounds (round 3), a backend
   (round 4).
