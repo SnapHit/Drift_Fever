@@ -12,7 +12,7 @@
    Known answer: the environment removed from the "with" side too (both
    sides ?env=0): the ratio falls to about one and the probe fails.
 
-   node game/test/look/reflect.js [--only showroom,race]   writes review/look/reflect.json */
+   node game/test/look/reflect.js [--only showroom,race] [--presets twilight,dusk]   writes review/look/reflect.json */
 import path from 'node:path';
 import * as L from './lib.js';
 
@@ -44,7 +44,7 @@ const BONNET = `
   return out;
 `;
 
-async function measure(env, where, query) {
+async function measure(env, where, query, preset) {
   const pg = await L.page(env, L.LAND, 'tier=high' + query);
   await L.dress(pg.page, L.HERO);
   if (where === 'showroom') {
@@ -52,12 +52,12 @@ async function measure(env, where, query) {
     await L.runFrames(pg.page, 2);
   } else {
     /* the race of the cover pair, at its step, seen from the cover's camera, where the whole bonnet shows */
-    await L.raceTo(pg.page, { rival: 'r3', to: 651, hands: 'r6', mult: 4 });
+    await L.raceTo(pg.page, { rival: 'r3', to: 651, hands: 'r6', mult: 4, preset });
     await L.coverCamera(pg.page, [7.6, 1.0, 205, 30, 0.9, 0]);
   }
   await L.hud(pg.page, false);
   await pg.page.evaluate(w => { if (w === 'showroom') { const s = window.__loop.showroom; s.state.angle = Math.PI * 0.82; s.state.vel = 0; s.state.hold = 1e9; s.update(0); } }, where);   // three quarters from the front, held still
-  const png = await L.snap(pg.page, path.join(L.lookShots, 'reflect-' + where + (query.includes('env=0') ? '-off' : '-on') + '.png'));
+  const png = await L.snap(pg.page, path.join(L.lookShots, 'reflect-' + where + (preset ? '-' + preset : '') + (query.includes('env=0') ? '-off' : '-on') + '.png'));
   const pts = await pg.page.evaluate(new Function('extra', BONNET), { where });
   const img = await L.decode(png), lum = [];
   for (const [x, y] of pts) {
@@ -76,12 +76,16 @@ async function measure(env, where, query) {
 const env = await L.start();
 const out = {};
 const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1].split(',') : ['showroom', 'race'];
-for (const where of only) {
-  const on = await measure(env, where, '&look=2'), off = await measure(env, where, '&look=2&env=0'), known = await measure(env, where, '&look=2&env=0');
+/* the race at the cover pair's time of day (the floodlit dusk, lamps on) and at the race's own (dusk, lamps off) */
+const presets = process.argv.includes('--presets') ? process.argv[process.argv.indexOf('--presets') + 1].split(',') : ['twilight', 'dusk'];
+const cases = only.flatMap(w => w === 'race' ? presets.map(p => [w, p]) : [[w, null]]);
+for (const [where, preset] of cases) {
+  const key = where + (preset ? ' ' + preset : '');
+  const on = await measure(env, where, '&look=2', preset), off = await measure(env, where, '&look=2&env=0', preset), known = await measure(env, where, '&look=2&env=0', preset);
   const ratio = on.spread / Math.max(1e-6, off.spread), knownRatio = known.spread / Math.max(1e-6, off.spread);
-  out[where] = { on, off, ratio: +ratio.toFixed(2), known: { ...known, ratio: +knownRatio.toFixed(2) } };
-  L.say(ratio >= 2 && on.points >= 6, where + ': the bonnet\'s brightness spread with the environment ' + on.spread.toFixed(3) + ' over ' + on.points + ' facets, without it ' + off.spread.toFixed(3) + ': x' + ratio.toFixed(2) + ' (at least x2)');
-  L.say(knownRatio < 2, 'known answer, ' + where + ': the environment removed from both sides gives x' + knownRatio.toFixed(2) + ': ' + (knownRatio < 2 ? 'CAUGHT' : 'MISSED'));
+  out[key] = { on, off, ratio: +ratio.toFixed(2), known: { ...known, ratio: +knownRatio.toFixed(2) } };
+  L.say(ratio >= 2 && on.points >= 6, key + ': the bonnet\'s brightness spread with the environment ' + on.spread.toFixed(3) + ' over ' + on.points + ' facets, without it ' + off.spread.toFixed(3) + ': x' + ratio.toFixed(2) + ' (at least x2)');
+  L.say(knownRatio < 2, 'known answer, ' + key + ': the environment removed from both sides gives x' + knownRatio.toFixed(2) + ': ' + (knownRatio < 2 ? 'CAUGHT' : 'MISSED'));
 }
 L.writeJson(path.join(L.lookDir, 'reflect.json'), out);
 await env.close();

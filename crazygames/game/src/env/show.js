@@ -100,10 +100,15 @@ export const SHOW = {
      the tail-lights; lit from above, each puff darker the nearer the
      ground it hangs (LIFT); and born a little in the underglow's colour
      (GLOW), so violet light under the car colours its smoke as it
-     leaves the tyres. The low tier keeps its number of puffs, so its
-     cost per frame, and gets the size and the life. */
+     leaves the tyres. The low tier keeps its cost: its number of
+     puffs, and the show's own life and size (LOW_KEEPS), since a puff
+     that lives longer is one more alive to update each frame and a
+     bigger one is more to fill (measured: with the look's life and
+     size the low tier's dusk race worked 14 per cent more than main,
+     with no particles 3 per cent); it gets the colours and the lift. */
   SMOKE_LOOK: {
     POOL:           { low: 110, high: 340 },
+    LOW_KEEPS:      ['LIFE', 'SIZE', 'GROW', 'GROW_DECAY'],   // the show's own numbers on the low tier
     LIFE:           [2.8, 4.2],
     SIZE:           [0.8, 1.15],
     GROW:           [3.0, 4.4],

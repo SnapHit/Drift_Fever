@@ -10,7 +10,7 @@
    Known answer: one pixel of this branch's frame changed by one level
    is caught.
 
-   node game/test/look/switch.js   writes review/look/switch.json */
+   node game/test/look/switch.js   writes review/look/switch.json (ONLY=garage,title for those cases, KEEP=dir to keep the frames) */
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -27,6 +27,8 @@ const STEP = 300;
 const CASES = [];
 for (const tier of ['low', 'high']) for (const [preset, rival] of [['dawn', 'r6'], ['dusk', 'r3'], ['night', 'r4']]) CASES.push({ kind: 'race', tier, preset, rival });
 CASES.push({ kind: 'title', tier: 'high' }, { kind: 'garage', tier: 'high' });
+if (process.env.ONLY) CASES.splice(0, CASES.length, ...CASES.filter(c => process.env.ONLY.split(',').includes(c.kind)));   // ONLY=garage,title: those cases alone
+const KEEP = process.env.KEEP || null;   // a folder: each side's frames kept there as PNG
 
 async function frames(dir) {
   const R = await import(pathToFileURL(path.join(dir, 'game/test/garage/lib.js')).href + '?' + path.basename(dir));
@@ -37,7 +39,7 @@ async function frames(dir) {
       const L = window.__loop, F = window.__feel;
       try { localStorage.clear(); } catch (e) {}
       L.save.reset(); L.save.setOnboarded();
-      F.draw = false; window.__clock = 1000;
+      F.draw = false; window.__clock = 1e7;   // far past the boot's own frame, so the first step is clamped the same on both sides however fast the page loaded (from 1000, a page ready inside a second turned the showroom's table by a step of its own)
       if (c.kind === 'race') { L.startRun({ ...L.battleSpec(c.rival), preset: c.preset }); L.skipCountdown(); F.setDriver({ player: 'mixed' }); }
       else if (c.kind === 'garage') { L.action('garage'); }
       else L.action('title');
@@ -46,7 +48,9 @@ async function frames(dir) {
     await pg.page.evaluate(seed => { let s = seed; Math.random = () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }, 7);
     await pg.page.evaluate(({ n }) => { const F = window.__feel; for (let k = 0; k < n; k++) { window.__clock += 1000 / 60; F.frame(window.__clock); } }, { n: c.kind === 'race' ? STEP : 30 });
     await pg.page.evaluate(() => { document.getElementById('ui').style.visibility = 'hidden'; const v = document.getElementById('vignette'); if (v) v.style.display = 'none'; const F = window.__feel, L = window.__loop; F.draw = true; const draw = () => L.app.state === 'garage' ? L.showroom.render() : F.scene.render(); draw(); draw(); F.draw = false; return new Promise(r => setTimeout(r, 80)); });
-    out[c.kind + ' ' + c.tier + (c.preset ? ' ' + c.preset : '')] = await pg.page.screenshot({ timeout: 180000 });
+    const key = c.kind + ' ' + c.tier + (c.preset ? ' ' + c.preset : '');
+    out[key] = await pg.page.screenshot({ timeout: 180000 });
+    if (KEEP) fs.writeFileSync(path.join(KEEP, key.replace(/ /g, '-') + '-' + (dir === root ? 'branch' : 'main') + '.png'), out[key]);
     if (pg.errors.length) console.log('page errors (' + c.kind + '): ' + pg.errors.slice(0, 2).join(' | '));
     await pg.close();
   }

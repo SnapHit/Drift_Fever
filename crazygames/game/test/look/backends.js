@@ -10,8 +10,10 @@
    the antialiasing by drawing the frame through the look's pipeline
    without it (?aa=0, a second page at the same moment). The showroom's
    studio is checked in the garage.
+   The floodlights' lamps are looked at from a camera facing a tower's
+   head (21 m up, they are above the chase camera's picture then).
    Known answer: the floodlights' lamps hidden on purpose in both
-   pictures read as missing.
+   pictures, from that camera, read as missing.
 
    node game/test/look/backends.js [--backends webgl2,webgpu] [--tiers low,high]   writes review/look/backends.json */
 import path from 'node:path';
@@ -40,6 +42,18 @@ const TOGGLE = `
   if (kind === 'name') sc.traverse(o => { if (o.name === name) o.visible = on; });
   else if (kind === 'car') S.car.visible = on;
   else if (kind === 'env') { if (!window.__env) window.__env = sc.environment; sc.environment = on ? window.__env : null; }
+  return true;
+`;
+/* the floodlights' heads stand 21 m up, above the chase camera's picture at that moment: the lamps are
+   looked at from a camera put 31 m from a tower's head, and the camera put back after */
+const AIM = `
+  const S = window.__feel.scene, T = S.THREE, cam = S.camera; let lit = null;
+  S.scene.traverse(o => { if (o.name === 'lit:flood') lit = o; });
+  if (extra === 'save') { window.__chase = { p: cam.position.clone(), q: cam.quaternion.clone() }; return !!lit; }
+  if (extra === 'back') { cam.position.copy(window.__chase.p); cam.quaternion.copy(window.__chase.q); cam.updateMatrixWorld(); return true; }
+  const m = new T.Matrix4(), b = new T.Box3(); lit.getMatrixAt(0, m);
+  lit.geometry.computeBoundingBox(); b.copy(lit.geometry.boundingBox).applyMatrix4(m);
+  const c = b.getCenter(new T.Vector3()); cam.position.set(c.x + 22, c.y - 6, c.z + 22); cam.lookAt(c); cam.updateMatrixWorld();
   return true;
 `;
 const draw = page => page.evaluate(() => { const F = window.__feel, Lp = window.__loop; F.draw = true; const d = () => Lp.app.state === 'garage' ? Lp.showroom.render() : F.scene.render(); d(); d(); F.draw = false; return new Promise(r => setTimeout(r, 60)); });
@@ -79,17 +93,24 @@ for (const backend of backends) {
     await frameAt(pg);
     const info = await L.sceneInfo(pg.page);
     const base = await picture(backend, pg.page);
+    const aim = how => pg.page.evaluate(new Function('extra', AIM), how);
     for (const [label, kind, name] of THINGS) {
+      const lamps = name === 'lit:flood';
+      if (lamps) { await aim('save'); await aim('head'); }
+      const before = lamps ? await picture(backend, pg.page) : base;
       await pg.page.evaluate(new Function('extra', TOGGLE), [kind, name, false]);
       const without = await picture(backend, pg.page);
       await pg.page.evaluate(new Function('extra', TOGGLE), [kind, name, true]);
-      rows[label] = changed(base, without);
-      L.say(rows[label] >= MIN, key + ' (' + info.backend + '): ' + label + ' drawn, ' + rows[label] + ' pixels change without it');
+      if (lamps) await aim('back');
+      rows[label] = changed(before, without);
+      L.say(rows[label] >= MIN, key + ' (' + info.backend + '): ' + label + ' drawn, ' + rows[label] + ' pixels change without it' + (lamps ? ' (seen from 31 m off a tower\'s head)' : ''));
     }
-    /* the known answer: the lamps hidden on purpose in both pictures */
+    /* the known answer: the lamps hidden on purpose in both pictures, from the camera that sees them */
+    await aim('save'); await aim('head');
     await pg.page.evaluate(new Function('extra', TOGGLE), ['name', 'lit:flood', false]);
     const k1 = await picture(backend, pg.page), k2 = await picture(backend, pg.page);
     await pg.page.evaluate(new Function('extra', TOGGLE), ['name', 'lit:flood', true]);
+    await aim('back');
     rows['known answer'] = changed(k1, k2);
     L.say(rows['known answer'] < MIN, key + ': known answer, the lamps hidden on purpose in both pictures read as missing (' + rows['known answer'] + ' pixels change): ' + (rows['known answer'] < MIN ? 'CAUGHT' : 'MISSED'));
     if (pg.errors.length) console.log('page errors: ' + pg.errors.slice(0, 3).join(' | '));

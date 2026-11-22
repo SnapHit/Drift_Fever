@@ -65,7 +65,8 @@ export function createEffects(THREE, opts) {
   const soft = softSprite(THREE, 128, true), spark = sparkSprite(THREE, 32), drop = rainSprite(THREE);
   const puff = show ? puffSprite(THREE, 128) : null;
   /* the cover look (?look=2): SHOW.SMOKE_LOOK over the show's smoke */
-  const look = show && !!o.look, SM = look ? { ...SHOW.SMOKE, ...SHOW.SMOKE_LOOK } : SHOW.SMOKE;
+  const look = show && !!o.look, keep = tierName === 'low' ? Object.fromEntries(SHOW.SMOKE_LOOK.LOW_KEEPS.map(k => [k, SHOW.SMOKE[k]])) : {};
+  const SM = look ? { ...SHOW.SMOKE, ...SHOW.SMOKE_LOOK, ...keep } : SHOW.SMOKE;
   const smoke = createParticles(THREE, show ? { max: size(SM.POOL[tierName] || SM.POOL.low), texture: puff, colour: 0xffffff, tint: true, name: 'smoke', renderOrder: 4, lift: look ? SM.LIFT : null } : { max: tier.smoke || 60, texture: soft, colour: 0xd0c8c0, name: 'smoke', renderOrder: 4 });
   const dust = createParticles(THREE, { max: tier.dust || 40, texture: soft, colour: FX.DUST_COLOUR, name: 'dust', renderOrder: 4 });
   const sparks = createParticles(THREE, show ? { max: size(SHOW.SPARKS.POOL[tierName] || SHOW.SPARKS.POOL.low), texture: spark, colour: SHOW.SPARKS.COLOUR, additive: true, name: 'sparks', renderOrder: 5 } : { max: tier.sparks || 60, texture: spark, colour: 0xffd090, additive: true, name: 'sparks', renderOrder: 5 });
