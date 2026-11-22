@@ -24,14 +24,8 @@
 
    node game/test/controls/career.js   writes review/controls/career.json */
 import * as R from './lib.js';
-import { createProDriver, PRO_DRIVER } from './driver.js';
+import { createProDriver, PRO_DRIVER, DRIVE } from './driver.js';
 
-/* the driver's numbers per variant, from the search (seeds 11, 12, 13, 120 tries each over three tracks) */
-export const DRIVE = {
-  a: { ENTRY_SPEED: 26.223, LEAD: 2.513, HB_TIME: 0.219, CURVE_BAND: 0.006, CURVE_LIFT: 0.029, DRIFT_LOOK: 17.973, DRIFT_LOOK_GAIN: 0.326, ANGLE_MAX: 63.198, ANGLE_MIN: 16.725, APPROACH: 71.972 },
-  b: { ENTRY_SPEED: 21.308, LEAD: 0.314, HB_TIME: 0.313, CURVE_BAND: 0.003, CURVE_LIFT: 0.028, DRIFT_LOOK: 18.204, DRIFT_LOOK_GAIN: 0.616, ANGLE_MAX: 63.007, ANGLE_MIN: 6.16, APPROACH: 84.976 },
-  c: { ENTRY_SPEED: 27.636, LEAD: 3.071, HB_TIME: 0.19, CURVE_BAND: 0.002, CURVE_LIFT: 0.021, DRIFT_LOOK: 14.174, DRIFT_LOOK_GAIN: 0.691, ANGLE_MAX: 47.319, ANGLE_MIN: 14.973, APPROACH: 75.703 },
-};
 const TRACKS = [0, 1, 2], HELD = 1.5;
 
 const env = await R.start(), out = { tracks: TRACKS, drive: DRIVE, runs: {} };
