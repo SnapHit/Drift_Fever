@@ -15,6 +15,7 @@
    Also the worn racing line: a soft dark ribbon that leans to the
    inside through corners, laid once per track. */
 import { asphaltTexture, concreteTexture, asphaltDetail, puddleTexture } from './textures.js';
+import { stripeWalls } from './venue.js';
 
 export const TRACK_STYLE = {
   ASPHALT_TILE:  7,        // m per repeat of the grain
@@ -125,7 +126,7 @@ export function styleTrack(THREE, group, preset, options) {
     ramp:     geo => lam(geo, {}),
     cut:      geo => lam(geo, {}),
     line:     geo => lam(geo, { emissive: 0xffffff, emissiveIntensity: TRACK_STYLE.LINE_EMISSIVE * (preset.edgeGlow || 0) }),
-    wall:     geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },
+    wall:     geo => { if (o.look) stripeWalls(THREE, geo); projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },   // the cover look: painted in panels (env/venue.js)
     barriers: geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },
     bridge:   geo => { projectUVs(THREE, geo, TRACK_STYLE.CONCRETE_TILE); return lam(geo, { map: T.concrete, side: THREE.DoubleSide }); },
     clip:     geo => lam(geo, { emissive: 0xff8a3c, emissiveIntensity: TRACK_STYLE.CLIP_EMISSIVE * (0.3 + (preset.edgeGlow || 0)) }),

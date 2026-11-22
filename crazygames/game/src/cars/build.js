@@ -64,7 +64,7 @@ export const FINISH = {
    gloss, the rest satin black. The lamps glow hard enough to bloom.
    Without the switch FINISH above is the whole story. */
 export const FINISH_LOOK = {
-  PAINT:   { roughness: 0.34, metalness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.05 },
+  PAINT:   { roughness: 0.34, metalness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.07, specularIntensity: 0.35 },   // specularIntensity: the colour coat's own sheen, low, so the sharp top coat does the reflecting and a facet facing a low sun keeps its colour
   GLASS:   { colour: 0x0a1018, roughness: 0.04, metalness: 0.4 },
   /* [roughness, metalness] by kind of trim */
   RUBBER:  [0.88, 0.0],    // the tyres
@@ -533,7 +533,7 @@ export function buildCar(THREE, S, options) {
   const look = LOOK_ON && !!(THREE.TSL && THREE.MeshStandardNodeMaterial);
   const L = FINISH_LOOK, HEAD_ON = look ? L.HEAD_ON : FINISH.HEAD_ON, TAIL_ON = look ? L.TAIL_ON : FINISH.TAIL_ON;
   const paint = look
-    ? new THREE.MeshPhysicalMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: L.PAINT.roughness, metalness: L.PAINT.metalness, clearcoat: L.PAINT.clearcoat, clearcoatRoughness: L.PAINT.clearcoatRoughness })
+    ? new THREE.MeshPhysicalMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: L.PAINT.roughness, metalness: L.PAINT.metalness, clearcoat: L.PAINT.clearcoat, clearcoatRoughness: L.PAINT.clearcoatRoughness, specularIntensity: L.PAINT.specularIntensity })
     : new THREE.MeshStandardMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: FINISH.PAINT_ROUGH, metalness: FINISH.PAINT_METAL });
   const glass = look
     ? new THREE.MeshStandardMaterial({ color: L.GLASS.colour, roughness: L.GLASS.roughness, metalness: L.GLASS.metalness })

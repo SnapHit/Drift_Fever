@@ -26,11 +26,11 @@ export const ENVMAP = {
   NEAR:         0.5,
   FAR:          1000,
   EYE:          1.2,         // m above the ground the cube is drawn from: about a car's waist
-  INTENSITY:    1.0,         // the scene's environmentIntensity
+  INTENSITY:    0.8,         // the scene's environmentIntensity: the cars keep their sky fill too (render/scene.js LOOK.COVER.CAR_HEMI), so a little under one
   /* the sun as the reflections see it: a disc of the preset's sun colour
      at this many times the colour, so a clear coat's highlight is white
      hot; the moon at night, dimmer */
-  SUN_GAIN:     { dusk: 28, dawn: 26, night: 5, rain: 0, twilight: 14 },
+  SUN_GAIN:     { dusk: 5, dawn: 5, night: 5, rain: 0, twilight: 14 },   // dusk and dawn's sun is low and a car drives into it: a hotter one turns a whole flat facet facing it white
   SUN_SIZE:     0.022,       // radians of apparent radius: smaller than the drawn disc, the hot core
   /* the ground below the horizon: the asphalt near, the terrain beyond,
      each its albedo times the preset's light (the sun's height and the

@@ -33,6 +33,7 @@ import { lookOf, glowHex, smokeHex } from '../garage/cosmetics.js';
 import { FX_ON, FX_PARTICLES, LOOK_ON } from '../fx.js';
 import { buildEnvMap, ENVMAP } from './envmap.js';
 import { presetLook } from '../env/presets.js';
+import { buildVenue } from '../env/venue.js';
 
 export const LOOK = {
   EDGE:         0xf6e7a1,     // the brightest, most saturated thing on screen (the mesh builder paints it)
@@ -105,7 +106,7 @@ export const LOOK = {
   COVER: {
     ANTIALIAS:  true,     // MSAA, four samples, on both tiers (?aa=0 turns it off, the clean edges probe's known answer)
     ENVIRONMENT: true,    // the world's environment (render/envmap.js; ?env=0 leaves it out, the reflections probe's known answer)
-    CAR_HEMI:   false,    // the cars' materials see the sun and the environment, not the flat sky fill: the environment is the sky, so the fill would count it twice
+    CAR_HEMI:   true,     // the cars' materials keep the flat sky fill with the environment over it (false: the sun and the environment only, which left a car's shaded side too dark to read its colour at dusk)
   },
 };
 
@@ -222,7 +223,7 @@ export function createScene(canvas, opts) {
   let park = null;   // the stunt park's own drawing (env/park.js), while free drift's ground is the one shown
   const concrete = concreteTexture(THREE, 128);
   /* the cover look's environment (render/envmap.js): the map, the key it was made for, and one generator kept for every track */
-  let envMap = null, envMapKey = null, pmrem = null, titleNext = false;
+  let envMap = null, envMapKey = null, pmrem = null, titleNext = false, venue = null;
   function setGround(ground) {
     currentGround = ground;
     const seed = (ground.seed >>> 0) || (ground.centre.length ? 7 : 3);
@@ -236,6 +237,7 @@ export function createScene(canvas, opts) {
     applyPreset(p);
     theme = th;
     if (groundGroup) { scene.remove(groundGroup); groundGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+    if (venue) { venue.dispose(); venue = null; }
     if (park) { park.dispose(); park = null; }
     groundGroup = new THREE.Group();
     const b = ground.bounds;
@@ -251,6 +253,7 @@ export function createScene(canvas, opts) {
       const at = m => C[Math.max(0, Math.min(n - 1, Math.round(m / 2)))];
       groundGroup.add(gantry(at(ground.startLine === undefined ? 8 : ground.startLine), LOOK.GANTRY_BEAM, true));
       if (ground.finish) groundGroup.add(gantry(at(ground.finish.along), LOOK.FINISH_BEAM, false));
+      if (LOOK_ON) { venue = buildVenue(THREE, ground); groundGroup.add(venue.group); }   // the cover look's catch fencing (env/venue.js)
     } else if (ground.park) {
       /* the stunt park (briefs/PLAYGROUND.md): its slab, walls, pillars, paint, names and lamps */
       track = null;
@@ -440,6 +443,8 @@ export function createScene(canvas, opts) {
     if (model && model.setUnderglow) model.setUnderglow(glowHex(looks.car.glow), k);
     if (ghostModel && ghostModel.setUnderglow) ghostModel.setUnderglow(glowHex(looks.ghost.glow), k * SHOW.UNDERGLOW.GHOST);
     if (rivalModel && rivalModel.setUnderglow) rivalModel.setUnderglow(glowHex(looks.rival.glow), k);
+    /* the cover look: each car's smoke is born a little in its underglow's colour (env/effects.js) */
+    if (LOOK_ON) { if (effects && effects.setGlow) effects.setGlow(glowHex(looks.car.glow), k); if (rivalFx && rivalFx.setGlow) rivalFx.setGlow(glowHex(looks.rival.glow), k); }
   }
   function mount(root, id, paintHex, ghost, look) {
     const t = carTune(id), V = t ? t.VEHICLE : TUNE.VEHICLE;
@@ -563,24 +568,26 @@ export function createScene(canvas, opts) {
   /* ---- effects ---- */
   function rebuildEffects() {
     if (effects) { scene.remove(effects.group); effects.dispose(); }
-    effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, smoke: smokeHex(looks.car.smoke) });
+    effects = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, smoke: smokeHex(looks.car.smoke), look: LOOK_ON });
     if (FX_ON) effects.setDensity(density());
     scene.add(effects.group);
     if (FX_ON) {
       if (show) { scene.remove(show.group); show.dispose(); }
-      show = createShow(THREE, { tier: T(), tierName: tier, preset });
+      show = createShow(THREE, { tier: T(), tierName: tier, preset, look: LOOK_ON });
       scene.add(show.group);
     }
     if (rivalModel) rebuildRivalFx();
+    else if (LOOK_ON) applyGlows();   // the new pools take the underglow's colour (the cover look)
   }
   function rebuildRivalFx() {
     if (rivalFx) { scene.remove(rivalFx.group); rivalFx.dispose(); rivalFx = null; }
     if (rivalShow) { scene.remove(rivalShow.group); rivalShow.dispose(); rivalShow = null; }
     if (!rivalModel) return;
-    rivalFx = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, share: FX_ON ? SHOW.RIVAL.SHARE[tier] || SHOW.RIVAL.SHARE.low : 0.5, noRain: true, smoke: smokeHex(looks.rival.smoke) });
+    rivalFx = createEffects(THREE, { tier: T(), tierName: tier, preset, show: FX_ON, share: FX_ON ? SHOW.RIVAL.SHARE[tier] || SHOW.RIVAL.SHARE.low : 0.5, noRain: true, smoke: smokeHex(looks.rival.smoke), look: LOOK_ON });
     if (FX_ON) rivalFx.setDensity(density());
     scene.add(rivalFx.group);
-    if (FX_ON) { rivalShow = createShow(THREE, { tier: T(), tierName: tier, preset, glows: SHOW.RIVAL.GLOWS[tier] || SHOW.RIVAL.GLOWS.low }); scene.add(rivalShow.group); }
+    if (FX_ON) { rivalShow = createShow(THREE, { tier: T(), tierName: tier, preset, glows: SHOW.RIVAL.GLOWS[tier] || SHOW.RIVAL.GLOWS.low, look: LOOK_ON }); scene.add(rivalShow.group); }
+    if (LOOK_ON) applyGlows();   // the new pools take the underglow's colour (the cover look)
   }
   rebuildEffects();
 

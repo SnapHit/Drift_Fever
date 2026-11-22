@@ -93,6 +93,28 @@ export const SHOW = {
     HEAT_LIFT:      0.45,        // the heat's tint: the colour this far towards white
     LIGHT:          { dusk: 0.95, night: 0.72, dawn: 1.0, rain: 0.8, twilight: 0.88 },
   },
+  /* THE COVER LOOK'S SMOKE (briefs/COVER-LOOK.md 6, ?look=2): the
+     cover's thick, billowing smoke, laid over SMOKE above. Bigger puffs
+     that live longer, so a long slide leaves a lingering bank behind
+     it; whiter, lit by the floods and the low sun rather than red from
+     the tail-lights; lit from above, each puff darker the nearer the
+     ground it hangs (LIFT); and born a little in the underglow's colour
+     (GLOW), so violet light under the car colours its smoke as it
+     leaves the tyres. The low tier keeps its number of puffs, so its
+     cost per frame, and gets the size and the life. */
+  SMOKE_LOOK: {
+    POOL:           { low: 110, high: 340 },
+    LIFE:           [2.8, 4.2],
+    SIZE:           [0.8, 1.15],
+    GROW:           [3.0, 4.4],
+    GROW_DECAY:     0.65,
+    ALPHA:          [0.62, 0.82],
+    RISE:           1.5,
+    COLOUR:         { dusk: 0xece2dc, night: 0xc8cce0, dawn: 0xfff6ee, rain: 0xc4c8d0, twilight: 0xe4e2ee },
+    BIRTH:          { dusk: 0xffe6d0, night: 0xf0dede, dawn: 0xfff2e2, rain: 0xe8dcdc, twilight: 0xf6ece8 },
+    GLOW:           0.45,        // share of the underglow's colour (at its strength) in a puff at birth
+    LIFT:           { h: 2.4, low: 0.68, high: 1.15 },   // a puff on the road is LIFT.low as bright, one LIFT.h metres up LIFT.high
+  },
   /* THE UNDERGLOW (briefs/GARAGE.md 3): a soft light under the car on
      the road, in a colour bought in the garage. The light is the glow
      mesh the car model carries (cars/build.js: a plain quad with a faded
@@ -120,8 +142,8 @@ const dimHex = (a, k) => mixHex(0x000000, a, k);
 /* The smoke's three colours for a preset (by name) and a chosen colour
    (0xRRGGBB, or null for the standard smoke): as it leaves the tyre, as
    it drifts away, and what the heat warms it towards. */
-export function smokeColours(presetName, pick) {
-  const S = SHOW.SMOKE, end = S.COLOUR[presetName] || S.COLOUR.dusk;
+export function smokeColours(presetName, pick, look) {
+  const S = look ? { ...SHOW.SMOKE, ...SHOW.SMOKE_LOOK } : SHOW.SMOKE, end = S.COLOUR[presetName] || S.COLOUR.dusk;   // look: the cover look's colours (SMOKE_LOOK)
   if (pick == null) return { birth: S.BIRTH[presetName] || S.BIRTH.dusk, end, tint: S.HEAT_TINT };
   const P = SHOW.SMOKE_PICK, light = P.LIGHT[presetName] === undefined ? 1 : P.LIGHT[presetName];
   return { birth: dimHex(mixHex(pick, 0xffffff, P.BIRTH_LIFT), light), end: mixHex(end, dimHex(pick, light), P.KEEP), tint: dimHex(mixHex(pick, 0xffffff, P.HEAT_LIFT), light) };
@@ -211,8 +233,8 @@ export function createShow(THREE, opts) {
     for (let k = 0; k < tails.length; k++) {
       v.set(tails[k][0], tails[k][1], tails[k][2]).applyMatrix4(ctx.car.matrix);
       glows.add(v.x, v.y, v.z, SHOW.HALO_SIZE * (1 + 0.5 * braking), 1, 0.12, 0.08, haloA);
-      /* on a wet road the tail-light shows in it, stretched towards the camera */
-      if (preset.wet) glows.add(v.x, (pose.y || 0) + 0.04, v.z, 0.2, 1, 0.1, 0.08, 0.45 * (1 + braking), 2.6);
+      /* on a wet road the tail-light shows in it, stretched towards the camera; with the cover look only when the camera is behind the light (from in front the stretch ran under the car and out ahead of it) */
+      if (preset.wet && !(o.look && (camera.position.x - v.x) * -Math.sin(pose.yaw) + (camera.position.z - v.z) * -Math.cos(pose.yaw) > 0)) glows.add(v.x, (pose.y || 0) + 0.04, v.z, 0.2, 1, 0.1, 0.08, 0.45 * (1 + braking), 2.6);
       /* the trail: a point every few centimetres while sliding */
       const tr = trail[k], strength = SHOW.TRAIL_PRESETS[name] || 0;
       const on = sliding && strength > 0;
