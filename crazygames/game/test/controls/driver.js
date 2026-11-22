@@ -47,7 +47,8 @@ export function createProDriver(ground, opts) {
   const keys = { up: false, down: false, left: false, right: false, hb: false };
   const st = { mode: 'grip', corner: null, hbUntil: 0, wanted: 0, psiWas: null, log: { slides: 0, entries: 0 } };
   const ahead = (along, c) => { let d = c.from - along; if (closed) d = ((d % L) + L) % L; return d; };
-  const inside = (along, c) => closed ? ((along - c.from) % L + L) % L <= ((c.to + D.EXIT_PAD - c.from) % L + L) % L : along >= c.from && along <= c.to + D.EXIT_PAD;
+  /* inside a slid corner: from where its handbrake goes on to EXIT_PAD past its end */
+  const inside = (along, c) => { const a = c.from - Math.max(0, D.LEAD) - 2; return closed ? ((along - a) % L + L) % L <= ((c.to + D.EXIT_PAD - a) % L + L) % L : along >= a && along <= c.to + D.EXIT_PAD; };
   /* press the steer keys towards a wanted steering (+ right), the slewed steering being now */
   function steerTo(want, now) {
     keys.left = keys.right = false;
