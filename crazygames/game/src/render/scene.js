@@ -110,6 +110,7 @@ export const LOOK = {
     FXAA:       true,     // render/fxaa.js, after the tone mapping, so a bright glowing edge is smoothed too (MSAA resolves before the tone curve)
     BLOOM:      { threshold: 0.9, strength: 0.7, radius: 0.014, taps: 12 },   // the high tier's bloom with the look: the floods and the lamps glow harder
     ENVIRONMENT: true,    // the world's environment (render/envmap.js; ?env=0 leaves it out, the reflections probe's known answer)
+    UNDERGLOW:  0.7,      // the underglow's strength with the look: the wet, darker road under it shows its pool more, and at full strength lime, amber and magenta stood within 15 per cent of the edge line at night, dusk and floodlit dusk (garage/readable.js --look: 14 of 50 failed)
     CAR_HEMI:   true,     // the cars' materials keep the flat sky fill with the environment over it (false: the sun and the environment only, which left a car's shaded side too dark to read its colour at dusk)
   },
 };
@@ -445,7 +446,7 @@ export function createScene(canvas, opts) {
      smoke of its own. */
   const looks = { car: lookOf(null), ghost: lookOf(null), rival: lookOf(null) };
   function applyGlows() {
-    const k = underglowStrength(preset.name, tier === 'high');
+    const k = underglowStrength(preset.name, tier === 'high') * (LOOK_ON ? LOOK.COVER.UNDERGLOW : 1);
     if (model && model.setUnderglow) model.setUnderglow(glowHex(looks.car.glow), k);
     if (ghostModel && ghostModel.setUnderglow) ghostModel.setUnderglow(glowHex(looks.ghost.glow), k * SHOW.UNDERGLOW.GHOST);
     if (rivalModel && rivalModel.setUnderglow) rivalModel.setUnderglow(glowHex(looks.rival.glow), k);
