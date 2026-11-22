@@ -74,6 +74,8 @@ async function run(race, tier, query, extra) {
 async function once(env, race, tier, query, extra) {
   const pg = backend === 'webgpu' ? await W.open(env, VP, 'tier=' + tier + query + '&title=1&adapt=0', { timeout: 60000 }) : await L.page(env, VP, 'tier=' + tier + query);
   if (backend === 'webgpu') await pg.page.evaluate(() => { try { localStorage.clear(); } catch (e) {} const S = window.__loop.save; S.reset(); S.setOnboarded(); for (let i = 0; i < 24; i++) S.careerResult(i, 3, 100000); });
+  const got = await pg.page.evaluate(() => window.__feel.scene.info().backend);
+  if (got !== backend) throw new Error('asked for ' + backend + ', the page drew with ' + got);   // a WebGPU page that falls back to WebGL 2 measures the wrong thing
   await L.dress(pg.page, L.STARTER);
   await L.raceTo(pg.page, { rival: L.RACES[race].rival, to: 0 });
   if (extra) await pg.page.evaluate(n => {   /* the known answer: n small meshes, each its own draw call, in front of the camera */
