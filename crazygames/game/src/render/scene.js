@@ -34,6 +34,7 @@ import { FX_ON, FX_PARTICLES, LOOK_ON } from '../fx.js';
 import { buildEnvMap, ENVMAP } from './envmap.js';
 import { presetLook } from '../env/presets.js';
 import { buildVenue } from '../env/venue.js';
+import { fxaa } from './fxaa.js';
 
 export const LOOK = {
   EDGE:         0xf6e7a1,     // the brightest, most saturated thing on screen (the mesh builder paints it)
@@ -104,7 +105,10 @@ export const LOOK = {
   /* THE COVER LOOK (briefs/COVER-LOOK.md, ?look=2): what the scene does
      differently with the switch on. Without it none of this is read. */
   COVER: {
-    ANTIALIAS:  true,     // MSAA, four samples, on both tiers (?aa=0 turns it off, the clean edges probe's known answer)
+    ANTIALIAS:  true,     // antialiasing on both tiers (?aa=0 turns it off, the clean edges probe's known answer): the look draws through its own post pass on both tiers
+    MSAA:       { low: 0, high: 4 },   // samples on the scene pass: the high tier's (a phone's tiled GPU resolves them cheaply); the low tier's edges are the FXAA's alone, which costs one pass and not four times the memory
+    FXAA:       true,     // render/fxaa.js, after the tone mapping, so a bright glowing edge is smoothed too (MSAA resolves before the tone curve)
+    BLOOM:      { threshold: 0.9, strength: 0.7, radius: 0.014, taps: 12 },   // the high tier's bloom with the look: the floods and the lamps glow harder
     ENVIRONMENT: true,    // the world's environment (render/envmap.js; ?env=0 leaves it out, the reflections probe's known answer)
     CAR_HEMI:   true,     // the cars' materials keep the flat sky fill with the environment over it (false: the sun and the environment only, which left a car's shaded side too dark to read its colour at dusk)
   },
@@ -116,14 +120,14 @@ export function createScene(canvas, opts) {
   const options = opts || {};
   const forceWebGL = options.renderer === 'webgl2';
   const antialias = LOOK_ON && LOOK.COVER.ANTIALIAS && query.get('aa') !== '0';
-  const renderer = new THREE.WebGPURenderer({ canvas, antialias, forceWebGL, alpha: false, powerPreference: 'high-performance' });
+  const renderer = new THREE.WebGPURenderer({ canvas, antialias: false, forceWebGL, alpha: false, powerPreference: 'high-performance' });   // the cover look's antialiasing is in its post pass (setPost)
   renderer.toneMapping = LOOK.TONE_MAPPING === 'aces' ? THREE.ACESFilmicToneMapping : THREE.NeutralToneMapping;
   renderer.shadowMap.enabled = query.get('shadows') !== '0';
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   let backend = 'pending', tier = options.tier || 'low';
   const view = { w: 1, h: 1 };
   const overrides = { preset: options.preset || query.get('preset') || null, theme: options.theme || query.get('theme') || null };
-  let post = null;
+  let post = null, postBloom = false;
   const ready = renderer.init().then(() => {
     backend = renderer.backend && renderer.backend.isWebGPUBackend ? 'webgpu' : 'webgl2';
     const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 0;
@@ -167,12 +171,12 @@ export function createScene(canvas, opts) {
   function stepDown() {
     adapt.level++;
     /* the bloom is only there to lose on the high tier: a low tier goes straight on to the pixels */
-    if (adapt.level === 2 && !post) adapt.level = 3;
+    if (adapt.level === 2 && !postBloom) adapt.level = 3;
     adapt.steps.push({ level: adapt.level, at: performance.now() });
     clearWindow();
     if (effects && effects.setDensity) effects.setDensity(density());
     if (rivalFx && rivalFx.setDensity) rivalFx.setDensity(density());
-    if (adapt.level === 2) post = null;
+    if (adapt.level === 2) setPost(false);
     if (adapt.level >= 3) applyPixels();
   }
   /* nothing that was taken away made the frames shorter: put it all back, for good */
@@ -600,6 +604,8 @@ export function createScene(canvas, opts) {
   /* ---- bloom on the high tier: the scene pass plus a soft ring of
      samples of its bright parts, through the renderer's post pipeline ---- */
   function setPost(on) {
+    postBloom = !!on;
+    if (LOOK_ON) { setPostLook(on); return; }
     if (!on) { post = null; return; }
     try {
       const TSL = THREE.TSL;
@@ -629,6 +635,38 @@ export function createScene(canvas, opts) {
       pipeline.outputNode = out;
       post = pipeline;
     } catch (e) { console.warn('bloom off: ' + (e && e.message)); post = null; }
+  }
+  /* THE COVER LOOK'S POST PASS, on both tiers: the scene (with MSAA on
+     the high tier), the bloom where the tier has it, the colour grade
+     per preset, then the tone mapping into a picture of its own and the
+     FXAA over that (render/fxaa.js). */
+  function setPostLook(bloom) {
+    try {
+      const TSL = THREE.TSL, C = LOOK.COVER;
+      const pipeline = new THREE.PostProcessing(renderer);
+      const scenePass = TSL.pass(scene, camera, { samples: antialias ? (C.MSAA[tier] || 0) : 0 });
+      let out = scenePass.getTextureNode('output');
+      if (bloom) {
+        const B = C.BLOOM;
+        let glow = TSL.vec3(0);
+        for (let i = 0; i < B.taps; i++) {
+          const a = i / B.taps * Math.PI * 2, r = (i % 2 ? 1 : 0.5) * B.radius;
+          glow = glow.add(scenePass.getTextureNode('output').sample(TSL.uv().add(TSL.vec2(Math.cos(a) * r, Math.sin(a) * r))).rgb.sub(B.threshold).max(0));
+        }
+        out = out.add(TSL.vec4(glow.mul(B.strength / B.taps), 0));
+      }
+      const G = grade;
+      let rgb = out.rgb.mul(G.gain).add(G.lift);
+      rgb = TSL.mix(TSL.vec3(rgb.dot(TSL.vec3(0.2126, 0.7152, 0.0722))), rgb, G.saturation);
+      if (tier === 'high') rgb = rgb.mul(TSL.float(1).sub(G.vignette.mul(TSL.smoothstep(0.35, 1.0, TSL.uv().sub(0.5).length().mul(1.414)))));   // the low tier's vignette is the page's own (main.js), over the canvas
+      out = TSL.vec4(rgb, out.a);
+      if (antialias && C.FXAA) {
+        pipeline.outputColorTransform = false;
+        const toned = TSL.rtt(TSL.renderOutput(out, renderer.toneMapping, renderer.outputColorSpace), null, null, { type: THREE.UnsignedByteType });
+        pipeline.outputNode = fxaa(THREE, toned);
+      } else pipeline.outputNode = out;
+      post = pipeline;
+    } catch (e) { console.warn('post off: ' + (e && e.message)); post = null; }
   }
 
   /* ---- per frame ---- */
