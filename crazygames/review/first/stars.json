@@ -1,0 +1,320 @@
+{
+ "main": "2fc25d4",
+ "targets": {
+  "branch": [
+   380,
+   900,
+   1580
+  ],
+  "main": [
+   450,
+   900,
+   1580
+  ]
+ },
+ "sides": {
+  "main": {
+   "strangers": [
+    {
+     "seed": 1,
+     "score": 378,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "8 of 12",
+     "coins": 97
+    },
+    {
+     "seed": 2,
+     "score": 415,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "9 of 12",
+     "coins": 41
+    },
+    {
+     "seed": 3,
+     "score": 317,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "8 of 12",
+     "coins": 31
+    },
+    {
+     "seed": 4,
+     "score": 281,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "5 of 12",
+     "coins": 28
+    },
+    {
+     "seed": 5,
+     "score": 326,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "7 of 12",
+     "coins": 32
+    },
+    {
+     "seed": 6,
+     "score": 403,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "10 of 12",
+     "coins": 100
+    },
+    {
+     "seed": 7,
+     "score": 345,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "8 of 12",
+     "coins": 34
+    },
+    {
+     "seed": 8,
+     "score": 366,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "9 of 12",
+     "coins": 36
+    },
+    {
+     "seed": 9,
+     "score": 474,
+     "stars": 1,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "9 of 12",
+     "coins": 237
+    },
+    {
+     "seed": 10,
+     "score": 249,
+     "stars": 0,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "5 of 12",
+     "coins": 24
+    }
+   ],
+   "drivers": {
+    "careful": {
+     "score": 491,
+     "stars": 1,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 77.3
+    },
+    "drifter": {
+     "score": 895,
+     "stars": 1,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 70
+    }
+   },
+   "errors": []
+  },
+  "branch": {
+   "strangers": [
+    {
+     "seed": 1,
+     "score": 459,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "5 of 12",
+     "coins": 175
+    },
+    {
+     "seed": 2,
+     "score": 561,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "11 of 12",
+     "coins": 246
+    },
+    {
+     "seed": 3,
+     "score": 388,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "7 of 12",
+     "coins": 168
+    },
+    {
+     "seed": 4,
+     "score": 454,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "8 of 12",
+     "coins": 235
+    },
+    {
+     "seed": 5,
+     "score": 371,
+     "stars": 0,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "7 of 12",
+     "coins": 37
+    },
+    {
+     "seed": 6,
+     "score": 433,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "7 of 12",
+     "coins": 173
+    },
+    {
+     "seed": 7,
+     "score": 387,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "7 of 12",
+     "coins": 168
+    },
+    {
+     "seed": 8,
+     "score": 392,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "8 of 12",
+     "coins": 169
+    },
+    {
+     "seed": 9,
+     "score": 530,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "10 of 12",
+     "coins": 243
+    },
+    {
+     "seed": 10,
+     "score": 472,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "9 of 12",
+     "coins": 237
+    }
+   ],
+   "drivers": {
+    "careful": {
+     "score": 488,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 78.4
+    },
+    "drifter": {
+     "score": 517,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 68.9
+    }
+   },
+   "errors": []
+  }
+ },
+ "withMainTargets": 5
+}

@@ -73,8 +73,11 @@ export const TUNE = {
        starter's FIRST handling below sets them, behind ?first=2. */
     HOLD_GRIP:          0,       // share of the front axle's grip a full steer asks for at speed, as a lateral acceleration (0: full lock, as always)
     HOLD_SLIP:          0,       // degrees added to that angle for the tyres' own slip
+    HOLD_RATE:          0,       // shares of that angle a second the steering turns in at, while it holds
+    HOLD_RETURN:        0,       // and returns at
     HOLD_CRUISE:        0,       // m/s a held steer on grip bleeds the car down towards
     HOLD_SCRUB:         0,       // m/s^2 it bleeds at, at full steer (0: none)
+    HOLD_AFTER:         0,       // s a full steer must be held before it bleeds
     WALL_KIND:          0,       // share of the speed it met a wall with that the car keeps along the wall (0: the wall as always)
     WALL_NOSE:          0,       // degrees the nose must point into a wall before it is turned along it
     WALL_TURN:          0,       // rad/s of yaw per radian the nose is off the wall's line, while it touches
@@ -143,6 +146,7 @@ export const TUNE = {
     POWER_STEER:        0,       // degrees full countersteer takes off, and full steering into the slide adds at full throttle
     POWER_CURVE:        1,       // countersteer takes POWER_STEER times its share to this power off: under 1, the first of it does the most, so any countersteer catches a slide that none would spin
     POWER_SLIDE:        0,       // share of the rear's grip in a drift that full throttle takes away (0: none)
+    KICK_STEER:         0,       // the first minute's starter (briefs/FIRST-MINUTE.md): degrees of slide under which DRIFT with steering kicks the slide the way of the steering (0: the way the car is already slipping, as always)
   },
   /* THE ROAD'S SHAPE UNDER THE CAR (briefs/TRACKS-2.md): banked corners
      and the climbs to a bridge. New physics beside the handling, not a
@@ -314,21 +318,31 @@ export const FIRST = {
   VEHICLE: {
     HOLD_GRIP:      0.9,     // a held button at speed asks for nine tenths of the front's grip: a circle of about 25 m at the cruise, tighter than every corner of track 1 (34 m and up), so holding it always makes the corner and the thumb only has to let go
     HOLD_SLIP:      2,       // degrees for the tyres' own slip, so the circle is about the one asked for
+    HOLD_RATE:      9,       // shares of the held angle a second (the plain starter turns in at 3.2 locks a second, so full steer took a third of a second to reach a lock five times the held one): a tap of 100 ms turns about 2 degrees at track 1's speeds and 200 ms about 5 (were 3.4 and 10)
+    HOLD_RETURN:    12,      // and lets go as quickly (5)
     HOLD_CRUISE:    19,      // m/s a held turn bleeds down towards (68 km/h; par pace is 18), instead of TURN_LIFT's 13
     HOLD_SCRUB:     14,      // m/s^2: from 30 m/s on the first straight to the cruise in under a second, so a held button into the first corner turns instead of running wide
+    HOLD_AFTER:     0.3,     // s of a full steer held before it bleeds: a stranger's long press into a corner does, a quick pulse never
     TURN_LIFT_FROM: 15,      // m/s the held turn's drive cut starts at (was 10, which held every held turn to 46 km/h)
     WALL_KIND:      0.75,    // a wall met keeps three quarters of the speed, along the wall
     WALL_NOSE:      10,      // degrees into a wall before the nose is turned along it
     WALL_TURN:      3,       // rad/s per radian: the nose comes round in about a third of a second (6 swung it at 200 degrees a second; 2 left more scrapes)
   },
-  ASSIST: {},
-  /* career track 1's star targets with the switch (main.js firstTargets; everything else's are as they were). Main's are 450, 900 and 1,580 */
-  STARS:            [450, 900, 1580],
-  SHOP_PAINT:       'amber',   // the paint the results offer when the coins buy nothing dearer: the cover car's colour
-  SCALE: {
-    STEER_RATE:     2.8125,  // 3.2 to 9 shares of the held angle a second: a tap of 100 ms turns about 2 degrees at track 1's speeds and 200 ms about 5 (were 3.4 and 10)
-    STEER_RETURN:   2.4,     // 5 to 12: and lets go as quickly
+  ASSIST: {
+    KICK_STEER:     12,      // DRIFT with steering kicks the slide the way the thumb steers, unless a slide of 12 degrees or more is already going (a weave's leftover slip sent half the strangers' slides the wrong way, into the outside wall)
+    DRIFT_CARVE:    0.55,    // was 0.9: a full slide at a stranger's 17 to 19 m/s carved a 24 to 26 m circle, inside every corner of track 1 (34 to 75 m), into the inside wall; now about 40 m. The scripted players with a thumb score as much as on main or more (review/first/REPORT.md)
   },
+  /* career track 1's star targets with the switch (main.js firstTargets; everything else's are as they were). Main's are 450, 900 and 1,580: with the starter above, 5 of 10 strangers' first runs reached 450 (main's own strangers 1); at 380, 9 of 10 (game/test/first/stars.js). Two and three stars are unchanged and the careful scripted driver still earns one */
+  STARS:            [380, 900, 1580],
+  SHOP_PAINT:       'amber',   // the paint the results offer when the coins buy nothing dearer: the cover car's colour
+  /* the first run's prompts with the switch (ui/onboard.js): measured with strangers' thumbs, the slide prompt 45 m before track 1's first corner (reached at about 28 m/s) and the brake prompt wherever it fell put them in the walls three times a lap, against once in three laps with the prompts skipped */
+  ONBOARD: {
+    DRIFT_AFTER:    1,       // corners driven before the slide prompt may come (then LOOP.ONBOARD.DRIFT_LEAD before the next, as always)
+    BRAKE_LEAD:     40,      // m before a corner the brake prompt comes, once the slide is done
+    BRAKE_SPEED:    21,      // m/s the car must be doing there (76 km/h): the brake is shown where it helps
+    BRAKE_WAIT:     12,      // s after the slide it comes anyway
+  },
+  SCALE: {},
 };
 
 /* What the ?tune=1 panel shows: path, label, min, max, step. */

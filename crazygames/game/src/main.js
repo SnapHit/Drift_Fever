@@ -335,7 +335,7 @@ function frame(t) {
     }
   }
   if (S === 'free' && app.park) parkFrame(dt);
-  if (onboard.active) onboard.update(dt, { driving: S === 'drive' || S === 'free', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity });
+  if (onboard.active) onboard.update(dt, { driving: S === 'drive' || S === 'free', record: raw, source: inputSource(), scoring: scoring.state, cornerAhead: S === 'drive' ? cornerAhead(app.track, world.along) : Infinity, speed: world.car.speed });
   if (onboard.active && onboard.taught) save.setOnboarded();   // the three prompts are done: never again, whatever was being driven
   if (S === 'drive' || S === 'countdown') {
     const p = app.progress.state;

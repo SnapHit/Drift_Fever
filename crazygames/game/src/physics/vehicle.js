@@ -56,6 +56,7 @@ export function createVehicle(x, z, yaw, tune) {
     prevBeta: 0,          // last step's slide angle, for the damping
     driftTarget: 0,       // the angle the drift controller is holding, easing towards the asked one, degrees
     hbGrip: 0,            // how far the handbrake has taken the rear's grip, 0 to 1, easing in
+    holdT: 0,             // s a full steer has been held on grip, for the held turn's scrub (HOLD_SCRUB; 0 and never read without it)
     speed: 0, vx: 0, vy: 0,
     slip: 0,              // body slip angle, rad, positive when the car points right of its travel
     alphaF: 0, alphaR: 0, // axle slip angles
@@ -107,13 +108,14 @@ export function stepVehicle(s, input, dt) {
   /* THE HELD BUTTON (briefs/FIRST-MINUTE.md, the starter on ?first=2): a
      thumb's steering is all or nothing, and at speed full lock asked for
      an 11 m circle at the front tyres' limit whatever the speed. With
-     HOLD_GRIP set, a full steer at speed asks for no more than the turn
-     that takes HOLD_GRIP of the front's grip (as a lateral acceleration,
-     more with a steering upgrade), plus HOLD_SLIP for the tyres' own
-     slip, and the slew is a share of that angle, so a tap is a small
-     correction and a hold is a corner at every speed. 0 in TUNE: this
-     never runs for a car without it. */
-  const holding = V.HOLD_GRIP > 0 && speed > 1;
+     HOLD_GRIP set, a full steer at speed on grip asks for no more than
+     the turn that takes HOLD_GRIP of the front's grip (as a lateral
+     acceleration, more with a steering upgrade), plus HOLD_SLIP for the
+     tyres' own slip, and slews at HOLD_RATE (HOLD_RETURN back) shares of
+     that angle a second, so a tap is a small correction and a hold is a
+     corner at every speed. In a drift the steering is as it always was.
+     0 in TUNE: this never runs for a car without it. */
+  const holding = V.HOLD_GRIP > 0 && speed > 1 && !s.drifting;
   if (holding) lockDrive = Math.min(lockDrive, Math.atan(L * V.HOLD_GRIP * V.MU_FRONT * g * (V.LOCK / TUNE.VEHICLE.LOCK) / (speed * speed)) + V.HOLD_SLIP * DEG);
   const beta = speed > 0.01 ? Math.atan2(vy, absVx) : 0;
   s.slip = beta;
@@ -149,7 +151,7 @@ export function stepVehicle(s, input, dt) {
   }
   const target = -steerIn * lockDrive;
   const turningIn = Math.abs(target) > Math.abs(s.steerDriver) && target * s.steerDriver >= 0;
-  s.steerDriver = moveToward(s.steerDriver, target, (turningIn ? V.STEER_RATE : V.STEER_RETURN) * (holding ? lockDrive : lockFull) * dt);
+  s.steerDriver = moveToward(s.steerDriver, target, holding ? (turningIn ? V.HOLD_RATE : V.HOLD_RETURN) * lockDrive * dt : (turningIn ? V.STEER_RATE : V.STEER_RETURN) * lockFull * dt);
   const lockAssist = A.COUNTERSTEER_LOCK * DEG;
   let delta = s.steerDriver + assist;
   if (delta > lockAssist) delta = lockAssist; else if (delta < -lockAssist) delta = -lockAssist;
@@ -297,7 +299,14 @@ export function stepVehicle(s, input, dt) {
       /* at the very start of a handbrake drift the slide has no direction
          yet: take it from the steering, defaulting to the way the car is
          turning */
-      const dirUse = absB < 2 * DEG ? (input.steer !== 0 ? (input.steer > 0 ? 1 : -1) : (s.r < 0 ? 1 : -1)) : dir;
+      /* the first minute's starter (briefs/FIRST-MINUTE.md, KICK_STEER):
+         DRIFT pressed with steering kicks the slide the way the thumb
+         steers unless a slide past KICK_STEER degrees is already going.
+         A thumb's weave leaves a few degrees of slip the other way, and
+         the slide went that way, held by DRIFT, into the outside wall.
+         0 in TUNE: as it always was. */
+      const kick = A.KICK_STEER > 0 && s.hb > 0 && input.steer !== 0 && absB < A.KICK_STEER * DEG;
+      const dirUse = kick ? (input.steer > 0 ? 1 : -1) : absB < 2 * DEG ? (input.steer !== 0 ? (input.steer > 0 ? 1 : -1) : (s.r < 0 ? 1 : -1)) : dir;
       const into = input.steer * dirUse;
       let target = into > 0 ? (A.DRIFT_ANGLE + A.DRIFT_RANGE * into) * Math.min(1, into * 2) : 0;
       target *= A.DRIFT_LIFT + (1 - A.DRIFT_LIFT) * input.throttle;
@@ -358,14 +367,18 @@ export function stepVehicle(s, input, dt) {
   }
 
   /* THE HELD TURN'S SCRUB (briefs/FIRST-MINUTE.md, with HOLD_GRIP): on
-     grip, a steer held at speed bleeds the car down towards HOLD_CRUISE
-     at HOLD_SCRUB m/s^2 (in proportion to the steer), so a held button
-     into a corner slows to the speed its circle holds instead of running
-     wide, as a drift's scrub slows a slide to DRIFT_CRUISE. 0 in TUNE:
+     grip, a full steer held at speed bleeds the car down towards
+     HOLD_CRUISE at HOLD_SCRUB m/s^2, so a held button into a corner slows
+     to the speed its circle holds instead of running wide, as a drift's
+     scrub slows a slide to DRIFT_CRUISE. Only a steer held full for
+     HOLD_AFTER seconds: a skilled thumb's quick pulses (a stick's depth,
+     given as presses) and a stick under full never bleed anything, which
+     halved what the scripted players earned with a thumb. 0 in TUNE:
      this never runs for a car without it. */
-  if (V.HOLD_SCRUB > 0 && !s.drifting && input.steer !== 0) {
+  if (V.HOLD_SCRUB > 0) {
+    s.holdT = !s.drifting && Math.abs(input.steer) >= 1 ? s.holdT + dt : 0;
     const sp = Math.hypot(s.wvx, s.wvz);
-    if (sp > V.HOLD_CRUISE) { const k = Math.max(V.HOLD_CRUISE, sp - V.HOLD_SCRUB * Math.abs(input.steer) * dt) / sp; s.wvx *= k; s.wvz *= k; }
+    if (s.holdT > V.HOLD_AFTER && sp > V.HOLD_CRUISE) { const k = Math.max(V.HOLD_CRUISE, sp - V.HOLD_SCRUB * dt) / sp; s.wvx *= k; s.wvz *= k; }
   }
 
   /* ---- the low speed blend: below LOW_SPEED the car turns as a

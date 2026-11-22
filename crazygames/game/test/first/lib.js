@@ -61,16 +61,19 @@ export const RUNNER = `(function () {
   const key = (name, down) => { const k = KEYS[name]; window.dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { key: k[0], code: k[1], bubbles: true })); };
   const r3 = v => Math.round(v * 1000) / 1000, r1 = v => Math.round(v * 10) / 10;
   window.__first = {
-    /* opts: { pro (keys on Pro), scale (the thumbs' known answer), maxS, startBy: 'click' | 'action', tweak (page source run before the run starts) } */
+    /* opts: { pro (keys on Pro), scale (the thumbs' known answer), maxS, started (the run already begun by a real press), tweak (page source run before the run starts), draw, keepClock } */
     run(seed, opts) {
       const o = opts || {}, L = window.__loop, F = window.__feel, A = L.app;
-      window.__clock = 1000;   // every run from the same clock: the game's dt is a difference of it, and a countdown that ends a frame later is another run
+      if (!o.keepClock) window.__clock = 1000;   // every run from the same clock: the game's dt is a difference of it, and a countdown that ends a frame later is another run
       F.draw = !!o.draw;   // the run's numbers need no pictures (the hitch probe draws)
-      const btn = document.querySelector('#screens.on [data-action="first"]');
-      if (!btn) return { error: 'no start here button on the title (state ' + A.state + ')' };
       if (o.tweak) new Function(o.tweak)();
-      btn.click();
+      if (!o.started) {   /* started: a real press on start here already began the run (garage.js) */
+        const btn = document.querySelector('#screens.on [data-action="first"]');
+        if (!btn) return { error: 'no start here button on the title (state ' + A.state + ')' };
+        btn.click();
+      }
       if (A.state !== 'countdown') return { error: 'start here did not start a run: ' + A.state };
+      if (o.skip) { const sk = document.querySelector('#skip'); if (sk && !sk.hidden) sk.click(); }   // a stranger who presses SKIP at once (the prompts' own cost, measured)
       const track = A.track, world = F.world;
       const th = makeThumbs(track, seed, { pro: !!o.pro, scale: o.scale });
       /* every step's hits and recoveries, not only the last step of a frame's */

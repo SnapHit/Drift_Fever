@@ -13,8 +13,9 @@
    throttle and brake) the prompts are Pro's own: drive, steer, the
    handbrake to slide, the throttle to hold it, brake. The key caps print
    what this keyboard's keys print (input/layout.js). */
-import { LOOP, PROFILES } from '../tune.js';
+import { LOOP, PROFILES, FIRST } from '../tune.js';
 import { keyLabel } from '../input/layout.js';
+import { FIRST_ON } from '../first.js';
 
 const KEYS = {
   steer: '<span class="keys"><kbd>&#9664;</kbd><kbd>&#9654;</kbd><i>or</i><kbd data-code="KeyA">A</kbd><kbd data-code="KeyD">D</kbd></span>',
@@ -74,6 +75,7 @@ export function createOnboarding(root, onSkip) {
     active: false, step: null, stepT: 0, steerT: 0, hbT: 0, waitT: 0,
     done: { steer: false, drift: false, brake: false }, how: {}, shown: [], infoT: 0, infoKind: null,
     chainShown: false, cleanShown: false, skipped: false, source: 'keys', mode: 'easy',
+    corners: 0, inCorner: false,   // corners driven, for the first minute's prompts (FIRST.ONBOARD)
   };
   let lastPrompt = '', lastInfo = '', lastPos = '';
 
@@ -81,7 +83,7 @@ export function createOnboarding(root, onSkip) {
   function start(source, mode) {
     st.active = true; st.step = null; st.stepT = 0; st.steerT = 0; st.hbT = 0; st.waitT = 0;
     st.done.steer = st.done.drift = st.done.brake = false; st.how = {}; st.shown.length = 0; st.infoT = 0; st.infoKind = null;
-    st.chainShown = st.cleanShown = false; st.skipped = false; st.source = source || 'keys';
+    st.chainShown = st.cleanShown = false; st.skipped = false; st.source = source || 'keys'; st.corners = 0; st.inCorner = false;
     st.mode = mode === 'pro' ? 'pro' : 'easy';
     if (st.mode === 'pro') st.done.drive = st.done.hold = false; else { delete st.done.drive; delete st.done.hold; }
     el.hidden = false; skip.hidden = false;
@@ -116,10 +118,14 @@ export function createOnboarding(root, onSkip) {
   function finish(step, how) { st.done[step] = true; st.how[step] = how; st.step = null; st.waitT = 0; setPrompt('', ''); }
 
   /* ctx: { driving, record (the input record), source, scoring (its
-     state), cornerAhead (m to the next corner, or Infinity) } */
+     state), cornerAhead (m to the next corner, or Infinity), speed (m/s) } */
   function update(dt, ctx) {
     if (!st.active) return;
     if (ctx.source) st.source = ctx.source;
+    /* corners driven: in one, then out of it */
+    const inCorner = ctx.cornerAhead === 0;
+    if (st.inCorner && !inCorner) st.corners++;
+    st.inCorner = inCorner;
     const s = ctx.scoring;
     /* the explanations, when the thing first happens */
     if (st.infoKind) { st.infoT -= dt; if (st.infoT <= 0) { st.infoKind = null; setInfo(''); } }
@@ -136,8 +142,8 @@ export function createOnboarding(root, onSkip) {
       else if (st.step === 'brake') { if (r.handbrake && r.steer === 0) st.hbT += dt; else st.hbT = 0; if (readable && st.hbT >= O.BRAKE_HOLD) finish('brake', 'done'); }
       if (st.step && st.stepT >= O.PROMPT_MAX) finish(st.step, 'timeout');
     } else if (!st.done.steer) show('steer');
-    else if (!st.done.drift) { st.waitT += dt; if (ctx.cornerAhead <= O.DRIFT_LEAD || st.waitT >= O.DRIFT_WAIT) show('drift'); }
-    else if (!st.done.brake) { st.waitT += dt; if (st.waitT >= O.BRAKE_AFTER) show('brake'); }
+    else if (!st.done.drift) { st.waitT += dt; if (firstDrift(ctx) ? firstDrift(ctx) === 'now' : ctx.cornerAhead <= O.DRIFT_LEAD || st.waitT >= O.DRIFT_WAIT) show('drift'); }
+    else if (!st.done.brake) { st.waitT += dt; if (FIRST_ON && ctx.cornerAhead !== Infinity ? firstBrake(ctx) : st.waitT >= O.BRAKE_AFTER) show('brake'); }
     else if (st.chainShown && st.cleanShown && !st.infoKind) stop(false);
     /* the steps are done: the explanations can still come, but SKIP has nothing left to skip */
     if (st.active && st.done.steer && st.done.drift && st.done.brake && !skip.hidden) skip.hidden = true;
@@ -164,6 +170,22 @@ export function createOnboarding(root, onSkip) {
     if (st.active && taught() && !skip.hidden) skip.hidden = true;
   }
   const taught = () => st.mode === 'pro' ? PRO_STEPS.every(k => st.done[k]) : st.done.steer && st.done.drift && st.done.brake;
+  /* THE FIRST MINUTE'S PROMPTS (briefs/FIRST-MINUTE.md, ?first=2, Easy
+     only): the slide prompt waits until FIRST.ONBOARD.DRIFT_AFTER
+     corners are behind the car (on track 1 the first is taken at full
+     pace), then comes DRIFT_LEAD before the next as always; the brake
+     prompt comes BRAKE_LEAD before a corner at BRAKE_SPEED or more,
+     where braking helps, or after BRAKE_WAIT. Without the switch, null
+     and the prompts are as they were. */
+  function firstDrift(ctx) {
+    if (!FIRST_ON || ctx.cornerAhead === Infinity) return null;   // the stunt park has no corners: its prompts are as they were
+    if (st.corners < FIRST.ONBOARD.DRIFT_AFTER) return st.waitT >= O.DRIFT_WAIT + 30 ? 'now' : 'wait';
+    return ctx.cornerAhead <= O.DRIFT_LEAD || st.waitT >= O.DRIFT_WAIT + 30 ? 'now' : 'wait';
+  }
+  function firstBrake(ctx) {
+    const F = FIRST.ONBOARD;
+    return (ctx.cornerAhead > 0 && ctx.cornerAhead <= F.BRAKE_LEAD && (ctx.speed || 0) >= F.BRAKE_SPEED) || st.waitT >= F.BRAKE_WAIT;
+  }
 
   /* for the probes: is a prompt or an explanation on screen */
   function visible() { return !el.hidden && (!prompt.hidden || !info.hidden); }

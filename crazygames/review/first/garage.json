@@ -1,0 +1,184 @@
+{
+ "main": "2fc25d4",
+ "limit": 180,
+ "reads": {
+  "title": 3,
+  "results": 3
+ },
+ "branch": {
+  "steps": [
+   {
+    "what": "title",
+    "at": 0
+   },
+   {
+    "what": "start here pressed",
+    "at": 3,
+    "state": "countdown"
+   },
+   {
+    "what": "results",
+    "at": 105.7,
+    "score": 459,
+    "stars": 1,
+    "coins": 175,
+    "saved": 175
+   },
+   {
+    "what": "the results' garage line pressed",
+    "at": 108.8,
+    "line": "AMBER PAINT your coins buy it now · ● 60 GARAGE ▶"
+   },
+   {
+    "what": "garage",
+    "at": 108.8,
+    "state": "garage",
+    "tab": "paint",
+    "preview": {
+     "paint": "amber"
+    },
+    "coins": 175,
+    "button": {
+     "text": "PAINT IT AMBER ● 60",
+     "enabled": true,
+     "action": "buy-paint"
+    }
+   }
+  ],
+  "garage": {
+   "state": "garage",
+   "tab": "paint",
+   "preview": {
+    "paint": "amber"
+   },
+   "coins": 175,
+   "button": {
+    "text": "PAINT IT AMBER ● 60",
+    "enabled": true,
+    "action": "buy-paint"
+   }
+  },
+  "seconds": 108.8,
+  "run": {
+   "score": 459,
+   "stars": 1,
+   "coins": 175
+  },
+  "onShow": true,
+  "errors": []
+ },
+ "mainPath": {
+  "steps": [
+   {
+    "what": "title",
+    "at": 0
+   },
+   {
+    "what": "start here pressed",
+    "at": 3,
+    "state": "countdown"
+   },
+   {
+    "what": "results",
+    "at": 147.3,
+    "score": 256,
+    "stars": 0,
+    "coins": 25,
+    "saved": 25
+   },
+   {
+    "what": "MENU then GARAGE pressed (no line on the results)",
+    "at": 150.8
+   },
+   {
+    "what": "garage",
+    "at": 150.8,
+    "state": "garage",
+    "tab": "cars",
+    "preview": {},
+    "coins": 25,
+    "button": {
+     "text": "CHOSEN back to the title",
+     "enabled": true,
+     "action": "title"
+    }
+   }
+  ],
+  "garage": {
+   "state": "garage",
+   "tab": "cars",
+   "preview": {},
+   "coins": 25,
+   "button": {
+    "text": "CHOSEN back to the title",
+    "enabled": true,
+    "action": "title"
+   }
+  },
+  "seconds": 150.8,
+  "run": {
+   "score": 256,
+   "stars": 0,
+   "coins": 25
+  },
+  "onShow": false,
+  "errors": []
+ },
+ "lineRemoved": {
+  "steps": [
+   {
+    "what": "title",
+    "at": 0
+   },
+   {
+    "what": "start here pressed",
+    "at": 3,
+    "state": "countdown"
+   },
+   {
+    "what": "results",
+    "at": 105.7,
+    "score": 459,
+    "stars": 1,
+    "coins": 175,
+    "saved": 175
+   },
+   {
+    "what": "MENU then GARAGE pressed (no line on the results)",
+    "at": 109.3
+   },
+   {
+    "what": "garage",
+    "at": 109.3,
+    "state": "garage",
+    "tab": "cars",
+    "preview": {},
+    "coins": 175,
+    "button": {
+     "text": "CHOSEN back to the title",
+     "enabled": true,
+     "action": "title"
+    }
+   }
+  ],
+  "garage": {
+   "state": "garage",
+   "tab": "cars",
+   "preview": {},
+   "coins": 175,
+   "button": {
+    "text": "CHOSEN back to the title",
+    "enabled": true,
+    "action": "title"
+   }
+  },
+  "seconds": 109.3,
+  "run": {
+   "score": 459,
+   "stars": 1,
+   "coins": 175
+  },
+  "onShow": false,
+  "errors": []
+ }
+}
