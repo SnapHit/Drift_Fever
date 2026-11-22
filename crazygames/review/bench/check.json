@@ -1,0 +1,112 @@
+{
+ "plain": {
+  "early": {
+   "state": "drive",
+   "mode": "battle",
+   "onboard": false,
+   "overlay": true
+  },
+  "res": {
+   "bench": {
+    "when": "2026-11-22T03:02:42.407Z",
+    "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "screen": "640x360 at 1x, 2 cores",
+    "tiers": [
+     {
+      "tier": "low",
+      "backend": "webgl2",
+      "frames": 64,
+      "fps": 5,
+      "low1": 4,
+      "slowShare": 100,
+      "workMs": 5.9,
+      "workP95": 11.2,
+      "drawCalls": 89,
+      "triangles": 352513,
+      "pixelRatio": 1,
+      "bloom": false,
+      "adapted": false
+     },
+     {
+      "tier": "high",
+      "backend": "webgl2",
+      "frames": 28,
+      "fps": 2,
+      "low1": 2,
+      "slowShare": 100,
+      "workMs": 5.6,
+      "workP95": 9.6,
+      "drawCalls": 92,
+      "triangles": 926755,
+      "pixelRatio": 1,
+      "bloom": true,
+      "adapted": false
+     }
+    ],
+    "done": true
+   },
+   "state": "bench",
+   "onboard": false,
+   "finished": false,
+   "text": "Drift Fever bench\nANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\n640x360 at 1x, 2 cores\nlow webgl2\t5 fps\t1% low 4\t100% stutter\t5.9 ms\nhigh webgl2\t2 fps\t1% low 2\t100% stutter\t5.6 ms\nfps: frames a second, median. 1% low: the slowest frames. Stutter: frames over 20 ms. ms: the game's own work per frame.\nCOPY RESULT",
+   "button": true
+  },
+  "errors": [],
+  "saveUnchanged": true
+ },
+ "busy": {
+  "early": {
+   "state": "drive",
+   "mode": "battle",
+   "onboard": false,
+   "overlay": true
+  },
+  "res": {
+   "bench": {
+    "when": "2026-11-22T03:03:22.513Z",
+    "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "screen": "640x360 at 1x, 2 cores",
+    "tiers": [
+     {
+      "tier": "low",
+      "backend": "webgl2",
+      "frames": 40,
+      "fps": 3,
+      "low1": 3,
+      "slowShare": 100,
+      "workMs": 3.5,
+      "workP95": 9.8,
+      "drawCalls": 95,
+      "triangles": 352253,
+      "pixelRatio": 1,
+      "bloom": false,
+      "adapted": false
+     },
+     {
+      "tier": "high",
+      "backend": "webgl2",
+      "frames": 22,
+      "fps": 2,
+      "low1": 2,
+      "slowShare": 100,
+      "workMs": 3.7,
+      "workP95": 6.5,
+      "drawCalls": 91,
+      "triangles": 926267,
+      "pixelRatio": 1,
+      "bloom": true,
+      "adapted": false
+     }
+    ],
+    "done": true
+   },
+   "state": "bench",
+   "onboard": false,
+   "finished": false,
+   "text": "Drift Fever bench\nANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\n640x360 at 1x, 2 cores\nlow webgl2\t3 fps\t1% low 3\t100% stutter\t3.5 ms\nhigh webgl2\t2 fps\t1% low 2\t100% stutter\t3.7 ms\nfps: frames a second, median. 1% low: the slowest frames. Stutter: frames over 20 ms. ms: the game's own work per frame.\nCOPY RESULT",
+   "button": true
+  },
+  "errors": [],
+  "saveUnchanged": true
+ }
+}

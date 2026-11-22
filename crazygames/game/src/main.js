@@ -59,6 +59,7 @@ import { battleSpec, battleLaps } from './loop/modes.js';
 import { createTandem } from './scoring/tandem.js';
 import { createLead } from './scoring/lead.js';
 import { createPlayer } from './rivals/players.js';
+import { runBench, BENCH } from './bench.js';
 import { createParkJudge, restandCones, challengeById, parkTally, sayValue, LEVELS } from './park/challenges.js';
 
 const query = new URLSearchParams(location.search);
@@ -514,7 +515,7 @@ function startRun(spec, opts) {
   app.missions = missions ? createMissionJudge(missions, app.track, app.laps) : null;
   app.heardMissions = 0;
   /* the list over the countdown; not on the onboarding run, which teaches the core and nothing else (the missions are still judged and paid) */
-  const teach = !!(opts && opts.onboard) || save.needsOnboarding();   // the prompts: the first run of anything, or HOW TO PLAY
+  const teach = !(opts && opts.bench) && (!!(opts && opts.onboard) || save.needsOnboarding());   // the prompts: the first run of anything, or HOW TO PLAY (never on the bench)
   const listed = missions && !teach;
   const head = runHead(spec);
   hud.setMissions(listed ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null, head);
@@ -858,6 +859,23 @@ scene.ready.then(() => {
     hud.setVisible(true); hud.setRun(devGround === 'park' ? 'car park' : 'test track', ''); input.touch.setVisible(true); hud.exit.hidden = true;
     resetRun();
     if (autoDrive) app.driver = createDriver(app.track, { drift: app.track.kind === 'circuit' ? 'sweeper' : null });
+  } else if (query.get('bench') === '1') {
+    /* the bench (bench.js): a heavy race driven by the scripted players,
+       measured on both tiers, stopped long before its line; nothing saved */
+    runBench({
+      root,
+      begin() {
+        startRun(battleSpec(rivalById(BENCH.RIVAL)), { bench: true });
+        app.countdown = 0;
+        app.driver = createPlayer(app.ground, 'mixed', null, () => (app.rival && app.rival.solid() ? app.rival.world.car : null));
+      },
+      end() { app.state = 'bench'; app.driver = null; hud.setVisible(false); input.touch.setVisible(false); },
+      tier: () => scene.info().tier,
+      setTier: t => scene.setTier(t),
+      info: () => scene.info(),
+      frameMs: () => frameMs,
+      adapt: () => scene.adaptState(),
+    });
   } else if (query.has('track')) {
     /* a track link: the Lab on that track, one click from driving it; a
        bad code is a plain message on the Lab, never a crash */

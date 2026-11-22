@@ -14,6 +14,17 @@ nothing outside `crazygames/`.** Gameplay changes happen in the root
 are re-vendored here by commit. If the renderer appears to need a gameplay
 change, stop and say so.
 
+## The road to outstanding, 22 November 2026: read ROADMAP.md first
+
+CrazyGames rejected the game at Basic Launch review for overall
+quality. By the author's word the same day, **only two things are
+fixed: it works instantly in a browser, and it is called Drift Fever.
+Everything else, the hard constraints below included, is now a default
+that a brief may change when it says why.** `ROADMAP.md` is the plan:
+what the evidence says, the rounds, and what must be true before
+resubmitting. Round 1 is two briefs run in parallel on their own
+branches: `briefs/COVER-LOOK.md` and `briefs/PRO-CONTROLS.md`.
+
 ## New direction, 29 October 2026: read DESIGN.md first
 
 The author played the stage 2 greybox and decided the live game's design
@@ -1080,3 +1091,17 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   Their only reason, in full: "The overall quality of the game does not
   yet meet the expectations of our platform", with a pointer to their
   New games list as examples. No specific fault was named.
+- 22 November 2026, after the rejection: `ROADMAP.md`, round 1's two
+  briefs, and **the bench**: `?bench=1` on any device
+  (`game/src/bench.js`) races Varsk on Upper deck with both cars driven
+  by the scripted players, measures the tier the device chose and then
+  the other for 12 s each after 3 s to settle, shows median fps, the
+  slowest 1 per cent, the share of frames over 20 ms and the game's own
+  work per frame, with a COPY RESULT button, and stops the race long
+  before its line. Nothing is saved and no prompts are shown
+  (`game/test/bench/check.js`: localStorage byte for byte the same
+  before and after; known answer: 45 ms forced into every frame reads
+  as a lower frame rate). `&adapt=0` keeps the quality from stepping
+  down mid measure. The sandbox's own numbers mean nothing (software
+  drawing). The author's desktop could not be measured the same day:
+  its display was asleep and the browser drew about 3 frames a second.
