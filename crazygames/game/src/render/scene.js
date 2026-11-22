@@ -111,6 +111,17 @@ export const LOOK = {
     BLOOM:      { threshold: 0.9, strength: 0.7, radius: 0.014, taps: 12 },   // the high tier's bloom with the look: the floods and the lamps glow harder
     ENVIRONMENT: true,    // the world's environment (render/envmap.js; ?env=0 leaves it out, the reflections probe's known answer)
     UNDERGLOW:  0.7,      // the underglow's strength with the look: the wet, darker road under it shows its pool more, and at full strength lime, amber and magenta stood within 15 per cent of the edge line at night, dusk and floodlit dusk (garage/readable.js --look: 14 of 50 failed)
+    /* THE CAR LIGHT (22 November 2026, the paint fix): a white key that
+       lights the cars alone, from above the camera and to one side of
+       it, as a photographer's floodlight does on the cover, so the
+       paint reads as its colour at twilight and at night instead of a
+       dark brown, and the top coat has something bright to mirror.
+       Never in the scene, so the world costs nothing more; given to the
+       cars' materials with the sky and the sun, and the player's car no
+       longer takes his own headlights (from the front they burnt a
+       white patch into his bonnet). ?key=0 gives the lights as they
+       were. */
+    CAR_KEY:    { colour: 0xfff4e6, yaw: 35, lift: 0.9, intensity: { dawn: 0, dusk: 0.5, twilight: 1.3, rain: 0.9, night: 1.4, other: 0.6 } },   // yaw: degrees round from the camera's side of the car; lift: height over distance; by daylight the sun does it, and more washed the paint out
     CAR_HEMI:   true,     // the cars' materials keep the flat sky fill with the environment over it (false: the sun and the environment only, which left a car's shaded side too dark to read its colour at dusk)
   },
 };
@@ -204,6 +215,10 @@ export function createScene(canvas, opts) {
   const sunDir = new THREE.Vector3(0, 1, 0);
   const headlight = new THREE.SpotLight(LOOK.HEADLIGHT.colour, LOOK.HEADLIGHT.intensity, LOOK.HEADLIGHT.distance, LOOK.HEADLIGHT.angle, LOOK.HEADLIGHT.penumbra, LOOK.HEADLIGHT.decay);
   headlight.visible = false;
+  /* the car light (LOOK.COVER.CAR_KEY), kept out of the scene: only the cars' materials are given it */
+  const keyOn = LOOK_ON && !!LOOK.COVER.CAR_KEY && query.get('key') !== '0';
+  const carKey = new THREE.DirectionalLight(LOOK.COVER.CAR_KEY.colour, 0);
+  carKey.castShadow = false;
   let preset = PRESETS.dusk, theme = THEMES.forest;
   scene.fog = new THREE.Fog(preset.horizon, preset.fogNear, preset.fogFar);
   function applyPreset(p) {
@@ -214,6 +229,7 @@ export function createScene(canvas, opts) {
     scene.fog.color.setHex(p.fog !== undefined ? p.fog : p.horizon); scene.fog.near = p.fogNear; scene.fog.far = p.fogFar;   // fog: only a cover look preset gives its own
     scene.background = new THREE.Color(p.horizon);
     renderer.toneMappingExposure = p.exposure;
+    if (keyOn) { const KI = LOOK.COVER.CAR_KEY.intensity; carKey.intensity = KI[p.name] !== undefined ? KI[p.name] : KI.other; }
     headlight.visible = !!(T().headlight && p.headlights);
     if (effects) effects.setPreset(p);
     if (show) show.setPreset(p);
@@ -324,6 +340,22 @@ export function createScene(canvas, opts) {
     if (!envOn || LOOK.COVER.CAR_HEMI || !m) return;
     const lit = THREE.TSL.lights([sun, ...(extra || [])]);
     m.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const mt of Array.isArray(o.material) ? o.material : [o.material]) if (mt.isMeshStandardMaterial) mt.lightsNode = lit; });
+  }
+  /* the car light: a key for the cars only (LOOK.COVER.CAR_KEY) */
+  function keyLights(m, list) {
+    if (!keyOn || !m) return;
+    const lit = THREE.TSL.lights(list);
+    m.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const mt of Array.isArray(o.material) ? o.material : [o.material]) if (mt.isMeshStandardMaterial || mt.isMeshStandardNodeMaterial || mt.isMeshPhysicalMaterial || mt.isMeshPhysicalNodeMaterial) mt.lightsNode = lit; });
+  }
+  /* aimed as each frame is drawn, from wherever the camera is by then (the chase camera, the director's, a probe's) */
+  function aimKey() {
+    if (!keyOn) return;
+    const K = LOOK.COVER.CAR_KEY, p = car.position, dx = camera.position.x - p.x, dz = camera.position.z - p.z, h = Math.hypot(dx, dz) || 1;
+    const a = K.yaw * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+    const ux = (dx * ca - dz * sa) / h, uz = (dx * sa + dz * ca) / h;
+    carKey.position.set(p.x + ux * 10, p.y + 10 * K.lift, p.z + uz * 10);
+    carKey.target.position.copy(p);
+    carKey.updateMatrixWorld(); carKey.target.updateMatrixWorld();
   }
   /* the next ground set is the title's backdrop (?look=2 draws it at floodlit dusk) */
   function setTitle() { titleNext = true; }
@@ -468,6 +500,7 @@ export function createScene(canvas, opts) {
     const r = mount(car, id, paintById(paintId || carById(id).paint).hex, false, looks.car);
     model = r.model; rig.bRear = r.bRear; rig.half = r.half;
     carLights(model, [headlight]);
+    keyLights(model, LOOK.COVER.CAR_HEMI ? [hemi, sun, carKey] : [sun, carKey]);   // not his own headlights: they sit in his nose, and from the front they burnt a white patch into his bonnet
     applyGlows();
     if (effects) effects.setSmoke(smokeHex(looks.car.smoke));
     if (model.lights && model.lights.set) model.lights.set(preset.headlights ? 1 : 0.35, 1);
@@ -507,7 +540,7 @@ export function createScene(canvas, opts) {
     /* the player's headlights never light him: a few metres behind him
        in a tandem they washed his paint to white. The sky and the sun
        still do, so he reads as his colour, lit as the scene is */
-    const lit = THREE.TSL.lights(envOn && !LOOK.COVER.CAR_HEMI ? [sun, rivalBeam] : [hemi, sun, rivalBeam]);   // the cover look: the environment is his sky fill, as it is the player's
+    const lit = THREE.TSL.lights((envOn && !LOOK.COVER.CAR_HEMI ? [sun, rivalBeam] : [hemi, sun, rivalBeam]).concat(keyOn ? [carKey] : []));   // the cover look: the environment is his sky fill, as it is the player's
     rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
     if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
     rivalLamps = carLamps(rivalModel);
@@ -777,6 +810,7 @@ export function createScene(canvas, opts) {
   function render() {
     const t0 = performance.now();
     if (env) env.sky.position.set(camera.position.x, 0, camera.position.z);
+    aimKey();
     /* The renderer counts frames in its own requestAnimationFrame loop,
        and a shadow map is refreshed once per counted frame. The probes
        stub requestAnimationFrame and drive the frame function by hand,

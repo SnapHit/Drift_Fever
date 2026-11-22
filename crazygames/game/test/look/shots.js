@@ -5,7 +5,7 @@
    car is the starter in cyan, what a new player drives; the moment is
    the same step of the same race on both sides.
 
-   node game/test/look/shots.js [--only day,night] [--sizes land,port] [--sides before,after] [--tier low|high] [--out dir] [--step N] [--pairs]
+   node game/test/look/shots.js [--extra '&coat=0'] [--only day,night] [--sizes land,port] [--sides before,after] [--tier low|high] [--out dir] [--step N] [--pairs]
    writes review/look/shots/<race>-<size>-<side>.png, and with --pairs
    review/look/pairs/<race>-<size>.jpg: before over after in landscape,
    side by side in portrait, for the report on a phone */
@@ -27,7 +27,7 @@ const env = await L.start();
 for (const race of only) {
   for (const size of sizes) {
     for (const side of sides) {
-      const pg = await L.page(env, VP[size], 'tier=' + tier + (side === 'after' ? '&look=2' : ''));
+      const pg = await L.page(env, VP[size], 'tier=' + tier + (side === 'after' ? '&look=2' + arg('--extra', '') : '&look=1'));   // the look is the default since 22 November: the side before it asks for ?look=1; --extra: more on the side with it (?coat=0&key=0)
       await L.dress(pg.page, L.STARTER);
       const at = await L.raceTo(pg.page, { rival: L.RACES[race].rival, to: stepOver || AT[race] });
       await L.hud(pg.page, true);

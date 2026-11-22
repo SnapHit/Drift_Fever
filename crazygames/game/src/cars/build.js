@@ -76,6 +76,18 @@ export const FINISH_LOOK = {
   DARK_MAX: 0x40,          // a trim colour whose brightest channel is at most this is black trim
   HEAD_ON: 4.2,            // the lamps' emissive intensity with the lights on: over the bloom's threshold
   TAIL_ON: 3.4,
+  /* THE TOP COAT (22 November 2026, after the look round's reflections
+     measured too faint on these faceted cars): the clear coat reads a
+     smoothed normal while the colour under it keeps its facets, so the
+     sky and the floodlights run across the panels as on the cover
+     instead of breaking up facet by facet. Faces meeting at less than
+     CREASE degrees share their normal in the coat; a sharper edge (a
+     roof against a side) keeps its line. ?coat=0 gives the faceted coat
+     back. (A stronger environment on the paint alone cannot be had from
+     its envMapIntensity: with the scene's environment three.js 0.184
+     reads scene.environmentIntensity instead; it would need an envMap
+     of its own.) */
+  COAT:    { crease: 55 },   // degrees: faces meeting at less than this share their normal in the coat
 };
 
 const SINKS = ['paint', 'glass', 'trim', 'head', 'tail'];
@@ -504,6 +516,25 @@ function softGlowMesh(THREE, hw, z0, z1, y) {
 
 /* ---- assembly ---- */
 
+/* The top coat's smoothed normal ('ccnormal'), from the faceted
+   geometry: each vertex takes the mean of the face normals at its
+   position within crease degrees of its own. */
+function addCoatNormals(THREE, geo, creaseDeg) {
+  const pos = geo.attributes.position, nor = geo.attributes.normal, n = pos.count, cosC = Math.cos(creaseDeg * Math.PI / 180);
+  const at = new Map(), q = v => Math.round(v * 2000);
+  for (let i = 0; i < n; i++) { const k = q(pos.getX(i)) + ',' + q(pos.getY(i)) + ',' + q(pos.getZ(i)); let b = at.get(k); if (!b) at.set(k, b = []); b.push(i); }
+  const out = new Float32Array(n * 3);
+  for (const b of at.values()) for (const i of b) {
+    const nx = nor.getX(i), ny = nor.getY(i), nz = nor.getZ(i);
+    let x = 0, y = 0, z = 0;
+    for (const j of b) { const mx = nor.getX(j), my = nor.getY(j), mz = nor.getZ(j); if (nx * mx + ny * my + nz * mz >= cosC) { x += mx; y += my; z += mz; } }
+    const l = Math.hypot(x, y, z) || 1;
+    out[i * 3] = x / l; out[i * 3 + 1] = y / l; out[i * 3 + 2] = z / l;
+  }
+  geo.setAttribute('ccnormal', new THREE.BufferAttribute(out, 3));
+}
+const coatOn = () => !/[?&]coat=0/.test(typeof location !== 'undefined' ? location.search : '');
+
 function geometryFrom(THREE, lists, names) {
   const pos = [], col = [], groups = [];
   let start = 0;
@@ -532,8 +563,9 @@ export function buildCar(THREE, S, options) {
   /* the cover look (?look=2) needs the node materials, which a plain three.js (a probe's) has not */
   const look = LOOK_ON && !!(THREE.TSL && THREE.MeshStandardNodeMaterial);
   const L = FINISH_LOOK, HEAD_ON = look ? L.HEAD_ON : FINISH.HEAD_ON, TAIL_ON = look ? L.TAIL_ON : FINISH.TAIL_ON;
+  const coat = look && coatOn() && !!THREE.MeshPhysicalNodeMaterial;
   const paint = look
-    ? new THREE.MeshPhysicalMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: L.PAINT.roughness, metalness: L.PAINT.metalness, clearcoat: L.PAINT.clearcoat, clearcoatRoughness: L.PAINT.clearcoatRoughness, specularIntensity: L.PAINT.specularIntensity })
+    ? new (coat ? THREE.MeshPhysicalNodeMaterial : THREE.MeshPhysicalMaterial)({ color: opts.paint != null ? opts.paint : S.paint, roughness: L.PAINT.roughness, metalness: L.PAINT.metalness, clearcoat: L.PAINT.clearcoat, clearcoatRoughness: L.PAINT.clearcoatRoughness, specularIntensity: L.PAINT.specularIntensity })
     : new THREE.MeshStandardMaterial({ color: opts.paint != null ? opts.paint : S.paint, roughness: FINISH.PAINT_ROUGH, metalness: FINISH.PAINT_METAL });
   const glass = look
     ? new THREE.MeshStandardMaterial({ color: L.GLASS.colour, roughness: L.GLASS.roughness, metalness: L.GLASS.metalness })
@@ -546,6 +578,11 @@ export function buildCar(THREE, S, options) {
   group.name = 'car:' + S.id;
   const bodyGeo = geometryFrom(THREE, sink.lists, ['paint', 'glass', 'trim']);
   if (look) addFinish(THREE, bodyGeo, false);
+  if (coat) {
+    addCoatNormals(THREE, bodyGeo, L.COAT.crease);
+    const T = THREE.TSL;
+    paint.clearcoatNormalNode = T.transformNormalToView(T.attribute('ccnormal', 'vec3')).normalize();
+  }
   const body = new THREE.Mesh(bodyGeo, [paint, glass, trim]);
   body.name = 'body';
   group.add(body);

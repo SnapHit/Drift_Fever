@@ -1171,3 +1171,32 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   his pick of a variant, the bench on his desktop and phone (both
   waiting for his desktop), and `SUBMISSION.md`'s controls text, which
   says the car drives itself.
+- 22 November 2026, evening, **the paint fix**, by the author's word
+  (the look round's open measure 1): three changes to how the cars are
+  drawn with the look, nothing else. (1) The top coat reads a smoothed
+  normal (`ccnormal`; faces meeting at under 55 degrees share it,
+  `FINISH_LOOK.COAT` in `cars/build.js`), so a reflection runs across
+  the panels instead of turning single facets white; the colour under
+  it keeps its facets. (2) A light for the cars alone
+  (`LOOK.COVER.CAR_KEY` in `render/scene.js`), from above the camera
+  and 35 degrees to one side, aimed as each frame is drawn: 1.3 at
+  twilight, 1.4 at night, 0.9 in rain, 0.5 at dusk and none at dawn
+  (where it washed the paint out), so the paint reads as its own colour
+  at twilight and at night. (3) The player's car no longer takes its
+  own headlights: they sit in its nose, and seen from the front they
+  burnt a white patch into the bonnet, in the cover pair since the
+  round. `?coat=0` and `?key=0` give each back. `?look=1` is still the
+  game before the look to the pixel (`look/switch.js` against ddf54e0:
+  both tiers, three presets, title and garage), and the car draws on
+  WebGPU on both tiers (`look/backends.js`, and read back by eye).
+  Measure 1 still fails, a little further: x0.68 at twilight, x0.91 at
+  dusk, x1.35 in the showroom (were x0.83, x0.99, x1.31), because a
+  smooth coat spreads a bonnet's brightness less, which is its point.
+  The paint still does not shine as the cover's does: the cover's gloss
+  is bright reflections of a bright, busy scene, and the twilight sky
+  the car mirrors is dark. A material's `envMapIntensity` does nothing
+  with the scene's environment in three.js 0.184 (it reads
+  `scene.environmentIntensity`), so a stronger environment on the paint
+  alone needs an envMap of its own. Not measured: the cost, one light
+  more on the cars' pixels only. Before and after:
+  `review/look/paint-fix.jpg`.
