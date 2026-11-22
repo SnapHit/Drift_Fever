@@ -18,6 +18,7 @@ import { wheelDesign, wheelIcon, standardIcon } from '../cars/wheels.js';
 import { carSpec } from '../cars/index.js';
 import { CHALLENGES, LEVELS, parkTally, coinsOf } from '../park/challenges.js';
 import { RIVALS, rivalOpen, rivalsLive, rivalNeeds, rivalState, ladderSummary, rivalPaint } from '../rivals/roster.js';
+import { keyLabel } from '../input/layout.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const stars = (n, dim) => '<span class="stars' + (dim ? ' dim' : '') + '">' + [0, 1, 2].map(i => '<span class="' + (i < n ? 'on' : 'off') + '">&#9733;</span>').join('') + '</span>';
@@ -74,8 +75,24 @@ export function createScreens(root, onAction) {
         ${info.sound ? `<button type="button" class="fsbtn" data-action="sound">${soundIcon(info.sound === 'off')}<span>SOUND ${info.sound === 'on' ? 'ON' : 'OFF'}</span></button>` : ''}
         ${info.sound ? `<button type="button" class="fsbtn" data-action="music"><span>&#9835;</span><span>MUSIC ${info.music === 'on' ? 'ON' : 'OFF'}</span></button>` : ''}
         <button type="button" class="fsbtn" data-action="onboard"><span>?</span><span>HOW TO PLAY</span></button>
+        ${info.controls && info.controls.source !== 'touch' ? `<button type="button" class="fsbtn" data-action="controls"><span>CONTROLS ${info.controls.pro ? 'PRO' : 'EASY'}</span></button>` : ''}
       </div>
-      <p class="hint">Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.</p>`);
+      <p class="hint">${hintLine(info.controls)}</p>`);
+  }
+  /* THE TITLE'S HINT (briefs/PRO-CONTROLS.md): what the player's own
+     input does. Without Pro on the address, and on touch, it is the line
+     it always was; with it, the keys or the pad as they drive now, the
+     letters as this keyboard prints them. */
+  function hintLine(c) {
+    const easy = 'Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.';
+    if (!c || c.source === 'touch') return easy;
+    const L = q => keyLabel('Key' + q, q), pad = c.source === 'pad';
+    if (c.pro) return pad
+      ? 'RT drives, LT brakes and then reverses, the stick steers and A is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.'
+      : L('W') + ' or Up drives, ' + L('S') + ' or Down brakes and then reverses, ' + L('A') + ' ' + L('D') + ' or the arrows steer and SPACE is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.';
+    return pad
+      ? 'The stick steers. A with steering throws the tail out; on its own it brakes. The car drives itself.'
+      : 'The arrows or ' + L('A') + ' ' + L('D') + ' steer. SPACE with steering throws the tail out; on its own it brakes. The car drives itself.';
   }
 
   /* THE RIVALS BUTTON on the title (briefs/RIVALS-LADDER.md): how many

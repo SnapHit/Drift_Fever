@@ -4,12 +4,17 @@
    the run was recorded in. The physics is deterministic, so the ghost
    drives exactly the run it was recorded from. When the tape runs out
    the ghost stops where it finished. Nothing here draws; the scene is
-   handed an interpolated pose. */
+   handed an interpolated pose.
+
+   A ghost knows how it was driven (briefs/PRO-CONTROLS.md): a Pro run's
+   record carries its profile (controls 'pro', the variant and that
+   variant's rev) and replays with that handling; a record with none is
+   Easy, built exactly as every ghost before it was. */
 import { createWorld } from '../physics/world.js';
-import { carTune } from '../garage/roster.js';
+import { handlingFor, profileOf } from '../physics/profile.js';
 
 export function createGhost(track, record) {
-  const world = createWorld(track, { tune: carTune(record.car, record.up) });   // the car as it was when the run was recorded, upgrades and all
+  const world = createWorld(track, { tune: handlingFor(record.car, record.up, profileOf(record.controls, record.variant)) });   // the car as it was when the run was recorded, upgrades, profile and all
   const tape = record.tape;
   const g = { record, world, entry: 0, left: 0, done: false, steps: 0, prev: { x: world.car.x, y: world.car.y || 0, z: world.car.z, yaw: world.car.yaw } };
   const inp = { steer: 0, throttle: 0, brake: 0, handbrake: 0 };
