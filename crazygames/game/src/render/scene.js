@@ -122,6 +122,8 @@ export const LOOK = {
        white patch into his bonnet). ?key=0 gives the lights as they
        were. */
     CAR_KEY:    { colour: 0xfff4e6, yaw: 35, lift: 0.9, intensity: { dawn: 0, dusk: 0.5, twilight: 1.3, rain: 0.9, night: 1.4, other: 0.6 } },   // yaw: degrees round from the camera's side of the car; lift: height over distance; by daylight the sun does it, and more washed the paint out
+    CAR_ENV:    true,     // the cars' paint mirrors an environment of its own under the lamps, on the high tier (render/envmap.js CAR_FLOODS; ?carenv=0 leaves it out)
+    CAR_ENV_COAT: 0.2,    // the top coat's roughness while it does: its panels as soft sheens (at the coat's own 0.07 they broke into streaks across the facets); the showroom keeps 0.07, where the studio's crisp strips are the point
     CAR_HEMI:   true,     // the cars' materials keep the flat sky fill with the environment over it (false: the sun and the environment only, which left a car's shaded side too dark to read its colour at dusk)
   },
 };
@@ -324,12 +326,32 @@ export function createScene(canvas, opts) {
     if (!envOn) return;
     if (envMap && envMapKey === key) return;
     if (!pmrem) pmrem = new THREE.PMREMGenerator(renderer);
-    const old = envMap;
+    const old = envMap, oldCar = carEnv;
     envMap = buildEnvMap(THREE, renderer, { sky: env && env.sky, preset: p, theme: th, seed, tierName: tier, generator: pmrem });
     envMapKey = key;
     scene.environment = envMap.texture;
     scene.environmentIntensity = ENVMAP.INTENSITY;
+    /* the cars' own (envmap.js CAR_FLOODS): under the lamps, on the high tier */
+    carEnv = carEnvOn && tier === 'high' && p.lamps ? buildEnvMap(THREE, renderer, { sky: env && env.sky, preset: p, theme: th, seed, tierName: tier, generator: pmrem, car: true }) : null;
+    paintEnv(model); paintEnv(rivalModel);
     if (old) old.dispose();
+    if (oldCar) oldCar.dispose();
+  }
+  /* the paint of a car mirrors the cars' own environment when there is one, else the scene's */
+  let carEnv = null;
+  const carEnvOn = LOOK_ON && !!LOOK.COVER.CAR_ENV && query.get('carenv') !== '0';
+  function paintEnv(m) {
+    if (!carEnvOn || !m) return;
+    m.group.traverse(o => {
+      if (!o.isMesh || !o.material) return;
+      for (const mt of Array.isArray(o.material) ? o.material : [o.material]) {
+        if (mt.name !== 'paint') continue;
+        const tex = carEnv ? carEnv.texture : null;
+        if (mt.userData.coat === undefined) mt.userData.coat = mt.clearcoatRoughness;
+        mt.clearcoatRoughness = tex ? LOOK.COVER.CAR_ENV_COAT : mt.userData.coat;
+        if (mt.envMap !== tex) { mt.envMap = tex; mt.envMapIntensity = ENVMAP.INTENSITY; mt.needsUpdate = true; }
+      }
+    });
   }
   /* With LOOK.COVER.CAR_HEMI false, the lights a car's materials see
      with the look on: the key light and the environment, not the sky's
@@ -501,6 +523,7 @@ export function createScene(canvas, opts) {
     model = r.model; rig.bRear = r.bRear; rig.half = r.half;
     carLights(model, [headlight]);
     keyLights(model, LOOK.COVER.CAR_HEMI ? [hemi, sun, carKey] : [sun, carKey]);   // not his own headlights: they sit in his nose, and from the front they burnt a white patch into his bonnet
+    paintEnv(model);
     applyGlows();
     if (effects) effects.setSmoke(smokeHex(looks.car.smoke));
     if (model.lights && model.lights.set) model.lights.set(preset.headlights ? 1 : 0.35, 1);
@@ -542,6 +565,7 @@ export function createScene(canvas, opts) {
        still do, so he reads as his colour, lit as the scene is */
     const lit = THREE.TSL.lights((envOn && !LOOK.COVER.CAR_HEMI ? [sun, rivalBeam] : [hemi, sun, rivalBeam]).concat(keyOn ? [carKey] : []));   // the cover look: the environment is his sky fill, as it is the player's
     rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
+    paintEnv(rivalModel);
     if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
     rivalLamps = carLamps(rivalModel);
     applyGlows();

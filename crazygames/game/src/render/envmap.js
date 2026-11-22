@@ -44,6 +44,17 @@ export const ENVMAP = {
   /* the floodlight banks, when the preset's lamps are on: panels in a
      ring at a little above the horizon, each a grid of hot lamps */
   FLOODS:       { count: 9, elev: [5, 16], dist: 160, w: 9, h: 4.5, cols: 4, rows: 2, gap: 0.22, gain: 36, colour: 0xfff2dc, seed: 17 },
+  /* THE CARS' OWN ENVIRONMENT (23 November 2026, after the paint fix:
+     the clear coat mirrored a dark twilight sky, so the paint did not
+     shine as the cover's does). The same scene with the floodlight banks
+     bigger and a second ring of them higher, as a photographer lights a
+     car: the top coat mirrors bright panels gliding over the roof, the
+     boot and the bonnet as the car turns. Only the cars' paint reads it
+     (render/scene.js), only under the lamps (twilight and night) and
+     only on the high tier. Narrow and hot, as the studio's strips are:
+     a coat mirrors a panel by its brightness, while the light the panel
+     throws on the colour goes by its size, so the paint keeps its colour. */
+  CAR_FLOODS:   { scale: 2.2, solid: { cols: 1, rows: 1, gap: 0.06, gain: 14 }, ring: { count: 7, elev: [18, 28], w: 30, h: 4, seed: 41 } },   // solid: each bank one soft panel, not a grid of lamps (a grid mirrored as broken streaks on the faceted paint)
   /* the stands and the venue's walls as dark shapes low on the horizon,
      so a reflection has something between the road and the sky */
   STANDS:       { count: 14, dist: 90, h: [9, 20], w: [24, 40], colour: 0x121219, lit: 0x6a6f88, litGain: 0.6 },   // dense, as the look's venue is: a wet road at a grazing angle mirrors these, not the bright sky above them
@@ -142,25 +153,30 @@ export function buildEnvMap(THREE, renderer, o) {
     g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     keep(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, toneMapped: false, side: THREE.DoubleSide })));
   }
-  /* the floodlight banks, when the lamps are on */
+  /* the floodlight banks, when the lamps are on (the cars' own environment: bigger, and a second ring higher) */
   if (preset.lamps) {
-    const F = E.FLOODS, r = rng((o.seed >>> 0) + F.seed), hot = rgb(F.colour).map(v => v * F.gain), back = rgb(0x22242c);
+    const C = o.car ? E.CAR_FLOODS : null;
+    const banks = [{ ...E.FLOODS, ...(C ? C.solid : {}), w: E.FLOODS.w * (C ? C.scale : 1), h: E.FLOODS.h * (C ? C.scale : 1) }];
+    if (C) banks.push({ ...E.FLOODS, ...C.solid, ...C.ring });
     const pos = [], col = [];
-    for (let i = 0; i < F.count; i++) {
-      const a = (i + 0.2 + r() * 0.6) / F.count * Math.PI * 2, el = (F.elev[0] + (F.elev[1] - F.elev[0]) * r()) * Math.PI / 180;
-      const cx = Math.cos(a) * Math.cos(el) * F.dist, cy = Math.sin(el) * F.dist - E.GROUND_DROP, cz = Math.sin(a) * Math.cos(el) * F.dist;
-      const ux = -Math.sin(a), uz = Math.cos(a);                  // across the bank
-      const vx = -Math.cos(a) * Math.sin(el), vy = Math.cos(el), vz = -Math.sin(a) * Math.sin(el);   // up the bank, square to the eye
-      const put = (u0, u1, v0, v1, c, lift) => {
-        const P = (u, v) => [cx + ux * u + vx * v - Math.cos(a) * lift, cy + vy * v, cz + uz * u + vz * v - Math.sin(a) * lift];
-        const A = P(u0, v0), B = P(u1, v0), C = P(u1, v1), D = P(u0, v1);
-        for (const v of [A, B, C, A, C, D]) { pos.push(...v); col.push(...c); }
-      };
-      put(-F.w / 2, F.w / 2, -F.h / 2, F.h / 2, back, 0);
-      const cw = F.w / F.cols, rh = F.h / F.rows;
-      for (let x = 0; x < F.cols; x++) for (let y = 0; y < F.rows; y++) {
-        const u0 = -F.w / 2 + x * cw + cw * F.gap / 2, v0 = -F.h / 2 + y * rh + rh * F.gap / 2;
-        put(u0, u0 + cw * (1 - F.gap), v0, v0 + rh * (1 - F.gap), hot, 0.5);
+    for (const F of banks) {
+      const r = rng((o.seed >>> 0) + F.seed), hot = rgb(F.colour).map(v => v * F.gain), back = rgb(0x22242c);
+      for (let i = 0; i < F.count; i++) {
+        const a = (i + 0.2 + r() * 0.6) / F.count * Math.PI * 2, el = (F.elev[0] + (F.elev[1] - F.elev[0]) * r()) * Math.PI / 180;
+        const cx = Math.cos(a) * Math.cos(el) * F.dist, cy = Math.sin(el) * F.dist - E.GROUND_DROP, cz = Math.sin(a) * Math.cos(el) * F.dist;
+        const ux = -Math.sin(a), uz = Math.cos(a);                  // across the bank
+        const vx = -Math.cos(a) * Math.sin(el), vy = Math.cos(el), vz = -Math.sin(a) * Math.sin(el);   // up the bank, square to the eye
+        const put = (u0, u1, v0, v1, c, lift) => {
+          const P = (u, v) => [cx + ux * u + vx * v - Math.cos(a) * lift, cy + vy * v, cz + uz * u + vz * v - Math.sin(a) * lift];
+          const A = P(u0, v0), B = P(u1, v0), C = P(u1, v1), D = P(u0, v1);
+          for (const v of [A, B, C, A, C, D]) { pos.push(...v); col.push(...c); }
+        };
+        put(-F.w / 2, F.w / 2, -F.h / 2, F.h / 2, back, 0);
+        const cw = F.w / F.cols, rh = F.h / F.rows;
+        for (let x = 0; x < F.cols; x++) for (let y = 0; y < F.rows; y++) {
+          const u0 = -F.w / 2 + x * cw + cw * F.gap / 2, v0 = -F.h / 2 + y * rh + rh * F.gap / 2;
+          put(u0, u0 + cw * (1 - F.gap), v0, v0 + rh * (1 - F.gap), hot, 0.5);
+        }
       }
     }
     const g = new THREE.BufferGeometry();

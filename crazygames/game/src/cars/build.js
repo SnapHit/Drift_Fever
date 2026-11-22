@@ -578,6 +578,7 @@ export function buildCar(THREE, S, options) {
   group.name = 'car:' + S.id;
   const bodyGeo = geometryFrom(THREE, sink.lists, ['paint', 'glass', 'trim']);
   if (look) addFinish(THREE, bodyGeo, false);
+  if (look) paint.name = 'paint';   // render/scene.js finds it by name, for the cars' own environment
   if (coat) {
     addCoatNormals(THREE, bodyGeo, L.COAT.crease);
     const T = THREE.TSL;
