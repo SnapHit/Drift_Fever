@@ -33,13 +33,21 @@
    Known answer: every glow at FIVE times its strength at night must
    fail a bar.
 
-   node game/test/garage/readable.js [low|high]   writes review/garage/readable-<tier>.json and shots */
+   With --look (briefs/COVER-LOOK.md, measure 9): the same bars with the
+   cover look on (?look=2), and its floodlit dusk (twilight) as a fifth
+   preset. The premise holds as it was (the edge line against the road
+   under the glow); what moved is the camera, which is closer and lower,
+   so the edge's points 4 to 40 m ahead lie lower in the frame, and the
+   road, which reflects. Written as readable-look-<tier>.json and its
+   shots, beside the plain ones, which are left as they were.
+
+   node game/test/garage/readable.js [low|high] [--look]   writes review/garage/readable-<tier>.json and shots */
 import path from 'node:path';
 import fs from 'node:fs';
 import * as G from './lib.js';
 
-const tier = process.argv[2] === 'high' ? 'high' : 'low';
-const PRESETS = ['night', 'dusk', 'dawn', 'rain'], GLOWS = ['aqua', 'lime', 'amber', 'magenta', 'violet'];
+const tier = process.argv[2] === 'high' ? 'high' : 'low', look = process.argv.includes('--look'), tag = look ? 'look-' + tier : tier;
+const PRESETS = look ? ['night', 'dusk', 'dawn', 'rain', 'twilight'] : ['night', 'dusk', 'dawn', 'rain'], GLOWS = ['aqua', 'lime', 'amber', 'magenta', 'violet'];
 const SEEN = 150, MARGIN = 1.15, TRACKS = [0, 4], VP = { width: 844, height: 390 };
 const env = await G.start(), out = { tier, viewport: VP, rows: [], known: [] };
 
@@ -89,7 +97,7 @@ function glowOf(on, off) {
 
 let asWorded = 0, rows = 0;
 for (const preset of PRESETS) {
-  const pg = await G.page(env, VP, 'tier=' + tier + '&preset=' + preset + '&adapt=0'), page = pg.page;
+  const pg = await G.page(env, VP, 'tier=' + tier + '&preset=' + preset + '&adapt=0' + (look ? '&look=2' : '')), page = pg.page;
   await G.hud(page, false);
   for (const index of TRACKS) {
     const frame = async (glow, boost) => {
@@ -98,7 +106,7 @@ for (const preset of PRESETS) {
       if (boost) await page.evaluate(k => { window.__feel.scene.carModel().underglow.material.color.multiplyScalar(k); }, boost);
       /* kept for the eye: career 1 at night and at dawn; the rest are measured and not kept */
       const keep = index === TRACKS[0] && !boost && (preset === 'night' || preset === 'dawn');
-      const png = await G.snap(page, path.join(G.shots, keep ? 'readable-' + tier + '-' + preset + '-' + (glow || 'off') + '.png' : 'tmp.png'));
+      const png = await G.snap(page, path.join(G.shots, keep ? 'readable-' + tag + '-' + preset + '-' + (glow || 'off') + '.png' : 'tmp.png'));
       return { m, img: await G.decode(png), pts: await page.evaluate(EDGE) };
     };
     const off = await frame('off');
@@ -124,7 +132,7 @@ for (const preset of PRESETS) {
 out.asWorded = { met: asWorded, of: rows };
 console.log('AS THE BRIEF WORDS IT (the glow never more colourful than the edge): met in ' + asWorded + ' of ' + rows + '. Not a bar here; see the head of this file.');
 try { fs.unlinkSync(path.join(G.shots, 'tmp.png')); } catch (e) { /* none */ }
-fs.writeFileSync(path.join(G.dir, 'readable-' + tier + '.json'), JSON.stringify(out, null, 1));
+fs.writeFileSync(path.join(G.dir, 'readable-' + tag + '.json'), JSON.stringify(out, null, 1));
 await env.close();
 console.log(G.failed() ? G.failed() + ' failed' : 'all passed');
 process.exit(G.failed() ? 1 : 0);

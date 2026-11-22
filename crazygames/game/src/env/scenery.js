@@ -50,7 +50,8 @@ export const PROP_DIMS = {
    many as a track needs to read at night, every FLOOD_EVERY metres on
    alternate sides, set back FLOOD_BACK past the barrier, facing it. */
 export const VENUE = {
-  MORE:          { grandstands: 2, boards: 2.2, tyres: 1.6, flags: 1.3, towers: 0 },   // the theme's trackside counts times these (towers: the floods replace them)
+  /* the theme's trackside counts times these, by tier (towers: the floods replace them). The low tier keeps the theme's stands: a stand's crowd is thousands of triangles, and the low tier keeps its cost */
+  MORE:          { low: { grandstands: 1, boards: 1.8, tyres: 1.4, flags: 1.2, towers: 0 }, high: { grandstands: 2, boards: 2.2, tyres: 1.6, flags: 1.3, towers: 0 } },
   FLOOD_EVERY:   62,       // m along the road between floodlight towers
   FLOOD_BACK:    11,       // m past the barrier to the tower's foot
   FLOOD_MAX:     18,
@@ -161,7 +162,8 @@ export function placeScenery(track, theme, terrain, options) {
   const C = track.centre, n = C.length;
   if (n) {
     /* the cover look: a denser trackside, the floods in place of the towers */
-    const side = o.look ? Object.fromEntries(Object.entries(theme.trackside).map(([k, v]) => [k, VENUE.MORE[k] === undefined ? v : Math.round(v * VENUE.MORE[k])])) : theme.trackside;
+    const more = o.look ? VENUE.MORE[o.tierName === 'low' ? 'low' : 'high'] : null;
+    const side = more ? Object.fromEntries(Object.entries(theme.trackside).map(([k, v]) => [k, more[k] === undefined ? v : Math.round(v * more[k])])) : theme.trackside;
     const corners = cornersOf(track).filter(c => c.angle >= SCENERY.MIN_CORNER_ANGLE).sort((a, b) => b.angle - a.angle);
     const closed = track.kind === 'circuit';
     const length = track.length;

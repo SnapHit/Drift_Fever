@@ -10,14 +10,21 @@
    out). The look must stay within 10 per cent of main on each, race by
    race (medians over the frames). The high tier is reported. Each race
    is its own browser, and one that fails to load is run again once.
+   --backend webgpu runs it on the WebGPU backend (game/test/webgpu/
+   lib.js): there, submitting a frame does not wait for the GPU, while
+   on WebGL 2 in this sandbox it does, and the GPU is software on the
+   same processor, so the drawing's own time leaks into the work
+   measured (taking the FXAA out moves it by a millisecond, with the
+   update unchanged). The game's own work is judged there.
    Known answer: 500 extra meshes added to the look's scene are caught.
 
-   node game/test/look/cost.js [--frames N] [--tiers low,high]   writes review/look/cost.json */
+   node game/test/look/cost.js [--frames N] [--tiers low,high] [--backend webgl2|webgpu]   writes review/look/cost-<backend>.json */
 import path from 'node:path';
 import * as L from './lib.js';
+import * as W from '../webgpu/lib.js';
 
 const args = process.argv.slice(2), arg = (k, d) => args.includes(k) ? args[args.indexOf(k) + 1] : d;
-const FRAMES = +arg('--frames', 150), tiers = arg('--tiers', 'low,high').split(',');
+const FRAMES = +arg('--frames', 150), tiers = arg('--tiers', 'low,high').split(','), backend = arg('--backend', 'webgl2');
 const VP = { width: 640, height: 360 };
 const LIMIT = 0.10;
 const COLLECT = `const i2 = F.scene.info(); return { dc: i2.drawCalls, tri: i2.triangles, ms: F.info().frameMs, phys: F.info().physMs, submit: i2.submitMs };`;
@@ -26,13 +33,14 @@ const p90 = list => { const s = list.slice().sort((a, b) => a - b); return s.len
 
 async function run(race, tier, query, extra) {
   for (let attempt = 0; ; attempt++) {
-    const env = await L.start();
+    const env = backend === 'webgpu' ? await W.start() : await L.start();
     try { const r = await once(env, race, tier, query, extra); await env.close(); return r; }
     catch (e) { await env.close().catch(() => {}); if (attempt >= 1) throw e; console.log('(run again after: ' + String(e.message || e).split('\n')[0] + ')'); }
   }
 }
 async function once(env, race, tier, query, extra) {
-  const pg = await L.page(env, VP, 'tier=' + tier + query);
+  const pg = backend === 'webgpu' ? await W.open(env, VP, 'tier=' + tier + query + '&title=1&adapt=0') : await L.page(env, VP, 'tier=' + tier + query);
+  if (backend === 'webgpu') await pg.page.evaluate(() => { try { localStorage.clear(); } catch (e) {} const S = window.__loop.save; S.reset(); S.setOnboarded(); for (let i = 0; i < 24; i++) S.careerResult(i, 3, 100000); });
   await L.dress(pg.page, L.STARTER);
   await L.raceTo(pg.page, { rival: L.RACES[race].rival, to: 0 });
   if (extra) await pg.page.evaluate(n => {   /* the known answer: n small meshes, each its own draw call, in front of the camera */
@@ -47,7 +55,7 @@ async function once(env, race, tier, query, extra) {
   return { frames: tail.length, drawCalls: med(tail.map(x => x.dc)), drawCallsMax: Math.max(...tail.map(x => x.dc)), triangles: med(tail.map(x => x.tri)), workMs: +med(tail.map(x => x.ms)).toFixed(2), workP90: +p90(tail.map(x => x.ms)).toFixed(2), physMs: +med(tail.map(x => x.phys)).toFixed(2), submitMs: +med(tail.map(x => x.submit)).toFixed(2) };
 }
 
-const out = { frames: FRAMES, size: VP.width + 'x' + VP.height, races: {} };
+const out = { frames: FRAMES, size: VP.width + 'x' + VP.height, backend, races: {} };
 const within = (a, b) => a <= b * (1 + LIMIT);
 for (const tier of tiers) {
   for (const race of ['day', 'dusk', 'night']) {
@@ -63,6 +71,6 @@ if (tiers.includes('low')) {
   out.knownAnswer = ka;
   L.say(!within(ka.drawCalls, main.drawCalls), 'known answer: the look with 500 extra meshes draws ' + ka.drawCalls + ' calls against main\'s ' + main.drawCalls + ': ' + (within(ka.drawCalls, main.drawCalls) ? 'MISSED' : 'CAUGHT'));
 }
-L.writeJson(path.join(L.lookDir, 'cost.json'), out);
+L.writeJson(path.join(L.lookDir, 'cost-' + backend + '.json'), out);
 console.log(L.failed() ? L.failed() + ' failed' : 'all passed');
 process.exit(L.failed() ? 1 : 0);

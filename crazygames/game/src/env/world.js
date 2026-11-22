@@ -70,7 +70,7 @@ export function buildEnvironment(THREE, track, options) {
   const back = makeBackdrop(THREE, theme, preset, seed);
 
   /* props */
-  const placed = placeScenery(track, theme, terrain, { share: tier.sceneryShare === undefined ? 1 : tier.sceneryShare, look: !!o.look });
+  const placed = placeScenery(track, theme, terrain, { share: tier.sceneryShare === undefined ? 1 : tier.sceneryShare, look: !!o.look, tierName: o.tierName });
   const props = buildProps(THREE, theme, seed, { look: !!o.look });
   const bodyMat = new THREE.MeshLambertMaterial({ vertexColors: true });
   const litMat = new THREE.MeshLambertMaterial({ vertexColors: true, emissive: 0xffffff, emissiveIntensity: preset.lamps ? WORLD.LIT_INTENSITY.on : WORLD.LIT_INTENSITY.off });

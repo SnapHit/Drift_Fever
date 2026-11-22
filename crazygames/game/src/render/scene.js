@@ -278,7 +278,7 @@ export function createScene(canvas, opts) {
     const key = [seed, ground.name, p.name, th.name, tier].join('|');
     if (env && envKey !== key) { scene.remove(env.group); scene.remove(env.sky); env.dispose(); env = null; }
     if (!env) {
-      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), sponsors: FX_ON ? SPONSORS_SHOW : null, look: LOOK_ON });
+      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), tierName: tier, sponsors: FX_ON ? SPONSORS_SHOW : null, look: LOOK_ON });
       scene.add(env.group); scene.add(env.sky);
       envKey = key;
       if (dressing) { scene.remove(dressing.group); dressing.dispose(); dressing = null; }
@@ -314,8 +314,10 @@ export function createScene(canvas, opts) {
     scene.environmentIntensity = ENVMAP.INTENSITY;
     if (old) old.dispose();
   }
-  /* The lights a car's materials see with the look on: the key light and
-     the environment, not the sky's flat fill (the environment is the sky). */
+  /* With LOOK.COVER.CAR_HEMI false, the lights a car's materials see
+     with the look on: the key light and the environment, not the sky's
+     flat fill (the environment is the sky). With it true (as set) the
+     cars keep the fill and this does nothing. */
   const envOn = LOOK_ON && LOOK.COVER.ENVIRONMENT && query.get('env') !== '0';
   function carLights(m, extra) {
     if (!envOn || LOOK.COVER.CAR_HEMI || !m) return;
