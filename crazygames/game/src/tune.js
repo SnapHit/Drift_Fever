@@ -114,6 +114,23 @@ export const TUNE = {
     RECOVER_AFTER:      1.2,     // s stuck (slow, against a wall or facing backwards, trying to drive) before the car is put back on the track
     RECOVER_SPEED:      2.0,     // m/s, below this counts as stuck
     RECOVER_LAUNCH:     8,       // m/s, the speed the car is given back on the track
+    /* PRO ONLY (briefs/PRO-CONTROLS.md, 22 November 2026). Every one is 0
+       here, which leaves the drift controller and the rear's grip exactly
+       as above: only a Pro profile (PROFILES below) sets them. On Pro the
+       drift controller holds the angle the throttle asks for, less what
+       countersteer takes off, instead of the angle the steering asks for:
+       POWER_BASE + throttle * (POWER_ANGLE + POWER_STEER * steering into
+       the slide) - POWER_STEER * countersteer, in degrees, never below 0.
+       So the throttle widens a slide, lifting closes it, countersteer
+       catches it, and full throttle with no countersteer asks for more
+       than 90 degrees, a spin. POWER_SLIDE is power oversteer: in a drift
+       the throttle takes this share of the rear's grip away, so lifting
+       gives it back. */
+    POWER_ANGLE:        0,       // degrees of drift angle full throttle asks for (0: the Easy controller)
+    POWER_BASE:         0,       // degrees asked with the throttle off (at or below 0, so lifting closes the slide)
+    POWER_STEER:        0,       // degrees full countersteer takes off, and full steering into the slide adds at full throttle
+    POWER_CURVE:        1,       // countersteer takes POWER_STEER times its share to this power off: under 1, the first of it does the most, so any countersteer catches a slide that none would spin
+    POWER_SLIDE:        0,       // share of the rear's grip in a drift that full throttle takes away (0: none)
   },
   /* THE ROAD'S SHAPE UNDER THE CAR (briefs/TRACKS-2.md): banked corners
      and the climbs to a bridge. New physics beside the handling, not a
@@ -178,7 +195,70 @@ export const TUNE = {
   },
   CONTROLS: {
     GAMEPAD_DEADZONE:   0.12,
-    AUTO_THROTTLE:      1,       // 1: the car always drives once the player has pressed anything; no brake, DRIFT slows it
+    AUTO_THROTTLE:      1,       // 1: the car always drives once the player has pressed anything; no brake, DRIFT slows it (Easy, and every touch run)
+    /* PRO's keys (briefs/PRO-CONTROLS.md): a key is on or off, so on Pro
+       the throttle and the brake it holds ramp in and out over these times,
+       counted in physics steps (input/input.js), never in frames. A
+       gamepad's triggers are analogue and are not ramped. */
+    THROTTLE_RAMP:      0.25,    // s for W or Up to take the throttle from nothing to full
+    THROTTLE_RELEASE:   0.12,    // s for the throttle to fall back to nothing when the key is let go
+    BRAKE_RAMP:         0.15,    // s for S or Down to take the brake to full
+    BRAKE_RELEASE:      0.08,    // s back to nothing
+    TRIGGER_DEADZONE:   0.05,    // a trigger reading this little is at rest
+  },
+};
+
+/* THE PROFILES BLOCK (briefs/PRO-CONTROLS.md, 22 November 2026): how the
+   player's car handles on Pro, a keyboard or a gamepad driving it with
+   throttle, brake, handbrake and steering. Each variant is a named set
+   of numbers layered on the player's car as the garage tunes it (its
+   own overrides and its upgrades), never on TUNE itself, so a rival, a
+   ghost recorded on Easy and every touch run are untouched
+   (physics/profile.js). Only the keys named here change: VEHICLE and
+   ASSIST set a number, SCALE multiplies the car's own (so a grip upgrade
+   still counts). Three variants, from most helped to least, for the
+   author to choose between by play: ?controls=pro&pro=a, b or c. rev is
+   kept with a ghost: change a variant's numbers and bump its rev, and
+   its old ghosts are left unplayed, as a car's rev does in the roster.
+   First guesses, measured in review/controls/REPORT.md. */
+export const PROFILES = {
+  PRO_VARIANTS: ['a', 'b', 'c'],
+  PRO_DEFAULT: 'a',            // the variant ?controls=pro alone drives: the first of the three, not a choice between them
+  PRO_PROMPTS: {               // the first run's prompts on Pro (ui/onboard.js); the rest of their timings are LOOP.ONBOARD's
+    HOLD_SLIDE:       0.6,     // s of a slide held with the throttle on before "hold the slide" counts as done
+  },
+  PRO: {
+    /* the most helped: a firm hold, the spin control and the angle limiter
+       still there but lighter than Easy's, the target growing slower, the
+       car's grip on the road as on Easy, a little power oversteer */
+    a: {
+      name: 'Helped', rev: 1,
+      VEHICLE: { TURN_LIFT: 0 },
+      ASSIST: { DRIFT_HOLD: 30, POWER_ANGLE: 100, POWER_BASE: -5, POWER_STEER: 70, POWER_CURVE: 0.5, POWER_SLIDE: 0.3, DRIFT_GRIP: 0.6,
+        ANGLE_LIMIT: 70, ANGLE_PULL: 8, SPIN_GAIN: 0, THROTTLE_EASE: 0.3, YAW_SOFT: 1.2, YAW_MAX: 2.4 },
+      SCALE: { DRIFT_EASE_IN: 0.8 },
+    },
+    /* in between: a lighter hold, no spin control and no limiter, more
+       power oversteer, less countersteer help on grip so a flick at speed
+       starts a slide */
+    b: {
+      name: 'Balanced', rev: 1,
+      VEHICLE: { TURN_LIFT: 0, TRACTION: 1.2 },
+      ASSIST: { DRIFT_HOLD: 18, POWER_ANGLE: 100, POWER_BASE: -10, POWER_STEER: 65, POWER_CURVE: 0.5, POWER_SLIDE: 0.55, DRIFT_GRIP: 0.9,
+        ANGLE_LIMIT: 95, ANGLE_PULL: 0, SPIN_GAIN: 0, THROTTLE_EASE: 0, YAW_SOFT: 9, COUNTERSTEER: 0.3, YAW_DAMP: 0.08, DRIFT_ENTER: 11 },
+      SCALE: {},
+    },
+    /* the least helped: the hold weakest, the target growing fastest (the
+       quickest spin), too much countersteer flips the car into the other
+       slide, and a rear a tenth less grippy so flicks and power slides
+       come easily */
+    c: {
+      name: 'Raw', rev: 1,
+      VEHICLE: { TURN_LIFT: 0, TRACTION: 1.2 },
+      ASSIST: { DRIFT_HOLD: 10, DRIFT_DAMP: 5, POWER_ANGLE: 100, POWER_BASE: -10, POWER_STEER: 65, POWER_CURVE: 0.5, POWER_SLIDE: 0.5, DRIFT_GRIP: 0.9,
+        ANGLE_LIMIT: 95, ANGLE_PULL: 0, SPIN_GAIN: 0, THROTTLE_EASE: 0, YAW_SOFT: 9, COUNTERSTEER: 0.15, YAW_DAMP: 0.05, DRIFT_ENTER: 10 },
+      SCALE: { MU_REAR: 0.9, DRIFT_EASE_IN: 1.5 },
+    },
   },
 };
 

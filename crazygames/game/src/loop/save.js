@@ -8,8 +8,14 @@
    defaults, never trusted and never a crash.
 
    Ghost tapes are stored compact: [[n, steer, throttle, brake, hb], ...]
-   as the recorder's run length entries. */
-import { LOOP } from '../tune.js';
+   as the recorder's run length entries.
+
+   Pro ghosts (briefs/PRO-CONTROLS.md, 22 November 2026): a run driven on
+   Pro keeps its best under the track's key with 'pro:' in front
+   ('pro:career:3'), beside the Easy one, and its record carries how it
+   was driven (controls, variant, prorev), which validGhost keeps. An Easy
+   ghost carries none of it and is stored exactly as before. */
+import { LOOP, PROFILES } from '../tune.js';
 import { ROSTER, PAINTS, upgradeLevels, UPGRADE_STATS } from '../garage/roster.js';
 import { RIVALS } from '../rivals/roster.js';
 import { carCosmetics, lookOf, isItem, owns, priceOf, STANDARD, KINDS } from '../garage/cosmetics.js';
@@ -67,8 +73,12 @@ export function validGhost(g) {
     steps += e[0];
   }
   if (steps !== g.steps) return null;
-  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1, rev: isNum(g.rev) ? g.rev : 1, up: upgradeLevels(g.up), look: lookOf(g.look), ...(isNum(g.seed) ? { seed: g.seed } : {}) };
+  return { score: g.score, best: isNum(g.best) ? g.best : 0, car: g.car, paint: paintIds.has(g.paint) ? g.paint : null, steps: g.steps, hash: typeof g.hash === 'string' ? g.hash : '', tape: g.tape, when: isNum(g.when) ? g.when : 0, seconds: isNum(g.seconds) ? g.seconds : 0, gen: isNum(g.gen) ? g.gen : 1, rev: isNum(g.rev) ? g.rev : 1, up: upgradeLevels(g.up), look: lookOf(g.look), ...(isNum(g.seed) ? { seed: g.seed } : {}),
+    ...(g.controls === 'pro' && PROFILES.PRO_VARIANTS.includes(g.variant) ? { controls: 'pro', variant: g.variant, prorev: isNum(g.prorev) ? g.prorev : 1 } : {}) };
 }
+
+/* a ghost key without Pro's prefix: the track it belongs to */
+const trackKey = k => k.startsWith('pro:') ? k.slice(4) : k;
 
 /* Repair anything into a valid save. Counts what it had to fix. */
 export function repair(raw) {
@@ -167,8 +177,8 @@ export function createSave(opts) {
      their ghosts are dropped, so the save stays small */
   function trimLab() {
     const codes = Object.keys(state.lab.codes).sort((a, b) => state.lab.codes[b].when - state.lab.codes[a].when);
-    for (const k of codes.slice(LOOP.LAB.KEEP)) { delete state.lab.codes[k]; delete state.ghosts['lab:' + k]; }
-    for (const k of Object.keys(state.ghosts)) if (k.startsWith('lab:') && !state.lab.codes[k.slice(4)]) delete state.ghosts[k];
+    for (const k of codes.slice(LOOP.LAB.KEEP)) { delete state.lab.codes[k]; delete state.ghosts['lab:' + k]; delete state.ghosts['pro:lab:' + k]; }
+    for (const k of Object.keys(state.ghosts)) { const t = trackKey(k); if (t.startsWith('lab:') && !state.lab.codes[t.slice(4)]) delete state.ghosts[k]; }
   }
   /* Storage that is full refuses the whole save, and then nothing after
      it is remembered, coins and stars included (a ghost on every career
@@ -295,10 +305,11 @@ export function createSave(opts) {
     setGhost(key, record) {
       const g = validGhost(record);
       if (!g) return false;
-      /* only one daily ghost is kept: today's */
-      if (key.startsWith('daily:')) for (const k of Object.keys(state.ghosts)) if (k.startsWith('daily:') && k !== key) delete state.ghosts[k];
+      /* only today's daily ghosts are kept (an Easy one and a Pro one) */
+      const day = trackKey(key);
+      if (day.startsWith('daily:')) for (const k of Object.keys(state.ghosts)) { const t = trackKey(k); if (t.startsWith('daily:') && t !== day) delete state.ghosts[k]; }
       state.ghosts[key] = g;
-      if (key.startsWith('lab:')) trimLab();
+      if (day.startsWith('lab:')) trimLab();
       write();
       return true;
     },

@@ -1,0 +1,2306 @@
+{
+ "390x844 pro keys": {
+  "title": {
+   "hint": "W or Up drives, S or Down brakes and then reverses, A D or the arrows steer and SPACE is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold W to drive",
+     "caps": [
+      "W",
+      "▲"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "W"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "S brakes, and reverses once stopped",
+     "caps": [
+      "S",
+      "▼"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "390x844 pro pad": {
+  "title": {
+   "hint": "RT drives, LT brakes and then reverses, the stick steers and A is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "pad"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold RT to drive",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap A while steering to slide",
+     "caps": [
+      "A"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "LT brakes, and reverses once stopped",
+     "caps": [
+      "LT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "390x844 easy keys": {
+  "title": {
+   "hint": "The arrows or A D steer. SPACE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "390x844 no switch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "390x844 touch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 73,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "touch"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer with the left and right buttons",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold DRIFT / BRAKE while steering to slide",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "DRIFT / BRAKE on its own brakes",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "844x390 pro keys": {
+  "title": {
+   "hint": "W or Up drives, S or Down brakes and then reverses, A D or the arrows steer and SPACE is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold W to drive",
+     "caps": [
+      "W",
+      "▲"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "W"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "S brakes, and reverses once stopped",
+     "caps": [
+      "S",
+      "▼"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "844x390 pro pad": {
+  "title": {
+   "hint": "RT drives, LT brakes and then reverses, the stick steers and A is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "pad"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold RT to drive",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap A while steering to slide",
+     "caps": [
+      "A"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "LT brakes, and reverses once stopped",
+     "caps": [
+      "LT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "844x390 easy keys": {
+  "title": {
+   "hint": "The arrows or A D steer. SPACE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "844x390 no switch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "844x390 touch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "touch"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer with the left and right buttons",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold DRIFT / BRAKE while steering to slide",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "DRIFT / BRAKE on its own brakes",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "800x450 pro keys": {
+  "title": {
+   "hint": "W or Up drives, S or Down brakes and then reverses, A D or the arrows steer and SPACE is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold W to drive",
+     "caps": [
+      "W",
+      "▲"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "W"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "S brakes, and reverses once stopped",
+     "caps": [
+      "S",
+      "▼"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "800x450 pro pad": {
+  "title": {
+   "hint": "RT drives, LT brakes and then reverses, the stick steers and A is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "pad"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold RT to drive",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap A while steering to slide",
+     "caps": [
+      "A"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "LT brakes, and reverses once stopped",
+     "caps": [
+      "LT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "800x450 easy keys": {
+  "title": {
+   "hint": "The arrows or A D steer. SPACE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "800x450 no switch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "800x450 touch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": false,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 77,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 57,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "touch"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer with the left and right buttons",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold DRIFT / BRAKE while steering to slide",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "DRIFT / BRAKE on its own brakes",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "1280x720 pro keys": {
+  "title": {
+   "hint": "W or Up drives, S or Down brakes and then reverses, A D or the arrows steer and SPACE is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold W to drive",
+     "caps": [
+      "W",
+      "▲"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "W"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "S brakes, and reverses once stopped",
+     "caps": [
+      "S",
+      "▼"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "1280x720 pro pad": {
+  "title": {
+   "hint": "RT drives, LT brakes and then reverses, the stick steers and A is the handbrake. Throw the tail out, then hold the slide with the throttle and countersteer.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "pad"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "drive",
+     "text": "Hold RT to drive",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Tap A while steering to slide",
+     "caps": [
+      "A"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "hold",
+     "text": "Hold the slide: throttle on, steer against it",
+     "caps": [
+      "RT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "LT brakes, and reverses once stopped",
+     "caps": [
+      "LT"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "pro",
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   }
+  }
+ },
+ "1280x720 easy keys": {
+  "title": {
+   "hint": "The arrows or A D steer. SPACE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": {
+    "action": "controls",
+    "h": 44,
+    "inside": true
+   },
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "controls",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "1280x720 no switch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "keys"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer",
+     "caps": [
+      "◀",
+      "▶",
+      "A",
+      "D"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold SPACE while steering to slide",
+     "caps": [
+      "SPACE",
+      "◀",
+      "▶"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "SPACE on its own brakes",
+     "caps": [
+      "SPACE"
+     ],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ },
+ "1280x720 touch": {
+  "title": {
+   "hint": "Steer left and right. DRIFT / BRAKE with steering throws the tail out; on its own it brakes. The car drives itself.",
+   "hintShown": true,
+   "hintInside": true,
+   "toggle": null,
+   "buttons": [
+    {
+     "action": "first",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "daily",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "rivals",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "park",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "garage",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "lab",
+     "h": 58,
+     "inside": true
+    },
+    {
+     "action": "fullscreen",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "sound",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "music",
+     "h": 44,
+     "inside": true
+    },
+    {
+     "action": "onboard",
+     "h": 44,
+     "inside": true
+    }
+   ],
+   "source": "touch"
+  },
+  "prompts": {
+   "seen": [
+    {
+     "step": "steer",
+     "text": "Steer with the left and right buttons",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "drift",
+     "text": "Hold DRIFT / BRAKE while steering to slide",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    },
+    {
+     "step": "brake",
+     "text": "DRIFT / BRAKE on its own brakes",
+     "caps": [],
+     "inside": true,
+     "skipH": 44,
+     "skipInside": true
+    }
+   ],
+   "mode": "easy",
+   "profile": {
+    "controls": "easy"
+   }
+  }
+ }
+}
