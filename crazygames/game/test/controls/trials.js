@@ -12,13 +12,15 @@
    steering right for HB s, then steering held right with throttle T
    until the slide reaches OPEN degrees (at most OPEN_MAX s), then steer
    C (negative is countersteer) with throttle T for HOLD s, then the
-   throttle off with the same steering for LIFT s. */
+   throttle off with the same steering for LIFT s. Over the hold's last
+   second it keeps the mean angle, its band and the lowest speed: a slide
+   gone round to a pivot is slow, and a probe calls it no slide. */
 export const TRIAL = { HB: 0.35, OPEN: 20, OPEN_MAX: 1, HOLD: 3, LIFT: 1, SPIN: 90, CLOSED: 10, STEP: 1 / 120 };
 
 export function slideTrial(step, car, T, C, o) {
   const P = Object.assign({}, TRIAL, o || {});
   const deg = 180 / Math.PI, slipOf = () => Math.atan2(car.vy, car.vx) * deg;
-  let phase = 'entry', t = 0, tPh = 0, opened = null, spunAt = null, closedAt = null, maxHold = -Infinity, minHold = Infinity;
+  let phase = 'entry', t = 0, tPh = 0, opened = null, spunAt = null, closedAt = null, maxHold = -Infinity, minHold = Infinity, minSpeed = Infinity;
   const held = [];
   let x0 = car.x, z0 = car.z, x1 = car.x, z1 = car.z;
   const inp = { steer: 0, throttle: 0, brake: 0, handbrake: 0 };
@@ -37,11 +39,11 @@ export function slideTrial(step, car, T, C, o) {
     const s = slipOf();
     if (car.x < x0) x0 = car.x; if (car.x > x1) x1 = car.x; if (car.z < z0) z0 = car.z; if (car.z > z1) z1 = car.z;
     if (spunAt === null && Math.abs(s) > P.SPIN && car.speed > 2) spunAt = { t, phase, sincePhase: t - tPh };
-    if (phase === 'hold' && t - tPh > P.HOLD - 1) { held.push(s); if (s > maxHold) maxHold = s; if (s < minHold) minHold = s; }
+    if (phase === 'hold' && t - tPh > P.HOLD - 1) { held.push(s); if (s > maxHold) maxHold = s; if (s < minHold) minHold = s; if (car.speed < minSpeed) minSpeed = car.speed; }
     if (phase === 'lift' && closedAt === null && Math.abs(s) < P.CLOSED) closedAt = t - tPh;
   }
   const mean = held.length ? held.reduce((a, b) => a + b, 0) / held.length : NaN;
-  return { T, C, opened, held: mean, band: [minHold, maxHold], spun: spunAt, closed: closedAt, speed: car.speed, box: [x0, z0, x1, z1] };
+  return { T, C, opened, held: mean, band: [minHold, maxHold], minSpeed, spun: spunAt, closed: closedAt, speed: car.speed, box: [x0, z0, x1, z1] };
 }
 
 /* spinTrial: the same entry, then throttle T with steering C (0: none,

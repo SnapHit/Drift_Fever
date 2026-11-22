@@ -7,11 +7,12 @@
    its solids taken out, so nothing is ever hit (a trial runs up to 137 by
    171 m). The car is given 20 m/s straight ahead first.
 
-   3. A handbrake entry, then the throttle held at three levels (0.6, 0.8
-      and full) with half countersteer: the held angle (the mean over the
-      last second of three) must rise with the throttle, each a slide that
-      scores (12 degrees or more) and is not a spin, and lifting must
-      close it under 10 degrees within a second. The angle against the
+   3. A handbrake entry, then the throttle held at three levels (0.7,
+      0.85 and full) with half countersteer: the held angle (the mean over
+      the last second of three) must rise with the throttle, each a slide
+      that scores (12 degrees or more), is not a spin and is not a pivot
+      (8 m/s or more), and lifting must close it under 10 degrees within
+      a second. The angle against the
       throttle at every countersteer is kept for the report.
       Known answer: on Easy, where the controller holds the angle the
       steering asks for, the same inputs show no rise (countersteer ends
@@ -28,7 +29,7 @@ import * as R from './lib.js';
 import { slideTrial, spinTrial, TRIAL } from './trials.js';
 
 const env = await R.start(), out = { trial: TRIAL, profiles: {} };
-const LEVELS = [0.6, 0.8, 1], HALF = -0.5;
+const LEVELS = [0.7, 0.85, 1], HALF = -0.5;
 const TABLE_T = [0, 0.25, 0.5, 0.625, 0.75, 0.875, 1], TABLE_C = [0.5, 0, -0.25, -0.5, -0.75, -1];
 const FULL = ['DRIFT_HOLD', 'SPIN_GAIN', 'SPIN_ANGLE', 'ANGLE_LIMIT', 'ANGLE_PULL', 'THROTTLE_EASE', 'YAW_SOFT', 'YAW_MAX'];
 
@@ -55,8 +56,8 @@ async function measure(profile, fullAssist) {
   return r;
 }
 
-const held = x => x.spun === null && x.held >= 12 && x.closed !== null && x.closed <= 1 && x.hits === 0;
-const fmt = x => x.spun ? 'spin' : !(Math.abs(x.held) >= 8) ? 'straight' : Math.round(x.held) + (x.closed !== null && x.closed <= 1 ? '' : ' (lift: not closed in 1 s)');
+const held = x => x.spun === null && x.held >= 12 && x.minSpeed >= 8 && x.closed !== null && x.closed <= 1 && x.hits === 0;   // a slide, not a pivot: still 8 m/s or more
+const fmt = x => x.spun ? 'spin' : !(Math.abs(x.held) >= 8) ? 'straight' : x.minSpeed < 8 ? 'a pivot at ' + Math.round(x.held) : Math.round(x.held) + (x.closed !== null && x.closed <= 1 ? '' : ' (lift: not closed in 1 s)');
 for (const p of ['easy', ...R.VARIANTS]) {
   const r = out.profiles[p] = await measure(p);
   const rise = r.rise, rising = rise.every(held) && rise[1].held > rise[0].held + 3 && rise[2].held > rise[1].held + 3;
@@ -75,9 +76,9 @@ const unspun = k.spins.letGo.spunAfter === null && k.spins.into.spunAfter === nu
 R.verdict(unspun, 'known answer: variant c with the assist at full strength (' + FULL.join(', ') + ' at their Easy values) is caught as unspinnable: ' + (unspun ? 'CAUGHT' : 'MISSED, it spun'));
 /* the angle against the throttle, for the report */
 for (const p of Object.keys(out.profiles)) {
-  console.log('\n' + p + ': held angle (degrees) by countersteer (rows, negative is against the slide) and throttle (columns)');
+  console.log('\n' + p + ': held angle (degrees) by countersteer (rows, negative is against the slide) and throttle (columns); spin, . straightened, pivot: under 8 m/s, * not closed a second after lifting');
   console.log('        ' + TABLE_T.map(T => String(T).padStart(9)).join(''));
-  for (const C of TABLE_C) console.log(String(C).padStart(6) + '  ' + out.profiles[p].table[C].map(x => (x.spun ? 'spin' : !(Math.abs(x.held) >= 8) ? '.' : String(Math.round(x.held)) + (x.closed !== null && x.closed <= 1 ? '' : '*')).padStart(9)).join(''));
+  for (const C of TABLE_C) console.log(String(C).padStart(6) + '  ' + out.profiles[p].table[C].map(x => (x.spun ? 'spin' : !(Math.abs(x.held) >= 8) ? '.' : (x.minSpeed < 8 ? 'pivot ' : '') + String(Math.round(x.held)) + (x.closed !== null && x.closed <= 1 ? '' : '*')).padStart(9)).join(''));
 }
 await env.close();
 process.exit(R.finish('slide', out) ? 1 : 0);

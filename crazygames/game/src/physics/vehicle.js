@@ -297,8 +297,8 @@ export function stepVehicle(s, input, dt) {
          only with the throttle on, so lifting always closes it.
          POWER_ANGLE is 0 on Easy and this never runs there. */
       if (A.POWER_ANGLE) {
-        const held = Math.max(-1, Math.min(1, -s.steerDriver / lockDrive)) * dirUse;
-        target = Math.max(0, A.POWER_BASE + throttle * (A.POWER_ANGLE + A.POWER_STEER * Math.max(0, held)) + A.POWER_STEER * Math.min(0, held));
+        const held = Math.max(-1, Math.min(1, -s.steerDriver / lockDrive)) * dirUse, counter = Math.max(0, -held);
+        target = Math.max(0, A.POWER_BASE + throttle * (A.POWER_ANGLE + A.POWER_STEER * Math.max(0, held)) - A.POWER_STEER * Math.pow(counter, A.POWER_CURVE || 1));
       }
       if (s.hb > 0 && input.steer !== 0) target = Math.max(target, A.DRIFT_ANGLE);
       /* Ease in: the angle the controller holds rises towards the one

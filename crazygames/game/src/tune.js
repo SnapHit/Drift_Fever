@@ -129,6 +129,7 @@ export const TUNE = {
     POWER_ANGLE:        0,       // degrees of drift angle full throttle asks for (0: the Easy controller)
     POWER_BASE:         0,       // degrees asked with the throttle off (at or below 0, so lifting closes the slide)
     POWER_STEER:        0,       // degrees full countersteer takes off, and full steering into the slide adds at full throttle
+    POWER_CURVE:        1,       // countersteer takes POWER_STEER times its share to this power off: under 1, the first of it does the most, so any countersteer catches a slide that none would spin
     POWER_SLIDE:        0,       // share of the rear's grip in a drift that full throttle takes away (0: none)
   },
   /* THE ROAD'S SHAPE UNDER THE CAR (briefs/TRACKS-2.md): banked corners
@@ -227,26 +228,36 @@ export const PROFILES = {
     HOLD_SLIDE:       0.6,     // s of a slide held with the throttle on before "hold the slide" counts as done
   },
   PRO: {
+    /* the most helped: a firm hold, the spin control and the angle limiter
+       still there but lighter than Easy's, the target growing slower, the
+       car's grip on the road as on Easy, a little power oversteer */
     a: {
       name: 'Helped', rev: 1,
       VEHICLE: { TURN_LIFT: 0 },
-      ASSIST: { DRIFT_HOLD: 30, POWER_ANGLE: 100, POWER_BASE: -5, POWER_STEER: 70, POWER_SLIDE: 0.3, DRIFT_GRIP: 0.6,
+      ASSIST: { DRIFT_HOLD: 30, POWER_ANGLE: 100, POWER_BASE: -5, POWER_STEER: 70, POWER_CURVE: 0.5, POWER_SLIDE: 0.3, DRIFT_GRIP: 0.6,
         ANGLE_LIMIT: 70, ANGLE_PULL: 8, SPIN_GAIN: 0, THROTTLE_EASE: 0.3, YAW_SOFT: 1.2, YAW_MAX: 2.4 },
-      SCALE: {},
+      SCALE: { DRIFT_EASE_IN: 0.8 },
     },
+    /* in between: a lighter hold, no spin control and no limiter, more
+       power oversteer, less countersteer help on grip so a flick at speed
+       starts a slide */
     b: {
       name: 'Balanced', rev: 1,
       VEHICLE: { TURN_LIFT: 0, TRACTION: 1.2 },
-      ASSIST: { DRIFT_HOLD: 18, POWER_ANGLE: 105, POWER_BASE: -10, POWER_STEER: 60, POWER_SLIDE: 0.55, DRIFT_GRIP: 0.9,
+      ASSIST: { DRIFT_HOLD: 18, POWER_ANGLE: 100, POWER_BASE: -10, POWER_STEER: 65, POWER_CURVE: 0.5, POWER_SLIDE: 0.55, DRIFT_GRIP: 0.9,
         ANGLE_LIMIT: 95, ANGLE_PULL: 0, SPIN_GAIN: 0, THROTTLE_EASE: 0, YAW_SOFT: 9, COUNTERSTEER: 0.3, YAW_DAMP: 0.08, DRIFT_ENTER: 11 },
       SCALE: {},
     },
+    /* the least helped: the hold weakest, the target growing fastest (the
+       quickest spin), too much countersteer flips the car into the other
+       slide, and a rear a tenth less grippy so flicks and power slides
+       come easily */
     c: {
       name: 'Raw', rev: 1,
-      VEHICLE: { TURN_LIFT: 0, TRACTION: 1.0 },
-      ASSIST: { DRIFT_HOLD: 8, DRIFT_DAMP: 4, POWER_ANGLE: 110, POWER_BASE: -15, POWER_STEER: 55, POWER_SLIDE: 0.7, DRIFT_GRIP: 1,
+      VEHICLE: { TURN_LIFT: 0, TRACTION: 1.2 },
+      ASSIST: { DRIFT_HOLD: 10, DRIFT_DAMP: 5, POWER_ANGLE: 100, POWER_BASE: -10, POWER_STEER: 65, POWER_CURVE: 0.5, POWER_SLIDE: 0.5, DRIFT_GRIP: 0.9,
         ANGLE_LIMIT: 95, ANGLE_PULL: 0, SPIN_GAIN: 0, THROTTLE_EASE: 0, YAW_SOFT: 9, COUNTERSTEER: 0.15, YAW_DAMP: 0.05, DRIFT_ENTER: 10 },
-      SCALE: { MU_REAR: 0.9 },
+      SCALE: { MU_REAR: 0.9, DRIFT_EASE_IN: 1.5 },
     },
   },
 };
