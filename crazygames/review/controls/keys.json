@@ -1,0 +1,130 @@
+{
+ "throttle": {
+  "want": 30,
+  "wantBack": 14,
+  "toFull": 30,
+  "toNone": 14,
+  "first": [
+   0.03,
+   0.07,
+   0.1,
+   0.13
+  ],
+  "speed": 7.575633082713133,
+  "mode": "pro"
+ },
+ "brake": {
+  "before": 25.251833686090066,
+  "after": 10.94279320742116,
+  "vx": -9.782197339051722,
+  "brakeFull": 18,
+  "want": 18,
+  "throttleWhileS": 0.64
+ },
+ "handbrake": {
+  "hb": 1,
+  "dF": 9.311967826905956,
+  "dR": 0,
+  "rec": [
+   0,
+   0,
+   0
+  ]
+ },
+ "letters": {
+  "AZERTY drive: prints z, sits at W": {
+   "t": 1,
+   "b": 0,
+   "s": 0,
+   "h": 0
+  },
+  "AZERTY left: prints q, sits at A": {
+   "t": 0,
+   "b": 0,
+   "s": -1,
+   "h": 0
+  },
+  "AZERTY brake: prints s, sits at S": {
+   "t": 0,
+   "b": 1,
+   "s": 0,
+   "h": 0
+  },
+  "AZERTY right, caps lock: prints D, sits at D": {
+   "t": 0,
+   "b": 0,
+   "s": 1,
+   "h": 0
+  },
+  "AZERTY: prints a, sits at Q, unbound": {
+   "t": 0,
+   "b": 0,
+   "s": 0,
+   "h": 0
+  },
+  "AZERTY: prints w, sits at Z, unbound": {
+   "t": 0,
+   "b": 0,
+   "s": 0,
+   "h": 0
+  },
+  "arrow up drives": {
+   "t": 1,
+   "b": 0,
+   "s": 0,
+   "h": 0
+  },
+  "arrow down brakes": {
+   "t": 0,
+   "b": 1,
+   "s": 0,
+   "h": 0
+  },
+  "space is the handbrake": {
+   "t": 0,
+   "b": 0,
+   "s": 0,
+   "h": 1
+  },
+  "shift is the handbrake": {
+   "t": 0,
+   "b": 0,
+   "s": 0,
+   "h": 1
+  },
+  "no code falls back to the letter: W": {
+   "t": 1,
+   "b": 0,
+   "s": 0,
+   "h": 0
+  }
+ },
+ "easyToggle": {
+  "before": "CONTROLS PRO",
+  "after": "CONTROLS EASY",
+  "profile": {
+   "controls": "easy"
+  },
+  "mode": "easy",
+  "t": 1,
+  "b": 0,
+  "h": 1,
+  "pref": "easy",
+  "back": "CONTROLS PRO",
+  "prefBack": null
+ },
+ "unbound": {
+  "want": 30,
+  "wantBack": 14,
+  "toFull": null,
+  "toNone": 1,
+  "first": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "speed": 0.009529905009991246,
+  "mode": "pro"
+ }
+}

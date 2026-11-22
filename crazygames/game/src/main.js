@@ -17,7 +17,9 @@
    the hidden assist level; ?auto=1 the scripted driver drives every run;
    ?title=1 shows the title even on a first visit (the probes' known
    answer for the clicks to gameplay); ?track=CODE opens the Track Lab on
-   that track, one click from driving it. */
+   that track, one click from driving it; ?controls=pro drives a keyboard
+   or a gamepad with throttle, brake and handbrake, and ?pro=a, b or c
+   picks the handling (briefs/PRO-CONTROLS.md, input/mode.js). */
 import { TUNE, LOOP } from './tune.js';
 import { createWorld, STEP } from './physics/world.js';
 import { createDriver } from './physics/driver.js';
@@ -28,6 +30,8 @@ import { STAND_IN as CAR_STAND_IN } from './render/car.js';
 import { createChaseCamera, carOnScreen } from './camera/chase.js';
 import { LOOK as TRACK_LOOK } from './tracks/mesh.js';
 import { createInput } from './input/input.js';
+import { controls } from './input/mode.js';
+import { EASY, handlingFor, ghostFields, proVariant } from './physics/profile.js';
 import { createScoring } from './scoring/drift.js';
 import { createHud } from './ui/hud.js';
 import { createScreens } from './ui/screens.js';
@@ -46,7 +50,7 @@ import { CAREER, CHAPTERS, chapterOf, chapterOpen, chapterNeeds, starsToOpen, ca
 import { missionsFor, allMissionsFor, createMissionJudge, missionTally } from './loop/missions.js';
 import { DEFAULT_SETTINGS, tidySettings, labSpec, specFromCode, randomSeed, linkFor, crossoverOffered, format as formatCode } from './lab/lab.js';
 import { drawPlan } from './tracks/plan.js';
-import { carTune, carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById } from './garage/roster.js';
+import { carById, carBox, carRev, upgradeLevels, ROSTER, UPGRADE_STATS, paintById } from './garage/roster.js';
 import { createShowroom } from './garage/showroom.js';
 import { lookOf, owns, isItem, KINDS } from './garage/cosmetics.js';
 import { FX_ON } from './fx.js';
@@ -107,6 +111,7 @@ const app = {
   dist: 0, distAlong: 0,    // in a race: the player's metres into the run, unwrapped
   park: null,               // in the stunt park (free drift): the challenges' judge (park/challenges.js), else null
   parkVisits: 0, parkPaid: 0, inPark: false,   // visits this session (the park's time of day moves on with each), the judge's events already paid, and whether the list was opened from inside the park
+  profile: EASY,            // how the player's car is driven this run (briefs/PRO-CONTROLS.md): Easy, or Pro and its variant, chosen as the run starts (input/mode.js)
 };
 const rivalPose = { x: 0, y: 0, z: 0, yaw: 0, car: null };
 let box = carBox('starter');
@@ -129,7 +134,7 @@ function setGround(ground, carId, paintId, start) {
   app.ground = ground;
   app.rival = null; app.lead = null; scene.setRival(null);
   app.park = null; hud.setPark(false);
-  app.world = createWorld(start ? Object.assign({}, ground, { start }) : ground, { tune: carTune(carId, save.state.cars[carId] && save.state.cars[carId].up) });
+  app.world = createWorld(start ? Object.assign({}, ground, { start }) : ground, { tune: handlingFor(carId, save.state.cars[carId] && save.state.cars[carId].up, app.profile) });
   box = carBox(carId);
   scene.setGround(ground);
   /* the car as it races: the cosmetics the save says it wears, never a garage preview (the dev drive has none) */
@@ -182,7 +187,7 @@ function resetRun() {
   if (app.rival) app.rival.reset();
   if (app.park) { app.park.reset(); app.parkPaid = 0; }
   app.tandem.reset(); if (app.lead) app.lead.reset(); app.dist = app.ground.start ? app.ground.start.along || 0 : 0; app.distAlong = app.world.along;
-  tape.length = 0; acc = 0; last = -1; app.runTime = 0;
+  tape.length = 0; acc = 0; last = -1; app.runTime = 0; input.resetRamp();
   prev.x = world.car.x; prev.y = world.car.y || 0; prev.z = world.car.z; prev.yaw = world.car.yaw;
   chase.reset({ yaw: world.car.yaw });
   if (director) director.reset();
@@ -265,7 +270,10 @@ function frame(t) {
     steps = Math.floor(acc / STEP + 1e-6);
     if (steps > MAX_STEPS) { steps = MAX_STEPS; acc = steps * STEP; }
     const p0 = performance.now();
-    for (let i = 0; i < steps; i++) { if (S === 'drive') driveStep(rec); else stepOnce(rec); }
+    /* Pro's keys ramp the throttle and the brake once per physics step
+       (input.ramp); anything else reaches the step as it was read */
+    const ramping = input.ramping && !window.__feel.inject && !app.driver && S !== 'results';
+    for (let i = 0; i < steps; i++) { const r = input.ramp(rec, ramping); if (S === 'drive') driveStep(r); else stepOnce(r); }
     acc = Math.max(0, acc - steps * STEP);
     physMs = performance.now() - p0; lastSteps = steps;
     if (S === 'drive' && app.settle > 0) { app.settle -= dt * ts; if (app.settle <= 0) finishRun(); }
@@ -339,7 +347,9 @@ function frame(t) {
 /* ---- the states ---- */
 function titleInfo() {
   const d = dailySpec();
-  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, fresh: Object.keys(save.state.career).length === 0, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, labCodes: Object.keys(save.state.lab.codes).length, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off' };
+  return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, fresh: Object.keys(save.state.career).length === 0, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, labCodes: Object.keys(save.state.lab.codes).length, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off',
+    /* the controls (briefs/PRO-CONTROLS.md): only when Pro is on the address; pro is what a keyboard or a gamepad drives with now */
+    controls: controls.available ? { pro: !controls.easyPreferred, source: inputSource() } : null };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -410,7 +420,7 @@ function showLab() {
   openLab();
   const L = app.lab;
   const best = L.code ? save.labBest(L.code) : null;
-  const ghost = L.code && L.track ? !!ghostFor('lab:' + L.code, L.track) : false;
+  const ghost = L.code && L.track ? !!(ghostFor('lab:' + L.code, L.track) || (controls.profileFor(inputSource()).controls === 'pro' && ghostFor('pro:lab:' + L.code, L.track))) : false;
   screens.lab(save.state, { ...L, best, ghost, link: L.code ? linkFor(L.code) : '' });
   const canvas = document.getElementById('plan');
   if (canvas && L.track) drawPlan(canvas, L.track, { labels: Math.min(view.w, view.h) >= 600 });
@@ -452,10 +462,17 @@ function ghostFor(key, track) {
   const rec = save.ghost(key);
   if (!rec || rec.gen !== (track.version || 1) || rec.rev !== carRev(rec.car)) return null;
   /* a career slot whose seed was replaced: a ghost recorded on another seed, or with none on a slot that has had two, drove another layout */
-  const m = /^career:(\d+)$/.exec(key), c = m ? CAREER[+m[1]] : null;
+  const m = /^(?:pro:)?career:(\d+)$/.exec(key), c = m ? CAREER[+m[1]] : null;
   if (c && (rec.seed !== undefined ? rec.seed !== c.seed : c.was !== undefined)) return null;
+  /* a Pro slot (briefs/PRO-CONTROLS.md) holds only a Pro run on a variant as it now is: one from before its numbers changed drove another car */
+  if (key.startsWith('pro:') && (rec.controls !== 'pro' || !proVariant(rec.variant) || rec.prorev !== proVariant(rec.variant).rev)) return null;
   return rec;
 }
+/* The ghost a run races: on Pro its own best, else the Easy one (which
+   replays as Easy, the way it was driven); on Easy only the Easy one, as
+   always. */
+function ghostKey(key) { return app.profile.controls === 'pro' ? 'pro:' + key : key; }
+function raceGhost(key, track) { return (app.profile.controls === 'pro' ? ghostFor(ghostKey(key), track) : null) || ghostFor(key, track); }
 
 /* Which controls the prompts should draw: the source that moved last,
    or, before anything has, the touch pad if it is showing. */
@@ -500,8 +517,18 @@ function careerNews(index, wasOpen, nextChapterWasOpen) {
   return { unlock, note, nextIndex };
 }
 
+/* How this run is driven: Pro on a keyboard or a gamepad when the address
+   asks for it and the device has not chosen Easy; Easy on touch, on the
+   bench and everywhere else (input/mode.js). Set before the world is
+   made, which reads it. */
+function chooseProfile(opts) {
+  app.profile = opts && opts.bench ? EASY : controls.profileFor(inputSource());
+  input.setMode(app.profile.controls);
+}
+
 function startRun(spec, opts) {
   app.spec = spec; app.key = spec.key;
+  chooseProfile(opts);
   app.track = trackFor(spec);
   const carId = save.state.car, paint = save.state.cars[carId].paint;
   const raceDef = spec.mode === 'battle' ? rivalById(spec.rival) : null;
@@ -521,7 +548,7 @@ function startRun(spec, opts) {
   const head = runHead(spec);
   hud.setMissions(listed ? missions.map((m, i) => ({ text: m.text, done: !!(save.state.missions[spec.key] || [])[i] })) : null, head);
   app.missionsShown = listed || head ? LOOP.MISSIONS.SHOWN : 0;
-  const rec = spec.mode === 'battle' ? null : ghostFor(spec.key, app.track);   // no ghost is kept for a battle
+  const rec = spec.mode === 'battle' ? null : raceGhost(spec.key, app.track);   // no ghost is kept for a battle
   app.ghost = rec ? createGhost(app.track, rec) : null;
   scene.setGhost(rec ? rec.car : null, rec ? rec.paint : null, rec ? rec.look : null);   // a ghost wears what it ran in; one from before the garage round, the standard ones
   hud.setToBeat(rec ? 'best ' + rec.score : spec.mode === 'lab' ? (save.labBest(spec.code) ? 'best ' + save.labBest(spec.code).best : '') : (save.state.career[String(spec.index)] ? 'best ' + save.state.career[String(spec.index)].best : ''));
@@ -545,7 +572,7 @@ function startRun(spec, opts) {
   hud.setRun(app.track.kind === 'circuit' ? 'LAP 1/' + app.laps : Math.round(app.progress.total()) + ' m', '0.0');
   hud.setCount(String(Math.ceil(LOOP.COUNTDOWN)), false);
   onboard.el.classList.remove('park');
-  if (teach) onboard.start(inputSource()); else if (onboard.active) onboard.stop(false);
+  if (teach) onboard.start(inputSource(), app.profile.controls); else if (onboard.active) onboard.stop(false);
 }
 
 function finishRun() {
@@ -584,10 +611,12 @@ function finishRun() {
   else if (spec.mode === 'lab') improved = save.labResult(spec.code, stars, score);
   save.addCoins(coins);
   const steps = tape.reduce((s, e) => s + e.n, 0);
-  const prevGhost = ghostFor(spec.key, app.track);
+  /* a Pro run's best keeps its own ghost, and the ghost records how it was driven (an Easy one records nothing new) */
+  const gkey = ghostKey(spec.key);
+  const prevGhost = ghostFor(gkey, app.track);
   let ghostSaved = false;
   if (steps >= LOOP.GHOST_MIN_STEPS && (!prevGhost || score > prevGhost.score)) {
-    ghostSaved = save.setGhost(spec.key, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up), look: lookOf(save.state.cars[save.state.car]) });
+    ghostSaved = save.setGhost(gkey, { score, best, car: save.state.car, paint: save.state.cars[save.state.car].paint, steps, hash: app.world.hash(), tape: compactTape(tape), when: Date.now(), seconds: app.runTime, gen: app.track.version || 1, ...(spec.mode === 'career' ? { seed: spec.seed } : {}), rev: carRev(save.state.car), up: upgradeLevels(save.state.cars[save.state.car].up), look: lookOf(save.state.cars[save.state.car]), ...ghostFields(app.profile) });
   }
   app.results = { finished: true, score, best, parts: { drift: scoring.state.drift, clean: scoring.state.clean, pace: scoring.state.pace }, cleanSectors: app.race ? app.race.state.clean + ' of ' + app.race.state.sectors : '', stars, newStars, targets: app.targets, coins, improved, mode: spec.mode, name: spec.name, seconds: app.runTime, nextIndex, laps: app.laps, kind: app.track.kind, ghostSaved, steps, hash: app.world.hash(), missions, missionTally: missionTally(save.state, CAREER.length), unlock, note, offer, label: runHead(spec) ? runHead(spec).label : '', code: spec.mode === 'lab' ? spec.code : null };
   app.state = 'results'; app.lockout = LOOP.RESULTS_LOCKOUT;
@@ -692,8 +721,9 @@ function countCoins(delay) {
    results, nothing paid but the challenges' levels, once each. The
    park's time of day moves on with each visit. */
 function startFree() {
+  chooseProfile();
   onboard.el.classList.add('park');   // SKIP sits under the park's list button
-  if (save.needsOnboarding()) onboard.start(inputSource()); else if (onboard.active) onboard.stop(false);   // a new player who picks the park first is shown the controls there
+  if (save.needsOnboarding()) onboard.start(inputSource(), app.profile.controls); else if (onboard.active) onboard.stop(false);   // a new player who picks the park first is shown the controls there
   app.spec = { mode: 'free', key: 'free', name: 'Stunt park' };
   app.track = freeGround(LOOP.PARK.PRESETS[app.parkVisits % LOOP.PARK.PRESETS.length]);
   app.parkVisits++;
@@ -756,6 +786,7 @@ function onAction(action, arg) {
   sound.ui('tap');
   switch (action) {
     case 'music': sound.setMusic(!sound.music); showMenu('title'); break;
+    case 'controls': controls.setEasyPreferred(!controls.easyPreferred); showMenu('title'); break;   // Pro or Easy on a keyboard and a gamepad, a preference of the device
     case 'fullscreen': toggleFullscreen(); break;
     case 'sound': sound.setMuted(!sound.muted); soundButton(); showMenu('title'); break;
     case 'title': menuGround(); showMenu('title'); break;
@@ -855,6 +886,7 @@ scene.ready.then(() => {
   if (devGround) {
     /* the feel prototype's endless drive, for the probes and for tuning */
     app.state = 'dev';
+    chooseProfile();   // Easy unless Pro is on the address too
     app.track = groundByName(devGround === 'park' ? 'park' : 'track');
     setGround(app.track, 'starter', 'cyan');
     hud.setVisible(true); hud.setRun(devGround === 'park' ? 'car park' : 'test track', ''); input.touch.setVisible(true); hud.exit.hidden = true;
@@ -929,6 +961,7 @@ window.__feel = {
 };
 window.__loop = {
   app, save, LOOP, screens, sound, onboard, standIn: { tracks: TRACK_STAND_IN, cars: CAR_STAND_IN },
+  controls, profile: () => app.profile, raceGhostKey: k => ghostKey(k),   // briefs/PRO-CONTROLS.md: the switch, this run's profile, and where its ghost is kept
   lab: { setLab, labSpec, specFromCode, state: () => app.lab && { settings: app.lab.settings, seed: app.lab.seed, code: app.lab.code, message: app.lab.message, error: app.lab.error, track: app.lab.track && { name: app.lab.track.name, length: app.lab.track.length, kind: app.lab.track.kind, corners: app.lab.track.corners.length, bridges: (app.lab.track.bridges || []).length, fallback: !!app.lab.track.fallback, theme: app.lab.track.theme, preset: app.lab.track.preset } } },
   action: onAction, startRun, dailySpec, careerSpec, careerUnlocked, trackFor, battleSpec: id => battleSpec(rivalById(id)), RIVALS, TANDEM,
   get showroom() { return showroomNow(); }, garage: () => ({ picked: app.picked, tab: app.tab, preview: { ...app.preview } }),

@@ -28,7 +28,10 @@
    { VEHICLE, ASSIST } whose prototypes are TUNE.VEHICLE and TUNE.ASSIST
    with a car's few overrides as own properties (see garage/roster.js),
    so everything not overridden still reads the live tune. With no tune
-   the car is the starter, which is the tune itself. */
+   the car is the starter, which is the tune itself. On Pro a profile is
+   layered over that pair the same way (physics/profile.js); its two
+   terms of its own, the throttle's angle and its power oversteer, read
+   numbers that are 0 in TUNE, and neither runs unless one is set. */
 import { TUNE } from '../tune.js';
 
 export const STEP = 1 / 120;
@@ -217,7 +220,11 @@ export function stepVehicle(s, input, dt) {
      released: with full grip back while sliding at 40 degrees it scrubbed
      the car down to walking pace in a couple of seconds. */
   const hbShare = Math.min(s.hb, s.hbGrip);
-  const driftShare = s.drifting && A.LEVEL > 0 ? 1 - (1 - A.DRIFT_GRIP) * A.LEVEL : 1;
+  let driftShare = s.drifting && A.LEVEL > 0 ? 1 - (1 - A.DRIFT_GRIP) * A.LEVEL : 1;
+  /* Pro's power oversteer (briefs/PRO-CONTROLS.md): in a drift the
+     throttle takes POWER_SLIDE of the rear's grip, so lifting gives it
+     back. POWER_SLIDE is 0 on Easy and this line never runs there. */
+  if (A.POWER_SLIDE && s.drifting && A.LEVEL > 0) driftShare = Math.max(0, driftShare - A.POWER_SLIDE * throttle);
   const muR = V.MU_REAR * Math.min(1 + (V.HANDBRAKE_GRIP - 1) * hbShare, driftShare);
   const capR = muR * loadR;
   let FxR = driveR + brakeR;
@@ -283,6 +290,16 @@ export function stepVehicle(s, input, dt) {
       const into = input.steer * dirUse;
       let target = into > 0 ? (A.DRIFT_ANGLE + A.DRIFT_RANGE * into) * Math.min(1, into * 2) : 0;
       target *= A.DRIFT_LIFT + (1 - A.DRIFT_LIFT) * input.throttle;
+      /* Pro (briefs/PRO-CONTROLS.md): the throttle asks for the angle and
+         countersteer takes it off, so the player holds a slide with the
+         throttle and countersteer. It reads the slewed steering, so a key
+         tapped is a part countersteer. Steering into the slide adds angle
+         only with the throttle on, so lifting always closes it.
+         POWER_ANGLE is 0 on Easy and this never runs there. */
+      if (A.POWER_ANGLE) {
+        const held = Math.max(-1, Math.min(1, -s.steerDriver / lockDrive)) * dirUse, counter = Math.max(0, -held);
+        target = Math.max(0, A.POWER_BASE + throttle * (A.POWER_ANGLE + A.POWER_STEER * Math.max(0, held)) - A.POWER_STEER * Math.pow(counter, A.POWER_CURVE || 1));
+      }
       if (s.hb > 0 && input.steer !== 0) target = Math.max(target, A.DRIFT_ANGLE);
       /* Ease in: the angle the controller holds rises towards the one
          asked for at DRIFT_EASE_IN degrees a second, so a drift builds

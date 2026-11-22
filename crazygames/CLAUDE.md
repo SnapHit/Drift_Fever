@@ -1105,3 +1105,25 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   down mid measure. The sandbox's own numbers mean nothing (software
   drawing). The author's desktop could not be measured the same day:
   its display was asleep and the browser drew about 3 frames a second.
+- 22 November 2026, **round 1B, Pro controls, merged behind
+  `?controls=pro`** (`briefs/PRO-CONTROLS.md`,
+  `review/controls/REPORT.md`, probes in `game/test/controls/`). On a
+  keyboard: W or Up the throttle (ramped in physics steps), S or Down
+  the brake and then reverse, A D or arrows steer, Space or Shift the
+  handbrake; on a pad the triggers are analogue pedals and A or X the
+  handbrake. Touch is always Easy, and a keyboard or pad player can pick
+  Easy with a CONTROLS toggle on the title (a device preference,
+  `driftfever.cg.controls`, never the save). The handling is a profile
+  layered on the player's car tune (`physics/profile.js`,
+  `PROFILES` in `tune.js`), three variants by `?pro=a|b|c` from most
+  helped to least, for the author to pick by play. Two new terms in
+  `vehicle.js` (the throttle's angle law in the drift controller, power
+  oversteer), both on numbers that are 0 on Easy inside ifs that never
+  run there. **Easy is the game as it was, to the bit**: main's tapes,
+  live runs and the Kestrow race, with no switch, with the toggle on
+  Easy and on touch (`controls/easy.js`, rerun by the reviewer before
+  the merge). Ghosts record their profile (`pro:career:0` slots) and an
+  old ghost is Easy. Open: tuning per car (5 of 30 car and upgrade
+  combinations miss the slide measures, all fully upgraded), rival
+  balance and star targets on Pro, the hint hidden in short landscape
+  frames as before, the author's pick of a variant.

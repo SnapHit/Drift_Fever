@@ -1,0 +1,380 @@
+{
+ "tracks": [
+  0,
+  1,
+  2
+ ],
+ "drive": {
+  "a": {
+   "ENTRY_SPEED": 26.223,
+   "LEAD": 2.513,
+   "HB_TIME": 0.219,
+   "CURVE_BAND": 0.006,
+   "CURVE_LIFT": 0.029,
+   "DRIFT_LOOK": 17.973,
+   "DRIFT_LOOK_GAIN": 0.326,
+   "ANGLE_MAX": 63.198,
+   "ANGLE_MIN": 16.725,
+   "APPROACH": 71.972
+  },
+  "b": {
+   "ENTRY_SPEED": 21.308,
+   "LEAD": 0.314,
+   "HB_TIME": 0.313,
+   "CURVE_BAND": 0.003,
+   "CURVE_LIFT": 0.028,
+   "DRIFT_LOOK": 18.204,
+   "DRIFT_LOOK_GAIN": 0.616,
+   "ANGLE_MAX": 63.007,
+   "ANGLE_MIN": 6.16,
+   "APPROACH": 84.976
+  },
+  "c": {
+   "ENTRY_SPEED": 27.636,
+   "LEAD": 3.071,
+   "HB_TIME": 0.19,
+   "CURVE_BAND": 0.002,
+   "CURVE_LIFT": 0.021,
+   "DRIFT_LOOK": 14.174,
+   "DRIFT_LOOK_GAIN": 0.691,
+   "ANGLE_MAX": 47.319,
+   "ANGLE_MIN": 14.973,
+   "APPROACH": 75.703
+  }
+ },
+ "runs": {
+  "a 0": {
+   "profile": {
+    "controls": "pro",
+    "variant": "a"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 67.2,
+   "score": 1736,
+   "slideT": 20.3,
+   "held": 6,
+   "longest": 3.6,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "a 0 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 73.1,
+   "score": 533,
+   "slideT": 2.3,
+   "held": 0,
+   "longest": 0.4,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "a 1": {
+   "profile": {
+    "controls": "pro",
+    "variant": "a"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 31.9,
+   "score": 803,
+   "slideT": 8.6,
+   "held": 2,
+   "longest": 3.1,
+   "spins": 0,
+   "hits": 1,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "a 1 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 34.2,
+   "score": 237,
+   "slideT": 1.2,
+   "held": 0,
+   "longest": 0.6,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "a 2": {
+   "profile": {
+    "controls": "pro",
+    "variant": "a"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 111.8,
+   "score": 6495,
+   "slideT": 66,
+   "held": 18,
+   "longest": 4,
+   "spins": 0,
+   "hits": 3,
+   "hard": 1,
+   "respawns": 0,
+   "errors": 0
+  },
+  "a 2 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 123.4,
+   "score": 814,
+   "slideT": 6.5,
+   "held": 0,
+   "longest": 0.4,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "b 0": {
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 87.7,
+   "score": 1382,
+   "slideT": 35.3,
+   "held": 12,
+   "longest": 3.9,
+   "spins": 0,
+   "hits": 9,
+   "hard": 1,
+   "respawns": 0,
+   "errors": 0
+  },
+  "b 0 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 75.5,
+   "score": 539,
+   "slideT": 3,
+   "held": 0,
+   "longest": 0.5,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "b 1": {
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 37.1,
+   "score": 565,
+   "slideT": 9.5,
+   "held": 2,
+   "longest": 2.7,
+   "spins": 0,
+   "hits": 1,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "b 1 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 35.4,
+   "score": 238,
+   "slideT": 1.6,
+   "held": 0,
+   "longest": 0.6,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "b 2": {
+   "profile": {
+    "controls": "pro",
+    "variant": "b"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 123.2,
+   "score": 2761,
+   "slideT": 60.1,
+   "held": 16,
+   "longest": 5.2,
+   "spins": 0,
+   "hits": 7,
+   "hard": 3,
+   "respawns": 0,
+   "errors": 0
+  },
+  "b 2 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 125.9,
+   "score": 853,
+   "slideT": 9.2,
+   "held": 0,
+   "longest": 0.5,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "c 0": {
+   "profile": {
+    "controls": "pro",
+    "variant": "c"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 70.2,
+   "score": 1521,
+   "slideT": 23.1,
+   "held": 7,
+   "longest": 3.5,
+   "spins": 0,
+   "hits": 3,
+   "hard": 2,
+   "respawns": 0,
+   "errors": 0
+  },
+  "c 0 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 73.2,
+   "score": 525,
+   "slideT": 1.9,
+   "held": 0,
+   "longest": 0.3,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "c 1": {
+   "profile": {
+    "controls": "pro",
+    "variant": "c"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 33.2,
+   "score": 718,
+   "slideT": 8.7,
+   "held": 2,
+   "longest": 3.2,
+   "spins": 0,
+   "hits": 1,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "c 1 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 33.9,
+   "score": 234,
+   "slideT": 0.9,
+   "held": 0,
+   "longest": 0.6,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "c 2": {
+   "profile": {
+    "controls": "pro",
+    "variant": "c"
+   },
+   "handling": "pro",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 112.3,
+   "score": 3450,
+   "slideT": 51.6,
+   "held": 17,
+   "longest": 3.5,
+   "spins": 0,
+   "hits": 1,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  },
+  "c 2 on Easy handling": {
+   "profile": {
+    "controls": "easy"
+   },
+   "handling": "easy",
+   "mode": "pro",
+   "finished": true,
+   "seconds": 123,
+   "score": 797,
+   "slideT": 5.4,
+   "held": 0,
+   "longest": 0.3,
+   "spins": 0,
+   "hits": 0,
+   "hard": 0,
+   "respawns": 0,
+   "errors": 0
+  }
+ }
+}
