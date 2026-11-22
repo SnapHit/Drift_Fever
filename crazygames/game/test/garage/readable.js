@@ -46,7 +46,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import * as G from './lib.js';
 
-const tier = process.argv[2] === 'high' ? 'high' : 'low', look = process.argv.includes('--look'), tag = tier;
+const tier = process.argv[2] === 'high' ? 'high' : 'low', look = process.argv.includes('--look');
 const DIR = look ? path.join(G.root, 'review', 'look') : G.dir, SHOTS = path.join(DIR, 'shots');
 fs.mkdirSync(SHOTS, { recursive: true });
 const PRESETS = look ? ['night', 'dusk', 'dawn', 'rain', 'twilight'] : ['night', 'dusk', 'dawn', 'rain'], GLOWS = ['aqua', 'lime', 'amber', 'magenta', 'violet'];
@@ -108,7 +108,7 @@ for (const preset of PRESETS) {
       if (boost) await page.evaluate(k => { window.__feel.scene.carModel().underglow.material.color.multiplyScalar(k); }, boost);
       /* kept for the eye: career 1 at night and at dawn; the rest are measured and not kept */
       const keep = index === TRACKS[0] && !boost && (preset === 'night' || preset === 'dawn');
-      const png = await G.snap(page, path.join(SHOTS, keep ? 'readable-' + tag + '-' + preset + '-' + (glow || 'off') + '.png' : 'tmp.png'));
+      const png = await G.snap(page, path.join(SHOTS, keep ? 'readable-' + tier + '-' + preset + '-' + (glow || 'off') + '.png' : 'tmp.png'));
       return { m, img: await G.decode(png), pts: await page.evaluate(EDGE) };
     };
     const off = await frame('off');
@@ -134,7 +134,7 @@ for (const preset of PRESETS) {
 out.asWorded = { met: asWorded, of: rows };
 console.log('AS THE BRIEF WORDS IT (the glow never more colourful than the edge): met in ' + asWorded + ' of ' + rows + '. Not a bar here; see the head of this file.');
 try { fs.unlinkSync(path.join(SHOTS, 'tmp.png')); } catch (e) { /* none */ }
-fs.writeFileSync(path.join(DIR, 'readable-' + tag + '.json'), JSON.stringify(out, null, 1));
+fs.writeFileSync(path.join(DIR, 'readable-' + tier + '.json'), JSON.stringify(out, null, 1));
 await env.close();
 console.log(G.failed() ? G.failed() + ' failed' : 'all passed');
 process.exit(G.failed() ? 1 : 0);
