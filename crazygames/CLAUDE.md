@@ -1127,3 +1127,24 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   combinations miss the slide measures, all fully upgraded), rival
   balance and star targets on Pro, the hint hidden in short landscape
   frames as before, the author's pick of a variant.
+- 22 November 2026, **round 1A, the cover look, merged behind
+  `?look=2`** (`briefs/COVER-LOOK.md`, `review/look/REPORT.md`, probes
+  in `game/test/look/`). An environment made at load from each preset's
+  own sky and lights (`render/envmap.js`), clear coat paint, glass and
+  trim, asphalt grain and wet patches with the lights' streaks in them,
+  floodlight towers and a denser venue (`env/venue.js`), white lit
+  smoke, a closer and lower camera (the car 15.8 per cent of the width
+  in landscape, was about 8), FXAA written in TSL (`render/fxaa.js`)
+  with MSAA on the high tier, and career track 1 and the title at
+  floodlit dusk. **Without the switch every frame is main's to the
+  pixel** (`look/switch.js`, rerun by the reviewer before the merge:
+  both tiers, three presets, title and showroom). Two measures fail and
+  are open: the paint's reflections are too faint for the brief's bar
+  on these faceted cars (the sky fill kept for readability), and on
+  WebGL 2 the low tier's own work per frame is 19 to 43 per cent over
+  main's (WebGPU within 10). Initial download 2.68 MB. Open for the
+  author: the cover pair by eye, everything new on his Pixel 9, the
+  bench with and without the look on his desktop and phone. In the
+  sandbox: 2 cores, so timing probes pin the GPU process and the page
+  to separate cores; a WebGPU page sometimes never gets its device, so
+  retry.
