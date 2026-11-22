@@ -1,0 +1,46 @@
+{
+ "look": {
+  "tiers": [
+   {
+    "tier": "low",
+    "drawCalls": 97,
+    "triangles": 357313,
+    "workMs": 5.1,
+    "fps": 4,
+    "frames": 44
+   },
+   {
+    "tier": "high",
+    "drawCalls": 93,
+    "triangles": 937766,
+    "workMs": 5.6,
+    "fps": 1,
+    "frames": 17
+   }
+  ],
+  "saveUnchanged": true,
+  "errors": []
+ },
+ "main": {
+  "tiers": [
+   {
+    "tier": "low",
+    "drawCalls": 92,
+    "triangles": 352571,
+    "workMs": 4.5,
+    "fps": 6,
+    "frames": 70
+   },
+   {
+    "tier": "high",
+    "drawCalls": 94,
+    "triangles": 926687,
+    "workMs": 6,
+    "fps": 2,
+    "frames": 26
+   }
+  ],
+  "saveUnchanged": true,
+  "errors": []
+ }
+}

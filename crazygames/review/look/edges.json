@@ -1,0 +1,32 @@
+{
+ "main": {
+  "rows": 233,
+  "onLine": 227,
+  "slope": -0.669,
+  "hard": 227,
+  "share": 1,
+  "contrast": 0.792
+ },
+ "look": {
+  "rows": 293,
+  "onLine": 273,
+  "slope": -1.14,
+  "hard": 0,
+  "share": 0,
+  "contrast": 0.665
+ },
+ "lookAaOff": {
+  "rows": 294,
+  "onLine": 279,
+  "slope": -1.139,
+  "hard": 279,
+  "share": 1,
+  "contrast": 0.664
+ },
+ "at": {
+  "rival": "r6",
+  "to": 150
+ },
+ "size": "1280x720",
+ "tier": "low"
+}

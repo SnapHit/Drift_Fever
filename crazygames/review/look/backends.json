@@ -1,0 +1,82 @@
+{
+ "webgl2 low": {
+  "backend": "webgl2",
+  "tier": "low",
+  "rows": {
+   "floodlight towers": 976,
+   "floodlight lamps": 2769,
+   "catch fence": 8878,
+   "fence posts": 1958,
+   "barriers in panels": 12533,
+   "the wet road (its material)": 152994,
+   "pools of light": 155730,
+   "glows: flares and wet streaks": 49122,
+   "smoke": 38602,
+   "the car (clear coat, trim, glass)": 26017,
+   "the environment in the reflections": 112460,
+   "known answer": 0,
+   "antialiasing": 27637,
+   "the showroom's studio": 40231
+  }
+ },
+ "webgl2 high": {
+  "backend": "webgl2",
+  "tier": "high",
+  "rows": {
+   "floodlight towers": 1788,
+   "floodlight lamps": 6563,
+   "catch fence": 8727,
+   "fence posts": 2072,
+   "barriers in panels": 12442,
+   "the wet road (its material)": 149693,
+   "pools of light": 162779,
+   "glows: flares and wet streaks": 51045,
+   "smoke": 24502,
+   "the car (clear coat, trim, glass)": 28737,
+   "the environment in the reflections": 84931,
+   "known answer": 0,
+   "antialiasing": 38136,
+   "the showroom's studio": 40231
+  }
+ },
+ "webgpu low": {
+  "backend": "webgpu",
+  "tier": "low",
+  "rows": {
+   "floodlight towers": 965,
+   "floodlight lamps": 2771,
+   "catch fence": 8876,
+   "fence posts": 1957,
+   "barriers in panels": 12472,
+   "the wet road (its material)": 153056,
+   "pools of light": 155743,
+   "glows: flares and wet streaks": 49114,
+   "smoke": 38592,
+   "the car (clear coat, trim, glass)": 26035,
+   "the environment in the reflections": 114684,
+   "known answer": 0,
+   "antialiasing": 27620,
+   "the showroom's studio": 40227
+  }
+ },
+ "webgpu high": {
+  "backend": "webgpu",
+  "tier": "high",
+  "rows": {
+   "floodlight towers": 1783,
+   "floodlight lamps": 6573,
+   "catch fence": 8732,
+   "fence posts": 2113,
+   "barriers in panels": 12398,
+   "the wet road (its material)": 149640,
+   "pools of light": 162730,
+   "glows: flares and wet streaks": 51043,
+   "smoke": 24499,
+   "the car (clear coat, trim, glass)": 28733,
+   "the environment in the reflections": 84945,
+   "known answer": 0,
+   "antialiasing": 38114,
+   "the showroom's studio": 40227
+  }
+ }
+}
