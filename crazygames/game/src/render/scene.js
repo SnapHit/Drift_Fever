@@ -655,16 +655,19 @@ export function createScene(canvas, opts) {
         }
         out = out.add(TSL.vec4(glow.mul(B.strength / B.taps), 0));
       }
-      const G = grade;
-      let rgb = out.rgb.mul(G.gain).add(G.lift);
-      rgb = TSL.mix(TSL.vec3(rgb.dot(TSL.vec3(0.2126, 0.7152, 0.0722))), rgb, G.saturation);
-      if (tier === 'high') rgb = rgb.mul(TSL.float(1).sub(G.vignette.mul(TSL.smoothstep(0.35, 1.0, TSL.uv().sub(0.5).length().mul(1.414)))));   // the low tier's vignette is the page's own (main.js), over the canvas
-      out = TSL.vec4(rgb, out.a);
+      /* the grade: lift, gain and saturation per preset, and on the high tier the vignette (the low tier's is the page's own, main.js, over the canvas) */
+      const G = grade, graded = c => {
+        let rgb = c.rgb.mul(G.gain).add(G.lift);
+        rgb = TSL.mix(TSL.vec3(rgb.dot(TSL.vec3(0.2126, 0.7152, 0.0722))), rgb, G.saturation);
+        if (tier === 'high') rgb = rgb.mul(TSL.float(1).sub(G.vignette.mul(TSL.smoothstep(0.35, 1.0, TSL.uv().sub(0.5).length().mul(1.414)))));
+        return TSL.vec4(rgb, c.a);
+      };
       if (antialias && C.FXAA) {
         pipeline.outputColorTransform = false;
-        const toned = TSL.rtt(TSL.renderOutput(out, renderer.toneMapping, renderer.outputColorSpace), null, null, { type: THREE.UnsignedByteType });
-        pipeline.outputNode = fxaa(THREE, toned);
-      } else pipeline.outputNode = out;
+        const display = c => TSL.renderOutput(graded(c), renderer.toneMapping, renderer.outputColorSpace);
+        if (tier === 'high') pipeline.outputNode = fxaa(THREE, TSL.rtt(display(out), null, null, { type: THREE.UnsignedByteType }));   // the bloom's picture, tone mapped once into its own, then smoothed
+        else pipeline.outputNode = fxaa(THREE, scenePass.getTextureNode('output'), display);   // the low tier: no picture between, each read tone mapped as it is taken
+      } else pipeline.outputNode = graded(out);
       post = pipeline;
     } catch (e) { console.warn('post off: ' + (e && e.message)); post = null; }
   }

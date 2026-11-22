@@ -17,20 +17,25 @@ export const FXAA = {
   SPAN_MAX:   8,         // px, the longest blur along an edge
 };
 
-/* tex: a texture node of the tone mapped picture (an RTT node); returns the antialiased colour node */
-export function fxaa(THREE, tex) {
+/* tex: a texture node of the picture; toDisplay (optional): a function
+   taking a sampled colour (vec4) to the displayed one, for a picture
+   not yet tone mapped (the low tier: one pass less, the tone curve
+   applied to each of the nine reads instead of written to a picture
+   of its own first). Returns the antialiased colour node. */
+export function fxaa(THREE, tex, toDisplay) {
   const T = THREE.TSL, F = FXAA;
   const uv = T.uv(), texel = T.vec2(1).div(T.vec2(tex.size(T.int(0))));
-  const at = (dx, dy) => tex.sample(uv.add(T.vec2(dx, dy).mul(texel))).rgb;
+  const read = p => toDisplay ? toDisplay(tex.sample(p)) : tex.sample(p);
+  const at = (dx, dy) => read(uv.add(T.vec2(dx, dy).mul(texel))).rgb;
   const luma = c => c.dot(T.vec3(0.299, 0.587, 0.114));
-  const M = tex.sample(uv);
+  const M = read(uv);
   const lNW = luma(at(-1, -1)), lNE = luma(at(1, -1)), lSW = luma(at(-1, 1)), lSE = luma(at(1, 1)), lM = luma(M.rgb);
   const lMin = T.min(lM, T.min(T.min(lNW, lNE), T.min(lSW, lSE))), lMax = T.max(lM, T.max(T.max(lNW, lNE), T.max(lSW, lSE)));
   const dir0 = T.vec2(lNW.add(lNE).sub(lSW.add(lSE)).negate(), lNW.add(lSW).sub(lNE.add(lSE)));
   const reduce = T.max(lNW.add(lNE).add(lSW).add(lSE).mul(0.25 * F.REDUCE_MUL), T.float(F.REDUCE_MIN));
   const rcp = T.float(1).div(T.min(dir0.x.abs(), dir0.y.abs()).add(reduce));
   const dir = T.clamp(dir0.mul(rcp), T.vec2(-F.SPAN_MAX), T.vec2(F.SPAN_MAX)).mul(texel);
-  const s = k => tex.sample(uv.add(dir.mul(k))).rgb;
+  const s = k => read(uv.add(dir.mul(k))).rgb;
   const A = s(1 / 3 - 0.5).add(s(2 / 3 - 0.5)).mul(0.5);
   const B = A.mul(0.5).add(s(-0.5).add(s(0.5)).mul(0.25));
   const lB = luma(B);

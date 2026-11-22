@@ -3,10 +3,19 @@
    terrain.js and scenery.js), so the same placement the scene draws is
    checked here over many generated tracks and every theme.
 
-   node game/test/visuals/occlusion.js [--seeds N] [--quick] [--career]
+   node game/test/visuals/occlusion.js [--seeds N] [--quick] [--career] [--look]
 
    --career checks the 24 career tracks instead, as the game asks for
    them (briefs/CHAPTERS.md), and writes review/chapters/occlusion.json.
+
+   --look checks the cover look (briefs/COVER-LOOK.md 4 and 7, ?look=2):
+   its trackside (the floodlight towers and the denser stands, boards,
+   flags and tyre stacks env/scenery.js places with the look) from its
+   camera (TUNE.CAMERA.LOOK: closer and lower), and writes
+   review/look/occlusion.json. Not placed here, as before the look: the
+   dressing's lamp row (env/dressing.js) and the look's catch fencing
+   (env/venue.js), a see through wire behind the barrier on the outside
+   of the corners. Its known answer: a barrier across the racing line.
 
    Three checks, each over every track and theme:
    a. Inside the barriers: no prop's footprint (a circle's rim, or a
@@ -43,6 +52,7 @@ const root = path.resolve(here, '..', '..', '..');
 const args = process.argv.slice(2);
 const quick = args.includes('--quick');
 const careerOnly = args.includes('--career');
+const look = args.includes('--look');
 const seedsN = args.includes('--seeds') ? +args[args.indexOf('--seeds') + 1] : (quick ? 4 : 24);
 
 export const BUDGET = {
@@ -58,7 +68,7 @@ export const BUDGET = {
 /* The chase camera's position for a centre sample: behind along the
    heading and above, as camera/chase.js places it in landscape. */
 function cameraAt(c, speed) {
-  const C = TUNE.CAMERA;
+  const C = look ? { ...TUNE.CAMERA, ...TUNE.CAMERA.LOOK } : TUNE.CAMERA;
   const dist = C.DISTANCE + C.DISTANCE_SPEED * speed;
   const fx = -Math.sin(c.heading), fz = -Math.cos(c.heading);
   return { x: c.x - fx * dist, y: (c.y || 0) + C.HEIGHT, z: c.z - fz * dist };
@@ -103,7 +113,7 @@ function underTerrain(a, b, terrain) {
 export function checkTrack(track, theme, options) {
   const o = options || {};
   const terrain = buildTerrain(track, theme, { cell: 8 });
-  const placed = placeScenery(track, theme, terrain, { share: 1 });
+  const placed = placeScenery(track, theme, terrain, { share: 1, look });
   const list = flatten(placed);
   if (o.inject) list.push(...o.inject);
   const C = track.centre, n = C.length;
@@ -208,6 +218,8 @@ const mid = kaTrack.centre[Math.floor(kaTrack.centre.length / 2)];
 const tree = { kind: 'pine', x: mid.x, y: 0, z: mid.z, r: PROP_DIMS.pine.r, h: PROP_DIMS.pine.h, ry: 0, s: 1, box: null };
 const kaTree = checkTrack(kaTrack, THEMES.forest, { inject: [tree] });
 const kaLift = checkTrack(kaTrack, THEMES.forest, { terrainLift: 1.5 });
+/* the cover look's known answer: a barrier (8 m across, 1.2 m tall) standing across the racing line */
+const kaBarrier = look ? checkTrack(kaTrack, THEMES.forest, { inject: [{ kind: 'barrier', x: mid.x, y: mid.y || 0, z: mid.z, r: 4, h: 1.2, ry: mid.heading, s: 1, box: [8, 0.5] }] }) : null;
 const verdicts = [];
 const verdict = (label, ok, detail) => { verdicts.push({ label, ok, detail }); console.log((ok ? 'PASS ' : 'FAIL ') + label + ': ' + detail); };
 verdict('no prop footprint inside the barriers, over ' + rows.length + ' track and theme pairs', worst.inside === 0 && worst.clear >= 0, worst.inside + ' inside, least clearance ' + worst.clear.toFixed(2) + ' m');
@@ -216,11 +228,12 @@ verdict('sight lines to the road ahead: none blocked within ' + BUDGET.CLEAR_AHE
 verdict('known answer: a pine on the road is inside the barriers', kaTree.inside >= 1 && kaTree.worstClear < 0, 'inside ' + kaTree.inside + ', clearance ' + kaTree.worstClear + ' m (' + kaTree.worstKind + ')');
 verdict('known answer: a pine on the road blocks sight lines', kaTree.blocked > 0 && kaTree.blockedNear > 0, kaTree.blocked + ' blocked, ' + kaTree.blockedNear + ' within ' + BUDGET.CLEAR_AHEAD + ' m, nearest ' + kaTree.nearest + ' m');
 verdict('known answer: the terrain lifted a metre and a half under the road is caught', kaLift.worstRise > BUDGET.ROAD_FLAT, 'worst rise ' + kaLift.worstRise + ' m');
+if (kaBarrier) verdict('known answer (the look): a barrier across the racing line blocks sight lines from the look\'s camera', kaBarrier.blocked > 0 && kaBarrier.blockedNear > 0, kaBarrier.blocked + ' blocked, ' + kaBarrier.blockedNear + ' within ' + BUDGET.CLEAR_AHEAD + ' m, nearest ' + kaBarrier.nearest + ' m');
 const out = { started: new Date(t0).toISOString(), seconds: +((Date.now() - t0) / 1000).toFixed(1), budget: BUDGET, seeds: seeds.length, themes: THEME_NAMES, summary: { pairs: rows.length, inside: worst.inside, leastClearance: worst.clear, worstRise: worst.rise, lines: totalLines, blocked: totalBlocked, blockedShare: +(totalBlocked / totalLines).toFixed(4), worstTrackBlockedShare: +worst.blockedShare.toFixed(4), blockedNear: worst.blockedNear }, knownAnswers: { treeOnRoad: kaTree, terrainLifted: { worstRise: kaLift.worstRise } }, verdicts, rows };
-const dir = path.join(root, 'review', careerOnly ? 'chapters' : 'visuals');
+const dir = path.join(root, 'review', look ? 'look' : careerOnly ? 'chapters' : 'visuals');
 fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(path.join(dir, 'occlusion.json'), JSON.stringify(out, null, 1));
 const failed = verdicts.filter(v => !v.ok).length;
-console.log((failed ? failed + ' FAILED' : 'all passed') + ' in ' + out.seconds + ' s; wrote review/' + (careerOnly ? 'chapters' : 'visuals') + '/occlusion.json');
+console.log((failed ? failed + ' FAILED' : 'all passed') + ' in ' + out.seconds + ' s; wrote review/' + (look ? 'look' : careerOnly ? 'chapters' : 'visuals') + '/occlusion.json');
 process.exit(failed ? 1 : 0);
 }
