@@ -271,11 +271,11 @@ export function createScene(canvas, opts) {
     const key = [seed, ground.name, p.name, th.name, tier].join('|');
     if (env && envKey !== key) { scene.remove(env.group); scene.remove(env.sky); env.dispose(); env = null; }
     if (!env) {
-      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), sponsors: FX_ON ? SPONSORS_SHOW : null });
+      env = buildEnvironment(THREE, ground, { preset: p, theme: th, tier: T(), sponsors: FX_ON ? SPONSORS_SHOW : null, look: LOOK_ON });
       scene.add(env.group); scene.add(env.sky);
       envKey = key;
       if (dressing) { scene.remove(dressing.group); dressing.dispose(); dressing = null; }
-      if (FX_ON) { dressing = buildDressing(THREE, ground, { preset: p, theme: th, tierName: tier, env }); scene.add(dressing.group); }
+      if (FX_ON) { dressing = buildDressing(THREE, ground, { preset: p, theme: th, tierName: tier, env, look: LOOK_ON }); scene.add(dressing.group); }
       if (LOOK_ON) setEnvironment(key, p, th, seed);
     }
     // cones

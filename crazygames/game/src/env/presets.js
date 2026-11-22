@@ -190,11 +190,11 @@ export const TWILIGHT = {
   glowGain:     1.7,
   sunElev:      62,           // the key light: the floodlights, high
   sunAzim:      150,
-  sun:          2.1,
+  sun:          1.35,
   sunColour:    0xe6ecff,     // cool white, as floodlights are
   hemiSky:      0x5a4a9a,     // the violet sky's fill
   hemiGround:   0x2a1a26,
-  hemi:         1.5,
+  hemi:         1.05,
   fogNear:      80,
   fogFar:       560,
   exposure:     1.05,

@@ -32,13 +32,13 @@ export const SHOW = {
   TRAIL_SOFT:       0.22,    // how far in from the soft sprite's edge the ribbon's own edges sit, 0 to 0.5 (0: fully soft edges, a thinner looking trail)
   TRAIL_MIN_SPEED:  6,       // m/s
   TRAIL_SPACING:    0.12,    // m the car moves before a new point is laid
-  TRAIL_PRESETS:    { dusk: 0.8, night: 1, dawn: 0.5, rain: 0.9 },   // how strongly each preset shows them. Dawn was 0 (daylight hides a tail-light) and dusk 0.55 until 15 November 2026: the author wants them on every track, and had never seen one
+  TRAIL_PRESETS:    { dusk: 0.8, night: 1, dawn: 0.5, rain: 0.9, twilight: 1 },   // how strongly each preset shows them. Dawn was 0 (daylight hides a tail-light) and dusk 0.55 until 15 November 2026: the author wants them on every track, and had never seen one
   /* the tail-lights */
-  TAIL_BASE:        { dusk: 0.6, night: 1, dawn: 0.35, rain: 1 },   // the tail-lights' glow with no brake
+  TAIL_BASE:        { dusk: 0.6, night: 1, dawn: 0.35, rain: 1, twilight: 1 },   // the tail-lights' glow with no brake
   TAIL_BRAKE:       2.4,     // and under the brake or the handbrake
   TAIL_EASE:        14,      // per second
   HALO_SIZE:        0.34,    // m, the halo round each tail-light
-  HALO_ALPHA:       { dusk: 0.35, night: 0.75, dawn: 0.15, rain: 0.7 },
+  HALO_ALPHA:       { dusk: 0.35, night: 0.75, dawn: 0.15, rain: 0.7, twilight: 0.7 },
   HALO_BRAKE:       2.0,     // the halo's size and brightness under the brake, times
   /* the exhaust pop on the lift */
   POP_MIN_SLIDE:    0.45,    // s of slide before its end pops
@@ -70,8 +70,8 @@ export const SHOW = {
     KEEP:           0.12,        // share of the wheel's velocity a puff is born with
     THROW:          [4.5, 6.5],  // m/s a puff is thrown the way the tyres slide (out of the corner), so the cloud billows beside the car's path where the camera can see it
     DRAG:           1.3,
-    COLOUR:         { dusk: 0xe8d4c8, night: 0xa4abc8, dawn: 0xfff0e2, rain: 0xb8bec8 },   // the smoke as it drifts away, lit by the preset
-    BIRTH:          { dusk: 0xffc89a, night: 0xff5a4a, dawn: 0xffe2c0, rain: 0xe0c4c4 },   // as it leaves the tyre: warm in the low sun, red from the tail-lights in the dark
+    COLOUR:         { dusk: 0xe8d4c8, night: 0xa4abc8, dawn: 0xfff0e2, rain: 0xb8bec8, twilight: 0xd6d2e2 },   // twilight: the cover look's floodlit dusk, white under the floods   // the smoke as it drifts away, lit by the preset
+    BIRTH:          { dusk: 0xffc89a, night: 0xff5a4a, dawn: 0xffe2c0, rain: 0xe0c4c4, twilight: 0xffb4a4 },   // as it leaves the tyre: warm in the low sun, red from the tail-lights in the dark
     HEAT_TINT:      0xffb48a,    // the smoke warms towards this with the heat
     HEAT_TINT_MAX:  0.3,
     /* the car stays readable: smoke that covers the car on the screen
@@ -91,7 +91,7 @@ export const SHOW = {
     KEEP:           0.62,        // share of the chosen colour left as the puff drifts away
     BIRTH_LIFT:     0.12,        // the colour at the tyre, lifted this far towards white
     HEAT_LIFT:      0.45,        // the heat's tint: the colour this far towards white
-    LIGHT:          { dusk: 0.95, night: 0.72, dawn: 1.0, rain: 0.8 },
+    LIGHT:          { dusk: 0.95, night: 0.72, dawn: 1.0, rain: 0.8, twilight: 0.88 },
   },
   /* THE UNDERGLOW (briefs/GARAGE.md 3): a soft light under the car on
      the road, in a colour bought in the garage. The light is the glow
@@ -103,7 +103,7 @@ export const SHOW = {
      brightness and colourfulness in every preset
      (game/test/garage/readable.js). */
   UNDERGLOW: {
-    STRENGTH:       { dusk: 0.34, night: 0.42, dawn: 0.3, rain: 0.36 },
+    STRENGTH:       { dusk: 0.34, night: 0.42, dawn: 0.3, rain: 0.36, twilight: 0.42 },
     GHOST:          0.5,         // a ghost's glow, as a share of that
     SOFT:           0.72,        // the soft form's share of that (the high tier): its bloom and grade lift it, and measured without this three colours came within 15 per cent of the edge at night
   },

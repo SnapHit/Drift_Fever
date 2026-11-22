@@ -57,6 +57,8 @@ export function createChaseCamera() {
     state.tx = pose.x + fx * look + lx * sx; state.ty = (pose.y || 0) + C.LOOK_UP + sy; state.tz = pose.z + fz * look + lz * sx;
     state.boostK += ((pose.boost > 0 ? 1 : 0) - state.boostK) * (1 - Math.exp(-dt / Math.max(0.01, C.BOOST_FOV_TIME)));
     state.fov = (state.portrait ? C.FOV_PORTRAIT : C.FOV) + C.FOV_SPEED * pose.speed + C.BOOST_FOV * state.boostK;
+    /* the cover look (TUNE.CAMERA.LOOK, only there): a screen wider than ASPECT_MAX sees no more across than ASPECT_MAX would */
+    if (C.ASPECT_MAX && aspect > C.ASPECT_MAX) state.fov = 2 * Math.atan(Math.tan(state.fov * DEG / 2) * C.ASPECT_MAX / aspect) / DEG;
     if (ceiling) state.py = Math.min(state.py, ceiling(state.px, state.pz, pose));
     if (cam) {
       cam.position.set(state.px, state.py, state.pz);
