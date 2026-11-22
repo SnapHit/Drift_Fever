@@ -1,0 +1,66 @@
+{
+ "ref": "23cfd99",
+ "now": {
+  "phone": {
+   "hud": 0,
+   "touch": 0,
+   "title": 2,
+   "firstTitle": 326,
+   "looks": 23,
+   "pressed": {
+    "readyAtPress": false,
+    "stateAfter": "countdown"
+   },
+   "after": {
+    "title": false,
+    "state": "countdown",
+    "backend": "webgpu"
+   },
+   "errors": []
+  },
+  "desktop": {
+   "hud": 0,
+   "touch": 0,
+   "title": 2,
+   "firstTitle": 283,
+   "looks": 17,
+   "pressed": null,
+   "after": {
+    "title": true,
+    "state": "title",
+    "backend": "webgpu"
+   },
+   "errors": []
+  }
+ },
+ "then": {
+  "phone": {
+   "hud": 2,
+   "touch": 2,
+   "title": 0,
+   "firstTitle": null,
+   "looks": 21,
+   "pressed": null,
+   "after": {
+    "title": true,
+    "state": "title",
+    "backend": "webgpu"
+   },
+   "errors": []
+  },
+  "desktop": {
+   "hud": 2,
+   "touch": 0,
+   "title": 0,
+   "firstTitle": null,
+   "looks": 16,
+   "pressed": null,
+   "after": {
+    "title": true,
+    "state": "title",
+    "backend": "webgpu"
+   },
+   "errors": []
+  }
+ }
+}

@@ -19,7 +19,7 @@ export * from '../garage/lib.js';
 export const ARGS = ['--enable-unsafe-webgpu', '--use-webgpu-adapter=swiftshader', '--ignore-gpu-blocklist'];
 export const start = () => R.start({ args: ARGS });
 
-const FAKE = `(function () {
+export const FAKE = `(function () {
   window.requestAnimationFrame = function () { return 0; }; window.cancelAnimationFrame = function () {};
   const real = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function (kind, opts) {

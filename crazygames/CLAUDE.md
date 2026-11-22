@@ -1200,3 +1200,24 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   alone needs an envMap of its own. Not measured: the cost, one light
   more on the cars' pixels only. Before and after:
   `review/look/paint-fix.jpg`.
+- 23 November 2026, after the author saw it on his phone: **the boot
+  no longer shows the race HUD.** For about half a second after
+  driftfever.com was typed in, the HUD and the touch buttons (0 POINTS,
+  0 KM/H, DRIFT / BRAKE) stood on an empty screen while the renderer
+  started, which read as a broken splash screen. Now nothing of a run
+  shows until a run starts (the HUD and the touch buttons are hidden as
+  they are made, in `main.js`), and the title is drawn the moment the
+  game's code runs, before the renderer is ready, with the 3D backdrop
+  coming in behind it once it is. A press in that time is kept and
+  acted on when the game is ready (full screen at once, as it needs the
+  press itself). A track link, the bench and the probes' ground draw
+  nothing early. `game/test/start/boot.js` watches the boot on the
+  sandbox's WebGPU (on its WebGL 2 the renderer starts inside one task,
+  so nothing is ever painted in between), as a phone and as a desktop:
+  no HUD, no touch buttons, the title before the game is ready, and a
+  press on start here in that time starts career track 1 once it is.
+  Known answer: main before the change (23cfd99) shows the HUD and the
+  touch buttons and no title, caught. `start/check.js` passes 27 of 27
+  with its park screenshot's timeout raised for the sandbox's software
+  drawing (not committed). Until the game's code has arrived the page is
+  still its plain dark ground.

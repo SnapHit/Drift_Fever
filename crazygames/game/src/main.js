@@ -75,6 +75,10 @@ const scoring = createScoring();
 const chase = createChaseCamera();
 const input = createInput(root);
 const hud = createHud(root);
+/* nothing of a run shows until a run starts: the race HUD and the touch
+   buttons used to stand on an empty screen while the renderer started
+   (about half a second on a phone), which read as a broken splash */
+hud.setVisible(false); input.touch.setVisible(false);
 /* CrazyGames' SDK: nothing unless this build is their package (sdk/host.js) */
 const sdk = createSdk();
 const screens = createScreens(root, onAction);
@@ -783,6 +787,8 @@ function closeParkList() {
 }
 
 function onAction(action, arg) {
+  /* the title is up before the game is ready (see "go"): a press then is kept and acted on once it is, but full screen needs the press itself */
+  if (!running) { if (action === 'fullscreen') toggleFullscreen(); else pendingAction = [action, arg]; return; }
   sound.ui('tap');
   switch (action) {
     case 'music': sound.setMusic(!sound.music); showMenu('title'); break;
@@ -875,6 +881,15 @@ onFullscreenChange(on => { hud.fs.innerHTML = fullscreenIcon(on); hud.fs.setAttr
 
 /* ---- go ---- */
 let running = false;
+/* The title at once, before the 3D is ready, so the first thing a visitor
+   sees is the game's own title on its dark ground; the backdrop comes in
+   behind it when the renderer has started. A press in that time waits in
+   pendingAction. Only a visit bound for the title (not a track link, the
+   bench or the probes' ground) draws it early. */
+let pendingAction = null;
+if (!devGround && query.get('bench') !== '1' && !query.has('track')) {
+  try { screens.title(save.state, titleInfo()); } catch (e) { screens.hide(); }   // the title comes with the game if it cannot come sooner
+}
 function loop(t) { frame(t); requestAnimationFrame(loop); }
 scene.ready.then(() => {
   resize();
@@ -929,7 +944,9 @@ scene.ready.then(() => {
   frame(performance.now());
   requestAnimationFrame(loop);
   window.__ready = true;
+  if (pendingAction) { const [a, g] = pendingAction; pendingAction = null; onAction(a, g); }
 }).catch(e => {
+  screens.hide();   // the early title would stand over the message
   const el = document.getElementById('fail');
   el.textContent = 'The 3D renderer could not start: ' + (e && e.message || e);
   el.hidden = false;
