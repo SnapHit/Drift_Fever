@@ -1076,3 +1076,7 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   seconds on the title before the first run, since the game opens on
   the menu. Not tried before submitting: an iPhone, Edge. Their Basic
   Launch scoring adds click-through rate from 23 November 2026.
+- 22 November 2026: **CrazyGames rejected it** at Basic Launch review.
+  Their only reason, in full: "The overall quality of the game does not
+  yet meet the expectations of our platform", with a pointer to their
+  New games list as examples. No specific fault was named.
