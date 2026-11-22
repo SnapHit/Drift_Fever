@@ -2251,19 +2251,19 @@
        "v": 20,
        "ms": 50,
        "turnedDeg": 0.7,
-       "sidewaysM": 0.45
+       "sidewaysM": 0.46
       },
       {
        "v": 20,
        "ms": 100,
-       "turnedDeg": 2.9,
-       "sidewaysM": 1.72
+       "turnedDeg": 2.8,
+       "sidewaysM": 1.74
       },
       {
        "v": 20,
        "ms": 200,
-       "turnedDeg": 7.2,
-       "sidewaysM": 4
+       "turnedDeg": 6.9,
+       "sidewaysM": 3.94
       },
       {
        "v": 25,
@@ -2275,13 +2275,13 @@
        "v": 25,
        "ms": 100,
        "turnedDeg": 2.2,
-       "sidewaysM": 1.51
+       "sidewaysM": 1.55
       },
       {
        "v": 25,
        "ms": 200,
-       "turnedDeg": 5.9,
-       "sidewaysM": 3.59
+       "turnedDeg": 5.4,
+       "sidewaysM": 3.56
       }
      ],
      "holds": [
@@ -2314,9 +2314,9 @@
       "onboard": {
        "shown": [
         "steer",
+        "clean",
         "drift",
         "brake",
-        "clean",
         "chain"
        ],
        "how": {
@@ -2326,61 +2326,61 @@
        },
        "taught": true
       },
-      "seconds": 94.63,
-      "score": 470,
+      "seconds": 98.6,
+      "score": 459,
       "stars": 1,
-      "coins": 177,
-      "cleanSectors": "7 of 12",
+      "coins": 175,
+      "cleanSectors": "5 of 12",
       "parts": {
-       "drift": 136,
-       "clean": 168,
-       "pace": 166
+       "drift": 180,
+       "clean": 120,
+       "pace": 159
       },
       "finished": true,
-      "meanV": 17.95,
+      "meanV": 17.2,
       "toPace": 1.78,
       "toPaceHigh": 2.38,
-      "crawlS": 0.77,
+      "crawlS": 4.97,
       "steerShare": 0.93,
-      "vSteering": 17.88,
-      "vNotSteering": 18.68,
-      "pressesPer10s": 8.48,
-      "swapsPer10s": 5.94,
-      "wander": 0.34,
-      "contactsPerLap": 2.33,
-      "hardPerLap": 2,
-      "impactMean": 9.97,
-      "impactMax": 16.5,
-      "lossPerContact": 6.38,
-      "lossTotal": 44.67,
-      "scrapeS": 0.12,
+      "vSteering": 17.32,
+      "vNotSteering": 15.44,
+      "pressesPer10s": 9.16,
+      "swapsPer10s": 6,
+      "wander": 0.35,
+      "contactsPerLap": 4.33,
+      "hardPerLap": 2.67,
+      "impactMean": 5.47,
+      "impactMax": 13.54,
+      "lossPerContact": 5.22,
+      "lossTotal": 67.81,
+      "scrapeS": 1.43,
       "shakeMax": 0.81,
-      "yawKickMean": 147.26,
-      "putBack": 0,
+      "yawKickMean": 259.65,
+      "putBack": 1,
       "offTrack": 0,
-      "slides": 10,
-      "slideSecondsMean": 1.08,
-      "slideSecondsTotal": 10.82,
-      "slidesOverOneSecond": 7,
-      "slideAngleMean": 28.39,
-      "slidesIntoWall": 2,
-      "endFallMean": 63.75,
-      "endFallMax": 78,
-      "spins": 4,
-      "spinsFromWall": 4,
-      "driftPresses": 8,
+      "slides": 11,
+      "slideSecondsMean": 0.91,
+      "slideSecondsTotal": 9.97,
+      "slidesOverOneSecond": 6,
+      "slideAngleMean": 28.63,
+      "slidesIntoWall": 7,
+      "endFallMean": 57,
+      "endFallMax": 66,
+      "spins": 6,
+      "spinsFromWall": 6,
+      "driftPresses": 7,
       "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.6,
+      "slideEndsWithThumbs": 0.55,
       "driftAlonePresses": 2,
-      "driftAloneLoss": 6.51,
+      "driftAloneLoss": 11.99,
       "countdownS": 3.02,
-      "promptS": 6.7,
-      "infoS": 9.02,
+      "promptS": 6.73,
+      "infoS": 7.75,
       "lineToResultsS": 0.95,
-      "cameraTurnMax": 5.9,
-      "cameraCuts": 0,
+      "cameraTurnMax": 7.4,
+      "cameraCuts": 3,
       "cameraCutsInDrive": 0,
-      "cameraCutsAtPutBack": 0,
+      "cameraCutsAtPutBack": 3,
       "cameraCutsAtFinish": 0,
       "cameraCutsInCountdown": 0,
       "fovStepMax": 2.8
@@ -2393,8 +2393,9 @@
       "onboard": {
        "shown": [
         "steer",
-        "drift",
         "clean",
+        "drift",
+        "chain",
         "brake"
        ],
        "how": {
@@ -2404,64 +2405,64 @@
        },
        "taught": true
       },
-      "seconds": 92.93,
-      "score": 400,
-      "stars": 0,
-      "coins": 100,
-      "cleanSectors": "8 of 12",
+      "seconds": 89.42,
+      "score": 561,
+      "stars": 1,
+      "coins": 246,
+      "cleanSectors": "11 of 12",
       "parts": {
-       "drift": 39,
-       "clean": 192,
-       "pace": 169
+       "drift": 122,
+       "clean": 264,
+       "pace": 175
       },
       "finished": true,
-      "meanV": 17.82,
+      "meanV": 18.51,
       "toPace": 1.78,
       "toPaceHigh": 2.38,
-      "crawlS": 2.53,
+      "crawlS": 0,
       "steerShare": 0.94,
-      "vSteering": 17.91,
-      "vNotSteering": 18.22,
-      "pressesPer10s": 8.86,
-      "swapsPer10s": 7.34,
-      "wander": 0.26,
-      "contactsPerLap": 2.67,
-      "hardPerLap": 1.67,
-      "impactMean": 7.75,
-      "impactMax": 20.03,
-      "lossPerContact": 5.15,
-      "lossTotal": 41.19,
-      "scrapeS": 1.3,
-      "shakeMax": 0.81,
-      "yawKickMean": 185.3,
-      "putBack": 1,
+      "vSteering": 18.59,
+      "vNotSteering": 18.58,
+      "pressesPer10s": 9.88,
+      "swapsPer10s": 7.3,
+      "wander": 0.24,
+      "contactsPerLap": 0,
+      "hardPerLap": 0.33,
+      "impactMean": 10.83,
+      "impactMax": 10.83,
+      "lossPerContact": 0,
+      "lossTotal": 0,
+      "scrapeS": 0,
+      "shakeMax": 0.59,
+      "yawKickMean": 0,
+      "putBack": 0,
       "offTrack": 0,
-      "slides": 7,
-      "slideSecondsMean": 0.81,
-      "slideSecondsTotal": 5.67,
-      "slidesOverOneSecond": 3,
-      "slideAngleMean": 25.43,
-      "slidesIntoWall": 3,
-      "endFallMean": 58.5,
+      "slides": 4,
+      "slideSecondsMean": 1.22,
+      "slideSecondsTotal": 4.87,
+      "slidesOverOneSecond": 2,
+      "slideAngleMean": 30.75,
+      "slidesIntoWall": 0,
+      "endFallMean": 64.5,
       "endFallMax": 66,
-      "spins": 2,
-      "spinsFromWall": 2,
-      "driftPresses": 5,
+      "spins": 0,
+      "spinsFromWall": 0,
+      "driftPresses": 4,
       "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.43,
+      "slideEndsWithThumbs": 0.5,
       "driftAlonePresses": 1,
       "driftAloneLoss": 8.51,
       "countdownS": 3.02,
       "promptS": 22.48,
-      "infoS": 0,
+      "infoS": 1.55,
       "lineToResultsS": 0.95,
-      "cameraTurnMax": 6.6,
-      "cameraCuts": 1,
-      "cameraCutsInDrive": 1,
+      "cameraTurnMax": 4.8,
+      "cameraCuts": 0,
+      "cameraCutsInDrive": 0,
       "cameraCutsAtPutBack": 0,
       "cameraCutsAtFinish": 0,
       "cameraCutsInCountdown": 0,
-      "fovStepMax": 2.9
+      "fovStepMax": 2.5
      },
      {
       "seed": 3,
@@ -2471,67 +2472,68 @@
       "onboard": {
        "shown": [
         "steer",
+        "clean",
         "drift",
         "brake",
-        "clean"
+        "chain"
        ],
        "how": {
         "steer": "done",
         "drift": "done",
-        "brake": "timeout"
+        "brake": "done"
        },
        "taught": true
       },
-      "seconds": 94.85,
-      "score": 350,
-      "stars": 0,
-      "coins": 35,
-      "cleanSectors": "6 of 12",
+      "seconds": 97.37,
+      "score": 388,
+      "stars": 1,
+      "coins": 168,
+      "cleanSectors": "7 of 12",
       "parts": {
-       "drift": 41,
-       "clean": 144,
-       "pace": 165
+       "drift": 59,
+       "clean": 168,
+       "pace": 161
       },
       "finished": true,
-      "meanV": 17.68,
+      "meanV": 17.28,
       "toPace": 1.78,
       "toPaceHigh": 2.38,
-      "crawlS": 2.47,
-      "steerShare": 0.95,
-      "vSteering": 17.55,
-      "vNotSteering": 17.66,
-      "pressesPer10s": 8.25,
-      "swapsPer10s": 6.88,
-      "wander": 0.31,
-      "contactsPerLap": 3.33,
-      "hardPerLap": 3,
-      "impactMean": 6.64,
-      "impactMax": 14.79,
-      "lossPerContact": 6.74,
-      "lossTotal": 67.38,
-      "scrapeS": 0.8,
+      "crawlS": 4.73,
+      "steerShare": 0.94,
+      "vSteering": 17.26,
+      "vNotSteering": 17.42,
+      "pressesPer10s": 8.24,
+      "swapsPer10s": 6.8,
+      "wander": 0.3,
+      "contactsPerLap": 4.67,
+      "hardPerLap": 2.67,
+      "impactMean": 5.85,
+      "impactMax": 14.83,
+      "lossPerContact": 5.38,
+      "lossTotal": 75.33,
+      "scrapeS": 1.55,
       "shakeMax": 0.81,
-      "yawKickMean": 162.67,
+      "yawKickMean": 206.56,
       "putBack": 0,
       "offTrack": 0,
-      "slides": 9,
-      "slideSecondsMean": 0.78,
-      "slideSecondsTotal": 7.05,
-      "slidesOverOneSecond": 4,
-      "slideAngleMean": 26.78,
-      "slidesIntoWall": 6,
-      "endFallMean": 56,
+      "slides": 13,
+      "slideSecondsMean": 0.67,
+      "slideSecondsTotal": 8.67,
+      "slidesOverOneSecond": 3,
+      "slideAngleMean": 23.75,
+      "slidesIntoWall": 7,
+      "endFallMean": 58,
       "endFallMax": 66,
-      "spins": 4,
-      "spinsFromWall": 4,
+      "spins": 1,
+      "spinsFromWall": 1,
       "driftPresses": 6,
       "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.56,
-      "driftAlonePresses": 0,
-      "driftAloneLoss": 0,
+      "slideEndsWithThumbs": 0.38,
+      "driftAlonePresses": 1,
+      "driftAloneLoss": 7.24,
       "countdownS": 3.02,
-      "promptS": 14.05,
-      "infoS": 4.5,
+      "promptS": 6.23,
+      "infoS": 7.82,
       "lineToResultsS": 0.95,
       "cameraTurnMax": 5.6,
       "cameraCuts": 0,
@@ -2539,7 +2541,7 @@
       "cameraCutsAtPutBack": 0,
       "cameraCutsAtFinish": 0,
       "cameraCutsInCountdown": 0,
-      "fovStepMax": 3.1
+      "fovStepMax": 2.7
      },
      {
       "seed": 4,
@@ -2549,76 +2551,76 @@
       "onboard": {
        "shown": [
         "steer",
+        "clean",
         "drift",
         "brake",
-        "clean",
         "chain"
        ],
        "how": {
         "steer": "done",
         "drift": "done",
-        "brake": "done"
+        "brake": "timeout"
        },
        "taught": true
       },
-      "seconds": 98.27,
-      "score": 337,
-      "stars": 0,
-      "coins": 33,
-      "cleanSectors": "4 of 12",
+      "seconds": 92.82,
+      "score": 454,
+      "stars": 1,
+      "coins": 235,
+      "cleanSectors": "8 of 12",
       "parts": {
-       "drift": 82,
-       "clean": 96,
-       "pace": 159
+       "drift": 93,
+       "clean": 192,
+       "pace": 169
       },
       "finished": true,
-      "meanV": 17.12,
+      "meanV": 17.87,
       "toPace": 1.78,
       "toPaceHigh": 2.38,
-      "crawlS": 5.43,
-      "steerShare": 0.94,
-      "vSteering": 17.05,
-      "vNotSteering": 17.52,
-      "pressesPer10s": 9.09,
-      "swapsPer10s": 7.15,
-      "wander": 0.3,
-      "contactsPerLap": 5,
-      "hardPerLap": 3.33,
-      "impactMean": 7.78,
-      "impactMax": 16.35,
+      "crawlS": 2.72,
+      "steerShare": 0.95,
+      "vSteering": 17.8,
+      "vNotSteering": 18.08,
+      "pressesPer10s": 8.97,
+      "swapsPer10s": 6.81,
+      "wander": 0.27,
+      "contactsPerLap": 1.67,
+      "hardPerLap": 1.67,
+      "impactMean": 6.4,
+      "impactMax": 11.3,
       "lossPerContact": 6.69,
-      "lossTotal": 100.31,
-      "scrapeS": 1.83,
-      "shakeMax": 0.81,
-      "yawKickMean": 243.23,
+      "lossTotal": 33.44,
+      "scrapeS": 1.67,
+      "shakeMax": 0.61,
+      "yawKickMean": 155.6,
       "putBack": 1,
       "offTrack": 0,
-      "slides": 13,
-      "slideSecondsMean": 0.73,
-      "slideSecondsTotal": 9.5,
-      "slidesOverOneSecond": 4,
-      "slideAngleMean": 27.16,
-      "slidesIntoWall": 9,
-      "endFallMean": 51,
+      "slides": 7,
+      "slideSecondsMean": 0.94,
+      "slideSecondsTotal": 6.55,
+      "slidesOverOneSecond": 3,
+      "slideAngleMean": 27.91,
+      "slidesIntoWall": 3,
+      "endFallMean": 57,
       "endFallMax": 66,
-      "spins": 5,
-      "spinsFromWall": 5,
-      "driftPresses": 8,
+      "spins": 2,
+      "spinsFromWall": 2,
+      "driftPresses": 5,
       "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.46,
-      "driftAlonePresses": 1,
-      "driftAloneLoss": 8.3,
+      "slideEndsWithThumbs": 0.43,
+      "driftAlonePresses": 0,
+      "driftAloneLoss": 0,
       "countdownS": 3.02,
-      "promptS": 6.35,
-      "infoS": 9,
+      "promptS": 14.13,
+      "infoS": 7.8,
       "lineToResultsS": 0.95,
-      "cameraTurnMax": 6,
+      "cameraTurnMax": 4.8,
       "cameraCuts": 0,
       "cameraCutsInDrive": 0,
       "cameraCutsAtPutBack": 0,
       "cameraCutsAtFinish": 0,
       "cameraCutsInCountdown": 0,
-      "fovStepMax": 3.2
+      "fovStepMax": 2.9
      },
      {
       "seed": 5,
@@ -2628,9 +2630,9 @@
       "onboard": {
        "shown": [
         "steer",
+        "clean",
         "drift",
-        "brake",
-        "clean"
+        "brake"
        ],
        "how": {
         "steer": "done",
@@ -2639,64 +2641,64 @@
        },
        "taught": true
       },
-      "seconds": 92.42,
-      "score": 361,
+      "seconds": 94.67,
+      "score": 371,
       "stars": 0,
-      "coins": 36,
-      "cleanSectors": "6 of 12",
+      "coins": 37,
+      "cleanSectors": "7 of 12",
       "parts": {
-       "drift": 47,
-       "clean": 144,
-       "pace": 170
+       "drift": 37,
+       "clean": 168,
+       "pace": 166
       },
       "finished": true,
-      "meanV": 17.99,
+      "meanV": 17.35,
       "toPace": 1.78,
       "toPaceHigh": 2.38,
-      "crawlS": 1.62,
-      "steerShare": 0.93,
-      "vSteering": 18.01,
-      "vNotSteering": 18.27,
-      "pressesPer10s": 11.4,
-      "swapsPer10s": 8.47,
-      "wander": 0.23,
-      "contactsPerLap": 3.33,
-      "hardPerLap": 1.67,
-      "impactMean": 8.8,
-      "impactMax": 19.9,
-      "lossPerContact": 5.46,
-      "lossTotal": 54.58,
-      "scrapeS": 0.83,
+      "crawlS": 5.5,
+      "steerShare": 0.94,
+      "vSteering": 17.37,
+      "vNotSteering": 17.82,
+      "pressesPer10s": 11.24,
+      "swapsPer10s": 8.48,
+      "wander": 0.24,
+      "contactsPerLap": 3.67,
+      "hardPerLap": 2,
+      "impactMean": 5.65,
+      "impactMax": 14.18,
+      "lossPerContact": 7.1,
+      "lossTotal": 78.07,
+      "scrapeS": 2.22,
       "shakeMax": 0.81,
-      "yawKickMean": 165.01,
-      "putBack": 0,
+      "yawKickMean": 256.38,
+      "putBack": 1,
       "offTrack": 0,
       "slides": 6,
-      "slideSecondsMean": 1.26,
-      "slideSecondsTotal": 7.57,
+      "slideSecondsMean": 1.11,
+      "slideSecondsTotal": 6.67,
       "slidesOverOneSecond": 5,
-      "slideAngleMean": 28.39,
-      "slidesIntoWall": 2,
-      "endFallMean": 60,
-      "endFallMax": 72,
-      "spins": 4,
-      "spinsFromWall": 4,
+      "slideAngleMean": 30.77,
+      "slidesIntoWall": 3,
+      "endFallMean": 44,
+      "endFallMax": 60,
+      "spins": 3,
+      "spinsFromWall": 3,
       "driftPresses": 5,
       "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.5,
+      "slideEndsWithThumbs": 0.83,
       "driftAlonePresses": 1,
       "driftAloneLoss": 7.36,
       "countdownS": 3.02,
-      "promptS": 15.02,
-      "infoS": 4.33,
+      "promptS": 14.8,
+      "infoS": 3.1,
       "lineToResultsS": 0.95,
-      "cameraTurnMax": 6.5,
-      "cameraCuts": 1,
-      "cameraCutsInDrive": 1,
+      "cameraTurnMax": 5.2,
+      "cameraCuts": 0,
+      "cameraCutsInDrive": 0,
       "cameraCutsAtPutBack": 0,
       "cameraCutsAtFinish": 0,
       "cameraCutsInCountdown": 0,
-      "fovStepMax": 3.1
+      "fovStepMax": 2.9
      },
      {
       "seed": 6,
@@ -2706,321 +2708,9 @@
       "onboard": {
        "shown": [
         "steer",
-        "drift",
-        "brake",
-        "clean"
-       ],
-       "how": {
-        "steer": "done",
-        "drift": "done",
-        "brake": "done"
-       },
-       "taught": true
-      },
-      "seconds": 91.92,
-      "score": 411,
-      "stars": 0,
-      "coins": 101,
-      "cleanSectors": "9 of 12",
-      "parts": {
-       "drift": 24,
-       "clean": 216,
-       "pace": 171
-      },
-      "finished": true,
-      "meanV": 17.79,
-      "toPace": 1.78,
-      "toPaceHigh": 2.38,
-      "crawlS": 4.2,
-      "steerShare": 0.92,
-      "vSteering": 17.78,
-      "vNotSteering": 18.69,
-      "pressesPer10s": 12.23,
-      "swapsPer10s": 8.19,
-      "wander": 0.19,
-      "contactsPerLap": 2,
-      "hardPerLap": 1.33,
-      "impactMean": 7.24,
-      "impactMax": 19.07,
-      "lossPerContact": 3.6,
-      "lossTotal": 21.6,
-      "scrapeS": 1.08,
-      "shakeMax": 0.81,
-      "yawKickMean": 136.82,
-      "putBack": 0,
-      "offTrack": 0,
-      "slides": 5,
-      "slideSecondsMean": 0.92,
-      "slideSecondsTotal": 4.62,
-      "slidesOverOneSecond": 3,
-      "slideAngleMean": 28.61,
-      "slidesIntoWall": 3,
-      "endFallMean": 36,
-      "endFallMax": 42,
-      "spins": 4,
-      "spinsFromWall": 4,
-      "driftPresses": 3,
-      "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.6,
-      "driftAlonePresses": 1,
-      "driftAloneLoss": 8.3,
-      "countdownS": 3.02,
-      "promptS": 6.18,
-      "infoS": 4.5,
-      "lineToResultsS": 0.95,
-      "cameraTurnMax": 5.3,
-      "cameraCuts": 0,
-      "cameraCutsInDrive": 0,
-      "cameraCutsAtPutBack": 0,
-      "cameraCutsAtFinish": 0,
-      "cameraCutsInCountdown": 0,
-      "fovStepMax": 2.9
-     },
-     {
-      "seed": 7,
-      "profile": {
-       "controls": "easy"
-      },
-      "onboard": {
-       "shown": [
-        "steer",
-        "drift",
-        "brake",
-        "clean"
-       ],
-       "how": {
-        "steer": "done",
-        "drift": "done",
-        "brake": "done"
-       },
-       "taught": true
-      },
-      "seconds": 88.08,
-      "score": 442,
-      "stars": 0,
-      "coins": 104,
-      "cleanSectors": "9 of 12",
-      "parts": {
-       "drift": 48,
-       "clean": 216,
-       "pace": 178
-      },
-      "finished": true,
-      "meanV": 18.2,
-      "toPace": 1.78,
-      "toPaceHigh": 2.38,
-      "crawlS": 0.62,
-      "steerShare": 0.92,
-      "vSteering": 18.15,
-      "vNotSteering": 18.7,
-      "pressesPer10s": 11.28,
-      "swapsPer10s": 9.69,
-      "wander": 0.17,
-      "contactsPerLap": 1,
-      "hardPerLap": 1,
-      "impactMean": 8.79,
-      "impactMax": 14.74,
-      "lossPerContact": 4.83,
-      "lossTotal": 14.49,
-      "scrapeS": 0.07,
-      "shakeMax": 0.8,
-      "yawKickMean": 149.47,
-      "putBack": 0,
-      "offTrack": 0,
-      "slides": 5,
-      "slideSecondsMean": 1.19,
-      "slideSecondsTotal": 5.93,
-      "slidesOverOneSecond": 4,
-      "slideAngleMean": 30.52,
-      "slidesIntoWall": 1,
-      "endFallMean": 60,
-      "endFallMax": 66,
-      "spins": 3,
-      "spinsFromWall": 3,
-      "driftPresses": 4,
-      "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.8,
-      "driftAlonePresses": 1,
-      "driftAloneLoss": 9.72,
-      "countdownS": 3.02,
-      "promptS": 6.15,
-      "infoS": 3.72,
-      "lineToResultsS": 0.95,
-      "cameraTurnMax": 4.9,
-      "cameraCuts": 0,
-      "cameraCutsInDrive": 0,
-      "cameraCutsAtPutBack": 0,
-      "cameraCutsAtFinish": 0,
-      "cameraCutsInCountdown": 0,
-      "fovStepMax": 2.9
-     },
-     {
-      "seed": 8,
-      "profile": {
-       "controls": "easy"
-      },
-      "onboard": {
-       "shown": [
-        "steer",
-        "drift",
-        "brake",
-        "clean"
-       ],
-       "how": {
-        "steer": "done",
-        "drift": "done",
-        "brake": "done"
-       },
-       "taught": true
-      },
-      "seconds": 92.43,
-      "score": 380,
-      "stars": 0,
-      "coins": 98,
-      "cleanSectors": "7 of 12",
-      "parts": {
-       "drift": 42,
-       "clean": 168,
-       "pace": 170
-      },
-      "finished": true,
-      "meanV": 17.47,
-      "toPace": 1.78,
-      "toPaceHigh": 2.38,
-      "crawlS": 5.22,
-      "steerShare": 0.93,
-      "vSteering": 17.43,
-      "vNotSteering": 17.61,
-      "pressesPer10s": 12.49,
-      "swapsPer10s": 10.75,
-      "wander": 0.19,
-      "contactsPerLap": 4,
-      "hardPerLap": 2,
-      "impactMean": 5.87,
-      "impactMax": 14.29,
-      "lossPerContact": 6.5,
-      "lossTotal": 78.05,
-      "scrapeS": 1.18,
-      "shakeMax": 0.81,
-      "yawKickMean": 145.74,
-      "putBack": 0,
-      "offTrack": 0,
-      "slides": 7,
-      "slideSecondsMean": 1.03,
-      "slideSecondsTotal": 7.2,
-      "slidesOverOneSecond": 5,
-      "slideAngleMean": 29.19,
-      "slidesIntoWall": 4,
-      "endFallMean": 56,
-      "endFallMax": 72,
-      "spins": 3,
-      "spinsFromWall": 3,
-      "driftPresses": 5,
-      "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.71,
-      "driftAlonePresses": 2,
-      "driftAloneLoss": 5.29,
-      "countdownS": 3.02,
-      "promptS": 6.5,
-      "infoS": 4.5,
-      "lineToResultsS": 0.95,
-      "cameraTurnMax": 5.5,
-      "cameraCuts": 0,
-      "cameraCutsInDrive": 0,
-      "cameraCutsAtPutBack": 0,
-      "cameraCutsAtFinish": 0,
-      "cameraCutsInCountdown": 0,
-      "fovStepMax": 2.9
-     },
-     {
-      "seed": 9,
-      "profile": {
-       "controls": "easy"
-      },
-      "onboard": {
-       "shown": [
-        "steer",
-        "drift",
-        "brake",
-        "clean"
-       ],
-       "how": {
-        "steer": "done",
-        "drift": "done",
-        "brake": "done"
-       },
-       "taught": true
-      },
-      "seconds": 90.52,
-      "score": 399,
-      "stars": 0,
-      "coins": 99,
-      "cleanSectors": "8 of 12",
-      "parts": {
-       "drift": 34,
-       "clean": 192,
-       "pace": 173
-      },
-      "finished": true,
-      "meanV": 17.81,
-      "toPace": 1.78,
-      "toPaceHigh": 2.38,
-      "crawlS": 5.02,
-      "steerShare": 0.89,
-      "vSteering": 17.87,
-      "vNotSteering": 17.9,
-      "pressesPer10s": 16.74,
-      "swapsPer10s": 11.98,
-      "wander": 0.17,
-      "contactsPerLap": 2.33,
-      "hardPerLap": 2,
-      "impactMean": 7.31,
-      "impactMax": 15.64,
-      "lossPerContact": 7.51,
-      "lossTotal": 52.6,
-      "scrapeS": 0.13,
-      "shakeMax": 0.81,
-      "yawKickMean": 269.81,
-      "putBack": 0,
-      "offTrack": 0,
-      "slides": 6,
-      "slideSecondsMean": 0.77,
-      "slideSecondsTotal": 4.6,
-      "slidesOverOneSecond": 2,
-      "slideAngleMean": 28.51,
-      "slidesIntoWall": 4,
-      "endFallMean": 57,
-      "endFallMax": 78,
-      "spins": 2,
-      "spinsFromWall": 2,
-      "driftPresses": 4,
-      "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.67,
-      "driftAlonePresses": 1,
-      "driftAloneLoss": 7.92,
-      "countdownS": 3.02,
-      "promptS": 6.4,
-      "infoS": 4.5,
-      "lineToResultsS": 0.95,
-      "cameraTurnMax": 5.8,
-      "cameraCuts": 0,
-      "cameraCutsInDrive": 0,
-      "cameraCutsAtPutBack": 0,
-      "cameraCutsAtFinish": 0,
-      "cameraCutsInCountdown": 0,
-      "fovStepMax": 4.2
-     },
-     {
-      "seed": 10,
-      "profile": {
-       "controls": "easy"
-      },
-      "onboard": {
-       "shown": [
-        "steer",
-        "drift",
-        "brake",
         "clean",
+        "drift",
+        "brake",
         "chain"
        ],
        "how": {
@@ -3030,89 +2720,404 @@
        },
        "taught": true
       },
-      "seconds": 90.02,
-      "score": 352,
-      "stars": 0,
-      "coins": 35,
-      "cleanSectors": "5 of 12",
+      "seconds": 90.53,
+      "score": 433,
+      "stars": 1,
+      "coins": 173,
+      "cleanSectors": "7 of 12",
       "parts": {
-       "drift": 58,
-       "clean": 120,
-       "pace": 174
+       "drift": 92,
+       "clean": 168,
+       "pace": 173
       },
       "finished": true,
-      "meanV": 17.98,
+      "meanV": 18.16,
       "toPace": 1.78,
       "toPaceHigh": 2.38,
-      "crawlS": 2.42,
-      "steerShare": 0.91,
-      "vSteering": 17.91,
-      "vNotSteering": 18.38,
-      "pressesPer10s": 13.16,
-      "swapsPer10s": 11.37,
-      "wander": 0.2,
-      "contactsPerLap": 2.67,
-      "hardPerLap": 2.33,
-      "impactMean": 7.22,
-      "impactMax": 19.17,
-      "lossPerContact": 6.05,
-      "lossTotal": 48.4,
-      "scrapeS": 0.23,
-      "shakeMax": 0.81,
-      "yawKickMean": 215.54,
+      "crawlS": 1.62,
+      "steerShare": 0.92,
+      "vSteering": 18.02,
+      "vNotSteering": 18.49,
+      "pressesPer10s": 11.75,
+      "swapsPer10s": 7.98,
+      "wander": 0.24,
+      "contactsPerLap": 2,
+      "hardPerLap": 1.67,
+      "impactMean": 6.93,
+      "impactMax": 14.04,
+      "lossPerContact": 7.52,
+      "lossTotal": 45.15,
+      "scrapeS": 0.37,
+      "shakeMax": 0.76,
+      "yawKickMean": 216.15,
       "putBack": 0,
       "offTrack": 0,
-      "slides": 7,
-      "slideSecondsMean": 1.3,
-      "slideSecondsTotal": 9.08,
-      "slidesOverOneSecond": 7,
-      "slideAngleMean": 28.59,
-      "slidesIntoWall": 3,
-      "endFallMean": 54,
-      "endFallMax": 66,
-      "spins": 1,
-      "spinsFromWall": 1,
-      "driftPresses": 7,
+      "slides": 6,
+      "slideSecondsMean": 1.28,
+      "slideSecondsTotal": 7.67,
+      "slidesOverOneSecond": 6,
+      "slideAngleMean": 33.7,
+      "slidesIntoWall": 0,
+      "endFallMean": 60,
+      "endFallMax": 84,
+      "spins": 2,
+      "spinsFromWall": 2,
+      "driftPresses": 6,
       "driftPressStarts": 1,
-      "slideEndsWithThumbs": 0.43,
-      "driftAlonePresses": 1,
-      "driftAloneLoss": 4.54,
+      "slideEndsWithThumbs": 0.67,
+      "driftAlonePresses": 0,
+      "driftAloneLoss": 0,
       "countdownS": 3.02,
       "promptS": 13.95,
-      "infoS": 9.02,
+      "infoS": 7.8,
       "lineToResultsS": 0.95,
-      "cameraTurnMax": 5.8,
+      "cameraTurnMax": 5.7,
       "cameraCuts": 0,
       "cameraCutsInDrive": 0,
       "cameraCutsAtPutBack": 0,
       "cameraCutsAtFinish": 0,
       "cameraCutsInCountdown": 0,
-      "fovStepMax": 3.1
+      "fovStepMax": 2.7
+     },
+     {
+      "seed": 7,
+      "profile": {
+       "controls": "easy"
+      },
+      "onboard": {
+       "shown": [
+        "steer",
+        "clean",
+        "drift",
+        "brake",
+        "chain"
+       ],
+       "how": {
+        "steer": "done",
+        "drift": "done",
+        "brake": "done"
+       },
+       "taught": true
+      },
+      "seconds": 91.8,
+      "score": 387,
+      "stars": 1,
+      "coins": 168,
+      "cleanSectors": "7 of 12",
+      "parts": {
+       "drift": 48,
+       "clean": 168,
+       "pace": 171
+      },
+      "finished": true,
+      "meanV": 17.65,
+      "toPace": 1.78,
+      "toPaceHigh": 2.38,
+      "crawlS": 4.62,
+      "steerShare": 0.91,
+      "vSteering": 17.95,
+      "vNotSteering": 14.5,
+      "pressesPer10s": 10.82,
+      "swapsPer10s": 9.29,
+      "wander": 0.21,
+      "contactsPerLap": 3.67,
+      "hardPerLap": 1.67,
+      "impactMean": 5.33,
+      "impactMax": 12.25,
+      "lossPerContact": 4.42,
+      "lossTotal": 48.62,
+      "scrapeS": 0.87,
+      "shakeMax": 0.75,
+      "yawKickMean": 235.89,
+      "putBack": 0,
+      "offTrack": 0,
+      "slides": 7,
+      "slideSecondsMean": 1.08,
+      "slideSecondsTotal": 7.53,
+      "slidesOverOneSecond": 4,
+      "slideAngleMean": 28.45,
+      "slidesIntoWall": 5,
+      "endFallMean": 54,
+      "endFallMax": 66,
+      "spins": 3,
+      "spinsFromWall": 3,
+      "driftPresses": 5,
+      "driftPressStarts": 1,
+      "slideEndsWithThumbs": 0.71,
+      "driftAlonePresses": 1,
+      "driftAloneLoss": 14.13,
+      "countdownS": 3.02,
+      "promptS": 6.13,
+      "infoS": 7.82,
+      "lineToResultsS": 0.95,
+      "cameraTurnMax": 4.9,
+      "cameraCuts": 0,
+      "cameraCutsInDrive": 0,
+      "cameraCutsAtPutBack": 0,
+      "cameraCutsAtFinish": 0,
+      "cameraCutsInCountdown": 0,
+      "fovStepMax": 2.6
+     },
+     {
+      "seed": 8,
+      "profile": {
+       "controls": "easy"
+      },
+      "onboard": {
+       "shown": [
+        "steer",
+        "clean",
+        "drift",
+        "brake"
+       ],
+       "how": {
+        "steer": "done",
+        "drift": "done",
+        "brake": "done"
+       },
+       "taught": true
+      },
+      "seconds": 88.03,
+      "score": 392,
+      "stars": 1,
+      "coins": 169,
+      "cleanSectors": "8 of 12",
+      "parts": {
+       "drift": 22,
+       "clean": 192,
+       "pace": 178
+      },
+      "finished": true,
+      "meanV": 18.31,
+      "toPace": 1.78,
+      "toPaceHigh": 2.38,
+      "crawlS": 0.62,
+      "steerShare": 0.93,
+      "vSteering": 18.3,
+      "vNotSteering": 18.57,
+      "pressesPer10s": 12.54,
+      "swapsPer10s": 10.72,
+      "wander": 0.15,
+      "contactsPerLap": 1.33,
+      "hardPerLap": 1.33,
+      "impactMean": 8.27,
+      "impactMax": 11.54,
+      "lossPerContact": 7.37,
+      "lossTotal": 29.48,
+      "scrapeS": 0.08,
+      "shakeMax": 0.63,
+      "yawKickMean": 263.63,
+      "putBack": 0,
+      "offTrack": 0,
+      "slides": 5,
+      "slideSecondsMean": 0.91,
+      "slideSecondsTotal": 4.57,
+      "slidesOverOneSecond": 3,
+      "slideAngleMean": 28.49,
+      "slidesIntoWall": 3,
+      "endFallMean": 54,
+      "endFallMax": 66,
+      "spins": 1,
+      "spinsFromWall": 1,
+      "driftPresses": 4,
+      "driftPressStarts": 1,
+      "slideEndsWithThumbs": 0.8,
+      "driftAlonePresses": 2,
+      "driftAloneLoss": 5.02,
+      "countdownS": 3.02,
+      "promptS": 6.48,
+      "infoS": 3.3,
+      "lineToResultsS": 0.95,
+      "cameraTurnMax": 4.9,
+      "cameraCuts": 0,
+      "cameraCutsInDrive": 0,
+      "cameraCutsAtPutBack": 0,
+      "cameraCutsAtFinish": 0,
+      "cameraCutsInCountdown": 0,
+      "fovStepMax": 2.8
+     },
+     {
+      "seed": 9,
+      "profile": {
+       "controls": "easy"
+      },
+      "onboard": {
+       "shown": [
+        "steer",
+        "clean",
+        "drift",
+        "brake",
+        "chain"
+       ],
+       "how": {
+        "steer": "done",
+        "drift": "done",
+        "brake": "done"
+       },
+       "taught": true
+      },
+      "seconds": 85.65,
+      "score": 530,
+      "stars": 1,
+      "coins": 243,
+      "cleanSectors": "10 of 12",
+      "parts": {
+       "drift": 107,
+       "clean": 240,
+       "pace": 183
+      },
+      "finished": true,
+      "meanV": 18.66,
+      "toPace": 1.78,
+      "toPaceHigh": 2.38,
+      "crawlS": 0.58,
+      "steerShare": 0.9,
+      "vSteering": 18.63,
+      "vNotSteering": 19.14,
+      "pressesPer10s": 17.35,
+      "swapsPer10s": 12.07,
+      "wander": 0.13,
+      "contactsPerLap": 0.33,
+      "hardPerLap": 0.67,
+      "impactMean": 9.64,
+      "impactMax": 12.77,
+      "lossPerContact": 10.55,
+      "lossTotal": 10.55,
+      "scrapeS": 0.02,
+      "shakeMax": 0.78,
+      "yawKickMean": 246.7,
+      "putBack": 0,
+      "offTrack": 0,
+      "slides": 5,
+      "slideSecondsMean": 1.27,
+      "slideSecondsTotal": 6.37,
+      "slidesOverOneSecond": 4,
+      "slideAngleMean": 32.67,
+      "slidesIntoWall": 0,
+      "endFallMean": 62.4,
+      "endFallMax": 72,
+      "spins": 1,
+      "spinsFromWall": 1,
+      "driftPresses": 5,
+      "driftPressStarts": 0.8,
+      "slideEndsWithThumbs": 0.4,
+      "driftAlonePresses": 0,
+      "driftAloneLoss": 0,
+      "countdownS": 3.02,
+      "promptS": 6.43,
+      "infoS": 7.67,
+      "lineToResultsS": 0.95,
+      "cameraTurnMax": 5.1,
+      "cameraCuts": 0,
+      "cameraCutsInDrive": 0,
+      "cameraCutsAtPutBack": 0,
+      "cameraCutsAtFinish": 0,
+      "cameraCutsInCountdown": 0,
+      "fovStepMax": 2.5
+     },
+     {
+      "seed": 10,
+      "profile": {
+       "controls": "easy"
+      },
+      "onboard": {
+       "shown": [
+        "steer",
+        "clean",
+        "drift",
+        "brake",
+        "chain"
+       ],
+       "how": {
+        "steer": "done",
+        "drift": "done",
+        "brake": "timeout"
+       },
+       "taught": true
+      },
+      "seconds": 84.18,
+      "score": 472,
+      "stars": 1,
+      "coins": 237,
+      "cleanSectors": "9 of 12",
+      "parts": {
+       "drift": 70,
+       "clean": 216,
+       "pace": 186
+      },
+      "finished": true,
+      "meanV": 18.79,
+      "toPace": 1.78,
+      "toPaceHigh": 2.38,
+      "crawlS": 0.13,
+      "steerShare": 0.91,
+      "vSteering": 18.74,
+      "vNotSteering": 19.01,
+      "pressesPer10s": 13.12,
+      "swapsPer10s": 11.93,
+      "wander": 0.12,
+      "contactsPerLap": 0,
+      "hardPerLap": 1,
+      "impactMean": 8.6,
+      "impactMax": 11.78,
+      "lossPerContact": 0,
+      "lossTotal": 0,
+      "scrapeS": 0,
+      "shakeMax": 0.64,
+      "yawKickMean": 0,
+      "putBack": 0,
+      "offTrack": 0,
+      "slides": 6,
+      "slideSecondsMean": 1.11,
+      "slideSecondsTotal": 6.67,
+      "slidesOverOneSecond": 3,
+      "slideAngleMean": 27.48,
+      "slidesIntoWall": 2,
+      "endFallMean": 61.5,
+      "endFallMax": 66,
+      "spins": 0,
+      "spinsFromWall": 0,
+      "driftPresses": 7,
+      "driftPressStarts": 1,
+      "slideEndsWithThumbs": 0.17,
+      "driftAlonePresses": 0,
+      "driftAloneLoss": 0,
+      "countdownS": 3.02,
+      "promptS": 13.93,
+      "infoS": 7.82,
+      "lineToResultsS": 0.95,
+      "cameraTurnMax": 5.1,
+      "cameraCuts": 0,
+      "cameraCutsInDrive": 0,
+      "cameraCutsAtPutBack": 0,
+      "cameraCutsAtFinish": 0,
+      "cameraCutsInCountdown": 0,
+      "fovStepMax": 2.9
      }
     ],
     "summary": {
      "runs": 10,
-     "withStar": 1,
+     "withStar": 9,
      "finished": 10,
      "seconds": {
-      "median": 92.43,
-      "worst": 98.27
+      "median": 91.8,
+      "worst": 98.6
      },
      "score": {
-      "median": 399,
-      "worst": 337
+      "median": 454,
+      "worst": 371
      },
      "stars": {
-      "median": 0,
+      "median": 1,
       "worst": 0
      },
      "coins": {
-      "median": 99,
-      "worst": 33
+      "median": 175,
+      "worst": 37
      },
      "meanV": {
-      "median": 17.82,
-      "worst": 17.12
+      "median": 18.16,
+      "worst": 17.2
      },
      "toPace": {
       "median": 1.78,
@@ -3123,68 +3128,68 @@
       "worst": 2.38
      },
      "crawlS": {
-      "median": 2.53,
-      "worst": 5.43
+      "median": 2.72,
+      "worst": 5.5
      },
      "steerShare": {
       "median": 0.93,
       "worst": 0.95
      },
      "vSteering": {
-      "median": 17.88,
-      "worst": 17.05
+      "median": 18.02,
+      "worst": 17.26
      },
      "vNotSteering": {
-      "median": 18.27,
-      "worst": 17.52
+      "median": 18.49,
+      "worst": 14.5
      },
      "pressesPer10s": {
-      "median": 11.4,
-      "worst": 16.74
+      "median": 11.24,
+      "worst": 17.35
      },
      "swapsPer10s": {
-      "median": 8.47,
-      "worst": 11.98
+      "median": 8.48,
+      "worst": 12.07
      },
      "wander": {
-      "median": 0.23,
-      "worst": 0.34
+      "median": 0.24,
+      "worst": 0.35
      },
      "contactsPerLap": {
-      "median": 2.67,
-      "worst": 5
+      "median": 2,
+      "worst": 4.67
      },
      "hardPerLap": {
-      "median": 2,
-      "worst": 3.33
+      "median": 1.67,
+      "worst": 2.67
      },
      "impactMean": {
-      "median": 7.75,
-      "worst": 9.97
+      "median": 6.93,
+      "worst": 10.83
      },
      "impactMax": {
-      "median": 16.5,
-      "worst": 20.03
+      "median": 12.77,
+      "worst": 14.83
      },
      "lossPerContact": {
-      "median": 6.38,
-      "worst": 7.51
+      "median": 6.69,
+      "worst": 10.55
      },
      "lossTotal": {
-      "median": 52.6,
-      "worst": 100.31
+      "median": 45.15,
+      "worst": 78.07
      },
      "scrapeS": {
-      "median": 0.83,
-      "worst": 1.83
+      "median": 0.87,
+      "worst": 2.22
      },
      "shakeMax": {
-      "median": 0.81,
+      "median": 0.76,
       "worst": 0.81
      },
      "yawKickMean": {
-      "median": 165.01,
-      "worst": 269.81
+      "median": 235.89,
+      "worst": 263.63
      },
      "putBack": {
       "median": 0,
@@ -3195,96 +3200,96 @@
       "worst": 0
      },
      "slides": {
-      "median": 7,
-      "worst": 5
+      "median": 6,
+      "worst": 4
      },
      "slideSecondsMean": {
-      "median": 1.03,
-      "worst": 0.73
+      "median": 1.11,
+      "worst": 0.67
      },
      "slideSecondsTotal": {
-      "median": 7.2,
-      "worst": 4.6
+      "median": 6.67,
+      "worst": 4.57
      },
      "slidesOverOneSecond": {
       "median": 4,
       "worst": 2
      },
      "slideAngleMean": {
-      "median": 28.51,
-      "worst": 25.43
+      "median": 28.63,
+      "worst": 23.75
      },
      "slidesIntoWall": {
       "median": 3,
-      "worst": 9
+      "worst": 7
      },
      "endFallMean": {
-      "median": 57,
-      "worst": 63.75
+      "median": 58,
+      "worst": 64.5
      },
      "endFallMax": {
       "median": 66,
-      "worst": 78
+      "worst": 84
      },
      "spins": {
-      "median": 4,
-      "worst": 5
+      "median": 2,
+      "worst": 6
      },
      "spinsFromWall": {
-      "median": 4,
-      "worst": 5
+      "median": 2,
+      "worst": 6
      },
      "driftPresses": {
       "median": 5,
-      "worst": 8
+      "worst": 7
      },
      "driftPressStarts": {
       "median": 1,
-      "worst": 1
+      "worst": 0.8
      },
      "slideEndsWithThumbs": {
-      "median": 0.6,
-      "worst": 0.43
+      "median": 0.55,
+      "worst": 0.17
      },
      "driftAlonePresses": {
       "median": 1,
       "worst": 2
      },
      "driftAloneLoss": {
-      "median": 7.92,
-      "worst": 9.72
+      "median": 7.24,
+      "worst": 14.13
      },
      "countdownS": {
       "median": 3.02,
       "worst": 3.02
      },
      "promptS": {
-      "median": 6.7,
+      "median": 13.93,
       "worst": 22.48
      },
      "infoS": {
-      "median": 4.5,
-      "worst": 9.02
+      "median": 7.8,
+      "worst": 7.82
      },
      "lineToResultsS": {
       "median": 0.95,
       "worst": 0.95
      },
      "cameraTurnMax": {
-      "median": 5.8,
-      "worst": 6.6
+      "median": 5.1,
+      "worst": 7.4
      },
      "cameraCuts": {
       "median": 0,
-      "worst": 1
+      "worst": 3
      },
      "cameraCutsInDrive": {
       "median": 0,
-      "worst": 1
+      "worst": 0
      },
      "cameraCutsAtPutBack": {
       "median": 0,
-      "worst": 0
+      "worst": 3
      },
      "cameraCutsAtFinish": {
       "median": 0,
@@ -3295,8 +3300,8 @@
       "worst": 0
      },
      "fovStepMax": {
-      "median": 3.1,
-      "worst": 4.2
+      "median": 2.8,
+      "worst": 2.9
      }
     },
     "errors": []
@@ -3658,8 +3663,8 @@
       },
       "seconds": 88.03,
       "score": 448,
-      "stars": 0,
-      "coins": 44,
+      "stars": 1,
+      "coins": 174,
       "cleanSectors": "2 of 12",
       "parts": {
        "drift": 222,
@@ -4219,7 +4224,7 @@
     ],
     "summary": {
      "runs": 10,
-     "withStar": 0,
+     "withStar": 1,
      "finished": 10,
      "seconds": {
       "median": 88.53,
@@ -4428,6 +4433,223 @@
     },
     "errors": []
    }
+  }
+ },
+ "knownAnswer": {
+  "half": {
+   "runs": 10,
+   "withStar": 0,
+   "finished": 10,
+   "seconds": {
+    "median": 144.65,
+    "worst": 160.63
+   },
+   "score": {
+    "median": 307,
+    "worst": 169
+   },
+   "stars": {
+    "median": 0,
+    "worst": 0
+   },
+   "coins": {
+    "median": 30,
+    "worst": 16
+   },
+   "meanV": {
+    "median": 13.21,
+    "worst": 12.23
+   },
+   "toPace": {
+    "median": 1.78,
+    "worst": 1.78
+   },
+   "toPaceHigh": {
+    "median": 2.38,
+    "worst": 2.38
+   },
+   "crawlS": {
+    "median": 5.35,
+    "worst": 16.7
+   },
+   "steerShare": {
+    "median": 0.96,
+    "worst": 0.96
+   },
+   "vSteering": {
+    "median": 12.97,
+    "worst": 11.92
+   },
+   "vNotSteering": {
+    "median": 13.16,
+    "worst": 12.75
+   },
+   "pressesPer10s": {
+    "median": 8.23,
+    "worst": 9.9
+   },
+   "swapsPer10s": {
+    "median": 6.09,
+    "worst": 7.74
+   },
+   "wander": {
+    "median": 0.4,
+    "worst": 0.47
+   },
+   "contactsPerLap": {
+    "median": 5.33,
+    "worst": 15
+   },
+   "hardPerLap": {
+    "median": 1.67,
+    "worst": 6.33
+   },
+   "impactMean": {
+    "median": 6.65,
+    "worst": 8.75
+   },
+   "impactMax": {
+    "median": 14.21,
+    "worst": 20.44
+   },
+   "lossPerContact": {
+    "median": 4.9,
+    "worst": 7.03
+   },
+   "lossTotal": {
+    "median": 77.32,
+    "worst": 247.18
+   },
+   "scrapeS": {
+    "median": 4.3,
+    "worst": 12.47
+   },
+   "shakeMax": {
+    "median": 0.77,
+    "worst": 0.81
+   },
+   "yawKickMean": {
+    "median": 48.21,
+    "worst": 85.68
+   },
+   "putBack": {
+    "median": 4,
+    "worst": 9
+   },
+   "offTrack": {
+    "median": 0,
+    "worst": 0
+   },
+   "slides": {
+    "median": 11,
+    "worst": 4
+   },
+   "slideSecondsMean": {
+    "median": 0.79,
+    "worst": 0.25
+   },
+   "slideSecondsTotal": {
+    "median": 6.8,
+    "worst": 1.77
+   },
+   "slidesOverOneSecond": {
+    "median": 3,
+    "worst": 0
+   },
+   "slideAngleMean": {
+    "median": 26,
+    "worst": 16.5
+   },
+   "slidesIntoWall": {
+    "median": 9,
+    "worst": 19
+   },
+   "endFallMean": {
+    "median": 63,
+    "worst": 66
+   },
+   "endFallMax": {
+    "median": 66,
+    "worst": 66
+   },
+   "spins": {
+    "median": 3,
+    "worst": 11
+   },
+   "spinsFromWall": {
+    "median": 3,
+    "worst": 11
+   },
+   "driftPresses": {
+    "median": 5,
+    "worst": 9
+   },
+   "driftPressStarts": {
+    "median": 1,
+    "worst": 0.75
+   },
+   "slideEndsWithThumbs": {
+    "median": 0.4,
+    "worst": 0.13
+   },
+   "driftAlonePresses": {
+    "median": 1,
+    "worst": 2
+   },
+   "driftAloneLoss": {
+    "median": 5.45,
+    "worst": 22.92
+   },
+   "countdownS": {
+    "median": 3.02,
+    "worst": 3.02
+   },
+   "promptS": {
+    "median": 7.22,
+    "worst": 14.05
+   },
+   "infoS": {
+    "median": 4.65,
+    "worst": 7.82
+   },
+   "lineToResultsS": {
+    "median": 0.95,
+    "worst": 0.95
+   },
+   "cameraTurnMax": {
+    "median": 10,
+    "worst": 10.5
+   },
+   "cameraCuts": {
+    "median": 10,
+    "worst": 19
+   },
+   "cameraCutsInDrive": {
+    "median": 0,
+    "worst": 1
+   },
+   "cameraCutsAtPutBack": {
+    "median": 10,
+    "worst": 18
+   },
+   "cameraCutsAtFinish": {
+    "median": 0,
+    "worst": 0
+   },
+   "cameraCutsInCountdown": {
+    "median": 0,
+    "worst": 0
+   },
+   "fovStepMax": {
+    "median": 4.3,
+    "worst": 5.5
+   }
+  },
+  "worse": {
+   "score": true,
+   "seconds": true,
+   "contactsPerLap": true,
+   "meanV": false
   }
  }
 }

@@ -9,9 +9,10 @@
       of the old handling), and the old ghost is still in the save;
    3. that run (the same driver) records its ghost under first:career:0
       with the new handling's revision, and the old one is untouched;
-   4. that ghost's tape, replayed through a run with the switch, finishes
-      with the hash the ghost recorded: it replays with the handling it
-      was driven on; a run of track 1 now races it;
+   4. a run of track 1 with the switch now races it, and the ghost it
+      races, stepped through its whole tape, ends with the hash and the
+      step count its run recorded: it replays with the handling it was
+      driven on (and its tape through a run's structure scores the same);
    5. without the switch again, a run of track 1 races the old ghost and
       never the new one, and every key the save had is still there.
    Known answer: the new ghost with its revision put back to the old
@@ -27,14 +28,14 @@ const RUN = `return (() => {
   const L = window.__loop, F = window.__feel; F.draw = false; window.__clock = 1000;
   L.save.setOnboarded();
   L.startRun(L.careerSpec(0));
-  const raced = L.app.ghost ? { rev: L.app.ghost.record.rev, hash: L.app.ghost.record.hash } : null;
+  const raced = L.app.ghost ? { rev: L.app.ghost.state.record.rev, hash: L.app.ghost.state.record.hash } : null;
   F.setDriver({ drift: null });
   for (let i = 0; i < 60 * 300 && L.app.state !== 'results'; i++) { window.__clock += 1000 / 60; F.frame(window.__clock); }
   const R = L.results();
   const g = L.save.state.ghosts;
   return { raced, score: R && R.score, hash: R && R.hash, ghosts: Object.fromEntries(Object.entries(g).map(([k, v]) => [k, { rev: v.rev, hash: v.hash, score: v.score, steps: v.steps }])), keys: Object.keys(L.save.state) };
 })();`;
-const RACES = `return (() => { const L = window.__loop; L.save.setOnboarded(); L.startRun(L.careerSpec(0)); const g = L.app.ghost; const r = g ? { rev: g.record.rev, hash: g.record.hash } : null; L.action('title'); return r; })();`;
+const RACES = `return (() => { const L = window.__loop; L.save.setOnboarded(); L.startRun(L.careerSpec(0)); const g = L.app.ghost; const r = g ? { rev: g.state.record.rev, hash: g.state.record.hash } : null; L.action('title'); return r; })();`;
 try {
   const ctx = await env.browser.newContext({ viewport: { width: 640, height: 360 }, deviceScaleFactor: 1 });
   const open = async q => {
@@ -57,8 +58,12 @@ try {
     const L = window.__loop, g = L.save.ghost('first:career:0');
     if (!g) return null;
     const tape = g.tape.map(e => ({ n: e[0], s: e[1], t: e[2], b: e[3], h: e[4] }));
+    L.save.setOnboarded(); L.startRun(L.careerSpec(0));
+    const gh = L.app.ghost; let stepped = null;
+    if (gh) { gh.reset(); while (!gh.state.done) gh.step(); stepped = { hash: gh.hash(), steps: gh.state.steps }; }
+    L.action('title');
     const R = L.replayRun(L.careerSpec(0), tape);
-    return { hash: R && R.hash, recorded: g.hash, score: R && R.score, recordedScore: g.score };
+    return { stepped, recorded: g.hash, recordedSteps: g.steps, score: R && R.score, recordedScore: g.score };
   });
   out.firstRacesAfter = await p.page.evaluate(new Function(RACES));
   /* the known answer: the new ghost's revision put back to the old handling's */
@@ -76,7 +81,8 @@ const old = out.plain.ghosts['career:0'], neu = out.first.ghosts['first:career:0
 F.say(!!old && old.rev === 1, '1. without the switch the run records an old ghost under career:0 (revision ' + (old && old.rev) + ')');
 F.say(out.firstRaces === null && !!out.first.ghosts['career:0'] && JSON.stringify(out.first.ghosts['career:0']) === JSON.stringify(old), '2. with ?first=2 a run of track 1 races no ghost (' + JSON.stringify(out.firstRaces) + '), and the old ghost is still in the save, unchanged');
 F.say(!!neu && neu.rev === FIRST.rev, '3. that run records its ghost under first:career:0 with the new handling\'s revision (' + (neu && neu.rev) + ', FIRST.rev ' + FIRST.rev + '; ' + (neu && neu.score) + ' points)');
-F.say(!!out.replay && out.replay.hash === out.replay.recorded && out.replay.score === out.replay.recordedScore, '4. its tape replayed through a run with the switch finishes as recorded: hash ' + (out.replay && out.replay.hash === out.replay.recorded ? 'the same' : 'DIFFERENT') + ', ' + (out.replay && out.replay.score) + ' points against ' + (out.replay && out.replay.recordedScore) + '; a run now races it: ' + (out.firstRacesAfter && out.firstRacesAfter.rev === FIRST.rev && out.firstRacesAfter.hash === neu.hash));
+const st = out.replay && out.replay.stepped;
+F.say(!!st && st.hash === out.replay.recorded && st.steps === out.replay.recordedSteps && out.replay.score === out.replay.recordedScore && !!out.firstRacesAfter && out.firstRacesAfter.rev === FIRST.rev && out.firstRacesAfter.hash === neu.hash, '4. a run with the switch now races it, and that ghost stepped through its tape ends as its run did: hash ' + (st && st.hash === out.replay.recorded ? 'the same' : 'DIFFERENT') + ', ' + (st && st.steps) + ' steps against ' + (out.replay && out.replay.recordedSteps) + '; its tape through a run scores ' + (out.replay && out.replay.score) + ' against ' + (out.replay && out.replay.recordedScore));
 F.say(!!out.plainAfter && out.plainAfter.rev === 1 && out.plainAfter.hash === old.hash && out.keysAfter.ghosts.includes('career:0') && out.keysAfter.ghosts.includes('first:career:0') && out.plain.keys.every(k => out.keysAfter.keys.includes(k)), '5. without the switch again a run races the old ghost (revision ' + (out.plainAfter && out.plainAfter.rev) + '), never the new one, and the save keeps every key it had (' + out.keysAfter.keys.length + ' keys; ghosts ' + out.keysAfter.ghosts.join(', ') + ')');
 F.say(out.known === null, 'known answer: the new ghost with its revision put back to the old handling\'s is not raced (' + JSON.stringify(out.known) + ')');
 F.say(!out.errors.length, 'no page errors (' + out.errors.join(' | ') + ')');

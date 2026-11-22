@@ -316,9 +316,9 @@ export const PROFILES = {
 export const FIRST = {
   rev: 2,
   VEHICLE: {
-    HOLD_GRIP:      0.9,     // a held button at speed asks for nine tenths of the front's grip: a circle of about 25 m at the cruise, tighter than every corner of track 1 (34 m and up), so holding it always makes the corner and the thumb only has to let go
+    HOLD_GRIP:      0.9,     // a held button at speed asks for nine tenths of the front's grip: held, the car settles at 18.4 m/s on a 22 m circle (main: 12.9 m/s on 11 m), tighter than every corner of track 1 (34 m and up), so holding it always makes the corner and the thumb only has to let go (game/test/first/newcomer.js)
     HOLD_SLIP:      2,       // degrees for the tyres' own slip, so the circle is about the one asked for
-    HOLD_RATE:      9,       // shares of the held angle a second (the plain starter turns in at 3.2 locks a second, so full steer took a third of a second to reach a lock five times the held one): a tap of 100 ms turns about 2 degrees at track 1's speeds and 200 ms about 5 (were 3.4 and 10)
+    HOLD_RATE:      9,       // shares of the held angle a second (the plain starter turns in at 3.2 locks a second, so full steer took a third of a second to reach a lock five times the held one): a tap of 100 ms turns the car 3.4, 2.8 and 2.2 degrees at 14, 20 and 25 m/s, and 200 ms 6.7, 6.9 and 5.4 (main: 3.3 to 3.4, and 8.6 to 11)
     HOLD_RETURN:    12,      // and lets go as quickly (5)
     HOLD_CRUISE:    19,      // m/s a held turn bleeds down towards (68 km/h; par pace is 18), instead of TURN_LIFT's 13
     HOLD_SCRUB:     14,      // m/s^2: from 30 m/s on the first straight to the cruise in under a second, so a held button into the first corner turns instead of running wide
@@ -330,7 +330,7 @@ export const FIRST = {
   },
   ASSIST: {
     KICK_STEER:     12,      // DRIFT with steering kicks the slide the way the thumb steers, unless a slide of 12 degrees or more is already going (a weave's leftover slip sent half the strangers' slides the wrong way, into the outside wall)
-    DRIFT_CARVE:    0.55,    // was 0.9: a full slide at a stranger's 17 to 19 m/s carved a 24 to 26 m circle, inside every corner of track 1 (34 to 75 m), into the inside wall; now about 40 m. The scripted players with a thumb score as much as on main or more (review/first/REPORT.md)
+    DRIFT_CARVE:    0.55,    // was 0.9: a full slide at a stranger's 17 to 19 m/s carved a 24 to 26 m circle, inside every corner of track 1 (34 to 75 m), into the inside wall; now about 40 m. With a thumb's hands on track 1 the scripted slide player scores 5,111 (main 3,220), the mixed 1,816 (1,952) and the grip 536 (564); the scripted drifter, whose steering is a stick's, 517 with 1 from slides (895 with 383): open (game/test/first/stars.js)
   },
   /* career track 1's star targets with the switch (main.js firstTargets; everything else's are as they were). Main's are 450, 900 and 1,580: with the starter above, 5 of 10 strangers' first runs reached 450 (main's own strangers 1); at 380, 9 of 10 (game/test/first/stars.js). Two and three stars are unchanged and the careful scripted driver still earns one */
   STARS:            [380, 900, 1580],

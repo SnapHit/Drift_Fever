@@ -42,7 +42,7 @@ const PROBE = {
   STRIDE:      10,      // frames from one sample to the next (the car's place is looked at on every frame between): 60 samples are 10 s of the title, its first slides in them
   WARM:        60,      // frames drawn first: the first ones build what they draw
   MOVED:       6,       // levels (of 255) a pixel must change by to count as moved
-  MOVING:      0.02,    // share of the backdrop's pixels that must move from one frame to the next
+  MOVING:      0.005,   // share of the picture's pixels that must move from one frame to the next to count as moving (a frame drawn twice moves none; on a phone the menu and its shade cover most of the backdrop, and the least seen moving was 1.7 per cent)
   PCT:         0.05,    // a line's contrast is what all but its darkest 5 per cent of pixels reach
   FLOOR:       4.5,     // the contrast every line keeps if main's own is lower (WCAG AA for text this size)
   COST_FRAMES: 150,     // frames timed for the cost, the first COST_SKIP dropped (they build)

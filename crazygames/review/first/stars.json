@@ -25,7 +25,9 @@
       1580
      ],
      "cleanSectors": "8 of 12",
-     "coins": 97
+     "coins": 97,
+     "drift": 72,
+     "bestChain": 46
     },
     {
      "seed": 2,
@@ -37,7 +39,9 @@
       1580
      ],
      "cleanSectors": "9 of 12",
-     "coins": 41
+     "coins": 41,
+     "drift": 81,
+     "bestChain": 81
     },
     {
      "seed": 3,
@@ -49,7 +53,9 @@
       1580
      ],
      "cleanSectors": "8 of 12",
-     "coins": 31
+     "coins": 31,
+     "drift": 9,
+     "bestChain": 6
     },
     {
      "seed": 4,
@@ -61,7 +67,9 @@
       1580
      ],
      "cleanSectors": "5 of 12",
-     "coins": 28
+     "coins": 28,
+     "drift": 50,
+     "bestChain": 50
     },
     {
      "seed": 5,
@@ -73,7 +81,9 @@
       1580
      ],
      "cleanSectors": "7 of 12",
-     "coins": 32
+     "coins": 32,
+     "drift": 38,
+     "bestChain": 38
     },
     {
      "seed": 6,
@@ -85,7 +95,9 @@
       1580
      ],
      "cleanSectors": "10 of 12",
-     "coins": 100
+     "coins": 100,
+     "drift": 45,
+     "bestChain": 40
     },
     {
      "seed": 7,
@@ -97,7 +109,9 @@
       1580
      ],
      "cleanSectors": "8 of 12",
-     "coins": 34
+     "coins": 34,
+     "drift": 31,
+     "bestChain": 11
     },
     {
      "seed": 8,
@@ -109,7 +123,9 @@
       1580
      ],
      "cleanSectors": "9 of 12",
-     "coins": 36
+     "coins": 36,
+     "drift": 23,
+     "bestChain": 11
     },
     {
      "seed": 9,
@@ -121,7 +137,9 @@
       1580
      ],
      "cleanSectors": "9 of 12",
-     "coins": 237
+     "coins": 237,
+     "drift": 126,
+     "bestChain": 108
     },
     {
      "seed": 10,
@@ -133,7 +151,9 @@
       1580
      ],
      "cleanSectors": "5 of 12",
-     "coins": 24
+     "coins": 24,
+     "drift": 4,
+     "bestChain": 4
     }
    ],
    "drivers": {
@@ -147,7 +167,9 @@
      ],
      "cleanSectors": "12 of 12",
      "hits": 0,
-     "seconds": 77.3
+     "seconds": 77.3,
+     "drift": 0,
+     "bestChain": 0
     },
     "drifter": {
      "score": 895,
@@ -159,7 +181,51 @@
      ],
      "cleanSectors": "12 of 12",
      "hits": 0,
-     "seconds": 70
+     "seconds": 70,
+     "drift": 383,
+     "bestChain": 87
+    },
+    "grip player": {
+     "score": 564,
+     "stars": 1,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 56.9,
+     "drift": 0,
+     "bestChain": 0
+    },
+    "slide player": {
+     "score": 3220,
+     "stars": 3,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "11 of 12",
+     "hits": 1,
+     "seconds": 67.5,
+     "drift": 2723,
+     "bestChain": 979
+    },
+    "mixed player": {
+     "score": 1952,
+     "stars": 3,
+     "targets": [
+      450,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 57.8,
+     "drift": 1392,
+     "bestChain": 279
     }
    },
    "errors": []
@@ -176,7 +242,9 @@
       1580
      ],
      "cleanSectors": "5 of 12",
-     "coins": 175
+     "coins": 175,
+     "drift": 180,
+     "bestChain": 87
     },
     {
      "seed": 2,
@@ -188,7 +256,9 @@
       1580
      ],
      "cleanSectors": "11 of 12",
-     "coins": 246
+     "coins": 246,
+     "drift": 122,
+     "bestChain": 83
     },
     {
      "seed": 3,
@@ -200,7 +270,9 @@
       1580
      ],
      "cleanSectors": "7 of 12",
-     "coins": 168
+     "coins": 168,
+     "drift": 59,
+     "bestChain": 18
     },
     {
      "seed": 4,
@@ -212,7 +284,9 @@
       1580
      ],
      "cleanSectors": "8 of 12",
-     "coins": 235
+     "coins": 235,
+     "drift": 93,
+     "bestChain": 71
     },
     {
      "seed": 5,
@@ -224,7 +298,9 @@
       1580
      ],
      "cleanSectors": "7 of 12",
-     "coins": 37
+     "coins": 37,
+     "drift": 37,
+     "bestChain": 12
     },
     {
      "seed": 6,
@@ -236,7 +312,9 @@
       1580
      ],
      "cleanSectors": "7 of 12",
-     "coins": 173
+     "coins": 173,
+     "drift": 92,
+     "bestChain": 57
     },
     {
      "seed": 7,
@@ -248,7 +326,9 @@
       1580
      ],
      "cleanSectors": "7 of 12",
-     "coins": 168
+     "coins": 168,
+     "drift": 48,
+     "bestChain": 17
     },
     {
      "seed": 8,
@@ -260,7 +340,9 @@
       1580
      ],
      "cleanSectors": "8 of 12",
-     "coins": 169
+     "coins": 169,
+     "drift": 22,
+     "bestChain": 9
     },
     {
      "seed": 9,
@@ -272,7 +354,9 @@
       1580
      ],
      "cleanSectors": "10 of 12",
-     "coins": 243
+     "coins": 243,
+     "drift": 107,
+     "bestChain": 69
     },
     {
      "seed": 10,
@@ -284,7 +368,9 @@
       1580
      ],
      "cleanSectors": "9 of 12",
-     "coins": 237
+     "coins": 237,
+     "drift": 70,
+     "bestChain": 21
     }
    ],
    "drivers": {
@@ -298,7 +384,9 @@
      ],
      "cleanSectors": "12 of 12",
      "hits": 0,
-     "seconds": 78.4
+     "seconds": 78.4,
+     "drift": 0,
+     "bestChain": 0
     },
     "drifter": {
      "score": 517,
@@ -310,7 +398,51 @@
      ],
      "cleanSectors": "12 of 12",
      "hits": 0,
-     "seconds": 68.9
+     "seconds": 68.9,
+     "drift": 1,
+     "bestChain": 1
+    },
+    "grip player": {
+     "score": 536,
+     "stars": 1,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 63.3,
+     "drift": 0,
+     "bestChain": 0
+    },
+    "slide player": {
+     "score": 5111,
+     "stars": 3,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "12 of 12",
+     "hits": 0,
+     "seconds": 66.9,
+     "drift": 4588,
+     "bestChain": 1276
+    },
+    "mixed player": {
+     "score": 1816,
+     "stars": 3,
+     "targets": [
+      380,
+      900,
+      1580
+     ],
+     "cleanSectors": "11 of 12",
+     "hits": 1,
+     "seconds": 59.6,
+     "drift": 1289,
+     "bestChain": 266
     }
    },
    "errors": []
