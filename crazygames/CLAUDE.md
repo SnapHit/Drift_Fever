@@ -1225,3 +1225,23 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   with its park screenshot's timeout raised for the sandbox's software
   drawing (not committed). Until the game's code has arrived the page is
   still its plain dark ground.
+- 23 November 2026, **the paint shine**, by the author's word (the
+  small round 1 fixes): under the lamps (twilight and night) on the high
+  tier, the cars' paint mirrors an environment of its own
+  (`ENVMAP.CAR_FLOODS` in `render/envmap.js`: the track's own, with the
+  floodlight banks bigger, each one soft panel, and a second ring
+  higher), with the top coat at 0.2 roughness while it does
+  (`LOOK.COVER.CAR_ENV_COAT`), so the panels glide over the roof, the
+  boot and the bonnet as soft sheens. Two tries were dropped: the banks
+  as grids of lamps, and the coat at its own 0.07, both mirrored as
+  broken white streaks across the facets. The showroom keeps its crisp
+  studio strips (its car never takes the cars' environment, and at 0.2
+  there the strips washed the paint pale); dawn and dusk and the low
+  tier are as they were. `?carenv=0` gives the paint fix's look back.
+  `?look=1` is still the game before the look to the pixel
+  (`look/switch.js` against ddf54e0), and the cars draw on WebGPU on
+  both tiers (read back by eye). Measure 1 at twilight x0.74 (was
+  x0.68), still under its bar for the reason in the entry above.
+  Not measured: the cost, a second environment made when a lit track
+  loads on the high tier. Before and after: `review/look/paint-shine.jpg`.
+  Also `SUBMISSION.md`'s controls now say what the keys do on Pro.
