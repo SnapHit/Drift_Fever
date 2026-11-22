@@ -25,6 +25,7 @@
 
    node game/test/look/cost.js [--frames N] [--tiers low,high] [--backend webgl2|webgpu] [--size 320x180] [--races day,dusk,night] [--rounds 2]   writes review/look/cost-<backend>.json */
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import * as L from './lib.js';
 import * as W from '../webgpu/lib.js';
 
@@ -35,6 +36,24 @@ const LIMIT = 0.10;
 const COLLECT = `const i2 = F.scene.info(); return { dc: i2.drawCalls, tri: i2.triangles, ms: F.info().frameMs, phys: F.info().physMs, submit: i2.submitMs };`;
 const med = list => { const s = list.slice().sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : 0; };
 const p90 = list => { const s = list.slice().sort((a, b) => a - b); return s.length ? s[Math.min(s.length - 1, Math.floor(s.length * 0.9))] : 0; };
+
+/* The GPU process held to one core and the page's own process to the other (all their threads), so
+   the page's frame is not timed while the software GPU takes its turns on the same core: on WebGL 2 its
+   commands are drawn while the frame is still being built, and one browser's median moved by up to
+   30 per cent from the next one's with the same build. The processes are this probe's own browser's,
+   found from this process down. */
+function pin() {
+  try {
+    const rows = execFileSync('ps', ['-eo', 'pid=,ppid=,args=']).toString().trim().split('\n').map(l => { const m = l.trim().match(/^(\d+)\s+(\d+)\s+(.*)$/); return m && { pid: +m[1], ppid: +m[2], args: m[3] }; }).filter(Boolean);
+    const mine = new Set([process.pid]);
+    for (let grew = true; grew;) { grew = false; for (const r of rows) if (!mine.has(r.pid) && mine.has(r.ppid)) { mine.add(r.pid); grew = true; } }
+    const ours = rows.filter(r => mine.has(r.pid)), gpu = ours.filter(r => r.args.includes('--type=gpu-process')), page = ours.filter(r => r.args.includes('--type=renderer'));
+    for (const r of gpu) execFileSync('taskset', ['-a', '-p', '-c', '1', String(r.pid)], { stdio: 'ignore' });
+    for (const r of page) execFileSync('taskset', ['-a', '-p', '-c', '0', String(r.pid)], { stdio: 'ignore' });
+    return gpu.length && page.length ? 'pinned' : 'not found';
+  } catch (e) { return 'not pinned: ' + String(e.message || e).slice(0, 60); }
+}
+let pinned = null;
 
 /* one frame, with the GPU idle before it */
 const STEP = (page, collect) => page.evaluate(async src => {
@@ -63,6 +82,7 @@ async function once(env, race, tier, query, extra) {
   }, extra);
   await L.hud(pg.page, false);
   await pg.page.evaluate(() => { window.__feel.draw = true; });
+  pinned = pin();
   const f = [];
   for (let i = 0; i < FRAMES; i++) f.push(await STEP(pg.page, COLLECT));
   await pg.close();
@@ -89,6 +109,7 @@ if (tiers.includes('low')) {
   const caught = !within(ka.drawCalls, main.drawCalls) && !within(ka.workMs, main.workMs);
   L.say(caught, 'known answer: the look with 500 extra meshes draws ' + ka.drawCalls + ' calls against main\'s ' + main.drawCalls + ' and works ' + ka.workMs + ' ms against ' + main.workMs + ': ' + (caught ? 'CAUGHT' : 'MISSED'));
 }
+out.cores = pinned;
 L.writeJson(path.join(L.lookDir, 'cost-' + backend + '.json'), out);
 console.log(L.failed() ? L.failed() + ' failed' : 'all passed');
 process.exit(L.failed() ? 1 : 0);
