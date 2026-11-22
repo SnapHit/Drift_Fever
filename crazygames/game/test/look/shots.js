@@ -5,8 +5,10 @@
    car is the starter in cyan, what a new player drives; the moment is
    the same step of the same race on both sides.
 
-   node game/test/look/shots.js [--only day,night] [--sizes land,port] [--sides before,after] [--tier low|high] [--out dir] [--step N]
-   writes review/look/shots/<race>-<size>-<side>.png */
+   node game/test/look/shots.js [--only day,night] [--sizes land,port] [--sides before,after] [--tier low|high] [--out dir] [--step N] [--pairs]
+   writes review/look/shots/<race>-<size>-<side>.png, and with --pairs
+   review/look/pairs/<race>-<size>.jpg: before over after in landscape,
+   side by side in portrait, for the report on a phone */
 import path from 'node:path';
 import * as L from './lib.js';
 
@@ -18,7 +20,7 @@ const tier = arg('--tier', 'high');
 const out = arg('--out', L.lookShots);
 const stepOver = args.includes('--step') ? +arg('--step') : null;
 /* the step of each race drawn: mid slide with the rival in the picture, found by eye */
-export const AT = { day: 700, dusk: 651, night: 760, first: 560 };
+export const AT = { day: 896, dusk: 651, night: 270, first: 560 };
 const VP = { land: L.LAND, port: L.PORT, phone: L.PHONE_LAND };
 
 const env = await L.start();
@@ -36,5 +38,22 @@ for (const race of only) {
       await pg.close();
     }
   }
+}
+if (args.includes('--pairs')) {
+  const fs = await import('node:fs'), dir = path.join(L.lookDir, 'pairs');
+  fs.mkdirSync(dir, { recursive: true });
+  const ctx = await env.browser.newContext({ viewport: { width: 1280, height: 1440 }, deviceScaleFactor: 1 }), page = await ctx.newPage();
+  for (const race of only) for (const size of sizes) {
+    const a = path.join(out, race + '-' + size + '-before.png'), b = path.join(out, race + '-' + size + '-after.png');
+    if (!fs.existsSync(a) || !fs.existsSync(b)) continue;
+    const [w, h] = [VP[size].width, VP[size].height], tall = w > h;
+    await page.setViewportSize(tall ? { width: w, height: h * 2 } : { width: w * 2, height: h });
+    const img = f => '<img src="data:image/png;base64,' + fs.readFileSync(f).toString('base64') + '">';
+    await page.setContent('<!doctype html><style>html,body{margin:0;background:#000}body{display:flex;flex-direction:' + (tall ? 'column' : 'row') + '}img{display:block;width:' + w + 'px;height:' + h + 'px}</style>' + img(a) + img(b));
+    await page.waitForTimeout(150);
+    await page.screenshot({ path: path.join(dir, race + '-' + VP[size].width + 'x' + VP[size].height + '.jpg'), type: 'jpeg', quality: 86 });
+    console.log('wrote review/look/pairs/' + race + '-' + VP[size].width + 'x' + VP[size].height + '.jpg');
+  }
+  await ctx.close();
 }
 await env.close();
