@@ -11,18 +11,22 @@
    something was built in it. WebGPU at the high tier (a Pixel 9's: four
    or more cores), WebGL 2 at its low tier; at SIZE, small, since the
    sandbox draws in software (pipeline builds do not depend on the size).
-   The brief's measure is frames over SLOW_MS (50 ms). Here every frame
-   drawn in software takes over 100 ms, so that count is reported and
-   cannot judge; the verdict is what a phone would feel as a hitch: no
-   pipeline built after GO, and no more frames after GO over SPIKE times
-   the run's own median than main has. The adaptive quality cannot step
+   The brief's measure is frames over SLOW_MS (50 ms). On WebGL 2 here
+   every frame drawn in software takes over 100 ms of the page's time
+   (its GL calls wait on the software GPU), so that count is reported
+   and cannot judge; on WebGPU the page only hands the work over (a few
+   ms a frame) and a pipeline is compiled by the GPU process, apart, so
+   what a build costs the GPU does not show in the page's time at all.
+   The verdict is therefore what makes a phone's hitch: no pipeline
+   built after GO, and no more frames after GO over SPIKE times the
+   run's own median than main has. The adaptive quality cannot step
    here (the probe's clock is a steady 60 Hz); what one step costs is
    measured after the run, by frames the game is told were slow.
    Known answer: a material never seen before, put in front of the
    camera 15 s into the run, is caught as a spike with a pipeline built
    in it.
 
-   node game/test/first/hitches.js [--backends webgl2,webgpu] [--sides main,branch]   writes review/first/hitches-<backends>.json */
+   node game/test/first/hitches.js [--backends webgl2,webgpu] [--sides main,branch] [--known-only]   writes review/first/hitches-<backends>.json */
 import path from 'node:path';
 import fs from 'node:fs';
 import * as F from './lib.js';
@@ -84,22 +88,25 @@ function hitches(r) {
   return { frames: rows.length, over: slow.length, worst: Math.max(...rows.map(x => x[K.real])), median, built: rows.reduce((n, x) => n + x[K.pipes], 0), builtInDrive: rows.slice(go).reduce((n, x) => n + x[K.pipes], 0), spikes: spikes.length, spikeFrames: spikes, slow: slow.filter(x => x.built > 0 || x.ms > SPIKE * median) };
 }
 
+const KNOWN_ONLY = args.includes('--known-only');   // the known answer alone (a run cut short keeps its runs in its file: they are written as they finish)
+const file = path.join(F.dir, (KNOWN_ONLY ? 'hitches-known-' : 'hitches-') + BACKENDS.join('-') + '.json');
 const out = { slowMs: SLOW_MS, span: SPAN, size: SIZE, seed: SEED, main: F.mainCommit(), runs: {} };
-for (const backend of BACKENDS) for (const side of SIDES) {
+if (!KNOWN_ONLY) for (const backend of BACKENDS) for (const side of SIDES) {
   const r = await cold(side, backend, { adapt: true });
   const h = out.runs[side + ' ' + backend] = { ...hitches(r), got: r.got, errors: r.errors, adapt: r.adapt };
   console.log('INFO ' + side + ' on ' + backend + ' (' + r.got.tier + ' tier): ' + h.over + ' of ' + h.frames + ' frames over ' + SLOW_MS + ' ms in the first ' + SPAN + ' s (software drawing: median ' + h.median + ' ms, worst ' + h.worst + '); ' + h.spikes + ' after GO over ' + SPIKE + ' times the median; pipelines built ' + h.built + ', ' + h.builtInDrive + ' of them after GO; the frames that built or spiked: ' + h.slow.map(s => s.state + ' ' + s.t.toFixed(2) + ' s ' + s.ms + ' ms' + (s.built ? ' built ' + s.built : '') + (s.sliding ? ' sliding' : '') + (s.wall ? ' wall' : '')).join(', ') + '; the adaptive quality, told frames were slow: ' + (r.adapt ? r.adapt.steps.map(s => 'level ' + s.from + ' to ' + s.to + ' in ' + s.ms + ' ms').join(', ') || 'no step' : '-'));
   F.say(r.errors.length === 0, side + ' on ' + backend + ': no page errors (' + r.errors.join(' | ') + ')');
+  F.writeJson(file, out);
 }
 if (SIDES.includes('branch')) for (const backend of BACKENDS) {
   const a = out.runs['main ' + backend], b = out.runs['branch ' + backend];
-  if (a && b) F.say(b.builtInDrive === 0 && b.spikes <= a.spikes, backend + ': with ?first=2, nothing built after GO (' + b.builtInDrive + ' pipelines, main ' + a.builtInDrive + ') and ' + b.spikes + ' frames after GO over ' + SPIKE + ' times the median (main ' + a.spikes + '); over ' + SLOW_MS + ' ms: ' + b.over + ' and ' + a.over + ' of ' + b.frames + ', which here is every frame drawn in software');
+  if (a && b) F.say(b.builtInDrive === 0 && b.spikes <= a.spikes, backend + ': with ?first=2, nothing built after GO (' + b.builtInDrive + ' pipelines, main ' + a.builtInDrive + ') and ' + b.spikes + ' frames after GO over ' + SPIKE + ' times the median (main ' + a.spikes + '); over ' + SLOW_MS + ' ms: ' + b.over + ' and ' + a.over + ' of ' + b.frames + (backend === 'webgl2' ? ', which on WebGL 2 here is every frame drawn in software' : ', the page\'s time alone: on WebGPU the GPU process compiles apart'));
 }
 /* the known answer, on the first backend, this branch */
 const kr = await cold(SIDES.includes('branch') ? 'branch' : 'main', BACKENDS[0], { known: true });
 const kh = hitches(kr), at = kh.spikeFrames.find(s => s.t >= 15 && s.t < 15.2 && s.built > 0);
 out.knownAnswer = kh;
 F.say(!!at, 'known answer: a material never seen before, put in front of the camera 15 s into the run on ' + BACKENDS[0] + ', is caught: ' + (at ? at.ms + ' ms at ' + at.t.toFixed(2) + ' s with ' + at.built + ' pipelines built' : 'MISSED (' + kh.slow.map(s => s.t.toFixed(2) + ' s ' + s.ms + ' ms').join(', ') + ')'));
-F.writeJson(path.join(F.dir, 'hitches-' + BACKENDS.join('-') + '.json'), out);
+F.writeJson(file, out);
 console.log(F.failed() ? F.failed() + ' failed' : 'all passed');
 process.exit(F.failed() ? 1 : 0);

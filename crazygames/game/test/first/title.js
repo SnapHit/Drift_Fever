@@ -28,7 +28,7 @@
    clock not moved) reads as not moving.
 
    node game/test/first/title.js [--backends webgl2,webgpu] [--tiers low,high] [--sizes 390x844,1280x720] [--frames 60] [--no-cost] [--no-pages]
-   writes review/first/title.json (title-cost.json with --no-pages) and review/first/title-*.png; the cost wants the machine to itself, the rest does not */
+   writes review/first/title-<backends>.json (title-cost-<backends>.json with --no-pages) and pictures title-*.jpg; the cost wants the machine to itself, the rest does not */
 import path from 'node:path';
 import fs from 'node:fs';
 import * as F from './lib.js';
@@ -50,8 +50,6 @@ const PROBE = {
   LIMIT:       0.10,    // the cost against main's title
   SHOTS:       [12, 48],      // samples written out as pictures (with ?first=2), for the eye
 };
-const tmp = fs.mkdtempSync(path.join(F.dir, '.title-'));
-process.on('exit', () => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) { /* left */ } });
 
 /* a page of one side's game on the title of an empty save */
 async function openTitle(sideName, backend, vp, tier) {
@@ -294,6 +292,6 @@ if (!args.includes('--no-pages')) {
     out.knownAnswers = { underMenu: { ...k1, rows: undefined }, still: { ...k2, rows: undefined } };
   } finally { await pg.close(); }
 }
-F.writeJson(path.join(F.dir, args.includes('--no-pages') ? 'title-cost.json' : 'title.json'), out);
+F.writeJson(path.join(F.dir, (args.includes('--no-pages') ? 'title-cost-' : 'title-') + BACKENDS.join('-') + '.json'), out);
 console.log(F.failed() ? F.failed() + ' failed' : 'all passed');
 process.exit(F.failed() ? 1 : 0);
