@@ -43,7 +43,9 @@ export async function openPage(env, viewport, query, opts) {
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   if (!(opts && opts.liveLoop)) await page.addInitScript(INIT);
-  const q = 'renderer=webgl2' + (query ? '&' + query : '');
+  /* the probes measure the shared simulation with Easy hands unless they ask for Pro (Pro has been the
+     default on keys since 22 November 2026; game/test/controls/ asks for it by name) */
+  const q = 'renderer=webgl2' + (query ? '&' + query : '') + (/(^|&)(controls|pro)=/.test(query || '') ? '' : '&controls=easy');
   await page.goto(env.url + '?' + q, { waitUntil: 'load', timeout: 120000 });
   await page.waitForFunction(() => window.__ready === true || (document.getElementById('fail') && !document.getElementById('fail').hidden), null, { timeout: 120000 });
   const failed = await page.evaluate(() => { const f = document.getElementById('fail'); return f && !f.hidden ? f.textContent : null; });

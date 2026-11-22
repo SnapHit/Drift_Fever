@@ -11,7 +11,7 @@
    main has, the reference picture's) and with ?look=2 at the cover's
    floodlit dusk. No number stands in for the eye.
 
-   node game/test/look/cover.js [--sides before,after] [--dpr 1|2] [--out dir] [--cam d,up,bearing,fov,ty,side] [--preset name] [--step N]
+   node game/test/look/cover.js [--extra '&coat=0'] [--sides before,after] [--dpr 1|2] [--out dir] [--cam d,up,bearing,fov,ty,side] [--preset name] [--step N]
    writes review/look/cover-<side>.png (the frame) and review/look/cover-pair.png
    (the cover over the frame with the switch), cover-pair-before.png (over the one without) */
 import path from 'node:path'; import fs from 'node:fs';
@@ -21,7 +21,7 @@ const sides = arg('--sides', 'before,after').split(','), dpr = +arg('--dpr', 1),
 fs.mkdirSync(out, { recursive: true });
 const REF = JSON.parse(fs.readFileSync(path.join(R.root, 'game', 'test', 'brand', 'reference-shots.json'), 'utf8'))['action-night'];
 export const SHOT = { ...REF, cam: args.includes('--cam') ? arg('--cam').split(',').map(Number) : REF.cams.landscape, step: +arg('--step', REF.step) };
-const SIDE = { before: { query: '', preset: arg('--preset', 'night') }, after: { query: '&look=2', preset: arg('--preset', 'twilight') } };
+const SIDE = { before: { query: '&look=1', preset: arg('--preset', 'night') }, after: { query: '&look=2' + arg('--extra', ''), preset: arg('--preset', 'twilight') } };   // --extra: more on the address of the side with the look (the paint fix's ?coat=0&key=0); the look is the default since 22 November, so the side before it asks for ?look=1
 const W = 1920, H = 1080;
 
 const env = await R.start();

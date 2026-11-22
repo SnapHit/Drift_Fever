@@ -198,8 +198,14 @@ repository with its root directory set to `crazygames/`. Its
 is `npm ci && npm run build` and the deploy command `npx wrangler deploy`.
 Every push to `main` deploys the live site from the repository root and
 the preview from here, with no credentials in the repository or in any
-session. The preview URL is https://drift-fever-crazygames.novlrgames.workers.dev/ and every reply to the author ends with it, by his request on 8 November 2026. It is public and
-unlisted, by the author's decision on 16 October 2026: no Cloudflare Access.
+session. The preview URL is https://drift-fever-crazygames.novlrgames.workers.dev/,
+public and unlisted, by the author's decision on 16 October 2026: no
+Cloudflare Access. **Since 22 November 2026, by his word, he plays
+everything at driftfever.com and the preview link is no longer used**:
+replies do not end with it (his request of 8 November is withdrawn),
+and links for play go to driftfever.com, with any switch on the
+address there. The preview still deploys from every push, as the
+CrazyGames build's own address.
 `SETUP.md` has the exact steps, for the parts only the author can do.
 
 **Since 15 November 2026 the new game is also the front page of
@@ -1148,3 +1154,20 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   sandbox: 2 cores, so timing probes pin the GPU process and the page
   to separate cores; a WebGPU page sometimes never gets its device, so
   retry.
+- 22 November 2026, evening, by the author's word after he played the
+  look on his phone ("it looks better"): **the look and Pro controls
+  are the default on driftfever.com**, with no switch. `?look=1` draws
+  the game as before the look round, pixel for pixel (`look/switch.js`
+  against ddf54e0); `?look=2` still means on. A keyboard or a gamepad
+  drives Pro variant a, the most helped, until he picks one by play
+  (`?pro=b` or `c` to try the others); the title's CONTROLS toggle or
+  `?controls=easy` gives Easy, to the bit the game before round 1B
+  (`controls/easy.js`, rerun with the defaults flipped). Touch is
+  always Easy. **The probes' harness asks for Easy** (`feel/lib.js`
+  adds `controls=easy` unless a probe names `controls` or `pro`),
+  because their scripted inputs were written for the DRIFT button; they
+  see the look, which is what ships. `garage/readable.js` therefore
+  measures the look by default now (68 of 70 in the round). Still open:
+  his pick of a variant, the bench on his desktop and phone (both
+  waiting for his desktop), and `SUBMISSION.md`'s controls text, which
+  says the car drives itself.

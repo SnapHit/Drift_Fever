@@ -34,7 +34,7 @@ async function frames(dir) {
   const R = await import(pathToFileURL(path.join(dir, 'game/test/garage/lib.js')).href + '?' + path.basename(dir));
   const env = await R.start(), out = {};
   for (const c of CASES) {
-    const pg = await R.openPage(env, { width: 640, height: 360 }, 'tier=' + c.tier + '&adapt=0&title=1');
+    const pg = await R.openPage(env, { width: 640, height: 360 }, 'tier=' + c.tier + '&adapt=0&title=1&look=1');   // the look is the default since 22 November: ?look=1 must still be the game before it
     const png = await pg.page.evaluate(async c => {
       const L = window.__loop, F = window.__feel;
       try { localStorage.clear(); } catch (e) {}

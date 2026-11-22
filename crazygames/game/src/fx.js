@@ -12,12 +12,13 @@ const value = query.get('fx');
 export const FX_ON = value !== '0' && value !== 'none';
 export const FX_PARTICLES = value !== 'none';
 
-/* THE COVER LOOK SWITCH (briefs/COVER-LOOK.md, 22 November 2026): the
-   game drawn as its cover is, behind ?look=2 until the author has
-   played it. An environment lighting every reflective surface, clear
-   coat paint, a wet floodlit road, a denser venue, thick lit smoke, a
-   closer and lower camera, antialiasing. Without the switch every frame
-   is the same as before the round, pixel for pixel. Presentation only:
+/* THE COVER LOOK (briefs/COVER-LOOK.md, 22 November 2026): the game
+   drawn as its cover is. Behind ?look=2 until the author had played it
+   on his phone; the default since the evening of 22 November, by his
+   word. An environment lighting every reflective surface, clear coat
+   paint, a wet floodlit road, a denser venue, thick lit smoke, a closer
+   and lower camera, antialiasing. ?look=1 shows the game as it was
+   before the round, every frame the same to the pixel. Presentation only:
    the physics, the input and the score never read this. It rides on
    the spectacle round, so ?fx=0 turns it off as well. */
-export const LOOK_ON = FX_ON && query.get('look') === '2';
+export const LOOK_ON = FX_ON && query.get('look') !== '1';

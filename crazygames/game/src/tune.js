@@ -243,7 +243,7 @@ export const TUNE = {
    First guesses, measured in review/controls/REPORT.md. */
 export const PROFILES = {
   PRO_VARIANTS: ['a', 'b', 'c'],
-  PRO_DEFAULT: 'a',            // the variant ?controls=pro alone drives: the first of the three, not a choice between them
+  PRO_DEFAULT: 'a',            // the variant a keyboard or a gamepad drives with no ?pro=: the most helped, until the author picks one
   PRO_PROMPTS: {               // the first run's prompts on Pro (ui/onboard.js); the rest of their timings are LOOP.ONBOARD's
     HOLD_SLIDE:       0.6,     // s of a slide held with the throttle on before "hold the slide" counts as done
   },

@@ -1,12 +1,13 @@
 /* WHICH CONTROLS A RUN IS DRIVEN WITH (briefs/PRO-CONTROLS.md, 22
-   November 2026). Pro is behind the address until the author has played
-   it: ?controls=pro turns it on for a keyboard and a gamepad, and ?pro=a,
-   b or c picks the variant (and turns it on too). Without either the game
-   is Easy everywhere, exactly as it was. Touch is always Easy. A keyboard
-   or gamepad player can choose Easy with the toggle on the title; that is
-   a preference of the device, kept under its own key, never in the save,
-   and every localStorage call is wrapped so the game plays the same with
-   no memory at all. */
+   November 2026). Pro is the default on a keyboard and a gamepad since
+   the evening of 22 November, by the author's word, before he has
+   picked a variant: ?pro=a, b or c picks one (a, the most helped,
+   otherwise), and ?controls=easy makes every run Easy, the game exactly
+   as it was before the round, as the probes' harness does. Touch is
+   always Easy. A keyboard or gamepad player can choose Easy with the
+   toggle on the title; that is a preference of the device, kept under
+   its own key, never in the save, and every localStorage call is
+   wrapped so the game plays the same with no memory at all. */
 import { PROFILES } from '../tune.js';
 import { EASY, profileOf } from '../physics/profile.js';
 
@@ -14,7 +15,7 @@ const PREF_KEY = 'driftfever.cg.controls';
 const query = (() => { try { return new URLSearchParams(location.search); } catch (e) { return new URLSearchParams(''); } })();
 const askedVariant = query.get('pro');
 const variant = PROFILES.PRO_VARIANTS.includes(askedVariant) ? askedVariant : PROFILES.PRO_DEFAULT;
-const available = query.get('controls') === 'pro' || PROFILES.PRO_VARIANTS.includes(askedVariant);
+const available = query.get('controls') !== 'easy';
 
 let easyPref = false;
 try { easyPref = localStorage.getItem(PREF_KEY) === 'easy'; } catch (e) { easyPref = false; }
