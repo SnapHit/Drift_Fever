@@ -104,6 +104,7 @@ export const LOOK = {
      differently with the switch on. Without it none of this is read. */
   COVER: {
     ANTIALIAS:  true,     // MSAA, four samples, on both tiers (?aa=0 turns it off, the clean edges probe's known answer)
+    ENVIRONMENT: true,    // the world's environment (render/envmap.js; ?env=0 leaves it out, the reflections probe's known answer)
     CAR_HEMI:   false,    // the cars' materials see the sun and the environment, not the flat sky fill: the environment is the sky, so the fill would count it twice
   },
 };
@@ -296,6 +297,7 @@ export function createScene(canvas, opts) {
      rebuilt, never per frame, and given to the scene, so every standard
      material (the cars, the wet road, the water) reflects it. */
   function setEnvironment(key, p, th, seed) {
+    if (!envOn) return;
     if (envMap && envMapKey === key) return;
     if (!pmrem) pmrem = new THREE.PMREMGenerator(renderer);
     const old = envMap;
@@ -307,8 +309,9 @@ export function createScene(canvas, opts) {
   }
   /* The lights a car's materials see with the look on: the key light and
      the environment, not the sky's flat fill (the environment is the sky). */
+  const envOn = LOOK_ON && LOOK.COVER.ENVIRONMENT && query.get('env') !== '0';
   function carLights(m, extra) {
-    if (!LOOK_ON || LOOK.COVER.CAR_HEMI || !m) return;
+    if (!envOn || LOOK.COVER.CAR_HEMI || !m) return;
     const lit = THREE.TSL.lights([sun, ...(extra || [])]);
     m.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const mt of Array.isArray(o.material) ? o.material : [o.material]) if (mt.isMeshStandardMaterial) mt.lightsNode = lit; });
   }
@@ -492,7 +495,7 @@ export function createScene(canvas, opts) {
     /* the player's headlights never light him: a few metres behind him
        in a tandem they washed his paint to white. The sky and the sun
        still do, so he reads as his colour, lit as the scene is */
-    const lit = THREE.TSL.lights(LOOK_ON && !LOOK.COVER.CAR_HEMI ? [sun, rivalBeam] : [hemi, sun, rivalBeam]);   // the cover look: the environment is his sky fill, as it is the player's
+    const lit = THREE.TSL.lights(envOn && !LOOK.COVER.CAR_HEMI ? [sun, rivalBeam] : [hemi, sun, rivalBeam]);   // the cover look: the environment is his sky fill, as it is the player's
     rivalModel.group.traverse(o => { if (!o.isMesh || !o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial || m.isMeshPhysicalMaterial) m.lightsNode = lit; });
     if (rivalModel.lights && rivalModel.lights.set) rivalModel.lights.set(preset.headlights ? 1 : 0.35, 1);
     rivalLamps = carLamps(rivalModel);

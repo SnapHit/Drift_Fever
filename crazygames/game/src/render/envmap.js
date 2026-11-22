@@ -51,10 +51,15 @@ export const ENVMAP = {
   STUDIO: {
     ROOM:       0x0b0e1a,    // the walls and the floor
     FLOOR:      0x1a1f33,
-    SOFTBOX:    { y: 9, w: 8, d: 4, gain: 5.5 },              // overhead
-    STRIPS:     [{ x: -7, z: 0, w: 0.9, h: 6, gain: 7 }, { x: 7, z: 0, w: 0.9, h: 6, gain: 7 }, { x: 0, z: -9, w: 10, h: 0.7, gain: 4 }, { x: 0, z: 9, w: 6, h: 0.7, gain: 3 }],
+    /* bright strips with dark between, as a car studio's: overhead, a few long bars; round the room, bands of light at three heights and tall panels. A facet catches a strip or a gap by the way it faces, so faceted paint sparkles instead of going one pale shade. Narrow and hot: a clear coat mirrors a strip by its brightness, while the light it throws on the paint goes by its size, so narrow strips give bright reflections without washing the colour out */
+    BARS:       { n: 5, y: 7, len: 14, w: 0.3, gap: 2.6, gain: 3.5 },
+    RINGS:      [{ y: 1.4, h: 0.22 }, { y: 2.6, h: 0.26 }, { y: 4.0, h: 0.3 }, { y: 5.8, h: 0.34 }],
+    RING:       { r: 10, gain: 12 },
+    PANELS:     { n: 8, r: 9, w: 0.28, h: 5.5, y: 3.0, gain: 6 },
     COLOUR:     0xf2f4ff,
     SIZE:       256,
+    FLOOR_ENV:  0.3,         // the showroom's floor reflects it this much (its own envMapIntensity)
+    LIGHTS:     0.45,        // the showroom's own key, rim and fill at this share with the studio on: its strips light the car as well, and both together wash the paint pale
   },
 };
 
@@ -181,8 +186,9 @@ export function studioEnvironment(THREE, renderer) {
   add(new THREE.SphereGeometry(30, 24, 12), rgb(S.ROOM), 0, 0, 0);
   add(new THREE.CircleGeometry(29, 32), rgb(S.FLOOR).map(v => v * 0.6), 0, -1, 0, -Math.PI / 2);
   const hot = gain => rgb(S.COLOUR).map(v => v * gain);
-  add(new THREE.PlaneGeometry(S.SOFTBOX.w, S.SOFTBOX.d), hot(S.SOFTBOX.gain), 0, S.SOFTBOX.y, 0, Math.PI / 2);
-  for (const st of S.STRIPS) add(new THREE.PlaneGeometry(st.w, st.h), hot(st.gain), st.x, 2.5, st.z, 0, st.x !== 0 ? Math.PI / 2 : 0);
+  for (let i = 0; i < S.BARS.n; i++) add(new THREE.PlaneGeometry(S.BARS.w, S.BARS.len), hot(S.BARS.gain), (i - (S.BARS.n - 1) / 2) * S.BARS.gap, S.BARS.y, 0, Math.PI / 2);
+  for (const r of S.RINGS) add(new THREE.CylinderGeometry(S.RING.r, S.RING.r, r.h, 48, 1, true), hot(S.RING.gain), 0, r.y, 0);
+  for (let i = 0; i < S.PANELS.n; i++) { const a = (i + 0.5) / S.PANELS.n * Math.PI * 2, m = add(new THREE.PlaneGeometry(S.PANELS.w, S.PANELS.h), hot(S.PANELS.gain), Math.sin(a) * S.PANELS.r, S.PANELS.y, Math.cos(a) * S.PANELS.r); m.lookAt(0, S.PANELS.y, 0); }
   const generator = new THREE.PMREMGenerator(renderer);
   const target = generator.fromScene(scene, 0, 0.1, 100, { size: S.SIZE });
   for (const d of own) d.dispose();

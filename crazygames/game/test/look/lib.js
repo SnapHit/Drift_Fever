@@ -73,6 +73,23 @@ export async function raceTo(pg, o) {
   }, o);
 }
 
+/* A still camera put where a photographer would stand, as
+   game/test/brand/capture.js puts it: [metres from the car, metres up,
+   bearing round the car in degrees, field of view, the height it looks
+   at, metres it looks to one side]. It holds until the next frame is
+   stepped (the chase camera writes it again then). */
+export async function coverCamera(pg, cam) {
+  await pg.evaluate(cam => {
+    const [dist, up, bearing, fov, ty = 0.55, sd = 0] = cam;
+    const F = window.__feel, S = F.scene, c = S.camera, p = F.pose, T = S.THREE;
+    S.resize(innerWidth, innerHeight);
+    const yaw = (p.yaw || 0) + bearing * Math.PI / 180, y0 = p.y || 0;
+    c.position.set(p.x + Math.sin(yaw) * dist, y0 + up, p.z + Math.cos(yaw) * dist);
+    c.up.set(0, 1, 0); c.fov = fov; c.aspect = innerWidth / innerHeight; c.updateProjectionMatrix();
+    c.lookAt(new T.Vector3(p.x + Math.sin(yaw + Math.PI / 2) * sd, y0 + ty, p.z + Math.cos(yaw + Math.PI / 2) * sd)); c.updateMatrixWorld();
+  }, cam);
+}
+
 /* the HUD and the low tier's vignette in or out of the picture */
 export async function hud(pg, on) {
   await pg.evaluate(on => { document.getElementById('ui').style.visibility = on ? '' : 'hidden'; const v = document.getElementById('vignette'); if (v) v.style.display = on ? '' : 'none'; }, !!on);
@@ -82,7 +99,7 @@ export async function hud(pg, on) {
    twice (nothing stepped between) and the page given a moment, as the
    garage round learnt. */
 export async function snap(pg, file) {
-  await pg.evaluate(() => { const F = window.__feel; F.draw = true; F.scene.render(); F.scene.render(); F.draw = false; return new Promise(res => setTimeout(res, 80)); });
+  await pg.evaluate(() => { const F = window.__feel, Lp = window.__loop, draw = () => Lp.app.state === 'garage' ? Lp.showroom.render() : F.scene.render(); F.draw = true; draw(); draw(); F.draw = false; return new Promise(res => setTimeout(res, 80)); });
   const png = await pg.screenshot(file ? { path: file, timeout: 180000 } : { timeout: 180000 });
   return png;
 }
