@@ -832,18 +832,29 @@ export function createScene(canvas, opts) {
   function resize(w, h) { view.w = w; view.h = h; camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h, false); }
   let lastSubmit = 0, lastStats = { drawCalls: 0, triangles: 0 }, lastNodeFrame = -1;
   /* THE FIRST MINUTE (briefs/FIRST-MINUTE.md, ?first=2; main.js calls it
-     each frame after the first until it says none are left): one more of
-     the effects' empty pools (env/particles.js) kept shown, empty, so it
-     is built in this frame, on the title, and not at the first slide or
-     the first wall, mid run. One a frame, so no frame builds them all.
+     each frame after the first until it says it is done): one more of the
+     effects' empty pools (env/particles.js) shown for one frame, empty,
+     so it is built then, on the title, and hidden again until it has
+     something to draw, so the title does not pay for it every frame (0.7
+     ms of a 3 ms frame here). One a frame, so no frame builds them all.
      (three.js's compileAsync was tried first: it built for another
      picture than the one the scene is drawn into, so everything was
      built twice.) */
+  let building = null;
   function prebuild() {
+    if (building) { building.userData.kept = keepAll; if (!keepAll && !building.geometry.drawRange.count) building.visible = false; building = null; }
     let next = null;
-    scene.traverse(o => { if (!next && o.userData.keepBuilt && !o.userData.kept) next = o; });
-    if (next) { next.userData.kept = true; next.visible = true; }
-    return !!next;
+    scene.traverse(o => { if (!next && o.userData.keepBuilt && !o.userData.built) next = o; });
+    if (next) { next.userData.built = true; next.userData.kept = true; next.visible = true; building = next; }
+    return !!building;
+  }
+  /* and in a run every pool stays shown, empty: whatever a new ground's
+     lights or fog change is built again at the countdown, never at the
+     first slide (main.js, startRun and menuGround) */
+  let keepAll = false;
+  function keepPools(on) {
+    keepAll = !!on;
+    scene.traverse(o => { if (o.userData.keepBuilt && o !== building) { o.userData.kept = keepAll; if (keepAll) o.visible = true; else if (!o.geometry.drawRange.count) o.visible = false; } });
   }
   function render() {
     const t0 = performance.now();
@@ -875,7 +886,7 @@ export function createScene(canvas, opts) {
     frameTime, adaptState: () => ({ level: adapt.level, steps: adapt.steps.slice(), on: adaptOn, done: adapt.done, gaveBack: adapt.gaveBack, pixelRatio: renderer.getPixelRatio(), bloom: !!post, density: density() }),
     info: () => ({ backend, tier, adapt: adapt.level, submitMs: lastSubmit, preset: preset.name, theme: theme.name, drawCalls: lastStats.drawCalls, triangles: lastStats.triangles, env: env ? env.info : null, bloom: !!post }),
     environment: () => env, dressing: () => dressing, park: () => park,
-    envMap: () => envMap, setTitle, prebuild,
+    envMap: () => envMap, setTitle, prebuild, keepPools,
     fireworks: stars => { if (dressing) dressing.fireworks(stars); },
     setTier: t => { if (LOOK.TIERS[t]) { tier = t; applyTier(); if (currentGround) setGround(currentGround); } },
   };

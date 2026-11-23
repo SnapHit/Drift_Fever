@@ -13,10 +13,10 @@
    car's own smoke never hides it. */
 
 /* THE FIRST MINUTE (briefs/FIRST-MINUTE.md, ?first=2): a pool render/
-   scene.js prebuild has kept (userData.kept, one pool a frame on the title
-   after its first frame) stays visible when empty, drawing nothing (its
-   range is empty), so it is built then and not at the first slide's smoke
-   or the first wall's sparks, mid run (game/test/first/hitches.js).
+   scene.js keeps (userData.kept: one frame each on the title after its
+   first, and all through a run) stays visible when empty, drawing nothing
+   (its range is empty), so it is built then and not at the first slide's
+   smoke or the first wall's sparks, mid run (game/test/first/hitches.js).
    Without the switch nothing is kept, and an empty pool is hidden as it
    always was. */
 const WHITE = [1, 1, 1];

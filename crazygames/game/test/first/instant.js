@@ -34,7 +34,7 @@ const WATCH = `(function () {
   };
   const id = setInterval(look, 2);   // not the frame loop: the WebGPU stand-in stubs it
 })();`;
-const SLOW = `(function () { let done = false; const busy = () => { const t = performance.now(); while (performance.now() - t < 400) {} }; const id = setInterval(() => { if (document.querySelector('#screens.on .screen.title') && !done) { done = true; busy(); clearInterval(id); } }, 1); })();`;
+const SLOW = `(function () { const real = HTMLCanvasElement.prototype.getContext; let done = false; HTMLCanvasElement.prototype.getContext = function (k, o) { if (!done && (k === 'webgl2' || k === 'webgpu')) { done = true; const t = performance.now(); while (performance.now() - t < 400) {} } return real.call(this, k, o); }; })();`;   // 400 ms spent as the renderer asks for its canvas, before its first frame, on either backend
 const EXTRA = `window.addEventListener('load', () => { fetch('./assets/brand/snaphit-lockup.svg?extra=1').catch(() => {}); });`;
 
 async function load(env, backend, query, extra) {

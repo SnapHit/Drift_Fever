@@ -486,6 +486,7 @@ function menuGround() {
   /* the live title's car is the chosen car as the garage tunes it, under no profile, driven by the scripted slide player (rivals/players.js) with a player's hands */
   if (FIRST_ON) { const mine = save.state.cars[save.state.car]; app.world = createWorld(app.track, { tune: carTune(save.state.car, mine && mine.up) }); app.titleDriver = createPlayer(app.track, 'slide', null, null, { index: 0, car: save.state.car }); app.titleLook = 30; }
   resetRun(); app.driver = null;
+  if (FIRST_ON) scene.keepPools(false);   // and on the title only while each is built (render/scene.js prebuild)
 }
 /* the live title (briefs/FIRST-MINUTE.md priority 4): on the title, with a clear place for the car */
 function titleFramed(S) { return !!titleCam && S === 'title' && running && !!app.titleDriver && !!app.titleLand; }
@@ -630,6 +631,7 @@ function startRun(spec, opts) {
   const raceDef = spec.mode === 'battle' ? rivalById(spec.rival) : null;
   /* a race starts level: the rival on his side of the grid, the player on the other */
   setGround(app.track, carId, paint, raceDef ? gridStart(app.track, -(raceDef.side || 1)) : null);
+  if (FIRST_ON) scene.keepPools(true);   // the first minute: the effects shown empty through a run, built at its countdown if not before (render/scene.js)
   app.laps = raceDef ? battleLaps(app.track, raceDef) : lapsFor(app.track);
   app.targets = firstTargets(spec) || starTargets(app.track, app.laps, starScale(spec));
   app.progress = createProgress(app.track, app.laps);
