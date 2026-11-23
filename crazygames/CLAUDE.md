@@ -26,8 +26,8 @@ resubmitting. Round 1 was two briefs run in parallel on their own
 branches, `briefs/COVER-LOOK.md` and `briefs/PRO-CONTROLS.md`, both
 merged and the default since 22 November. Round 2 is
 `briefs/FIRST-MINUTE.md` (the first minute, and the starter car a
-friend of the author's found "clunky" on track 1), started 23 November
-on `crazygames-first-minute`.
+friend of the author's found "clunky" on track 1), merged behind
+`?first=2` on 23 November for his phone.
 
 ## New direction, 29 October 2026: read DESIGN.md first
 
@@ -1245,3 +1245,40 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   Not measured: the cost, a second environment made when a lit track
   loads on the high tier. Before and after: `review/look/paint-shine.jpg`.
   Also `SUBMISSION.md`'s controls now say what the keys do on Pro.
+- 23 November 2026, **round 2, the first minute, merged behind
+  `?first=2`** (`briefs/FIRST-MINUTE.md`, `review/first/REPORT.md`,
+  probes in `game/test/first/`). The friend's "clunky" was measured
+  before anything changed, with scripted strangers playing the first
+  run on a phone: a held steer button capped the car at 46 km/h on an
+  11 m circle (strangers hold one 95 per cent of the run), taps barely
+  turned it, walls stopped it dead nose first and it was put back on
+  the road with a camera cut (7 cuts a run, worst 23), the first trail
+  and exhaust flame built their materials mid run, and 1 stranger in 10
+  earned a star. The slide itself and track 1 were not the clunk, so
+  track 1 and Kestrow are unchanged. With the switch, on Easy only (the
+  new handling under Pro's throttle rode the walls): the starter's held
+  button turns a 22 m circle at 68 km/h and bleeds speed into a corner
+  after 0.3 s, taps are gentler, a kind wall turns the nose along it
+  and keeps three quarters of the speed, DRIFT with steering kicks the
+  slide the thumb's way (`FIRST` in `tune.js`, its own `first:` ghosts
+  and revision); the slide and brake prompts come where they help;
+  track 1's first star is 380 (was 450); the results show what the
+  coins buy (amber paint on a first run) one press from the garage;
+  the effects are built on the title, one a frame, so nothing is built
+  after GO; the title is live, the player's car drifting track 1 in
+  the screen's largest clear stretch, standing on the line if the
+  device's frames are slow. Strangers: three laps 92 s (was 132), 9 of
+  10 earn a star, 0 camera cuts (was 7), the garage 109 s after the
+  page opens. Rivals' own races and every replay are the same to the
+  bit with and without the switch; **without it the game is main's**
+  (`park/same.js` and `look/switch.js` as shipped, rerun by the
+  reviewer against 2fc25d4 before the merge: the bit and the pixel).
+  Open: the live title's own work on the low tier is x1.38 on WebGL 2
+  and x1.19 on WebGPU against main's title (bar x1.10); on a desktop it
+  frames the car in a corner over the road, without the twilight sky;
+  a gamepad set to Easy barely slides on the new handling (a stick's
+  steering is not all or nothing); with the new starter the rivals win
+  more lead bonus off the scripted mixed player; and on keys (Pro a,
+  the default) the scripted strangers meet a wall 18.7 times a lap and
+  earn no star, which round 2 did not change. For his phone, in a
+  private tab: driftfever.com/?first=2.

@@ -129,11 +129,15 @@ that small changes get the same answer.
   a keyboard or gamepad (variant a until he picks; `?controls=easy` for
   the old ones). Since then: the paint fix, and the boot no longer
   flashes the race HUD before the title.
-- **Round 2 is running**: `briefs/FIRST-MINUTE.md`, on its own branch,
-  by the author's go-ahead of 23 November. New evidence went into it:
-  a friend of his played it and called the initial experience of the
+- **Round 2 is merged behind `?first=2`** (`briefs/FIRST-MINUTE.md`,
+  `review/first/REPORT.md`), by the author's go-ahead of 23 November,
+  waiting for his play on his phone. New evidence went into it: a
+  friend of his played it and called the initial experience of the
   first race track "clunky", and his reading is that the first car
-  needs to be more enjoyable to play with.
+  needs to be more enjoyable to play with. Measured, the clunk was the
+  starter on touch (held steer capped at 46 km/h, walls stopping it
+  dead, camera cuts) and mid run builds; on keys, Pro a is rougher
+  still for a newcomer and round 2 did not change it.
 - He cannot play on a desktop for a while, so the Pro variant and the
   bench wait, and round 2 is judged on his phone first.
 - He has emailed CrazyGames' developer support asking what fell short.
