@@ -61,7 +61,7 @@ export const RUNNER = `(function () {
   const key = (name, down) => { const k = KEYS[name]; window.dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { key: k[0], code: k[1], bubbles: true })); };
   const r3 = v => Math.round(v * 1000) / 1000, r1 = v => Math.round(v * 10) / 10;
   window.__first = {
-    /* opts: { pro (keys on Pro), scale (the thumbs' known answer), maxS, started (the run already begun by a real press), tweak (page source run before the run starts), draw, keepClock,
+    /* opts: { pro (keys on Pro), keys (keys on Easy), scale (the thumbs' known answer), maxS, started (the run already begun by a real press), tweak (page source run before the run starts), draw, keepClock,
        flush (hitches.js: drawing, each frame stepped with the GPU idle before it, so its time is its own work; the run is then a promise), inject: { at (s of the run), src (page source run once then: a known answer) },
        pause: { corner, share } (strip.js, with flush: the frame the car is share of the way through that corner on the first lap is drawn, and the run waits there for window.__first.resume(); window.__first.paused says when) } */
     run(seed, opts) {
@@ -99,7 +99,7 @@ export const RUNNER = `(function () {
           if (want === held[k]) continue;
           held[k] = want;
           if (o.pro) key(k, !!want);
-          else if (k === 'left' || k === 'right' || k === 'hb') F.input.touch.press(k, !!want);
+          else if (k === 'left' || k === 'right' || k === 'hb') { if (o.keys) key(k, !!want); else F.input.touch.press(k, !!want); }   // keys: Easy on a keyboard, the arrows and SPACE
         }
         fHit = 0; fHard = 0; fResp = 0;
         if (pc && !pausedOnce && A.state === 'drive' && A.runTime > 1 && world.along >= pauseAt && world.along < pc.to) { pausedOnce = true; pauseDue = true; F.draw = true; }
@@ -118,7 +118,7 @@ export const RUNNER = `(function () {
       };
       const finish = () => {
       world.stepWorld = orig;
-      for (const k of Object.keys(held)) if (held[k]) { if (o.pro) key(k, false); else if (k === 'left' || k === 'right' || k === 'hb') F.input.touch.press(k, false); }
+      for (const k of Object.keys(held)) if (held[k]) { if (o.pro) key(k, false); else if (k === 'left' || k === 'right' || k === 'hb') { if (o.keys) key(k, false); else F.input.touch.press(k, false); } }
       const R = A.results;
       return { seed, P: th.P, log: th.log, frames: rows.length, wall: Math.round(performance.now() - t0), track: { name: track.name, length: track.length, corners: track.corners.map(c => ({ from: c.from, to: c.to, radius: c.radius, angle: c.angle, dir: c.dir })), checkpoints: track.checkpoints, kind: track.kind, laps: A.laps },
         targets: A.targets, profile: L.profile(), results: R ? { score: R.score, stars: R.stars, coins: R.coins, parts: R.parts, cleanSectors: R.cleanSectors, seconds: R.seconds, best: R.best, bestChain: Math.round(F.scoring.state.best), missions: R.missions ? R.missions.map(m => ({ kind: m.kind, doneNow: m.doneNow, coins: m.coins })) : null } : null,

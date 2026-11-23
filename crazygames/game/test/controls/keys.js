@@ -7,9 +7,10 @@
    wheel stopped while the front turns); the letters go by where the key
    sits on a simulated AZERTY keyboard (z at W's place drives, q at A's
    steers left, a at Q's and w at Z's do nothing), arrows too; and with
-   the title's toggle on Easy the same page drives as Easy always has (W
-   is DRIFT). Known answer: the throttle key unbound (W, its letter and
-   Up taken out of Pro's bindings) fails the throttle check.
+   the title's toggle on Easy the same page drives as Easy does (the
+   car drives itself; since 23 November W only drives and SPACE is
+   DRIFT). Known answer: the throttle key unbound (W, its letter and Up
+   taken out of Pro's bindings) fails the throttle check.
    node game/test/controls/keys.js   writes review/controls/keys.json */
 import * as R from './lib.js';
 
@@ -84,9 +85,10 @@ const easy = out.easyToggle = await page.evaluate(new Function(R.KEY + `
   document.querySelector('[data-action="controls"]').click(); const after = document.querySelector('[data-action="controls"]').textContent;
   L.startRun(L.careerSpec(0)); L.skipCountdown(); frames(1);
   const I = window.__feel.input; down('w', 'KeyW'); const r = I.read(performance.now()); const o = { before, after, profile: L.profile(), mode: I.mode, t: r.throttle, b: r.brake, h: r.handbrake, pref: localStorage.getItem('driftfever.cg.controls') };
-  up('w', 'KeyW'); L.action('title'); document.querySelector('[data-action="controls"]').click(); o.back = document.querySelector('[data-action="controls"]').textContent; o.prefBack = localStorage.getItem('driftfever.cg.controls'); return o;`));
-R.verdict(/PRO/.test(easy.before) && /EASY/.test(easy.after) && easy.profile.controls === 'easy' && easy.mode === 'easy' && easy.h === 1 && easy.t === 1 && easy.b === 0 && easy.pref === 'easy' && /PRO/.test(easy.back) && easy.prefBack === null,
-  'the title toggle: ' + easy.before + ' to ' + easy.after + ', remembered on the device (' + easy.pref + '), and then W is DRIFT with the car driving itself, as Easy always was (throttle ' + easy.t + ', handbrake ' + easy.h + '); toggled back: ' + easy.back);
+  up('w', 'KeyW'); down(' ', 'Space'); o.hSpace = I.read(performance.now() + 1).handbrake; up(' ', 'Space');
+  L.action('title'); document.querySelector('[data-action="controls"]').click(); o.back = document.querySelector('[data-action="controls"]').textContent; o.prefBack = localStorage.getItem('driftfever.cg.controls'); return o;`));
+R.verdict(/PRO/.test(easy.before) && /EASY/.test(easy.after) && easy.profile.controls === 'easy' && easy.mode === 'easy' && easy.h === 0 && easy.hSpace === 1 && easy.t === 1 && easy.b === 0 && easy.pref === 'easy' && /PRO/.test(easy.back) && easy.prefBack === null,
+  'the title toggle: ' + easy.before + ' to ' + easy.after + ', remembered on the device (' + easy.pref + '), and then the car drives itself as Easy does, W only drives (throttle ' + easy.t + ', handbrake ' + easy.h + ') and SPACE is DRIFT (handbrake ' + easy.hSpace + '); toggled back: ' + easy.back + ', the choice forgotten (' + easy.prefBack + ')');
 
 /* known answer: the throttle key unbound */
 const unbound = out.unbound = await page.evaluate(new Function(R.KEY + `

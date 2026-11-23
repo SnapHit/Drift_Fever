@@ -108,8 +108,9 @@
   "mode": "easy",
   "t": 1,
   "b": 0,
-  "h": 1,
+  "h": 0,
   "pref": "easy",
+  "hSpace": 1,
   "back": "CONTROLS PRO",
   "prefBack": null
  },

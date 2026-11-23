@@ -1,0 +1,45 @@
+{
+ "shipped": {
+  "pref0": null,
+  "label0": "CONTROLS EASY",
+  "run0": "easy",
+  "w": {
+   "throttle": 1,
+   "handbrake": 0,
+   "speed": 0.68
+  },
+  "space": 1,
+  "label1": "CONTROLS PRO",
+  "pref1": "pro",
+  "run1": "pro a",
+  "label2": "CONTROLS EASY",
+  "pref2": null,
+  "run2": "easy",
+  "pad": true,
+  "touch": false,
+  "chosenEasy": {
+   "keys": false,
+   "pad": false,
+   "pref": "easy"
+  },
+  "prefEnd": null,
+  "errors": []
+ },
+ "asked": {
+  "label": "CONTROLS PRO",
+  "run": "pro a",
+  "errors": []
+ },
+ "main": {
+  "pref0": null,
+  "label0": "CONTROLS PRO",
+  "run0": "pro a",
+  "w": {
+   "throttle": 1,
+   "handbrake": 0,
+   "speed": 0.03
+  },
+  "space": 1,
+  "errors": []
+ }
+}

@@ -1298,3 +1298,37 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   late) and passes with the round on, 2 runs of 2. Keyboards stay on Pro
   a, which round 2 did not change: the reviewer's advice is Easy as the
   keyboard default until he has played Pro, his call.
+- 23 November 2026, evening, after the author played Pro on a desktop
+  for the first time: "I turned, tapped drift, countersteered, and the
+  car always overturned and crashed into the wall. It's not good."
+  **Keyboards start on Easy again**, with round 2's starter; Pro is one
+  press away on the title's CONTROLS toggle. Why
+  (`game/test/controls/release.js`, his keys in the open with nothing
+  to hit): on every Pro variant a slide closes only when the throttle
+  lifts, so letting the countersteer key go with W still held, as
+  anyone does once the nose points down the road, winds the slide into
+  a spin every time (a: 2.4 to 2.7 s after letting go, b: 1.2 to 1.6,
+  c: 0.8 to 1.2), and on a track the wall comes first. Neutral steering
+  at full throttle asks the drift controller for 95 degrees on variant
+  a (`POWER_BASE` plus `POWER_ANGLE`), and keys give only full
+  countersteer, none, or full into the slide. The prompt says "throttle
+  on, steer against it" and nothing says lift. The round's own measure
+  4 asked for that spin, so it is the design failing keys, not a bug;
+  the keyboard strangers had shown it (18.7 wall contacts a lap, a star
+  in 0 or 1 of 10 runs). On Easy his keys never spin (0 in 24), and the
+  same strangers on keys (`first/newcomer.js --only keys-easy`) earn a
+  star 9 times in 10 with 2 contacts a lap, 0 put backs and 1 camera
+  cut, as on touch. Also fixed on Easy: W and Up were DRIFT / BRAKE, so
+  a desktop player holding W to go was holding the brake; now they only
+  drive (the car does by itself), and Space, Shift, S and Down are DRIFT
+  / BRAKE (`ready/keys.js`, `controls/keys.js`). A gamepad stays on Pro
+  (its trigger can feather, and on Easy a stick barely slides with the
+  new starter), with the same trap when the stick centres and the
+  trigger is held. In `input/mode.js` the toggle keeps 'easy' or 'pro'
+  on the device and forgets it when toggled back to the input's own
+  default; a device that chose Easy before keeps it; `?controls=pro` or
+  any `?pro=` still puts the keys on Pro. `controls/default.js`
+  measures it (known answer: main before it, 72dbd14, puts the keys on
+  Pro a). Proposed, not started: Pro reworked for keys, so a slide
+  holds when the keys are let go and countersteer closes it; its bar is
+  `release.js`'s known answer reading no spin.

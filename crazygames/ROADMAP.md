@@ -139,15 +139,27 @@ that small changes get the same answer.
   starter on touch (held steer capped at 46 km/h, walls stopping it
   dead, camera cuts) and mid run builds; on keys, Pro a is rougher
   still for a newcomer and round 2 did not change it.
-- He cannot play on a desktop for a while, so the Pro variant and the
-  bench wait, and round 2 is judged on his phone first.
+- **Keyboards start on Easy again** since the evening of 23 November,
+  with round 2's starter, after he played Pro on a desktop for the
+  first time: "I turned, tapped drift, countersteered, and the car
+  always overturned and crashed into the wall." On every Pro variant a
+  caught slide spins once the countersteer key is let go with W held,
+  because only lifting closes a slide (`game/test/controls/release.js`).
+  On Easy his keys never spin, and the keyboard strangers earn a star 9
+  times in 10 (was 0 or 1 on Pro a). Pro is one press away on the
+  title's CONTROLS toggle; gamepads stay on Pro. W and Up no longer
+  brake on Easy.
+- He has played on a desktop once; the bench there still waits.
 - He has emailed CrazyGames' developer support asking what fell short.
 
 ## Decisions waiting on the author
 
-- Pick a Pro variant on a keyboard (`?pro=b`, `?pro=c`), when he has a
-  desktop; until then, whether keyboards start on Easy (the reviewer's
-  advice: on Pro a the scripted strangers meet a wall 18.7 times a lap).
+- Whether to rework Pro for keys (proposed, not started): a slide that
+  holds when the keys are let go, countersteer that closes it, steering
+  into it that opens it, and lifting that ends it, measured with the
+  keyboard strangers on track 1. The bar: `controls/release.js` reads
+  no spin. Then keyboards could go back to Pro, and the variant pick
+  follows.
 - Run `?bench=1&adapt=0` on his desktop and phone and send the result.
 - CrazyGames' answer, when it comes, goes into the next brief.
 - Later: first party counts (round 2), paid sounds (round 3), a backend

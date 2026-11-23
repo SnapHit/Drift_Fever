@@ -13,14 +13,15 @@
    STEER_RETURN) reads as worse on this probe's own numbers (the score,
    the time, the wall contacts and the speed, at least three of four).
 
-   node game/test/first/newcomer.js [--runs 10] [--only touch|keys] [--no-known]   writes review/first/newcomer.json */
+   node game/test/first/newcomer.js [--runs 10] [--only touch|keys|keys-easy] [--no-known]   writes review/first/newcomer.json (newcomer-<only>.json with --only) */
 import path from 'node:path';
 import * as F from './lib.js';
 import { clunk, summarise } from './measure.js';
 
 const args = process.argv.slice(2), arg = (k, d) => args.includes(k) ? args[args.indexOf(k) + 1] : d;
 const RUNS = +arg('--runs', 10), ONLY = arg('--only', null);
-const INPUTS = [{ name: 'touch', vp: F.PHONE, touch: true, query: '' }, { name: 'keys', vp: F.DESKTOP, touch: false, query: 'pro=a' }].filter(i => !ONLY || i.name === ONLY);
+/* keys-easy (23 November 2026, when keyboards started on Easy): the same strangers on a desktop by the arrows and SPACE on Easy, only when asked for by --only */
+const INPUTS = [{ name: 'touch', vp: F.PHONE, touch: true, query: '' }, { name: 'keys', vp: F.DESKTOP, touch: false, query: 'pro=a' }, { name: 'keys-easy', vp: F.DESKTOP, touch: false, query: '', keys: true }].filter(i => ONLY ? i.name === ONLY : i.name !== 'keys-easy');
 const SEEDS = Array.from({ length: RUNS }, (_, i) => 1 + i);
 const HALF = 'const T = window.__feel.TUNE.VEHICLE; T.STEER_RATE *= 0.5; T.STEER_RETURN *= 0.5;';
 
@@ -60,7 +61,7 @@ async function sideRuns(sideName, query, tweak) {
       const runs = [];
       for (const seed of SEEDS) {
         await pg.page.evaluate(() => { const L = window.__loop; try { localStorage.clear(); } catch (e) { /* none */ } L.save.reset(); L.action('title'); });
-        const r = await pg.page.evaluate(({ seed, pro }) => window.__first.run(seed, { pro }), { seed, pro: inp.name === 'keys' });
+        const r = await pg.page.evaluate(({ seed, pro, keys }) => window.__first.run(seed, { pro, keys }), { seed, pro: inp.name === 'keys', keys: !!inp.keys });
         if (r.error) throw new Error(sideName + ' ' + inp.name + ' seed ' + seed + ': ' + r.error);
         runs.push({ seed, profile: r.profile, onboard: r.onboard, ...clunk(r, F.COLS) });
       }

@@ -11,9 +11,11 @@
    mode: there is no brake and no throttle: the car drives itself once
    anything is pressed, and DRIFT both drifts (with steering) and stops
    the car (without). Keyboard: left and right (arrows or A, D) steer;
-   space, shift, up, down, W or S drift (the letters by position, so Q,
-   D, Z, S on AZERTY); R restart. Gamepad: left stick or d-pad steer, A,
-   B, X or either trigger drift, Y or start restart.
+   space, shift, down or S drift (the letters by position, so Q, D, Z, S
+   on AZERTY); W and up only drive, which the car does by itself (until
+   23 November 2026 they drifted too, so a desktop player holding W to
+   go was holding the brake); R restart. Gamepad: left stick or d-pad
+   steer, A, B, X or either trigger drift, Y or start restart.
 
    PRO (briefs/PRO-CONTROLS.md, 22 November 2026), keyboard and gamepad
    only: the player drives. Keyboard: W or Up is the throttle, S or Down
@@ -53,9 +55,9 @@ export function createInput(root) {
      rebinding (CrazyGames' quality guidelines, checked 14 November 2026).
      Arrows, space and shift are the same key everywhere. A key event with
      no code (some remote keyboards) falls back to the letter it prints. */
-  const codeMap = { KeyA: 'left', KeyD: 'right', KeyW: 'hb', KeyS: 'hb' };
-  const keyMap = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'hb', ArrowDown: 'hb', ' ': 'hb', Shift: 'hb' };
-  const letterMap = { a: 'left', A: 'left', d: 'right', D: 'right', w: 'hb', W: 'hb', s: 'hb', S: 'hb' };
+  const codeMap = { KeyA: 'left', KeyD: 'right', KeyW: 'go', KeyS: 'hb' };
+  const keyMap = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'go', ArrowDown: 'hb', ' ': 'hb', Shift: 'hb' };
+  const letterMap = { a: 'left', A: 'left', d: 'right', D: 'right', w: 'go', W: 'go', s: 'hb', S: 'hb' };
   const bound = e => keyMap[e.key] || (e.code ? codeMap[e.code] : letterMap[e.key]);
   /* Pro's keys, the same keys with their own jobs, kept by the key held
      (two keys for one job, W and Up, each count until let go) */
@@ -134,7 +136,7 @@ export function createInput(root) {
       record.steer = (keys.has('right') ? 1 : 0) - (keys.has('left') ? 1 : 0);
       record.handbrake = keys.has('hb') ? 1 : 0;
     }
-    if (record.steer !== 0 || record.handbrake) started = true;
+    if (record.steer !== 0 || record.handbrake || (!proHands && record.source === 'keys' && keys.has('go'))) started = true;
     if (proHands) { record.throttle = throttle; record.brake = brake; }
     else {
       record.brake = 0;

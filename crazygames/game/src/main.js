@@ -382,7 +382,7 @@ function titleInfo() {
   const d = dailySpec();
   return { dailyDate: d.date, dailyName: d.date, dailyKind: d.kind === 'circuit' ? LOOP.LAPS + ' laps' : 'sprint', standIn: TRACK_STAND_IN, fresh: Object.keys(save.state.career).length === 0, missions: missionTally(save.state, CAREER.length), missionsOf: CAREER.length * 3, labCodes: Object.keys(save.state.lab.codes).length, storage: save.status.available, backPay: save.status.backPay || 0, sound: sound.available ? (sound.muted ? 'off' : 'on') : null, music: sound.music ? 'on' : 'off',
     /* the controls (briefs/PRO-CONTROLS.md): only when Pro is on the address; pro is what a keyboard or a gamepad drives with now */
-    controls: controls.available ? { pro: !controls.easyPreferred, source: inputSource() } : null };
+    controls: controls.available ? { pro: controls.proFor(inputSource()), source: inputSource() } : null };
 }
 function showMenu(name) {
   app.state = name; app.driver = null;
@@ -886,7 +886,7 @@ function onAction(action, arg) {
   sound.ui('tap');
   switch (action) {
     case 'music': sound.setMusic(!sound.music); showMenu('title'); break;
-    case 'controls': controls.setEasyPreferred(!controls.easyPreferred); showMenu('title'); break;   // Pro or Easy on a keyboard and a gamepad, a preference of the device
+    case 'controls': controls.toggle(inputSource()); showMenu('title'); break;   // Pro or Easy for the input in use, a preference of the device (input/mode.js)
     case 'fullscreen': toggleFullscreen(); break;
     case 'sound': sound.setMuted(!sound.muted); soundButton(); showMenu('title'); break;
     case 'title': menuGround(); showMenu('title'); break;

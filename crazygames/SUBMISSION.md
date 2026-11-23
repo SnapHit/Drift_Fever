@@ -48,17 +48,14 @@ game-covers). Their portal is https://developer.crazygames.com/.
 **Controls**
 
 > Desktop
-> - W or Up arrow: throttle
-> - S or Down arrow: brake, then reverse
-> - A / D or Left / Right arrow: steer
-> - Space or Shift: handbrake. Throw the tail out, then hold the slide
->   with the throttle and countersteer
+> - A / D or Left / Right arrow: steer. The car drives itself
+> - Space, Shift, S or Down: drift while you steer; on its own it brakes
 > - R: restart the run
 > - L or Tab: the challenge list in the stunt park
-> - CONTROLS on the title switches to Easy: the car drives itself and
->   Space, Shift, W, S, Up or Down is DRIFT / BRAKE
-> - A gamepad works too: right trigger throttle, left trigger brake,
->   stick or d-pad to steer, A or X handbrake
+> - CONTROLS on the title switches to Pro: W or Up throttle, S or Down
+>   brake and then reverse, Space or Shift handbrake
+> - A gamepad drives on Pro: right trigger throttle, left trigger
+>   brake, stick or d-pad to steer, A or X handbrake
 >
 > Mobile
 > - The two arrow buttons steer
