@@ -1,0 +1,347 @@
+{
+ "slowMs": 50,
+ "span": 30,
+ "size": {
+  "width": 195,
+  "height": 422
+ },
+ "seed": 1,
+ "main": "2fc25d4",
+ "runs": {
+  "main webgl2": {
+   "frames": 1980,
+   "over": 1647,
+   "worst": 10495.3,
+   "median": 112.5,
+   "built": 43,
+   "builtInDrive": 4,
+   "spikes": 4,
+   "spikeFrames": [
+    {
+     "frame": 182,
+     "t": 0.033,
+     "ms": 2696.9,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 241,
+     "t": 1.017,
+     "ms": 362,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 335,
+     "t": 2.583,
+     "ms": 10495.3,
+     "built": 2,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 369,
+     "t": 3.15,
+     "ms": 4115.2,
+     "built": 2,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    }
+   ],
+   "slow": [
+    {
+     "frame": 0,
+     "t": 0,
+     "ms": 2060.8,
+     "built": 39,
+     "state": "countdown",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 182,
+     "t": 0.033,
+     "ms": 2696.9,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 241,
+     "t": 1.017,
+     "ms": 362,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 335,
+     "t": 2.583,
+     "ms": 10495.3,
+     "built": 2,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 369,
+     "t": 3.15,
+     "ms": 4115.2,
+     "built": 2,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    }
+   ],
+   "got": {
+    "backend": "webgl2",
+    "tier": "low"
+   },
+   "errors": [],
+   "adapt": {
+    "from": 0,
+    "steps": [
+     {
+      "frame": 44,
+      "ms": 2,
+      "from": 0,
+      "to": 1
+     },
+     {
+      "frame": 195,
+      "ms": 10278,
+      "from": 1,
+      "to": 3
+     }
+    ],
+    "level": 3
+   }
+  },
+  "branch webgl2": {
+   "frames": 1980,
+   "over": 1781,
+   "worst": 419.9,
+   "median": 120.6,
+   "built": 5,
+   "builtInDrive": 0,
+   "spikes": 2,
+   "spikeFrames": [
+    {
+     "frame": 247,
+     "t": 1.117,
+     "ms": 372.7,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 676,
+     "t": 8.267,
+     "ms": 382.3,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    }
+   ],
+   "slow": [
+    {
+     "frame": 0,
+     "t": 0,
+     "ms": 266.1,
+     "built": 5,
+     "state": "countdown",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 167,
+     "t": 0,
+     "ms": 419.9,
+     "built": 0,
+     "state": "countdown",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 247,
+     "t": 1.117,
+     "ms": 372.7,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    },
+    {
+     "frame": 676,
+     "t": 8.267,
+     "ms": 382.3,
+     "built": 0,
+     "state": "drive",
+     "sliding": false,
+     "wall": false
+    }
+   ],
+   "got": {
+    "backend": "webgl2",
+    "tier": "low"
+   },
+   "errors": [],
+   "adapt": {
+    "from": 0,
+    "steps": [
+     {
+      "frame": 44,
+      "ms": 3,
+      "from": 0,
+      "to": 1
+     },
+     {
+      "frame": 195,
+      "ms": 9337,
+      "from": 1,
+      "to": 3
+     }
+    ],
+    "level": 3
+   }
+  },
+  "main webgpu": {
+   "frames": 1980,
+   "over": 1,
+   "worst": 399.4,
+   "median": 2.3,
+   "built": 54,
+   "builtInDrive": 8,
+   "spikes": 0,
+   "spikeFrames": [],
+   "slow": [
+    {
+     "frame": 0,
+     "t": 0,
+     "ms": 399.4,
+     "built": 46,
+     "state": "countdown",
+     "sliding": false,
+     "wall": false
+    }
+   ],
+   "got": {
+    "backend": "webgpu",
+    "tier": "high"
+   },
+   "errors": [],
+   "adapt": {
+    "from": 0,
+    "steps": [
+     {
+      "frame": 44,
+      "ms": 2,
+      "from": 0,
+      "to": 1
+     },
+     {
+      "frame": 195,
+      "ms": 18,
+      "from": 1,
+      "to": 2
+     }
+    ],
+    "level": 2
+   }
+  },
+  "branch webgpu": {
+   "frames": 1980,
+   "over": 1,
+   "worst": 157.6,
+   "median": 2.7,
+   "built": 7,
+   "builtInDrive": 0,
+   "spikes": 0,
+   "spikeFrames": [],
+   "slow": [
+    {
+     "frame": 0,
+     "t": 0,
+     "ms": 157.6,
+     "built": 7,
+     "state": "countdown",
+     "sliding": false,
+     "wall": false
+    }
+   ],
+   "got": {
+    "backend": "webgpu",
+    "tier": "high"
+   },
+   "errors": [],
+   "adapt": {
+    "from": 0,
+    "steps": [
+     {
+      "frame": 44,
+      "ms": 4,
+      "from": 0,
+      "to": 1
+     },
+     {
+      "frame": 195,
+      "ms": 13,
+      "from": 1,
+      "to": 2
+     }
+    ],
+    "level": 2
+   }
+  }
+ },
+ "knownAnswer": {
+  "frames": 1980,
+  "over": 1704,
+  "worst": 8467.9,
+  "median": 116.2,
+  "built": 6,
+  "builtInDrive": 1,
+  "spikes": 1,
+  "spikeFrames": [
+   {
+    "frame": 1082,
+    "t": 15.033,
+    "ms": 8467.9,
+    "built": 1,
+    "state": "drive",
+    "sliding": false,
+    "wall": false
+   }
+  ],
+  "slow": [
+   {
+    "frame": 0,
+    "t": 0,
+    "ms": 355.9,
+    "built": 5,
+    "state": "countdown",
+    "sliding": false,
+    "wall": false
+   },
+   {
+    "frame": 1082,
+    "t": 15.033,
+    "ms": 8467.9,
+    "built": 1,
+    "state": "drive",
+    "sliding": false,
+    "wall": false
+   }
+  ]
+ }
+}

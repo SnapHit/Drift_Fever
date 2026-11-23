@@ -1,0 +1,66 @@
+{
+ "probe": {
+  "FRAMES": 60,
+  "STRIDE": 10,
+  "WARM": 60,
+  "MOVED": 6,
+  "MOVING": 0.005,
+  "PCT": 0.05,
+  "FLOOR": 4.5,
+  "COST_FRAMES": 150,
+  "COST_SKIP": 10,
+  "LIMIT": 0.1,
+  "SHOTS": [
+   12,
+   48
+  ]
+ },
+ "main": "2fc25d4",
+ "pages": {},
+ "cost": {
+  "webgl2": {
+   "main": {
+    "frames": 140,
+    "drawCalls": 81,
+    "drawCallsMax": 81,
+    "triangles": 481915,
+    "workMs": 2.4,
+    "physMs": 0,
+    "adapt": 0,
+    "cores": "pinned"
+   },
+   "branch": {
+    "frames": 140,
+    "drawCalls": 75,
+    "drawCallsMax": 80,
+    "triangles": 181261,
+    "workMs": 3.3,
+    "physMs": 0.1,
+    "adapt": 0,
+    "cores": "pinned"
+   }
+  },
+  "webgpu": {
+   "main": {
+    "frames": 140,
+    "drawCalls": 81,
+    "drawCallsMax": 81,
+    "triangles": 481915,
+    "workMs": 2.6,
+    "physMs": 0,
+    "adapt": 0,
+    "cores": "pinned"
+   },
+   "branch": {
+    "frames": 140,
+    "drawCalls": 75,
+    "drawCallsMax": 80,
+    "triangles": 181261,
+    "workMs": 3.1,
+    "physMs": 0.1,
+    "adapt": 0,
+    "cores": "pinned"
+   }
+  }
+ }
+}

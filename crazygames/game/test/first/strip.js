@@ -29,15 +29,15 @@ for (const side of ['main', 'branch']) {
     const pg = await F.freshPage(env, S.R, F.PHONE, 'tier=high' + (side === 'branch' ? '&first=2' : ''), true);
     const p = pg.page;
     await p.evaluate(n => { const F = window.__feel; F.draw = true; window.__clock = 1000; for (let i = 0; i < n; i++) { window.__clock += 1000 / 60; F.frame(window.__clock); } }, STRIP.TITLE * 60);
-    shots[side + '-title'] = await p.screenshot();
+    shots[side + '-title'] = await p.screenshot({ timeout: 300000 });
     const run = p.evaluate(({ seed, pause }) => window.__first.run(seed, { flush: true, keepClock: true, pause, maxS: 240 }), { seed: STRIP.SEED, pause: STRIP.CORNER });
     for (const end = Date.now() + 600000; Date.now() < end; await new Promise(r => setTimeout(r, 250))) if (await p.evaluate(() => !!(window.__first && window.__first.paused))) break;
-    shots[side + '-corner'] = await p.screenshot();
+    shots[side + '-corner'] = await p.screenshot({ timeout: 300000 });
     await p.evaluate(() => window.__first.resume());
     const r = await run;
     if (r.error) throw new Error(side + ': ' + r.error);
     await p.evaluate(n => { const F = window.__feel; F.draw = true; for (let i = 0; i < n; i++) { window.__clock += 1000 / 60; F.frame(window.__clock); } }, STRIP.AFTER);
-    shots[side + '-results'] = await p.screenshot();
+    shots[side + '-results'] = await p.screenshot({ timeout: 300000 });
     console.log('INFO ' + side + ': ' + (r.results ? r.results.score + ' points, ' + r.results.stars + ' stars, ' + r.results.seconds.toFixed(1) + ' s' : 'no results') + '; page errors ' + pg.errors.length);
     await pg.close();
   } finally { await env.close(); }

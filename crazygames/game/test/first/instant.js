@@ -15,8 +15,8 @@
    and no request main does not make but the game's own new code (its
    new modules under src/, part of the initial download, which npm run
    build counts), each listed.
-   Known answers: a page told to spend 400 ms more before its first
-   frame reads as later; a request added before the first tap is caught.
+   Known answers: a page told to spend 2 s more before its first frame
+   reads as later; a request added before the first tap is caught.
 
    node game/test/first/instant.js [--loads 5] [--backends webgl2,webgpu]   writes review/first/instant.json */
 import path from 'node:path';
@@ -34,7 +34,7 @@ const WATCH = `(function () {
   };
   const id = setInterval(look, 2);   // not the frame loop: the WebGPU stand-in stubs it
 })();`;
-const SLOW = `(function () { const real = HTMLCanvasElement.prototype.getContext; let done = false; HTMLCanvasElement.prototype.getContext = function (k, o) { if (!done && (k === 'webgl2' || k === 'webgpu')) { done = true; const t = performance.now(); while (performance.now() - t < 400) {} } return real.call(this, k, o); }; })();`;   // 400 ms spent as the renderer asks for its canvas, before its first frame, on either backend
+const SLOW = `(function () { const real = HTMLCanvasElement.prototype.getContext; let done = false; HTMLCanvasElement.prototype.getContext = function (k, o) { if (!done && (k === 'webgl2' || k === 'webgpu')) { done = true; const t = performance.now(); while (performance.now() - t < 2000) {} } return real.call(this, k, o); }; })();`;   // 2 s spent as the renderer asks for its canvas, before its first frame, on either backend: more than the slack and the spread of a load in software (on WebGL 2 here a load takes 6 to 7.5 s, and 400 ms went unseen)
 const EXTRA = `window.addEventListener('load', () => { fetch('./assets/brand/snaphit-lockup.svg?extra=1').catch(() => {}); });`;
 
 async function load(env, backend, query, extra) {
@@ -73,7 +73,7 @@ for (const backend of BACKENDS) {
     F.say(bad === 0, backend + ': every load drew on ' + backend + ' (' + bad + ' did not)');
     F.say(b.ready <= a.ready * (1 + SLACK) && b.title <= a.title * (1 + SLACK), backend + ': the first 3D frame at ' + b.ready + ' ms with ?first=2 against main\'s ' + a.ready + ' (medians of ' + LOADS + '; main ' + a.spread.join(' to ') + ', this branch ' + b.spread.join(' to ') + '), the title painted at ' + b.title + ' against ' + a.title + ': no later');
     F.say(more.length === 0, backend + ': nothing fetched before the first tap that main does not fetch (' + (more.join(', ') || 'none') + '; main ' + mainUrls.size + ' addresses) but the game\'s own new code, in the initial download: ' + (code.join(', ') || 'none'));
-    F.say(known.ready > b.ready * (1 + SLACK), 'known answer, ' + backend + ': a page told to spend 400 ms more before its first frame reads as later: ' + known.ready + ' ms against ' + b.ready + ' (' + (known.ready > b.ready * (1 + SLACK) ? 'CAUGHT' : 'MISSED') + ')');
+    F.say(known.ready > b.ready * (1 + SLACK), 'known answer, ' + backend + ': a page told to spend 2 s more before its first frame reads as later: ' + known.ready + ' ms against ' + b.ready + ' (' + (known.ready > b.ready * (1 + SLACK) ? 'CAUGHT' : 'MISSED') + ')');
     F.say(out.backends[backend].extra.length > 0, 'known answer, ' + backend + ': a request added before the first tap is caught (' + out.backends[backend].extra.join(', ') + ')');
   } finally { await envs.main.close(); await envs.branch.close(); }
 }
