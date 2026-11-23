@@ -52,10 +52,8 @@ game-covers). Their portal is https://developer.crazygames.com/.
 > - Space, Shift, S or Down: drift while you steer; on its own it brakes
 > - R: restart the run
 > - L or Tab: the challenge list in the stunt park
-> - CONTROLS on the title switches to Pro: W or Up throttle, S or Down
->   brake and then reverse, Space or Shift handbrake
-> - A gamepad drives on Pro: right trigger throttle, left trigger
->   brake, stick or d-pad to steer, A or X handbrake
+> - A gamepad works too: stick or d-pad to steer, A, B, X or a trigger
+>   to drift and brake
 >
 > Mobile
 > - The two arrow buttons steer

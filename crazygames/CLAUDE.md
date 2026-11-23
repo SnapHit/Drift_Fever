@@ -1332,3 +1332,26 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   Pro a). Proposed, not started: Pro reworked for keys, so a slide
   holds when the keys are let go and countersteer closes it; its bar is
   `release.js`'s known answer reading no spin.
+- 23 November 2026, evening, after the author played Easy on his
+  desktop ("the default easy setting works well") and asked whether Pro
+  adds much for a player: **Pro is hidden and every run is Easy**, keys,
+  gamepads and touch, by his word. The reviewer's reasons: the only
+  evidence (his play and the keyboard strangers) favours Easy, Pro was
+  a guess from what the leading desktop games offer, Easy keeps its
+  skill (chains, three stars, rivals, park golds), and Pro doubles the
+  upkeep (its own ghosts and handling, star targets and rivals never
+  balanced for it). The title has no CONTROLS toggle; Pro is reached
+  only by `?controls=pro` or any `?pro=`, which brings the toggle back
+  with its old behaviour, and a stored choice of Pro is ignored without
+  the address (`input/mode.js`). Gamepads moved to Easy, where the
+  stick is now read all or nothing like a key (full lock once pushed
+  `TUNE.CONTROLS.PAD_EASY_FULL` 0.5 of the way, nothing before; on Pro
+  it stays analogue), since a stick's part steering barely started a
+  slide on round 2's starter: pushed with A it gives the very record the
+  right arrow with SPACE gives, and those keys were measured with the
+  strangers above. `controls/default.js` measures all of it (known
+  answer: main before it, 9a3ac14, shows the toggle and drives a pad on
+  Pro). Pro's code, its probes and its rework's starting point
+  (`release.js`) are kept, not deleted, in case strangers on a desktop
+  or CrazyGames ask for throttle control; the rework is dropped from the
+  plan.

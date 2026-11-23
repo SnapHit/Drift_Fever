@@ -139,6 +139,13 @@ that small changes get the same answer.
   starter on touch (held steer capped at 46 km/h, walls stopping it
   dead, camera cuts) and mid run builds; on keys, Pro a is rougher
   still for a newcomer and round 2 did not change it.
+- **Pro is hidden and every run is Easy** since the evening of 23
+  November, by his word after playing Easy on a desktop ("works well")
+  and asking whether Pro adds much for a player: it is reached only by
+  `?controls=pro`, and gamepads moved to Easy with the stick read all
+  or nothing, like a key. Kept, not deleted, in case strangers on a
+  desktop or CrazyGames ask for throttle control. Before that, the same
+  evening:
 - **Keyboards start on Easy again** since the evening of 23 November,
   with round 2's starter, after he played Pro on a desktop for the
   first time: "I turned, tapped drift, countersteered, and the car
@@ -154,12 +161,11 @@ that small changes get the same answer.
 
 ## Decisions waiting on the author
 
-- Whether to rework Pro for keys (proposed, not started): a slide that
-  holds when the keys are let go, countersteer that closes it, steering
-  into it that opens it, and lifting that ends it, measured with the
-  keyboard strangers on track 1. The bar: `controls/release.js` reads
-  no spin. Then keyboards could go back to Pro, and the variant pick
-  follows.
+- Pro's rework is dropped from the plan (his word, 23 November). If
+  round 5's strangers on a desktop or CrazyGames ask for throttle
+  control, its starting point is in `controls/release.js`: a slide that
+  holds when the keys are let go, countersteer that closes it, lifting
+  that ends it.
 - Run `?bench=1&adapt=0` on his desktop and phone and send the result.
 - CrazyGames' answer, when it comes, goes into the next brief.
 - Later: first party counts (round 2), paid sounds (round 3), a backend

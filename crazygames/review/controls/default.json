@@ -1,45 +1,97 @@
 {
  "shipped": {
   "pref0": null,
-  "label0": "CONTROLS EASY",
+  "toggle0": null,
   "run0": "easy",
   "w": {
    "throttle": 1,
-   "handbrake": 0,
-   "speed": 0.68
+   "handbrake": 0
   },
   "space": 1,
-  "label1": "CONTROLS PRO",
-  "pref1": "pro",
-  "run1": "pro a",
-  "label2": "CONTROLS EASY",
-  "pref2": null,
-  "run2": "easy",
-  "pad": true,
+  "pad": false,
   "touch": false,
-  "chosenEasy": {
-   "keys": false,
-   "pad": false,
-   "pref": "easy"
+  "stick": {
+   "easyFar": {
+    "steer": 1,
+    "handbrake": 1,
+    "source": "pad"
+   },
+   "easyLight": {
+    "steer": 0,
+    "handbrake": 0,
+    "source": "pad"
+   },
+   "easyLeft": {
+    "steer": -1,
+    "handbrake": 0,
+    "source": "pad"
+   },
+   "proFar": {
+    "steer": 0.773,
+    "handbrake": 0,
+    "source": "pad"
+   }
   },
-  "prefEnd": null,
+  "keysSame": {
+   "steer": 1,
+   "handbrake": 1
+  },
   "errors": []
  },
+ "storedPro": {
+  "pref": "pro",
+  "keys": false,
+  "pad": false
+ },
  "asked": {
-  "label": "CONTROLS PRO",
-  "run": "pro a",
+  "label0": "CONTROLS PRO",
+  "run0": "pro a",
+  "pad": true,
+  "label1": "CONTROLS EASY",
+  "pref1": "easy",
+  "run1": "easy",
+  "label2": "CONTROLS PRO",
+  "pref2": null,
+  "run2": "pro a",
   "errors": []
  },
  "main": {
   "pref0": null,
-  "label0": "CONTROLS PRO",
-  "run0": "pro a",
+  "toggle0": "CONTROLS EASY",
+  "run0": "easy",
   "w": {
    "throttle": 1,
-   "handbrake": 0,
-   "speed": 0.03
+   "handbrake": 0
   },
   "space": 1,
+  "pad": true,
+  "touch": false,
+  "stick": {
+   "easyFar": {
+    "steer": 0.773,
+    "handbrake": 1,
+    "source": "pad"
+   },
+   "easyLight": {
+    "steer": 0.318,
+    "handbrake": 0,
+    "source": "pad"
+   },
+   "easyLeft": {
+    "steer": -0.659,
+    "handbrake": 0,
+    "source": "pad"
+   },
+   "proFar": {
+    "steer": 0.773,
+    "handbrake": 0,
+    "source": "pad"
+   }
+  },
+  "keysSame": {
+   "steer": 1,
+   "handbrake": 1
+  },
   "errors": []
  }
 }

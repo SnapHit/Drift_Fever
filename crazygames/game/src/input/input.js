@@ -15,7 +15,8 @@
    on AZERTY); W and up only drive, which the car does by itself (until
    23 November 2026 they drifted too, so a desktop player holding W to
    go was holding the brake); R restart. Gamepad: left stick or d-pad
-   steer, A, B, X or either trigger drift, Y or start restart.
+   steer (the stick as all or nothing, like a key), A, B, X or either
+   trigger drift, Y or start restart.
 
    PRO (briefs/PRO-CONTROLS.md, 22 November 2026), keyboard and gamepad
    only: the player drives. Keyboard: W or Up is the throttle, S or Down
@@ -95,6 +96,11 @@ export function createInput(root) {
       let steer = p.axes[0] || 0;
       if (Math.abs(steer) < dz) steer = 0; else steer = (steer - Math.sign(steer) * dz) / (1 - dz);
       const b = i => (p.buttons[i] && (p.buttons[i].value || (p.buttons[i].pressed ? 1 : 0))) || 0;
+      /* Easy reads the stick as a key or a thumb: full lock once it is
+         pushed PAD_EASY_FULL of the way, nothing before. The first
+         minute's starter steers by whole presses, and a stick's part
+         steering barely started a slide on it (review/first/REPORT.md). */
+      if (mode !== 'pro') steer = Math.abs(steer) >= TUNE.CONTROLS.PAD_EASY_FULL ? Math.sign(steer) : 0;
       if (b(14)) steer = -1; if (b(15)) steer = 1;
       let throttle = 1, brake = 0, handbrake, restart = b(3) || b(9);
       if (mode === 'pro') {

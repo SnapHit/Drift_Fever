@@ -230,6 +230,7 @@ export const TUNE = {
   },
   CONTROLS: {
     GAMEPAD_DEADZONE:   0.12,
+    PAD_EASY_FULL:      0.5,     // on Easy the stick is full lock once pushed this far past the deadzone, nothing before (since 23 November 2026, when pads moved to Easy)
     AUTO_THROTTLE:      1,       // 1: the car always drives once the player has pressed anything; no brake, DRIFT slows it (Easy, and every touch run)
     /* PRO's keys (briefs/PRO-CONTROLS.md): a key is on or off, so on Pro
        the throttle and the brake it holds ramp in and out over these times,
@@ -258,7 +259,7 @@ export const TUNE = {
    First guesses, measured in review/controls/REPORT.md. */
 export const PROFILES = {
   PRO_VARIANTS: ['a', 'b', 'c'],
-  PRO_DEFAULT: 'a',            // the variant Pro drives with no ?pro= (a gamepad's default; a keyboard's once the title's toggle or ?controls=pro asks): the most helped, until the author picks one
+  PRO_DEFAULT: 'a',            // the variant ?controls=pro drives with no ?pro=; Pro is hidden since 23 November 2026, every run is Easy without the address
   PRO_PROMPTS: {               // the first run's prompts on Pro (ui/onboard.js); the rest of their timings are LOOP.ONBOARD's
     HOLD_SLIDE:       0.6,     // s of a slide held with the throttle on before "hold the slide" counts as done
   },
