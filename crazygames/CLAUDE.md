@@ -26,8 +26,9 @@ resubmitting. Round 1 was two briefs run in parallel on their own
 branches, `briefs/COVER-LOOK.md` and `briefs/PRO-CONTROLS.md`, both
 merged and the default since 22 November. Round 2 is
 `briefs/FIRST-MINUTE.md` (the first minute, and the starter car a
-friend of the author's found "clunky" on track 1), merged behind
-`?first=2` on 23 November for his phone.
+friend of the author's found "clunky" on track 1), merged on 23
+November and the default since that afternoon (`?first=1` for the game
+before it).
 
 ## New direction, 29 October 2026: read DESIGN.md first
 
@@ -1282,3 +1283,18 @@ every push to `main` or a `crazygames-*` branch that touches this folder.
   the default) the scripted strangers meet a wall 18.7 times a lap and
   earn no star, which round 2 did not change. For his phone, in a
   private tab: driftfever.com/?first=2.
+- 23 November 2026, afternoon, by the author's word after he played it
+  on his phone ("I love it, make it the default"): **round 2 is the
+  default on driftfever.com.** `?first=1` is the game before the round,
+  to the bit and the pixel (`park/same.js` and `look/switch.js` as
+  shipped, against d81c452); `?first=2` still means on. It is off in
+  Node (`game/src/first.js`), where the probes' own physics runs were
+  made without it and there is no page to ask. **The probes' harness
+  asks for `first=1`** unless a probe names `first` (`feel/lib.js`), as
+  it asks for Easy, because their tapes, scans and bars were made on the
+  old starter; `game/test/first/` names it. `start/boot.js` now presses
+  start here from inside the page the moment it is drawn (from outside
+  it raced a boot of a few tens of milliseconds and often came too
+  late) and passes with the round on, 2 runs of 2. Keyboards stay on Pro
+  a, which round 2 did not change: the reviewer's advice is Easy as the
+  keyboard default until he has played Pro, his call.

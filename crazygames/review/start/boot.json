@@ -4,9 +4,9 @@
   "phone": {
    "hud": 0,
    "touch": 0,
-   "title": 2,
-   "firstTitle": 326,
-   "looks": 23,
+   "title": 3,
+   "firstTitle": 628,
+   "looks": 48,
    "pressed": {
     "readyAtPress": false,
     "stateAfter": "countdown"
@@ -21,9 +21,9 @@
   "desktop": {
    "hud": 0,
    "touch": 0,
-   "title": 2,
-   "firstTitle": 283,
-   "looks": 17,
+   "title": 3,
+   "firstTitle": 584,
+   "looks": 41,
    "pressed": null,
    "after": {
     "title": true,
@@ -35,11 +35,11 @@
  },
  "then": {
   "phone": {
-   "hud": 2,
-   "touch": 2,
+   "hud": 4,
+   "touch": 4,
    "title": 0,
    "firstTitle": null,
-   "looks": 21,
+   "looks": 30,
    "pressed": null,
    "after": {
     "title": true,
@@ -49,11 +49,11 @@
    "errors": []
   },
   "desktop": {
-   "hud": 2,
+   "hud": 3,
    "touch": 0,
    "title": 0,
    "firstTitle": null,
-   "looks": 16,
+   "looks": 51,
    "pressed": null,
    "after": {
     "title": true,

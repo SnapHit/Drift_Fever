@@ -44,8 +44,10 @@ export async function openPage(env, viewport, query, opts) {
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   if (!(opts && opts.liveLoop)) await page.addInitScript(INIT);
   /* the probes measure the shared simulation with Easy hands unless they ask for Pro (Pro has been the
-     default on keys since 22 November 2026; game/test/controls/ asks for it by name) */
-  const q = 'renderer=webgl2' + (query ? '&' + query : '') + (/(^|&)(controls|pro)=/.test(query || '') ? '' : '&controls=easy');
+     default on keys since 22 November 2026; game/test/controls/ asks for it by name), and the game
+     before round 2 unless they ask for it (its starter and live title have been the default since 23
+     November; game/test/first/ asks by name): their tapes, scans and bars were made on the old starter */
+  const q = 'renderer=webgl2' + (query ? '&' + query : '') + (/(^|&)(controls|pro)=/.test(query || '') ? '' : '&controls=easy') + (/(^|&)first=/.test(query || '') ? '' : '&first=1');
   await page.goto(env.url + '?' + q, { waitUntil: 'load', timeout: 120000 });
   await page.waitForFunction(() => window.__ready === true || (document.getElementById('fail') && !document.getElementById('fail').hidden), null, { timeout: 120000 });
   const failed = await page.evaluate(() => { const f = document.getElementById('fail'); return f && !f.hidden ? f.textContent : null; });

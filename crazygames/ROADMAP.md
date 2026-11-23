@@ -129,9 +129,10 @@ that small changes get the same answer.
   a keyboard or gamepad (variant a until he picks; `?controls=easy` for
   the old ones). Since then: the paint fix, and the boot no longer
   flashes the race HUD before the title.
-- **Round 2 is merged behind `?first=2`** (`briefs/FIRST-MINUTE.md`,
-  `review/first/REPORT.md`), by the author's go-ahead of 23 November,
-  waiting for his play on his phone. New evidence went into it: a
+- **Round 2 is in and is the default** (`briefs/FIRST-MINUTE.md`,
+  `review/first/REPORT.md`) since the afternoon of 23 November, by the
+  author's word after playing it on his phone ("I love it");
+  `?first=1` for the game before it. New evidence went into it: a
   friend of his played it and called the initial experience of the
   first race track "clunky", and his reading is that the first car
   needs to be more enjoyable to play with. Measured, the clunk was the
@@ -145,7 +146,8 @@ that small changes get the same answer.
 ## Decisions waiting on the author
 
 - Pick a Pro variant on a keyboard (`?pro=b`, `?pro=c`), when he has a
-  desktop.
+  desktop; until then, whether keyboards start on Easy (the reviewer's
+  advice: on Pro a the scripted strangers meet a wall 18.7 times a lap).
 - Run `?bench=1&adapt=0` on his desktop and phone and send the result.
 - CrazyGames' answer, when it comes, goes into the next brief.
 - Later: first party counts (round 2), paid sounds (round 3), a backend

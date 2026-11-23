@@ -32,7 +32,7 @@ const SIZES = { phone: { width: 390, height: 844, touch: true }, desktop: { widt
 
 /* what a player could see, looked at every 10 ms until window.__ready */
 const WATCH = `(function () {
-  const seen = window.__boot = { hud: 0, touch: 0, title: 0, firstTitle: null, looks: 0 };
+  const seen = window.__boot = { hud: 0, touch: 0, title: 0, firstTitle: null, looks: 0, pressed: null };
   const shows = el => !!el && !el.classList.contains('hidden') && !el.hidden && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
   const t0 = performance.now();
   const look = () => {
@@ -44,7 +44,20 @@ const WATCH = `(function () {
   };
   const id = setInterval(look, 10);
   document.addEventListener('DOMContentLoaded', look);
-})();`;
+  /* the press before the game is ready: made from inside the page the moment start here is drawn (a
+     mutation observer runs before the page yields), not raced from outside, which in the sandbox's
+     boot of a few tens of milliseconds often came too late */
+  if (window.__pressEarly) {
+    const mo = new MutationObserver(() => {
+      if (seen.pressed) return;
+      const b = document.querySelector('#screens.on .screen.title [data-action="first"]');
+      if (!b) return;
+      seen.pressed = { readyAtPress: window.__ready === true };
+      b.click(); mo.disconnect();
+    });
+    mo.observe(document, { childList: true, subtree: true });   // the document itself: before the page runs it has no root element yet
+  }
+})();`
 
 /* asked of the page every few ms, not by Playwright's own polling, which waits on a frame the stubbed loop never gives */
 async function until(page, fn, ms, every = 100) {
@@ -68,21 +81,17 @@ async function side(dir, name, opts) {
       const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, hasTouch: vp.touch, isMobile: vp.touch });
       const page = await ctx.newPage(), errors = [];
       page.on('pageerror', e => errors.push(String(e).slice(0, 200)));
-      await page.addInitScript(FAKE); await page.addInitScript(WATCH);
+      await page.addInitScript(FAKE);
+      if (opts.press && size === 'phone') await page.addInitScript('window.__pressEarly = true;');
+      await page.addInitScript(WATCH);
       await page.goto(url, { waitUntil: 'commit', timeout: 120000 });
-      let pressed = null;
-      if (opts.press && size === 'phone') {
-        /* a press on the title's main button the moment it shows, before the game is ready */
-        await until(page, () => !!document.querySelector('#screens.on .screen.title [data-action="first"]') || window.__ready === true, 90000, 5);
-        const before = await page.evaluate(() => window.__ready === true);
-        await page.evaluate(() => { const b = document.querySelector('#screens.on .screen.title [data-action="first"]'); if (b) b.click(); });
-        pressed = { readyAtPress: before };
-      }
+      const press = opts.press && size === 'phone';
       /* in software a WebGPU page now and then never gets its device: given up after 90 s and opened again, three times at most */
       const came = await until(page, () => window.__ready === true || (document.getElementById('fail') && !document.getElementById('fail').hidden), 90000);
       if (!came) { await ctx.close(); if (attempt >= 2) throw new Error(name + ' ' + size + ': the page never became ready'); console.log('(' + name + ' ' + size + ': again, the WebGPU device never came)'); continue; }
-      if (pressed) { await until(page, () => window.__loop && window.__loop.app.state !== 'title', 30000); pressed.stateAfter = await page.evaluate(() => window.__loop.app.state); }
+      if (press) await until(page, () => window.__loop && window.__loop.app.state !== 'title', 30000);
       const boot = await page.evaluate(() => window.__boot);
+      const pressed = press ? { ...(boot.pressed || { readyAtPress: null }), stateAfter: await page.evaluate(() => window.__loop.app.state) } : null;
       const after = await page.evaluate(() => ({ title: !!document.querySelector('#screens.on .screen.title'), state: window.__loop ? window.__loop.app.state : null, backend: window.__feel && window.__feel.scene ? window.__feel.scene.info().backend : null }));
       out[size] = { ...boot, pressed, after, errors };
       await ctx.close();
@@ -100,7 +109,7 @@ for (const [size, r] of Object.entries(now)) {
   ok(size + ': nor the touch buttons', r.touch === 0, r.touch + ' of ' + r.looks + ' looks');
   ok(size + ': the title shows before the game is ready', r.title > 0, r.title + ' of ' + r.looks + ' looks' + (r.firstTitle !== null ? ', first at ' + r.firstTitle + ' ms of the watch' : ''));
   ok(size + ': no page errors, on WebGPU', r.errors.length === 0 && r.after.backend === 'webgpu', (r.errors.join(' | ') || 'none') + ', backend ' + r.after.backend);
-  if (r.pressed) ok(size + ': a press on start here before the game is ready starts career track 1 once it is', r.pressed.readyAtPress === false && /countdown|drive/.test(r.pressed.stateAfter), 'pressed with the game ' + (r.pressed.readyAtPress ? 'already ready (not a test of the wait)' : 'not ready') + ', then state ' + r.pressed.stateAfter);
+  if (r.pressed) ok(size + ': a press on start here before the game is ready starts career track 1 once it is', r.pressed.readyAtPress === false && /countdown|drive/.test(r.pressed.stateAfter), (r.pressed.readyAtPress === null ? 'never pressed' : 'pressed with the game ' + (r.pressed.readyAtPress ? 'already ready (not a test of the wait)' : 'not ready')) + ', then state ' + r.pressed.stateAfter);
   else ok(size + ': still on the title once ready', r.after.title && r.after.state === 'title', 'state ' + r.after.state);
 }
 
